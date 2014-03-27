@@ -14,8 +14,8 @@
 class ThreadException : public SyscallException
 {
 public:
-  ThreadException(const std::string& message, unsigned errNo = 0) : SyscallException("Thread::" + message, errNo) {};
-  virtual ~ThreadException() throw() {};
+    ThreadException(const std::string& message, unsigned errNo = 0) : SyscallException("Thread::" + message, errNo) {};
+    virtual ~ThreadException() throw() {};
 };
 
 #endif // THREADEXCEPTION_HPP

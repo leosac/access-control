@@ -12,15 +12,15 @@
 class ScopeLock
 {
 public:
-  ScopeLock(Mutex& mutex);
-  ~ScopeLock();
+    ScopeLock(Mutex& mutex);
+    ~ScopeLock();
 
 private:
-  ScopeLock(const ScopeLock& other);
-  ScopeLock& operator=(const ScopeLock& other);
+    ScopeLock(const ScopeLock& other);
+    ScopeLock& operator=(const ScopeLock& other);
 
 private:
-  Mutex&    _mutex;
+    Mutex&    _mutex;
 };
 
 #endif // SCOPELOCK_H

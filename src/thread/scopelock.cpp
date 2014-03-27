@@ -9,22 +9,22 @@
 ScopeLock::ScopeLock(Mutex& mutex)
 : _mutex(mutex)
 {
-  _mutex.lock();
+    _mutex.lock();
 }
 
 ScopeLock::~ScopeLock()
 {
-  _mutex.unlock();
+    _mutex.unlock();
 }
 
 ScopeLock::ScopeLock(const ScopeLock& other)
 : _mutex(_mutex)
 {
-  static_cast<void>(other);
+    static_cast<void>(other);
 }
 
 ScopeLock& ScopeLock::operator=(const ScopeLock& other)
 {
-  static_cast<void>(other);
-  return (*this);
+    static_cast<void>(other);
+    return (*this);
 }

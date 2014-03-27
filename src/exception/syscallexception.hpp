@@ -14,8 +14,8 @@
 class SyscallException : public OSACException
 {
 public:
-  SyscallException(const std::string& message, unsigned errNo = 0) : OSACException(message + ((errNo) ? (" (" + std::string(strerror(errNo)) + ")") : (""))) {};
-  virtual ~SyscallException() throw() {};
+    SyscallException(const std::string& message, unsigned errNo = 0) : OSACException(message + ((errNo) ? (" (" + std::string(strerror(errNo)) + ")") : (""))) {};
+    virtual ~SyscallException() throw() {};
 };
 
 #endif // SYSCALLEXCEPTION_HPP

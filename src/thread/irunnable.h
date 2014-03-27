@@ -10,8 +10,8 @@
 class IRunnable
 {
 public:
-  virtual ~IRunnable() {}
-  virtual void  run() = 0;
+    virtual ~IRunnable() {}
+    virtual void  run() = 0;
 };
 
 #endif // IRUNNABLE_H

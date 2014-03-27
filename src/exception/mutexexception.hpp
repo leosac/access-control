@@ -12,8 +12,8 @@
 class MutexException : public SyscallException
 {
 public:
-  MutexException(const std::string& message, unsigned errNo = 0) : SyscallException("Mutex::" + message, errNo) {};
-  virtual ~MutexException() throw() {};
+    MutexException(const std::string& message, unsigned errNo = 0) : SyscallException("Mutex::" + message, errNo) {};
+    virtual ~MutexException() throw() {};
 };
 
 #endif // MUTEXEXCEPTION_HPP

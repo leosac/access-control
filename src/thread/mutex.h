@@ -14,21 +14,21 @@
 class Mutex : public IMutex
 {
 public:
-  Mutex(); // NOTE May throw MutexException
-  virtual ~Mutex(); // NOTE May throw MutexException
+    Mutex(); // NOTE May throw MutexException
+    virtual ~Mutex(); // NOTE May throw MutexException
 
 private:
-  Mutex(const Mutex& other);
-  Mutex& operator=(const Mutex& other);
+    Mutex(const Mutex& other);
+    Mutex& operator=(const Mutex& other);
 
 public:
-  void  lock(); // NOTE May throw MutexException
-  void  unlock(); // NOTE May throw MutexException
-  bool  trylock(); // NOTE May throw MutexException
+    void  lock(); // NOTE May throw MutexException
+    void  unlock(); // NOTE May throw MutexException
+    bool  trylock(); // NOTE May throw MutexException
 
 private:
-  pthread_mutex_t   _mutex;
-  unsigned          _errNo;
+    pthread_mutex_t   _mutex;
+    unsigned          _errNo;
 };
 
 #endif // MUTEX_H
