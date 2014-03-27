@@ -13,8 +13,8 @@ class IThread
 {
 public:
     virtual ~IThread() {}
-    virtual void  start(IRunnable* runnable) = 0;
-    virtual void  join() = 0;
+    virtual void    start(IRunnable* runnable) = 0;
+    virtual void    join() = 0;
 };
 
 #endif // ITHREAD_H

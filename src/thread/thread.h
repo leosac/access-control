@@ -22,15 +22,15 @@ private:
     Thread& operator=(const Thread& other);
 
 public:
-    void  start(IRunnable* runnable); // NOTE May throw ThreadException
-    void  join(); // NOTE May throw ThreadException
+    void    start(IRunnable* runnable); // NOTE May throw ThreadException
+    void    join(); // NOTE May throw ThreadException
 
 private:
-    static void*  launch(void* thread);
+    static void*    launch(void* thread);
 
 private:
-    pthread_t _thread;
-    unsigned  _errNo;
+    pthread_t   _thread;
+    unsigned    _errNo;
 };
 
 #endif // THREAD_H

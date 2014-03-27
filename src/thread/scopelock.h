@@ -20,7 +20,7 @@ private:
     ScopeLock& operator=(const ScopeLock& other);
 
 private:
-    Mutex&    _mutex;
+    Mutex&  _mutex;
 };
 
 #endif // SCOPELOCK_H

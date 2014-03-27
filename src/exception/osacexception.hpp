@@ -22,7 +22,7 @@ public:
     const char* what() const throw() { return (_message.c_str()); }
 
 private:
-    const std::string _message;
+    const std::string   _message;
 };
 
 #endif // OSACEXCEPTION_HPP

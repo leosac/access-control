@@ -15,7 +15,7 @@ DynamicLibrary::~DynamicLibrary() {}
 
 void DynamicLibrary::open(RelocationMode mode)
 {
-    char* err;
+    char*   err;
 
     if (!(_handle = dlopen(_file.c_str(), mode)))
     {
@@ -34,8 +34,8 @@ void DynamicLibrary::close()
 
 void* DynamicLibrary::getSymbol(const std::string& symbol)
 {
-    void* sym;
-    char* err;
+    void*   sym;
+    char*   err;
 
     sym = dlsym(_handle, symbol.c_str());
     if (err = dlerror())
