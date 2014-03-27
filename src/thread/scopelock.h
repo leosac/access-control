@@ -7,7 +7,7 @@
 #ifndef SCOPELOCK_H
 #define SCOPELOCK_H
 
-#include "Mutex.h"
+#include "mutex.h"
 
 class ScopeLock
 {
@@ -20,7 +20,7 @@ private:
   ScopeLock& operator=(const ScopeLock& other);
 
 private:
-  Mutex&	_mutex;
+  Mutex&    _mutex;
 };
 
 #endif // SCOPELOCK_H

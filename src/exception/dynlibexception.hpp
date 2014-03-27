@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "OSACException.hpp"
+#include "osacexception.hpp"
 
 class DynLibException : public OSACException
 {

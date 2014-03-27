@@ -4,8 +4,8 @@
  * \brief Object wrapper around posix threads
  */
 
-#include "Thread.h"
-#include "Exception/ThreadException.hpp"
+#include "thread.h"
+#include "exception/threadexception.hpp"
 
 Thread::Thread() {}
 

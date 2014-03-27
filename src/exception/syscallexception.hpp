@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-#include "OSACException.hpp"
+#include "osacexception.hpp"
 
 class SyscallException : public OSACException
 {

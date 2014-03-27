@@ -4,10 +4,10 @@
  * \brief Object wrapper around pthread mutexes
  */
 
-#include "Mutex.h"
+#include "mutex.h"
 
 #include <cerrno>
-#include "Exception/MutexException.hpp"
+#include "exception/mutexexception.hpp"
 
 Mutex::Mutex()
 {

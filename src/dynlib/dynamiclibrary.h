@@ -24,13 +24,13 @@ public:
   ~DynamicLibrary();
 
 public:
-  void		open(RelocationMode mode = Lazy); // NOTE May throw DynLibException
-  void		close(); // NOTE May throw DynLibException
-  void*		getSymbol(const std::string& symbol); // NOTE May throw DynLibException
+  void      open(RelocationMode mode = Lazy); // NOTE May throw DynLibException
+  void      close(); // NOTE May throw DynLibException
+  void*     getSymbol(const std::string& symbol); // NOTE May throw DynLibException
 
 private:
-  std::string	_file;
-  void*		_handle;
+  std::string   _file;
+  void*         _handle;
 };
 
 #endif // DYNAMICLIBRARY_H

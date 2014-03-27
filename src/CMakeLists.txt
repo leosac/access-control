@@ -1,9 +1,9 @@
 set(OSAC_SRCS
   main.cpp
-  DynLib/DynamicLibrary.cpp
-  Thread/Thread.cpp
-  Thread/Mutex.cpp
-  Thread/ScopeLock.cpp
+  dynlib/dynamiclibrary.cpp
+  thread/thread.cpp
+  thread/mutex.cpp
+  thread/scopelock.cpp
 )
 
 add_executable(osac ${OSAC_SRCS})

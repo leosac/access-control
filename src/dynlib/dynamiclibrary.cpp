@@ -4,8 +4,8 @@
  * \brief DynamicLibrary class
  */
 
-#include "DynamicLibrary.h"
-#include "Exception/DynLibException.hpp"
+#include "dynamiclibrary.h"
+#include "exception/dynlibexception.hpp"
 
 DynamicLibrary::DynamicLibrary(const std::string& file)
 : _file(file)

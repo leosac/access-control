@@ -7,7 +7,7 @@
 #ifndef MUTEXEXCEPTION_HPP
 #define MUTEXEXCEPTION_HPP
 
-#include "SyscallException.hpp"
+#include "syscallexception.hpp"
 
 class MutexException : public SyscallException
 {

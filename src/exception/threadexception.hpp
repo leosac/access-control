@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "SyscallException.hpp"
+#include "syscallexception.hpp"
 
 class ThreadException : public SyscallException
 {

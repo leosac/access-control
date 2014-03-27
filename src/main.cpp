@@ -6,9 +6,9 @@
 
 #include <iostream>
 
-#include "Exception/OSACException.hpp"
-#include "DynLib/DynamicLibrary.h"
-#include "Thread/Thread.h"
+#include "exception/osacexception.hpp"
+#include "dynlib/dynamiclibrary.h"
+#include "thread/thread.h"
 
 typedef union {
   void*		rawPtr;

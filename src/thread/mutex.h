@@ -9,7 +9,7 @@
 
 #include <pthread.h>
 
-#include "IMutex.h"
+#include "imutex.h"
 
 class Mutex : public IMutex
 {
@@ -22,13 +22,13 @@ private:
   Mutex& operator=(const Mutex& other);
 
 public:
-  void	lock(); // NOTE May throw MutexException
-  void	unlock(); // NOTE May throw MutexException
-  bool	trylock(); // NOTE May throw MutexException
+  void  lock(); // NOTE May throw MutexException
+  void  unlock(); // NOTE May throw MutexException
+  bool  trylock(); // NOTE May throw MutexException
 
 private:
-  pthread_mutex_t	_mutex;
-  unsigned		_errNo;
+  pthread_mutex_t   _mutex;
+  unsigned          _errNo;
 };
 
 #endif // MUTEX_H
