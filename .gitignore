@@ -1,0 +1,8 @@
+!.gitignore
+
+#Ryp custom
+*.kdev4*
+*#*.bak
+
+#CMake related
+build
