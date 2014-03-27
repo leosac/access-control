@@ -4,12 +4,12 @@
  * \brief Object wrapper around posix threads
  */
 
-#ifndef THREAD_H
-#define THREAD_H
+#ifndef THREAD_HPP
+#define THREAD_HPP
 
 #include <pthread.h>
 
-#include "ithread.h"
+#include "ithread.hpp"
 
 class Thread : public IThread
 {
@@ -33,4 +33,4 @@ private:
     unsigned    _errNo;
 };
 
-#endif // THREAD_H
+#endif // THREAD_HPP

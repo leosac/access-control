@@ -4,8 +4,8 @@
  * \brief interface for threaded classes
  */
 
-#ifndef IRUNNABLE_H
-#define IRUNNABLE_H
+#ifndef IRUNNABLE_HPP
+#define IRUNNABLE_HPP
 
 class IRunnable
 {
@@ -14,4 +14,4 @@ public:
     virtual void    run() = 0;
 };
 
-#endif // IRUNNABLE_H
+#endif // IRUNNABLE_HPP

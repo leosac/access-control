@@ -4,10 +4,10 @@
  * \brief Utility class for automatic mutex lock
  */
 
-#ifndef SCOPELOCK_H
-#define SCOPELOCK_H
+#ifndef SCOPELOCK_HPP
+#define SCOPELOCK_HPP
 
-#include "mutex.h"
+#include "mutex.hpp"
 
 class ScopeLock
 {
@@ -23,4 +23,4 @@ private:
     Mutex&  _mutex;
 };
 
-#endif // SCOPELOCK_H
+#endif // SCOPELOCK_HPP

@@ -4,7 +4,7 @@
  * \brief Utility class for automatic mutex lock
  */
 
-#include "scopelock.h"
+#include "scopelock.hpp"
 
 ScopeLock::ScopeLock(Mutex& mutex)
 : _mutex(mutex)

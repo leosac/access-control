@@ -4,7 +4,7 @@
  * \brief Object wrapper around pthread mutexes
  */
 
-#include "mutex.h"
+#include "mutex.hpp"
 
 #include <cerrno>
 #include "exception/mutexexception.hpp"

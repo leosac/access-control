@@ -4,8 +4,8 @@
  * \brief DynamicLibrary class
  */
 
-#ifndef DYNAMICLIBRARY_H
-#define DYNAMICLIBRARY_H
+#ifndef DYNAMICLIBRARY_HPP
+#define DYNAMICLIBRARY_HPP
 
 #include <dlfcn.h>
 
@@ -33,4 +33,4 @@ private:
     void*       _handle;
 };
 
-#endif // DYNAMICLIBRARY_H
+#endif // DYNAMICLIBRARY_HPP

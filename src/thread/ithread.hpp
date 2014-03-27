@@ -4,10 +4,10 @@
  * \brief Thread interface
  */
 
-#ifndef ITHREAD_H
-#define ITHREAD_H
+#ifndef ITHREAD_HPP
+#define ITHREAD_HPP
 
-#include "irunnable.h"
+#include "irunnable.hpp"
 
 class IThread
 {
@@ -17,4 +17,4 @@ public:
     virtual void    join() = 0;
 };
 
-#endif // ITHREAD_H
+#endif // ITHREAD_HPP

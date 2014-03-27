@@ -7,8 +7,8 @@
 #include <iostream>
 
 #include "exception/osacexception.hpp"
-#include "dynlib/dynamiclibrary.h"
-#include "thread/thread.h"
+#include "dynlib/dynamiclibrary.hpp"
+#include "thread/thread.hpp"
 
 typedef union {
   void*		rawPtr;

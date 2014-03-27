@@ -4,12 +4,12 @@
  * \brief Object wrapper around pthread mutexes
  */
 
-#ifndef MUTEX_H
-#define MUTEX_H
+#ifndef MUTEX_HPP
+#define MUTEX_HPP
 
 #include <pthread.h>
 
-#include "imutex.h"
+#include "imutex.hpp"
 
 class Mutex : public IMutex
 {
@@ -31,4 +31,4 @@ private:
     unsigned        _errNo;
 };
 
-#endif // MUTEX_H
+#endif // MUTEX_HPP

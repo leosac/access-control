@@ -4,8 +4,8 @@
  * \brief Mutex interface
  */
 
-#ifndef IMUTEX_H
-#define IMUTEX_H
+#ifndef IMUTEX_HPP
+#define IMUTEX_HPP
 
 class IMutex
 {
@@ -16,4 +16,4 @@ public:
     virtual bool    trylock() = 0;
 };
 
-#endif // IMUTEX_H
+#endif // IMUTEX_HPP
