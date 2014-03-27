@@ -12,8 +12,10 @@
 
 class OSACException : public std::exception
 {
-public:
+protected:
   OSACException(const std::string& message) : _message(message) {};
+
+public:
   virtual ~OSACException() throw() {};
 
 public:
