@@ -4,22 +4,37 @@
  * \brief standard main
  */
 
-#include <list>
 #include <iostream>
+
+#include "Exception/OSACException.hpp"
+#include "DynLib/DynamicLibrary.h"
+
+typedef union {
+  void*		rawPtr;
+  double	(*f)(double);
+} Cast;
 
 int	main(int ac, char** av)
 {
   static_cast<void>(ac);
   static_cast<void>(av);
 
-  std::list<int>	list;
-
-  list.push_front(42);
-
-  for (auto it : list)
+  try
   {
-    std::cout << it << std::endl;
-  }
+    DynamicLibrary lib("libm.so");
 
+    lib.open(DynamicLibrary::Now);
+
+    Cast c;
+
+    c.rawPtr = lib.getSymbol("cos");
+    std::cout << c.f(3.1415f) << std::endl;
+
+    lib.close();
+  }
+  catch (const OSACException& e)
+  {
+    std::cerr << e.what() << std::endl;
+  }
   return (0);
 }

@@ -1,0 +1,26 @@
+/**
+ * \file OSACException.hpp
+ * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \brief Exception class for OSAC Project related errors
+ */
+
+#ifndef OSACEXCEPTION_HPP
+#define OSACEXCEPTION_HPP
+
+#include <exception>
+#include <string>
+
+class OSACException : public std::exception
+{
+public:
+  OSACException(const std::string& message) : _message(message) {};
+  virtual ~OSACException() throw() {};
+
+public:
+  const char* what() const throw() { return (_message.c_str()); }
+
+private:
+  const std::string	_message;
+};
+
+#endif // OSACEXCEPTION_HPP
