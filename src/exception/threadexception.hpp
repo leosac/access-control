@@ -1,5 +1,5 @@
 /**
- * \file ThreadException.hpp
+ * \file threadexception.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Exception class for Thread errors
  */

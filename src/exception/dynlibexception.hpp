@@ -1,5 +1,5 @@
 /**
- * \file DynLibException.hpp
+ * \file dynlibexception.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Exception class for DynLib related errors
  */

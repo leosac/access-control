@@ -1,5 +1,5 @@
 /**
- * \file DynamicLibrary.h
+ * \file dynamiclibrary.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief DynamicLibrary class
  */

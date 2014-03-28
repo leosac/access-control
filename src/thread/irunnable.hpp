@@ -1,5 +1,5 @@
 /**
- * \file IRunnable.h
+ * \file irunnable.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief interface for threaded classes
  */

@@ -1,5 +1,5 @@
 /**
- * \file IMutex.h
+ * \file imutex.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Mutex interface
  */

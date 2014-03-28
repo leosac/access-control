@@ -1,5 +1,5 @@
 /**
- * \file OSACException.hpp
+ * \file osacexception.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Exception class for OSAC Project related errors
  */

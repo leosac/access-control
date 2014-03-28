@@ -1,5 +1,5 @@
 /**
- * \file Mutex.h
+ * \file mutex.cpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Object wrapper around pthread mutexes
  */
@@ -21,14 +21,10 @@ Mutex::~Mutex()
         throw (MutexException("pthread_mutex_destroy() failed", _errNo));
 }
 
-Mutex::Mutex(const Mutex& other)
-{
-    static_cast<void>(other);
-}
+Mutex::Mutex(const Mutex& /*other*/) {}
 
-Mutex& Mutex::operator=(const Mutex& other)
+Mutex& Mutex::operator=(const Mutex& /*other*/)
 {
-    static_cast<void>(other);
     return (*this);
 }
 

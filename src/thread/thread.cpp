@@ -1,5 +1,5 @@
 /**
- * \file Thread.cpp
+ * \file thread.cpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Object wrapper around posix threads
  */
@@ -11,14 +11,10 @@ Thread::Thread() {}
 
 Thread::~Thread() {}
 
-Thread::Thread(const Thread& other)
-{
-    static_cast<void>(other);
-}
+Thread::Thread(const Thread& /*other*/) {}
 
-Thread& Thread::operator=(const Thread& other)
+Thread& Thread::operator=(const Thread& /*other*/)
 {
-    static_cast<void>(other);
     return (*this);
 }
 

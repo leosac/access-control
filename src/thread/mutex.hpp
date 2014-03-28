@@ -1,5 +1,5 @@
 /**
- * \file Mutex.h
+ * \file mutex.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Object wrapper around pthread mutexes
  */

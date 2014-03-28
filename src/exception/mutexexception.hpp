@@ -1,5 +1,5 @@
 /**
- * \file MutexException.hpp
+ * \file mutexexception.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Exception class for Mutex errors
  */

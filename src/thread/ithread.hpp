@@ -1,5 +1,5 @@
 /**
- * \file IThread.h
+ * \file ithread.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Thread interface
  */

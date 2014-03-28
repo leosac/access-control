@@ -1,5 +1,5 @@
 /**
- * \file DynamicLibrary.cpp
+ * \file dynamiclibrary.cpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief DynamicLibrary class
  */
@@ -19,7 +19,7 @@ void DynamicLibrary::open(RelocationMode mode)
 
     if (!(_handle = dlopen(_file.c_str(), mode)))
     {
-        if (err = dlerror())
+        if ((err = dlerror()))
             throw DynLibException(std::string("dlopen(): ") + err);
         else
             throw DynLibException("dlopen(): Unknown error");
@@ -38,7 +38,7 @@ void* DynamicLibrary::getSymbol(const std::string& symbol)
     char*   err;
 
     sym = dlsym(_handle, symbol.c_str());
-    if (err = dlerror())
+    if ((err = dlerror()))
         throw DynLibException(std::string("dlsym(): ") + err);
     return (sym);
 }

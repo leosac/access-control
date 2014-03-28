@@ -7,46 +7,13 @@
 #include <iostream>
 
 #include "exception/osacexception.hpp"
-#include "dynlib/dynamiclibrary.hpp"
-#include "thread/thread.hpp"
+#include "core.hpp"
 
-typedef union {
-  void*		rawPtr;
-  double	(*f)(double);
-} Cast;
-
-class JeanLouis : public IRunnable
+int	main(int /*ac*/, char** /*av*/)
 {
-public:
-  void	run()
-  {
-    std::cout << "Salut, moi c'est JeanLouis !" << std::endl;
-  }
-};
-
-int	main(int ac, char** av)
-{
-  static_cast<void>(ac);
-  static_cast<void>(av);
-
   try
   {
-    DynamicLibrary lib("libm.so");
-
-    lib.open(DynamicLibrary::Now);
-
-    Cast c;
-
-    c.rawPtr = lib.getSymbol("cos");
-    std::cout << c.f(3.1415f) << std::endl;
-
-    lib.close();
-
-    Thread	th;
-    JeanLouis	jl;
-
-    th.start(&jl);
-    th.join();
+    Core    core;
   }
   catch (const OSACException& e)
   {

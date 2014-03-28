@@ -1,5 +1,5 @@
 /**
- * \file SyscallException.hpp
+ * \file syscallexception.hpp
  * \author Thibault Schueller <thibault.schueller@islog.com>
  * \brief Exception class with errno string printing for unix syscall error codes
  */
