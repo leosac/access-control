@@ -1,12 +1,11 @@
 set(OSAC_BIN osac)
 
 set(OSAC_SRCS
-    main.cpp
     core.cpp
+    event.cpp
+    main.cpp
     dynlib/dynamiclibrary.cpp
-    thread/thread.cpp
-    thread/mutex.cpp
-    thread/scopelock.cpp
+    modules/journallogger.cpp
 )
 
 add_executable(${OSAC_BIN} ${OSAC_SRCS})

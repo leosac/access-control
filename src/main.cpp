@@ -14,6 +14,8 @@ int	main(int /*ac*/, char** /*av*/)
   try
   {
     Core    core;
+
+    core.run();
   }
   catch (const OSACException& e)
   {
