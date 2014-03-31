@@ -13,8 +13,9 @@
 #include "event.hpp"
 #include "modules/iloggermodule.hpp"
 #include "hardware/ihwmanager.hpp"
+#include "signal/isignalcallback.hpp"
 
-class Core
+class Core : public ISignalCallback
 {
 public:
     Core();
@@ -23,6 +24,9 @@ public:
 private:
     Core(const Core& other);
     Core& operator=(const Core& other);
+
+public:
+    void    handleSignal(int signal); // Inherited from ISignalCallback
 
 public:
     void    run();

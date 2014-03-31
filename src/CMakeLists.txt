@@ -9,6 +9,7 @@ set(OSAC_SRCS
     hardware/device/gpiomanager.cpp
     hardware/device/gpio.cpp
     modules/journallogger.cpp
+    signal/signalhandler.cpp
 )
 
 add_executable(${OSAC_BIN} ${OSAC_SRCS})

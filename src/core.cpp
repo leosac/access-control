@@ -13,6 +13,8 @@
 #include "hardware/hwmanager.hpp"
 
 #include "hardware/device/gpio.hpp" // FIXME Debug
+#include "signal/signalhandler.hpp"
+#include "exception/signalexception.hpp"
 
 Core::Core()
 :   _isRunning(true),
@@ -28,6 +30,16 @@ Core& Core::operator=(const Core& /*other*/)
     return (*this);
 }
 
+void Core::handleSignal(int /*signal*/)
+{
+    std::lock_guard<std::mutex> lg(_runMutex);
+    if (_isRunning)
+    {
+        dispatchEvent(Event("caught signal", "Core"));
+        _isRunning = false;
+    }
+}
+
 void Core::run()
 {
     load();
@@ -39,7 +51,6 @@ void Core::run()
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         dispatchEvent(Event("alive", "Core"));
         _runMutex.lock();
-        _isRunning = false; // FIXME Debug
     }
     _runMutex.unlock();
     dispatchEvent(Event("exiting", "Core"));
@@ -52,6 +63,15 @@ void Core::load()
     GPIO* gpio = _hwManager->reserveGPIO(12);
     gpio->getPinNo();
     _loggerModules.push_front(new JournalLogger(Event::Debug));
+
+    try
+    {
+        SignalHandler::registerCallback(this);
+    }
+    catch (const SignalException& e)
+    {
+        dispatchEvent(Event(e.what(), "Core"));
+    }
 }
 
 void Core::unload()

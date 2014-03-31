@@ -10,8 +10,9 @@
 
 #include "exception/deviceexception.hpp"
 
-static const char* exportPath = "/sys/class/gpio/export";
-static const char* unexportPath = "/sys/class/gpio/unexport";
+static const std::string sysfsPath = "/sys/class/gpio/";
+static const std::string exportPath = sysfsPath + "export";
+static const std::string unexportPath = sysfsPath + "unexport";
 
 GPIOManager::GPIOManager()
 :   _exportFile(exportPath),
@@ -40,7 +41,7 @@ GPIO* GPIOManager::reserve(int id)
     ss << id << std::endl;
     idString = ss.str();
     _exportFile.write(idString.c_str(), idString.size());
-    
+
 //     _unexportFile.write(idString.c_str(), idString.size());
-    return (new GPIO(id));
+    return (new GPIO(id, sysfsPath + "gpio" + idString));
 }
