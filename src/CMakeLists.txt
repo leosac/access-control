@@ -5,6 +5,7 @@ set(OSAC_SRCS
     event.cpp
     main.cpp
     dynlib/dynamiclibrary.cpp
+    hardware/hwmanager.cpp
     modules/journallogger.cpp
 )
 

@@ -12,6 +12,7 @@
 
 #include "event.hpp"
 #include "modules/iloggermodule.hpp"
+#include "hardware/ihwmanager.hpp"
 
 class Core
 {
@@ -27,11 +28,14 @@ public:
     void    run();
 
 private:
+    void    load();
+    void    unload();
     void    dispatchEvent(const Event& event);
 
 private:
     std::mutex                  _runMutex;
     bool                        _isRunning;
+    IHWManager*                  _hwManager;
     std::list<ILoggerModule*>   _loggerModules;
 };
 

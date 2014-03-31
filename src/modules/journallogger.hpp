@@ -12,11 +12,14 @@
 class JournalLogger : public ILoggerModule
 {
 public:
-    JournalLogger();
+    JournalLogger(int logLevel = Event::Notice);
     ~JournalLogger();
 
 public:
     void    sendEvent(const Event& event);
+
+private:
+    int     _logLevel;
 };
 
 #endif // JOURNALLOGGER_HPP

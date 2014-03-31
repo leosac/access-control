@@ -8,7 +8,7 @@
 #define EVENT_HPP
 
 #include <string>
-#include <ctime>
+#include <chrono>
 
 class Event
 {
@@ -23,16 +23,20 @@ public:
         Info        = 6, /* Informational message e.g. startup information at driver initialization */
         Debug       = 7  /* Debug messages */
     };
+    typedef std::chrono::system_clock::time_point Date;
 
 public:
-    Event();
+    Event(const std::string& message, const std::string& source = std::string(), LogLevel level = Debug);
     ~Event();
 
 public:
-    std::time_t   date;
-    int           logLevel;
-    std::string   source;
-    std::string   message;
+    static const std::string&   getLogLevelString(int level);
+
+public:
+    std::string     message;
+    std::string     source;
+    int             logLevel;
+    Date            date;
 };
 
 #endif // EVENT_HPP
