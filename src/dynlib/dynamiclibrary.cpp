@@ -8,7 +8,8 @@
 #include "exception/dynlibexception.hpp"
 
 DynamicLibrary::DynamicLibrary(const std::string& file)
-: _file(file)
+:   _file(file),
+    _handle(nullptr)
 {}
 
 DynamicLibrary::~DynamicLibrary() {}

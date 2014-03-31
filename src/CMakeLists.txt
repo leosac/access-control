@@ -6,6 +6,8 @@ set(OSAC_SRCS
     main.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
+    hardware/device/gpiomanager.cpp
+    hardware/device/gpio.cpp
     modules/journallogger.cpp
 )
 

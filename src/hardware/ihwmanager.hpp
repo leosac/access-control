@@ -7,11 +7,13 @@
 #ifndef IHWMANAGER_HPP
 #define IHWMANAGER_HPP
 
+class GPIO;
+
 class IHWManager
 {
 public:
     virtual ~IHWManager() {}
-//     virtual void    lol() = 0;
+    virtual GPIO*   reserveGPIO(int id) = 0;
 };
 
 #endif // IHWMANAGER_HPP
