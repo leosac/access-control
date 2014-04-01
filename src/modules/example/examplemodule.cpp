@@ -1,3 +1,9 @@
+/**
+ * \file examplemodule.cpp
+ * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \brief example module class
+ */
+
 #include "examplemodule.hpp"
 
 #include <iostream>

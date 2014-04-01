@@ -1,14 +1,21 @@
+/**
+ * \file init.cpp
+ * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \brief example init function for returning a moduleloader class to the core
+ */
+
 #include "examplemoduleloader.hpp"
 
-#ifndef EXPORT_PUBLIC
+// FIXME Add correct support for -fvisibility=hidden
+#ifndef MODULE_PUBLIC
 #   ifdef example_EXPORTS
-#       define EXPORT_PUBLIC
-#   else
-#       define EXPORT_PUBLIC __declspec(dllimport)
+#       define MODULE_PUBLIC __attribute__((visibility("default")))
+#   elif defined(_WIN32)
+#       define MODULE_PUBLIC
 #   endif
 #endif
 
-extern "C" IModuleLoader* EXPORT_PUBLIC getLoader()
+extern "C" MODULE_PUBLIC IModuleLoader* getLoader()
 {
     return (new ExampleModuleLoader);
 }

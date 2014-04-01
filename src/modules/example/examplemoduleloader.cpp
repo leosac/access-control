@@ -1,3 +1,9 @@
+/**
+ * \file examplemoduleloader.cpp
+ * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \brief example moduleloader class
+ */
+
 #include "examplemoduleloader.hpp"
 
 #include "examplemodule.hpp"

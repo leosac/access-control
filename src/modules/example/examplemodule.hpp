@@ -1,3 +1,9 @@
+/**
+ * \file examplemodule.hpp
+ * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \brief example module class
+ */
+
 #ifndef EXAMPLEMODULE_HPP
 #define EXAMPLEMODULE_HPP
 
