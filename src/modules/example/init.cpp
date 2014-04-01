@@ -4,9 +4,9 @@
 
 #ifndef EXPORT_PUBLIC
 #   ifdef example_EXPORTS
-#       define EXPORT_PUBLIC __declspec(dllexport)
-#   else
 #       define EXPORT_PUBLIC
+#   else
+#       define EXPORT_PUBLIC __declspec(dllimport)
 #   endif
 #endif
 

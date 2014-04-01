@@ -11,6 +11,7 @@ set(OSAC_SRCS
     hardware/device/gpio.cpp
     modules/journallogger.cpp
     signal/signalhandler.cpp
+    tools/version.cpp
 )
 
 add_executable(${OSAC_BIN} ${OSAC_SRCS})
@@ -30,4 +31,4 @@ target_link_libraries(${OSAC_BIN} dl pthread)
 install(TARGETS ${OSAC_BIN} RUNTIME DESTINATION bin)
 
 # Build modules
-add_subdirectory(modules/example)
+add_subdirectory(modules)

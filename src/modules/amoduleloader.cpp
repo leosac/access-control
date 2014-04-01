@@ -6,11 +6,11 @@
 
 #include "amoduleloader.hpp"
 
-#include "osac.hpp"
+#include "tools/version.hpp"
 
 AModuleLoader::AModuleLoader(const std::string& name, int major, int minor, int patch)
 :   _name(name),
-    _version(OSAC::buildVersionString(major, minor, patch))
+    _version(Version::buildVersionString(major, minor, patch))
 {}
 
 AModuleLoader::~AModuleLoader() {}

@@ -10,9 +10,9 @@ set(EXAMPLE_SRCS
 add_library(${EXAMPLE_BIN} SHARED ${EXAMPLE_SRCS})
 
 #Add symbol export options flags
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-endif()
+# if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+# endif()
 
 target_link_libraries(${EXAMPLE_BIN})
 
