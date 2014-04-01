@@ -1,7 +1,5 @@
 #include "examplemoduleloader.hpp"
 
-#include <iostream> // FIXME Debug
-
 #ifndef EXPORT_PUBLIC
 #   ifdef example_EXPORTS
 #       define EXPORT_PUBLIC
