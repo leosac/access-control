@@ -25,6 +25,13 @@ public:
     static std::string& getVersionString();
 
     /**
+     * return semver compatible version string formatted this way: MAJOR.MINOR.PATCH
+     * @see getVersionString()
+     * @return version string
+     */
+    static std::string  buildVersionString(int major, int minor, int patch);
+
+    /**
      * compare two version strings using semver v2.0.0
      * @see getVersionString()
      * @return 0 on match, -1 if a older than b, 1 if a is newer than b
@@ -39,7 +46,7 @@ public:
     static int          versionCompare(const std::string& v);
 
     /**
-     * check validity of a version string
+     * check validity of a semver version string
      * @see getVersionString()
      * @return true if the version is valid
      */

@@ -41,7 +41,7 @@ private:
     std::list<std::string>      _args;
     std::mutex                  _runMutex;
     bool                        _isRunning;
-    IHWManager*                  _hwManager;
+    IHWManager*                 _hwManager;
     std::list<ILoggerModule*>   _loggerModules;
 };
 

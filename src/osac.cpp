@@ -16,13 +16,16 @@ static std::string vstring = std::string();
 std::string& OSAC::getVersionString()
 {
     if (vstring.empty())
-    {
-        std::stringstream   ss;
-
-        ss << Major << '.' << Minor << '.' << Patch;
-        vstring = ss.str();
-    }
+        vstring = buildVersionString(Major, Minor, Patch);
     return (vstring);
+}
+
+std::string OSAC::buildVersionString(int major, int minor, int patch)
+{
+    std::stringstream   ss;
+
+    ss << major << '.' << minor << '.' << patch;
+    return (ss.str());
 }
 
 static void cleanVersionString(std::string& v)

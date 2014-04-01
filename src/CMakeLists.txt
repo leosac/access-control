@@ -28,3 +28,6 @@ endif()
 target_link_libraries(${OSAC_BIN} dl pthread)
 
 install(TARGETS ${OSAC_BIN} RUNTIME DESTINATION bin)
+
+# Build modules
+add_subdirectory(modules/example)

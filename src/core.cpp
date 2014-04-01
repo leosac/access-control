@@ -13,11 +13,13 @@
 #include "signal/signalhandler.hpp"
 #include "exception/signalexception.hpp"
 #include "modules/journallogger.hpp"
+#include "modules/imoduleloader.hpp"
 #include "hardware/hwmanager.hpp"
 #include "hardware/device/gpio.hpp" // FIXME Debug
+#include "dynlib/dynamiclibrary.hpp"
 
 Core::Core()
-:   _isRunning(true),
+:   _isRunning(false),
     _hwManager(nullptr)
 {}
 
@@ -48,6 +50,7 @@ void Core::run(const std::list<std::string>& args)
     load();
     dispatchEvent(Event("starting", "Core"));
     _runMutex.lock();
+    _isRunning = true;
     while (_isRunning)
     {
         _runMutex.unlock();
@@ -75,9 +78,25 @@ bool Core::parseArguments()
 
 void Core::load()
 {
-    _hwManager = new HWManager;
-    GPIO* gpio = _hwManager->reserveGPIO(12);
-    gpio->getPinNo();
+    DynamicLibrary          df("./modules/example/libexample.so");
+    IModuleLoader::InitFunc func;
+    IModuleLoader*          moduleloader;
+    IModule*                module;
+
+    df.open();
+    void* s = df.getSymbol("getLoader");
+    *reinterpret_cast<void**>(&func) = s;
+
+    moduleloader = func();
+    std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
+
+    module = moduleloader->instanciateModule();
+    module->sayHello();
+
+//     _hwManager = new HWManager;
+//     GPIO* gpio = _hwManager->reserveGPIO(12);
+//     gpio->getPinNo();
+
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 
     try
