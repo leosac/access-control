@@ -4,6 +4,7 @@ set(OSAC_SRCS
     core.cpp
     event.cpp
     main.cpp
+    osac.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
     hardware/device/gpiomanager.cpp

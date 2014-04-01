@@ -7,14 +7,14 @@
 #include "core.hpp"
 
 #include <thread>
-#include <iostream>
+#include <iostream> // FIXME Debug
 
-#include "modules/journallogger.hpp"
-#include "hardware/hwmanager.hpp"
-
-#include "hardware/device/gpio.hpp" // FIXME Debug
+#include "osac.hpp"
 #include "signal/signalhandler.hpp"
 #include "exception/signalexception.hpp"
+#include "modules/journallogger.hpp"
+#include "hardware/hwmanager.hpp"
+#include "hardware/device/gpio.hpp" // FIXME Debug
 
 Core::Core()
 :   _isRunning(true),
@@ -40,8 +40,11 @@ void Core::handleSignal(int /*signal*/)
     }
 }
 
-void Core::run()
+void Core::run(const std::list<std::string>& args)
 {
+    _args = args;
+    if (!parseArguments())
+        return;
     load();
     dispatchEvent(Event("starting", "Core"));
     _runMutex.lock();
@@ -55,6 +58,19 @@ void Core::run()
     _runMutex.unlock();
     dispatchEvent(Event("exiting", "Core"));
     unload();
+}
+
+bool Core::parseArguments()
+{
+    for (auto arg : _args)
+    {
+        if (arg == "--version")
+        {
+            std::cout << "Version: " << OSAC::getVersionString() << std::endl;
+            return (false);
+        }
+    }
+    return (true);
 }
 
 void Core::load()

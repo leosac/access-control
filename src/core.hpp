@@ -29,14 +29,16 @@ public:
     void    handleSignal(int signal); // Inherited from ISignalCallback
 
 public:
-    void    run();
+    void    run(const std::list<std::string>& args);
 
 private:
+    bool    parseArguments();
     void    load();
     void    unload();
     void    dispatchEvent(const Event& event);
 
 private:
+    std::list<std::string>      _args;
     std::mutex                  _runMutex;
     bool                        _isRunning;
     IHWManager*                  _hwManager;
