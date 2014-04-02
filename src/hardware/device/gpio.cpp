@@ -18,7 +18,8 @@ GPIO::GPIO(int pinNo)
 :   _pinNo(pinNo),
     _path(GpioPrefix + std::to_string(pinNo))
 {
-    exportGpio();
+    if (!exists())
+        exportGpio();
     _directionFile.open(_path + '/' + DirectionFilename);
     _valueFile.open(_path + '/' + ValueFilename);
     if (!_directionFile.is_open())
@@ -31,7 +32,8 @@ GPIO::~GPIO()
 {
     _directionFile.close();
     _valueFile.close();
-    unexportGpio();
+    if (exists())
+        unexportGpio();
 }
 
 int GPIO::getPinNo() const
@@ -55,7 +57,7 @@ int GPIO::getDirection()
     else if (value == "out")
         return (Out);
     else
-        throw (DeviceException("direction read error"));
+        throw (DeviceException("direction read error (read " + value + ")"));
 }
 
 void GPIO::setDirection(int direction)
@@ -87,6 +89,16 @@ void GPIO::setValue(int value)
         _valueFile << "1" << std::endl;
     else
         throw (DeviceException("invalid value parameter"));
+}
+
+bool GPIO::exists()
+{
+    std::fstream    gpio(_path);
+    bool            rslt;
+
+    rslt = gpio.good();
+    gpio.close();
+    return (rslt);
 }
 
 void GPIO::exportGpio()

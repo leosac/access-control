@@ -41,6 +41,7 @@ public:
     void                setValue(int value);
 
 private:
+    bool    exists();
     void    exportGpio();
     void    unexportGpio();
 

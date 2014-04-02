@@ -102,8 +102,8 @@ void Core::load()
 
     std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
     std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
-    gpio->setDirection(1);
-    gpio->setValue(1);
+    gpio->setDirection(GPIO::Out);
+    gpio->setValue(GPIO::High);
     std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
     std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
     delete gpio;
