@@ -100,12 +100,20 @@ void Core::load()
     GPIO* gpio = _hwManager->reserveGPIO(11);
     gpio->getPinNo();
 
-    std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
+
     std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
     gpio->setDirection(GPIO::Out);
-    gpio->setValue(GPIO::High);
-    std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
     std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
+    while (42)
+    {
+        std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        gpio->setValue(GPIO::High);
+        std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        gpio->setValue(GPIO::Low);
+    }
+
     delete gpio;
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));

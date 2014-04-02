@@ -52,9 +52,9 @@ int GPIO::getDirection()
 
     _valueFile.seekp(0);
     _valueFile >> value;
-    if (value == "in")
+    if (value == std::to_string(In))
         return (In);
-    else if (value == "out")
+    else if (value == std::to_string(Out))
         return (Out);
     else
         throw (DeviceException("direction read error (read " + value + ")"));
@@ -73,20 +73,22 @@ void GPIO::setDirection(int direction)
 
 int GPIO::getValue()
 {
-    std::string value;
+    std::string ret;
+    int         value;
 
     _valueFile.seekp(0);
-    _valueFile >> value;
-    return (std::stoi(value));
+    _valueFile >> ret;
+    value = (ret != std::to_string(Low));
+    return (value);
 }
 
 void GPIO::setValue(int value)
 {
     _valueFile.seekp(0);
     if (value == Low)
-        _valueFile << "0" << std::endl;
+        _valueFile << std::to_string(Low) << std::endl;
     else if (value == High)
-        _valueFile << "1" << std::endl;
+        _valueFile << std::to_string(High) << std::endl;
     else
         throw (DeviceException("invalid value parameter"));
 }

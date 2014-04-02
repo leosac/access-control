@@ -20,12 +20,12 @@ class GPIO
 
 public:
     enum Direction {
-        Out = 0,
-        In = 1,
+        In = 0,
+        Out = 1
     };
     enum Value {
         Low = 0,
-        High = 1,
+        High = 1
     };
 
 public:
