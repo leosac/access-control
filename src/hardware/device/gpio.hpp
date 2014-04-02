@@ -7,10 +7,17 @@
 #ifndef GPIO_HPP
 #define GPIO_HPP
 
+#include <fstream>
 #include <string>
 
 class GPIO
 {
+    static const std::string    ExportPath;
+    static const std::string    UnexportPath;
+    static const std::string    GpioPrefix;
+    static const std::string    DirectionFilename;
+    static const std::string    ValueFilename;
+
 public:
     enum Direction {
         Out = 0,
@@ -22,19 +29,26 @@ public:
     };
 
 public:
-    GPIO(int pinNo, const std::string& path);
+    GPIO(int pinNo);
     ~GPIO();
 
 public:
-    int     getPinNo() const;
-    int     getDirection() const;
-    void    setDirection(int direction);
-    int     getValue() const;
-    void    setValue(int value);
+    int                 getPinNo() const;
+    const std::string&  getPath() const;
+    int                 getDirection();
+    void                setDirection(int direction);
+    int                 getValue();
+    void                setValue(int value);
+
+private:
+    void    exportGpio();
+    void    unexportGpio();
 
 private:
     const int           _pinNo;
     const std::string   _path;
+    std::fstream        _directionFile;
+    std::fstream        _valueFile;
 };
 
 #endif // GPIO_HPP

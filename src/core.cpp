@@ -92,10 +92,21 @@ void Core::load()
 
     module = moduleloader->instanciateModule();
     module->sayHello();
+    delete moduleloader;
+    delete module;
+    df.close();
 
-//     _hwManager = new HWManager;
-//     GPIO* gpio = _hwManager->reserveGPIO(12);
-//     gpio->getPinNo();
+    _hwManager = new HWManager;
+    GPIO* gpio = _hwManager->reserveGPIO(11);
+    gpio->getPinNo();
+
+    std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
+    std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
+    gpio->setDirection(1);
+    gpio->setValue(1);
+    std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
+    std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
+    delete gpio;
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 

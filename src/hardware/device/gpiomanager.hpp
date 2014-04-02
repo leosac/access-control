@@ -9,8 +9,6 @@
 
 #include "gpio.hpp"
 
-#include <fstream>
-
 class GPIOManager
 {
 public:
@@ -23,10 +21,6 @@ private:
 
 public:
     GPIO*   reserve(int id);
-
-private:
-    std::ofstream  _exportFile;
-    std::ofstream  _unexportFile;
 };
 
 #endif // GPIOMANAGER_HPP

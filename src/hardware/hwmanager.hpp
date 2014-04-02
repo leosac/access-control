@@ -8,8 +8,7 @@
 #define HWMANAGER_HPP
 
 #include "ihwmanager.hpp"
-
-class GPIOManager;
+#include "device/gpiomanager.hpp"
 
 class HWManager : public IHWManager
 {
@@ -21,7 +20,7 @@ public:
     GPIO*   reserveGPIO(int id);
 
 private:
-    GPIOManager*    _gpioManager;
+    GPIOManager _gpioManager;
 };
 
 #endif // HWMANAGER_HPP
