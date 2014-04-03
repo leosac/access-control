@@ -12,6 +12,7 @@ set(OSAC_SRCS
     modules/journallogger.cpp
     signal/signalhandler.cpp
     tools/version.cpp
+    tools/unixsyscall.cpp
 )
 
 add_executable(${OSAC_BIN} ${OSAC_SRCS})

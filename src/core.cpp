@@ -97,24 +97,12 @@ void Core::load()
     df.close();
 
     _hwManager = new HWManager;
-    GPIO* gpio = _hwManager->reserveGPIO(11);
-    gpio->getPinNo();
+    GPIO* gpio = _hwManager->reserveGPIO(3);
 
-
+    std::cout << "GPIO No" << gpio->getPinNo() << " reserved" << std::endl;
+    gpio->setDirection(GPIO::In);
     std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
-    gpio->setDirection(GPIO::Out);
-    std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
-    while (42)
-    {
-        std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        gpio->setValue(GPIO::High);
-        std::cout << "GPIO Val:" << gpio->getValue() << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        gpio->setValue(GPIO::Low);
-    }
-
-    delete gpio;
+    gpio->setEdgeMode(GPIO::Falling);
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 
