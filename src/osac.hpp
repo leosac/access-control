@@ -19,15 +19,16 @@ public:
 public:
     /**
      * return OSAC version string formatted this way: MAJOR.MINOR.PATCH
-     * @see versionCompare()
      * @return version string
+     * @see versionCompare()
      */
     static std::string& getVersionString();
 
     /**
      * compare version string against current OSAC version
-     * @see getVersionString()
+     * @param v to compare against OSAC
      * @return 0 on match, -1 if v older than OSAC, 1 if v is newer than OSAC
+     * @see getVersionString()
      */
     static int          versionCompare(const std::string& v);
 

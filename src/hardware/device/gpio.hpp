@@ -21,15 +21,13 @@ class GPIO
     static const std::string    ValueFilename;
     static const std::string    EdgeFilename;
     static const std::string    ActiveLowFilename;
+    static const int            EdgeModes = 4;
+    static const std::string    EdgeStrings[EdgeModes];
 
 public:
     enum Direction {
         In = 0,
-        Out = 1
-    };
-    enum Value {
-        Low = 0,
-        High = 1
+        Out
     };
     enum EdgeMode {
         None = 0,
@@ -45,11 +43,16 @@ public:
 public:
     int                 getPinNo() const;
     const std::string&  getPath() const;
-    int                 getDirection();
-    void                setDirection(int direction);
-    int                 getValue();
-    void                setValue(int value);
-    void                setEdgeMode(int edgeMode);
+
+public:
+    Direction           getDirection();
+    void                setDirection(Direction direction);
+    bool                getValue();
+    void                setValue(bool state);
+    bool                isActiveLow();
+    void                setActiveLow(bool state);
+    EdgeMode            getEdgeMode();
+    void                setEdgeMode(EdgeMode mode);
 
 private:
     bool    exists();
@@ -61,9 +64,8 @@ private:
     const std::string   _path;
     std::fstream        _directionFile;
     std::fstream        _valueFile;
-    std::fstream        _edgeFile;
     std::fstream        _activeLowFile;
-    int                 _valueFd; // NOTE Used for polling
+    std::fstream        _edgeFile;
 };
 
 #endif // GPIO_HPP

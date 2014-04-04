@@ -97,11 +97,32 @@ void Core::load()
     df.close();
 
     _hwManager = new HWManager;
-    GPIO* gpio = _hwManager->reserveGPIO(3);
+
+    if (!_args.size())
+        throw (SignalException("Not enough arguments"));
+
+    GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
 
     std::cout << "GPIO No" << gpio->getPinNo() << " reserved" << std::endl;
+
+    gpio->setActiveLow(true);
+    std::cout << "IsActiveLow=" << gpio->isActiveLow() << std::endl;
+    gpio->setActiveLow(false);
+    std::cout << "IsActiveLow=" << gpio->isActiveLow() << std::endl;
+
     gpio->setDirection(GPIO::In);
-    std::cout << "GPIO Dir:" << gpio->getDirection() << std::endl;
+    std::cout << "DirectionIsIn=" << (gpio->getDirection() == GPIO::In) << std::endl;
+    gpio->setEdgeMode(GPIO::Rising); // Won't go further
+
+    while (1)
+    {
+        std::cout << "Boucle" << std::endl;
+        gpio->setValue(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        gpio->setValue(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }
+
     gpio->setEdgeMode(GPIO::Falling);
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
