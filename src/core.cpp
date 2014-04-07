@@ -80,23 +80,23 @@ bool Core::parseArguments()
 
 void Core::load()
 {
-//     DynamicLibrary          df("./modules/example/libexample.so");
-//     IModuleLoader::InitFunc func;
-//     IModuleLoader*          moduleloader;
-//     IModule*                module;
-//
-//     df.open();
-//     void* s = df.getSymbol("getLoader");
-//     *reinterpret_cast<void**>(&func) = s;
-//
-//     moduleloader = func();
-//     std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
-//
-//     module = moduleloader->instanciateModule();
-//     module->sayHello();
-//     delete moduleloader;
-//     delete module;
-//     df.close();
+    DynamicLibrary          df("./modules/example/libexample.so");
+    IModuleLoader::InitFunc func;
+    IModuleLoader*          moduleloader;
+    IModule*                module;
+
+    df.open();
+    void* s = df.getSymbol("getLoader");
+    *reinterpret_cast<void**>(&func) = s;
+
+    moduleloader = func();
+    std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
+
+    module = moduleloader->instanciateModule();
+    module->sayHello();
+    delete moduleloader;
+    delete module;
+    df.close();
 
     _hwManager = new HWManager;
 
@@ -111,15 +111,6 @@ void Core::load()
     gpio->setEdgeMode(GPIO::Rising);
     std::cout << "EdgeModeIsRising=" << (gpio->getEdgeMode() == GPIO::Rising) << std::endl;
     gpio->startPolling();
-
-//     while (1)
-//     {
-//         std::cout << "Boucle" << std::endl;
-//         gpio->setValue(false);
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//         gpio->setValue(true);
-//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-//     }
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 

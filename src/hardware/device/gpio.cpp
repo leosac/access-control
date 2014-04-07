@@ -180,10 +180,9 @@ void GPIO::setEdgeMode(EdgeMode mode)
 
 void GPIO::startPolling()
 {
-    struct pollfd   fdset[2];
-    int             nfds = 2;
+    struct pollfd   fdset;
     int             gpioFd;
-    const unsigned  bufferLen = 64;
+    const unsigned  bufferLen = 32;
     char            buffer[bufferLen];
     int             ret;
 
@@ -192,40 +191,26 @@ void GPIO::startPolling()
 
     while (42)
     {
-        ::memset((void*)fdset, 0, sizeof(fdset));
+        ::memset(&fdset, 0, sizeof(fdset));
 
-        fdset[0].fd = STDIN_FILENO;
-        fdset[0].events = POLLIN;
+        fdset.fd = gpioFd;
+        fdset.events = POLLPRI;
 
-        fdset[1].fd = gpioFd;
-        fdset[1].events = POLLPRI;
-
-        if ((ret = ::poll(fdset, nfds, PollTimeoutDelayMs)) == -1)
+        if ((ret = ::poll(&fdset, 1, PollTimeoutDelayMs)) == -1)
             throw (DeviceException(UnixSyscall::getErrorString("poll", errno)));
-        if (ret == 0)
-            std::cout << "timeout" << std::endl;
-
-        if (fdset[1].revents & POLLPRI)
+        if (!ret)
+            continue; // poll() timed out
+        if (fdset.revents & POLLPRI)
         {
-            if ((ret = ::read(fdset[1].fd, buffer, bufferLen - 1)) == -1)
+            if ((ret = ::read(fdset.fd, buffer, bufferLen - 1)) == -1)
                 throw (DeviceException(UnixSyscall::getErrorString("read", errno)));
             if (ret > 1)
                 buffer[ret - 1] = '\0';
-            if (::lseek(fdset[1].fd, 0, SEEK_SET) == -1)
+            if (::lseek(fdset.fd, 0, SEEK_SET) == -1)
                 throw (DeviceException(UnixSyscall::getErrorString("lseek", errno)));
             std::cout << "poll() interrupt caught: buffer=" << buffer << std::endl;
         }
-
-        if (fdset[0].revents & POLLIN)
-        {
-            if ((ret = ::read(fdset[0].fd, buffer, bufferLen - 1)) == -1)
-                throw (DeviceException(UnixSyscall::getErrorString("read", errno)));
-            if (ret > 0)
-                buffer[ret] = '\0';
-            std::cout << "poll() user input caught: buffer=" << buffer << std::endl;
-        }
     }
-
     if (::close(gpioFd) == -1)
         throw (DeviceException(UnixSyscall::getErrorString("close", errno)));
 }

@@ -10,7 +10,7 @@
 #include <fstream>
 #include <string>
 
-// NOTE This class will throw on kernel older than 2.6.33 due to the lack of edge mode support
+// NOTE This class WILL throw on kernels older than 2.6.33 due to the lack of edge mode support
 
 class GPIO
 {
@@ -46,15 +46,15 @@ public:
     const std::string&  getPath() const;
 
 public:
-    Direction           getDirection();
-    void                setDirection(Direction direction);
-    bool                getValue();
-    void                setValue(bool state);
-    bool                isActiveLow();
-    void                setActiveLow(bool state);
-    EdgeMode            getEdgeMode();
-    void                setEdgeMode(EdgeMode mode);
-    void                startPolling();
+    Direction   getDirection();
+    void        setDirection(Direction direction);
+    bool        getValue();
+    void        setValue(bool state);
+    bool        isActiveLow();
+    void        setActiveLow(bool state);
+    EdgeMode    getEdgeMode();
+    void        setEdgeMode(EdgeMode mode);
+    void        startPolling();
 
 private:
     bool    exists();
