@@ -1,6 +1,6 @@
 /**
  * \file signalhandler.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief signal handler to provide a C++ interface for UNIX sigaction()
  */
 

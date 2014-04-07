@@ -1,6 +1,6 @@
 /**
  * \file imoduleloader.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief module loader interface
  */
 

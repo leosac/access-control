@@ -1,6 +1,6 @@
 /**
  * \file main.cpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief standard main
  */
 

@@ -1,6 +1,6 @@
 /**
  * \file examplemodule.cpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief example module class
  */
 

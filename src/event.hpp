@@ -1,6 +1,6 @@
 /**
  * \file event.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief event class for intermodule communications
  */
 
