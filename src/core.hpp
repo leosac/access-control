@@ -17,6 +17,7 @@
 
 class Core : public ISignalCallback
 {
+    static const int IdleSleepTimeMs = 1000;
 public:
     Core();
     ~Core();

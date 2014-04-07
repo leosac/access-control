@@ -18,6 +18,8 @@
 #include "hardware/device/gpio.hpp" // FIXME Debug
 #include "dynlib/dynamiclibrary.hpp"
 
+const int Core::IdleSleepTimeMs;
+
 Core::Core()
 :   _isRunning(false),
     _hwManager(nullptr)
@@ -54,7 +56,7 @@ void Core::run(const std::list<std::string>& args)
     while (_isRunning)
     {
         _runMutex.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
         dispatchEvent(Event("alive", "Core"));
         _runMutex.lock();
     }
@@ -78,23 +80,23 @@ bool Core::parseArguments()
 
 void Core::load()
 {
-    DynamicLibrary          df("./modules/example/libexample.so");
-    IModuleLoader::InitFunc func;
-    IModuleLoader*          moduleloader;
-    IModule*                module;
-
-    df.open();
-    void* s = df.getSymbol("getLoader");
-    *reinterpret_cast<void**>(&func) = s;
-
-    moduleloader = func();
-    std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
-
-    module = moduleloader->instanciateModule();
-    module->sayHello();
-    delete moduleloader;
-    delete module;
-    df.close();
+//     DynamicLibrary          df("./modules/example/libexample.so");
+//     IModuleLoader::InitFunc func;
+//     IModuleLoader*          moduleloader;
+//     IModule*                module;
+//
+//     df.open();
+//     void* s = df.getSymbol("getLoader");
+//     *reinterpret_cast<void**>(&func) = s;
+//
+//     moduleloader = func();
+//     std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
+//
+//     module = moduleloader->instanciateModule();
+//     module->sayHello();
+//     delete moduleloader;
+//     delete module;
+//     df.close();
 
     _hwManager = new HWManager;
 
@@ -104,26 +106,20 @@ void Core::load()
     GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
 
     std::cout << "GPIO No" << gpio->getPinNo() << " reserved" << std::endl;
-
-    gpio->setActiveLow(true);
-    std::cout << "IsActiveLow=" << gpio->isActiveLow() << std::endl;
-    gpio->setActiveLow(false);
-    std::cout << "IsActiveLow=" << gpio->isActiveLow() << std::endl;
-
     gpio->setDirection(GPIO::In);
     std::cout << "DirectionIsIn=" << (gpio->getDirection() == GPIO::In) << std::endl;
-    gpio->setEdgeMode(GPIO::Rising); // Won't go further
+    gpio->setEdgeMode(GPIO::Rising);
+    std::cout << "EdgeModeIsRising=" << (gpio->getEdgeMode() == GPIO::Rising) << std::endl;
+    gpio->startPolling();
 
-    while (1)
-    {
-        std::cout << "Boucle" << std::endl;
-        gpio->setValue(false);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        gpio->setValue(true);
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }
-
-    gpio->setEdgeMode(GPIO::Falling);
+//     while (1)
+//     {
+//         std::cout << "Boucle" << std::endl;
+//         gpio->setValue(false);
+//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+//         gpio->setValue(true);
+//         std::this_thread::sleep_for(std::chrono::milliseconds(500));
+//     }
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 
