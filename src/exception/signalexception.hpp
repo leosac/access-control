@@ -1,6 +1,6 @@
 /**
  * \file signalexception.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief Exception class for Signal related errors
  */
 

@@ -1,6 +1,6 @@
 /**
  * \file unixsyscall.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief unix syscall helper functions
  */
 

@@ -1,6 +1,6 @@
 /**
  * \file iloggermodule.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief interface for the logger module
  */
 

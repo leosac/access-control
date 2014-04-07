@@ -1,6 +1,6 @@
 /**
  * \file iactivitymonitormodule.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief interface for the activity monitor module
  */
 

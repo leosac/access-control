@@ -1,6 +1,6 @@
 /**
  * \file deviceexception.hpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief Exception class for Device related errors
  */
 

@@ -1,6 +1,6 @@
 /**
  * \file init.cpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief example init function for returning a moduleloader class to the core
  */
 

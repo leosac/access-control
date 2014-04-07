@@ -1,6 +1,6 @@
 /**
  * \file core.cpp
- * \author Thibault Schueller <thibault.schueller@islog.com>
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief module managing class
  */
 
@@ -100,17 +100,13 @@ void Core::load()
 
     _hwManager = new HWManager;
 
-    if (!_args.size())
-        throw (SignalException("Not enough arguments"));
+//     if (!_args.size())
+//         throw (SignalException("Not enough arguments"));
 
-    GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
-
-    std::cout << "GPIO No" << gpio->getPinNo() << " reserved" << std::endl;
-    gpio->setDirection(GPIO::In);
-    std::cout << "DirectionIsIn=" << (gpio->getDirection() == GPIO::In) << std::endl;
-    gpio->setEdgeMode(GPIO::Rising);
-    std::cout << "EdgeModeIsRising=" << (gpio->getEdgeMode() == GPIO::Rising) << std::endl;
-    gpio->startPolling();
+//     GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
+//     gpio->setDirection(GPIO::In);
+//     gpio->setEdgeMode(GPIO::Rising);
+//     gpio->startPolling();
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 
