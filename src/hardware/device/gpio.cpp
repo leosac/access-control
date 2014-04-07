@@ -6,13 +6,13 @@
 
 #include "gpio.hpp"
 
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <poll.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 
-#include <cerrno>
 #include <iostream> // FIXME Debug
 
 #include "exception/deviceexception.hpp"
@@ -25,6 +25,7 @@ const std::string   GPIO::DirectionFilename = "direction";
 const std::string   GPIO::ValueFilename     = "value";
 const std::string   GPIO::ActiveLowFilename = "active_low";
 const std::string   GPIO::EdgeFilename      = "edge";
+const int           GPIO::PollTimeoutDelayMs;
 const std::string   GPIO::EdgeStrings[EdgeModes] = {
     "none",
     "rising",
@@ -34,30 +35,18 @@ const std::string   GPIO::EdgeStrings[EdgeModes] = {
 
 GPIO::GPIO(int pinNo)
 :   _pinNo(pinNo),
-    _path(GpioPrefix + std::to_string(pinNo))
+    _path(GpioPrefix + std::to_string(_pinNo)),
+    _directionFile(_path + '/' + DirectionFilename),
+    _valueFile(_path + '/' + ValueFilename),
+    _activeLowFile(_path + '/' + ActiveLowFilename),
+    _edgeFile(_path + '/' + EdgeFilename)
 {
     if (!exists())
         exportGpio();
-    _directionFile.open(_path + '/' + DirectionFilename);
-//     _valueFile.open(_path + '/' + ValueFilename);
-    _activeLowFile.open(_path + '/' + ActiveLowFilename);
-    _edgeFile.open(_path + '/' + EdgeFilename);
-    if (!_directionFile.good())
-        throw (DeviceException("could not open direction file"));
-//     else if (!_valueFile.good())
-//         throw (DeviceException("could not open value file"));
-    else if (!_activeLowFile.good())
-        throw (DeviceException("could not open active_low file"));
-    else if (!_edgeFile.good())
-        throw (DeviceException("could not open edge file"));
 }
 
 GPIO::~GPIO()
 {
-    _directionFile.close();
-//     _valueFile.close();
-    _activeLowFile.close();
-    _edgeFile.close();
     if (exists())
         unexportGpio();
 }
@@ -74,10 +63,13 @@ const std::string& GPIO::getPath() const
 
 GPIO::Direction GPIO::getDirection()
 {
-    std::string ret;
+    std::string     ret;
+    std::fstream    file(_directionFile, std::ios::in);
 
-    _directionFile.seekp(0);
-    _directionFile >> ret;
+    if (!file.good())
+        throw (DeviceException("could not open " + _directionFile));
+    file.seekp(0);
+    file >> ret;
     if (ret == "in")
         return (In);
     else if (ret == "out")
@@ -88,21 +80,28 @@ GPIO::Direction GPIO::getDirection()
 
 void GPIO::setDirection(Direction direction)
 {
-    _directionFile.seekp(0);
+    std::fstream    file(_directionFile, std::ios::out);
+
+    if (!file.good())
+        throw (DeviceException("could not open " + _directionFile));
+    file.seekp(0);
     if (direction == In)
-        _directionFile << "in" << std::endl;
+        file << "in";
     else if (direction == Out)
-        _directionFile << "out" << std::endl;
+        file << "out";
     else
         throw (DeviceException("invalid direction parameter"));
 }
 
 bool GPIO::getValue()
 {
-    std::string ret;
+    std::string     ret;
+    std::fstream    file(_valueFile, std::ios::in);
 
-    _valueFile.seekp(0);
-    _valueFile >> ret;
+    if (!file.good())
+        throw (DeviceException("could not open " + _valueFile));
+    file.seekp(0);
+    file >> ret;
     if (ret == "1")
         return (true);
     else if (ret == "0")
@@ -113,16 +112,23 @@ bool GPIO::getValue()
 
 void GPIO::setValue(bool state)
 {
-    _valueFile.seekp(0);
-    _valueFile << ((state) ? ("1") : ("0")) << std::endl;
+    std::fstream    file(_valueFile, std::ios::out);
+
+    if (!file.good())
+        throw (DeviceException("could not open " + _valueFile));
+    file.seekp(0);
+    file << ((state) ? ("1") : ("0"));
 }
 
 bool GPIO::isActiveLow()
 {
-    std::string ret;
+    std::string     ret;
+    std::fstream    file(_activeLowFile, std::ios::in);
 
-    _activeLowFile.seekp(0);
-    _activeLowFile >> ret;
+    if (!file.good())
+        throw (DeviceException("could not open " + _activeLowFile));
+    file.seekp(0);
+    file >> ret;
     if (ret == "0")
         return (false);
     else if (ret == "1")
@@ -133,16 +139,23 @@ bool GPIO::isActiveLow()
 
 void GPIO::setActiveLow(bool state)
 {
-    _activeLowFile.seekp(0);
-    _activeLowFile << ((state) ? ("1") : ("0")) << std::endl;
+    std::fstream    file(_activeLowFile, std::ios::out);
+
+    if (!file.good())
+        throw (DeviceException("could not open " + _activeLowFile));
+    file.seekp(0);
+    file << ((state) ? ("1") : ("0"));
 }
 
 GPIO::EdgeMode GPIO::getEdgeMode()
 {
-    std::string ret;
+    std::string     ret;
+    std::fstream    file(_edgeFile, std::ios::in);
 
-    _edgeFile.seekp(0);
-    _edgeFile >> ret;
+    if (!file.good())
+        throw (DeviceException("could not open " + _edgeFile));
+    file.seekp(0);
+    file >> ret;
     for (int i = 0; i < EdgeModes; ++i)
     {
         if (ret == EdgeStrings[i])
@@ -153,31 +166,33 @@ GPIO::EdgeMode GPIO::getEdgeMode()
 
 void GPIO::setEdgeMode(EdgeMode mode)
 {
-    const unsigned  bufferLen = 64;
-    char            buffer[bufferLen];
-    int             ret;
+    std::fstream    file(_edgeFile, std::ios::out);
+
+    if (!file.good())
+        throw (DeviceException("could not open " + _edgeFile));
 
     if (mode < 0 || mode >= EdgeModes)
         throw (DeviceException("invalid edge mode parameter"));
 
-    _edgeFile.seekp(0);
-    _edgeFile << EdgeStrings[mode] << std::endl;
+    file.seekp(0);
+    file << EdgeStrings[mode];
+}
 
-    if (mode == None)
-        return;
-
-    std::cout << "EdgeMode=" << getEdgeMode() << std::endl;
-
+void GPIO::startPolling()
+{
     struct pollfd   fdset[2];
-    int             gpioFd; // NOTE Used for polling
+    int             nfds = 2;
+    int             gpioFd;
+    const unsigned  bufferLen = 64;
+    char            buffer[bufferLen];
+    int             ret;
 
-    std::cout << "File=" << (_path + '/' + ValueFilename).c_str() << std::endl;
-    if ((gpioFd = open((_path + '/' + ValueFilename).c_str(), O_RDONLY | O_NONBLOCK) == -1))
+    if ((gpioFd = ::open(_valueFile.c_str(), O_RDONLY | O_NONBLOCK)) == -1)
         throw (DeviceException(UnixSyscall::getErrorString("open", errno)));
 
     while (42)
     {
-        memset((void*)fdset, 0, sizeof(fdset));
+        ::memset((void*)fdset, 0, sizeof(fdset));
 
         fdset[0].fd = STDIN_FILENO;
         fdset[0].events = POLLIN;
@@ -185,27 +200,25 @@ void GPIO::setEdgeMode(EdgeMode mode)
         fdset[1].fd = gpioFd;
         fdset[1].events = POLLPRI;
 
-        if ((ret = poll(fdset, 2, 3000)) == -1)
+        if ((ret = ::poll(fdset, nfds, PollTimeoutDelayMs)) == -1)
             throw (DeviceException(UnixSyscall::getErrorString("poll", errno)));
         if (ret == 0)
-        {
             std::cout << "timeout" << std::endl;
-        }
 
         if (fdset[1].revents & POLLPRI)
         {
-            if ((ret = read(fdset[1].fd, buffer, bufferLen - 1)) == -1)
+            if ((ret = ::read(fdset[1].fd, buffer, bufferLen - 1)) == -1)
                 throw (DeviceException(UnixSyscall::getErrorString("read", errno)));
-            if (ret > 0)
-                buffer[ret] = '\0';
-            if (lseek(gpioFd, 0, SEEK_SET) == -1)
+            if (ret > 1)
+                buffer[ret - 1] = '\0';
+            if (::lseek(fdset[1].fd, 0, SEEK_SET) == -1)
                 throw (DeviceException(UnixSyscall::getErrorString("lseek", errno)));
             std::cout << "poll() interrupt caught: buffer=" << buffer << std::endl;
         }
 
         if (fdset[0].revents & POLLIN)
         {
-            if ((ret = read(fdset[0].fd, buffer, bufferLen - 1)) == -1)
+            if ((ret = ::read(fdset[0].fd, buffer, bufferLen - 1)) == -1)
                 throw (DeviceException(UnixSyscall::getErrorString("read", errno)));
             if (ret > 0)
                 buffer[ret] = '\0';
@@ -213,7 +226,7 @@ void GPIO::setEdgeMode(EdgeMode mode)
         }
     }
 
-    if (close(gpioFd) == -1)
+    if (::close(gpioFd) == -1)
         throw (DeviceException(UnixSyscall::getErrorString("close", errno)));
 }
 
@@ -223,7 +236,6 @@ bool GPIO::exists()
     bool            rslt;
 
     rslt = gpio.good();
-    gpio.close();
     return (rslt);
 }
 
@@ -234,15 +246,13 @@ void GPIO::exportGpio()
     if (!ex.good())
         throw (DeviceException("could not export gpio"));
     ex << std::to_string(_pinNo);
-    ex.close();
 }
 
 void GPIO::unexportGpio()
 {
     std::fstream    unex(ExportPath, std::ios::out);
 
-    if (!unex.is_open())
+    if (!unex.good())
         throw (DeviceException("could not unexport gpio"));
     unex << std::to_string(_pinNo);
-    unex.close();
 }

@@ -21,6 +21,7 @@ class GPIO
     static const std::string    ValueFilename;
     static const std::string    EdgeFilename;
     static const std::string    ActiveLowFilename;
+    static const int            PollTimeoutDelayMs = 500;
     static const int            EdgeModes = 4;
     static const std::string    EdgeStrings[EdgeModes];
 
@@ -53,6 +54,7 @@ public:
     void                setActiveLow(bool state);
     EdgeMode            getEdgeMode();
     void                setEdgeMode(EdgeMode mode);
+    void                startPolling();
 
 private:
     bool    exists();
@@ -62,10 +64,10 @@ private:
 private:
     const int           _pinNo;
     const std::string   _path;
-    std::fstream        _directionFile;
-    std::fstream        _valueFile;
-    std::fstream        _activeLowFile;
-    std::fstream        _edgeFile;
+    const std::string   _directionFile;
+    const std::string   _valueFile;
+    const std::string   _activeLowFile;
+    const std::string   _edgeFile;
 };
 
 #endif // GPIO_HPP
