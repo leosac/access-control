@@ -6,17 +6,9 @@
 
 #include "gpio.hpp"
 
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <poll.h>
-
-#include <iostream> // FIXME Debug
+#include <fstream>
 
 #include "exception/deviceexception.hpp"
-#include "tools/unixsyscall.hpp"
 
 const std::string   GPIO::ExportPath        = "/sys/class/gpio/export";
 const std::string   GPIO::UnexportPath      = "/sys/class/gpio/unexport";
@@ -25,7 +17,6 @@ const std::string   GPIO::DirectionFilename = "direction";
 const std::string   GPIO::ValueFilename     = "value";
 const std::string   GPIO::ActiveLowFilename = "active_low";
 const std::string   GPIO::EdgeFilename      = "edge";
-const int           GPIO::PollTimeoutDelayMs;
 const std::string   GPIO::EdgeStrings[EdgeModes] = {
     "none",
     "rising",
@@ -39,7 +30,8 @@ GPIO::GPIO(int pinNo)
     _directionFile(_path + '/' + DirectionFilename),
     _valueFile(_path + '/' + ValueFilename),
     _activeLowFile(_path + '/' + ActiveLowFilename),
-    _edgeFile(_path + '/' + EdgeFilename)
+    _edgeFile(_path + '/' + EdgeFilename),
+    _poller(_valueFile)
 {
     if (!exists())
         exportGpio();
@@ -47,6 +39,8 @@ GPIO::GPIO(int pinNo)
 
 GPIO::~GPIO()
 {
+    if (_poller.isRunning())
+        _poller.stop();
     if (exists())
         unexportGpio();
 }
@@ -180,39 +174,12 @@ void GPIO::setEdgeMode(EdgeMode mode)
 
 void GPIO::startPolling()
 {
-    struct pollfd   fdset;
-    int             gpioFd;
-    const unsigned  bufferLen = 32;
-    char            buffer[bufferLen];
-    int             ret;
+    _poller.start();
+}
 
-    if ((gpioFd = ::open(_valueFile.c_str(), O_RDONLY | O_NONBLOCK)) == -1)
-        throw (DeviceException(UnixSyscall::getErrorString("open", errno)));
-
-    while (42)
-    {
-        ::memset(&fdset, 0, sizeof(fdset));
-
-        fdset.fd = gpioFd;
-        fdset.events = POLLPRI;
-
-        if ((ret = ::poll(&fdset, 1, PollTimeoutDelayMs)) == -1)
-            throw (DeviceException(UnixSyscall::getErrorString("poll", errno)));
-        if (!ret)
-            continue; // poll() timed out
-        if (fdset.revents & POLLPRI)
-        {
-            if ((ret = ::read(fdset.fd, buffer, bufferLen - 1)) == -1)
-                throw (DeviceException(UnixSyscall::getErrorString("read", errno)));
-            if (ret > 1)
-                buffer[ret - 1] = '\0';
-            if (::lseek(fdset.fd, 0, SEEK_SET) == -1)
-                throw (DeviceException(UnixSyscall::getErrorString("lseek", errno)));
-            std::cout << "poll() interrupt caught: buffer=" << buffer << std::endl;
-        }
-    }
-    if (::close(gpioFd) == -1)
-        throw (DeviceException(UnixSyscall::getErrorString("close", errno)));
+void GPIO::stopPolling()
+{
+    _poller.stop();
 }
 
 bool GPIO::exists()

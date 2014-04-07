@@ -7,8 +7,9 @@
 #ifndef GPIO_HPP
 #define GPIO_HPP
 
-#include <fstream>
 #include <string>
+
+#include "gpiopoller.hpp"
 
 // NOTE This class WILL throw on kernels older than 2.6.33 due to the lack of edge mode support
 
@@ -21,7 +22,6 @@ class GPIO
     static const std::string    ValueFilename;
     static const std::string    EdgeFilename;
     static const std::string    ActiveLowFilename;
-    static const int            PollTimeoutDelayMs = 500;
     static const int            EdgeModes = 4;
     static const std::string    EdgeStrings[EdgeModes];
 
@@ -55,6 +55,7 @@ public:
     EdgeMode    getEdgeMode();
     void        setEdgeMode(EdgeMode mode);
     void        startPolling();
+    void        stopPolling();
 
 private:
     bool    exists();
@@ -68,6 +69,7 @@ private:
     const std::string   _valueFile;
     const std::string   _activeLowFile;
     const std::string   _edgeFile;
+    GPIOPoller          _poller;
 };
 
 #endif // GPIO_HPP

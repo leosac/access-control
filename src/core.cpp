@@ -100,13 +100,13 @@ void Core::load()
 
     _hwManager = new HWManager;
 
-//     if (!_args.size())
-//         throw (SignalException("Not enough arguments"));
+    if (!_args.size())
+        throw (SignalException("Not enough arguments"));
 
-//     GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
-//     gpio->setDirection(GPIO::In);
-//     gpio->setEdgeMode(GPIO::Rising);
-//     gpio->startPolling();
+    GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
+    gpio->setDirection(GPIO::In);
+    gpio->setEdgeMode(GPIO::Rising);
+    gpio->startPolling();
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 
