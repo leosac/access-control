@@ -14,6 +14,7 @@ set(OSAC_SRCS
     signal/signalhandler.cpp
     tools/version.cpp
     tools/unixsyscall.cpp
+    tools/unixfs.cpp
 )
 
 include_directories(.)

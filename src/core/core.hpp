@@ -9,9 +9,11 @@
 
 #include <mutex>
 #include <list>
+#include <map>
 
 #include "event.hpp"
 #include "modules/iloggermodule.hpp"
+#include "modules/imodule.hpp"
 #include "hardware/ihwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 
@@ -36,14 +38,17 @@ private:
     bool    parseArguments();
     void    load();
     void    unload();
+    bool    loadModule(const std::string& path, const std::string& alias);
     void    dispatchEvent(const Event& event);
 
 private:
-    std::list<std::string>      _args;
-    std::mutex                  _runMutex;
-    bool                        _isRunning;
-    IHWManager*                 _hwManager;
-    std::list<ILoggerModule*>   _loggerModules;
+    std::list<std::string>          _args;
+    std::mutex                      _runMutex;
+    bool                            _isRunning;
+    IHWManager*                     _hwManager;
+    std::map<std::string, IModule*> _modules;
+    std::list<std::string>          _moduleDirectories;
+    std::list<ILoggerModule*>       _loggerModules;
 };
 
 #endif // CORE_HPP
