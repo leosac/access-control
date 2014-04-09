@@ -1,5 +1,5 @@
-project(OSAC)
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+project(OSAC)
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -16,5 +16,9 @@ option(NO_HW "NoHardware" OFF)
 if(NO_HW)
     add_definitions(-DNO_HW)
 endif()
+
+add_definitions(-DOSAC_VERSION_MAJOR=0)
+add_definitions(-DOSAC_VERSION_MINOR=1)
+add_definitions(-DOSAC_VERSION_PATCH=0)
 
 add_subdirectory(src)

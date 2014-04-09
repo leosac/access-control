@@ -9,12 +9,24 @@
 
 #include <string>
 
+#ifndef OSAC_VERSION_MAJOR
+#define OSAC_VERSION_MAJOR 0
+#endif
+
+#ifndef OSAC_VERSION_MINOR
+#define OSAC_VERSION_MINOR 0
+#endif
+
+#ifndef OSAC_VERSION_PATCH
+#define OSAC_VERSION_PATCH 0
+#endif
+
 class OSAC
 {
 public:
-    static const int Major = 0;
-    static const int Minor = 1;
-    static const int Patch = 0;
+    static const int Major = OSAC_VERSION_MAJOR;
+    static const int Minor = OSAC_VERSION_MINOR;
+    static const int Patch = OSAC_VERSION_PATCH;
 
 public:
     /**
