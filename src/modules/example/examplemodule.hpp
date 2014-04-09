@@ -20,7 +20,7 @@ private:
     ExampleModule& operator=(const ExampleModule& other);
 
 public:
-    void    sayHello() const;
+    void    sendEvent(const Event& event);
 };
 
 #endif // EXAMPLEMODULE_HPP

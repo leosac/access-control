@@ -7,13 +7,12 @@
 #ifndef ILOGGERMODULE_HPP
 #define ILOGGERMODULE_HPP
 
-#include "core/event.hpp"
+#include "imodule.hpp"
 
-class ILoggerModule
+class ILoggerModule : public IModule
 {
 public:
     virtual ~ILoggerModule() {}
-    virtual void    sendEvent(const Event& event) = 0;
 };
 
 #endif // ILOGGERMODULE_HPP

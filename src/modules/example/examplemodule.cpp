@@ -19,7 +19,7 @@ ExampleModule& ExampleModule::operator=(const ExampleModule& /*other*/)
     return (*this);
 }
 
-void ExampleModule::sayHello() const
+void ExampleModule::sendEvent(const Event& /*event*/)
 {
-    std::cout << "Hello :D" << std::endl;
+    
 }

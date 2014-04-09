@@ -12,18 +12,23 @@
 #include "osac.hpp"
 #include "signal/signalhandler.hpp"
 #include "exception/signalexception.hpp"
+#include "exception/dynlibexception.hpp"
 #include "modules/journallogger.hpp"
 #include "modules/imoduleloader.hpp"
 #include "hardware/hwmanager.hpp"
 #include "hardware/device/gpio.hpp" // FIXME Debug
 #include "dynlib/dynamiclibrary.hpp"
+#include "tools/unixfs.hpp"
 
 const int Core::IdleSleepTimeMs;
 
 Core::Core()
 :   _isRunning(false),
     _hwManager(nullptr)
-{}
+{
+    _moduleDirectories.push_back(UnixFs::getCWD());
+    _moduleDirectories.push_back("modules/example");
+}
 
 Core::~Core() {}
 
@@ -80,23 +85,6 @@ bool Core::parseArguments()
 
 void Core::load()
 {
-    DynamicLibrary          df("./modules/example/libexample.so");
-    IModuleLoader::InitFunc func;
-    IModuleLoader*          moduleloader;
-    IModule*                module;
-
-    df.open();
-    void* s = df.getSymbol("getLoader");
-    *reinterpret_cast<void**>(&func) = s;
-
-    moduleloader = func();
-    std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
-
-    module = moduleloader->instanciateModule();
-    module->sayHello();
-    delete moduleloader;
-    delete module;
-    df.close();
 
 #ifndef NO_HW
     _hwManager = new HWManager;
@@ -110,7 +98,12 @@ void Core::load()
     _gpio->startPolling();
 #endif
 
-    _loggerModules.push_front(new JournalLogger(Event::Debug));
+    for (auto folder : _moduleDirectories)
+    {
+        UnixFs::FileList fl = UnixFs::listFiles(folder, ".so");
+        for (auto lib : fl)
+            loadModule(lib, lib);
+    }
 
     try
     {
@@ -124,16 +117,52 @@ void Core::load()
 
 void Core::unload()
 {
-    for (auto logger : _loggerModules)
-        delete logger;
-    _loggerModules.clear();
+    for (auto module : _modules)
+        delete module.second;
+    _modules.clear();
 
+#ifndef NO_HW
     delete _hwManager;
     _hwManager = nullptr;
+#endif
+}
+
+bool Core::loadModule(const std::string& path, const std::string& alias)
+{
+    DynamicLibrary          lib(UnixFs::getCWD() + '/' + path);
+    IModuleLoader::InitFunc func;
+    IModule*                module = nullptr;
+
+    std::cout << "load " << path << " alias " << alias << std::endl;
+    if (_modules[alias] != nullptr)
+        return (false);
+    try
+    {
+        IModuleLoader*          moduleloader;
+
+        lib.open(DynamicLibrary::Now);
+        void* s = lib.getSymbol("getLoader");
+        *reinterpret_cast<void**>(&func) = s;
+        moduleloader = func();
+        std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
+        module = moduleloader->instanciateModule();
+        delete moduleloader; // FIXME Debug
+    }
+    catch (const DynLibException& e)
+    {
+        dispatchEvent(Event(e.what(), "Core", Event::Error));
+        if (module)
+            delete module;
+        return (false);
+    }
+    _modules[alias] = module;
+    return (true);
 }
 
 void Core::dispatchEvent(const Event& event)
 {
     for (auto logger : _loggerModules)
         logger->sendEvent(event);
+    if (_loggerModules.empty())
+        std::cout << '[' << event.date.time_since_epoch().count() << ']' << " " << Event::getLogLevelString(event.logLevel) << " " << event.source << "::" << event.message<< std::endl;
 }

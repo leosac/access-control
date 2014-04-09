@@ -7,11 +7,13 @@
 #ifndef IMODULE_HPP
 #define IMODULE_HPP
 
+#include "core/event.hpp"
+
 class IModule
 {
 public:
     virtual ~IModule() {}
-    virtual void    sayHello() const = 0;
+    virtual void    sendEvent(const Event& event) = 0;
 };
 
 #endif // IMODULE_HPP
