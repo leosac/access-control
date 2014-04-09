@@ -31,9 +31,6 @@ public:
      * @see getVersionString()
      */
     static int          versionCompare(const std::string& v);
-
-private:
-    static const std::string validChars;
 };
 
 #endif // OSAC_HPP

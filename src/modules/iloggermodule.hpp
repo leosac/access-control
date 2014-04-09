@@ -7,7 +7,7 @@
 #ifndef ILOGGERMODULE_HPP
 #define ILOGGERMODULE_HPP
 
-#include "event.hpp"
+#include "core/event.hpp"
 
 class ILoggerModule
 {

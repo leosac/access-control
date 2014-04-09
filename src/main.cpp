@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "exception/osacexception.hpp"
-#include "core.hpp"
+#include "core/core.hpp"
 
 int	main(int ac, char** av)
 {

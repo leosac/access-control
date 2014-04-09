@@ -1,10 +1,10 @@
 set(OSAC_BIN osac)
 
 set(OSAC_SRCS
-    core.cpp
-    event.cpp
     main.cpp
     osac.cpp
+    core/core.cpp
+    core/event.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
     hardware/device/gpiomanager.cpp
@@ -15,6 +15,8 @@ set(OSAC_SRCS
     tools/version.cpp
     tools/unixsyscall.cpp
 )
+
+include_directories(.)
 
 add_executable(${OSAC_BIN} ${OSAC_SRCS})
 
@@ -28,7 +30,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
     endif()
 endif()
 
-target_link_libraries(${OSAC_BIN} dl pthread)
+target_link_libraries(${OSAC_BIN} dl)
 
 install(TARGETS ${OSAC_BIN} RUNTIME DESTINATION bin)
 
