@@ -13,6 +13,8 @@
 #include <fcntl.h>
 #include <poll.h>
 
+#include <iostream> // FIXME Debug
+
 #include "exception/deviceexception.hpp"
 #include "tools/unixsyscall.hpp"
 
@@ -50,6 +52,8 @@ void GPIOPoller::start()
         std::lock_guard<std::mutex> lg(_runMutex);
         _isRunning = true;
     }
+
+    std::cout << "Starting polling thread" << std::endl;
     _pollThread = new std::thread(&launch, this);
 }
 
@@ -61,9 +65,11 @@ void GPIOPoller::stop()
         std::lock_guard<std::mutex> lg(_runMutex);
         _isRunning = false;
     }
+    std::cout << "Joining polling thread" << std::endl;
     _pollThread->join();
     delete _pollThread;
     _pollThread = nullptr;
+    std::cout << "Stopped polling thread" << std::endl;
 }
 
 bool GPIOPoller::isRunning()
@@ -102,7 +108,7 @@ void GPIOPoller::run()
                 buffer[ret - 1] = '\0';
             if (::lseek(fdset.fd, 0, SEEK_SET) == -1)
                 throw (DeviceException(UnixSyscall::getErrorString("lseek", errno)));
-            // TODO CALLBACK
+            std::cout << "Button pressed !" << std::endl;
         }
         _runMutex.lock();
     }

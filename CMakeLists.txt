@@ -9,6 +9,12 @@ endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 
-include_directories(src)
+#Build Options
+option(NO_HW "NoHardware" OFF)
+
+#Define the corresponding macro
+if(NO_HW)
+    add_definitions(-DNO_HW)
+endif()
 
 add_subdirectory(src)

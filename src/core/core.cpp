@@ -98,15 +98,17 @@ void Core::load()
     delete module;
     df.close();
 
+#ifndef NO_HW
     _hwManager = new HWManager;
 
     if (!_args.size())
         throw (SignalException("Not enough arguments"));
 
-    GPIO* gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
-    gpio->setDirection(GPIO::In);
-    gpio->setEdgeMode(GPIO::Rising);
-    gpio->startPolling();
+    _gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
+    _gpio->setDirection(GPIO::In);
+    _gpio->setEdgeMode(GPIO::Rising);
+    _gpio->startPolling();
+#endif
 
     _loggerModules.push_front(new JournalLogger(Event::Debug));
 
