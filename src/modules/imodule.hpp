@@ -26,6 +26,7 @@ public:
 public:
     virtual ~IModule() {}
     virtual void                sendEvent(const Event& event) = 0;
+    virtual Type                getType() const = 0;
     virtual const std::string&  getVersionString() const = 0;
 };
 

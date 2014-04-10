@@ -17,6 +17,7 @@ public:
 
 public:
     void    sendEvent(const Event& event);
+    Type    getType() const;
 
 private:
     int     _logLevel;

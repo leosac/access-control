@@ -48,3 +48,8 @@ void JournalLogger::sendEvent(const Event& event)
         std::clog << event.source << "::";
     std::clog << event.message<< std::endl;
 }
+
+IModule::Type JournalLogger::getType() const
+{
+    return (Logger);
+}

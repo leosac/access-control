@@ -36,7 +36,7 @@ public:
      * @param filename to strip
      * @return filename without path
      */
-    static std::string stripPath(const std::string& filename);
+    static std::string  stripPath(const std::string& filename);
 };
 
 #endif // UNIXFS_HPP

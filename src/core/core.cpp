@@ -25,7 +25,7 @@ Core::Core()
 :   _isRunning(false),
     _hwManager(nullptr)
 {
-    _moduleDirectories.push_back(UnixFs::getCWD());
+    _libsDirectories.push_back(UnixFs::getCWD());
 }
 
 Core::~Core() {}
@@ -95,12 +95,7 @@ void Core::load()
     _gpio->startPolling();
 #endif
 
-    for (auto folder : _moduleDirectories)
-    {
-        UnixFs::FileList fl = UnixFs::listFiles(folder, ".so");
-        for (auto lib : fl)
-            loadModule(lib, lib);
-    }
+    loadLibraries();
 
     try
     {
@@ -108,7 +103,7 @@ void Core::load()
     }
     catch (const SignalException& e)
     {
-        dispatchEvent(Event(e.what(), "Core"));
+        std::cerr << e.what() << std::endl;
     }
 }
 
@@ -118,33 +113,83 @@ void Core::unload()
         delete module.second;
     _modules.clear();
 
+    unloadLibraries();
+
 #ifndef NO_HW
     delete _hwManager;
     _hwManager = nullptr;
 #endif
 }
 
-bool Core::loadModule(const std::string& path, const std::string& alias)
+void Core::loadLibraries()
 {
-    DynamicLibrary      lib(UnixFs::getCWD() + '/' + path);
+    std::string     libname;
+    DynamicLibrary* lib;
+
+    _libsDirectories.push_back("modules/example"); // FIXME Debug
+
+    for (auto folder : _libsDirectories)
+    {
+        UnixFs::FileList fl = UnixFs::listFiles(folder, ".so");
+        for (auto path : fl)
+        {
+            libname = UnixFs::stripPath(path);
+            if (_dynlibs[libname] != nullptr)
+            {
+                std::cerr << "module already loaded (" << path << ')' << std::endl;
+                continue;
+            }
+            lib = new DynamicLibrary(path);
+            try
+            {
+                lib->open();
+            }
+            catch (const DynLibException& e)
+            {
+                std::cerr << e.what() << std::endl;
+                delete lib;
+            }
+            _dynlibs[libname] = lib;
+        }
+    }
+}
+
+void Core::unloadLibraries()
+{
+    for (auto lib : _dynlibs)
+    {
+        try
+        {
+            lib.second->close();
+        }
+        catch (const DynLibException& e)
+        {
+            std::cerr << e.what() << std::endl;
+        }
+        delete lib.second;
+    }
+}
+
+bool Core::loadModule(const std::string& libname, const std::string& alias)
+{
+    DynamicLibrary*     lib = _dynlibs[libname];
     IModule::InitFunc   func;
     IModule*            module = nullptr;
 
-    std::cout << "load " << path << " alias " << alias << std::endl;
-    if (_modules[alias] != nullptr)
+    if (!lib)
+        return (false);
+    if (_modules[alias])
         return (false);
     try
     {
-        lib.open(DynamicLibrary::Now);
-        void* s = lib.getSymbol("getNewModuleInstance");
+        void* s = lib->getSymbol("getNewModuleInstance");
         *reinterpret_cast<void**>(&func) = s;
         module = func();
     }
     catch (const DynLibException& e)
     {
-        dispatchEvent(Event(e.what(), "Core", Event::Error));
-        if (module)
-            delete module;
+        std::cerr << e.what() << std::endl;
+        delete module;
         return (false);
     }
     _modules[alias] = module;

@@ -23,6 +23,7 @@ public:
     void    sendEvent(const Event& event);
 
 public:
+    Type                getType() const;
     const std::string&  getVersionString() const;
 
 private:
