@@ -12,10 +12,11 @@
 #include <map>
 
 #include "event.hpp"
-#include "modules/iloggermodule.hpp"
 #include "modules/imodule.hpp"
 #include "hardware/ihwmanager.hpp"
 #include "signal/isignalcallback.hpp"
+
+class DynamicLibrary;
 
 class Core : public ISignalCallback
 {
@@ -48,7 +49,7 @@ private:
     IHWManager*                     _hwManager;
     std::map<std::string, IModule*> _modules;
     std::list<std::string>          _moduleDirectories;
-    std::list<ILoggerModule*>       _loggerModules;
+    std::list<IModule*>             _loggerModules;
 };
 
 #endif // CORE_HPP

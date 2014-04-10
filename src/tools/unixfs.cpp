@@ -62,3 +62,13 @@ UnixFs::FileList UnixFs::listFiles(const std::string& folder, const std::string&
         throw (FsException(UnixSyscall::getErrorString("closedir", errno)));
     return (l);
 }
+
+std::string UnixFs::stripPath(const std::string& filename)
+{
+    std::size_t pos;
+
+    if ((pos = filename.find_last_of('/')) == std::string::npos)
+        return (filename);
+    else
+        return (filename.substr(pos + 1));
+}

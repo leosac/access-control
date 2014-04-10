@@ -11,7 +11,7 @@ class IActivityMonitor
 {
 public:
     virtual ~IActivityMonitor() {}
-    virtual void    lol() = 0;
+    virtual void    lol() = 0; // FIXME Debug
 };
 
 #endif // IACTIVITYMONITORMODULE_HPP

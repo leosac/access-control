@@ -30,6 +30,13 @@ public:
      * @return file list
      */
     static FileList     listFiles(const std::string& folder, const std::string& extension = std::string());
+
+    /**
+     * remove the full path from a filename
+     * @param filename to strip
+     * @return filename without path
+     */
+    static std::string stripPath(const std::string& filename);
 };
 
 #endif // UNIXFS_HPP

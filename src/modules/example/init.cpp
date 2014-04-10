@@ -1,10 +1,10 @@
 /**
  * \file init.cpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief example init function for returning a moduleloader class to the core
+ * \brief example init function for returning a module class to the core
  */
 
-#include "examplemoduleloader.hpp"
+#include "examplemodule.hpp"
 
 // FIXME Add correct support for -fvisibility=hidden
 #ifndef MODULE_PUBLIC
@@ -15,7 +15,7 @@
 #   endif
 #endif
 
-extern "C" MODULE_PUBLIC IModuleLoader* getLoader()
+extern "C" MODULE_PUBLIC IModule* getNewModuleInstance()
 {
-    return (new ExampleModuleLoader);
+    return (new ExampleModule);
 }

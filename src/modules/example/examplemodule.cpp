@@ -6,9 +6,10 @@
 
 #include "examplemodule.hpp"
 
-#include <iostream>
+#include "tools/version.hpp"
 
-ExampleModule::ExampleModule() {}
+ExampleModule::ExampleModule()
+:   _version(Version::buildVersionString(0, 1, 0)) {}
 
 ExampleModule::~ExampleModule() {}
 
@@ -21,5 +22,10 @@ ExampleModule& ExampleModule::operator=(const ExampleModule& /*other*/)
 
 void ExampleModule::sendEvent(const Event& /*event*/)
 {
-    
+
+}
+
+const std::string& ExampleModule::getVersionString() const
+{
+    return (_version);
 }

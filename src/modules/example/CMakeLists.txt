@@ -2,9 +2,7 @@ set(EXAMPLE_BIN example)
 
 set(EXAMPLE_SRCS
     examplemodule.cpp
-    examplemoduleloader.cpp
     init.cpp
-    ../amoduleloader.cpp
 )
 
 add_library(${EXAMPLE_BIN} SHARED ${EXAMPLE_SRCS})
