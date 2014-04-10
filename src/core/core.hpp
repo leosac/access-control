@@ -39,17 +39,20 @@ private:
     bool    parseArguments();
     void    load();
     void    unload();
-    bool    loadModule(const std::string& path, const std::string& alias);
+    void    loadLibraries();
+    void    unloadLibraries();
+    bool    loadModule(const std::string& libname, const std::string& alias);
     void    dispatchEvent(const Event& event);
 
 private:
-    std::list<std::string>          _args;
-    std::mutex                      _runMutex;
-    bool                            _isRunning;
-    IHWManager*                     _hwManager;
-    std::map<std::string, IModule*> _modules;
-    std::list<std::string>          _moduleDirectories;
-    std::list<IModule*>             _loggerModules;
+    std::list<std::string>                  _args;
+    std::mutex                              _runMutex;
+    bool                                    _isRunning;
+    IHWManager*                             _hwManager;
+    std::map<std::string, IModule*>         _modules;
+    std::map<std::string, DynamicLibrary*>  _dynlibs;
+    std::list<std::string>                  _libsDirectories;
+    std::list<IModule*>                     _loggerModules;
 };
 
 #endif // CORE_HPP

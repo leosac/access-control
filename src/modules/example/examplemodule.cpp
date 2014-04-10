@@ -20,9 +20,14 @@ ExampleModule& ExampleModule::operator=(const ExampleModule& /*other*/)
     return (*this);
 }
 
-void ExampleModule::sendEvent(const Event& /*event*/)
+void ExampleModule::sendEvent(const Event& event)
 {
+    static_cast<void>(event);
+}
 
+IModule::Type ExampleModule::getType() const
+{
+    return (Logger);
 }
 
 const std::string& ExampleModule::getVersionString() const
