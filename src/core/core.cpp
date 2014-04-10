@@ -14,7 +14,6 @@
 #include "exception/signalexception.hpp"
 #include "exception/dynlibexception.hpp"
 #include "modules/journallogger.hpp"
-#include "modules/imoduleloader.hpp"
 #include "hardware/hwmanager.hpp"
 #include "hardware/device/gpio.hpp" // FIXME Debug
 #include "dynlib/dynamiclibrary.hpp"
@@ -27,7 +26,6 @@ Core::Core()
     _hwManager(nullptr)
 {
     _moduleDirectories.push_back(UnixFs::getCWD());
-    _moduleDirectories.push_back("modules/example");
 }
 
 Core::~Core() {}
@@ -85,7 +83,6 @@ bool Core::parseArguments()
 
 void Core::load()
 {
-
 #ifndef NO_HW
     _hwManager = new HWManager;
 
@@ -129,24 +126,19 @@ void Core::unload()
 
 bool Core::loadModule(const std::string& path, const std::string& alias)
 {
-    DynamicLibrary          lib(UnixFs::getCWD() + '/' + path);
-    IModuleLoader::InitFunc func;
-    IModule*                module = nullptr;
+    DynamicLibrary      lib(UnixFs::getCWD() + '/' + path);
+    IModule::InitFunc   func;
+    IModule*            module = nullptr;
 
     std::cout << "load " << path << " alias " << alias << std::endl;
     if (_modules[alias] != nullptr)
         return (false);
     try
     {
-        IModuleLoader*          moduleloader;
-
         lib.open(DynamicLibrary::Now);
-        void* s = lib.getSymbol("getLoader");
+        void* s = lib.getSymbol("getNewModuleInstance");
         *reinterpret_cast<void**>(&func) = s;
-        moduleloader = func();
-        std::cout << "Module " << moduleloader->getModuleName() << " loaded (v" << moduleloader->getVersionString() << ")" << std::endl;
-        module = moduleloader->instanciateModule();
-        delete moduleloader; // FIXME Debug
+        module = func();
     }
     catch (const DynLibException& e)
     {

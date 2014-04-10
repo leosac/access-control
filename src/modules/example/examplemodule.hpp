@@ -21,6 +21,12 @@ private:
 
 public:
     void    sendEvent(const Event& event);
+
+public:
+    const std::string&  getVersionString() const;
+
+private:
+    const std::string _version;
 };
 
 #endif // EXAMPLEMODULE_HPP
