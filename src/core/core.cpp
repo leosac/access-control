@@ -15,7 +15,7 @@
 #include "exception/dynlibexception.hpp"
 #include "modules/journallogger.hpp"
 #include "hardware/hwmanager.hpp"
-#include "hardware/device/gpio.hpp" // FIXME Debug
+#include "hardware/device/gpio/gpio.hpp" // FIXME Debug
 #include "dynlib/dynamiclibrary.hpp"
 #include "tools/unixfs.hpp"
 
@@ -85,14 +85,6 @@ void Core::load()
 {
 #ifndef NO_HW
     _hwManager = new HWManager;
-
-    if (!_args.size())
-        throw (SignalException("Not enough arguments"));
-
-    _gpio = _hwManager->reserveGPIO(std::stoi(_args.front()));
-    _gpio->setDirection(GPIO::In);
-    _gpio->setEdgeMode(GPIO::Rising);
-    _gpio->startPolling();
 #endif
 
     loadLibraries();
