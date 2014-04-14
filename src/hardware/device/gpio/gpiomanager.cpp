@@ -16,6 +16,7 @@
 #include <iostream> // FIXME Debug
 
 #include "exception/gpioexception.hpp"
+#include "igpiolistener.hpp"
 #include "tools/unixsyscall.hpp"
 
 static void launch(GPIOManager* instance)
@@ -47,8 +48,8 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
     listener.mode = mode;
     listener.fdIdx = 0;
 
-    if (!_polledGpio[listener.gpioNo])
-        reserveGPIO(listener.gpioNo);
+    if (!_polledGpio[gpioNo])
+        _polledGpio[gpioNo] = new GPIO(gpioNo);
     _listeners.push_back(listener);
 }
 
@@ -81,7 +82,6 @@ void GPIOManager::pollLoop()
         while (_isRunning)
         {
             _runMutex.unlock();
-
             if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
                 throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
             else if (!ret)
@@ -110,11 +110,6 @@ void GPIOManager::pollLoop()
             _runMutex.lock();
         }
     }
-}
-
-void GPIOManager::reserveGPIO(int gpioNo)
-{
-    _polledGpio[gpioNo] = new GPIO(gpioNo);
 }
 
 void GPIOManager::buildFdSet()

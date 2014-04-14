@@ -17,8 +17,9 @@
 #include <vector>
 #include <map>
 
-#include "igpiolistener.hpp"
 #include "igpioobservable.hpp"
+
+class IGPIOListener;
 
 class GPIOManager : public IGPIOObservable
 {
@@ -41,13 +42,12 @@ private:
     GPIOManager& operator=(const GPIOManager& other);
 
 public:
-    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode);
+    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode); // NOTE call this before starting to poll
     void    startPolling();
     void    stopPolling();
     void    pollLoop();
 
 private:
-    void    reserveGPIO(int gpioNo); // NOTE may throw GPIOException
     void    buildFdSet();
 
 private:
