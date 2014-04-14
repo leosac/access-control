@@ -16,6 +16,10 @@ public:
     HWManager();
     ~HWManager();
 
+public:
+    void    start();
+    void    stop();
+
 private:
     GPIOManager _gpioManager;
 };

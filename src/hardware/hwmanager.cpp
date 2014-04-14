@@ -9,3 +9,13 @@
 HWManager::HWManager() {}
 
 HWManager::~HWManager() {}
+
+void HWManager::start()
+{
+    _gpioManager.startPolling();
+}
+
+void HWManager::stop()
+{
+    _gpioManager.stopPolling();
+}

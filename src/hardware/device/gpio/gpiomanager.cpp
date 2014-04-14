@@ -13,37 +13,23 @@
 #include <fcntl.h>
 
 #include <thread>
-#include <iostream>
+#include <iostream> // FIXME Debug
 
 #include "exception/gpioexception.hpp"
 #include "tools/unixsyscall.hpp"
 
 static void launch(GPIOManager* instance)
 {
-    instance->run();
+    instance->pollLoop();
 }
 
 GPIOManager::GPIOManager()
-:   _isRunning(true),
-    _needFdUpdate(true),
-    _pollTimeout(1000) // FIXME Debug
-{
-    _pollThread = std::thread(&launch, this);
-    std::cout << "thread started" << std::endl;
-}
+:   _isRunning(false),
+    _pollTimeout(DefaultTimeout)
+{}
 
 GPIOManager::~GPIOManager()
-{
-    std::cout << ">>> ~GPIOManager()" << std::endl;
-    {
-        std::lock_guard<std::mutex> lg(_runMutex);
-        _isRunning = false;
-    }
-    // TODO Deblock poll()
-    _pollThread.join();
-    std::cout << "thread joined" << std::endl;
-    std::cout << "<<< ~GPIOManager()" << std::endl;
-}
+{}
 
 GPIOManager::GPIOManager(const GPIOManager& /*other*/) {}
 
@@ -61,81 +47,87 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
     listener.mode = mode;
     listener.fdIdx = 0;
 
-    if (!_gpio[listener.gpioNo])
+    if (!_polledGpio[listener.gpioNo])
         reserveGPIO(listener.gpioNo);
     _listeners.push_back(listener);
-    rebuildFdSet();
 }
 
-void GPIOManager::run()
+void GPIOManager::startPolling()
+{
+    _pollThread = std::thread(&launch, this);
+}
+
+void GPIOManager::stopPolling()
+{
+    {
+        std::lock_guard<std::mutex> lg(_runMutex);
+        _isRunning = false;
+    }
+    _pollThread.join();
+}
+
+void GPIOManager::pollLoop()
 {
     const unsigned  bufferLen = 32;
     char            buffer[bufferLen];
     int             ret;
-    unsigned int    setSize;
+    unsigned int    fdsetSize;
 
-    std::cout << "run() started" << std::endl;
+    buildFdSet();
+    fdsetSize = _fdset.size();
     {
         std::lock_guard<std::mutex> lg(_runMutex);
+        _isRunning = true;
         while (_isRunning)
         {
             _runMutex.unlock();
-            setSize = _fdset.size();
 
-            if (_needFdUpdate)
-                resetFdSet(setSize);
-
-            if ((ret = ::poll(&_fdset[0], setSize, _pollTimeout)) < 0)
+            if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
                 throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
-            if (!ret)
-                continue;
-
-            _listenerMutex.lock();
-            for (unsigned int i = 0; i < setSize; ++i)
+            else if (!ret)
+                ;// Timed out
+            else
             {
-                if (_fdset[i].revents & POLLPRI)
+                for (unsigned int i = 0; i < fdsetSize; ++i)
                 {
-                    if ((ret = ::read(_fdset[i].fd, buffer, bufferLen - 1)) < 0)
-                        throw (GpioException(UnixSyscall::getErrorString("read", errno)));
-                    else if (ret > 1)
-                        buffer[ret - 1] = '\0';
-                    if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
-                        throw (GpioException(UnixSyscall::getErrorString("lseek", errno)));
-                    for (auto listener : _listeners)
+                    if (_fdset[i].revents & POLLPRI)
                     {
-                        if (listener.fdIdx == i)
-                            listener.instance->notify(listener.gpioNo);
+                        _fdset[i].revents = 0;
+                        if ((ret = ::read(_fdset[i].fd, buffer, bufferLen - 1)) < 0)
+                            throw (GpioException(UnixSyscall::getErrorString("read", errno)));
+                        else if (ret > 1)
+                            buffer[ret - 1] = '\0';
+                        if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
+                            throw (GpioException(UnixSyscall::getErrorString("lseek", errno)));
+                        for (auto listener : _listeners)
+                        {
+                            if (listener.fdIdx == i)
+                                listener.instance->notify(listener.gpioNo);
+                        }
                     }
                 }
             }
             _runMutex.lock();
-            _isRunning = false; // FIXME Debug
         }
     }
-    std::cout << "run() ended" << std::endl;
 }
 
 void GPIOManager::reserveGPIO(int gpioNo)
 {
-    _gpio[gpioNo] = new GPIO(gpioNo);
+    _polledGpio[gpioNo] = new GPIO(gpioNo);
 }
 
-void GPIOManager::rebuildFdSet()
+void GPIOManager::buildFdSet()
 {
     int i = 0;
 
-    if (_fdset.size() != _listeners.size())
-        _fdset.resize(_listeners.size());
+    _fdset.resize(_listeners.size());
     for (auto listener : _listeners)
     {
-        _fdset[i].fd = _gpio[listener.gpioNo]->getPollFd();
+        _fdset[i].fd = _polledGpio[listener.gpioNo]->getPollFd();
         _fdset[i].events = POLLPRI;
+        _fdset[i].revents = 0;
         ++i;
     }
 }
 
-void GPIOManager::resetFdSet(unsigned int size)
-{
-    for (unsigned int i = 0; i < size; ++i)
-        _fdset[i].revents = 0;
-}
