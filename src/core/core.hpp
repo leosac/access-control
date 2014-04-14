@@ -39,6 +39,7 @@ private:
     void    unload();
     void    loadLibraries();
     void    unloadLibraries();
+    void    debugPrintLibs();
     bool    loadModule(const std::string& libname, const std::string& alias);
     void    dispatchEvent(const Event& event);
 

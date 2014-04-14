@@ -7,20 +7,22 @@
 #ifndef JOURNALLOGGER_HPP
 #define JOURNALLOGGER_HPP
 
-#include "imodule.hpp"
+#include "modules/imodule.hpp"
 
 class JournalLogger : public IModule
 {
 public:
-    JournalLogger(int logLevel = Event::Notice);
+    JournalLogger(int logLevel = Event::Debug);
     ~JournalLogger();
 
 public:
-    void    sendEvent(const Event& event);
-    Type    getType() const;
+    void                sendEvent(const Event& event);
+    Type                getType() const;
+    const std::string&  getVersionString() const;
 
 private:
-    int     _logLevel;
+    const std::string   _version;
+    int                 _logLevel;
 };
 
 #endif // JOURNALLOGGER_HPP
