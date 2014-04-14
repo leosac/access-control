@@ -22,6 +22,7 @@
 
 class GPIOManager : public IGPIOObservable
 {
+    static const int DefaultTimeout = 500;
 public:
     typedef struct pollfd PollFdSet;
     typedef struct {
@@ -41,22 +42,20 @@ private:
 
 public:
     void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode);
-    void    run();
+    void    startPolling();
+    void    stopPolling();
+    void    pollLoop();
 
 private:
     void    reserveGPIO(int gpioNo); // NOTE may throw GPIOException
-    void    rebuildFdSet();
-    void    resetFdSet(unsigned int size);
+    void    buildFdSet();
 
 private:
     bool                    _isRunning;
     std::mutex              _runMutex;
-    bool                    _needFdUpdate;
     std::thread             _pollThread;
     int                     _pollTimeout;
-    std::mutex              _listenerMutex;
-    std::mutex              _updateMutex;
-    std::map<int, GPIO*>    _gpio;
+    std::map<int, GPIO*>    _polledGpio;
     std::list<ListenerInfo> _listeners;
     std::vector<PollFdSet>  _fdset;
 };

@@ -11,6 +11,8 @@ class IHWManager
 {
 public:
     virtual ~IHWManager() {}
+    virtual void    start() = 0;
+    virtual void    stop() = 0;
 };
 
 #endif // IHWMANAGER_HPP
