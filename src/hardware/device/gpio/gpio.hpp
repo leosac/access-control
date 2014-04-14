@@ -9,8 +9,6 @@
 
 #include <string>
 
-#include "gpiopoller.hpp"
-
 // NOTE This class WILL throw on kernels older than 2.6.33 due to the lack of edge mode support
 
 class GPIO
@@ -44,6 +42,7 @@ public:
 public:
     int                 getPinNo() const;
     const std::string&  getPath() const;
+    int                 getPollFd() const;
 
 public:
     Direction   getDirection();
@@ -54,8 +53,6 @@ public:
     void        setActiveLow(bool state);
     EdgeMode    getEdgeMode();
     void        setEdgeMode(EdgeMode mode);
-    void        startPolling();
-    void        stopPolling();
 
 private:
     bool    exists();
@@ -69,7 +66,7 @@ private:
     const std::string   _valueFile;
     const std::string   _activeLowFile;
     const std::string   _edgeFile;
-    GPIOPoller          _poller;
+    int                 _pollFd;
 };
 
 #endif // GPIO_HPP

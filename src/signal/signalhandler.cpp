@@ -11,6 +11,7 @@
 
 #include "isignalcallback.hpp"
 #include "exception/signalexception.hpp"
+#include "tools/unixsyscall.hpp"
 
 static ISignalCallback* sigCallback = nullptr;
 
@@ -25,9 +26,10 @@ void SignalHandler::registerCallback(ISignalCallback* callback)
     struct sigaction    act;
 
     act.sa_handler = &fesser_e;
-    if (sigemptyset(&act.sa_mask) == -1)
-        throw (SignalException("sigemptyset() failed"));
-    act.sa_flags = 0;
-    sigaction(SIGINT, &act, 0);
+    if (sigemptyset(&act.sa_mask) < 0)
+        throw (SignalException(UnixSyscall::getErrorString("sigemptyset", errno)));
+    act.sa_flags = SA_RESTART;
+    if (sigaction(SIGINT, &act, 0) < 0)
+        throw (SignalException(UnixSyscall::getErrorString("sigaction", errno)));
     sigCallback = callback;
 }

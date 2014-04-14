@@ -31,8 +31,6 @@ private:
 
 public:
     void    handleSignal(int signal); // Inherited from ISignalCallback
-
-public:
     void    run(const std::list<std::string>& args);
 
 private:
@@ -48,10 +46,12 @@ private:
     std::list<std::string>                  _args;
     std::mutex                              _runMutex;
     bool                                    _isRunning;
+
+private:
     IHWManager*                             _hwManager;
-    std::map<std::string, IModule*>         _modules;
-    std::map<std::string, DynamicLibrary*>  _dynlibs;
     std::list<std::string>                  _libsDirectories;
+    std::map<std::string, DynamicLibrary*>  _dynlibs;
+    std::map<std::string, IModule*>         _modules;
     std::list<IModule*>                     _loggerModules;
 };
 

@@ -7,9 +7,8 @@ set(OSAC_SRCS
     core/event.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
-    hardware/device/gpiomanager.cpp
-    hardware/device/gpio.cpp
-    hardware/device/gpiopoller.cpp
+    hardware/device/gpio/gpiomanager.cpp
+    hardware/device/gpio/gpio.cpp
     modules/journallogger.cpp
     signal/signalhandler.cpp
     tools/version.cpp
@@ -31,7 +30,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
     endif()
 endif()
 
-target_link_libraries(${OSAC_BIN} dl)
+target_link_libraries(${OSAC_BIN} dl pthread)
 
 install(TARGETS ${OSAC_BIN} RUNTIME DESTINATION bin)
 
