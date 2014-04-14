@@ -9,7 +9,6 @@ set(OSAC_SRCS
     hardware/hwmanager.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
-    modules/journallogger.cpp
     signal/signalhandler.cpp
     tools/version.cpp
     tools/unixsyscall.cpp

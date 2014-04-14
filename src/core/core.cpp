@@ -13,7 +13,6 @@
 #include "signal/signalhandler.hpp"
 #include "exception/signalexception.hpp"
 #include "exception/dynlibexception.hpp"
-#include "modules/journallogger.hpp"
 #include "hardware/hwmanager.hpp"
 #include "hardware/device/gpio/gpio.hpp" // FIXME Debug
 #include "dynlib/dynamiclibrary.hpp"
@@ -88,6 +87,7 @@ void Core::load()
     loadLibraries();
 
     // TODO load modules
+    loadModule(_dynlibs.begin()->first, "myModule"); // FIXME Debug
 
     try
     {
@@ -120,7 +120,7 @@ void Core::loadLibraries()
     std::string     libname;
     DynamicLibrary* lib;
 
-    _libsDirectories.push_back("modules/example"); // FIXME Debug
+    _libsDirectories.push_back("modules/journal");
 
     for (auto folder : _libsDirectories)
     {
@@ -146,6 +146,7 @@ void Core::loadLibraries()
             _dynlibs[libname] = lib;
         }
     }
+    debugPrintLibs(); // FIXME Debug
 }
 
 void Core::unloadLibraries()
@@ -162,6 +163,14 @@ void Core::unloadLibraries()
         }
         delete lib.second;
     }
+}
+
+void Core::debugPrintLibs()
+{
+    std::cout << "Debug::Libs:" << std::endl;
+
+    for (auto lib : _dynlibs)
+        std::cout << lib.first << std::endl;
 }
 
 bool Core::loadModule(const std::string& libname, const std::string& alias)
@@ -187,6 +196,8 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
         return (false);
     }
     _modules[alias] = module;
+    if (module->getType() == IModule::Logger)
+        _loggerModules.push_back(module);
     return (true);
 }
 
