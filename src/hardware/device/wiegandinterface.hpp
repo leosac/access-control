@@ -13,7 +13,7 @@
 
 class WiegandInterface : public IGPIOListener
 {
-    static const int    DataBufferLen = 64;
+    static const int    DataBufferLen = 5;
 public:
     WiegandInterface(IGPIOObservable& gpioProvider);
     ~WiegandInterface();
