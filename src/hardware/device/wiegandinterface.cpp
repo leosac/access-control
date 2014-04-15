@@ -4,11 +4,13 @@
 #include <iostream> // FIXME Debug printing
 #include <iomanip> // FIXME Debug printing
 
-WiegandInterface::WiegandInterface()
+WiegandInterface::WiegandInterface(IGPIOObservable& gpioProvider)
 :   _bitIdx(0)
 {
-    _hiGpio = 15; // FIXME Debug
-    _loGpio = 18; // FIXME Debug
+    _hiGpio = 14; // FIXME Debug
+    _loGpio = 15; // FIXME Debug
+    gpioProvider.registerListener(this, _hiGpio);
+    gpioProvider.registerListener(this, _loGpio);
 }
 
 WiegandInterface::~WiegandInterface() {}

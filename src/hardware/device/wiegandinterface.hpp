@@ -4,6 +4,7 @@
 #include <map>
 
 #include "gpio/igpiolistener.hpp"
+#include "gpio/igpioobservable.hpp"
 #include "tools/bufferutils.hpp"
 
 /* NOTE This class is very likely to be created by the main thread,
@@ -14,7 +15,7 @@ class WiegandInterface : public IGPIOListener
 {
     static const int    DataBufferLen = 64;
 public:
-    WiegandInterface();
+    WiegandInterface(IGPIOObservable& gpioProvider);
     ~WiegandInterface();
 
 private:
@@ -28,7 +29,7 @@ public:
 private:
     void    reset();
 
-public:
+private:
     Byte        _buffer[DataBufferLen];
     std::size_t _bitIdx;
     int         _hiGpio;

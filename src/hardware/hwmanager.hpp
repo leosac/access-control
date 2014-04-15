@@ -9,6 +9,7 @@
 
 #include "ihwmanager.hpp"
 #include "device/gpio/gpiomanager.hpp"
+#include "device/wiegandinterface.hpp"
 
 class HWManager : public IHWManager
 {
@@ -21,7 +22,8 @@ public:
     void    stop();
 
 private:
-    GPIOManager _gpioManager;
+    GPIOManager         _gpioManager;
+    WiegandInterface    _wiegand;
 };
 
 #endif // HWMANAGER_HPP

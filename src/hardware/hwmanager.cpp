@@ -6,13 +6,14 @@
 
 #include "hwmanager.hpp"
 
-HWManager::HWManager() {}
+HWManager::HWManager()
+:   _wiegand(_gpioManager)
+{}
 
 HWManager::~HWManager() {}
 
 void HWManager::start()
 {
-
     _gpioManager.startPolling();
 }
 

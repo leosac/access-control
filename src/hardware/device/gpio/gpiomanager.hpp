@@ -43,7 +43,7 @@ private:
     GPIOManager& operator=(const GPIOManager& other);
 
 public:
-    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode = GPIO::Rising); // NOTE call this before starting to poll
+    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode); // NOTE call this before starting to poll
     void    startPolling();
     void    stopPolling();
     void    pollLoop();
