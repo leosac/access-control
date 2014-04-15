@@ -6,6 +6,10 @@
 #include "gpio/igpiolistener.hpp"
 #include "tools/bufferutils.hpp"
 
+/* NOTE This class is very likely to be created by the main thread,
+ * but controlled by the polling thread
+ */
+
 class WiegandInterface : public IGPIOListener
 {
     static const int    DataBufferLen = 64;
@@ -19,6 +23,7 @@ private:
 
 public:
     void    notify(int gpioNo);
+    void    timeout();
 
 private:
     void    reset();

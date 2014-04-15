@@ -49,7 +49,13 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
     listener.fdIdx = 0;
 
     if (!_polledGpio[gpioNo])
-        _polledGpio[gpioNo] = new GPIO(gpioNo);
+    {
+        GPIO*   gpio = new GPIO(gpioNo);
+
+        gpio->setDirection(GPIO::In);
+        gpio->setEdgeMode(mode);
+        _polledGpio[gpioNo] = gpio;
+    }
     _listeners.push_back(listener);
 }
 
@@ -84,7 +90,7 @@ void GPIOManager::pollLoop()
             if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
                 throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
             else if (!ret)
-                ;// Timed out
+                timeout();
             else
             {
                 for (unsigned int i = 0; i < fdsetSize; ++i)
@@ -109,6 +115,12 @@ void GPIOManager::pollLoop()
             _runMutex.lock();
         }
     }
+}
+
+void GPIOManager::timeout()
+{
+    for (auto listener : _listeners)
+        listener.instance->timeout();
 }
 
 void GPIOManager::buildFdSet()

@@ -1,12 +1,14 @@
 #include "wiegandinterface.hpp"
 
 #include <cstring>
+#include <iostream> // FIXME Debug printing
+#include <iomanip> // FIXME Debug printing
 
 WiegandInterface::WiegandInterface()
 :   _bitIdx(0)
 {
-    _hiGpio = 15; // FIXME DEBUG test
-    _loGpio = 18; // FIXME DEBUG test
+    _hiGpio = 15; // FIXME Debug
+    _loGpio = 18; // FIXME Debug
 }
 
 WiegandInterface::~WiegandInterface() {}
@@ -20,9 +22,25 @@ WiegandInterface& WiegandInterface::operator=(const WiegandInterface& /*other*/)
 
 void WiegandInterface::notify(int gpioNo)
 {
+    if (_bitIdx == DataBufferLen * 8) // Buffer overflow
+        reset();
+
     if (gpioNo == _hiGpio)
-        _buffer[_bitIdx / 8] |= 1 << (_bitIdx % 8);
+       _buffer[_bitIdx / 8] |= 1 << (8 - _bitIdx % 8);
     ++_bitIdx;
+}
+
+void WiegandInterface::timeout()
+{
+    if (_bitIdx)
+    {
+        // TODO send message
+        std::cout << "Read:";
+        for (int i = DataBufferLen; i >= 0; --i)
+            std::cout << std::hex << _buffer[i] << ' ';
+        std::cout << std::endl;
+        reset();
+    }
 }
 
 void WiegandInterface::reset()
