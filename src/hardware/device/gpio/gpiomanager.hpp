@@ -23,7 +23,7 @@ class IGPIOListener;
 
 class GPIOManager : public IGPIOObservable
 {
-    static const int            DefaultTimeout = 500;
+    static const int            DefaultTimeout = 100;
     static const unsigned int   PollBufferSize = 64;
 public:
     typedef struct pollfd PollFdSet;
@@ -43,12 +43,13 @@ private:
     GPIOManager& operator=(const GPIOManager& other);
 
 public:
-    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode); // NOTE call this before starting to poll
+    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode = GPIO::Rising); // NOTE call this before starting to poll
     void    startPolling();
     void    stopPolling();
     void    pollLoop();
 
 private:
+    void    timeout();
     void    buildFdSet();
 
 private:

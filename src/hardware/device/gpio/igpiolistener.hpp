@@ -13,7 +13,8 @@ class IGPIOListener
 {
 public:
     virtual ~IGPIOListener() {}
-    virtual void    notify(int gpioNo) = 0;
+    virtual void    notify(int gpioNo) = 0; // NOTE An interrupt was caught
+    virtual void    timeout() = 0; // NOTE Called when poll() times out
 };
 
 #endif // IGPIOLISTENER_HPP
