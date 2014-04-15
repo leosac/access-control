@@ -69,8 +69,7 @@ void GPIOManager::stopPolling()
 
 void GPIOManager::pollLoop()
 {
-    const unsigned  bufferLen = 32;
-    char            buffer[bufferLen];
+    char            buffer[PollBufferSize];
     int             ret;
     unsigned int    fdsetSize;
 
@@ -93,7 +92,7 @@ void GPIOManager::pollLoop()
                     if (_fdset[i].revents & POLLPRI)
                     {
                         _fdset[i].revents = 0;
-                        if ((ret = ::read(_fdset[i].fd, buffer, bufferLen - 1)) < 0)
+                        if ((ret = ::read(_fdset[i].fd, buffer, PollBufferSize - 1)) < 0)
                             throw (GpioException(UnixSyscall::getErrorString("read", errno)));
                         else if (ret > 1)
                             buffer[ret - 1] = '\0';
