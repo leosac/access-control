@@ -82,7 +82,9 @@ bool Core::parseArguments()
 
 void Core::load()
 {
+#ifndef NO_HW
     _hwManager = new HWManager;
+#endif
 
     loadLibraries();
 
@@ -97,13 +99,17 @@ void Core::load()
     {
         std::cerr << e.what() << std::endl;
     }
-
+#ifndef NO_HW
     _hwManager->start();
+#endif
+
 }
 
 void Core::unload()
 {
+#ifndef NO_HW
     _hwManager->stop();
+#endif
 
     for (auto module : _modules)
         delete module.second;
@@ -111,8 +117,10 @@ void Core::unload()
 
     unloadLibraries();
 
+#ifndef NO_HW
     delete _hwManager;
     _hwManager = nullptr;
+#endif
 }
 
 void Core::loadLibraries()
