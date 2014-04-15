@@ -13,7 +13,6 @@
 #include <fcntl.h>
 
 #include <thread>
-#include <iostream> // FIXME Debug
 
 #include "exception/gpioexception.hpp"
 #include "igpiolistener.hpp"

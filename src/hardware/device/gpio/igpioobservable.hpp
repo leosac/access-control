@@ -18,7 +18,7 @@ public:
 
 public:
     virtual ~IGPIOObservable() {}
-    virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode) = 0;
+    virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode = GPIO::Rising) = 0;
 };
 
 #endif // IGPIOOBSERVALBE_HPP
