@@ -7,8 +7,8 @@
 WiegandInterface::WiegandInterface(IGPIOObservable& gpioProvider)
 :   _bitIdx(0)
 {
-    _hiGpio = 14; // FIXME Debug
-    _loGpio = 15; // FIXME Debug
+    _hiGpio = 15; // FIXME Debug
+    _loGpio = 14; // FIXME Debug
     gpioProvider.registerListener(this, _hiGpio, GPIO::Rising);
     gpioProvider.registerListener(this, _loGpio, GPIO::Rising);
 }
@@ -28,7 +28,7 @@ void WiegandInterface::notify(int gpioNo)
         reset();
 
     if (gpioNo == _hiGpio)
-       _buffer[_bitIdx / 8] |= (1 << (_bitIdx % 8));
+       _buffer[_bitIdx / 8] |= (1 << (7 - _bitIdx % 8));
 
     ++_bitIdx;
 }
@@ -52,7 +52,7 @@ void WiegandInterface::reset()
 void WiegandInterface::debugPrint()
 {
     std::cout << "Read: ";
-    for (int i = _bitIdx / 8; i >= 0; --i)
+    for (int i = (_bitIdx - 1) / 8; i >= 0; --i)
     {
         for (int j = 7; j >= 0; --j)
             std::cout << ((_buffer[i] & (1 << j)) > 0);
