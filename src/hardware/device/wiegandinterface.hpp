@@ -1,3 +1,9 @@
+/**
+ * \file wiegandinterface.hpp
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
+ * \brief Wiegand hardware communication layer
+ */
+
 #ifndef WIEGANDINTERFACE_HPP
 #define WIEGANDINTERFACE_HPP
 
@@ -28,7 +34,7 @@ public:
 
 private:
     void    reset();
-    void    debugPrint();
+    void    debugPrint(); // FIXME Debug
 
 private:
     Byte        _buffer[DataBufferLen];
