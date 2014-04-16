@@ -15,7 +15,7 @@
 
 static ISignalCallback* sigCallback = nullptr;
 
-static void fesser_e(int signal)
+static void handler(int signal)
 {
     if (sigCallback)
         sigCallback->handleSignal(signal);
@@ -25,7 +25,7 @@ void SignalHandler::registerCallback(ISignalCallback* callback)
 {
     struct sigaction    act;
 
-    act.sa_handler = &fesser_e;
+    act.sa_handler = &handler;
     if (sigemptyset(&act.sa_mask) < 0)
         throw (SignalException(UnixSyscall::getErrorString("sigemptyset", errno)));
     act.sa_flags = SA_RESTART;

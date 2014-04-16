@@ -127,11 +127,12 @@ void GPIOManager::buildFdSet()
     int i = 0;
 
     _fdset.resize(_listeners.size());
-    for (auto listener : _listeners)
+    for (std::list<ListenerInfo>::iterator it = _listeners.begin(); it != _listeners.end(); ++it)
     {
-        _fdset[i].fd = _polledGpio[listener.gpioNo]->getPollFd();
+        _fdset[i].fd = _polledGpio[it->gpioNo]->getPollFd();
         _fdset[i].events = POLLPRI;
         _fdset[i].revents = 0;
+        it->fdIdx = i;
         ++i;
     }
 }

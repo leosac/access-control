@@ -28,6 +28,7 @@ public:
 
 private:
     void    reset();
+    void    debugPrint();
 
 private:
     Byte        _buffer[DataBufferLen];
