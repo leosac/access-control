@@ -20,7 +20,7 @@ class DynamicLibrary;
 
 class Core : public ISignalCallback
 {
-    static const int IdleSleepTimeMs = 1000;
+    static const int IdleSleepTimeMs = 10000;
 public:
     Core();
     ~Core();

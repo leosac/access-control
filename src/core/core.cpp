@@ -53,16 +53,17 @@ void Core::run(const std::list<std::string>& args)
         return;
     load();
     dispatchEvent(Event("starting", "Core"));
-    _runMutex.lock();
-    _isRunning = true;
-    while (_isRunning)
     {
-        _runMutex.unlock();
-        std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
-        dispatchEvent(Event("alive", "Core"));
-        _runMutex.lock();
+        std::lock_guard<std::mutex> lg(_runMutex);
+        _isRunning = true;
+        while (_isRunning)
+        {
+            _runMutex.unlock();
+            std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
+            dispatchEvent(Event("alive", "Core"));
+            _runMutex.lock();
+        }
     }
-    _runMutex.unlock();
     dispatchEvent(Event("exiting", "Core"));
     unload();
 }
