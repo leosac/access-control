@@ -19,7 +19,7 @@
 
 class WiegandInterface : public IGPIOListener
 {
-    static const int    DataBufferLen = 5;
+    static const int    DataBufferSize = 10;
 public:
     WiegandInterface(IGPIOObservable& gpioProvider);
     ~WiegandInterface();
@@ -37,7 +37,7 @@ private:
     void    debugPrint(); // FIXME Debug
 
 private:
-    Byte        _buffer[DataBufferLen];
+    Byte        _buffer[DataBufferSize];
     std::size_t _bitIdx;
     int         _hiGpio;
     int         _loGpio;

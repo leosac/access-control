@@ -30,7 +30,7 @@ WiegandInterface& WiegandInterface::operator=(const WiegandInterface& /*other*/)
 
 void WiegandInterface::notify(int gpioNo)
 {
-    if (_bitIdx >= DataBufferLen * 8) // Buffer overflow
+    if (_bitIdx >= DataBufferSize * 8) // Buffer overflow
         reset();
 
     if (gpioNo == _hiGpio)
@@ -51,7 +51,7 @@ void WiegandInterface::timeout()
 
 void WiegandInterface::reset()
 {
-    ::memset(_buffer, 0, DataBufferLen);
+    ::memset(_buffer, 0, DataBufferSize);
     _bitIdx = 0;
 }
 
