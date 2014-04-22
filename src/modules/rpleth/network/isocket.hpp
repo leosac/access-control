@@ -1,3 +1,9 @@
+/**
+ * \file isocket.hpp
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
+ * \brief socket interface
+ */
+
 #ifndef ISOCKET_HPP
 #define ISOCKET_HPP
 

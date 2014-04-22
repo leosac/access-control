@@ -1,3 +1,9 @@
+/**
+ * \file unixsocket.cpp
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
+ * \brief Unix socket class
+ */
+
 #include <sstream>
 #include <cerrno>
 #include <unistd.h>
