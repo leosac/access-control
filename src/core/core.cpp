@@ -129,7 +129,7 @@ void Core::loadLibraries()
     std::string     libname;
     DynamicLibrary* lib;
 
-    _libsDirectories.push_back("modules/journal");
+    _libsDirectories.push_back("modules/rpleth");
 
     for (auto folder : _libsDirectories)
     {
@@ -201,7 +201,7 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
     catch (const DynLibException& e)
     {
         std::cerr << e.what() << std::endl;
-        delete module;
+        delete module; // FIXME Safe ?
         return (false);
     }
     _modules[alias] = module;
@@ -214,6 +214,4 @@ void Core::dispatchEvent(const Event& event)
 {
     for (auto logger : _loggerModules)
         logger->sendEvent(event);
-    if (_loggerModules.empty())
-        std::cout << '[' << event.date.time_since_epoch().count() << ']' << " " << Event::getLogLevelString(event.logLevel) << " " << event.source << "::" << event.message<< std::endl;
 }
