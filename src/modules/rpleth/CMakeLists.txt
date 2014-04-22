@@ -1,8 +1,10 @@
 set(RPLETH_BIN rpleth)
 
 set(RPLETH_SRCS
-    rplethauth.cpp
     init.cpp
+    rplethauth.cpp
+    rplethpacket.cpp
+    protocol.cpp
     network/unixsocket.cpp
 )
 

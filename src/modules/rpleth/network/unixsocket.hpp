@@ -1,3 +1,9 @@
+/**
+ * \file unixsocket.hpp
+ * \author Thibault Schueller <ryp.sqrt@gmail.com>
+ * \brief Unix socket class
+ */
+
 #ifndef UNIXSOCKET_HPP
 #define UNIXSOCKET_HPP
 
