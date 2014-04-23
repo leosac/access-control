@@ -8,6 +8,7 @@
 #define ISOCKET_HPP
 
 #include <string>
+
 #include "tools/bufferutils.hpp"
 
 namespace Rezzo

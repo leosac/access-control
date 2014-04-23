@@ -40,7 +40,7 @@ RplethAuth::~RplethAuth()
     _networkThread.join();
 }
 
-void RplethAuth::sendEvent(const Event& event)
+void RplethAuth::sendEvent(const Event& /*event*/)
 {
     // TODO
 }
@@ -60,6 +60,7 @@ void RplethAuth::run()
     RplethProtocol  protocol;
     Byte            buffer[1024 + 1];
     std::size_t     ret;
+    int             selectRet;
 
     _serverSocket = new Rezzo::UnixSocket(Rezzo::ISocket::TCP);
     _serverSocket->bind(_port);
@@ -80,9 +81,9 @@ void RplethAuth::run()
         }
         _timeoutStruct.tv_sec = _timeout / 1000;
         _timeoutStruct.tv_usec = (_timeout % 1000) * 1000;
-        if ((ret = ::select(_fdMax + 1, &_rSet, nullptr, nullptr, &_timeoutStruct)) == -1)
+        if ((selectRet = ::select(_fdMax + 1, &_rSet, nullptr, nullptr, &_timeoutStruct)) == -1)
             throw (ModuleException(UnixSyscall::getErrorString("select", errno)));
-        else if (ret > 0)
+        else if (selectRet > 0)
         {
             for (std::list<Rezzo::ISocket*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
             {

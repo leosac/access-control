@@ -6,23 +6,23 @@
 
 #include "rplethpacket.hpp"
 
-RplethPacket::RplethPacket(Sender sender)
+RplethPacket::RplethPacket(Sender packetSender)
 :   isGood(false),
-    sender(sender)
+    sender(packetSender)
 {}
 
 RplethPacket::~RplethPacket() {}
 
 Byte RplethPacket::checksum() const
 {
-    Byte sum = 0;
+    Byte s = 0;
 
     if (sender == Server)
-        sum ^= status;
-    sum ^= type;
-    sum ^= command;
-    sum ^= dataLen;
+        s ^= status;
+    s ^= type;
+    s ^= command;
+    s ^= dataLen;
     for (int i = 0; i < dataLen; ++i)
-        sum ^= data[i];
-    return (sum);
+        s ^= data[i];
+    return (s);
 }
