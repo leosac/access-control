@@ -21,8 +21,8 @@ namespace Rezzo
         UnixSocket(int handle, Address address);
 
     public:
-        std::size_t recv(char* data, std::size_t size, int flags = 0);
-        std::size_t send(const char* data, std::size_t size, int flags = 0);
+        std::size_t recv(Byte* data, std::size_t size, int flags = 0);
+        std::size_t send(const Byte* data, std::size_t size, int flags = 0);
         void        connect(const std::string& host, Port port);
         void        bind(Port port);
         void        listen(int backLogSize = 0);

@@ -4,7 +4,7 @@ set(RPLETH_SRCS
     init.cpp
     rplethauth.cpp
     rplethpacket.cpp
-    protocol.cpp
+    rplethprotocol.cpp
     network/unixsocket.cpp
 )
 

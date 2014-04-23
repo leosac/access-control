@@ -18,6 +18,7 @@ class RplethAuth : public IModule
 {
     static const Rezzo::ISocket::Port   DefaultPort = 9559;
     static const long                   DefaultTimeoutMs = 500;
+
 public:
     RplethAuth(Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
     ~RplethAuth();

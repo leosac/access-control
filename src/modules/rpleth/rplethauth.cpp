@@ -7,8 +7,10 @@
 #include "rplethauth.hpp"
 
 #include <iostream>
+#include <unistd.h> // FIXME rm this
 
 #include "network/unixsocket.hpp"
+#include "rplethprotocol.hpp"
 #include "tools/version.hpp"
 #include "tools/unixsyscall.hpp"
 #include "exception/moduleexception.hpp"
@@ -55,8 +57,9 @@ const std::string& RplethAuth::getVersionString() const
 
 void RplethAuth::run()
 {
-    char    buffer[1024 + 1];
-    int     ret;
+    RplethProtocol  protocol;
+    Byte            buffer[1024 + 1];
+    std::size_t     ret;
 
     _serverSocket = new Rezzo::UnixSocket(Rezzo::ISocket::TCP);
     _serverSocket->bind(_port);
@@ -66,9 +69,9 @@ void RplethAuth::run()
     while (_isRunning)
     {
         _runMutex.unlock();
-        std::cout << "LOOP" << std::endl;
         FD_ZERO(&_rSet);
         FD_SET(_serverSocket->getHandle(), &_rSet);
+        FD_SET(0, &_rSet);
         _fdMax = _serverSocket->getHandle();
         for (std::list<Rezzo::ISocket*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
         {
@@ -93,12 +96,31 @@ void RplethAuth::run()
                         std::cout << "Client OUT" << std::endl;
                         break;
                     }
-                    buffer[ret] = '\0';
-                    std::cout << "Client dit:" << buffer << std::endl;
+                    RplethPacket packet = RplethProtocol::decodeCommand(buffer, ret);
+                    RplethPacket response = protocol.processClientPacket(packet);
+                    std::size_t size = RplethProtocol::encodeCommand(response, buffer, 1024);
+                    (*it)->send(buffer, size);
                 }
             }
+            if (FD_ISSET(0, &_rSet))
+            {
+                read(0, buffer, 1024);
+                std::cout << "Input Detected" << std::endl;
+                Rezzo::ISocket* client = _clients.front();
+                RplethPacket csn(RplethPacket::Server);
+                csn.type = RplethProtocol::HID;
+                csn.command = RplethProtocol::Badge;
+                csn.dataLen = 4;
+                csn.data = std::vector<Byte>(4, 0xFF);
+                csn.sum = csn.checksum();
+                std::size_t size = RplethProtocol::encodeCommand(csn, buffer, 1024);
+                client->send(buffer, size);
+            }
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
+            {
                 _clients.push_back(_serverSocket->accept());
+                std::cout << "Client connected" << std::endl;
+            }
         }
         _runMutex.lock();
     }

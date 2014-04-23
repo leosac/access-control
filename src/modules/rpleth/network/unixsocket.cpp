@@ -50,7 +50,7 @@ UnixSocket::UnixSocket(int handle, ISocket::Address address)
 
 UnixSocket::~UnixSocket() {}
 
-std::size_t UnixSocket::recv(char* data, std::size_t size, int flags)
+std::size_t UnixSocket::recv(Byte* data, std::size_t size, int flags)
 {
     int ret;
 
@@ -59,7 +59,7 @@ std::size_t UnixSocket::recv(char* data, std::size_t size, int flags)
     return (ret);
 }
 
-std::size_t UnixSocket::send(const char* data, std::size_t size, int flags)
+std::size_t UnixSocket::send(const Byte* data, std::size_t size, int flags)
 {
     int ret;
 
