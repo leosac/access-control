@@ -7,14 +7,34 @@
 #ifndef RPLETHPACKET_HPP
 #define RPLETHPACKET_HPP
 
+#include "tools/bufferutils.hpp"
+
+#include <vector>
+
 class RplethPacket
 {
 public:
-    RplethPacket();
+    enum Sender {
+        Client = 0,
+        Server
+    };
+
+public:
+    RplethPacket(Sender sender);
     ~RplethPacket();
 
 public:
-    bool    isGood;
+    Byte    checksum() const;
+
+public:
+    Byte                status;
+    Byte                type;
+    Byte                command;
+    Byte                dataLen;
+    std::vector<Byte>   data;
+    Byte                sum;
+    bool                isGood;
+    Sender              sender;
 };
 
 #endif // RPLETHPACKET_HPP

@@ -8,6 +8,7 @@
 #define ISOCKET_HPP
 
 #include <string>
+#include "tools/bufferutils.hpp"
 
 namespace Rezzo
 {
@@ -43,8 +44,8 @@ namespace Rezzo
 
     public:
         virtual ~ISocket() {}
-        virtual std::size_t recv(char* data, std::size_t size, int flags = 0) = 0;
-        virtual std::size_t send(const char* data, std::size_t size, int flags = 0) = 0;
+        virtual std::size_t recv(Byte* data, std::size_t size, int flags = 0) = 0;
+        virtual std::size_t send(const Byte* data, std::size_t size, int flags = 0) = 0;
         virtual void        connect(const std::string& host, Port port) = 0;
         virtual void        bind(Port port) = 0;
         virtual void        listen(int backLogSize = 0) = 0;
