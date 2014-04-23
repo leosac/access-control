@@ -76,7 +76,7 @@ void UnixSocket::connect(const std::string& host, Port port)
     _address.ip = resolveHostname(host);
     _address.port = port;
     addr.sin_family = AF_INET;
-    addr.sin_port = ::htons(port);
+    addr.sin_port = htons(port);
     addr.sin_addr.s_addr = _address.ip;
     if ((ret = ::connect(_handle, reinterpret_cast<const struct sockaddr*>(&addr), sizeof(addr)) == -1))
         throw (ModuleException(UnixSyscall::getErrorString("connect", errno)));
@@ -90,7 +90,7 @@ void UnixSocket::bind(Port port)
     _address.port = port;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = _address.ip;
-    addr.sin_port = ::htons(_address.port);
+    addr.sin_port = htons(_address.port);
     if (::bind(_handle, reinterpret_cast<const struct sockaddr*>(&addr), sizeof(addr)) == -1)
         throw (ModuleException(UnixSyscall::getErrorString("bind", errno)));
 }
@@ -115,7 +115,7 @@ ISocket* UnixSocket::accept()
     size = sizeof(addr);
     if ((handle = ::accept(_handle, reinterpret_cast<struct sockaddr*>(&addr), &size)) == -1)
         throw (ModuleException(UnixSyscall::getErrorString("accept", errno)));
-    clientAddr.port = ::htons(addr.sin_port);
+    clientAddr.port = htons(addr.sin_port);
     clientAddr.ip = addr.sin_addr.s_addr;
     return (new UnixSocket(handle, clientAddr));
 }

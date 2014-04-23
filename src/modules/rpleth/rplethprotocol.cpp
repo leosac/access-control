@@ -39,7 +39,7 @@ RplethPacket RplethProtocol::decodeCommand(const Byte* buffer, std::size_t size)
     packet.command = buffer[CommandByteIdx];
     packet.dataLen = buffer[SizeByteIdx];
 
-    if (size != (packet.dataLen + 4))
+    if (size != static_cast<std::size_t>(packet.dataLen + 4))
     {
         packet.status = BadSize;
         std::cout << "DEBUG: Packet size KO" << std::endl;
@@ -64,8 +64,10 @@ RplethPacket RplethProtocol::decodeCommand(const Byte* buffer, std::size_t size)
     return (packet);
 }
 
-std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size)
+std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t /*size*/)
 {
+    // TODO Compare with input size
+
     if (packet.sender == RplethPacket::Server)
     {
         buffer[0] = packet.status;

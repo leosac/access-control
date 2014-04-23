@@ -23,6 +23,10 @@ public:
     DynamicLibrary(const std::string& file);
     ~DynamicLibrary();
 
+private:
+    DynamicLibrary(const DynamicLibrary& other);
+    DynamicLibrary& operator=(const DynamicLibrary& other);
+
 public:
     void    open(RelocationMode mode = Lazy); // NOTE May throw DynLibException
     void    close(); // NOTE May throw DynLibException

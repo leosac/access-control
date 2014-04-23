@@ -20,7 +20,7 @@ public:
     };
 
 public:
-    RplethPacket(Sender sender);
+    RplethPacket(Sender packetSender);
     ~RplethPacket();
 
 public:

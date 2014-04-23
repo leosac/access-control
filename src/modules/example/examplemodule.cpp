@@ -13,7 +13,7 @@ ExampleModule::ExampleModule()
 
 ExampleModule::~ExampleModule() {}
 
-ExampleModule::ExampleModule(const ExampleModule& /*other*/) {}
+ExampleModule::ExampleModule(const ExampleModule& /*other*/) : _version() {}
 
 ExampleModule& ExampleModule::operator=(const ExampleModule& /*other*/)
 {

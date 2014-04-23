@@ -14,6 +14,13 @@ DynamicLibrary::DynamicLibrary(const std::string& file)
 
 DynamicLibrary::~DynamicLibrary() {}
 
+DynamicLibrary::DynamicLibrary(const DynamicLibrary& /*other*/) : _file(), _handle() {}
+
+DynamicLibrary& DynamicLibrary::operator=(const DynamicLibrary& /*other*/)
+{
+    return (*this);
+}
+
 void DynamicLibrary::open(RelocationMode mode)
 {
     char*   err;
