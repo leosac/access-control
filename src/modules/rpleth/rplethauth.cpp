@@ -28,6 +28,7 @@ RplethAuth::RplethAuth(Rezzo::ISocket::Port port, long timeoutMs)
     _fdMax(0),
     _timeout(timeoutMs)
 {
+    _isRunning = true;
     _networkThread = std::thread(&launch, this);
 }
 
@@ -40,14 +41,9 @@ RplethAuth::~RplethAuth()
     _networkThread.join();
 }
 
-void RplethAuth::sendEvent(const Event& /*event*/)
-{
-    // TODO
-}
-
 IModule::Type RplethAuth::getType() const
 {
-    return (Authentication);
+    return (Auth);
 }
 
 const std::string& RplethAuth::getVersionString() const
@@ -66,7 +62,6 @@ void RplethAuth::run()
     _serverSocket->bind(_port);
     _serverSocket->listen();
     _runMutex.lock();
-    _isRunning = true;
     while (_isRunning)
     {
         _runMutex.unlock();

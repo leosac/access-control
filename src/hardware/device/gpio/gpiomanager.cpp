@@ -60,6 +60,7 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
 
 void GPIOManager::startPolling()
 {
+    _isRunning = true;
     _pollThread = std::thread(&launch, this);
 }
 
@@ -82,7 +83,6 @@ void GPIOManager::pollLoop()
     fdsetSize = _fdset.size();
     {
         std::lock_guard<std::mutex> lg(_runMutex);
-        _isRunning = true;
         while (_isRunning)
         {
             _runMutex.unlock();

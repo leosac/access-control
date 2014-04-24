@@ -7,8 +7,6 @@
 #ifndef IMODULE_HPP
 #define IMODULE_HPP
 
-#include "core/event.hpp"
-
 #include <string>
 
 class IModule
@@ -18,14 +16,13 @@ public:
     enum Type {
         Door,
         AccessPoint,
-        Authentication,
+        Auth,
         Logger,
         ActivityMonitor
     };
 
 public:
     virtual ~IModule() {}
-    virtual void                sendEvent(const Event& event) = 0;
     virtual Type                getType() const = 0;
     virtual const std::string&  getVersionString() const = 0;
 };
