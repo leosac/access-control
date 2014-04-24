@@ -7,9 +7,9 @@
 #ifndef EXAMPLEMODULE_HPP
 #define EXAMPLEMODULE_HPP
 
-#include "modules/imodule.hpp"
+#include "modules/ieventlistenermodule.hpp"
 
-class ExampleModule : public IModule
+class ExampleModule : public IEventListenerModule
 {
 public:
     ExampleModule();

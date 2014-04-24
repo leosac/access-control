@@ -7,9 +7,9 @@
 #ifndef JOURNALLOGGER_HPP
 #define JOURNALLOGGER_HPP
 
-#include "modules/imodule.hpp"
+#include "modules/ieventlistenermodule.hpp"
 
-class JournalLogger : public IModule
+class JournalLogger : public IEventListenerModule
 {
 public:
     JournalLogger(int logLevel = Event::Debug);

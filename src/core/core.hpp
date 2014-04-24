@@ -13,6 +13,8 @@
 
 #include "event.hpp"
 #include "modules/imodule.hpp"
+#include "modules/ieventlistenermodule.hpp"
+#include "modules/iauthmodule.hpp"
 #include "hardware/ihwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 
@@ -21,6 +23,8 @@ class DynamicLibrary;
 class Core : public ISignalCallback
 {
     static const int IdleSleepTimeMs = 10000;
+    typedef void (Core::*RegisterFunc)(IModule*);
+
 public:
     Core();
     ~Core();
@@ -44,6 +48,14 @@ private:
     void    dispatchEvent(const Event& event);
 
 private:
+    void    registerModule(IModule* module, const std::string& alias);
+    void    registerDoorModule(IModule* module);
+    void    registerAccessPointModule(IModule* module);
+    void    registerAuthModule(IModule* module);
+    void    registerLoggerModule(IModule* module);
+    void    registerActivityMonitorModule(IModule* module);
+
+private:
     std::list<std::string>                  _args;
     std::mutex                              _runMutex;
     bool                                    _isRunning;
@@ -53,7 +65,9 @@ private:
     std::list<std::string>                  _libsDirectories;
     std::map<std::string, DynamicLibrary*>  _dynlibs;
     std::map<std::string, IModule*>         _modules;
-    std::list<IModule*>                     _loggerModules;
+    std::map<IModule::Type, RegisterFunc>   _registrationHandler;
+    std::list<IEventListenerModule*>        _loggerModules;
+    IAuthModule*                            _authModule;
 };
 
 #endif // CORE_HPP

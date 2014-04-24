@@ -11,10 +11,10 @@
 #include <thread>
 #include <mutex>
 
-#include "modules/imodule.hpp"
+#include "modules/iauthmodule.hpp"
 #include "network/isocket.hpp"
 
-class RplethAuth : public IModule
+class RplethAuth : public IAuthModule
 {
     static const Rezzo::ISocket::Port   DefaultPort = 9559;
     static const long                   DefaultTimeoutMs = 500;
@@ -24,7 +24,6 @@ public:
     ~RplethAuth();
 
 public:
-    void                sendEvent(const Event& event);
     Type                getType() const;
     const std::string&  getVersionString() const;
     void                run();

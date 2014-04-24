@@ -7,34 +7,38 @@
 #include "core.hpp"
 
 #include <thread>
-#include <iostream> // FIXME Debug
+#include <iostream>
 
 #include "osac.hpp"
 #include "signal/signalhandler.hpp"
-#include "exception/signalexception.hpp"
-#include "exception/dynlibexception.hpp"
 #include "hardware/hwmanager.hpp"
-#include "hardware/device/gpio/gpio.hpp" // FIXME Debug
 #include "dynlib/dynamiclibrary.hpp"
 #include "tools/unixfs.hpp"
+
+#include "exception/signalexception.hpp"
+#include "exception/dynlibexception.hpp"
+#include "exception/moduleexception.hpp"
 
 const int Core::IdleSleepTimeMs;
 
 Core::Core()
 :   _isRunning(false),
-    _hwManager(nullptr)
+    _hwManager(nullptr),
+    _authModule(nullptr)
 {
     _libsDirectories.push_back(UnixFs::getCWD());
+    _registrationHandler[IModule::Door] = &Core::registerDoorModule;
+    _registrationHandler[IModule::AccessPoint] = &Core::registerAccessPointModule;
+    _registrationHandler[IModule::Auth] = &Core::registerAuthModule;
+    _registrationHandler[IModule::Logger] = &Core::registerLoggerModule;
+    _registrationHandler[IModule::ActivityMonitor] = &Core::registerActivityMonitorModule;
 }
 
 Core::~Core() {}
 
 Core::Core(const Core& /*other*/) {}
 
-Core& Core::operator=(const Core& /*other*/)
-{
-    return (*this);
-}
+Core& Core::operator=(const Core& /*other*/) {return (*this);}
 
 void Core::handleSignal(int /*signal*/)
 {
@@ -59,8 +63,8 @@ void Core::run(const std::list<std::string>& args)
         while (_isRunning)
         {
             _runMutex.unlock();
-            std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
             dispatchEvent(Event("alive", "Core"));
+            std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
             _runMutex.lock();
         }
     }
@@ -103,7 +107,6 @@ void Core::load()
 #ifndef NO_HW
     _hwManager->start();
 #endif
-
 }
 
 void Core::unload()
@@ -130,6 +133,7 @@ void Core::loadLibraries()
     DynamicLibrary* lib;
 
     _libsDirectories.push_back("modules/rpleth");
+    _libsDirectories.push_back("modules/journal");
 
     for (auto folder : _libsDirectories)
     {
@@ -176,10 +180,9 @@ void Core::unloadLibraries()
 
 void Core::debugPrintLibs()
 {
-    std::cout << "Debug::Libs:" << std::endl;
-
+    std::cout << "Libs:" << std::endl;
     for (auto lib : _dynlibs)
-        std::cout << lib.first << std::endl;
+        std::cout << "-> " << lib.first << std::endl;
 }
 
 bool Core::loadModule(const std::string& libname, const std::string& alias)
@@ -201,12 +204,10 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
     catch (const DynLibException& e)
     {
         std::cerr << e.what() << std::endl;
-        delete module; // FIXME Safe ?
+        delete module; // FIXME is it safe ?
         return (false);
     }
-    _modules[alias] = module;
-    if (module->getType() == IModule::Logger)
-        _loggerModules.push_back(module);
+    registerModule(module, alias);
     return (true);
 }
 
@@ -214,4 +215,49 @@ void Core::dispatchEvent(const Event& event)
 {
     for (auto logger : _loggerModules)
         logger->sendEvent(event);
+}
+
+void Core::registerModule(IModule* module, const std::string& alias)
+{
+    RegisterFunc    func = _registrationHandler[module->getType()];
+
+    if (!func)
+        throw (ModuleException("Unknown module type"));
+    ((*this).*func)(module);
+    _modules[alias] = module;
+}
+
+void Core::registerDoorModule(IModule* /*module*/)
+{
+    // TODO
+}
+
+void Core::registerAccessPointModule(IModule* /*module*/)
+{
+    // TODO
+}
+
+void Core::registerAuthModule(IModule* module)
+{
+    IAuthModule*    auth;
+
+    if (!(auth = dynamic_cast<IAuthModule*>(module)))
+        throw (ModuleException("Invalid Auth module"));
+    if (_authModule)
+        throw (ModuleException("Replacing existing Auth module"));
+    _authModule = auth;
+}
+
+void Core::registerLoggerModule(IModule* module)
+{
+    IEventListenerModule*   logger;
+
+    if (!(logger = dynamic_cast<IEventListenerModule*>(module)))
+        throw (ModuleException("Invalid Logger module"));
+    _loggerModules.push_back(logger);
+}
+
+void Core::registerActivityMonitorModule(IModule* /*module*/)
+{
+    // TODO
 }
