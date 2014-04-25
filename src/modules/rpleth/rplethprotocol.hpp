@@ -8,6 +8,7 @@
 #define RPLETHPROTOCOL_HPP
 
 #include "rplethpacket.hpp"
+#include "network/circularbuffer.hpp"
 
 #include <queue>
 
@@ -17,6 +18,9 @@ class RplethProtocol
     static const std::size_t    CommandByteIdx  = 1;
     static const std::size_t    SizeByteIdx     = 2;
     static const std::size_t    PacketMinSize   = 4;
+
+private:
+    RplethProtocol();
 
 public:
     enum TypeCode {
@@ -66,18 +70,9 @@ public:
     };
 
 public:
-    RplethProtocol();
-    ~RplethProtocol();
-
-public:
-    static RplethPacket decodeCommand(const Byte* buffer, std::size_t size);
+    static RplethPacket decodeCommand(CircularBuffer& buffer);
     static std::size_t  encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size);
-
-public:
-    RplethPacket        processClientPacket(const RplethPacket& packet);
-
-private:
-    std::queue<RplethPacket>    _serverStack;
+    static RplethPacket processClientPacket(const RplethPacket& packet);
 };
 
 #endif // RPLETHPROTOCOL_HPP

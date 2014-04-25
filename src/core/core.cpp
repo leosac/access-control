@@ -94,7 +94,10 @@ void Core::load()
     loadLibraries();
 
     // TODO load modules
-    loadModule(_dynlibs.begin()->first, "myModule"); // FIXME Debug
+    for (auto lib : _dynlibs)
+        loadModule(lib.first, lib.first + "-test"); // FIXME Debug
+
+    debugPrintModules();
 
     try
     {
@@ -178,13 +181,6 @@ void Core::unloadLibraries()
     }
 }
 
-void Core::debugPrintLibs()
-{
-    std::cout << "Libs:" << std::endl;
-    for (auto lib : _dynlibs)
-        std::cout << "-> " << lib.first << std::endl;
-}
-
 bool Core::loadModule(const std::string& libname, const std::string& alias)
 {
     DynamicLibrary*     lib = _dynlibs[libname];
@@ -215,6 +211,20 @@ void Core::dispatchEvent(const Event& event)
 {
     for (auto logger : _loggerModules)
         logger->sendEvent(event);
+}
+
+void Core::debugPrintLibs()
+{
+    std::cout << "Libs:" << std::endl;
+    for (auto lib : _dynlibs)
+        std::cout << "-> " << lib.first << std::endl;
+}
+
+void Core::debugPrintModules()
+{
+    std::cout << "Loaded modules:" << std::endl;
+    for (auto module : _modules)
+        std::cout << "-> " << module.first << std::endl;
 }
 
 void Core::registerModule(IModule* module, const std::string& alias)

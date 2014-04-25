@@ -10,11 +10,18 @@
 #include "imodule.hpp"
 
 #include <string>
+#include <vector>
 
 class IAuthModule : public IModule
 {
 public:
+    typedef struct {
+        int                 id;
+    } AuthRequest;
+
+public:
     virtual ~IAuthModule() {}
+    virtual void    sendAuthRequest(const AuthRequest& request) = 0;
 };
 
 #endif // IAUTHMODULE_HPP

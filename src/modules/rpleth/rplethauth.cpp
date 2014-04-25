@@ -41,6 +41,11 @@ RplethAuth::~RplethAuth()
     _networkThread.join();
 }
 
+void RplethAuth::sendAuthRequest(const IAuthModule::AuthRequest& /*request*/)
+{
+    // TODO
+}
+
 IModule::Type RplethAuth::getType() const
 {
     return (Auth);
@@ -53,9 +58,7 @@ const std::string& RplethAuth::getVersionString() const
 
 void RplethAuth::run()
 {
-    RplethProtocol  protocol;
-    Byte            buffer[1024 + 1];
-    std::size_t     ret;
+    std::size_t     readRet;
     int             selectRet;
 
     _serverSocket = new Rezzo::UnixSocket(Rezzo::ISocket::TCP);
@@ -67,12 +70,11 @@ void RplethAuth::run()
         _runMutex.unlock();
         FD_ZERO(&_rSet);
         FD_SET(_serverSocket->getHandle(), &_rSet);
-        FD_SET(0, &_rSet);
         _fdMax = _serverSocket->getHandle();
-        for (std::list<Rezzo::ISocket*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+        for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
         {
-            _fdMax = std::max(_fdMax, (*it)->getHandle());
-            FD_SET((*it)->getHandle(), &_rSet);
+            _fdMax = std::max(_fdMax, it->socket->getHandle());
+            FD_SET(it->socket->getHandle(), &_rSet);
         }
         _timeoutStruct.tv_sec = _timeout / 1000;
         _timeoutStruct.tv_usec = (_timeout % 1000) * 1000;
@@ -80,53 +82,57 @@ void RplethAuth::run()
             throw (ModuleException(UnixSyscall::getErrorString("select", errno)));
         else if (selectRet > 0)
         {
-            for (std::list<Rezzo::ISocket*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+            for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
             {
-                if (FD_ISSET((*it)->getHandle(), &_rSet))
+                if (FD_ISSET(it->socket->getHandle(), &_rSet))
                 {
-                    ret = (*it)->recv(buffer, 1024);
-                    if (!ret)
+                    try
                     {
-                        delete *it;
+                        readRet = it->socket->recv(_buffer, RingBufferSize);
+                        it->buffer.write(_buffer, readRet);
+                        handleClientMessage(*it);
+                    }
+                    catch (const ModuleException& e)
+                    {
+                        it->socket->close();
+                        delete it->socket;
                         _clients.erase(it);
-                        std::cout << "Client OUT" << std::endl;
+                        std::cout << "Client disconnected" << std::endl;
                         break;
                     }
-                    RplethPacket packet = RplethProtocol::decodeCommand(buffer, ret);
-                    RplethPacket response = protocol.processClientPacket(packet);
-                    std::size_t size = RplethProtocol::encodeCommand(response, buffer, 1024);
-                    (*it)->send(buffer, size);
                 }
-            }
-            if (FD_ISSET(0, &_rSet))
-            {
-                read(0, buffer, 1024);
-                std::cout << "Input Detected" << std::endl;
-                Rezzo::ISocket* client = _clients.front();
-                RplethPacket csn(RplethPacket::Server);
-                csn.type = RplethProtocol::HID;
-                csn.command = RplethProtocol::Badge;
-                csn.dataLen = 4;
-                csn.data = std::vector<Byte>(4, 0xFF);
-                csn.sum = csn.checksum();
-                std::size_t size = RplethProtocol::encodeCommand(csn, buffer, 1024);
-                client->send(buffer, size);
             }
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
-                _clients.push_back(_serverSocket->accept());
+                _clients.push_back(Client(_serverSocket->accept()));
                 std::cout << "Client connected" << std::endl;
             }
         }
         _runMutex.lock();
     }
     _runMutex.unlock();
-    std::cout << "ENDLOOP" << std::endl;
-    for (std::list<Rezzo::ISocket*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
-        (*it)->close();
-        delete *it;
+        it->socket->close();
+        delete it->socket;
     }
     _serverSocket->close();
     delete _serverSocket;
+}
+
+void RplethAuth::handleClientMessage(RplethAuth::Client& client)
+{
+    RplethPacket packet(RplethPacket::Client);
+
+    do
+    {
+        packet = RplethProtocol::decodeCommand(client.buffer);
+        if (!packet.isGood)
+            break;
+        std::cout << "Packet received (s=" << packet.dataLen + 4 << ')' << std::endl;
+        RplethPacket response = RplethProtocol::processClientPacket(packet);
+        std::size_t size = RplethProtocol::encodeCommand(response, _buffer, RingBufferSize);
+        client.socket->send(_buffer, size);
+    }
+    while (packet.isGood && client.buffer.toRead());
 }

@@ -21,7 +21,9 @@ public:
 
 public:
     RplethPacket(Sender packetSender);
+    RplethPacket(const RplethPacket& other);
     ~RplethPacket();
+    RplethPacket& operator=(const RplethPacket& other);
 
 public:
     Byte    checksum() const;
