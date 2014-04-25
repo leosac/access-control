@@ -11,56 +11,43 @@
 
 RplethProtocol::RplethProtocol() {}
 
-RplethProtocol::~RplethProtocol() {}
-
-RplethPacket RplethProtocol::decodeCommand(const Byte* buffer, std::size_t size)
+RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
 {
     RplethPacket    packet(RplethPacket::Client);
+    std::size_t     toRead = buffer.toRead();
 
-    std::cout << "DEBUG: Packet received size=" << size << std::endl;
-
+    std::cout << "DEBUG: Packet decode: ToRead size=" << toRead << std::endl;
     packet.status = Success;
-    if (size < PacketMinSize)
-    {
-        packet.status = BadSize;
-        std::cout << "DEBUG: Packet min size KO" << std::endl;
+    packet.isGood = false;
+    if (toRead < PacketMinSize)
         return (packet);
-    }
-    packet.isGood = true; // The packet has enough information to be interpreted by the protocol
 
-    packet.type = buffer[TypeByteIdx];
-    if (packet.type >= MaxType)
-    {
-        packet.status = BadType;
-        std::cout << "DEBUG: Packet type KO" << std::endl;
-        return (packet);
-    }
-
-    packet.command = buffer[CommandByteIdx];
     packet.dataLen = buffer[SizeByteIdx];
-
-    if (size != static_cast<std::size_t>(packet.dataLen + 4))
-    {
-        packet.status = BadSize;
-        std::cout << "DEBUG: Packet size KO" << std::endl;
+    if (toRead < static_cast<std::size_t>(packet.dataLen + 4))
         return (packet);
-    }
-
     if (packet.dataLen)
     {
         packet.data = std::vector<Byte>(packet.dataLen);
         for (unsigned int i = 0; i < packet.dataLen; ++i)
             packet.data[i] = buffer[SizeByteIdx + 1 + i];
     }
-
+    packet.type = buffer[TypeByteIdx];
+    packet.command = buffer[CommandByteIdx];
     packet.sum = buffer[SizeByteIdx + packet.dataLen + 1];
-    if (packet.sum != packet.checksum())
+    packet.isGood = true; // The packet has enough information to be interpreted by the protocol
+    buffer.fastForward(4 + packet.dataLen); // Circular buffer was actually read but indexes were not updated
+
+    if (packet.type >= MaxType)
+    {
+        packet.status = BadType;
+        std::cout << "DEBUG: Packet type KO" << std::endl;
+    }
+
+    else if (packet.sum != packet.checksum())
     {
         packet.status = BadChecksum;
         std::cout << "DEBUG: Checksum KO" << std::endl;
-        return (packet);
     }
-
     return (packet);
 }
 
@@ -90,16 +77,10 @@ RplethPacket RplethProtocol::processClientPacket(const RplethPacket& packet)
 {
     RplethPacket response = packet;
 
-//     if (!packet.isGood || packet.sender != RplethPacket::Client)
-
     response.sender = RplethPacket::Server;
     if (response.type == Rpleth && response.command == Ping)
-    {
         response.status = Success;
-    }
     else
-    {
         response.status = Success; // NOTE Default response
-    }
     return (response);
 }

@@ -7,11 +7,34 @@
 #include "rplethpacket.hpp"
 
 RplethPacket::RplethPacket(Sender packetSender)
-:   isGood(false),
-    sender(packetSender)
+:   sender(packetSender)
+{}
+
+RplethPacket::RplethPacket(const RplethPacket& other)
+:   status(other.status),
+    type(other.type),
+    command(other.command),
+    dataLen(other.dataLen),
+    data(other.data),
+    sum(other.sum),
+    isGood(other.isGood),
+    sender(other.sender)
 {}
 
 RplethPacket::~RplethPacket() {}
+
+RplethPacket& RplethPacket::operator=(const RplethPacket& other)
+{
+    status = other.status;
+    type = other.type;
+    command = other.command;
+    dataLen = other.dataLen;
+    data = other.data;
+    sum = other.sum;
+    isGood = other.isGood;
+    sender = other.sender;
+    return (*this);
+}
 
 Byte RplethPacket::checksum() const
 {

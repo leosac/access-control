@@ -6,6 +6,7 @@ set(RPLETH_SRCS
     rplethpacket.cpp
     rplethprotocol.cpp
     network/unixsocket.cpp
+    network/circularbuffer.cpp
 )
 
 add_library(${RPLETH_BIN} SHARED ${RPLETH_SRCS})

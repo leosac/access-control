@@ -54,7 +54,7 @@ std::size_t UnixSocket::recv(Byte* data, std::size_t size, int flags)
 {
     int ret;
 
-    if ((ret = ::recv(_handle, data, size, flags)) < 0)
+    if ((ret = ::recv(_handle, data, size, flags)) <= 0)
         throw (ModuleException(UnixSyscall::getErrorString("recv", errno)));
     return (ret);
 }
