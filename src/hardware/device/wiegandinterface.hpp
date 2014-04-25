@@ -34,7 +34,7 @@ public:
 
 private:
     void    reset();
-    void    debugPrint(); // FIXME Debug
+    void    debugPrint();
 
 private:
     Byte        _buffer[DataBufferSize];

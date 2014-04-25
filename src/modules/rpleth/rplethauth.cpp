@@ -34,10 +34,7 @@ RplethAuth::RplethAuth(Rezzo::ISocket::Port port, long timeoutMs)
 
 RplethAuth::~RplethAuth()
 {
-    {
-        std::lock_guard<std::mutex> lg(_runMutex);
-        _isRunning = false;
-    }
+    _isRunning = false;
     _networkThread.join();
 }
 
@@ -64,10 +61,8 @@ void RplethAuth::run()
     _serverSocket = new Rezzo::UnixSocket(Rezzo::ISocket::TCP);
     _serverSocket->bind(_port);
     _serverSocket->listen();
-    _runMutex.lock();
     while (_isRunning)
     {
-        _runMutex.unlock();
         FD_ZERO(&_rSet);
         FD_SET(_serverSocket->getHandle(), &_rSet);
         _fdMax = _serverSocket->getHandle();
@@ -108,9 +103,7 @@ void RplethAuth::run()
                 std::cout << "Client connected" << std::endl;
             }
         }
-        _runMutex.lock();
     }
-    _runMutex.unlock();
     for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
         it->socket->close();

@@ -7,7 +7,7 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 
-#include <mutex>
+#include <atomic>
 #include <list>
 #include <map>
 
@@ -58,8 +58,7 @@ private:
 
 private:
     std::list<std::string>                  _args;
-    std::mutex                              _runMutex;
-    bool                                    _isRunning;
+    std::atomic<bool>                       _isRunning;
 
 private:
     IHWManager*                             _hwManager;
