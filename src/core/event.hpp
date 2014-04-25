@@ -26,7 +26,7 @@ public:
     typedef std::chrono::system_clock::time_point Date;
 
 public:
-    Event(const std::string& message, const std::string& source = std::string(), LogLevel level = Debug);
+    Event(const std::string& msg, const std::string& src = std::string(), const std::string& dest = std::string(), LogLevel level = Debug);
     ~Event();
 
 public:
@@ -35,6 +35,7 @@ public:
 public:
     std::string     message;
     std::string     source;
+    std::string     destination;
     int             logLevel;
     Date            date;
 };

@@ -11,7 +11,7 @@
 
 #include <poll.h>
 
-#include <mutex>
+#include <atomic>
 #include <thread>
 #include <list>
 #include <vector>
@@ -53,8 +53,7 @@ private:
     void    buildFdSet();
 
 private:
-    bool                    _isRunning;
-    std::mutex              _runMutex;
+    std::atomic<bool>       _isRunning;
     std::thread             _pollThread;
     int                     _pollTimeout;
     std::map<int, GPIO*>    _polledGpio;

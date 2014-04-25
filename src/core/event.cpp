@@ -6,8 +6,6 @@
 
 #include "event.hpp"
 
-#include <chrono>
-
 static const int            logLevelCount = 8;
 static const std::string    logLevelStrings[logLevelCount + 1] = {
     "EMERGENCY",
@@ -21,9 +19,10 @@ static const std::string    logLevelStrings[logLevelCount + 1] = {
     "(unknown)"
 };
 
-Event::Event(const std::string& msg, const std::string& src, LogLevel level)
+Event::Event(const std::string& msg, const std::string& src, const std::string& dest, LogLevel level)
 :   message(msg),
     source(src),
+    destination(dest),
     logLevel(level),
     date(std::chrono::system_clock::now())
 {}

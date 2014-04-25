@@ -16,7 +16,7 @@ class IAuthModule : public IModule
 {
 public:
     typedef struct {
-        int                 id;
+        int id;
     } AuthRequest;
 
 public:

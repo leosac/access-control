@@ -9,7 +9,7 @@
 
 #include <list>
 #include <thread>
-#include <mutex>
+#include <atomic>
 
 #include "modules/iauthmodule.hpp"
 #include "network/isocket.hpp"
@@ -42,8 +42,7 @@ private:
 
 private:
     const std::string       _version;
-    bool                    _isRunning;
-    std::mutex              _runMutex;
+    std::atomic<bool>       _isRunning;
     std::thread             _networkThread;
     Rezzo::ISocket*         _serverSocket;
     Rezzo::ISocket::Port    _port;

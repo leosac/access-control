@@ -63,10 +63,7 @@ void GPIOManager::startPolling()
 
 void GPIOManager::stopPolling()
 {
-    {
-        std::lock_guard<std::mutex> lg(_runMutex);
-        _isRunning = false;
-    }
+    _isRunning = false;
     _pollThread.join();
 }
 
@@ -79,10 +76,8 @@ void GPIOManager::pollLoop()
     buildFdSet();
     fdsetSize = _fdset.size();
     {
-        std::lock_guard<std::mutex> lg(_runMutex);
         while (_isRunning)
         {
-            _runMutex.unlock();
             if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
                 throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
             else if (!ret)
@@ -108,7 +103,6 @@ void GPIOManager::pollLoop()
                     }
                 }
             }
-            _runMutex.lock();
         }
     }
 }

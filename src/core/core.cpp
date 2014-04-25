@@ -42,7 +42,6 @@ Core& Core::operator=(const Core& /*other*/) {return (*this);}
 
 void Core::handleSignal(int /*signal*/)
 {
-    std::lock_guard<std::mutex> lg(_runMutex);
     if (_isRunning)
     {
         dispatchEvent(Event("caught signal", "Core"));
@@ -57,16 +56,11 @@ void Core::run(const std::list<std::string>& args)
         return;
     load();
     dispatchEvent(Event("starting", "Core"));
+    _isRunning = true;
+    while (_isRunning)
     {
-        std::lock_guard<std::mutex> lg(_runMutex);
-        _isRunning = true;
-        while (_isRunning)
-        {
-            _runMutex.unlock();
-            dispatchEvent(Event("alive", "Core"));
-            std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
-            _runMutex.lock();
-        }
+        dispatchEvent(Event("alive", "Core"));
+        std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
     }
     dispatchEvent(Event("exiting", "Core"));
     unload();
@@ -95,7 +89,7 @@ void Core::load()
 
     // TODO load modules
     for (auto lib : _dynlibs)
-        loadModule(lib.first, lib.first + "-test"); // FIXME Debug
+        loadModule(lib.first, lib.first + "-debug"); // FIXME Debug
 
     debugPrintModules();
 
