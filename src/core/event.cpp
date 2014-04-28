@@ -19,7 +19,7 @@ static const std::string    logLevelStrings[logLevelCount + 1] = {
     "(unknown)"
 };
 
-Event::Event(const std::string& msg, const std::string& src, const std::string& dest, LogLevel level)
+Event::Event(const std::string& msg, const std::string& src, const std::string& dest, LogLevel level) noexcept
 :   message(msg),
     source(src),
     destination(dest),
@@ -27,7 +27,12 @@ Event::Event(const std::string& msg, const std::string& src, const std::string& 
     date(std::chrono::system_clock::now())
 {}
 
-Event::~Event() {}
+Event::~Event() noexcept {}
+
+bool Event::operator<(const Event& other) const noexcept
+{
+    return (date < other.date);
+}
 
 const std::string& Event::getLogLevelString(int level)
 {

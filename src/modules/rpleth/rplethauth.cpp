@@ -22,13 +22,12 @@ static void launch(RplethAuth* instance)
 
 RplethAuth::RplethAuth(Rezzo::ISocket::Port port, long timeoutMs)
 :   _version(Version::buildVersionString(0, 1, 0)),
-    _isRunning(false),
+    _isRunning(true),
     _serverSocket(nullptr),
     _port(port),
     _fdMax(0),
     _timeout(timeoutMs)
 {
-    _isRunning = true;
     _networkThread = std::thread(&launch, this);
 }
 
@@ -92,7 +91,7 @@ void RplethAuth::run()
                         it->socket->close();
                         delete it->socket;
                         _clients.erase(it);
-                        std::cout << "Client disconnected" << std::endl;
+                        std::cout << "Client disconnected" << std::endl; // FIXME Debug
                         break;
                     }
                 }
@@ -100,7 +99,7 @@ void RplethAuth::run()
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
                 _clients.push_back(Client(_serverSocket->accept()));
-                std::cout << "Client connected" << std::endl;
+                std::cout << "Client connected" << std::endl; // FIXME Debug
             }
         }
     }
@@ -122,7 +121,7 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
         packet = RplethProtocol::decodeCommand(client.buffer);
         if (!packet.isGood)
             break;
-        std::cout << "Packet received (s=" << packet.dataLen + 4 << ')' << std::endl;
+        std::cout << "Packet received (s=" << packet.dataLen + 4 << ')' << std::endl; // FIXME Debug
         RplethPacket response = RplethProtocol::processClientPacket(packet);
         std::size_t size = RplethProtocol::encodeCommand(response, _buffer, RingBufferSize);
         client.socket->send(_buffer, size);
