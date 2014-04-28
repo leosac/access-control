@@ -32,7 +32,7 @@ public:
     ~RplethAuth();
 
 public:
-    void                sendAuthRequest(const AuthRequest& request);
+    void                notify(const Event& event);
     Type                getType() const;
     const std::string&  getVersionString() const;
     void                run();

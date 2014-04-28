@@ -21,7 +21,6 @@ public:
 
 public:
     virtual ~IAuthModule() {}
-    virtual void    sendAuthRequest(const AuthRequest& request) = 0;
 };
 
 #endif // IAUTHMODULE_HPP

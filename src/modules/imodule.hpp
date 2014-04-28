@@ -7,9 +7,11 @@
 #ifndef IMODULE_HPP
 #define IMODULE_HPP
 
+#include "modules/ieventlistener.hpp"
+
 #include <string>
 
-class IModule
+class IModule : public IEventListener
 {
 public:
     typedef IModule* (*InitFunc)();

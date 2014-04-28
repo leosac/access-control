@@ -25,6 +25,7 @@ class GPIOManager : public IGPIOObservable
 {
     static const int            DefaultTimeout = 100;
     static const unsigned int   PollBufferSize = 64;
+
 public:
     typedef struct pollfd PollFdSet;
     typedef struct {

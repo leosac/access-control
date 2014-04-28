@@ -7,9 +7,9 @@
 #ifndef EXAMPLEMODULE_HPP
 #define EXAMPLEMODULE_HPP
 
-#include "modules/ieventlistenermodule.hpp"
+#include "modules/imodule.hpp"
 
-class ExampleModule : public IEventListenerModule
+class ExampleModule : public IModule
 {
 public:
     ExampleModule();
@@ -20,9 +20,7 @@ private:
     ExampleModule& operator=(const ExampleModule& other);
 
 public:
-    void    sendEvent(const Event& event);
-
-public:
+    void                notify(const Event& event);
     Type                getType() const;
     const std::string&  getVersionString() const;
 
