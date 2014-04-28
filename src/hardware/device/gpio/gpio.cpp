@@ -45,10 +45,14 @@ GPIO::GPIO(int pinNo)
 
 GPIO::~GPIO()
 {
-    if (::close(_pollFd) == -1)
-        throw (GpioException(UnixSyscall::getErrorString("close", errno)));
-    if (exists())
-        unexportGpio();
+    try
+    {
+        if (::close(_pollFd) == -1)
+            throw (GpioException(UnixSyscall::getErrorString("close", errno)));
+        if (exists())
+            unexportGpio();
+    }
+    catch (const GpioException& e) {}
 }
 
 int GPIO::getPinNo() const

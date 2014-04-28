@@ -10,6 +10,7 @@
 #include <atomic>
 #include <list>
 #include <map>
+#include <queue>
 
 #include "event.hpp"
 #include "modules/imodule.hpp"
@@ -61,13 +62,13 @@ private:
     std::atomic<bool>                       _isRunning;
 
 private:
-    IHWManager*                             _hwManager;
-    std::list<std::string>                  _libsDirectories;
-    std::map<std::string, DynamicLibrary*>  _dynlibs;
-    std::map<std::string, IModule*>         _modules;
-    std::map<IModule::Type, RegisterFunc>   _registrationHandler;
-    std::list<IEventListenerModule*>        _loggerModules;
-    IAuthModule*                            _authModule;
+    IHWManager*                                 _hwManager;
+    std::list<std::string>                      _libsDirectories;
+    std::map<std::string, DynamicLibrary*>      _dynlibs;
+    std::map<std::string, IModule*>             _modules;
+    std::map<IModule::Type, RegisterFunc>       _registrationHandler;
+    std::list<IEventListenerModule*>            _loggerModules;
+    IAuthModule*                                _authModule;
 };
 
 #endif // CORE_HPP
