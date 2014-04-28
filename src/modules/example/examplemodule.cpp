@@ -20,7 +20,7 @@ ExampleModule& ExampleModule::operator=(const ExampleModule& /*other*/)
     return (*this);
 }
 
-void ExampleModule::sendEvent(const Event& event)
+void ExampleModule::notify(const Event& event)
 {
     static_cast<void>(event);
 }

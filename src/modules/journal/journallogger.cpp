@@ -19,7 +19,7 @@ JournalLogger::JournalLogger(int logLevel)
 
 JournalLogger::~JournalLogger() {}
 
-void JournalLogger::sendEvent(const Event& event)
+void JournalLogger::notify(const Event& event)
 {
     std::stringstream   ss;
     std::time_t         now_c = std::chrono::system_clock::to_time_t(event.date);

@@ -28,8 +28,7 @@ GPIOManager::GPIOManager()
     _pollTimeout(DefaultTimeout)
 {}
 
-GPIOManager::~GPIOManager()
-{}
+GPIOManager::~GPIOManager() {}
 
 GPIOManager::GPIOManager(const GPIOManager& /*other*/) {}
 
@@ -75,31 +74,27 @@ void GPIOManager::pollLoop()
 
     buildFdSet();
     fdsetSize = _fdset.size();
+    while (_isRunning)
     {
-        while (_isRunning)
+        if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
+            throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
+        else if (!ret)
+            timeout();
+        else
         {
-            if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
-                throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
-            else if (!ret)
-                timeout();
-            else
+            for (unsigned int i = 0; i < fdsetSize; ++i)
             {
-                for (unsigned int i = 0; i < fdsetSize; ++i)
+                if (_fdset[i].revents & POLLPRI)
                 {
-                    if (_fdset[i].revents & POLLPRI)
+                    _fdset[i].revents = 0;
+                    if ((ret = ::read(_fdset[i].fd, buffer, PollBufferSize - 1)) < 0)
+                        throw (GpioException(UnixSyscall::getErrorString("read", errno)));
+                    if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
+                        throw (GpioException(UnixSyscall::getErrorString("lseek", errno)));
+                    for (auto listener : _listeners)
                     {
-                        _fdset[i].revents = 0;
-                        if ((ret = ::read(_fdset[i].fd, buffer, PollBufferSize - 1)) < 0)
-                            throw (GpioException(UnixSyscall::getErrorString("read", errno)));
-                        else if (ret > 1)
-                            buffer[ret - 1] = '\0';
-                        if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
-                            throw (GpioException(UnixSyscall::getErrorString("lseek", errno)));
-                        for (auto listener : _listeners)
-                        {
-                            if (listener.fdIdx == i)
-                                listener.instance->notify(listener.gpioNo);
-                        }
+                        if (listener.fdIdx == i)
+                            listener.instance->notify(listener.gpioNo);
                     }
                 }
             }

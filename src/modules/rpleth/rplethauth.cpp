@@ -37,10 +37,7 @@ RplethAuth::~RplethAuth()
     _networkThread.join();
 }
 
-void RplethAuth::sendAuthRequest(const IAuthModule::AuthRequest& /*request*/)
-{
-    // TODO
-}
+void RplethAuth::notify(const Event& /*event*/) {}
 
 IModule::Type RplethAuth::getType() const
 {

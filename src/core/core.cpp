@@ -55,15 +55,32 @@ void Core::run(const std::list<std::string>& args)
     if (!parseArguments())
         return;
     load();
-    dispatchEvent(Event("starting", "Core"));
+    notify(Event("starting", "Core"));
     _isRunning = true;
     while (_isRunning)
     {
-        dispatchEvent(Event("alive", "Core"));
+        {
+            std::lock_guard<std::mutex> lg(_eventQueueMutex);
+            while (!_eventQueue.empty())
+            {
+                Event e = _eventQueue.top();
+
+                _eventQueue.pop();
+                _eventQueueMutex.unlock();
+                dispatchEvent(e);
+                _eventQueueMutex.lock();
+            }
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
     }
-    dispatchEvent(Event("exiting", "Core"));
+    notify(Event("exiting", "Core"));
     unload();
+}
+
+void Core::notify(const Event& event)
+{
+    std::lock_guard<std::mutex> lg(_eventQueueMutex);
+    _eventQueue.push(event);
 }
 
 bool Core::parseArguments()
@@ -203,8 +220,14 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
 
 void Core::dispatchEvent(const Event& event)
 {
+    IModule*    dest;
+
+    if ((dest = _modules[event.destination]))
+        dest->notify(event);
+    else
+        std::cerr << "Event: unknown destination '" << event.destination << "'" << std::endl;
     for (auto logger : _loggerModules)
-        logger->sendEvent(event);
+        logger->notify(event);
 }
 
 void Core::debugPrintLibs()
@@ -254,9 +277,9 @@ void Core::registerAuthModule(IModule* module)
 
 void Core::registerLoggerModule(IModule* module)
 {
-    IEventListenerModule*   logger;
+    IEventListener*   logger;
 
-    if (!(logger = dynamic_cast<IEventListenerModule*>(module)))
+    if (!(logger = dynamic_cast<IEventListener*>(module)))
         throw (ModuleException("Invalid Logger module"));
     _loggerModules.push_back(logger);
 }

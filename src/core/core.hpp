@@ -7,23 +7,24 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 
-#include <atomic>
+#include <queue>
 #include <list>
 #include <map>
-#include <queue>
+#include <atomic>
+#include <mutex>
 
 #include "event.hpp"
 #include "modules/imodule.hpp"
-#include "modules/ieventlistenermodule.hpp"
+#include "modules/ieventlistener.hpp"
 #include "modules/iauthmodule.hpp"
 #include "hardware/ihwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 
 class DynamicLibrary;
 
-class Core : public ISignalCallback
+class Core : public ISignalCallback, public IEventListener
 {
-    static const int IdleSleepTimeMs = 10000;
+    static const int IdleSleepTimeMs = 5;
     typedef void (Core::*RegisterFunc)(IModule*);
 
 public:
@@ -36,6 +37,7 @@ private:
 
 public:
     void    handleSignal(int signal); // Inherited from ISignalCallback
+    void    notify(const Event& event); // Inherited from IEventListener
     void    run(const std::list<std::string>& args);
 
 private:
@@ -67,8 +69,10 @@ private:
     std::map<std::string, DynamicLibrary*>      _dynlibs;
     std::map<std::string, IModule*>             _modules;
     std::map<IModule::Type, RegisterFunc>       _registrationHandler;
-    std::list<IEventListenerModule*>            _loggerModules;
+    std::list<IEventListener*>                  _loggerModules;
     IAuthModule*                                _authModule;
+    std::priority_queue<Event>                  _eventQueue;
+    std::mutex                                  _eventQueueMutex;
 };
 
 #endif // CORE_HPP
