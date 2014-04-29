@@ -6,8 +6,7 @@
 
 #include "rplethauth.hpp"
 
-#include <iostream>
-#include <unistd.h> // FIXME rm this
+#include <iostream> // FIXME rm this
 
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
@@ -20,8 +19,9 @@ static void launch(RplethAuth* instance)
     instance->run();
 }
 
-RplethAuth::RplethAuth(Rezzo::ISocket::Port port, long timeoutMs)
-:   _version(Version::buildVersionString(0, 1, 0)),
+RplethAuth::RplethAuth(IEventListener* listener, Rezzo::ISocket::Port port, long timeoutMs)
+:   _listener(listener),
+    _version(Version::buildVersionString(0, 1, 0)),
     _isRunning(true),
     _serverSocket(nullptr),
     _port(port),
@@ -37,7 +37,14 @@ RplethAuth::~RplethAuth()
     _networkThread.join();
 }
 
-void RplethAuth::notify(const Event& /*event*/) {}
+void RplethAuth::notify(const Event& event)
+{
+    CardId cid;
+
+    std::cout << "Auth: Event received: " << event.message << std::endl;
+    std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
+    _cardIdQueue.push(cid);
+}
 
 IModule::Type RplethAuth::getType() const
 {
@@ -71,7 +78,9 @@ void RplethAuth::run()
         _timeoutStruct.tv_usec = (_timeout % 1000) * 1000;
         if ((selectRet = ::select(_fdMax + 1, &_rSet, nullptr, nullptr, &_timeoutStruct)) == -1)
             throw (ModuleException(UnixSyscall::getErrorString("select", errno)));
-        else if (selectRet > 0)
+        else if (!selectRet)
+            handleCardIdQueue();
+        else
         {
             for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
             {
@@ -88,7 +97,7 @@ void RplethAuth::run()
                         it->socket->close();
                         delete it->socket;
                         _clients.erase(it);
-                        std::cout << "Client disconnected" << std::endl; // FIXME Debug
+                        _listener->notify(Event("Client disconnected", "Auth")); // FIXME Debug
                         break;
                     }
                 }
@@ -96,7 +105,7 @@ void RplethAuth::run()
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
                 _clients.push_back(Client(_serverSocket->accept()));
-                std::cout << "Client connected" << std::endl; // FIXME Debug
+                _listener->notify(Event("Client connected", "Auth")); // FIXME Debug
             }
         }
     }
@@ -124,4 +133,27 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
         client.socket->send(_buffer, size);
     }
     while (packet.isGood && client.buffer.toRead());
+}
+
+void RplethAuth::handleCardIdQueue()
+{
+    CardId                      cid;
+    RplethPacket                packet(RplethPacket::Client);
+    std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
+    std::size_t                 size;
+
+    packet.type = RplethProtocol::HID;
+    packet.command = RplethProtocol::Badge;
+    while (!_cardIdQueue.empty())
+    {
+        cid = _cardIdQueue.front();
+        _cardIdQueue.pop();
+        _cardIdQueueMutex.unlock();
+        packet.dataLen = cid.size();
+        packet.data = cid;
+        size = RplethProtocol::encodeCommand(packet, _buffer, RingBufferSize);
+        for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+            it->socket->send(_buffer, size);
+        _cardIdQueueMutex.lock();
+    }
 }
