@@ -206,7 +206,7 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
     {
         void* s = lib->getSymbol("getNewModuleInstance");
         *reinterpret_cast<void**>(&func) = s;
-        module = func();
+        module = func(this);
     }
     catch (const DynLibException& e)
     {

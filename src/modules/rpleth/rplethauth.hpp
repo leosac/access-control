@@ -10,6 +10,8 @@
 #include <list>
 #include <thread>
 #include <atomic>
+#include <queue>
+#include <mutex>
 
 #include "modules/iauthmodule.hpp"
 #include "network/isocket.hpp"
@@ -26,9 +28,10 @@ class RplethAuth : public IAuthModule
         CircularBuffer  buffer;
         explicit s_client(Rezzo::ISocket* sock) : socket(sock), buffer(RingBufferSize) {}
     } Client;
+    typedef std::vector<Byte> CardId;
 
 public:
-    RplethAuth(Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
+    RplethAuth(IEventListener* listener, Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
     ~RplethAuth();
 
 public:
@@ -39,12 +42,16 @@ public:
 
 private:
     void                handleClientMessage(Client& client);
+    void                handleCardIdQueue();
 
 private:
+    IEventListener*         _listener;
     const std::string       _version;
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;
     Rezzo::ISocket*         _serverSocket;
+    std::queue<CardId>      _cardIdQueue;
+    std::mutex              _cardIdQueueMutex;
     Rezzo::ISocket::Port    _port;
     std::list<Client>       _clients;
     fd_set                  _rSet;

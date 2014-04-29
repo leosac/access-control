@@ -14,7 +14,7 @@
 class IModule : public IEventListener
 {
 public:
-    typedef IModule* (*InitFunc)();
+    typedef IModule* (*InitFunc)(IEventListener*);
     enum Type {
         Door,
         AccessPoint,
