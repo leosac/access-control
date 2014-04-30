@@ -30,10 +30,6 @@ GPIOManager::GPIOManager()
 
 GPIOManager::~GPIOManager() {}
 
-GPIOManager::GPIOManager(const GPIOManager& /*other*/) {}
-
-GPIOManager& GPIOManager::operator=(const GPIOManager& /*other*/) {return (*this);}
-
 void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::EdgeMode mode)
 {
     ListenerInfo    listener;

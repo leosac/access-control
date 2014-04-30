@@ -14,8 +14,11 @@
 class HWManager : public IHWManager
 {
 public:
-    HWManager();
+    explicit HWManager();
     ~HWManager();
+
+    HWManager(const HWManager& other) = delete;
+    HWManager& operator=(const HWManager& other) = delete;
 
 public:
     void    start();

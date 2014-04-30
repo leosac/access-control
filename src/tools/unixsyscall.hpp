@@ -11,7 +11,8 @@
 
 class UnixSyscall
 {
-    UnixSyscall();
+    UnixSyscall() = delete;
+    
 public:
     static std::string getErrorString(const std::string& func, int errNo);
 };

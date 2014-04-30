@@ -21,13 +21,6 @@ WiegandInterface::WiegandInterface(IGPIOObservable& gpioProvider)
 
 WiegandInterface::~WiegandInterface() {}
 
-WiegandInterface::WiegandInterface(const WiegandInterface& /*other*/) {}
-
-WiegandInterface& WiegandInterface::operator=(const WiegandInterface& /*other*/)
-{
-    return (*this);
-}
-
 void WiegandInterface::notify(int gpioNo)
 {
     if (_bitIdx >= DataBufferSize * 8) // Buffer overflow

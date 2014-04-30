@@ -28,12 +28,11 @@ class Core : public ISignalCallback, public IEventListener
     typedef void (Core::*RegisterFunc)(IModule*);
 
 public:
-    Core();
+    explicit Core();
     ~Core();
 
-private:
-    Core(const Core& other);
-    Core& operator=(const Core& other);
+    Core(const Core& other) = delete;
+    Core& operator=(const Core& other) = delete;
 
 public:
     void    handleSignal(int signal); // Inherited from ISignalCallback

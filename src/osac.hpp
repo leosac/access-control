@@ -23,6 +23,8 @@
 
 class OSAC
 {
+    OSAC() = delete;
+
 public:
     static const int Major = OSAC_VERSION_MAJOR;
     static const int Minor = OSAC_VERSION_MINOR;

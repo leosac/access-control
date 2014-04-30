@@ -11,6 +11,8 @@ class ISignalCallback;
 
 class SignalHandler
 {
+    SignalHandler() = delete;
+
 public:
     static void registerCallback(ISignalCallback* callback);
 };
