@@ -14,6 +14,7 @@
 #include <mutex>
 
 #include "event.hpp"
+#include "icore.hpp"
 #include "modules/imodule.hpp"
 #include "modules/ieventlistener.hpp"
 #include "modules/iauthmodule.hpp"
@@ -22,7 +23,7 @@
 
 class DynamicLibrary;
 
-class Core : public ISignalCallback, public IEventListener
+class Core : public ISignalCallback, public ICore
 {
     static const int IdleSleepTimeMs = 5;
     typedef void (Core::*RegisterFunc)(IModule*);
@@ -35,9 +36,10 @@ public:
     Core& operator=(const Core& other) = delete;
 
 public:
-    void    handleSignal(int signal); // Inherited from ISignalCallback
-    void    notify(const Event& event); // Inherited from IEventListener
-    void    run(const std::list<std::string>& args);
+    void        handleSignal(int signal); // Inherited from ISignalCallback
+    void        notify(const Event& event); // Inherited from IEventListener
+    IHWManager* getHWManager(); // Inherited from ICore
+    void        run(const std::list<std::string>& args);
 
 private:
     bool    parseArguments();

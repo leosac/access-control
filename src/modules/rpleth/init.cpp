@@ -15,7 +15,7 @@
 #   endif
 #endif
 
-extern "C" MODULE_PUBLIC IModule* getNewModuleInstance(IEventListener* listener)
+extern "C" MODULE_PUBLIC IModule* getNewModuleInstance(ICore& core)
 {
-    return (new RplethAuth(listener));
+    return (new RplethAuth(core));
 }

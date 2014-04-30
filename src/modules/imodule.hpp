@@ -7,14 +7,14 @@
 #ifndef IMODULE_HPP
 #define IMODULE_HPP
 
-#include "modules/ieventlistener.hpp"
+#include "core/icore.hpp"
 
 #include <string>
 
 class IModule : public IEventListener
 {
 public:
-    typedef IModule* (*InitFunc)(IEventListener*);
+    typedef IModule* (*InitFunc)(ICore&);
     enum Type {
         Door,
         AccessPoint,

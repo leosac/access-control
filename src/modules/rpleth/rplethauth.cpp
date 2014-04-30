@@ -19,7 +19,7 @@ static void launch(RplethAuth* instance)
     instance->run();
 }
 
-RplethAuth::RplethAuth(IEventListener* listener, Rezzo::ISocket::Port port, long timeoutMs)
+RplethAuth::RplethAuth(IEventListener& listener, Rezzo::ISocket::Port port, long timeoutMs)
 :   _listener(listener),
     _version(Version::buildVersionString(0, 1, 0)),
     _isRunning(true),
@@ -97,7 +97,7 @@ void RplethAuth::run()
                         it->socket->close();
                         delete it->socket;
                         _clients.erase(it);
-                        _listener->notify(Event("Client disconnected", "Auth")); // FIXME Debug
+                        _listener.notify(Event("Client disconnected", "Auth")); // FIXME Debug
                         break;
                     }
                 }
@@ -105,7 +105,7 @@ void RplethAuth::run()
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
                 _clients.push_back(Client(_serverSocket->accept()));
-                _listener->notify(Event("Client connected", "Auth")); // FIXME Debug
+                _listener.notify(Event("Client connected", "Auth")); // FIXME Debug
             }
         }
     }
@@ -154,6 +154,7 @@ void RplethAuth::handleCardIdQueue()
         size = RplethProtocol::encodeCommand(packet, _buffer, RingBufferSize);
         for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
             it->socket->send(_buffer, size);
+        _listener.notify(Event("Open the door !", "RplethAuth", "Door"));
         _cardIdQueueMutex.lock();
     }
 }

@@ -31,7 +31,7 @@ class RplethAuth : public IAuthModule
     typedef std::vector<Byte> CardId;
 
 public:
-    explicit RplethAuth(IEventListener* listener, Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
+    explicit RplethAuth(IEventListener& listener, Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
     ~RplethAuth();
 
     RplethAuth(const RplethAuth& other) = delete;
@@ -48,7 +48,7 @@ private:
     void                handleCardIdQueue();
 
 private:
-    IEventListener*         _listener;
+    IEventListener&         _listener;
     const std::string       _version;
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;
