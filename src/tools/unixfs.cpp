@@ -15,8 +15,6 @@
 #include "unixsyscall.hpp"
 #include "exception/fsexception.hpp"
 
-UnixFs::UnixFs() {}
-
 std::string UnixFs::getCWD()
 {
     char*       str = getcwd(NULL, 0);

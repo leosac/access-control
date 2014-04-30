@@ -11,6 +11,7 @@
 
 #include "gpio/igpiolistener.hpp"
 #include "gpio/igpioobservable.hpp"
+#include "iwiegandlistener.hpp"
 #include "tools/bufferutils.hpp"
 
 /* NOTE This class is very likely to be created by the main thread,
@@ -22,7 +23,7 @@ class WiegandInterface : public IGPIOListener
     static const int    DataBufferSize = 10;
 
 public:
-    explicit WiegandInterface(IGPIOObservable& gpioProvider);
+    explicit WiegandInterface(IGPIOObservable& gpioProvider, IWiegandListener* listener);
     ~WiegandInterface();
 
     WiegandInterface(const WiegandInterface& other) = delete;
@@ -37,10 +38,11 @@ private:
     void    debugPrint();
 
 private:
-    Byte        _buffer[DataBufferSize];
-    std::size_t _bitIdx;
-    int         _hiGpio;
-    int         _loGpio;
+    IWiegandListener*   _listener;
+    Byte                _buffer[DataBufferSize];
+    std::size_t         _bitIdx;
+    int                 _hiGpio;
+    int                 _loGpio;
 };
 
 #endif // WIEGANDINTERFACE_HPP

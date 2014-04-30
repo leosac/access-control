@@ -36,13 +36,24 @@ Core::Core()
 
 Core::~Core() {}
 
-void Core::handleSignal(int /*signal*/)
+void Core::handleSignal(int signal)
 {
     if (_isRunning)
     {
-        dispatchEvent(Event("caught signal", "Core"));
+        notify(Event("caught signal (" + std::to_string(signal) + ')', "Core"));
         _isRunning = false;
     }
+}
+
+void Core::notify(const Event& event)
+{
+    std::lock_guard<std::mutex> lg(_eventQueueMutex);
+    _eventQueue.push(event);
+}
+
+IHWManager* Core::getHWManager()
+{
+    return (_hwManager);
 }
 
 void Core::run(const std::list<std::string>& args)
@@ -71,12 +82,6 @@ void Core::run(const std::list<std::string>& args)
     }
     notify(Event("exiting", "Core"));
     unload();
-}
-
-void Core::notify(const Event& event)
-{
-    std::lock_guard<std::mutex> lg(_eventQueueMutex);
-    _eventQueue.push(event);
 }
 
 bool Core::parseArguments()
@@ -144,6 +149,8 @@ void Core::loadLibraries()
 
     _libsDirectories.push_back("modules/rpleth");
     _libsDirectories.push_back("modules/journal");
+    _libsDirectories.push_back("modules/example");
+    _libsDirectories.push_back("modules/ap-wiegand");
 
     for (auto folder : _libsDirectories)
     {
@@ -202,7 +209,7 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
     {
         void* s = lib->getSymbol("getNewModuleInstance");
         *reinterpret_cast<void**>(&func) = s;
-        module = func(this);
+        module = func(*this);
     }
     catch (const DynLibException& e)
     {

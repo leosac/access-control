@@ -10,7 +10,8 @@
 #include <iostream> // FIXME Debug printing
 #include <iomanip> // FIXME Debug printing
 
-WiegandInterface::WiegandInterface(IGPIOObservable& gpioProvider)
+WiegandInterface::WiegandInterface(IGPIOObservable& gpioProvider, IWiegandListener* listener)
+:   _listener(listener)
 {
     _hiGpio = 15; // FIXME Debug
     _loGpio = 14; // FIXME Debug
@@ -36,7 +37,13 @@ void WiegandInterface::timeout()
 {
     if (_bitIdx)
     {
-        // TODO send message
+        std::size_t                 size = (_bitIdx - 1 / 8) + 1;
+        IWiegandListener::CardId    c(size);
+
+        for (std::size_t i = 0; i < size; ++i)
+            c[i] = _buffer[i];
+
+        _listener->notifyCardRead(c);
         debugPrint();
         reset();
     }

@@ -8,12 +8,21 @@
 
 #include "tools/version.hpp"
 
-WiegandModule::WiegandModule(IEventListener* listener)
-:   _listener(listener),
-    _version(Version::buildVersionString(0, 1, 0))
+WiegandModule::WiegandModule(ICore& core)
+:   _listener(core),
+    _version(Version::buildVersionString(0, 1, 0)),
+    _interface(core.getHWManager()->buildWiegandInterface(this))
 {}
 
-WiegandModule::~WiegandModule() {}
+WiegandModule::~WiegandModule()
+{
+    delete _interface;
+}
+
+void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
+{
+    _listener.notify(Event("MESSG", "wiegandmodule", "rpleth.so-debug"));
+}
 
 void WiegandModule::notify(const Event& event)
 {
