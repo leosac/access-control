@@ -13,13 +13,6 @@ ExampleModule::ExampleModule()
 
 ExampleModule::~ExampleModule() {}
 
-ExampleModule::ExampleModule(const ExampleModule& /*other*/) : _version() {}
-
-ExampleModule& ExampleModule::operator=(const ExampleModule& /*other*/)
-{
-    return (*this);
-}
-
 void ExampleModule::notify(const Event& event)
 {
     static_cast<void>(event);

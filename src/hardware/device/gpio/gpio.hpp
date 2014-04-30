@@ -36,8 +36,11 @@ public:
     };
 
 public:
-    GPIO(int pinNo);
+    explicit GPIO(int pinNo);
     ~GPIO();
+
+    GPIO(const GPIO& other) = delete;
+    GPIO& operator=(const GPIO& other) = delete;
 
 public:
     int                 getPinNo() const;

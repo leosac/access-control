@@ -12,8 +12,11 @@
 class JournalLogger : public IModule
 {
 public:
-    JournalLogger(int logLevel = Event::Debug);
+    explicit JournalLogger(int logLevel = Event::Debug);
     ~JournalLogger();
+
+    JournalLogger(const JournalLogger& other) = delete;
+    JournalLogger& operator=(const JournalLogger& other) = delete;
 
 public:
     void                notify(const Event& event);

@@ -12,12 +12,11 @@
 class ExampleModule : public IModule
 {
 public:
-    ExampleModule();
+    explicit ExampleModule();
     ~ExampleModule();
 
-private:
-    ExampleModule(const ExampleModule& other);
-    ExampleModule& operator=(const ExampleModule& other);
+    ExampleModule(const ExampleModule& other) = delete;
+    ExampleModule& operator=(const ExampleModule& other) = delete;
 
 public:
     void                notify(const Event& event);
@@ -25,7 +24,7 @@ public:
     const std::string&  getVersionString() const;
 
 private:
-    const std::string _version;
+    const std::string   _version;
 };
 
 #endif // EXAMPLEMODULE_HPP

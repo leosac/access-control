@@ -9,7 +9,7 @@
 #include "exception/osacexception.hpp"
 #include "core/core.hpp"
 
-int	main(int ac, char** av)
+int main(int ac, char** av)
 {
     std::list<std::string>  args;
 

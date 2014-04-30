@@ -20,13 +20,13 @@
 class WiegandInterface : public IGPIOListener
 {
     static const int    DataBufferSize = 10;
+
 public:
-    WiegandInterface(IGPIOObservable& gpioProvider);
+    explicit WiegandInterface(IGPIOObservable& gpioProvider);
     ~WiegandInterface();
 
-private:
-    WiegandInterface(const WiegandInterface& other);
-    WiegandInterface& operator=(const WiegandInterface& other);
+    WiegandInterface(const WiegandInterface& other) = delete;
+    WiegandInterface& operator=(const WiegandInterface& other) = delete;
 
 public:
     void    notify(int gpioNo);

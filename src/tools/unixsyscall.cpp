@@ -8,8 +8,6 @@
 
 #include <string.h>
 
-UnixSyscall::UnixSyscall() {}
-
 std::string UnixSyscall::getErrorString(const std::string& func, int errNo)
 {
     return (func + "() failed (" + std::string(strerror(errNo)) + ")");

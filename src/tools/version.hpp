@@ -11,6 +11,8 @@
 
 class Version
 {
+    Version() = delete;
+
 public:
     /**
      * return semver compatible version string formatted this way: MAJOR.MINOR.PATCH

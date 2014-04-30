@@ -19,8 +19,7 @@ class RplethProtocol
     static const std::size_t    SizeByteIdx     = 2;
     static const std::size_t    PacketMinSize   = 4;
 
-private:
-    RplethProtocol();
+    RplethProtocol() = delete;
 
 public:
     enum TypeCode {

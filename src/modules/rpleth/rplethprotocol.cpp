@@ -9,8 +9,6 @@
 #include <iostream> // DEBUG
 #include <vector>
 
-RplethProtocol::RplethProtocol() {}
-
 RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
 {
     RplethPacket    packet(RplethPacket::Client);

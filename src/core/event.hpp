@@ -26,7 +26,7 @@ public:
     typedef std::chrono::system_clock::time_point Date;
 
 public:
-    Event(const std::string& msg, const std::string& src = std::string(), const std::string& dest = std::string(), LogLevel level = Debug) noexcept;
+    explicit Event(const std::string& msg, const std::string& src = std::string(), const std::string& dest = std::string(), LogLevel level = Debug) noexcept;
     ~Event();
 
 public:

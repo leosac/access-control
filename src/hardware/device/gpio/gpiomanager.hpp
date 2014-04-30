@@ -36,12 +36,11 @@ public:
     } ListenerInfo;
 
 public:
-    GPIOManager();
+    explicit GPIOManager();
     ~GPIOManager();
 
-private:
-    GPIOManager(const GPIOManager& other);
-    GPIOManager& operator=(const GPIOManager& other);
+    GPIOManager(const GPIOManager& other) = delete;
+    GPIOManager& operator=(const GPIOManager& other) = delete;
 
 public:
     void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode); // NOTE call this before starting to poll

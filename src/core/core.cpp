@@ -36,10 +36,6 @@ Core::Core()
 
 Core::~Core() {}
 
-Core::Core(const Core& /*other*/) {}
-
-Core& Core::operator=(const Core& /*other*/) {return (*this);}
-
 void Core::handleSignal(int /*signal*/)
 {
     if (_isRunning)
