@@ -201,7 +201,7 @@ void GPIO::exportGpio()
     std::fstream    ex(ExportPath, std::ios::out);
 
     if (!ex.good())
-        throw (GpioException("could not export gpio"));
+        throw (GpioException("could not export gpio " + std::to_string(_pinNo)));
     ex << std::to_string(_pinNo);
 }
 
@@ -210,6 +210,6 @@ void GPIO::unexportGpio()
     std::fstream    unex(ExportPath, std::ios::out);
 
     if (!unex.good())
-        throw (GpioException("could not unexport gpio"));
+        throw (GpioException("could not unexport gpio " + std::to_string(_pinNo)));
     unex << std::to_string(_pinNo);
 }

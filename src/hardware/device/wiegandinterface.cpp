@@ -37,11 +37,11 @@ void WiegandInterface::timeout()
 {
     if (_bitIdx)
     {
-        std::size_t                 size = (_bitIdx - 1 / 8) + 1;
+        std::size_t                 size = ((_bitIdx - 1) / 8) + 1;
         IWiegandListener::CardId    c(size);
 
         for (std::size_t i = 0; i < size; ++i)
-            c[i] = _buffer[i];
+            c[i] = _buffer[size - i - 1];
 
         _listener->notifyCardRead(c);
         debugPrint();

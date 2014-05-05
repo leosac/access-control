@@ -6,7 +6,7 @@
 
 #include "rplethauth.hpp"
 
-#include <iostream> // FIXME rm this
+#include <sstream>
 
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
@@ -39,9 +39,13 @@ RplethAuth::~RplethAuth()
 
 void RplethAuth::notify(const Event& event)
 {
-    CardId cid;
+    std::stringstream   ss(event.message);
+    CardId              cid;
+    unsigned int        val;
 
-    std::cout << "Auth: Event received: " << event.message << std::endl;
+    while (ss >> val)
+        cid.push_back(static_cast<Byte>(val));
+
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
     _cardIdQueue.push(cid);
 }
@@ -127,7 +131,7 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
         packet = RplethProtocol::decodeCommand(client.buffer);
         if (!packet.isGood)
             break;
-        std::cout << "Packet received (s=" << packet.dataLen + 4 << ')' << std::endl; // FIXME Debug
+//         std::cout << "Packet received (s=" << packet.dataLen + 4 << ')' << std::endl; // FIXME Debug
         RplethPacket response = RplethProtocol::processClientPacket(packet);
         std::size_t size = RplethProtocol::encodeCommand(response, _buffer, RingBufferSize);
         client.socket->send(_buffer, size);
@@ -138,10 +142,11 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
 void RplethAuth::handleCardIdQueue()
 {
     CardId                      cid;
-    RplethPacket                packet(RplethPacket::Client);
+    RplethPacket                packet(RplethPacket::Server);
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
     std::size_t                 size;
 
+    packet.status = RplethProtocol::Success;
     packet.type = RplethProtocol::HID;
     packet.command = RplethProtocol::Badge;
     while (!_cardIdQueue.empty())
