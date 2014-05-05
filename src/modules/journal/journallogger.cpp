@@ -47,8 +47,8 @@ void JournalLogger::notify(const Event& event)
 
     std::clog << '[' << ss.str() << ']' << " " << Event::getLogLevelString(event.logLevel) << " ";
     if (!event.source.empty())
-        std::clog << event.source << "::";
-    std::clog << event.message<< std::endl;
+        std::clog << event.source << " said ";
+    std::clog << '\"' << event.message << '\"' << std::endl;
 }
 
 IModule::Type JournalLogger::getType() const

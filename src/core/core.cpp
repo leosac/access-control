@@ -14,6 +14,7 @@
 #include "hardware/hwmanager.hpp"
 #include "dynlib/dynamiclibrary.hpp"
 #include "tools/unixfs.hpp"
+#include "tools/unlock_guard.hpp"
 
 #include "exception/signalexception.hpp"
 #include "exception/dynlibexception.hpp"
@@ -73,9 +74,8 @@ void Core::run(const std::list<std::string>& args)
                 Event e = _eventQueue.top();
 
                 _eventQueue.pop();
-                _eventQueueMutex.unlock();
+                unlock_guard<std::mutex> ulg(_eventQueueMutex);
                 dispatchEvent(e);
-                _eventQueueMutex.lock();
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
@@ -280,7 +280,7 @@ void Core::registerAuthModule(IModule* module)
 
 void Core::registerLoggerModule(IModule* module)
 {
-    IEventListener*   logger;
+    IEventListener* logger;
 
     if (!(logger = dynamic_cast<IEventListener*>(module)))
         throw (ModuleException("Invalid Logger module"));
