@@ -73,10 +73,10 @@ void RplethAuth::run()
         FD_ZERO(&_rSet);
         FD_SET(_serverSocket->getHandle(), &_rSet);
         _fdMax = _serverSocket->getHandle();
-        for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+        for (auto& client : _clients)
         {
-            _fdMax = std::max(_fdMax, it->socket->getHandle());
-            FD_SET(it->socket->getHandle(), &_rSet);
+            _fdMax = std::max(_fdMax, client.socket->getHandle());
+            FD_SET(client.socket->getHandle(), &_rSet);
         }
         _timeoutStruct.tv_sec = _timeout / 1000;
         _timeoutStruct.tv_usec = (_timeout % 1000) * 1000;
@@ -113,10 +113,10 @@ void RplethAuth::run()
             }
         }
     }
-    for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    for (auto& client : _clients)
     {
-        it->socket->close();
-        delete it->socket;
+        client.socket->close();
+        delete client.socket;
     }
     _serverSocket->close();
     delete _serverSocket;
@@ -157,8 +157,8 @@ void RplethAuth::handleCardIdQueue()
         packet.dataLen = cid.size();
         packet.data = cid;
         size = RplethProtocol::encodeCommand(packet, _buffer, RingBufferSize);
-        for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-            it->socket->send(_buffer, size);
+        for (auto& client : _clients)
+            client.socket->send(_buffer, size);
         _listener.notify(Event("Open the door !", "RplethAuth", "Door"));
         _cardIdQueueMutex.lock();
     }

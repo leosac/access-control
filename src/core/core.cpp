@@ -86,7 +86,7 @@ void Core::run(const std::list<std::string>& args)
 
 bool Core::parseArguments()
 {
-    for (auto arg : _args)
+    for (auto& arg : _args)
     {
         if (arg == "--version")
         {
@@ -106,7 +106,7 @@ void Core::load()
     loadLibraries();
 
     // TODO load modules
-    for (auto lib : _dynlibs)
+    for (auto& lib : _dynlibs)
         loadModule(lib.first, lib.first + "-debug"); // FIXME Debug
 
     debugPrintModules();
@@ -130,7 +130,7 @@ void Core::unload()
     _hwManager->stop();
 #endif
 
-    for (auto module : _modules)
+    for (auto& module : _modules)
         delete module.second;
     _modules.clear();
 
@@ -152,10 +152,10 @@ void Core::loadLibraries()
     _libsDirectories.push_back("modules/example");
     _libsDirectories.push_back("modules/ap-wiegand");
 
-    for (auto folder : _libsDirectories)
+    for (auto& folder : _libsDirectories)
     {
         UnixFs::FileList fl = UnixFs::listFiles(folder, ".so");
-        for (auto path : fl)
+        for (auto& path : fl)
         {
             libname = UnixFs::stripPath(path);
             if (_dynlibs[libname] != nullptr)
@@ -181,7 +181,7 @@ void Core::loadLibraries()
 
 void Core::unloadLibraries()
 {
-    for (auto lib : _dynlibs)
+    for (auto& lib : _dynlibs)
     {
         try
         {
@@ -229,21 +229,21 @@ void Core::dispatchEvent(const Event& event)
         dest->notify(event);
     else
         std::cerr << "Event: unknown destination '" << event.destination << "'" << std::endl;
-    for (auto logger : _loggerModules)
+    for (auto& logger : _loggerModules)
         logger->notify(event);
 }
 
 void Core::debugPrintLibs()
 {
     std::cout << "Libs:" << std::endl;
-    for (auto lib : _dynlibs)
+    for (auto& lib : _dynlibs)
         std::cout << "-> " << lib.first << std::endl;
 }
 
 void Core::debugPrintModules()
 {
     std::cout << "Loaded modules:" << std::endl;
-    for (auto module : _modules)
+    for (auto& module : _modules)
         std::cout << "-> " << module.first << std::endl;
 }
 
