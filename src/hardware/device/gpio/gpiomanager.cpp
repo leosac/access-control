@@ -87,7 +87,7 @@ void GPIOManager::pollLoop()
                         throw (GpioException(UnixSyscall::getErrorString("read", errno)));
                     if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
                         throw (GpioException(UnixSyscall::getErrorString("lseek", errno)));
-                    for (auto listener : _listeners)
+                    for (auto& listener : _listeners)
                     {
                         if (listener.fdIdx == i)
                             listener.instance->notify(listener.gpioNo);
@@ -100,7 +100,7 @@ void GPIOManager::pollLoop()
 
 void GPIOManager::timeout()
 {
-    for (auto listener : _listeners)
+    for (auto& listener : _listeners)
         listener.instance->timeout();
 }
 
@@ -109,12 +109,12 @@ void GPIOManager::buildFdSet()
     int i = 0;
 
     _fdset.resize(_listeners.size());
-    for (std::list<ListenerInfo>::iterator it = _listeners.begin(); it != _listeners.end(); ++it)
+    for (auto& listener : _listeners)
     {
-        _fdset[i].fd = _polledGpio[it->gpioNo]->getPollFd();
+        _fdset[i].fd = _polledGpio[listener.gpioNo]->getPollFd();
         _fdset[i].events = POLLPRI;
         _fdset[i].revents = 0;
-        it->fdIdx = i;
+        listener.fdIdx = i;
         ++i;
     }
 }
