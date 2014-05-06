@@ -17,7 +17,7 @@
 
 std::string UnixFs::getCWD()
 {
-    char*       str = getcwd(NULL, 0);
+    char*       str = getcwd(nullptr, 0);
     std::string path;
 
     if (str)
@@ -42,9 +42,9 @@ UnixFs::FileList UnixFs::listFiles(const std::string& folder, const std::string&
         throw (FsException("empty folder"));
     if (*path.rbegin() != '/')
         path.append("/");
-    if ((dir = opendir(path.c_str())) == NULL)
+    if ((dir = opendir(path.c_str())) == nullptr)
         throw (FsException(UnixSyscall::getErrorString("opendir", errno)));
-    while((entry = readdir(dir)) != NULL)
+    while((entry = readdir(dir)) != nullptr)
     {
         if (entry->d_type != DT_REG)
             continue;
