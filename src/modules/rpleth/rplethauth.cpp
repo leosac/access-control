@@ -86,7 +86,7 @@ void RplethAuth::run()
             handleCardIdQueue();
         else
         {
-            for (std::list<Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+            for (auto it = _clients.begin(); it != _clients.end(); ++it)
             {
                 if (FD_ISSET(it->socket->getHandle(), &_rSet))
                 {
