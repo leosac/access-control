@@ -39,10 +39,9 @@ public:
     void        handleSignal(int signal); // Inherited from ISignalCallback
     void        notify(const Event& event); // Inherited from IEventListener
     IHWManager* getHWManager(); // Inherited from ICore
-    void        run(const std::list<std::string>& args);
+    void        run();
 
 private:
-    bool    parseArguments();
     void    load();
     void    unload();
     void    loadLibraries();
@@ -61,10 +60,7 @@ private:
     void    registerActivityMonitorModule(IModule* module);
 
 private:
-    std::list<std::string>                  _args;
-    std::atomic<bool>                       _isRunning;
-
-private:
+    std::atomic<bool>                           _isRunning;
     IHWManager*                                 _hwManager;
     std::list<std::string>                      _libsDirectories;
     std::map<std::string, DynamicLibrary*>      _dynlibs;

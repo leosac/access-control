@@ -9,17 +9,13 @@
 #include "exception/osacexception.hpp"
 #include "core/core.hpp"
 
-int main(int ac, char** av)
+int main(int /*ac*/, char** /*av*/)
 {
-    std::list<std::string>  args;
-
-    for (int i = 1; i < ac; ++i)
-        args.push_back(av[i]);
     try
     {
         Core    core;
 
-        core.run(args);
+        core.run();
     }
     catch (const OSACException& e)
     {

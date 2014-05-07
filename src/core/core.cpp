@@ -55,11 +55,8 @@ IHWManager* Core::getHWManager()
     return (_hwManager);
 }
 
-void Core::run(const std::list<std::string>& args)
+void Core::run()
 {
-    _args = args;
-    if (!parseArguments())
-        return;
     load();
     notify(Event("starting", "Core"));
     _isRunning = true;
@@ -82,24 +79,9 @@ void Core::run(const std::list<std::string>& args)
     unload();
 }
 
-bool Core::parseArguments()
-{
-    for (auto& arg : _args)
-    {
-        if (arg == "--version")
-        {
-            std::cout << "Version: " << OSAC::getVersionString() << std::endl;
-            return (false);
-        }
-    }
-    return (true);
-}
-
 void Core::load()
 {
-#ifndef NO_HW
     _hwManager = new HWManager;
-#endif
 
     loadLibraries();
 
@@ -117,16 +99,12 @@ void Core::load()
     {
         std::cerr << e.what() << std::endl;
     }
-#ifndef NO_HW
     _hwManager->start();
-#endif
 }
 
 void Core::unload()
 {
-#ifndef NO_HW
     _hwManager->stop();
-#endif
 
     for (auto& module : _modules)
         delete module.second;
@@ -134,21 +112,14 @@ void Core::unload()
 
     unloadLibraries();
 
-#ifndef NO_HW
     delete _hwManager;
     _hwManager = nullptr;
-#endif
 }
 
 void Core::loadLibraries()
 {
     std::string     libname;
     DynamicLibrary* lib;
-
-    _libsDirectories.push_back("modules/rpleth");
-    _libsDirectories.push_back("modules/journal");
-    _libsDirectories.push_back("modules/example");
-    _libsDirectories.push_back("modules/ap-wiegand");
 
     for (auto& folder : _libsDirectories)
     {
