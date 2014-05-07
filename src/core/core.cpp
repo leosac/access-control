@@ -35,8 +35,6 @@ Core::Core()
     _registrationHandler[IModule::ActivityMonitor] = &Core::registerActivityMonitorModule;
 }
 
-Core::~Core() {}
-
 void Core::handleSignal(int signal)
 {
     if (_isRunning)

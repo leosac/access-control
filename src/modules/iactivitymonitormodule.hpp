@@ -10,7 +10,7 @@
 class IActivityMonitor
 {
 public:
-    virtual ~IActivityMonitor() {}
+    virtual ~IActivityMonitor() = default;
     virtual void    lol() = 0; // FIXME Debug
 };
 

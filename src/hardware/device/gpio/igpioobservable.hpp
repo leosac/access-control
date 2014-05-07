@@ -17,7 +17,7 @@ public:
     typedef void (IGPIOObservable::*CallbackFn)(int, GPIO::EdgeMode);
 
 public:
-    virtual ~IGPIOObservable() {}
+    virtual ~IGPIOObservable() = default;
     virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode = GPIO::Rising) = 0;
 };
 

@@ -16,7 +16,7 @@ protected:
     OSACException(const std::string& message) : _message(message) {};
 
 public:
-    virtual ~OSACException() throw() {};
+    virtual ~OSACException() throw() = default;
 
 public:
     const char* what() const throw() { return (_message.c_str()); }

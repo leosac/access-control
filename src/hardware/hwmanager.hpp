@@ -15,8 +15,8 @@
 class HWManager : public IHWManager
 {
 public:
-    explicit HWManager();
-    ~HWManager();
+    explicit HWManager() = default;
+    ~HWManager() = default;
 
     HWManager(const HWManager& other) = delete;
     HWManager& operator=(const HWManager& other) = delete;
@@ -26,7 +26,7 @@ public:
     void    stop();
 
 public:
-    WiegandInterface*   buildWiegandInterface(IWiegandListener* listener);
+    WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx);
 
 private:
     GPIOManager         _gpioManager;

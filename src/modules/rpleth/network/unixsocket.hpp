@@ -14,8 +14,8 @@ namespace Rezzo
     class UnixSocket : public ISocket
     {
     public:
-        UnixSocket(Protocol protocol);
-        virtual ~UnixSocket();
+        explicit UnixSocket(Protocol protocol);
+        ~UnixSocket() = default;
 
     protected:
         UnixSocket(int handle, Address address);

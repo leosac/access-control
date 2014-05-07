@@ -28,8 +28,6 @@ GPIOManager::GPIOManager()
     _pollTimeout(DefaultTimeout)
 {}
 
-GPIOManager::~GPIOManager() {}
-
 void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::EdgeMode mode)
 {
     ListenerInfo    listener;

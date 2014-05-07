@@ -13,7 +13,7 @@
 WiegandModule::WiegandModule(ICore& core)
 :   _listener(core),
     _version(Version::buildVersionString(0, 1, 0)),
-    _interface(core.getHWManager()->buildWiegandInterface(this))
+    _interface(core.getHWManager()->buildWiegandInterface(this, 15, 14))
 {}
 
 WiegandModule::~WiegandModule()

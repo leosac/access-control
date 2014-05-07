@@ -15,7 +15,7 @@ class GpioException : public OSACException
 {
 public:
     GpioException(const std::string& message) : OSACException("Gpio::" + message) {};
-    virtual ~GpioException() throw() {};
+    virtual ~GpioException() throw() = default;
 };
 
 #endif // GPIOEXCEPTION_HPP

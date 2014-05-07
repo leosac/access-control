@@ -17,8 +17,6 @@ JournalLogger::JournalLogger(int logLevel)
     _logLevel(logLevel)
 {}
 
-JournalLogger::~JournalLogger() {}
-
 void JournalLogger::notify(const Event& event)
 {
     std::stringstream   ss;
