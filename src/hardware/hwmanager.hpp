@@ -29,7 +29,9 @@ public:
     WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx);
 
 private:
+#ifndef NO_HW
     GPIOManager         _gpioManager;
+#endif
 };
 
 #endif // HWMANAGER_HPP
