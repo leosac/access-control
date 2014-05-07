@@ -16,8 +16,6 @@ CircularBuffer::CircularBuffer(std::size_t size)
     _toRead(0)
 {}
 
-CircularBuffer::~CircularBuffer() {}
-
 std::size_t CircularBuffer::read(Byte* data, std::size_t size) noexcept
 {
     std::size_t readIdx;

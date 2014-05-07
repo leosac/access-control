@@ -18,7 +18,7 @@ public:
     typedef std::vector<Byte> CardId;
 
 public:
-    virtual ~IWiegandListener() {}
+    virtual ~IWiegandListener() = default;
     virtual void    notifyCardRead(const CardId& cardId) = 0;
 };
 

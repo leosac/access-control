@@ -10,7 +10,7 @@
 class ISignalCallback
 {
 public:
-    virtual ~ISignalCallback() {}
+    virtual ~ISignalCallback() = default;
     virtual void    handleSignal(int signal) = 0;
 };
 

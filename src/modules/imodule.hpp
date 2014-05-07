@@ -24,7 +24,7 @@ public:
     };
 
 public:
-    virtual ~IModule() {}
+    virtual ~IModule() = default;
     virtual Type                getType() const = 0;
     virtual const std::string&  getVersionString() const = 0;
 };

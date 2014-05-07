@@ -6,10 +6,6 @@
 
 #include "hwmanager.hpp"
 
-HWManager::HWManager() {}
-
-HWManager::~HWManager() {}
-
 void HWManager::start()
 {
     _gpioManager.startPolling();
@@ -20,7 +16,7 @@ void HWManager::stop()
     _gpioManager.stopPolling();
 }
 
-WiegandInterface* HWManager::buildWiegandInterface(IWiegandListener* listener)
+WiegandInterface* HWManager::buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx)
 {
-    return (new WiegandInterface(_gpioManager, listener));
+    return (new WiegandInterface(_gpioManager, listener, hiGpioIdx, loGpioIdx));
 }

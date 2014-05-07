@@ -9,9 +9,8 @@
 #include "tools/version.hpp"
 
 ExampleModule::ExampleModule()
-:   _version(Version::buildVersionString(0, 1, 0)) {}
-
-ExampleModule::~ExampleModule() {}
+:   _version(Version::buildVersionString(0, 1, 0))
+{}
 
 void ExampleModule::notify(const Event& event)
 {

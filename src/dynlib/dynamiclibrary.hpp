@@ -21,7 +21,7 @@ public:
 
 public:
     explicit DynamicLibrary(const std::string& file);
-    ~DynamicLibrary();
+    ~DynamicLibrary() = default;
 
     DynamicLibrary(const DynamicLibrary& other) = delete;
     DynamicLibrary& operator=(const DynamicLibrary& other) = delete;

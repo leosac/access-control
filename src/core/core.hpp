@@ -30,7 +30,7 @@ class Core : public ISignalCallback, public ICore
 
 public:
     explicit Core();
-    ~Core();
+    ~Core() = default;
 
     Core(const Core& other) = delete;
     Core& operator=(const Core& other) = delete;

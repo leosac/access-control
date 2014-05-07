@@ -48,8 +48,6 @@ UnixSocket::UnixSocket(int handle, ISocket::Address address)
     _address(address)
 {}
 
-UnixSocket::~UnixSocket() {}
-
 std::size_t UnixSocket::recv(Byte* data, std::size_t size, int flags)
 {
     int ret;

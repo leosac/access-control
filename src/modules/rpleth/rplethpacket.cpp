@@ -21,8 +21,6 @@ RplethPacket::RplethPacket(const RplethPacket& other)
     sender(other.sender)
 {}
 
-RplethPacket::~RplethPacket() {}
-
 RplethPacket& RplethPacket::operator=(const RplethPacket& other)
 {
     status = other.status;

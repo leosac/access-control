@@ -12,8 +12,6 @@ DynamicLibrary::DynamicLibrary(const std::string& file)
     _handle(nullptr)
 {}
 
-DynamicLibrary::~DynamicLibrary() {}
-
 void DynamicLibrary::open(RelocationMode mode)
 {
     char*   err;

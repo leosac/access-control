@@ -18,7 +18,7 @@ class CircularBuffer
 
 public:
     CircularBuffer(std::size_t size = DefaultSize);
-    ~CircularBuffer();
+    ~CircularBuffer() = default;
 
 public:
     std::size_t read(Byte* data, std::size_t size) noexcept;

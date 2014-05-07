@@ -23,8 +23,8 @@ class WiegandInterface : public IGPIOListener
     static const int    DataBufferSize = 10;
 
 public:
-    explicit WiegandInterface(IGPIOObservable& gpioProvider, IWiegandListener* listener);
-    ~WiegandInterface();
+    explicit WiegandInterface(IGPIOObservable& gpioProvider, IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx);
+    ~WiegandInterface() = default;
 
     WiegandInterface(const WiegandInterface& other) = delete;
     WiegandInterface& operator=(const WiegandInterface& other) = delete;
