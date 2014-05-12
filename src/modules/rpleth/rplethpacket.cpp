@@ -38,7 +38,7 @@ Byte RplethPacket::checksum() const
 {
     Byte s = 0;
 
-    if (sender == Server)
+    if (sender == Sender::Server)
         s ^= status;
     s ^= type;
     s ^= command;

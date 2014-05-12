@@ -11,11 +11,4 @@ set(RPLETH_SRCS
 
 add_library(${RPLETH_BIN} SHARED ${RPLETH_SRCS})
 
-#Add symbol exporting options flags
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-endif()
-
-target_link_libraries(${RPLETH_BIN})
-
-install(TARGETS ${RPLETH_BIN} LIBRARY DESTINATION bin)
+set_target_properties(${RPLETH_BIN} PROPERTIES COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")

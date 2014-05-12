@@ -7,11 +7,4 @@ set(WIEGAND_SRCS
 
 add_library(${WIEGAND_BIN} SHARED ${WIEGAND_SRCS})
 
-#Add symbol exporting options flags
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-endif()
-
-target_link_libraries(${WIEGAND_BIN})
-
-install(TARGETS ${WIEGAND_BIN} LIBRARY DESTINATION bin)
+set_target_properties(${WIEGAND_BIN} PROPERTIES COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")

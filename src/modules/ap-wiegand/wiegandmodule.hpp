@@ -23,7 +23,7 @@ public:
 public:
     void                notifyCardRead(const CardId& cardId);
     void                notify(const Event& event);
-    Type                getType() const;
+    ModuleType          getType() const;
     const std::string&  getVersionString() const;
 
 private:

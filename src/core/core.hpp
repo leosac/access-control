@@ -65,7 +65,7 @@ private:
     std::list<std::string>                      _libsDirectories;
     std::map<std::string, DynamicLibrary*>      _dynlibs;
     std::map<std::string, IModule*>             _modules;
-    std::map<IModule::Type, RegisterFunc>       _registrationHandler;
+    std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<IEventListener*>                  _loggerModules;
     IAuthModule*                                _authModule;
     std::priority_queue<Event>                  _eventQueue;

@@ -14,7 +14,7 @@
 class RplethPacket
 {
 public:
-    enum Sender {
+    enum class Sender {
         Client = 0,
         Server
     };

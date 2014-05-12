@@ -22,7 +22,12 @@ void HWManager::stop()
 
 WiegandInterface* HWManager::buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx)
 {
-#ifndef NO_HW
+#ifdef NO_HW
+    static_cast<void>(listener);
+    static_cast<void>(hiGpioIdx);
+    static_cast<void>(loGpioIdx);
+    return (nullptr);
+#else
     return (new WiegandInterface(_gpioManager, listener, hiGpioIdx, loGpioIdx));
 #endif
 }

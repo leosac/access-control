@@ -16,23 +16,26 @@ set(OSAC_SRCS
     tools/unixfs.cpp
 )
 
+# NOTE Available for ALL targets
 include_directories(.)
 
 add_executable(${OSAC_BIN} ${OSAC_SRCS})
 
-# Add C++11 support flags
-list(APPEND CMAKE_CXX_FLAGS ${CXX11_FLAGS})
+set(OSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -Wundef -O")
+        set(OSAC_COMPILE_FLAGS "${OSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O")
     endif()
 endif()
 
+#Set compilation flags for current target
+set_target_properties(${OSAC_BIN} PROPERTIES COMPILE_FLAGS "${OSAC_COMPILE_FLAGS}")
+
 target_link_libraries(${OSAC_BIN} dl pthread)
 
-install(TARGETS ${OSAC_BIN} RUNTIME DESTINATION bin)
-
 # Build modules
-add_subdirectory(modules)
+if(NOT NO_MODULE)
+    add_subdirectory(modules)
+endif()

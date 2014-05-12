@@ -25,12 +25,12 @@ UnixSocket::UnixSocket(Protocol protocol)
     int             type = 0;
     int             opt = 1;
 
-    if (protocol == TCP)
+    if (protocol == ISocket::Protocol::TCP)
     {
         protoName = "TCP";
         type = SOCK_STREAM;
     }
-    else if (protocol == ISocket::UDP)
+    else if (protocol == ISocket::Protocol::UDP)
     {
         protoName = "UDP";
         type = SOCK_DGRAM;

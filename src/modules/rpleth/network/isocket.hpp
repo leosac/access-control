@@ -23,7 +23,7 @@ namespace Rezzo
     class ISocket
     {
     public:
-        enum Protocol {
+        enum class Protocol {
             TCP = 0,
             UDP
         };

@@ -6,8 +6,8 @@
 
 #include "event.hpp"
 
-static const int            logLevelCount = 8;
-static const std::string    logLevelStrings[logLevelCount + 1] = {
+static const unsigned int   logLevelCount = 8;
+static const std::string    logLevelStrings[logLevelCount] = {
     "EMERGENCY",
     "ALERT",
     "CRITICAL",
@@ -15,11 +15,10 @@ static const std::string    logLevelStrings[logLevelCount + 1] = {
     "WARNING",
     "NOTICE",
     "INFO",
-    "DEBUG",
-    "(unknown)"
+    "DEBUG"
 };
 
-Event::Event(const std::string& msg, const std::string& src, const std::string& dest, LogLevel level) noexcept
+Event::Event(const std::string& msg, const std::string& src, const std::string& dest, LogLevel level)
 :   message(msg),
     source(src),
     destination(dest),
@@ -27,17 +26,12 @@ Event::Event(const std::string& msg, const std::string& src, const std::string& 
     date(std::chrono::system_clock::now())
 {}
 
-Event::~Event() noexcept {}
-
-bool Event::operator<(const Event& other) const noexcept
+bool Event::operator<(const Event& other) const
 {
     return (date < other.date);
 }
 
-const std::string& Event::getLogLevelString(int level)
+const std::string& Event::getLogLevelString(Event::LogLevel level)
 {
-    if (logLevelCount && level < logLevelCount)
-        return (logLevelStrings[level]);
-    else
-        return (logLevelStrings[logLevelCount]);
+    return (logLevelStrings[static_cast<unsigned int>(level)]); // NOTE Should be safe due to enum class type safety
 }

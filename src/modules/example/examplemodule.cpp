@@ -17,9 +17,9 @@ void ExampleModule::notify(const Event& event)
     static_cast<void>(event);
 }
 
-IModule::Type ExampleModule::getType() const
+IModule::ModuleType ExampleModule::getType() const
 {
-    return (Logger);
+    return (ModuleType::Logger);
 }
 
 const std::string& ExampleModule::getVersionString() const
