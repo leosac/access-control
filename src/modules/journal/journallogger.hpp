@@ -12,7 +12,7 @@
 class JournalLogger : public IModule
 {
 public:
-    explicit JournalLogger(int logLevel = Event::Debug);
+    explicit JournalLogger(Event::LogLevel logLevel = Event::LogLevel::Debug);
     ~JournalLogger() = default;
 
     JournalLogger(const JournalLogger& other) = delete;
@@ -20,12 +20,12 @@ public:
 
 public:
     void                notify(const Event& event);
-    Type                getType() const;
+    ModuleType          getType() const;
     const std::string&  getVersionString() const;
 
 private:
     const std::string   _version;
-    int                 _logLevel;
+    Event::LogLevel     _logLevel;
 };
 
 #endif // JOURNALLOGGER_HPP

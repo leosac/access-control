@@ -11,7 +11,7 @@
 
 RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
 {
-    RplethPacket    packet(RplethPacket::Client);
+    RplethPacket    packet(RplethPacket::Sender::Client);
     std::size_t     toRead = buffer.toRead();
 
     std::cout << "DEBUG: Packet decode: ToRead size=" << toRead << std::endl;
@@ -53,7 +53,7 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buff
 {
     // TODO Compare with input size
 
-    if (packet.sender == RplethPacket::Server)
+    if (packet.sender == RplethPacket::Sender::Server)
     {
         buffer[0] = packet.status;
         ++buffer;
@@ -65,7 +65,7 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buff
         buffer[SizeByteIdx + i + 1] = packet.data[i];
     buffer[SizeByteIdx + packet.dataLen + 1] = packet.checksum();
 
-    if (packet.sender == RplethPacket::Server)
+    if (packet.sender == RplethPacket::Sender::Server)
         return (packet.dataLen + 4 + 1);
     else
         return (packet.dataLen + 4);
@@ -75,7 +75,7 @@ RplethPacket RplethProtocol::processClientPacket(const RplethPacket& packet)
 {
     RplethPacket response = packet;
 
-    response.sender = RplethPacket::Server;
+    response.sender = RplethPacket::Sender::Server;
     if (response.type == Rpleth && response.command == Ping)
         response.status = Success;
     else

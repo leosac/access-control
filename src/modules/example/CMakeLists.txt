@@ -7,11 +7,4 @@ set(EXAMPLE_SRCS
 
 add_library(${EXAMPLE_BIN} SHARED ${EXAMPLE_SRCS})
 
-#Add symbol exporting options flags
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-endif()
-
-target_link_libraries(${EXAMPLE_BIN})
-
-install(TARGETS ${EXAMPLE_BIN} LIBRARY DESTINATION bin)
+set_target_properties(${EXAMPLE_BIN} PROPERTIES COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")

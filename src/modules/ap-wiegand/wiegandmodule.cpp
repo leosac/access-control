@@ -39,9 +39,9 @@ void WiegandModule::notify(const Event& event)
     static_cast<void>(event);
 }
 
-IModule::Type WiegandModule::getType() const
+IModule::ModuleType WiegandModule::getType() const
 {
-    return (AccessPoint);
+    return (ModuleType::AccessPoint);
 }
 
 const std::string& WiegandModule::getVersionString() const

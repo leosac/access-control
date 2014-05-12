@@ -16,7 +16,7 @@ CircularBuffer::CircularBuffer(std::size_t size)
     _toRead(0)
 {}
 
-std::size_t CircularBuffer::read(Byte* data, std::size_t size) noexcept
+std::size_t CircularBuffer::read(Byte* data, std::size_t size)
 {
     std::size_t readIdx;
 
@@ -36,7 +36,7 @@ std::size_t CircularBuffer::read(Byte* data, std::size_t size) noexcept
     return (readIdx);
 }
 
-std::size_t CircularBuffer::write(const Byte* data, std::size_t size) noexcept
+std::size_t CircularBuffer::write(const Byte* data, std::size_t size)
 {
     if (!size || size > _size)
         return (0);
@@ -51,12 +51,12 @@ std::size_t CircularBuffer::write(const Byte* data, std::size_t size) noexcept
     return (size);
 }
 
-Byte CircularBuffer::operator[](int idx) const noexcept
+Byte CircularBuffer::operator[](int idx) const
 {
     return (_buffer[(_rIdx + idx) % _size]);
 }
 
-void CircularBuffer::fastForward(std::size_t offset) noexcept
+void CircularBuffer::fastForward(std::size_t offset)
 {
     if (offset > _toRead)
         offset = _toRead;
@@ -64,24 +64,24 @@ void CircularBuffer::fastForward(std::size_t offset) noexcept
     _toRead -= offset;
 }
 
-void CircularBuffer::reset() noexcept
+void CircularBuffer::reset()
 {
     _rIdx = 0;
     _wIdx = 0;
     _toRead = 0;
 }
 
-std::size_t CircularBuffer::getSize() const noexcept
+std::size_t CircularBuffer::getSize() const
 {
     return (_size);
 }
 
-std::size_t CircularBuffer::toRead() const noexcept
+std::size_t CircularBuffer::toRead() const
 {
     return (_toRead);
 }
 
-bool CircularBuffer::isEmpty() const noexcept
+bool CircularBuffer::isEmpty() const
 {
     return (_toRead > 0);
 }

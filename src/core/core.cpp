@@ -28,11 +28,11 @@ Core::Core()
     _authModule(nullptr)
 {
     _libsDirectories.push_back(UnixFs::getCWD());
-    _registrationHandler[IModule::Door] = &Core::registerDoorModule;
-    _registrationHandler[IModule::AccessPoint] = &Core::registerAccessPointModule;
-    _registrationHandler[IModule::Auth] = &Core::registerAuthModule;
-    _registrationHandler[IModule::Logger] = &Core::registerLoggerModule;
-    _registrationHandler[IModule::ActivityMonitor] = &Core::registerActivityMonitorModule;
+    _registrationHandler[IModule::ModuleType::Door] = &Core::registerDoorModule;
+    _registrationHandler[IModule::ModuleType::AccessPoint] = &Core::registerAccessPointModule;
+    _registrationHandler[IModule::ModuleType::Auth] = &Core::registerAuthModule;
+    _registrationHandler[IModule::ModuleType::Logger] = &Core::registerLoggerModule;
+    _registrationHandler[IModule::ModuleType::ActivityMonitor] = &Core::registerActivityMonitorModule;
 }
 
 void Core::handleSignal(int signal)

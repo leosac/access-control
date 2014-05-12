@@ -14,7 +14,7 @@
 class DynamicLibrary
 {
 public:
-    enum RelocationMode {
+    enum class RelocationMode : int {
         Lazy = RTLD_LAZY,
         Now = RTLD_NOW
     };
@@ -27,7 +27,7 @@ public:
     DynamicLibrary& operator=(const DynamicLibrary& other) = delete;
 
 public:
-    void    open(RelocationMode mode = Lazy); // NOTE May throw DynLibException
+    void    open(RelocationMode mode = RelocationMode::Lazy); // NOTE May throw DynLibException
     void    close(); // NOTE May throw DynLibException
     void*   getSymbol(const std::string& symbol); // NOTE May throw DynLibException
 

@@ -20,7 +20,7 @@ public:
 
 public:
     void                notify(const Event& event);
-    Type                getType() const;
+    ModuleType          getType() const;
     const std::string&  getVersionString() const;
 
 private:

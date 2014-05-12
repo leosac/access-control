@@ -50,9 +50,9 @@ void RplethAuth::notify(const Event& event)
     _cardIdQueue.push(cid);
 }
 
-IModule::Type RplethAuth::getType() const
+IModule::ModuleType RplethAuth::getType() const
 {
-    return (Auth);
+    return (ModuleType::Auth);
 }
 
 const std::string& RplethAuth::getVersionString() const
@@ -65,7 +65,7 @@ void RplethAuth::run()
     std::size_t     readRet;
     int             selectRet;
 
-    _serverSocket = new Rezzo::UnixSocket(Rezzo::ISocket::TCP);
+    _serverSocket = new Rezzo::UnixSocket(Rezzo::ISocket::Protocol::TCP);
     _serverSocket->bind(_port);
     _serverSocket->listen();
     while (_isRunning)
@@ -124,7 +124,7 @@ void RplethAuth::run()
 
 void RplethAuth::handleClientMessage(RplethAuth::Client& client)
 {
-    RplethPacket packet(RplethPacket::Client);
+    RplethPacket packet(RplethPacket::Sender::Client);
 
     do
     {
@@ -142,7 +142,7 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
 void RplethAuth::handleCardIdQueue()
 {
     CardId                      cid;
-    RplethPacket                packet(RplethPacket::Server);
+    RplethPacket                packet(RplethPacket::Sender::Server);
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
     std::size_t                 size;
 

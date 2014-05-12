@@ -21,14 +21,14 @@ public:
     ~CircularBuffer() = default;
 
 public:
-    std::size_t read(Byte* data, std::size_t size) noexcept;
-    std::size_t write(const Byte* data, std::size_t size) noexcept;
-    Byte        operator[](int idx) const noexcept;
-    void        fastForward(std::size_t offset) noexcept;
-    void        reset() noexcept;
-    std::size_t getSize() const noexcept;
-    std::size_t toRead() const noexcept;
-    bool        isEmpty() const noexcept;
+    std::size_t read(Byte* data, std::size_t size);
+    std::size_t write(const Byte* data, std::size_t size);
+    Byte        operator[](int idx) const;
+    void        fastForward(std::size_t offset);
+    void        reset();
+    std::size_t getSize() const;
+    std::size_t toRead() const;
+    bool        isEmpty() const;
 
 private:
     std::vector<Byte>   _buffer;

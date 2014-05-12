@@ -13,7 +13,7 @@
 class Event
 {
 public:
-    enum LogLevel {
+    enum class LogLevel : unsigned int {
         Emergency   = 0, /* Emergency messages, system is about to crash or is unstable */
         Alert       = 1, /* Something bad happened and action must be taken immediately */
         Critical    = 2, /* A critical condition occurred like a serious hardware/software failure */
@@ -26,20 +26,20 @@ public:
     typedef std::chrono::system_clock::time_point Date;
 
 public:
-    explicit Event(const std::string& msg, const std::string& src = std::string(), const std::string& dest = std::string(), LogLevel level = Debug) noexcept;
-    ~Event();
+    explicit Event(const std::string& msg, const std::string& src = std::string(), const std::string& dest = std::string(), LogLevel level = LogLevel::Debug);
+    ~Event() = default;
 
 public:
-    bool operator<(const Event& other) const noexcept;
+    bool operator<(const Event& other) const;
 
 public:
-    static const std::string&   getLogLevelString(int level);
+    static const std::string&   getLogLevelString(Event::LogLevel level);
 
 public:
     std::string     message;
     std::string     source;
     std::string     destination;
-    int             logLevel;
+    LogLevel        logLevel;
     Date            date;
 };
 
