@@ -19,16 +19,16 @@ void DynamicLibrary::open(RelocationMode mode)
     if (!(_handle = dlopen(_file.c_str(), static_cast<int>(mode))))
     {
         if ((err = dlerror()))
-            throw DynLibException(std::string("dlopen(): ") + err);
+            throw (DynLibException(std::string("dlopen(): ") + err));
         else
-            throw DynLibException("dlopen(): Unknown error");
+            throw (DynLibException("dlopen(): Unknown error"));
     }
 }
 
 void DynamicLibrary::close()
 {
     if (dlclose(_handle))
-        throw DynLibException(std::string("dlclose(): ") + dlerror());
+        throw (DynLibException(std::string("dlclose(): ") + dlerror()));
 }
 
 void* DynamicLibrary::getSymbol(const std::string& symbol)
@@ -38,6 +38,6 @@ void* DynamicLibrary::getSymbol(const std::string& symbol)
 
     sym = dlsym(_handle, symbol.c_str());
     if ((err = dlerror()))
-        throw DynLibException(std::string("dlsym(): ") + err);
+        throw (DynLibException(std::string("dlsym(): ") + err));
     return (sym);
 }
