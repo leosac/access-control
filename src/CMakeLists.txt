@@ -17,9 +17,6 @@ set(OSAC_SRCS
     tools/unixfs.cpp
 )
 
-# NOTE Available for ALL targets
-include_directories(.)
-
 add_executable(${OSAC_BIN} ${OSAC_SRCS})
 
 set(OSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -32,7 +29,9 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 endif()
 
 #Set compilation flags for current target
-set_target_properties(${OSAC_BIN} PROPERTIES COMPILE_FLAGS "${OSAC_COMPILE_FLAGS}")
+set_target_properties(${OSAC_BIN} PROPERTIES
+    COMPILE_FLAGS "${OSAC_COMPILE_FLAGS}"
+    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${OSAC_BIN} dl pthread)
 
