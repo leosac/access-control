@@ -6,8 +6,10 @@
 
 #include "unixfs.hpp"
 
+extern "C" {
 #include <unistd.h>
 #include <dirent.h>
+}
 
 #include <cerrno>
 #include <algorithm>

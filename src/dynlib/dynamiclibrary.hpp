@@ -7,7 +7,9 @@
 #ifndef DYNAMICLIBRARY_HPP
 #define DYNAMICLIBRARY_HPP
 
+extern "C" {
 #include <dlfcn.h>
+}
 
 #include <string>
 
@@ -15,8 +17,8 @@ class DynamicLibrary
 {
 public:
     enum class RelocationMode : int {
-        Lazy = RTLD_LAZY,
-        Now = RTLD_NOW
+        Lazy    = RTLD_LAZY,
+        Now     = RTLD_NOW
     };
 
 public:

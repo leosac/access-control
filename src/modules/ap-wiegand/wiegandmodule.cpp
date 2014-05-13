@@ -31,7 +31,6 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             ss << ' ';
         ss << static_cast<unsigned int>(cardId[i]);
     }
-    _listener.notify(Event(ss.str(), "wiegandmodule", "librpleth.so-debug")); // FIXME Debug
 }
 
 void WiegandModule::notify(const Event& event)

@@ -6,7 +6,7 @@
 
 #include "unixsyscall.hpp"
 
-#include <string.h>
+#include <cstring>
 
 std::string UnixSyscall::getErrorString(const std::string& func, int errNo)
 {

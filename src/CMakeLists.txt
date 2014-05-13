@@ -3,6 +3,7 @@ set(OSAC_BIN osac)
 set(OSAC_SRCS
     main.cpp
     osac.cpp
+    core/authrequest.cpp
     core/core.cpp
     core/event.cpp
     dynlib/dynamiclibrary.cpp
