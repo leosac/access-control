@@ -4,13 +4,17 @@
  * \brief Unix socket class
  */
 
-#include <sstream>
-#include <cerrno>
+#include "unixsocket.hpp"
+
+extern "C" {
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netdb.h>
+}
 
-#include "unixsocket.hpp"
+#include <sstream>
+#include <cerrno>
+
 #include "tools/unixsyscall.hpp"
 #include "exception/moduleexception.hpp"
 

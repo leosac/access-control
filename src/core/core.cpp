@@ -62,18 +62,16 @@ void Core::run()
     _isRunning = true;
     while (_isRunning)
     {
-        {
-            std::lock_guard<std::mutex> lg(_eventQueueMutex);
-            while (!_eventQueue.empty())
-            {
-                Event e = _eventQueue.top();
-
-                _eventQueue.pop();
-                unlock_guard<std::mutex> ulg(_eventQueueMutex);
-                dispatchEvent(e);
-            }
-        }
         std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
+        std::lock_guard<std::mutex> lg(_eventQueueMutex);
+        while (!_eventQueue.empty())
+        {
+            Event e = _eventQueue.top();
+
+            _eventQueue.pop();
+            unlock_guard<std::mutex> ulg(_eventQueueMutex);
+            dispatchEvent(e);
+        }
     }
     notify(Event("exiting", "Core"));
     unload();
@@ -87,7 +85,7 @@ void Core::load()
 
     // TODO load modules
     for (auto& lib : _dynlibs)
-        loadModule(lib.first, lib.first + "-debug"); // FIXME Debug
+        loadModule(lib.first, lib.first + "-debug");
 
     debugPrintModules();
 

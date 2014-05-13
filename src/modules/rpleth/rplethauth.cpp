@@ -101,7 +101,7 @@ void RplethAuth::run()
                         it->socket->close();
                         delete it->socket;
                         _clients.erase(it);
-                        _listener.notify(Event("Client disconnected", "Auth")); // FIXME Debug
+                        _listener.notify(Event("Client disconnected", "Auth"));
                         break;
                     }
                 }
@@ -109,7 +109,7 @@ void RplethAuth::run()
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
                 _clients.push_back(Client(_serverSocket->accept()));
-                _listener.notify(Event("Client connected", "Auth")); // FIXME Debug
+                _listener.notify(Event("Client connected", "Auth"));
             }
         }
     }
@@ -131,7 +131,6 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
         packet = RplethProtocol::decodeCommand(client.buffer);
         if (!packet.isGood)
             break;
-//         std::cout << "Packet received (s=" << packet.dataLen + 4 << ')' << std::endl; // FIXME Debug
         RplethPacket response = RplethProtocol::processClientPacket(packet);
         std::size_t size = RplethProtocol::encodeCommand(response, _buffer, RingBufferSize);
         client.socket->send(_buffer, size);

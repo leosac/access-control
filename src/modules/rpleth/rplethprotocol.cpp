@@ -49,10 +49,10 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
     return (packet);
 }
 
-std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t /*size*/)
+std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size)
 {
-    // TODO Compare with input size
-
+    if (size < packet.dataLen + 5) // Buffer is too small
+        return (0);
     if (packet.sender == RplethPacket::Sender::Server)
     {
         buffer[0] = packet.status;
@@ -79,6 +79,6 @@ RplethPacket RplethProtocol::processClientPacket(const RplethPacket& packet)
     if (response.type == Rpleth && response.command == Ping)
         response.status = Success;
     else
-        response.status = Success; // NOTE Default response
+        response.status = Success; // Default response
     return (response);
 }

@@ -6,8 +6,10 @@
 
 #include "signalhandler.hpp"
 
+extern "C" {
 #include <signal.h>
 #include <unistd.h>
+}
 
 #include "isignalcallback.hpp"
 #include "exception/signalexception.hpp"

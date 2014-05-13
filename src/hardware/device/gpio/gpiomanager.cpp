@@ -6,11 +6,13 @@
 
 #include "gpiomanager.hpp"
 
+extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
+}
 
 #include <thread>
 
