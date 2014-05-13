@@ -22,11 +22,9 @@ public:
     HWManager& operator=(const HWManager& other) = delete;
 
 public:
-    void    start();
-    void    stop();
-
-public:
-    WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx);
+    virtual void                start() override;
+    virtual void                stop() override;
+    virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) override;
 
 private:
 #ifndef NO_HW

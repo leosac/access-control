@@ -30,8 +30,8 @@ public:
     WiegandInterface& operator=(const WiegandInterface& other) = delete;
 
 public:
-    void    notify(int gpioNo);
-    void    timeout();
+    virtual void    notify(int gpioNo) override;
+    virtual void    timeout() override;
 
 private:
     void    reset();

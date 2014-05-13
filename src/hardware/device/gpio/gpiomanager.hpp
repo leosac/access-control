@@ -43,7 +43,9 @@ public:
     GPIOManager& operator=(const GPIOManager& other) = delete;
 
 public:
-    void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode); // NOTE call this before starting to poll
+    virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode) override; // NOTE call this BEFORE starting to poll
+
+public:
     void    startPolling();
     void    stopPolling();
     void    pollLoop();

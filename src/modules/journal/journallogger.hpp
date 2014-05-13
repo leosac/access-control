@@ -19,9 +19,9 @@ public:
     JournalLogger& operator=(const JournalLogger& other) = delete;
 
 public:
-    void                notify(const Event& event);
-    ModuleType          getType() const;
-    const std::string&  getVersionString() const;
+    virtual void                notify(const Event& event) override;
+    virtual ModuleType          getType() const override;
+    virtual const std::string&  getVersionString() const override;
 
 private:
     const std::string   _version;

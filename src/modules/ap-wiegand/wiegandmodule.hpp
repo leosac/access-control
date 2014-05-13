@@ -21,10 +21,10 @@ public:
     WiegandModule& operator=(const WiegandModule& other) = delete;
 
 public:
-    void                notifyCardRead(const CardId& cardId);
-    void                notify(const Event& event);
-    ModuleType          getType() const;
-    const std::string&  getVersionString() const;
+    virtual void                notifyCardRead(const CardId& cardId) override;
+    virtual void                notify(const Event& event) override;
+    virtual ModuleType          getType() const override;
+    virtual const std::string&  getVersionString() const override;
 
 private:
     IEventListener&     _listener;
