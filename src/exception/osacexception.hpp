@@ -13,13 +13,11 @@
 class OSACException : public std::exception
 {
 protected:
-    OSACException(const std::string& message) : _message(message) {};
+    explicit OSACException(const std::string& message) : _message(message) {};
 
 public:
-    virtual ~OSACException() throw() = default;
-
-public:
-    const char* what() const throw() override { return (_message.c_str()); }
+    virtual ~OSACException() = default;
+    virtual const char* what() const noexcept final { return (_message.c_str()); }
 
 private:
     const std::string   _message;
