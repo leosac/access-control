@@ -21,7 +21,7 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
         return (packet);
 
     packet.dataLen = buffer[SizeByteIdx];
-    if (toRead < static_cast<std::size_t>(packet.dataLen + 4))
+    if (toRead < packet.dataLen + 4U)
         return (packet);
     if (packet.dataLen)
     {
@@ -51,7 +51,7 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
 
 std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size)
 {
-    if (size < packet.dataLen + 5) // Buffer is too small
+    if (size < packet.dataLen + 5U) // Buffer is too small
         return (0);
     if (packet.sender == RplethPacket::Sender::Server)
     {

@@ -9,7 +9,6 @@
 
 #include <vector>
 
-#include "wiegandinterface.hpp"
 #include "tools/bufferutils.hpp"
 
 class IWiegandListener
