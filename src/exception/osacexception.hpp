@@ -19,7 +19,7 @@ public:
     virtual ~OSACException() throw() = default;
 
 public:
-    const char* what() const throw() { return (_message.c_str()); }
+    const char* what() const throw() override { return (_message.c_str()); }
 
 private:
     const std::string   _message;

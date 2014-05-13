@@ -38,9 +38,11 @@ public:
     RplethAuth& operator=(const RplethAuth& other) = delete;
 
 public:
-    void                notify(const Event& event);
-    ModuleType          getType() const;
-    const std::string&  getVersionString() const;
+    virtual void                notify(const Event& event) override;
+    virtual ModuleType          getType() const override;
+    virtual const std::string&  getVersionString() const override;
+
+public:
     void                run();
 
 private:

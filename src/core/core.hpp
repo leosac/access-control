@@ -36,10 +36,12 @@ public:
     Core& operator=(const Core& other) = delete;
 
 public:
-    void        handleSignal(int signal); // Inherited from ISignalCallback
-    void        notify(const Event& event); // Inherited from IEventListener
-    IHWManager* getHWManager(); // Inherited from ICore
-    void        run();
+    virtual void        handleSignal(int signal) override;
+    virtual void        notify(const Event& event) override;
+    virtual IHWManager* getHWManager() override;
+
+public:
+    void    run();
 
 private:
     void    load();
