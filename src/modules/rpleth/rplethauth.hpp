@@ -46,6 +46,7 @@ public:
     void                run();
 
 private:
+    void                buildSelectParams();
     void                handleClientMessage(Client& client);
     void                handleCardIdQueue();
 

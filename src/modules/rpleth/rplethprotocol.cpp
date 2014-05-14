@@ -6,7 +6,6 @@
 
 #include "rplethprotocol.hpp"
 
-#include <iostream> // DEBUG
 #include <vector>
 
 RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
@@ -14,7 +13,6 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
     RplethPacket    packet(RplethPacket::Sender::Client);
     std::size_t     toRead = buffer.toRead();
 
-    std::cout << "DEBUG: Packet decode: ToRead size=" << toRead << std::endl;
     packet.status = Success;
     packet.isGood = false;
     if (toRead < PacketMinSize)
@@ -36,16 +34,9 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
     buffer.fastForward(4 + packet.dataLen); // Circular buffer was actually read but indexes were not updated
 
     if (packet.type >= MaxType)
-    {
         packet.status = BadType;
-        std::cout << "DEBUG: Packet type KO" << std::endl;
-    }
-
     else if (packet.sum != packet.checksum())
-    {
         packet.status = BadChecksum;
-        std::cout << "DEBUG: Checksum KO" << std::endl;
-    }
     return (packet);
 }
 

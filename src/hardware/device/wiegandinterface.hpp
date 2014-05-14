@@ -35,7 +35,6 @@ public:
 
 private:
     void    reset();
-    void    debugPrint();
 
 private:
     IWiegandListener*   _listener;

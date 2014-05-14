@@ -28,8 +28,8 @@ namespace Rezzo
             UDP
         };
 
-        typedef uint16_t Port;
-        typedef uint32_t Ip;
+        typedef std::uint16_t Port;
+        typedef std::uint32_t Ip;
         typedef struct s_address {
             Port    port;
             Ip      ip;

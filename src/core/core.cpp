@@ -8,6 +8,7 @@
 
 #include <thread>
 #include <iostream>
+#include <sstream>
 
 #include "osac.hpp"
 #include "signal/signalhandler.hpp"
@@ -16,9 +17,9 @@
 #include "tools/unixfs.hpp"
 #include "tools/unlock_guard.hpp"
 
+#include "exception/coreexception.hpp"
 #include "exception/signalexception.hpp"
 #include "exception/dynlibexception.hpp"
-#include "exception/moduleexception.hpp"
 
 const int Core::IdleSleepTimeMs;
 
@@ -64,14 +65,16 @@ void Core::run()
     while (_isRunning)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
-        std::lock_guard<std::mutex> lg(_eventQueueMutex);
-        while (!_eventQueue.empty())
         {
-            Event e = _eventQueue.top();
+            std::lock_guard<std::mutex> lg(_eventQueueMutex);
+            while (!_eventQueue.empty())
+            {
+                Event e = _eventQueue.top();
 
-            _eventQueue.pop();
-            unlock_guard<std::mutex> ulg(_eventQueueMutex);
-            dispatchEvent(e);
+                _eventQueue.pop();
+                unlock_guard<std::mutex> ulg(_eventQueueMutex);
+                processEvent(e);
+            }
         }
     }
     notify(Event("exiting", "Core"));
@@ -144,7 +147,7 @@ void Core::loadLibraries()
             _dynlibs[libname] = lib;
         }
     }
-    debugPrintLibs(); // FIXME Debug
+    debugPrintLibs();
 }
 
 void Core::unloadLibraries()
@@ -189,12 +192,46 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
     return (true);
 }
 
-void Core::dispatchEvent(const Event& event)
+void Core::processEvent(const Event& event)
 {
-    IModule*    dest;
+    IModule*    dest = nullptr;
 
     if ((dest = _modules[event.destination]))
+    {
+        /*if (dest->getType() == IModule::ModuleType::AccessPoint)
+        {
+            AuthRequest ar(event.destination, event.message);
+
+            std::cout << "CORE::New AR pushed: id=" << ar.getUid() << std::endl; // DEBUG
+            _authRequests.emplace(std::make_pair(ar.getUid(), ar));
+        }
+        else if (dest->getType() == IModule::ModuleType::Auth)
+        {
+            std::stringstream   ss(event.message);
+            std::string         uidstr;
+            AuthRequest::Uid    uid;
+
+            ss >> uidstr;
+            uid = std::stoi(uidstr);
+            if (_authRequests.count(uid) > 0)
+            {
+                AuthRequest&    ar = _authRequests.at(uid);
+                std::string     rslt;
+
+                ss >> rslt;
+                if (rslt == "granted")
+                    ar.grant(true);
+                else if (rslt == "denied")
+                    ar.grant(false);
+                else
+                    std::cerr << "bad status from auth: " << rslt << std::endl;
+            }
+            else
+                throw (CoreException("bad uid from auth"));
+        }*/
+
         dest->notify(event);
+    }
     else
         std::cerr << "Event: unknown destination '" << event.destination << "'" << std::endl;
     for (auto& logger : _loggerModules)
@@ -220,7 +257,7 @@ void Core::registerModule(IModule* module, const std::string& alias)
     RegisterFunc    func = _registrationHandler[module->getType()];
 
     if (!func)
-        throw (ModuleException("Unknown module type"));
+        throw (CoreException("Unknown module type"));
     ((*this).*func)(module);
     _modules[alias] = module;
 }
@@ -240,9 +277,9 @@ void Core::registerAuthModule(IModule* module)
     IAuthModule*    auth;
 
     if (!(auth = dynamic_cast<IAuthModule*>(module)))
-        throw (ModuleException("Invalid Auth module"));
+        throw (CoreException("Invalid Auth module"));
     if (_authModule)
-        throw (ModuleException("Replacing existing Auth module"));
+        throw (CoreException("Replacing existing Auth module"));
     _authModule = auth;
 }
 
@@ -251,7 +288,7 @@ void Core::registerLoggerModule(IModule* module)
     IEventListener* logger;
 
     if (!(logger = dynamic_cast<IEventListener*>(module)))
-        throw (ModuleException("Invalid Logger module"));
+        throw (CoreException("Invalid Logger module"));
     _loggerModules.push_back(logger);
 }
 
