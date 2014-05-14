@@ -6,14 +6,10 @@
 
 #include "event.hpp"
 
-static const unsigned int   logLevelCount = 8;
+static const unsigned int   logLevelCount = 4;
 static const std::string    logLevelStrings[logLevelCount] = {
-    "EMERGENCY",
-    "ALERT",
-    "CRITICAL",
     "ERROR",
     "WARNING",
-    "NOTICE",
     "INFO",
     "DEBUG"
 };

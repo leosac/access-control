@@ -15,6 +15,7 @@
 
 #include "event.hpp"
 #include "icore.hpp"
+#include "authrequest.hpp"
 #include "modules/imodule.hpp"
 #include "modules/ieventlistener.hpp"
 #include "modules/iauthmodule.hpp"
@@ -49,7 +50,7 @@ private:
     void    loadLibraries();
     void    unloadLibraries();
     bool    loadModule(const std::string& libname, const std::string& alias);
-    void    dispatchEvent(const Event& event);
+    void    processEvent(const Event& event);
     void    debugPrintLibs();
     void    debugPrintModules();
 
@@ -72,6 +73,7 @@ private:
     IAuthModule*                                _authModule;
     std::priority_queue<Event>                  _eventQueue;
     std::mutex                                  _eventQueueMutex;
+    std::map<AuthRequest::Uid, AuthRequest>     _authRequests;
 };
 
 #endif // CORE_HPP

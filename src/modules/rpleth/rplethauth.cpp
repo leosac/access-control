@@ -70,16 +70,7 @@ void RplethAuth::run()
     _serverSocket->listen();
     while (_isRunning)
     {
-        FD_ZERO(&_rSet);
-        FD_SET(_serverSocket->getHandle(), &_rSet);
-        _fdMax = _serverSocket->getHandle();
-        for (auto& client : _clients)
-        {
-            _fdMax = std::max(_fdMax, client.socket->getHandle());
-            FD_SET(client.socket->getHandle(), &_rSet);
-        }
-        _timeoutStruct.tv_sec = _timeout / 1000;
-        _timeoutStruct.tv_usec = (_timeout % 1000) * 1000;
+        buildSelectParams();
         if ((selectRet = ::select(_fdMax + 1, &_rSet, nullptr, nullptr, &_timeoutStruct)) == -1)
             throw (ModuleException(UnixSyscall::getErrorString("select", errno)));
         else if (!selectRet)
@@ -120,6 +111,20 @@ void RplethAuth::run()
     }
     _serverSocket->close();
     delete _serverSocket;
+}
+
+void RplethAuth::buildSelectParams()
+{
+    FD_ZERO(&_rSet);
+    FD_SET(_serverSocket->getHandle(), &_rSet);
+    _fdMax = _serverSocket->getHandle();
+    for (auto& client : _clients)
+    {
+        _fdMax = std::max(_fdMax, client.socket->getHandle());
+        FD_SET(client.socket->getHandle(), &_rSet);
+    }
+    _timeoutStruct.tv_sec = _timeout / 1000;
+    _timeoutStruct.tv_usec = (_timeout % 1000) * 1000;
 }
 
 void RplethAuth::handleClientMessage(RplethAuth::Client& client)

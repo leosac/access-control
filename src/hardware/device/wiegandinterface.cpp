@@ -7,8 +7,6 @@
 #include "wiegandinterface.hpp"
 
 #include <cstring>
-#include <iostream> // FIXME Debug printing
-#include <iomanip> // FIXME Debug printing
 
 WiegandInterface::WiegandInterface(IGPIOObservable& gpioProvider, IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx)
 :   _listener(listener),
@@ -42,7 +40,6 @@ void WiegandInterface::timeout()
             c[i] = _buffer[size - i - 1];
 
         _listener->notifyCardRead(c);
-        debugPrint();
         reset();
     }
 }
@@ -51,16 +48,4 @@ void WiegandInterface::reset()
 {
     ::memset(_buffer, 0, DataBufferSize);
     _bitIdx = 0;
-}
-
-void WiegandInterface::debugPrint()
-{
-    std::cout << "Read: ";
-    for (int i = (_bitIdx - 1) / 8; i >= 0; --i)
-    {
-        for (int j = 7; j >= 0; --j)
-            std::cout << ((_buffer[i] & (1 << j)) > 0);
-        std::cout << ' ';
-    }
-    std::cout << "(bits = " << _bitIdx << ")" << std::endl;
 }

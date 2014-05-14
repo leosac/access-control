@@ -14,14 +14,10 @@ class Event
 {
 public:
     enum class LogLevel : unsigned int {
-        Emergency   = 0, /* Emergency messages, system is about to crash or is unstable */
-        Alert       = 1, /* Something bad happened and action must be taken immediately */
-        Critical    = 2, /* A critical condition occurred like a serious hardware/software failure */
-        Error       = 3, /* An error condition, often used by drivers to indicate difficulties with the hardware */
-        Warning     = 4, /* A warning, meaning nothing serious by itself but might indicate problems */
-        Notice      = 5, /* Nothing serious, but notably nevertheless. Often used to report security events. */
-        Info        = 6, /* Informational message e.g. startup information at driver initialization */
-        Debug       = 7  /* Debug messages */
+        Error = 0,
+        Warning,
+        Info,
+        Debug
     };
     typedef std::chrono::system_clock::time_point Date;
 
@@ -36,11 +32,11 @@ public:
     static const std::string&   getLogLevelString(Event::LogLevel level);
 
 public:
-    std::string     message;
-    std::string     source;
-    std::string     destination;
-    LogLevel        logLevel;
-    Date            date;
+    std::string         message;
+    std::string         source;
+    std::string         destination;
+    LogLevel            logLevel;
+    Date                date;
 };
 
 #endif // EVENT_HPP

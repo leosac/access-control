@@ -15,8 +15,6 @@ DoorModule::DoorModule()
 void DoorModule::notify(const Event& event)
 {
     static_cast<void>(event);
-
-    
 }
 
 IModule::ModuleType DoorModule::getType() const
