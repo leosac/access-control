@@ -25,7 +25,7 @@ public:
     virtual void                start() override;
     virtual void                stop() override;
     virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) override;
-
+    
 private:
 #ifndef NO_HW
     GPIOManager         _gpioManager;
