@@ -10,8 +10,9 @@
 
 #include "tools/version.hpp"
 
-WiegandModule::WiegandModule(ICore& core)
+WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _listener(core),
+    _name(name),
     _version(Version::buildVersionString(0, 1, 0)),
     _interface(core.getHWManager()->buildWiegandInterface(this, 15, 14))
 {}
@@ -31,11 +32,17 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             ss << ' ';
         ss << static_cast<unsigned int>(cardId[i]);
     }
+    _listener.notify(Event(ss.str(), _name, "libdoor.so-default"));
 }
 
 void WiegandModule::notify(const Event& event)
 {
     static_cast<void>(event);
+}
+
+const std::string& WiegandModule::getName() const
+{
+    return (_name);
 }
 
 IModule::ModuleType WiegandModule::getType() const

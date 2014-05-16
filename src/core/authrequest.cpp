@@ -31,6 +31,16 @@ AuthRequest::Uid AuthRequest::getUid() const
     return (_uid);
 }
 
+const std::string& AuthRequest::getTarget() const
+{
+    return (_target);
+}
+
+const std::string& AuthRequest::getInfo() const
+{
+    return (_requestInfo);
+}
+
 void AuthRequest::grant(bool granted)
 {
     _granted = granted;

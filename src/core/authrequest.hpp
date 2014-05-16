@@ -30,9 +30,11 @@ public:
     AuthRequest(AuthRequest&&) = default; // FIXME
 
 public:
-    Uid     getUid() const;
-    void    grant(bool granted);
-    void    setStatus(Status status);
+    Uid                 getUid() const;
+    const std::string&  getTarget() const;
+    const std::string&  getInfo() const;
+    void                grant(bool granted);
+    void                setStatus(Status status);
 
 private:
     static Uid  UidCounter;

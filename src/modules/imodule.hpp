@@ -14,7 +14,7 @@
 class IModule : public IEventListener
 {
 public:
-    typedef IModule* (*InitFunc)(ICore&);
+    typedef IModule* (*InitFunc)(ICore&, const std::string&);
     enum class ModuleType : unsigned int {
         Door = 0,
         AccessPoint,
@@ -25,6 +25,7 @@ public:
 
 public:
     virtual ~IModule() = default;
+    virtual const std::string&  getName() const = 0;
     virtual ModuleType          getType() const = 0;
     virtual const std::string&  getVersionString() const = 0;
 };

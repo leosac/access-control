@@ -49,7 +49,7 @@ private:
     void    unload();
     void    loadLibraries();
     void    unloadLibraries();
-    bool    loadModule(const std::string& libname, const std::string& alias);
+    bool    loadModule(const std::string& libname, const std::string& alias = std::string());
     void    processEvent(const Event& event);
     void    debugPrintLibs();
     void    debugPrintModules();

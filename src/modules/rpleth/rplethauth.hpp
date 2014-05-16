@@ -31,7 +31,7 @@ class RplethAuth : public IAuthModule
     typedef std::vector<Byte> CardId;
 
 public:
-    explicit RplethAuth(IEventListener& listener, Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
+    explicit RplethAuth(IEventListener& listener, const std::string& name, Rezzo::ISocket::Port port = DefaultPort, long timeoutMs = DefaultTimeoutMs);
     ~RplethAuth();
 
     RplethAuth(const RplethAuth& other) = delete;
@@ -39,6 +39,7 @@ public:
 
 public:
     virtual void                notify(const Event& event) override;
+    virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual const std::string&  getVersionString() const override;
 
@@ -52,6 +53,7 @@ private:
 
 private:
     IEventListener&         _listener;
+    const std::string       _name;
     const std::string       _version;
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;

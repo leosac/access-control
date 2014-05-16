@@ -7,6 +7,7 @@
 #include "version.hpp"
 
 #include <sstream>
+#include <string>
 #include <algorithm>
 
 const std::string Version::validChars = "0123456789.-";
