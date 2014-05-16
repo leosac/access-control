@@ -3,6 +3,7 @@ set(OSAC_BIN osac)
 set(OSAC_SRCS
     main.cpp
     osac.cpp
+    runtimeoptions.cpp
     core/authrequest.cpp
     core/core.cpp
     core/event.cpp

@@ -35,7 +35,6 @@ Core::Core()
     _registrationHandler[IModule::ModuleType::Auth] = &Core::registerAuthModule;
     _registrationHandler[IModule::ModuleType::Logger] = &Core::registerLoggerModule;
     _registrationHandler[IModule::ModuleType::ActivityMonitor] = &Core::registerActivityMonitorModule;
-    std::cout << "Open Source Access Controller v" << OSAC::getVersionString() << std::endl;
 }
 
 void Core::handleSignal(int signal)
