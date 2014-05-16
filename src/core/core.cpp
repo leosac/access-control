@@ -9,6 +9,7 @@
 #include <thread>
 #include <iostream>
 #include <sstream>
+#include <string>
 
 #include "osac.hpp"
 #include "signal/signalhandler.hpp"
@@ -89,7 +90,11 @@ void Core::load()
 
     // TODO load modules
     for (auto& lib : _dynlibs)
-        loadModule(lib.first, lib.first + "-debug");
+        loadModule(lib.first);
+
+
+    if (!_authModule)
+        throw (CoreException("No auth module loaded"));
 
     debugPrintModules();
 
@@ -121,7 +126,7 @@ void Core::unload()
 void Core::loadLibraries()
 {
     std::string     libname;
-    DynamicLibrary* lib;
+    DynamicLibrary* lib = nullptr;
 
     for (auto& folder : _libsDirectories)
     {
@@ -129,7 +134,7 @@ void Core::loadLibraries()
         for (auto& path : fl)
         {
             libname = UnixFs::stripPath(path);
-            if (_dynlibs[libname] != nullptr)
+            if (_dynlibs.count(libname) > 0)
             {
                 std::cerr << "module already loaded (" << path << ')' << std::endl;
                 continue;
@@ -168,19 +173,22 @@ void Core::unloadLibraries()
 
 bool Core::loadModule(const std::string& libname, const std::string& alias)
 {
-    DynamicLibrary*     lib = _dynlibs[libname];
+    DynamicLibrary*     lib = _dynlibs.at(libname);
     IModule::InitFunc   func;
     IModule*            module = nullptr;
 
     if (!lib)
         return (false);
-    if (_modules[alias])
+    if (_modules.count(alias) > 0)
         return (false);
     try
     {
         void* s = lib->getSymbol("getNewModuleInstance");
         *reinterpret_cast<void**>(&func) = s;
-        module = func(*this);
+        if (alias.empty())
+            module = func(*this, libname + "-default");
+        else
+            module = func(*this, alias);
     }
     catch (const DynLibException& e)
     {
@@ -188,24 +196,32 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
         delete module; // FIXME is it safe ?
         return (false);
     }
-    registerModule(module, alias);
+    registerModule(module, module->getName());
     return (true);
 }
 
 void Core::processEvent(const Event& event)
 {
     IModule*    dest = nullptr;
+    IModule*    source = nullptr;
 
-    if ((dest = _modules[event.destination]))
+    if (event.source.empty())
+        throw (CoreException("No source specified from Event"));
+    else if (event.source != "Core")
     {
-        /*if (dest->getType() == IModule::ModuleType::AccessPoint)
+        if (!(source = _modules[event.source]))
+            throw (CoreException("Invalid"));
+        if (source->getType() == IModule::ModuleType::AccessPoint)
         {
             AuthRequest ar(event.destination, event.message);
 
+            if (!(dest = _modules[event.destination]))
+                throw (CoreException("bad destination"));
             std::cout << "CORE::New AR pushed: id=" << ar.getUid() << std::endl; // DEBUG
             _authRequests.emplace(std::make_pair(ar.getUid(), ar));
+            dest->notify(Event(std::to_string(ar.getUid()) + " request"));
         }
-        else if (dest->getType() == IModule::ModuleType::Auth)
+        else if (source->getType() == IModule::ModuleType::Auth)
         {
             std::stringstream   ss(event.message);
             std::string         uidstr;
@@ -218,36 +234,60 @@ void Core::processEvent(const Event& event)
                 AuthRequest&    ar = _authRequests.at(uid);
                 std::string     rslt;
 
+                if (!(dest = _modules[ar.getTarget()]))
+                    throw (CoreException("bad destination"));
                 ss >> rslt;
                 if (rslt == "granted")
+                {
                     ar.grant(true);
+                    dest->notify(Event(uidstr + " open"));
+                }
                 else if (rslt == "denied")
-                    ar.grant(false);
+                    _authRequests.erase(uid);
                 else
                     std::cerr << "bad status from auth: " << rslt << std::endl;
             }
             else
                 throw (CoreException("bad uid from auth"));
-        }*/
+        }
+        else if (source->getType() == IModule::ModuleType::Door)
+        {
+            std::stringstream   ss(event.message);
+            std::string         uidstr;
+            AuthRequest::Uid    uid;
 
-        dest->notify(event);
+            ss >> uidstr;
+            uid = std::stoi(uidstr);
+
+            if (_authRequests.count(uid) > 0)
+            {
+                AuthRequest&    ar = _authRequests.at(uid);
+                std::string     rslt;
+
+                ss >> rslt;
+                if (rslt == "opened")
+                    _authRequests.erase(uid);
+                else if (rslt == "askauth")
+                    _authModule->notify(Event(uidstr + " request " + ar.getInfo()));
+            }
+            else
+                throw (CoreException("bad uid from auth"));
+        }
     }
-    else
-        std::cerr << "Event: unknown destination '" << event.destination << "'" << std::endl;
     for (auto& logger : _loggerModules)
         logger->notify(event);
 }
 
 void Core::debugPrintLibs()
 {
-    std::cout << "Libs:" << std::endl;
+    std::cout << "Libs: (" << _dynlibs.size() << " total)" << std::endl;
     for (auto& lib : _dynlibs)
         std::cout << "-> " << lib.first << std::endl;
 }
 
 void Core::debugPrintModules()
 {
-    std::cout << "Loaded modules:" << std::endl;
+    std::cout << "Loaded modules: (" << _modules.size() << " total)" << std::endl;
     for (auto& module : _modules)
         std::cout << "-> " << module.first << std::endl;
 }

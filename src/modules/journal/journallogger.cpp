@@ -12,8 +12,9 @@
 #include <ctime>
 #include <chrono>
 
-JournalLogger::JournalLogger(Event::LogLevel logLevel)
-:   _version(Version::buildVersionString(0, 1, 0)),
+JournalLogger::JournalLogger(const std::string& name, Event::LogLevel logLevel)
+:   _name(name),
+    _version(Version::buildVersionString(0, 1, 0)),
     _logLevel(logLevel)
 {}
 
@@ -47,6 +48,11 @@ void JournalLogger::notify(const Event& event)
     if (!event.source.empty())
         std::clog << event.source << " said ";
     std::clog << '\"' << event.message << '\"' << std::endl;
+}
+
+const std::string& JournalLogger::getName() const
+{
+    return (_name);
 }
 
 IModule::ModuleType JournalLogger::getType() const

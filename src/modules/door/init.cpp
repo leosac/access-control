@@ -16,7 +16,7 @@
 #   endif
 #endif
 
-extern "C" MODULE_PUBLIC IModule* getNewModuleInstance(ICore& /*core*/)
+extern "C" MODULE_PUBLIC IModule* getNewModuleInstance(ICore& core, const std::string& name)
 {
-    return (new DoorModule);
+    return (new DoorModule(core, name));
 }

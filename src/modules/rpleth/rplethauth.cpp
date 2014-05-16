@@ -19,8 +19,9 @@ static void launch(RplethAuth* instance)
     instance->run();
 }
 
-RplethAuth::RplethAuth(IEventListener& listener, Rezzo::ISocket::Port port, long timeoutMs)
+RplethAuth::RplethAuth(IEventListener& listener, const std::string& name, Rezzo::ISocket::Port port, long timeoutMs)
 :   _listener(listener),
+    _name(name),
     _version(Version::buildVersionString(0, 1, 0)),
     _isRunning(true),
     _serverSocket(nullptr),
@@ -42,12 +43,23 @@ void RplethAuth::notify(const Event& event)
     std::stringstream   ss(event.message);
     CardId              cid;
     unsigned int        val;
+    std::string         uidstr;
+
+    ss >> uidstr;
+    ss.ignore();
 
     while (ss >> val)
         cid.push_back(static_cast<Byte>(val));
 
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
     _cardIdQueue.push(cid);
+
+    _listener.notify(Event(uidstr + " granted", _name));
+}
+
+const std::string& RplethAuth::getName() const
+{
+    return (_name);
 }
 
 IModule::ModuleType RplethAuth::getType() const
@@ -163,7 +175,6 @@ void RplethAuth::handleCardIdQueue()
         size = RplethProtocol::encodeCommand(packet, _buffer, RingBufferSize);
         for (auto& client : _clients)
             client.socket->send(_buffer, size);
-        _listener.notify(Event("Open the door !", "RplethAuth", "Door"));
         _cardIdQueueMutex.lock();
     }
 }
