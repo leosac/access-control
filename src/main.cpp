@@ -34,7 +34,7 @@ int main(int argc, char** argv)
             options.setParam("configfile", configFile.getValue());
         }
         catch (const TCLAP::ArgException &e) {
-            std::cerr << "Error: " << e.error() << " for arg " << e.argId() << std::endl;
+            throw (OSACException(e.error()));
         }
         Core    core(options);
 
