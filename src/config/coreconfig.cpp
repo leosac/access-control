@@ -18,6 +18,8 @@
 using boost::property_tree::ptree;
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;
+using boost::property_tree::xml_writer_settings;
+using boost::property_tree::xml_parser_error;
 
 CoreConfig::CoreConfig(const std::string& path)
 :   _path(path)
@@ -32,7 +34,7 @@ void CoreConfig::load()
         throw (ConfigException(_path, "Could not open file"));
     try
     {
-        read_xml(cfg, pt);
+        read_xml(cfg, pt, boost::property_tree::xml_parser::trim_whitespace);
         BOOST_FOREACH(ptree::value_type const& v, pt.get_child("core"))
         {
             if (v.first == "plugin")
@@ -47,7 +49,7 @@ void CoreConfig::load()
                 _pluginDirs.push_back(v.second.data());
         }
     }
-    catch (const boost::property_tree::xml_parser_error& e)
+    catch (xml_parser_error& e)
     {
         throw (ConfigException(_path, e.what()));
     }
@@ -55,8 +57,9 @@ void CoreConfig::load()
 
 void CoreConfig::save()
 {
-    std::ofstream   cfg(_path);
-    ptree           pt;
+    std::ofstream               cfg(_path);
+    ptree                       pt;
+    xml_writer_settings<char>   settings(' ', 4);
 
     if (!cfg.good())
         throw (ConfigException(_path, "Could not open file"));
@@ -71,9 +74,9 @@ void CoreConfig::save()
             node.put("<xmlattr>.file", plugin.file);
             node.put("alias", plugin.alias);
         }
-        write_xml(cfg, pt);
+        write_xml(cfg, pt, settings);
     }
-    catch (const boost::property_tree::xml_parser_error& e)
+    catch (const xml_parser_error& e)
     {
         throw (ConfigException(_path, e.what()));
     }
