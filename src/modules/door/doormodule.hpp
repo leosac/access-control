@@ -22,12 +22,10 @@ public:
     virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
-    virtual const std::string&  getVersionString() const override;
 
 private:
     IEventListener&     _listener;
     const std::string   _name;
-    const std::string   _version;
 };
 
 #endif // DOORMODULE_HPP

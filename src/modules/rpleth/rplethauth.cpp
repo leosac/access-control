@@ -10,7 +10,6 @@
 
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
-#include "tools/version.hpp"
 #include "tools/unixsyscall.hpp"
 #include "exception/moduleexception.hpp"
 
@@ -22,7 +21,6 @@ static void launch(RplethAuth* instance)
 RplethAuth::RplethAuth(IEventListener& listener, const std::string& name, Rezzo::ISocket::Port port, long timeoutMs)
 :   _listener(listener),
     _name(name),
-    _version(Version::buildVersionString(0, 1, 0)),
     _isRunning(true),
     _serverSocket(nullptr),
     _port(port),
@@ -65,11 +63,6 @@ const std::string& RplethAuth::getName() const
 IModule::ModuleType RplethAuth::getType() const
 {
     return (ModuleType::Auth);
-}
-
-const std::string& RplethAuth::getVersionString() const
-{
-    return (_version);
 }
 
 void RplethAuth::run()

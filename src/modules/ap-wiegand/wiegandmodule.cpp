@@ -8,12 +8,9 @@
 
 #include <sstream>
 
-#include "tools/version.hpp"
-
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _listener(core),
     _name(name),
-    _version(Version::buildVersionString(0, 1, 0)),
     _interface(core.getHWManager()->buildWiegandInterface(this, 15, 14))
 {}
 
@@ -48,9 +45,4 @@ const std::string& WiegandModule::getName() const
 IModule::ModuleType WiegandModule::getType() const
 {
     return (ModuleType::AccessPoint);
-}
-
-const std::string& WiegandModule::getVersionString() const
-{
-    return (_version);
 }
