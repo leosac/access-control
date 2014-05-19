@@ -24,12 +24,13 @@
 
 const int Core::IdleSleepTimeMs;
 
-Core::Core()
-:   _isRunning(false),
+Core::Core(RuntimeOptions& options)
+:   _options(options),
+    _coreConfig(options.getParam("configfile")),
+    _isRunning(false),
     _hwManager(nullptr),
     _authModule(nullptr)
 {
-    _libsDirectories.push_back(UnixFs::getCWD());
     _registrationHandler[IModule::ModuleType::Door] = &Core::registerDoorModule;
     _registrationHandler[IModule::ModuleType::AccessPoint] = &Core::registerAccessPointModule;
     _registrationHandler[IModule::ModuleType::Auth] = &Core::registerAuthModule;
@@ -83,14 +84,16 @@ void Core::run()
 
 void Core::load()
 {
+    loadConfig();
+
+    for (const auto& dir : _coreConfig.getPluginDirs())
+        _libsDirectories.push_back(dir);
+
     _hwManager = new HWManager;
 
     loadLibraries();
-
-    // TODO load modules
-    for (auto& lib : _dynlibs)
-        loadModule(lib.first);
-
+    for (const auto& plugin : _coreConfig.getPlugins())
+        loadModule(plugin.file, plugin.alias);
 
     if (!_authModule)
         throw (CoreException("No auth module loaded"));
@@ -120,6 +123,8 @@ void Core::unload()
 
     delete _hwManager;
     _hwManager = nullptr;
+
+    unloadConfig();
 }
 
 void Core::loadLibraries()
@@ -168,6 +173,16 @@ void Core::unloadLibraries()
         }
         delete lib.second;
     }
+}
+
+void Core::loadConfig()
+{
+    _coreConfig.load();
+}
+
+void Core::unloadConfig()
+{
+    _coreConfig.save();
 }
 
 bool Core::loadModule(const std::string& libname, const std::string& alias)
@@ -279,14 +294,14 @@ void Core::processEvent(const Event& event)
 
 void Core::debugPrintLibs()
 {
-    std::cout << "Libs: (" << _dynlibs.size() << " total)" << std::endl;
+    std::cout << "Libs: (total " << _dynlibs.size() << ")" << std::endl;
     for (auto& lib : _dynlibs)
         std::cout << "-> " << lib.first << std::endl;
 }
 
 void Core::debugPrintModules()
 {
-    std::cout << "Loaded modules: (" << _modules.size() << " total)" << std::endl;
+    std::cout << "Loaded modules: (total " << _modules.size() << ")" << std::endl;
     for (auto& module : _modules)
         std::cout << "-> " << module.first << std::endl;
 }

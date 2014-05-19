@@ -4,6 +4,7 @@ set(OSAC_SRCS
     main.cpp
     osac.cpp
     runtimeoptions.cpp
+    config/coreconfig.cpp
     core/authrequest.cpp
     core/core.cpp
     core/event.cpp
@@ -34,7 +35,7 @@ set_target_properties(${OSAC_BIN} PROPERTIES
     COMPILE_FLAGS "${OSAC_COMPILE_FLAGS}"
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${OSAC_BIN} dl pthread)
+target_link_libraries(${OSAC_BIN} dl pthread ${Boost_LIBRARIES})
 
 # Build modules
 if(NOT NO_MODULE)
