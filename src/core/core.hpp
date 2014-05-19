@@ -21,6 +21,8 @@
 #include "modules/iauthmodule.hpp"
 #include "hardware/ihwmanager.hpp"
 #include "signal/isignalcallback.hpp"
+#include "runtimeoptions.hpp"
+#include "config/coreconfig.hpp"
 
 class DynamicLibrary;
 
@@ -30,7 +32,7 @@ class Core : public ISignalCallback, public ICore
     typedef void (Core::*RegisterFunc)(IModule*);
 
 public:
-    explicit Core();
+    explicit Core(RuntimeOptions& options);
     ~Core() = default;
 
     Core(const Core& other) = delete;
@@ -49,6 +51,8 @@ private:
     void    unload();
     void    loadLibraries();
     void    unloadLibraries();
+    void    loadConfig();
+    void    unloadConfig();
     bool    loadModule(const std::string& libname, const std::string& alias = std::string());
     void    processEvent(const Event& event);
     void    debugPrintLibs();
@@ -63,6 +67,8 @@ private:
     void    registerActivityMonitorModule(IModule* module);
 
 private:
+    RuntimeOptions&                             _options;
+    CoreConfig                                  _coreConfig;
     std::atomic<bool>                           _isRunning;
     IHWManager*                                 _hwManager;
     std::list<std::string>                      _libsDirectories;
