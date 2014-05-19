@@ -41,7 +41,6 @@ public:
     virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
-    virtual const std::string&  getVersionString() const override;
 
 public:
     void                run();
@@ -54,7 +53,6 @@ private:
 private:
     IEventListener&         _listener;
     const std::string       _name;
-    const std::string       _version;
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;
     Rezzo::ISocket*         _serverSocket;

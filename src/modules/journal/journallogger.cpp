@@ -5,7 +5,6 @@
  */
 
 #include "journallogger.hpp"
-#include "tools/version.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -14,7 +13,6 @@
 
 JournalLogger::JournalLogger(const std::string& name, Event::LogLevel logLevel)
 :   _name(name),
-    _version(Version::buildVersionString(0, 1, 0)),
     _logLevel(logLevel)
 {}
 
@@ -58,9 +56,4 @@ const std::string& JournalLogger::getName() const
 IModule::ModuleType JournalLogger::getType() const
 {
     return (ModuleType::Logger);
-}
-
-const std::string& JournalLogger::getVersionString() const
-{
-    return (_version);
 }
