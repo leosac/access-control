@@ -8,10 +8,11 @@
 #define IMODULE_HPP
 
 #include "core/icore.hpp"
+#include "config/ixmlserializable.hpp"
 
 #include <string>
 
-class IModule : public IEventListener
+class IModule : public IEventListener, public IXmlSerializable
 {
 public:
     typedef IModule* (*InitFunc)(ICore&, const std::string&);

@@ -24,3 +24,13 @@ IModule::ModuleType ExampleModule::getType() const
 {
     return (ModuleType::Logger);
 }
+
+void ExampleModule::serialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}
+
+void ExampleModule::deserialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}
