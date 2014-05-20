@@ -26,7 +26,7 @@ const int Core::IdleSleepTimeMs;
 
 Core::Core(RuntimeOptions& options)
 :   _options(options),
-    _coreConfig(options.getParam("configfile")),
+    _coreConfig(options.getParam("configfile"), *this),
     _isRunning(false),
     _hwManager(nullptr),
     _authModule(nullptr)
@@ -36,15 +36,6 @@ Core::Core(RuntimeOptions& options)
     _registrationHandler[IModule::ModuleType::Auth] = &Core::registerAuthModule;
     _registrationHandler[IModule::ModuleType::Logger] = &Core::registerLoggerModule;
     _registrationHandler[IModule::ModuleType::ActivityMonitor] = &Core::registerActivityMonitorModule;
-}
-
-void Core::handleSignal(int signal)
-{
-    if (_isRunning)
-    {
-        notify(Event("caught signal (" + std::to_string(signal) + ')', "Core"));
-        _isRunning = false;
-    }
 }
 
 void Core::notify(const Event& event)
@@ -58,10 +49,63 @@ IHWManager* Core::getHWManager()
     return (_hwManager);
 }
 
+void Core::handleSignal(int signal)
+{
+    if (_isRunning)
+    {
+        notify(Event("caught signal (" + std::to_string(signal) + ')', "Core"));
+        _isRunning = false;
+    }
+}
+
+void Core::serialize(boost::property_tree::ptree& node)
+{
+    for (const auto& dir : _libsDirectories)
+        node.add("core.plugindir", dir);
+    for (const auto& module : _modules)
+    {
+        boost::property_tree::ptree& child = node.add("core.module", std::string());
+
+        child.put("<xmlattr>.file", module.second.libname);
+        child.put("alias", module.first);
+    }
+    for (auto& module : _modules)
+        delete module.second.instance;
+    _modules.clear();
+
+    unloadLibraries();
+}
+
+void Core::deserialize(boost::property_tree::ptree& node)
+{
+    for (const auto& v : node.get_child("core"))
+    {
+        if (v.first == "plugindir")
+            _libsDirectories.push_back(v.second.data());
+    }
+    loadLibraries();
+    _hwManager = new HWManager;
+    for (const auto& v : node.get_child("core"))
+    {
+        if (v.first == "module")
+            loadModule(v.second.get<std::string>("<xmlattr>.file", "default"), v.second.get<std::string>("alias"));
+    }
+    if (!_authModule)
+        throw (CoreException("No auth module loaded"));
+    debugPrintModules();
+}
+
 void Core::run()
 {
-    load();
+    _coreConfig.deserialize();
     notify(Event("starting", "Core"));
+    try {
+        SignalHandler::registerCallback(this);
+    }
+    catch (const SignalException& e) {
+        throw (CoreException(e.what()));
+    }
+    _hwManager->start();
     _isRunning = true;
     while (_isRunning)
     {
@@ -79,52 +123,10 @@ void Core::run()
         }
     }
     notify(Event("exiting", "Core"));
-    unload();
-}
-
-void Core::load()
-{
-    loadConfig();
-
-    for (const auto& dir : _coreConfig.getPluginDirs())
-        _libsDirectories.push_back(dir);
-
-    _hwManager = new HWManager;
-
-    loadLibraries();
-    for (const auto& plugin : _coreConfig.getPlugins())
-        loadModule(plugin.file, plugin.alias);
-
-    if (!_authModule)
-        throw (CoreException("No auth module loaded"));
-
-    debugPrintModules();
-
-    try
-    {
-        SignalHandler::registerCallback(this);
-    }
-    catch (const SignalException& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    _hwManager->start();
-}
-
-void Core::unload()
-{
     _hwManager->stop();
-
-    for (auto& module : _modules)
-        delete module.second;
-    _modules.clear();
-
-    unloadLibraries();
-
+    _coreConfig.serialize();
     delete _hwManager;
     _hwManager = nullptr;
-
-    unloadConfig();
 }
 
 void Core::loadLibraries()
@@ -175,16 +177,6 @@ void Core::unloadLibraries()
     }
 }
 
-void Core::loadConfig()
-{
-    _coreConfig.load();
-}
-
-void Core::unloadConfig()
-{
-    _coreConfig.save();
-}
-
 bool Core::loadModule(const std::string& libname, const std::string& alias)
 {
     DynamicLibrary*     lib = _dynlibs.at(libname);
@@ -210,7 +202,7 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
         delete module; // FIXME is it safe ?
         return (false);
     }
-    registerModule(module, module->getName());
+    registerModule(module, libname, module->getName());
     return (true);
 }
 
@@ -223,13 +215,13 @@ void Core::processEvent(const Event& event)
         throw (CoreException("No source specified from Event"));
     else if (event.source != "Core")
     {
-        if (!(source = _modules[event.source]))
+        if (!(source = _modules[event.source].instance))
             throw (CoreException("Invalid"));
         if (source->getType() == IModule::ModuleType::AccessPoint)
         {
             AuthRequest ar(event.destination, event.message);
 
-            if (!(dest = _modules[event.destination]))
+            if (!(dest = _modules[event.destination].instance))
                 throw (CoreException("bad destination"));
             std::cout << "CORE::New AR pushed: id=" << ar.getUid() << std::endl; // DEBUG
             _authRequests.emplace(std::make_pair(ar.getUid(), ar));
@@ -248,7 +240,7 @@ void Core::processEvent(const Event& event)
                 AuthRequest&    ar = _authRequests.at(uid);
                 std::string     rslt;
 
-                if (!(dest = _modules[ar.getTarget()]))
+                if (!(dest = _modules[ar.getTarget()].instance))
                     throw (CoreException("bad destination"));
                 ss >> rslt;
                 if (rslt == "granted")
@@ -306,14 +298,14 @@ void Core::debugPrintModules()
         std::cout << "-> " << module.first << std::endl;
 }
 
-void Core::registerModule(IModule* module, const std::string& alias)
+void Core::registerModule(IModule* module, const std::string& libname, const std::string& alias)
 {
     RegisterFunc    func = _registrationHandler[module->getType()];
 
     if (!func)
         throw (CoreException("Unknown module type"));
     ((*this).*func)(module);
-    _modules[alias] = module;
+    _modules[alias] = { libname, module };
 }
 
 void Core::registerDoorModule(IModule* /*module*/)

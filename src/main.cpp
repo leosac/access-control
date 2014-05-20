@@ -7,6 +7,7 @@
 #include <iostream>
 #include <algorithm>
 
+// NOTE TCLAP is easily replacable by boost::program_options
 #include <tclap/CmdLine.h>
 
 #include "osac.hpp"

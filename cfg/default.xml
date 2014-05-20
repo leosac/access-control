@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <core>
     <plugindir>.</plugindir>
-    <plugin file="libjournal.so">
+    <module file="libjournal.so">
         <alias>log</alias>
-    </plugin>
-    <plugin file="libwiegand.so">
+    </module>
+    <module file="libwiegand.so">
         <alias>reader</alias>
-    </plugin>
-    <plugin file="librpleth.so">
+    </module>
+    <module file="librpleth.so">
         <alias>rpleth</alias>
-    </plugin>
-    <plugin file="libdoor.so">
+    </module>
+    <module file="libdoor.so">
         <alias>door</alias>
-    </plugin>
+    </module>
 </core>
