@@ -22,14 +22,18 @@
 #include "hardware/ihwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 #include "runtimeoptions.hpp"
-#include "config/coreconfig.hpp"
+#include "config/xmlconfig.hpp"
 
 class DynamicLibrary;
 
-class Core : public ISignalCallback, public ICore
+class Core : public ICore, public ISignalCallback, public IXmlSerializable
 {
     static const int IdleSleepTimeMs = 5;
     typedef void (Core::*RegisterFunc)(IModule*);
+    typedef struct s_module {
+        std::string libname;
+        IModule*    instance;
+    } Module;
 
 public:
     explicit Core(RuntimeOptions& options);
@@ -39,27 +43,25 @@ public:
     Core& operator=(const Core& other) = delete;
 
 public:
-    virtual void        handleSignal(int signal) override;
     virtual void        notify(const Event& event) override;
     virtual IHWManager* getHWManager() override;
+    virtual void        handleSignal(int signal) override;
+    virtual void        serialize(boost::property_tree::ptree& node) override;
+    virtual void        deserialize(boost::property_tree::ptree& node) override;
 
 public:
     void    run();
 
 private:
-    void    load();
-    void    unload();
     void    loadLibraries();
     void    unloadLibraries();
-    void    loadConfig();
-    void    unloadConfig();
     bool    loadModule(const std::string& libname, const std::string& alias = std::string());
     void    processEvent(const Event& event);
     void    debugPrintLibs();
     void    debugPrintModules();
 
 private:
-    void    registerModule(IModule* module, const std::string& alias);
+    void    registerModule(IModule* module, const std::string& libname, const std::string& alias);
     void    registerDoorModule(IModule* module);
     void    registerAccessPointModule(IModule* module);
     void    registerAuthModule(IModule* module);
@@ -68,12 +70,12 @@ private:
 
 private:
     RuntimeOptions&                             _options;
-    CoreConfig                                  _coreConfig;
+    XmlConfig                                   _coreConfig;
     std::atomic<bool>                           _isRunning;
     IHWManager*                                 _hwManager;
     std::list<std::string>                      _libsDirectories;
     std::map<std::string, DynamicLibrary*>      _dynlibs;
-    std::map<std::string, IModule*>             _modules;
+    std::map<std::string, Module>               _modules;
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<IEventListener*>                  _loggerModules;
     IAuthModule*                                _authModule;

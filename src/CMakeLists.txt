@@ -4,7 +4,7 @@ set(OSAC_SRCS
     main.cpp
     osac.cpp
     runtimeoptions.cpp
-    config/coreconfig.cpp
+    config/xmlconfig.cpp
     core/authrequest.cpp
     core/core.cpp
     core/event.cpp
