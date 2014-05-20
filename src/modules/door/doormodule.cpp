@@ -31,3 +31,13 @@ IModule::ModuleType DoorModule::getType() const
 {
     return (ModuleType::Door);
 }
+
+void DoorModule::serialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}
+
+void DoorModule::deserialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}

@@ -53,12 +53,12 @@ public:
     void    run();
 
 private:
-    void    loadLibraries();
-    void    unloadLibraries();
-    bool    loadModule(const std::string& libname, const std::string& alias = std::string());
-    void    processEvent(const Event& event);
-    void    debugPrintLibs();
-    void    debugPrintModules();
+    void        loadLibraries();
+    void        unloadLibraries();
+    IModule*    loadModule(const std::string& libname, const std::string& alias = std::string());
+    void        processEvent(const Event& event);
+    void        debugPrintLibs();
+    void        debugPrintModules();
 
 private:
     void    registerModule(IModule* module, const std::string& libname, const std::string& alias);

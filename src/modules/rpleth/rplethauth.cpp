@@ -65,6 +65,16 @@ IModule::ModuleType RplethAuth::getType() const
     return (ModuleType::Auth);
 }
 
+void RplethAuth::serialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}
+
+void RplethAuth::deserialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}
+
 void RplethAuth::run()
 {
     std::size_t     readRet;

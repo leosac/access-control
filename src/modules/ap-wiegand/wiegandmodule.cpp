@@ -46,3 +46,13 @@ IModule::ModuleType WiegandModule::getType() const
 {
     return (ModuleType::AccessPoint);
 }
+
+void WiegandModule::serialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}
+
+void WiegandModule::deserialize(boost::property_tree::ptree& node)
+{
+    static_cast<void>(node);
+}

@@ -68,9 +68,9 @@ void Core::serialize(boost::property_tree::ptree& node)
 
         child.put("<xmlattr>.file", module.second.libname);
         child.put("alias", module.first);
-    }
-    for (auto& module : _modules)
+        module.second.instance->serialize(child);
         delete module.second.instance;
+    }
     _modules.clear();
 
     unloadLibraries();
@@ -85,10 +85,13 @@ void Core::deserialize(boost::property_tree::ptree& node)
     }
     loadLibraries();
     _hwManager = new HWManager;
-    for (const auto& v : node.get_child("core"))
+    for (auto& v : node.get_child("core"))
     {
         if (v.first == "module")
-            loadModule(v.second.get<std::string>("<xmlattr>.file", "default"), v.second.get<std::string>("alias"));
+        {
+            IModule* module = loadModule(v.second.get<std::string>("<xmlattr>.file", "default"), v.second.get<std::string>("alias"));
+            module->deserialize(v.second);
+        }
     }
     if (!_authModule)
         throw (CoreException("No auth module loaded"));
@@ -165,30 +168,27 @@ void Core::unloadLibraries()
 {
     for (auto& lib : _dynlibs)
     {
-        try
-        {
+        try {
             lib.second->close();
         }
-        catch (const DynLibException& e)
-        {
-            std::cerr << e.what() << std::endl;
+        catch (const DynLibException& e) {
+            throw (CoreException(e.what()));
         }
         delete lib.second;
     }
 }
 
-bool Core::loadModule(const std::string& libname, const std::string& alias)
+IModule* Core::loadModule(const std::string& libname, const std::string& alias)
 {
     DynamicLibrary*     lib = _dynlibs.at(libname);
     IModule::InitFunc   func;
     IModule*            module = nullptr;
 
     if (!lib)
-        return (false);
+        throw (CoreException("Invalid source library"));
     if (_modules.count(alias) > 0)
-        return (false);
-    try
-    {
+        throw (CoreException("A library named \'" + alias + "\' already exists"));
+    try {
         void* s = lib->getSymbol("getNewModuleInstance");
         *reinterpret_cast<void**>(&func) = s;
         if (alias.empty())
@@ -196,14 +196,12 @@ bool Core::loadModule(const std::string& libname, const std::string& alias)
         else
             module = func(*this, alias);
     }
-    catch (const DynLibException& e)
-    {
-        std::cerr << e.what() << std::endl;
+    catch (const DynLibException& e) {
         delete module; // FIXME is it safe ?
-        return (false);
+        throw (CoreException(e.what()));
     }
     registerModule(module, libname, module->getName());
-    return (true);
+    return (module);
 }
 
 void Core::processEvent(const Event& event)
