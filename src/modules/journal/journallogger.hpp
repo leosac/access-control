@@ -13,7 +13,7 @@ class JournalLogger : public IModule
 {
 public:
     explicit JournalLogger(const std::string& name, Event::LogLevel logLevel = Event::LogLevel::Debug);
-    ~JournalLogger() = default;
+    ~JournalLogger() noexcept = default;
 
     JournalLogger(const JournalLogger& other) = delete;
     JournalLogger& operator=(const JournalLogger& other) = delete;
@@ -24,7 +24,7 @@ public:
     virtual ModuleType          getType() const override;
     virtual void                serialize(boost::property_tree::ptree& node) override;
     virtual void                deserialize(boost::property_tree::ptree& node) override;
-    
+
 private:
     const std::string   _name;
     Event::LogLevel     _logLevel;

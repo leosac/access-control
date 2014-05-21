@@ -13,7 +13,7 @@ class DoorModule : public IModule
 {
 public:
     explicit DoorModule(ICore& core, const std::string& name);
-    ~DoorModule() = default;
+    ~DoorModule() noexcept = default;
 
     DoorModule(const DoorModule& other) = delete;
     DoorModule& operator=(const DoorModule& other) = delete;

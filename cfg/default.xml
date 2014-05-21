@@ -7,6 +7,7 @@
     <module file="libwiegand.so">
         <alias>reader</alias>
         <properties>
+            <target>doorA</target>
             <higpio>15</higpio>
             <logpio>14</logpio>
         </properties>
@@ -18,6 +19,9 @@
         </properties>
     </module>
     <module file="libdoor.so">
-        <alias>door</alias>
+        <alias>doorA</alias>
+    </module>
+    <module file="libdoor.so">
+        <alias>doorB</alias>
     </module>
 </core>

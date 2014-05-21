@@ -20,7 +20,7 @@ public:
     } AuthRequest;
 
 public:
-    virtual ~IAuthModule() = default;
+    virtual ~IAuthModule() noexcept = default;
 };
 
 #endif // IAUTHMODULE_HPP

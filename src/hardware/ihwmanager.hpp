@@ -13,7 +13,7 @@ class WiegandInterface;
 class IHWManager
 {
 public:
-    virtual ~IHWManager() = default;
+    virtual ~IHWManager() noexcept = default;
     virtual void    start() = 0;
     virtual void    stop() = 0;
     virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) = 0;

@@ -15,7 +15,7 @@ class CoreException : public OSACException
 {
 public:
     CoreException(const std::string& message) : OSACException("Core::" + message) {};
-    virtual ~CoreException() = default;
+    virtual ~CoreException() noexcept = default;
 };
 
 #endif // COREEXCEPTION_HPP

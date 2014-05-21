@@ -12,7 +12,7 @@
 class IXmlSerializable
 {
 public:
-    ~IXmlSerializable() = default;
+    ~IXmlSerializable() noexcept = default;
     virtual void    serialize(boost::property_tree::ptree& node) = 0;
     virtual void    deserialize(boost::property_tree::ptree& node) = 0;
 };

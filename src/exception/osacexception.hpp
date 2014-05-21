@@ -14,7 +14,7 @@ class OSACException : public std::exception
 {
 public:
     explicit OSACException(const std::string& message) : _message(message) {};
-    virtual ~OSACException() = default;
+    virtual ~OSACException() noexcept = default;
     virtual const char* what() const noexcept final { return (_message.c_str()); }
 
 private:

@@ -44,7 +44,7 @@ namespace Rezzo
         } Address;
 
     public:
-        virtual ~ISocket() = default;
+        virtual ~ISocket() noexcept = default;
         virtual std::size_t recv(Byte* data, std::size_t size, int flags = 0) = 0;
         virtual std::size_t send(const Byte* data, std::size_t size, int flags = 0) = 0;
         virtual void        connect(const std::string& host, Port port) = 0;

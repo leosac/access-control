@@ -32,7 +32,7 @@ class RplethAuth : public IAuthModule
 
 public:
     explicit RplethAuth(IEventListener& listener, const std::string& name);
-    ~RplethAuth() = default;
+    ~RplethAuth() noexcept = default;
 
     RplethAuth(const RplethAuth& other) = delete;
     RplethAuth& operator=(const RplethAuth& other) = delete;

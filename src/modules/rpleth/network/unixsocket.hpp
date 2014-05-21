@@ -15,7 +15,7 @@ namespace Rezzo
     {
     public:
         explicit UnixSocket(Protocol protocol);
-        ~UnixSocket() = default;
+        ~UnixSocket() noexcept = default;
 
     protected:
         UnixSocket(int handle, Address address);
