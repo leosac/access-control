@@ -12,7 +12,7 @@
 class IGPIOListener
 {
 public:
-    virtual ~IGPIOListener() = default;
+    virtual ~IGPIOListener() noexcept = default;
     virtual void    notify(int gpioNo) = 0; // NOTE An interrupt was caught
     virtual void    timeout() = 0; // NOTE Called when poll() times out
 };

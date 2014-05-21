@@ -15,7 +15,7 @@ class SignalException : public OSACException
 {
 public:
     SignalException(const std::string& message) : OSACException("Signal::" + message) {};
-    virtual ~SignalException() = default;
+    virtual ~SignalException() noexcept = default;
 };
 
 #endif // SIGNALEXCEPTION_HPP

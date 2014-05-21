@@ -15,7 +15,7 @@ using boost::property_tree::ptree;
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;
 using boost::property_tree::xml_writer_settings;
-using boost::property_tree::xml_parser_error;
+using boost::property_tree::ptree_error;
 using boost::property_tree::xml_parser::no_concat_text;
 using boost::property_tree::xml_parser::no_comments;
 using boost::property_tree::xml_parser::trim_whitespace;
@@ -38,7 +38,7 @@ void XmlConfig::serialize()
         _object.serialize(pt);
         write_xml(cfg, pt, settings);
     }
-    catch (const xml_parser_error& e)
+    catch (const ptree_error& e)
     {
         throw (ConfigException(_file, e.what()));
     }
@@ -56,7 +56,7 @@ void XmlConfig::deserialize()
         read_xml(cfg, pt, trim_whitespace | no_comments);
         _object.deserialize(pt);
     }
-    catch (xml_parser_error& e)
+    catch (ptree_error& e)
     {
         throw (ConfigException(_file, e.what()));
     }

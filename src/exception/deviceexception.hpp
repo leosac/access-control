@@ -15,7 +15,7 @@ class DeviceException : public OSACException
 {
 public:
     DeviceException(const std::string& message) : OSACException("Device::" + message) {};
-    virtual ~DeviceException() = default;
+    virtual ~DeviceException() noexcept = default;
 };
 
 #endif // DEVICEEXCEPTION_HPP

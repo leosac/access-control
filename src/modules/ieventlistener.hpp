@@ -12,7 +12,7 @@
 class IEventListener
 {
 public:
-    virtual ~IEventListener() = default;
+    virtual ~IEventListener() noexcept = default;
     virtual void    notify(const Event& event) = 0;
 };
 

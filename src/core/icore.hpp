@@ -13,7 +13,7 @@
 class ICore : public IEventListener
 {
 public:
-    virtual ~ICore() = default;
+    virtual ~ICore() noexcept = default;
     virtual IHWManager& getHWManager() = 0;
 };
 

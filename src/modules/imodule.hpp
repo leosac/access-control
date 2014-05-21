@@ -25,7 +25,7 @@ public:
     };
 
 public:
-    virtual ~IModule() = default;
+    virtual ~IModule() noexcept = default;
     virtual const std::string&  getName() const = 0;
     virtual ModuleType          getType() const = 0;
 };

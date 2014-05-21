@@ -15,7 +15,7 @@ class FsException : public OSACException
 {
 public:
     FsException(const std::string& message) : OSACException("Fs::" + message) {};
-    virtual ~FsException() = default;
+    virtual ~FsException() noexcept = default;
 };
 
 #endif // FSEXCEPTION_HPP
