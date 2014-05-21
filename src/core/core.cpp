@@ -7,8 +7,6 @@
 #include "core.hpp"
 
 #include <thread>
-#include <iostream>
-#include <sstream>
 #include <string>
 
 #include "osac.hpp"
@@ -44,9 +42,9 @@ void Core::notify(const Event& event)
     _eventQueue.push(event);
 }
 
-IHWManager* Core::getHWManager()
+IHWManager& Core::getHWManager()
 {
-    return (_hwManager);
+    return (*_hwManager);
 }
 
 void Core::handleSignal(int signal)
@@ -102,12 +100,7 @@ void Core::run()
 {
     _coreConfig.deserialize();
     notify(Event("starting", "Core"));
-    try {
-        SignalHandler::registerCallback(this);
-    }
-    catch (const SignalException& e) {
-        throw (CoreException(e.what()));
-    }
+    SignalHandler::registerCallback(this);
     _hwManager->start();
     _isRunning = true;
     while (_isRunning)
@@ -227,11 +220,11 @@ void Core::processEvent(const Event& event)
         }
         else if (source->getType() == IModule::ModuleType::Auth)
         {
-            std::stringstream   ss(event.message);
+            std::istringstream  iss(event.message);
             std::string         uidstr;
             AuthRequest::Uid    uid;
 
-            ss >> uidstr;
+            iss >> uidstr;
             uid = std::stoi(uidstr);
             if (_authRequests.count(uid) > 0)
             {
@@ -240,7 +233,7 @@ void Core::processEvent(const Event& event)
 
                 if (!(dest = _modules[ar.getTarget()].instance))
                     throw (CoreException("bad destination"));
-                ss >> rslt;
+                iss >> rslt;
                 if (rslt == "granted")
                 {
                     ar.grant(true);
@@ -256,11 +249,11 @@ void Core::processEvent(const Event& event)
         }
         else if (source->getType() == IModule::ModuleType::Door)
         {
-            std::stringstream   ss(event.message);
+            std::istringstream  iss(event.message);
             std::string         uidstr;
             AuthRequest::Uid    uid;
 
-            ss >> uidstr;
+            iss >> uidstr;
             uid = std::stoi(uidstr);
 
             if (_authRequests.count(uid) > 0)
@@ -268,7 +261,7 @@ void Core::processEvent(const Event& event)
                 AuthRequest&    ar = _authRequests.at(uid);
                 std::string     rslt;
 
-                ss >> rslt;
+                iss >> rslt;
                 if (rslt == "opened")
                     _authRequests.erase(uid);
                 else if (rslt == "askauth")

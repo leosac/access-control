@@ -15,10 +15,10 @@ DoorModule::DoorModule(ICore& core, const std::string& name)
 
 void DoorModule::notify(const Event& event)
 {
-    std::stringstream   ss(event.message);
+    std::istringstream  iss(event.message);
     std::string         uidstr;
 
-    ss >> uidstr;
+    iss >> uidstr;
     _listener.notify(Event(uidstr + " askauth", _name));
 }
 

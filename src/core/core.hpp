@@ -44,7 +44,7 @@ public:
 
 public:
     virtual void        notify(const Event& event) override;
-    virtual IHWManager* getHWManager() override;
+    virtual IHWManager& getHWManager() override;
     virtual void        handleSignal(int signal) override;
     virtual void        serialize(boost::property_tree::ptree& node) override;
     virtual void        deserialize(boost::property_tree::ptree& node) override;

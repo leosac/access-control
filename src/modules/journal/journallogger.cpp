@@ -18,31 +18,31 @@ JournalLogger::JournalLogger(const std::string& name, Event::LogLevel logLevel)
 
 void JournalLogger::notify(const Event& event)
 {
-    std::stringstream   ss;
+    std::ostringstream  oss;
     std::time_t         now_c = std::chrono::system_clock::to_time_t(event.date);
     struct tm*          l = std::localtime(&now_c);
 
     if (event.logLevel > _logLevel)
         return;
 
-    ss << l->tm_year + 1900 << '/';
-    ss.fill('0');
-    ss.width(2);
-    ss << l->tm_mon + 1 << '/';
-    ss.fill('0');
-    ss.width(2);
-    ss << l->tm_mday << ' ';
-    ss.fill('0');
-    ss.width(2);
-    ss << l->tm_hour << 'h';
-    ss.fill('0');
-    ss.width(2);
-    ss << l->tm_min << ' ';
-    ss.fill('0');
-    ss.width(2);
-    ss << l->tm_sec << 's';
+    oss << l->tm_year + 1900 << '/';
+    oss.fill('0');
+    oss.width(2);
+    oss << l->tm_mon + 1 << '/';
+    oss.fill('0');
+    oss.width(2);
+    oss << l->tm_mday << ' ';
+    oss.fill('0');
+    oss.width(2);
+    oss << l->tm_hour << 'h';
+    oss.fill('0');
+    oss.width(2);
+    oss << l->tm_min << ' ';
+    oss.fill('0');
+    oss.width(2);
+    oss << l->tm_sec << 's';
 
-    std::clog << '[' << ss.str() << ']' << " " << Event::getLogLevelString(event.logLevel) << " ";
+    std::clog << '[' << oss.str() << ']' << " " << Event::getLogLevelString(event.logLevel) << " ";
     if (!event.source.empty())
         std::clog << event.source << " said ";
     std::clog << '\"' << event.message << '\"' << std::endl;

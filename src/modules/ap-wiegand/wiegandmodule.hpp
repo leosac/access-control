@@ -15,7 +15,7 @@ class WiegandModule : public IModule, public IWiegandListener
 {
 public:
     explicit WiegandModule(ICore& core, const std::string& name);
-    ~WiegandModule();
+    ~WiegandModule() = default;
 
     WiegandModule(const WiegandModule& other) = delete;
     WiegandModule& operator=(const WiegandModule& other) = delete;
@@ -31,6 +31,9 @@ public:
 private:
     IEventListener&     _listener;
     const std::string   _name;
+    unsigned int        _hiGPIO;
+    unsigned int        _loGPIO;
+    IHWManager&         _hwmanager;
     WiegandInterface*   _interface;
 };
 

@@ -26,7 +26,7 @@ set(OSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(OSAC_COMPILE_FLAGS "${OSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O")
+        set(OSAC_COMPILE_FLAGS "${OSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef")
     endif()
 endif()
 

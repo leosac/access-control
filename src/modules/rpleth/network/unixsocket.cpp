@@ -132,17 +132,17 @@ void UnixSocket::close()
 
 std::string UnixSocket::getIp() const
 {
-    std::stringstream   ss;
+    std::ostringstream  oss;
     Ip                  ip = _address.ip;
 
     for (int i = 0; i < 4; ++i)
     {
-        ss << (ip & 0xff);
+        oss << (ip & 0xff);
         ip >>= 8;
         if (i < 3)
-            ss << '.';
+            oss << '.';
     }
-    return (ss.str());
+    return (oss.str());
 }
 
 ISocket::Port UnixSocket::getPort() const
