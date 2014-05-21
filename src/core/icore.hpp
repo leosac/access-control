@@ -14,7 +14,7 @@ class ICore : public IEventListener
 {
 public:
     virtual ~ICore() = default;
-    virtual IHWManager* getHWManager() = 0;
+    virtual IHWManager& getHWManager() = 0;
 };
 
 #endif // ICORE_HPP

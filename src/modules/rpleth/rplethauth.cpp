@@ -18,35 +18,27 @@ static void launch(RplethAuth* instance)
     instance->run();
 }
 
-RplethAuth::RplethAuth(IEventListener& listener, const std::string& name, Rezzo::ISocket::Port port, long timeoutMs)
+RplethAuth::RplethAuth(IEventListener& listener, const std::string& name)
 :   _listener(listener),
     _name(name),
     _isRunning(true),
     _serverSocket(nullptr),
-    _port(port),
+    _port(DefaultPort),
     _fdMax(0),
-    _timeout(timeoutMs)
-{
-    _networkThread = std::thread(&launch, this);
-}
-
-RplethAuth::~RplethAuth()
-{
-    _isRunning = false;
-    _networkThread.join();
-}
+    _timeout(DefaultTimeoutMs)
+{}
 
 void RplethAuth::notify(const Event& event)
 {
-    std::stringstream   ss(event.message);
+    std::istringstream  iss(event.message);
     CardId              cid;
     unsigned int        val;
     std::string         uidstr;
 
-    ss >> uidstr;
-    ss.ignore();
+    iss >> uidstr;
+    iss.ignore();
 
-    while (ss >> val)
+    while (iss >> val)
         cid.push_back(static_cast<Byte>(val));
 
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
@@ -67,12 +59,22 @@ IModule::ModuleType RplethAuth::getType() const
 
 void RplethAuth::serialize(boost::property_tree::ptree& node)
 {
-    static_cast<void>(node);
+    boost::property_tree::ptree& child = node.add("properties", std::string());
+
+    child.put("port", _port);
+
+    _isRunning = false;
+    _networkThread.join();
 }
 
 void RplethAuth::deserialize(boost::property_tree::ptree& node)
 {
-    static_cast<void>(node);
+    for (auto& v : node)
+    {
+        if (v.first == "properties")
+            _port = v.second.get<Rezzo::UnixSocket::Port>("port");
+    }
+    _networkThread = std::thread(&launch, this);
 }
 
 void RplethAuth::run()

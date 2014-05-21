@@ -16,10 +16,10 @@ static std::string vstring = std::string();
 
 std::string Version::buildVersionString(int major, int minor, int patch)
 {
-    std::stringstream   ss;
+    std::ostringstream  oss;
 
-    ss << major << '.' << minor << '.' << patch;
-    return (ss.str());
+    oss << major << '.' << minor << '.' << patch;
+    return (oss.str());
 }
 
 static void cleanVersionString(std::string& v)
@@ -30,19 +30,19 @@ static void cleanVersionString(std::string& v)
 
 int Version::versionCompare(std::string a, std::string b)
 {
-    std::stringstream   ssa;
-    std::stringstream   ssb;
+    std::istringstream  issa;
+    std::istringstream  issb;
     int                 va;
     int                 vb;
 
     cleanVersionString(a);
     cleanVersionString(b);
-    ssa.str(a);
-    ssb.str(b);
+    issa.str(a);
+    issb.str(b);
     for (int i = 0; i < 3; ++i)
     {
-        ssa >> va;
-        ssb >> vb;
+        issa >> va;
+        issb >> vb;
         if (va > vb)
             return (1);
         else if (va < vb)

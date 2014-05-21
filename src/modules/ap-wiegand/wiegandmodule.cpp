@@ -11,25 +11,23 @@
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _listener(core),
     _name(name),
-    _interface(core.getHWManager()->buildWiegandInterface(this, 15, 14))
+    _hiGPIO(0),
+    _loGPIO(0),
+    _hwmanager(core.getHWManager()),
+    _interface(nullptr)
 {}
-
-WiegandModule::~WiegandModule()
-{
-    delete _interface;
-}
 
 void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
 {
-    std::stringstream  ss;
+    std::ostringstream  oss;
 
     for (std::size_t i = 0; i < cardId.size(); ++i)
     {
         if (i > 0)
-            ss << ' ';
-        ss << static_cast<unsigned int>(cardId[i]);
+            oss << ' ';
+        oss << static_cast<unsigned int>(cardId[i]);
     }
-    _listener.notify(Event(ss.str(), _name, "libdoor.so-default"));
+    _listener.notify(Event(oss.str(), _name, "libdoor.so-default"));
 }
 
 void WiegandModule::notify(const Event& event)
@@ -49,10 +47,23 @@ IModule::ModuleType WiegandModule::getType() const
 
 void WiegandModule::serialize(boost::property_tree::ptree& node)
 {
-    static_cast<void>(node);
+    boost::property_tree::ptree& child = node.add("properties", std::string());
+
+    child.put("higpio", _hiGPIO);
+    child.put("logpio", _loGPIO);
+
+    delete _interface;
 }
 
 void WiegandModule::deserialize(boost::property_tree::ptree& node)
 {
-    static_cast<void>(node);
+    for (auto& v : node)
+    {
+        if (v.first == "properties")
+        {
+            _hiGPIO = v.second.get<unsigned int>("higpio");
+            _loGPIO = v.second.get<unsigned int>("logpio");
+            _interface = _hwmanager.buildWiegandInterface(this, _hiGPIO, _loGPIO);
+        }
+    }
 }
