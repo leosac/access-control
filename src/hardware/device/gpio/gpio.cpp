@@ -15,6 +15,7 @@ extern "C" {
 
 #include "exception/gpioexception.hpp"
 #include "tools/unixsyscall.hpp"
+#include "tools/log.hpp"
 
 const std::string   GPIO::ExportPath        = "/sys/class/gpio/export";
 const std::string   GPIO::UnexportPath      = "/sys/class/gpio/unexport";
@@ -39,8 +40,10 @@ GPIO::GPIO(int pinNo)
     _edgeFile(_path + '/' + EdgeFilename),
     _pollFd(-1)
 {
+    LOG() << "GPIO number " << _pinNo;
     if (!exists())
         exportGpio();
+    LOG() << "Opening file " << _valueFile;
     if ((_pollFd = ::open(_valueFile.c_str(), O_RDONLY | O_NONBLOCK)) == -1)
         throw (GpioException(UnixSyscall::getErrorString("open", errno)));
 }
@@ -195,6 +198,7 @@ bool GPIO::exists()
     bool            rslt;
 
     rslt = gpio.good();
+    LOG() << "rslt=" << rslt;
     return (rslt);
 }
 
@@ -202,6 +206,7 @@ void GPIO::exportGpio()
 {
     std::fstream    ex(ExportPath, std::ios::out);
 
+    LOG() << "Opening file " << ExportPath;
     if (!ex.good())
         throw (GpioException("could not export gpio " + std::to_string(_pinNo)));
     ex << std::to_string(_pinNo);
@@ -209,8 +214,9 @@ void GPIO::exportGpio()
 
 void GPIO::unexportGpio()
 {
-    std::fstream    unex(ExportPath, std::ios::out);
+    std::fstream    unex(UnexportPath, std::ios::out);
 
+    LOG() << "Opening file " << UnexportPath;
     if (!unex.good())
         throw (GpioException("could not unexport gpio " + std::to_string(_pinNo)));
     unex << std::to_string(_pinNo);

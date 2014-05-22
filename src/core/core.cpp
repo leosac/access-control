@@ -15,6 +15,7 @@
 #include "dynlib/dynamiclibrary.hpp"
 #include "tools/unixfs.hpp"
 #include "tools/unlock_guard.hpp"
+#include "tools/log.hpp"
 
 #include "exception/coreexception.hpp"
 #include "exception/signalexception.hpp"
@@ -137,19 +138,14 @@ void Core::loadLibraries()
         {
             libname = UnixFs::stripPath(path);
             if (_dynlibs.count(libname) > 0)
-            {
-                std::cerr << "module already loaded (" << path << ')' << std::endl;
-                continue;
-            }
+                throw (CoreException("module already loaded (" + path + ')'));
             lib = new DynamicLibrary(path);
-            try
-            {
+            try {
                 lib->open();
             }
-            catch (const DynLibException& e)
-            {
-                std::cerr << e.what() << std::endl;
+            catch (const DynLibException& e) {
                 delete lib;
+                throw (CoreException(e.what()));
             }
             _dynlibs[libname] = lib;
         }
@@ -214,7 +210,7 @@ void Core::processEvent(const Event& event)
 
             if (!(dest = _modules[event.destination].instance))
                 throw (CoreException("bad destination"));
-            std::cout << "CORE::New AR pushed: id=" << ar.getUid() << std::endl; // DEBUG
+            LOG() << "CORE::New AR pushed: id=" << ar.getUid();
             _authRequests.emplace(std::make_pair(ar.getUid(), ar));
             dest->notify(Event(std::to_string(ar.getUid()) + " request"));
         }
@@ -242,7 +238,7 @@ void Core::processEvent(const Event& event)
                 else if (rslt == "denied")
                     _authRequests.erase(uid);
                 else
-                    std::cerr << "bad status from auth: " << rslt << std::endl;
+                    LOG() << "bad status from auth: " << rslt;
             }
             else
                 throw (CoreException("bad uid from auth"));
@@ -277,16 +273,16 @@ void Core::processEvent(const Event& event)
 
 void Core::debugPrintLibs()
 {
-    std::cout << "Libs: (total " << _dynlibs.size() << ")" << std::endl;
+    LOG() << "Libs: (total " << _dynlibs.size() << ")";
     for (auto& lib : _dynlibs)
-        std::cout << "-> " << lib.first << std::endl;
+        LOG() << "-> " << lib.first;
 }
 
 void Core::debugPrintModules()
 {
-    std::cout << "Loaded modules: (total " << _modules.size() << ")" << std::endl;
+    LOG() << "Loaded modules: (total " << _modules.size() << ")";
     for (auto& module : _modules)
-        std::cout << "-> " << module.first << std::endl;
+        LOG() << "-> " << module.first;
 }
 
 void Core::registerModule(IModule* module, const std::string& libname, const std::string& alias)
