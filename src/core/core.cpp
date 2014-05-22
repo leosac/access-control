@@ -198,6 +198,7 @@ void Core::processEvent(const Event& event)
     IModule*    dest = nullptr;
     IModule*    source = nullptr;
 
+    LOG() << "Processing event:\n    from:" << event.source << "\n    to:" << event.destination << "\n    msg:" << event.message;
     if (event.source.empty())
         throw (CoreException("No source specified from Event"));
     else if (event.source != "Core")
@@ -210,7 +211,7 @@ void Core::processEvent(const Event& event)
 
             if (!(dest = _modules[event.destination].instance))
                 throw (CoreException("bad destination"));
-            LOG() << "CORE::New AR pushed: id=" << ar.getUid();
+            LOG() << "new AR pushed: id=" << ar.getUid();
             _authRequests.emplace(std::make_pair(ar.getUid(), ar));
             dest->notify(Event(std::to_string(ar.getUid()) + " request"));
         }

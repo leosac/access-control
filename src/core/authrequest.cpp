@@ -41,6 +41,11 @@ const std::string& AuthRequest::getInfo() const
     return (_requestInfo);
 }
 
+AuthRequest::Status AuthRequest::getStatus() const
+{
+    return (_status);
+}
+
 void AuthRequest::grant(bool granted)
 {
     _granted = granted;

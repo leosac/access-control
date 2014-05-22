@@ -33,6 +33,7 @@ public:
     Uid                 getUid() const;
     const std::string&  getTarget() const;
     const std::string&  getInfo() const;
+    Status              getStatus() const;
     void                grant(bool granted);
     void                setStatus(Status status);
 

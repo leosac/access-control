@@ -15,7 +15,7 @@ class GPIO
 {
     static const std::string    ExportPath;
     static const std::string    UnexportPath;
-    static const std::string    GpioPrefix;
+    static const std::string    GpioPathPrefix;
     static const std::string    DirectionFilename;
     static const std::string    ValueFilename;
     static const std::string    EdgeFilename;
@@ -36,7 +36,7 @@ public:
     };
 
 public:
-    explicit GPIO(int pinNo);
+    explicit GPIO(int pinNo/*, const std::string& sysfsName*/);
     ~GPIO();
 
     GPIO(const GPIO& other) = delete;
