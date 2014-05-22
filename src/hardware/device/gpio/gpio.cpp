@@ -19,7 +19,7 @@ extern "C" {
 
 const std::string   GPIO::ExportPath        = "/sys/class/gpio/export";
 const std::string   GPIO::UnexportPath      = "/sys/class/gpio/unexport";
-const std::string   GPIO::GpioPrefix        = "/sys/class/gpio/gpio";
+const std::string   GPIO::GpioPathPrefix    = "/sys/class/gpio/";
 const std::string   GPIO::DirectionFilename = "direction";
 const std::string   GPIO::ValueFilename     = "value";
 const std::string   GPIO::ActiveLowFilename = "active_low";
@@ -31,9 +31,9 @@ const std::string   GPIO::EdgeStrings[EdgeModes] = {
     "both"
 };
 
-GPIO::GPIO(int pinNo)
+GPIO::GPIO(int pinNo/*, const std::string& sysfsName*/)
 :   _pinNo(pinNo),
-    _path(GpioPrefix + std::to_string(_pinNo)),
+    _path(GpioPathPrefix + "gpio" + std::to_string(_pinNo) + "_ph" + std::to_string(_pinNo + 19)), // NOTE cubieboard2 fix FIXME asap
     _directionFile(_path + '/' + DirectionFilename),
     _valueFile(_path + '/' + ValueFilename),
     _activeLowFile(_path + '/' + ActiveLowFilename),
