@@ -44,7 +44,11 @@ void RplethAuth::notify(const Event& event)
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
     _cardIdQueue.push(cid);
 
-    _listener.notify(Event(uidstr + " granted", _name));
+    if (_auth.hasAccess(cid))
+        _listener.notify(Event(uidstr + " granted", _name));
+    else
+        _listener.notify(Event(uidstr + " denied", _name));
+
 }
 
 const std::string& RplethAuth::getName() const
@@ -62,6 +66,7 @@ void RplethAuth::serialize(boost::property_tree::ptree& node)
     boost::property_tree::ptree& child = node.add("properties", std::string());
 
     child.put("port", _port);
+    _auth.serialize(child);
 
     _isRunning = false;
     _networkThread.join();
@@ -72,7 +77,10 @@ void RplethAuth::deserialize(boost::property_tree::ptree& node)
     for (auto& v : node)
     {
         if (v.first == "properties")
+        {
             _port = v.second.get<Rezzo::UnixSocket::Port>("port");
+            _auth.deserialize(v.second);
+        }
     }
     _networkThread = std::thread(&launch, this);
 }

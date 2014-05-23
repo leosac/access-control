@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 
 // NOTE TCLAP is easily replacable by boost::program_options
@@ -12,6 +13,7 @@
 
 #include "osac.hpp"
 #include "tools/unixfs.hpp"
+#include "tools/log.hpp"
 #include "core/core.hpp"
 #include "exception/osacexception.hpp"
 #include "runtimeoptions.hpp"

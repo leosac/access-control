@@ -52,7 +52,7 @@ void Core::handleSignal(int signal)
 {
     if (_isRunning)
     {
-        notify(Event("caught signal (" + std::to_string(signal) + ')', "Core"));
+        LOG() << "caught signal (" << signal << ')';
         _isRunning = false;
     }
 }
@@ -71,7 +71,6 @@ void Core::serialize(boost::property_tree::ptree& node)
         delete module.second.instance;
     }
     _modules.clear();
-
     unloadLibraries();
 }
 
@@ -100,7 +99,7 @@ void Core::deserialize(boost::property_tree::ptree& node)
 void Core::run()
 {
     _coreConfig.deserialize();
-    notify(Event("starting", "Core"));
+    LOG() << "starting core loop";
     SignalHandler::registerCallback(this);
     _hwManager->start();
     _isRunning = true;
@@ -119,7 +118,7 @@ void Core::run()
             }
         }
     }
-    notify(Event("exiting", "Core"));
+    LOG() << "exiting core loop";
     _hwManager->stop();
     _coreConfig.serialize();
     delete _hwManager;
@@ -233,11 +232,15 @@ void Core::processEvent(const Event& event)
                 iss >> rslt;
                 if (rslt == "granted")
                 {
+                    LOG() << "access granted for " << uidstr;
                     ar.grant(true);
                     dest->notify(Event(uidstr + " open"));
                 }
                 else if (rslt == "denied")
+                {
+                    LOG() << "access denied for " << uidstr;
                     _authRequests.erase(uid);
+                }
                 else
                     LOG() << "bad status from auth: " << rslt;
             }
@@ -296,15 +299,9 @@ void Core::registerModule(IModule* module, const std::string& libname, const std
     _modules[alias] = { libname, module };
 }
 
-void Core::registerDoorModule(IModule* /*module*/)
-{
-    // TODO
-}
+void Core::registerDoorModule(IModule* /*module*/) {}
 
-void Core::registerAccessPointModule(IModule* /*module*/)
-{
-    // TODO
-}
+void Core::registerAccessPointModule(IModule* /*module*/) {}
 
 void Core::registerAuthModule(IModule* module)
 {
@@ -326,7 +323,4 @@ void Core::registerLoggerModule(IModule* module)
     _loggerModules.push_back(logger);
 }
 
-void Core::registerActivityMonitorModule(IModule* /*module*/)
-{
-    // TODO
-}
+void Core::registerActivityMonitorModule(IModule* /*module*/) {}
