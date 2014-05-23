@@ -16,6 +16,7 @@
 #include "modules/iauthmodule.hpp"
 #include "network/isocket.hpp"
 #include "network/circularbuffer.hpp"
+#include "auth/authenticator.hpp"
 
 class RplethAuth : public IAuthModule
 {
@@ -28,6 +29,8 @@ class RplethAuth : public IAuthModule
         CircularBuffer  buffer;
         explicit s_client(Rezzo::ISocket* sock) : socket(sock), buffer(RingBufferSize) {}
     } Client;
+
+public:
     typedef std::vector<Byte> CardId;
 
 public:
@@ -54,6 +57,7 @@ private:
 
 private:
     IEventListener&         _listener;
+    Authenticator           _auth;
     const std::string       _name;
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;

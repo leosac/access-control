@@ -23,7 +23,7 @@ public:
     ~LogLine()
     {
         _stream << std::endl;
-        _out << _stream.rdbuf();
+        _out << _stream.rdbuf(); // NOTE C++11 garantees thread safety
         _out.flush();
     }
 

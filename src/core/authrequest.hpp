@@ -44,7 +44,7 @@ private:
     const Uid           _uid;
     const std::string   _target;
     const std::string   _requestInfo;
-    Status              _status;
+    Status              _status; // NOTE Unused for now
     bool                _granted;
 };
 
