@@ -74,14 +74,12 @@ void RplethAuth::serialize(boost::property_tree::ptree& node)
 
 void RplethAuth::deserialize(boost::property_tree::ptree& node)
 {
-    for (auto& v : node)
+    for (const auto& v : node)
     {
         if (v.first == "properties")
-        {
             _port = v.second.get<Rezzo::UnixSocket::Port>("port");
-            _auth.deserialize(v.second);
-        }
     }
+    _auth.deserialize(node.get_child("properties").get_child("auth"));
     _networkThread = std::thread(&launch, this);
 }
 

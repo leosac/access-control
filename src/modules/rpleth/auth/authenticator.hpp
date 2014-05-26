@@ -7,11 +7,16 @@
 #ifndef AUTHENTICATOR_HPP
 #define AUTHENTICATOR_HPP
 
+#include <vector>
+#include <list>
+
 #include "config/ixmlserializable.hpp"
 #include "tools/bufferutils.hpp"
 
 class Authenticator : public IXmlSerializable
 {
+    typedef std::vector<Byte>   CSN;
+
 public:
     explicit Authenticator() = default;
     ~Authenticator() = default;
@@ -22,10 +27,16 @@ public:
     virtual void    serialize(boost::property_tree::ptree& node) override;
     virtual void    deserialize(boost::property_tree::ptree& node) override;
 
-    bool    hasAccess(const std::vector<Byte>& card);
+public:
+    bool    hasAccess(const CSN& csn);
+    void    authorizeCard(const CSN& csn);
 
 private:
+    std::string serializeCard(const CSN& csn);
+    void        deserializeCard(const std::string& card);
 
+private:
+    std::list<CSN>  _csnList;
 };
 
 #endif // AUTHENTICATOR_HPP

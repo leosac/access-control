@@ -6,8 +6,6 @@
 
 #include "event.hpp"
 
-#include <iostream>
-
 static const unsigned int   logLevelCount = 4;
 static const std::string    logLevelStrings[logLevelCount] = {
     "ERROR",
