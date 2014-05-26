@@ -30,20 +30,27 @@ void Authenticator::deserialize(boost::property_tree::ptree& node)
         if (v.first == "card")
             deserializeCard(v.second.data());
     }
-//     CSN test;
-//     test.push_back(Byte());
-//     test.push_back(Byte());
-//     test.push_back(Byte());
-//     test.push_back(Byte());
-//     authorizeCard(test);
 }
 
 bool Authenticator::hasAccess(const CSN& csn)
 {
-    if (std::find(_csnList.begin(), _csnList.end(), csn) != _csnList.end())
-        return (true);
-    else
-        return (false);
+    for (const auto& c : _csnList)
+    {
+        bool match = true;
+        if (c.size() != csn.size())
+            continue;
+        for (std::size_t i = 0; i < c.size(); ++i)
+        {
+            if (csn[i] != c[i])
+            {
+                match = false;
+                break;
+            }
+        }
+        if (match)
+            return (true);
+    }
+    return (false);
 }
 
 void Authenticator::authorizeCard(const Authenticator::CSN& csn)

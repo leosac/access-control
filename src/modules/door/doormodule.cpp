@@ -18,11 +18,13 @@ void DoorModule::notify(const Event& event)
     std::istringstream  iss(event.message);
     std::string         uidstr;
     std::string         code;
+    std::string         csn;
 
     iss >> uidstr;
     iss >> code;
+    std::getline(iss, csn);
     if (code == "request")
-        _listener.notify(Event(uidstr + " askauth", _name));
+        _listener.notify(Event(uidstr + " askauth " + csn, _name));
     else if (code == "open")
     {
         ; // FIXME Open da door

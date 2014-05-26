@@ -212,7 +212,7 @@ void Core::processEvent(const Event& event)
                 throw (CoreException("bad destination"));
             LOG() << "new AR pushed: id=" << ar.getUid() << " data=" << ar.getInfo();
             _authRequests.emplace(std::make_pair(ar.getUid(), ar));
-            dest->notify(Event(std::to_string(ar.getUid()) + " request"));
+            dest->notify(Event(std::to_string(ar.getUid()) + " request " + ar.getInfo()));
         }
         else if (source->getType() == IModule::ModuleType::Auth)
         {

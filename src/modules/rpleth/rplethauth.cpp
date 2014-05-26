@@ -34,9 +34,10 @@ void RplethAuth::notify(const Event& event)
     CardId              cid;
     unsigned int        val;
     std::string         uidstr;
+    std::string         opcode;
 
     iss >> uidstr;
-    iss.ignore();
+    iss >> opcode;
 
     while (iss >> val)
         cid.push_back(static_cast<Byte>(val));

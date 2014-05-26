@@ -8,8 +8,8 @@
         <alias>reader</alias>
         <properties>
             <target>doorA</target>
-            <higpio>1</higpio>
-            <logpio>2</logpio>
+            <higpio>15</higpio>
+            <logpio>14</logpio>
         </properties>
     </module>
     <module file="librpleth.so">
@@ -20,6 +20,8 @@
                 <user>test</user>
                 <card>de:ad:be:ef</card>
                 <card>B1:6B:00:B5</card>
+                <card>BA:5E:Be:ef</card>
+                <card>40:a0:83:80</card>
             </auth>
         </properties>
     </module>
