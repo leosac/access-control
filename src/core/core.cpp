@@ -210,7 +210,7 @@ void Core::processEvent(const Event& event)
 
             if (!(dest = _modules[event.destination].instance))
                 throw (CoreException("bad destination"));
-            LOG() << "new AR pushed: id=" << ar.getUid();
+            LOG() << "new AR pushed: id=" << ar.getUid() << " data=" << ar.getInfo();
             _authRequests.emplace(std::make_pair(ar.getUid(), ar));
             dest->notify(Event(std::to_string(ar.getUid()) + " request"));
         }

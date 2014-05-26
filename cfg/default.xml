@@ -16,6 +16,11 @@
         <alias>rpleth</alias>
         <properties>
             <port>9559</port>
+            <auth>
+                <user>test</user>
+                <card>de:ad:be:ef</card>
+                <card>B1:6B:00:B5</card>
+            </auth>
         </properties>
     </module>
     <module file="libdoor.so">
