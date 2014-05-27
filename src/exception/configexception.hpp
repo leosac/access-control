@@ -15,7 +15,7 @@ class ConfigException : public OSACException
 {
 public:
     ConfigException(const std::string& file, const std::string& message) : OSACException("Config::" + file + ": "  + message) {};
-    virtual ~ConfigException() noexcept = default;
+    virtual ~ConfigException() {}
 };
 
 #endif // CONFIGEXCEPTION_HPP

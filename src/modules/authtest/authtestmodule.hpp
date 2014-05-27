@@ -18,7 +18,7 @@ public:
 
 public:
     explicit AuthTestModule(IEventListener& listener, const std::string& name);
-    ~AuthTestModule() noexcept = default;
+    ~AuthTestModule() = default;
 
     AuthTestModule(const AuthTestModule& other) = delete;
     AuthTestModule& operator=(const AuthTestModule& other) = delete;

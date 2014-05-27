@@ -15,7 +15,7 @@ class ModuleException : public OSACException
 {
 public:
     ModuleException(const std::string& message) : OSACException("Module::" + message) {};
-    virtual ~ModuleException() noexcept = default;
+    virtual ~ModuleException() {}
 };
 
 #endif // MODULEEXCEPTION_HPP

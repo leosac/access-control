@@ -13,7 +13,7 @@ class JournalLogger : public IModule
 {
 public:
     explicit JournalLogger(const std::string& name, Event::LogLevel logLevel = Event::LogLevel::Debug);
-    ~JournalLogger() noexcept = default;
+    ~JournalLogger() = default;
 
     JournalLogger(const JournalLogger& other) = delete;
     JournalLogger& operator=(const JournalLogger& other) = delete;

@@ -15,12 +15,7 @@
 class IAuthModule : public IModule
 {
 public:
-    typedef struct {
-        int id;
-    } AuthRequest;
-
-public:
-    virtual ~IAuthModule() noexcept = default;
+    virtual ~IAuthModule() {}
 };
 
 #endif // IAUTHMODULE_HPP

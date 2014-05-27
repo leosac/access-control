@@ -37,7 +37,7 @@ public:
 
 public:
     explicit GPIOManager();
-    ~GPIOManager() noexcept = default;
+    ~GPIOManager() = default;
 
     GPIOManager(const GPIOManager& other) = delete;
     GPIOManager& operator=(const GPIOManager& other) = delete;

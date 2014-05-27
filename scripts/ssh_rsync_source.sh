@@ -11,4 +11,4 @@ fi
 
 PATHTOTARGET='osac/'
 
-rsync -rav --delete --exclude 'build' --exclude '.git' -e ssh $1 ${PATHTOTARGET}
+rsync -rav --delete --exclude '.git' --exclude 'build' --exclude 'doc' -e ssh $1 ${PATHTOTARGET}

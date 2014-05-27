@@ -16,7 +16,7 @@ class HWManager : public IHWManager
 {
 public:
     explicit HWManager() = default;
-    ~HWManager() noexcept = default;
+    ~HWManager() = default;
 
     HWManager(const HWManager& other) = delete;
     HWManager& operator=(const HWManager& other) = delete;

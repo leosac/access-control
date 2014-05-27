@@ -15,7 +15,7 @@ class WiegandModule : public IModule, public IWiegandListener
 {
 public:
     explicit WiegandModule(ICore& core, const std::string& name);
-    ~WiegandModule() noexcept = default;
+    ~WiegandModule() = default;
 
     WiegandModule(const WiegandModule& other) = delete;
     WiegandModule& operator=(const WiegandModule& other) = delete;

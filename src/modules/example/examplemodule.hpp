@@ -13,7 +13,7 @@ class ExampleModule : public IModule
 {
 public:
     explicit ExampleModule(const std::string& name);
-    ~ExampleModule() noexcept = default;
+    ~ExampleModule() = default;
 
     ExampleModule(const ExampleModule& other) = delete;
     ExampleModule& operator=(const ExampleModule& other) = delete;

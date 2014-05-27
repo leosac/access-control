@@ -14,7 +14,7 @@ class GPIO;
 class IHWManager
 {
 public:
-    virtual ~IHWManager() noexcept = default;
+    virtual ~IHWManager() {}
     virtual void    start() = 0;
     virtual void    stop() = 0;
     virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) = 0;

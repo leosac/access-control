@@ -24,7 +24,7 @@ class WiegandInterface : public IGPIOListener
 
 public:
     explicit WiegandInterface(IGPIOObservable& gpioProvider, IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx);
-    ~WiegandInterface() noexcept = default;
+    ~WiegandInterface() = default;
 
     WiegandInterface(const WiegandInterface& other) = delete;
     WiegandInterface& operator=(const WiegandInterface& other) = delete;
