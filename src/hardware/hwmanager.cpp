@@ -31,3 +31,13 @@ WiegandInterface* HWManager::buildWiegandInterface(IWiegandListener* listener, u
     return (new WiegandInterface(_gpioManager, listener, hiGpioIdx, loGpioIdx));
 #endif
 }
+
+GPIO* HWManager::buildGPIO(int idx)
+{
+#ifdef NO_HW
+    static_cast<void>(idx);
+    return (nullptr);
+#else
+    return (_gpioManager.getGPIO(idx));
+#endif
+}

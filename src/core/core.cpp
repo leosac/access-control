@@ -262,7 +262,7 @@ void Core::processEvent(const Event& event)
                 std::string     rslt;
 
                 iss >> rslt;
-                if (rslt == "opened")
+                if (rslt == "opened" || rslt == "denied")
                     _authRequests.erase(uid);
                 else if (rslt == "askauth")
                     _authModule->notify(Event(uidstr + " request " + ar.getInfo()));
