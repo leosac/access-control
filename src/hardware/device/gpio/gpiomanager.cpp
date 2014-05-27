@@ -50,6 +50,11 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
     _listeners.push_back(listener);
 }
 
+GPIO* GPIOManager::getGPIO(int idx)
+{
+    return (new GPIO(idx));
+}
+
 void GPIOManager::startPolling()
 {
     _isRunning = true;

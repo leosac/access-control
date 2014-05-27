@@ -5,7 +5,6 @@ set(RPLETH_SRCS
     rplethauth.cpp
     rplethpacket.cpp
     rplethprotocol.cpp
-    auth/authenticator.cpp
     network/unixsocket.cpp
     network/circularbuffer.cpp
 )

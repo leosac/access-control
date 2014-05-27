@@ -18,7 +18,7 @@ void Authenticator::serialize(boost::property_tree::ptree& node)
     {
         boost::property_tree::ptree ptre;
 
-        ptre.put("", serializeCard(csn));
+        ptre.put(std::string(), serializeCard(csn));
         child.add_child("card", ptre);
     }
 }

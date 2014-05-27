@@ -25,10 +25,11 @@ public:
     virtual void                start() override;
     virtual void                stop() override;
     virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) override;
+    virtual GPIO*               buildGPIO(int idx) override;
 
 private:
 #ifndef NO_HW
-    GPIOManager         _gpioManager;
+    GPIOManager         _gpioManager; // FIXME Prefer iface
 #endif
 };
 

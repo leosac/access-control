@@ -9,8 +9,16 @@
 
 #include "modules/imodule.hpp"
 
+class GPIO; // FIXME Debug
+
 class DoorModule : public IModule
 {
+    typedef struct {
+        bool    open;
+        int     start;
+        int     end;
+    } Day;
+
 public:
     explicit DoorModule(ICore& core, const std::string& name);
     ~DoorModule() noexcept = default;
@@ -26,8 +34,15 @@ public:
     virtual void                deserialize(boost::property_tree::ptree& node) override;
 
 private:
+    void    open();
+    bool    isDoorOpenable();
+
+private:
     IEventListener&     _listener;
+    IHWManager&         _hwmanager;
     const std::string   _name;
+    GPIO*               _debugLed; // FIXME
+    Day                 _days[7];
 };
 
 #endif // DOORMODULE_HPP

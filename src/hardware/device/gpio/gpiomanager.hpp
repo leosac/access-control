@@ -44,6 +44,7 @@ public:
 
 public:
     virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode) override; // NOTE call this BEFORE starting to poll
+    GPIO*           getGPIO(int idx);
 
 public:
     void    startPolling();

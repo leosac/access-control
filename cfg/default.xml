@@ -3,6 +3,8 @@
     <plugindir>.</plugindir>
     <module file="libjournal.so">
         <alias>log</alias>
+        <properties>
+        </properties>
     </module>
     <module file="libwiegand.so">
         <alias>reader</alias>
@@ -12,10 +14,9 @@
             <logpio>14</logpio>
         </properties>
     </module>
-    <module file="librpleth.so">
-        <alias>rpleth</alias>
+    <module file="libauthtest.so">
+        <alias>authtest</alias>
         <properties>
-            <port>9559</port>
             <auth>
                 <user>test</user>
                 <card>de:ad:be:ef</card>
@@ -27,8 +28,14 @@
     </module>
     <module file="libdoor.so">
         <alias>doorA</alias>
+        <properties>
+            <gpio>18</gpio>
+        </properties>
     </module>
     <module file="libdoor.so">
         <alias>doorB</alias>
+        <properties>
+            <gpio>17</gpio>
+        </properties>
     </module>
 </core>
