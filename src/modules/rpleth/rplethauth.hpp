@@ -34,7 +34,7 @@ public:
 
 public:
     explicit RplethAuth(IEventListener& listener, const std::string& name);
-    ~RplethAuth() noexcept = default;
+    ~RplethAuth() = default;
 
     RplethAuth(const RplethAuth& other) = delete;
     RplethAuth& operator=(const RplethAuth& other) = delete;

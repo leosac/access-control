@@ -37,7 +37,7 @@ class Core : public ICore, public ISignalCallback, public IXmlSerializable
 
 public:
     explicit Core(RuntimeOptions& options);
-    ~Core() noexcept = default;
+    ~Core() = default;
 
     Core(const Core& other) = delete;
     Core& operator=(const Core& other) = delete;
