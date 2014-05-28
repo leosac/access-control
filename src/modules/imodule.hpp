@@ -7,8 +7,8 @@
 #ifndef IMODULE_HPP
 #define IMODULE_HPP
 
-#include "core/icore.hpp"
 #include "config/ixmlserializable.hpp"
+#include "core/icore.hpp"
 
 #include <string>
 

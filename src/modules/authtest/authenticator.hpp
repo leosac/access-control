@@ -25,7 +25,7 @@ public:
     Authenticator& operator=(const Authenticator& other) = delete;
 
     virtual void    serialize(boost::property_tree::ptree& node) override;
-    virtual void    deserialize(boost::property_tree::ptree& node) override;
+    virtual void    deserialize(const boost::property_tree::ptree& node) override;
 
 public:
     bool    hasAccess(const CSN& csn);

@@ -63,7 +63,7 @@ void JournalLogger::serialize(boost::property_tree::ptree& node)
     static_cast<void>(node);
 }
 
-void JournalLogger::deserialize(boost::property_tree::ptree& node)
+void JournalLogger::deserialize(const boost::property_tree::ptree& node)
 {
     static_cast<void>(node);
 }

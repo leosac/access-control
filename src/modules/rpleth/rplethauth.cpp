@@ -68,7 +68,7 @@ void RplethAuth::serialize(boost::property_tree::ptree& node)
     _networkThread.join();
 }
 
-void RplethAuth::deserialize(boost::property_tree::ptree& node)
+void RplethAuth::deserialize(const boost::property_tree::ptree& node)
 {
     for (const auto& v : node)
     {

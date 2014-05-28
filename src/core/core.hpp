@@ -19,7 +19,7 @@
 #include "modules/imodule.hpp"
 #include "modules/ieventlistener.hpp"
 #include "modules/iauthmodule.hpp"
-#include "hardware/ihwmanager.hpp"
+#include "hardware/hwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 #include "runtimeoptions.hpp"
 #include "config/xmlconfig.hpp"
@@ -47,7 +47,7 @@ public:
     virtual IHWManager& getHWManager() override;
     virtual void        handleSignal(int signal) override;
     virtual void        serialize(boost::property_tree::ptree& node) override;
-    virtual void        deserialize(boost::property_tree::ptree& node) override;
+    virtual void        deserialize(const boost::property_tree::ptree& node) override;
 
 public:
     void    run();
@@ -70,9 +70,12 @@ private:
 
 private:
     RuntimeOptions&                             _options;
+    HWManager                                   _hwManager;
     XmlConfig                                   _coreConfig;
+    XmlConfig                                   _hwconfig;
+
+private:
     std::atomic<bool>                           _isRunning;
-    IHWManager*                                 _hwManager;
     std::list<std::string>                      _libsDirectories;
     std::map<std::string, DynamicLibrary*>      _dynlibs;
     std::map<std::string, Module>               _modules;

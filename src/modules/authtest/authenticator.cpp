@@ -23,7 +23,7 @@ void Authenticator::serialize(boost::property_tree::ptree& node)
     }
 }
 
-void Authenticator::deserialize(boost::property_tree::ptree& node)
+void Authenticator::deserialize(const boost::property_tree::ptree& node)
 {
     for (const auto& v : node)
     {

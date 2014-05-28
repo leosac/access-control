@@ -25,9 +25,10 @@ const int Core::IdleSleepTimeMs;
 
 Core::Core(RuntimeOptions& options)
 :   _options(options),
-    _coreConfig(options.getParam("configfile"), *this),
+    _hwManager(),
+    _coreConfig(options.getParam("corecfg"), *this),
+    _hwconfig(options.getParam("hwcfg"), _hwManager),
     _isRunning(false),
-    _hwManager(nullptr),
     _authModule(nullptr)
 {
     _registrationHandler[IModule::ModuleType::Door] = &Core::registerDoorModule;
@@ -45,7 +46,7 @@ void Core::notify(const Event& event)
 
 IHWManager& Core::getHWManager()
 {
-    return (*_hwManager);
+    return (_hwManager);
 }
 
 void Core::handleSignal(int signal)
@@ -59,22 +60,25 @@ void Core::handleSignal(int signal)
 
 void Core::serialize(boost::property_tree::ptree& node)
 {
+    boost::property_tree::ptree core;
+
     for (const auto& dir : _libsDirectories)
-        node.add("core.plugindir", dir);
+        core.add("plugindir", dir);
     for (const auto& module : _modules)
     {
-        boost::property_tree::ptree& child = node.add("core.module", std::string());
+        boost::property_tree::ptree& child = core.add("module", std::string());
 
         child.put("<xmlattr>.file", module.second.libname);
         child.put("alias", module.first);
         module.second.instance->serialize(child);
         delete module.second.instance;
     }
+    node.put_child("core", core);
     _modules.clear();
     unloadLibraries();
 }
 
-void Core::deserialize(boost::property_tree::ptree& node)
+void Core::deserialize(const boost::property_tree::ptree& node)
 {
     for (const auto& v : node.get_child("core"))
     {
@@ -82,7 +86,6 @@ void Core::deserialize(boost::property_tree::ptree& node)
             _libsDirectories.push_back(v.second.data());
     }
     loadLibraries();
-    _hwManager = new HWManager;
     for (auto& v : node.get_child("core"))
     {
         if (v.first == "module")
@@ -98,10 +101,11 @@ void Core::deserialize(boost::property_tree::ptree& node)
 
 void Core::run()
 {
+    _hwconfig.deserialize();
     _coreConfig.deserialize();
-    LOG() << "starting core loop";
     SignalHandler::registerCallback(this);
-    _hwManager->start();
+    _hwManager.start();
+    LOG() << "starting core loop";
     _isRunning = true;
     while (_isRunning)
     {
@@ -119,10 +123,9 @@ void Core::run()
         }
     }
     LOG() << "exiting core loop";
-    _hwManager->stop();
+    _hwManager.stop();
     _coreConfig.serialize();
-    delete _hwManager;
-    _hwManager = nullptr;
+    _hwconfig.serialize();
 }
 
 void Core::loadLibraries()
