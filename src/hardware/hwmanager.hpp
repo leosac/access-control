@@ -11,8 +11,9 @@
 #include "device/gpio/gpiomanager.hpp"
 #include "device/wiegandinterface.hpp"
 #include "device/iwiegandlistener.hpp"
+#include "config/ixmlserializable.hpp"
 
-class HWManager : public IHWManager
+class HWManager : public IHWManager, public IXmlSerializable
 {
 public:
     explicit HWManager() = default;
@@ -20,6 +21,10 @@ public:
 
     HWManager(const HWManager& other) = delete;
     HWManager& operator=(const HWManager& other) = delete;
+
+public:
+    virtual void serialize(boost::property_tree::ptree& node) override;
+    virtual void deserialize(boost::property_tree::ptree& node) override;
 
 public:
     virtual void                start() override;
