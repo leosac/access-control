@@ -55,7 +55,7 @@ void WiegandModule::serialize(boost::property_tree::ptree& node)
     delete _interface;
 }
 
-void WiegandModule::deserialize(boost::property_tree::ptree& node)
+void WiegandModule::deserialize(const boost::property_tree::ptree& node)
 {
     for (auto& v : node)
     {

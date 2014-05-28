@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<hardware>
+    <device type="button" name="testButtonA"/>
+    <device type="button" name="testButtonB"/>
+</hardware>

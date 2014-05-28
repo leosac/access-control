@@ -14,7 +14,7 @@ class IXmlSerializable
 public:
     virtual ~IXmlSerializable() {}
     virtual void    serialize(boost::property_tree::ptree& node) = 0;
-    virtual void    deserialize(boost::property_tree::ptree& node) = 0;
+    virtual void    deserialize(const boost::property_tree::ptree& node) = 0;
 };
 
 #endif // IXMLSERIALIZABLE_HPP

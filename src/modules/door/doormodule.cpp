@@ -72,7 +72,7 @@ void DoorModule::serialize(boost::property_tree::ptree& node)
         properties.put<int>("gpio", 0);
 }
 
-void DoorModule::deserialize(boost::property_tree::ptree& node)
+void DoorModule::deserialize(const boost::property_tree::ptree& node)
 {
     boost::property_tree::ptree properties = node.get_child("properties");
 

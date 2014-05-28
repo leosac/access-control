@@ -50,7 +50,7 @@ void AuthTestModule::serialize(boost::property_tree::ptree& node)
     _auth.serialize(child);
 }
 
-void AuthTestModule::deserialize(boost::property_tree::ptree& node)
+void AuthTestModule::deserialize(const boost::property_tree::ptree& node)
 {
     _auth.deserialize(node.get_child("properties").get_child("auth"));
 }

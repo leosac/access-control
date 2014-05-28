@@ -10,6 +10,7 @@ set(OSAC_SRCS
     core/event.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
+    hardware/device/button.cpp
     hardware/device/wiegandinterface.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp

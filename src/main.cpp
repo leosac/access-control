@@ -18,7 +18,8 @@
 #include "exception/osacexception.hpp"
 #include "runtimeoptions.hpp"
 
-static const std::string  DefaultConfigFile = UnixFs::getCWD() + "/cfg/default.xml";
+static const std::string  DefaultCoreCfg = UnixFs::getCWD() + "/cfg/default.xml";
+static const std::string  DefaultHwCfg = UnixFs::getCWD() + "/cfg/hardware.xml";
 
 int main(int argc, char** argv)
 {
@@ -28,13 +29,16 @@ int main(int argc, char** argv)
         try {
             TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', OSAC::getVersionString());
             TCLAP::SwitchArg                verboseSwitch("v", "verbose", "Increase verbosity", false);
-            TCLAP::ValueArg<std::string>    configFile("f", "config-file", "Configuration file", false, DefaultConfigFile, "string");
+            TCLAP::ValueArg<std::string>    coreFile("f", "core-cfg", "Configuration file", false, DefaultCoreCfg, "string");
+            TCLAP::ValueArg<std::string>    hwFile("g", "hw-cfg", "Hardware configuration file", false, DefaultHwCfg, "string");
 
             cmd.add(verboseSwitch);
-            cmd.add(configFile);
+            cmd.add(coreFile);
+            cmd.add(hwFile);
             cmd.parse(argc, argv);
             options.setFlag(RuntimeOptions::Verbose, verboseSwitch.getValue());
-            options.setParam("configfile", configFile.getValue());
+            options.setParam("corecfg", coreFile.getValue());
+            options.setParam("hwcfg", hwFile.getValue());
         }
         catch (const TCLAP::ArgException &e) {
             throw (OSACException(e.error()));
