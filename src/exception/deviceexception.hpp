@@ -14,7 +14,7 @@
 class DeviceException : public OSACException
 {
 public:
-    DeviceException(const std::string& message) : OSACException("Device::" + message) {};
+    DeviceException(const std::string& message) : OSACException("Device::" + message) {}
     virtual ~DeviceException() {}
 };
 

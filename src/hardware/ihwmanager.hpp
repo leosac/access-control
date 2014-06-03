@@ -19,11 +19,9 @@ class IHWManager
 {
 public:
     virtual ~IHWManager() {}
-    virtual void                start() = 0;
-    virtual void                stop() = 0;
-    virtual IDevice*            getDevice(const std::string& name) = 0;
-    virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) = 0;
-    virtual GPIO*               buildGPIO(int idx) = 0;
+    virtual void        start() = 0;
+    virtual void        stop() = 0;
+    virtual IDevice*    getDevice(const std::string& name) = 0;
 };
 
 #endif // IHWMANAGER_HPP

@@ -18,10 +18,11 @@
 #include <map>
 
 #include "igpioobservable.hpp"
+#include "igpioprovider.hpp"
 
 class IGPIOListener;
 
-class GPIOManager : public IGPIOObservable
+class GPIOManager : public IGPIOObservable, public IGPIOProvider
 {
     static const int            DefaultTimeout = 100;
     static const unsigned int   PollBufferSize = 64;
@@ -44,7 +45,7 @@ public:
 
 public:
     virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode) override; // NOTE call this BEFORE starting to poll
-    GPIO*           getGPIO(int idx);
+    virtual GPIO*   getGPIO(int gpioNo) override;
 
 public:
     void    startPolling();

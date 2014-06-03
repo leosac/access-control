@@ -9,11 +9,12 @@
 #include <sstream>
 #include <chrono>
 #include <ctime>
-#include <thread>
 
 #include "tools/log.hpp"
 
 #include "hardware/device/gpio/gpio.hpp" // FIXME Debug
+#include <hardware/device/led.hpp>
+#include <exception/moduleexception.hpp>
 
 DoorModule::DoorModule(ICore& core, const std::string& name)
 :   _listener(core),
@@ -66,10 +67,7 @@ void DoorModule::serialize(boost::property_tree::ptree& node)
         ptre.put<int>("<xmlattr>.end", _days[i].end);
         properties.add_child("day", ptre);
     }
-    if (_debugLed) // FIXME
-        properties.put<int>("gpio", _debugLed->getPinNo());
-    else
-        properties.put<int>("gpio", 0);
+    properties.put<std::string>("grantedLed", _grantedLedName);
 }
 
 void DoorModule::deserialize(const boost::property_tree::ptree& node)
@@ -87,23 +85,19 @@ void DoorModule::deserialize(const boost::property_tree::ptree& node)
         if (v.first == "day")
         {
             int idx = v.second.get<int>("<xmlattr>.idx", 0);
-            _days[idx].open = v.second.get<bool>("<xmlattr>.opened", false);
+            _days[idx].open = v.second.get<bool>("<xmlattr>.opened", true);
             _days[idx].start = v.second.get<int>("<xmlattr>.start", 0);
             _days[idx].end = v.second.get<int>("<xmlattr>.end", 24);
         }
     }
-    _debugLed = _hwmanager.buildGPIO(properties.get<int>("gpio"));
-    if (_debugLed) // FIXME
-        _debugLed->setDirection(GPIO::Out);
+    _grantedLedName = properties.get<std::string>("grantedLed");
+    if (!(_grantedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_grantedLedName))))
+        throw (ModuleException("could not retrieve device \'" + _grantedLedName + '\''));
 }
 
 void DoorModule::open()
 {
-    if (!_debugLed) // FIXME
-        return ;
-    _debugLed->setValue(true);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    _debugLed->setValue(false);
+    _grantedLed->blink(); // DEBUG
 }
 
 bool DoorModule::isDoorOpenable()

@@ -4,7 +4,7 @@ project(OSAC)
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(WARNING "In-source builds are not encouraged. Make a separate folder for building:\nmkdir build; cd build; cmake ..;cd ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
-endif(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+endif()
 
 # Force CMAKE_BUILD_TYPE
 if(CMAKE_BUILD_TYPE STREQUAL "")

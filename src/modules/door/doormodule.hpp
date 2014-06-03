@@ -9,7 +9,7 @@
 
 #include "modules/imodule.hpp"
 
-class GPIO; // FIXME Debug
+class Led;
 
 class DoorModule : public IModule
 {
@@ -41,7 +41,8 @@ private:
     IEventListener&     _listener;
     IHWManager&         _hwmanager;
     const std::string   _name;
-    GPIO*               _debugLed; // FIXME
+    Led*                _grantedLed;
+    std::string         _grantedLedName;
     Day                 _days[7];
 };
 

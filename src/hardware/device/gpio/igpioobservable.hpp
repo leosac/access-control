@@ -4,8 +4,8 @@
  * \brief interface for gpio poller
  */
 
-#ifndef IGPIOOBSERVALBE_HPP
-#define IGPIOOBSERVALBE_HPP
+#ifndef IGPIOOBSERVABLE_HPP
+#define IGPIOOBSERVABLE_HPP
 
 #include "gpio.hpp"
 
@@ -21,4 +21,4 @@ public:
     virtual void    registerListener(IGPIOListener* listener, int gpioNo, GPIO::EdgeMode mode = GPIO::Rising) = 0;
 };
 
-#endif // IGPIOOBSERVALBE_HPP
+#endif // IGPIOOBSERVABLE_HPP

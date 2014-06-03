@@ -14,7 +14,7 @@
 class FsException : public OSACException
 {
 public:
-    FsException(const std::string& message) : OSACException("Fs::" + message) {};
+    FsException(const std::string& message) : OSACException("Fs::" + message) {}
     virtual ~FsException() {}
 };
 

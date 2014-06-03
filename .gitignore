@@ -2,7 +2,7 @@
 
 #Ryp custom
 *.kdev4*
-*#*.bak
+*.bak
 
 #CMake related
 build

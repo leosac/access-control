@@ -14,7 +14,7 @@
 class ModuleException : public OSACException
 {
 public:
-    ModuleException(const std::string& message) : OSACException("Module::" + message) {};
+    ModuleException(const std::string& message) : OSACException("Module::" + message) {}
     virtual ~ModuleException() {}
 };
 

@@ -10,8 +10,7 @@
         <alias>reader</alias>
         <properties>
             <target>doorA</target>
-            <higpio>15</higpio>
-            <logpio>14</logpio>
+            <readerDevice>readerA</readerDevice>
         </properties>
     </module>
     <module file="libauthtest.so">
@@ -29,13 +28,13 @@
     <module file="libdoor.so">
         <alias>doorA</alias>
         <properties>
-            <gpio>18</gpio>
+            <grantedLed>led1</grantedLed>
         </properties>
     </module>
     <module file="libdoor.so">
         <alias>doorB</alias>
         <properties>
-            <gpio>17</gpio>
+            <grantedLed>led2</grantedLed>
         </properties>
     </module>
 </core>

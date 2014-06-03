@@ -11,7 +11,8 @@ set(OSAC_SRCS
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
     hardware/device/button.cpp
-    hardware/device/wiegandinterface.cpp
+    hardware/device/led.cpp
+    hardware/device/wiegandreader.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
     signal/signalhandler.cpp
