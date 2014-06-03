@@ -14,7 +14,7 @@
 class DynLibException : public OSACException
 {
 public:
-    DynLibException(const std::string& message) : OSACException("DynLib::" + message) {};
+    DynLibException(const std::string& message) : OSACException("DynLib::" + message) {}
     virtual ~DynLibException() {}
 };
 

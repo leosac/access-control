@@ -18,6 +18,7 @@ extern "C" {
 
 #include "exception/gpioexception.hpp"
 #include "igpiolistener.hpp"
+#include "tools/log.hpp"
 #include "tools/unixsyscall.hpp"
 
 static void launch(GPIOManager* instance)
@@ -73,6 +74,7 @@ void GPIOManager::pollLoop()
     int             ret;
     unsigned int    fdsetSize;
 
+    LOG() << "starting poller";
     buildFdSet();
     fdsetSize = _fdset.size();
     while (_isRunning)

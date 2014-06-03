@@ -8,8 +8,10 @@
 #define WIEGANDMODULE_HPP
 
 #include "modules/imodule.hpp"
-#include "hardware/device/wiegandinterface.hpp"
 #include "hardware/device/iwiegandlistener.hpp"
+
+class Led;
+class WiegandReader;
 
 class WiegandModule : public IModule, public IWiegandListener
 {
@@ -35,7 +37,8 @@ private:
     unsigned int        _loGPIO;
     std::string         _target;
     IHWManager&         _hwmanager;
-    WiegandInterface*   _interface;
+    WiegandReader*      _interface;
+    std::string         _interfaceName;
 };
 
 #endif // WIEGANDMODULE_HPP

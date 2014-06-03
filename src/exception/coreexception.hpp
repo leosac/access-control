@@ -14,7 +14,7 @@
 class CoreException : public OSACException
 {
 public:
-    CoreException(const std::string& message) : OSACException("Core::" + message) {};
+    CoreException(const std::string& message) : OSACException("Core::" + message) {}
     virtual ~CoreException() {}
 };
 

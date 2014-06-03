@@ -40,7 +40,6 @@ GPIO::GPIO(int pinNo/*, const std::string& sysfsName*/)
     _edgeFile(_path + '/' + EdgeFilename),
     _pollFd(-1)
 {
-    LOG() << "GPIO number " << _pinNo;
     if (!exists())
         exportGpio();
     LOG() << "Opening file " << _valueFile;
@@ -198,7 +197,6 @@ bool GPIO::exists()
     bool            rslt;
 
     rslt = gpio.good();
-    LOG() << "rslt=" << rslt;
     return (rslt);
 }
 

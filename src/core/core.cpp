@@ -91,7 +91,10 @@ void Core::deserialize(const boost::property_tree::ptree& node)
         if (v.first == "module")
         {
             IModule* module = loadModule(v.second.get<std::string>("<xmlattr>.file", "default"), v.second.get<std::string>("alias"));
+
+            LOG() << "module " << module->getName() << " created";
             module->deserialize(v.second);
+            LOG() << "module " << module->getName() << " deserialized";
         }
     }
     if (!_authModule)
@@ -102,9 +105,12 @@ void Core::deserialize(const boost::property_tree::ptree& node)
 void Core::run()
 {
     _hwconfig.deserialize();
-    _coreConfig.deserialize();
-    SignalHandler::registerCallback(this);
+    LOG() << "devices are up";
     _hwManager.start();
+    LOG() << "hwmanager started";
+    _coreConfig.deserialize();
+    LOG() << "core config loaded";
+    SignalHandler::registerCallback(this);
     LOG() << "starting core loop";
     _isRunning = true;
     while (_isRunning)

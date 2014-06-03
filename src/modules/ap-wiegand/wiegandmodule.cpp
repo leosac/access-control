@@ -8,6 +8,9 @@
 
 #include <sstream>
 
+#include "hardware/device/wiegandreader.hpp"
+#include "exception/moduleexception.hpp"
+
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _listener(core),
     _name(name),
@@ -47,24 +50,17 @@ IModule::ModuleType WiegandModule::getType() const
 
 void WiegandModule::serialize(boost::property_tree::ptree& node)
 {
-    boost::property_tree::ptree& child = node.add("properties", std::string());
+    boost::property_tree::ptree& properties = node.add("properties", std::string());
 
-    child.put("target", _target);
-    child.put("higpio", _hiGPIO);
-    child.put("logpio", _loGPIO);
-    delete _interface;
+    properties.put("target", _target);
+    properties.put("readerDevice", _interfaceName);
 }
 
 void WiegandModule::deserialize(const boost::property_tree::ptree& node)
 {
-    for (auto& v : node)
-    {
-        if (v.first == "properties")
-        {
-            _target = v.second.get<std::string>("target");
-            _hiGPIO = v.second.get<unsigned int>("higpio");
-            _loGPIO = v.second.get<unsigned int>("logpio");
-            _interface = _hwmanager.buildWiegandInterface(this, _hiGPIO, _loGPIO);
-        }
-    }
+    boost::property_tree::ptree properties = node.get_child("properties");
+
+    _interfaceName = properties.get<std::string>("readerDevice");
+    if (!(_interface = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_interfaceName))))
+        throw (ModuleException("could not get reader device"));
 }

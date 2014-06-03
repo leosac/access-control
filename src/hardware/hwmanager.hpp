@@ -13,7 +13,6 @@
 
 #include "iserializabledevice.hpp"
 #include "device/gpio/gpiomanager.hpp"
-#include "device/wiegandinterface.hpp"
 #include "device/iwiegandlistener.hpp"
 
 class HWManager : public IHWManager, public IXmlSerializable
@@ -35,20 +34,16 @@ public:
     virtual void deserialize(const boost::property_tree::ptree& node) override;
 
 public:
-    virtual void                start() override;
-    virtual void                stop() override;
-    virtual IDevice*            getDevice(const std::string& name) override;
-    virtual WiegandInterface*   buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx) override;
-    virtual GPIO*               buildGPIO(int idx) override;
+    virtual void        start() override;
+    virtual void        stop() override;
+    virtual IDevice*    getDevice(const std::string& name) override;
 
 private:
     ISerializableDevice*    buildDevice(const std::string& type);
 
 private:
+    GPIOManager                     _gpioManager;
     std::map<std::string, Device>   _devices;
-#ifndef NO_HW
-    GPIOManager                     _gpioManager; // FIXME Prefer iface
-#endif
 };
 
 #endif // HWMANAGER_HPP

@@ -15,7 +15,7 @@ public:
     enum class DeviceType {
         Led,
         Button,
-        Wiegand
+        WiegandReader
     };
 
 public:

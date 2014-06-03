@@ -10,7 +10,10 @@
 
 #include "exception/deviceexception.hpp"
 #include "tools/log.hpp"
+
 #include "device/button.hpp"
+#include "device/led.hpp"
+#include "device/wiegandreader.hpp"
 
 void HWManager::serialize(boost::property_tree::ptree& node)
 {
@@ -71,36 +74,14 @@ IDevice* HWManager::getDevice(const std::string& name)
     return (_devices.at(name).instance);
 }
 
-WiegandInterface* HWManager::buildWiegandInterface(IWiegandListener* listener, unsigned int hiGpioIdx, unsigned int loGpioIdx)
-{
-#ifdef NO_HW
-    static_cast<void>(listener);
-    static_cast<void>(hiGpioIdx);
-    static_cast<void>(loGpioIdx);
-    return (nullptr);
-#else
-    return (new WiegandInterface(_gpioManager, listener, hiGpioIdx, loGpioIdx));
-#endif
-}
-
-GPIO* HWManager::buildGPIO(int idx)
-{
-#ifdef NO_HW
-    static_cast<void>(idx);
-    return (nullptr);
-#else
-    return (_gpioManager.getGPIO(idx));
-#endif
-}
-
 ISerializableDevice* HWManager::buildDevice(const std::string& type)
 {
-// #ifdef NO_HW
-//         return (nullptr);
-// #endif
-
     if (type == "button")
         return (new Button);
+    else if (type == "wiegandreader")
+        return (new WiegandReader(_gpioManager));
+    else if (type == "led")
+        return (new Led(_gpioManager));
     else
         return (nullptr);
 }
