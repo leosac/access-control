@@ -21,12 +21,12 @@ const std::string& Led::getName() const
     return (_name);
 }
 
-void Led::serialize(boost::property_tree::ptree& node)
+void Led::serialize(ptree& node)
 {
     node.put<int>("gpio", _gpioNo);
 }
 
-void Led::deserialize(const boost::property_tree::ptree& node)
+void Led::deserialize(const ptree& node)
 {
     _gpioNo = node.get<int>("gpio");
     if (!(_gpio = _gpioProvider.getGPIO(_gpioNo)))

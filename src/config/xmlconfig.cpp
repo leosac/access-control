@@ -11,7 +11,6 @@
 
 #include "exception/configexception.hpp"
 
-using boost::property_tree::ptree;
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;
 using boost::property_tree::xml_writer_settings;

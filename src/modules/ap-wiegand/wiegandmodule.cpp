@@ -48,17 +48,17 @@ IModule::ModuleType WiegandModule::getType() const
     return (ModuleType::AccessPoint);
 }
 
-void WiegandModule::serialize(boost::property_tree::ptree& node)
+void WiegandModule::serialize(ptree& node)
 {
-    boost::property_tree::ptree& properties = node.add("properties", std::string());
+    ptree& properties = node.add("properties", std::string());
 
     properties.put("target", _target);
     properties.put("readerDevice", _interfaceName);
 }
 
-void WiegandModule::deserialize(const boost::property_tree::ptree& node)
+void WiegandModule::deserialize(const ptree& node)
 {
-    boost::property_tree::ptree properties = node.get_child("properties");
+    ptree properties = node.get_child("properties");
 
     _interfaceName = properties.get<std::string>("readerDevice");
     if (!(_interface = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_interfaceName))))

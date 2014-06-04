@@ -58,9 +58,9 @@ IModule::ModuleType RplethAuth::getType() const
     return (ModuleType::Auth);
 }
 
-void RplethAuth::serialize(boost::property_tree::ptree& node)
+void RplethAuth::serialize(ptree& node)
 {
-    boost::property_tree::ptree& child = node.add("properties", std::string());
+    ptree& child = node.add("properties", std::string());
 
     child.put("port", _port);
 
@@ -68,7 +68,7 @@ void RplethAuth::serialize(boost::property_tree::ptree& node)
     _networkThread.join();
 }
 
-void RplethAuth::deserialize(const boost::property_tree::ptree& node)
+void RplethAuth::deserialize(const ptree& node)
 {
     for (const auto& v : node)
     {

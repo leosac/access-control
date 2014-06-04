@@ -9,12 +9,14 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+using boost::property_tree::ptree;
+
 class IXmlSerializable
 {
 public:
     virtual ~IXmlSerializable() {}
-    virtual void    serialize(boost::property_tree::ptree& node) = 0;
-    virtual void    deserialize(const boost::property_tree::ptree& node) = 0;
+    virtual void    serialize(ptree& node) = 0;
+    virtual void    deserialize(const ptree& node) = 0;
 };
 
 #endif // IXMLSERIALIZABLE_HPP

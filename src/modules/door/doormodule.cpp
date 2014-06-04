@@ -53,13 +53,13 @@ IModule::ModuleType DoorModule::getType() const
     return (ModuleType::Door);
 }
 
-void DoorModule::serialize(boost::property_tree::ptree& node)
+void DoorModule::serialize(ptree& node)
 {
-    boost::property_tree::ptree& properties = node.add("properties", std::string());
+    ptree& properties = node.add("properties", std::string());
 
     for (std::size_t i = 0; i < 7; ++i)
     {
-        boost::property_tree::ptree ptre;
+        ptree ptre;
 
         ptre.put<int>("<xmlattr>.idx", i);
         ptre.put<bool>("<xmlattr>.opened", _days[i].open);
@@ -70,9 +70,9 @@ void DoorModule::serialize(boost::property_tree::ptree& node)
     properties.put<std::string>("grantedLed", _grantedLedName);
 }
 
-void DoorModule::deserialize(const boost::property_tree::ptree& node)
+void DoorModule::deserialize(const ptree& node)
 {
-    boost::property_tree::ptree properties = node.get_child("properties");
+    ptree properties = node.get_child("properties");
 
     for (std::size_t i = 0; i < 7; ++i)
     {
