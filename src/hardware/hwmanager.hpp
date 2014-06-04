@@ -30,8 +30,8 @@ public:
     HWManager& operator=(const HWManager& other) = delete;
 
 public:
-    virtual void serialize(boost::property_tree::ptree& node) override;
-    virtual void deserialize(const boost::property_tree::ptree& node) override;
+    virtual void serialize(ptree& node) override;
+    virtual void deserialize(const ptree& node) override;
 
 public:
     virtual void        start() override;

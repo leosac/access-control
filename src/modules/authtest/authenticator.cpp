@@ -9,21 +9,21 @@
 #include <sstream>
 #include <iomanip>
 
-void Authenticator::serialize(boost::property_tree::ptree& node)
+void Authenticator::serialize(ptree& node)
 {
-    boost::property_tree::ptree& child = node.add("auth", std::string());
+    ptree& child = node.add("auth", std::string());
 
     child.put("user", "test"); // FIXME
     for (const auto& csn : _csnList)
     {
-        boost::property_tree::ptree ptre;
+        ptree ptre;
 
         ptre.put(std::string(), serializeCard(csn));
         child.add_child("card", ptre);
     }
 }
 
-void Authenticator::deserialize(const boost::property_tree::ptree& node)
+void Authenticator::deserialize(const ptree& node)
 {
     for (const auto& v : node)
     {

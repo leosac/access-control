@@ -15,13 +15,13 @@
 #include "device/led.hpp"
 #include "device/wiegandreader.hpp"
 
-void HWManager::serialize(boost::property_tree::ptree& node)
+void HWManager::serialize(ptree& node)
 {
-    boost::property_tree::ptree hardware;
+    ptree hardware;
 
     for (auto& dev : _devices)
     {
-        boost::property_tree::ptree& devNode = hardware.add("device", std::string());
+        ptree& devNode = hardware.add("device", std::string());
 
         devNode.put("<xmlattr>.name", dev.first);
         devNode.put("<xmlattr>.type", dev.second.type);
@@ -32,9 +32,9 @@ void HWManager::serialize(boost::property_tree::ptree& node)
     _devices.clear();
 }
 
-void HWManager::deserialize(const boost::property_tree::ptree& node)
+void HWManager::deserialize(const ptree& node)
 {
-    boost::property_tree::ptree hardware = node.get_child("hardware");
+    ptree hardware = node.get_child("hardware");
 
     for (const auto& v : hardware)
     {

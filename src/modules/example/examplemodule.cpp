@@ -25,12 +25,12 @@ IModule::ModuleType ExampleModule::getType() const
     return (ModuleType::Logger);
 }
 
-void ExampleModule::serialize(boost::property_tree::ptree& node)
+void ExampleModule::serialize(ptree& node)
 {
     static_cast<void>(node);
 }
 
-void ExampleModule::deserialize(const boost::property_tree::ptree& node)
+void ExampleModule::deserialize(const ptree& node)
 {
     static_cast<void>(node);
 }

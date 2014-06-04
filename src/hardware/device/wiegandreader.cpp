@@ -42,13 +42,13 @@ const std::string& WiegandReader::getName() const
     return (_name);
 }
 
-void WiegandReader::serialize(boost::property_tree::ptree& node)
+void WiegandReader::serialize(ptree& node)
 {
     node.put<int>("higpio", _hiGpio);
     node.put<int>("logpio", _loGpio);
 }
 
-void WiegandReader::deserialize(const boost::property_tree::ptree& node)
+void WiegandReader::deserialize(const ptree& node)
 {
     _hiGpio = node.get<int>("higpio");
     _loGpio = node.get<int>("logpio");

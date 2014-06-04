@@ -23,8 +23,8 @@ public:
 
 public:
     virtual const std::string&  getName() const override;
-    virtual void                serialize(boost::property_tree::ptree& node) override;
-    virtual void                deserialize(const boost::property_tree::ptree& node) override;
+    virtual void                serialize(ptree& node) override;
+    virtual void                deserialize(const ptree& node) override;
 
 public:
     void    blink();

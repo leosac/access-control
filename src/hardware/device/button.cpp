@@ -15,12 +15,12 @@ const std::string& Button::getName() const
     return (_name);
 }
 
-void Button::serialize(boost::property_tree::ptree& node)
+void Button::serialize(ptree& node)
 {
     static_cast<void>(node); // FIXME
 }
 
-void Button::deserialize(const boost::property_tree::ptree& node)
+void Button::deserialize(const ptree& node)
 {
     static_cast<void>(node); // FIXME
 }

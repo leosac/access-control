@@ -58,15 +58,15 @@ void Core::handleSignal(int signal)
     }
 }
 
-void Core::serialize(boost::property_tree::ptree& node)
+void Core::serialize(ptree& node)
 {
-    boost::property_tree::ptree core;
+    ptree core;
 
     for (const auto& dir : _libsDirectories)
         core.add("plugindir", dir);
     for (const auto& module : _modules)
     {
-        boost::property_tree::ptree& child = core.add("module", std::string());
+        ptree& child = core.add("module", std::string());
 
         child.put("<xmlattr>.file", module.second.libname);
         child.put("alias", module.first);
@@ -78,7 +78,7 @@ void Core::serialize(boost::property_tree::ptree& node)
     unloadLibraries();
 }
 
-void Core::deserialize(const boost::property_tree::ptree& node)
+void Core::deserialize(const ptree& node)
 {
     for (const auto& v : node.get_child("core"))
     {

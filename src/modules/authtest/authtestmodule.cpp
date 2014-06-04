@@ -43,14 +43,14 @@ IModule::ModuleType AuthTestModule::getType() const
     return (ModuleType::Auth);
 }
 
-void AuthTestModule::serialize(boost::property_tree::ptree& node)
+void AuthTestModule::serialize(ptree& node)
 {
-    boost::property_tree::ptree& child = node.add("properties", std::string());
+    ptree& child = node.add("properties", std::string());
 
     _auth.serialize(child);
 }
 
-void AuthTestModule::deserialize(const boost::property_tree::ptree& node)
+void AuthTestModule::deserialize(const ptree& node)
 {
     _auth.deserialize(node.get_child("properties").get_child("auth"));
 }

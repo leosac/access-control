@@ -58,12 +58,12 @@ IModule::ModuleType JournalLogger::getType() const
     return (ModuleType::Logger);
 }
 
-void JournalLogger::serialize(boost::property_tree::ptree& node)
+void JournalLogger::serialize(ptree& node)
 {
     static_cast<void>(node);
 }
 
-void JournalLogger::deserialize(const boost::property_tree::ptree& node)
+void JournalLogger::deserialize(const ptree& node)
 {
     static_cast<void>(node);
 }
