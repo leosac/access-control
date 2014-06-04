@@ -6,9 +6,13 @@
 
 #include "button.hpp"
 
-IDevice::DeviceType Button::getType() const
+Button::Button(const std::string& name)
+:   _name(name)
+{}
+
+const std::string& Button::getName() const
 {
-    return (DeviceType::Button);
+    return (_name);
 }
 
 void Button::serialize(boost::property_tree::ptree& node)

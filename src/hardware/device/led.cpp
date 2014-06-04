@@ -11,13 +11,14 @@
 #include "hardware/device/gpio/gpio.hpp"
 #include "exception/moduleexception.hpp"
 
-Led::Led(IGPIOProvider& gpioProvider)
-:   _gpioProvider(gpioProvider)
+Led::Led(const std::string& name, IGPIOProvider& gpioProvider)
+:   _name(name),
+    _gpioProvider(gpioProvider)
 {}
 
-IDevice::DeviceType Led::getType() const
+const std::string& Led::getName() const
 {
-    return (DeviceType::Led);
+    return (_name);
 }
 
 void Led::serialize(boost::property_tree::ptree& node)

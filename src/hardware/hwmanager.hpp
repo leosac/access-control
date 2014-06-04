@@ -39,7 +39,7 @@ public:
     virtual IDevice*    getDevice(const std::string& name) override;
 
 private:
-    ISerializableDevice*    buildDevice(const std::string& type);
+    ISerializableDevice*    buildDevice(const std::string& type, const std::string& name);
 
 private:
     GPIOManager                     _gpioManager;

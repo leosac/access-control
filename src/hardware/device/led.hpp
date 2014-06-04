@@ -15,24 +15,25 @@ class GPIO;
 class Led : public ISerializableDevice
 {
 public:
-    explicit Led(IGPIOProvider& gpioProvider);
+    explicit Led(const std::string& name, IGPIOProvider& gpioProvider);
     ~Led() = default;
 
     Led(const Led& other) = delete;
     Led& operator=(const Led& other) = delete;
 
 public:
-    virtual void serialize(boost::property_tree::ptree& node) override;
-    virtual void deserialize(const boost::property_tree::ptree& node) override;
-    virtual DeviceType getType() const override;
+    virtual const std::string&  getName() const override;
+    virtual void                serialize(boost::property_tree::ptree& node) override;
+    virtual void                deserialize(const boost::property_tree::ptree& node) override;
 
 public:
     void    blink();
 
 private:
-    IGPIOProvider&  _gpioProvider;
-    int             _gpioNo;
-    GPIO*           _gpio;
+    const std::string   _name;
+    IGPIOProvider&      _gpioProvider;
+    int                 _gpioNo;
+    GPIO*               _gpio;
 };
 
 #endif // LED_HPP

@@ -8,8 +8,9 @@
 
 #include <cstring>
 
-WiegandReader::WiegandReader(IGPIOObservable& gpioProvider)
-:   _gpioProvider(gpioProvider)
+WiegandReader::WiegandReader(const std::string& name, IGPIOObservable& gpioProvider)
+:   _name(name),
+    _gpioProvider(gpioProvider)
 {}
 
 void WiegandReader::notify(int gpioNo)
@@ -36,9 +37,9 @@ void WiegandReader::timeout()
     }
 }
 
-IDevice::DeviceType WiegandReader::getType() const
+const std::string& WiegandReader::getName() const
 {
-    return (IDevice::DeviceType::WiegandReader);
+    return (_name);
 }
 
 void WiegandReader::serialize(boost::property_tree::ptree& node)

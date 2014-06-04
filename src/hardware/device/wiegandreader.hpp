@@ -25,7 +25,7 @@ class WiegandReader : public IGPIOListener, public ISerializableDevice
     static const int    DataBufferSize = 10;
 
 public:
-    explicit WiegandReader(IGPIOObservable& gpioProvider);
+    explicit WiegandReader(const std::string& name, IGPIOObservable& gpioProvider);
     ~WiegandReader() = default;
 
     WiegandReader(const WiegandReader& other) = delete;
@@ -36,14 +36,15 @@ public:
     virtual void        timeout() override;
 
 public:
-    virtual DeviceType  getType() const override;
-    virtual void        serialize(boost::property_tree::ptree& node) override;
-    virtual void        deserialize(const boost::property_tree::ptree& node) override;
+    virtual const std::string&  getName() const override;
+    virtual void                serialize(boost::property_tree::ptree& node) override;
+    virtual void                deserialize(const boost::property_tree::ptree& node) override;
 
 private:
     void    reset();
 
 private:
+    const std::string               _name;
     std::list<IWiegandListener*>    _listener;
     IGPIOObservable&                _gpioProvider;
     Byte                            _buffer[DataBufferSize];

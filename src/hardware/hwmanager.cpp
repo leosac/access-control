@@ -24,7 +24,7 @@ void HWManager::serialize(boost::property_tree::ptree& node)
         boost::property_tree::ptree& devNode = hardware.add("device", std::string());
 
         devNode.put("<xmlattr>.name", dev.first);
-        devNode.put("<xmlattr>.type", dev.second.type); // FIXME
+        devNode.put("<xmlattr>.type", dev.second.type);
         dev.second.instance->serialize(devNode);
         delete dev.second.instance;
     }
@@ -44,7 +44,7 @@ void HWManager::deserialize(const boost::property_tree::ptree& node)
             std::string             name(v.second.get<std::string>("<xmlattr>.name"));
             std::string             type(v.second.get<std::string>("<xmlattr>.type"));
 
-            if (!(dev.instance = buildDevice(type)))
+            if (!(dev.instance = buildDevice(type, name)))
                 throw (DeviceException("unable to load device of type \'" + type + '\''));
             dev.type = type;
             if (_devices.count(name) > 0)
@@ -74,14 +74,14 @@ IDevice* HWManager::getDevice(const std::string& name)
     return (_devices.at(name).instance);
 }
 
-ISerializableDevice* HWManager::buildDevice(const std::string& type)
+ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::string& name)
 {
     if (type == "button")
-        return (new Button);
+        return (new Button(name));
     else if (type == "wiegandreader")
-        return (new WiegandReader(_gpioManager));
+        return (new WiegandReader(name, _gpioManager));
     else if (type == "led")
-        return (new Led(_gpioManager));
+        return (new Led(name, _gpioManager));
     else
         return (nullptr);
 }
