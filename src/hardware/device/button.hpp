@@ -13,20 +13,21 @@ class GPIO;
 class Button : public ISerializableDevice
 {
 public:
-    explicit Button() = default;
+    explicit Button(const std::string& name);
     ~Button() = default;
 
     Button(const Button& other) = delete;
     Button& operator=(const Button& other) = delete;
 
 public:
-    virtual IDevice::DeviceType getType() const override;
+    virtual const std::string&  getName() const override;
     virtual void                serialize(boost::property_tree::ptree& node) override;
     virtual void                deserialize(const boost::property_tree::ptree& node) override;
 
 private:
-    int     _gpioNo;
-    GPIO*   _gpio;
+    const std::string   _name;
+    int                 _gpioNo;
+    GPIO*               _gpio;
 };
 
 #endif // BUTTON_HPP

@@ -14,9 +14,9 @@ class ISerializableDevice : public IDevice, public IXmlSerializable
 {
 public:
     virtual ~ISerializableDevice() {}
-    virtual DeviceType  getType() const override = 0;
-    virtual void        serialize(boost::property_tree::ptree& node) override = 0;
-    virtual void        deserialize(const boost::property_tree::ptree& node) override = 0;
+    virtual const std::string&  getName() const override = 0;
+    virtual void                serialize(boost::property_tree::ptree& node) override = 0;
+    virtual void                deserialize(const boost::property_tree::ptree& node) override = 0;
 };
 
 #endif // ISERIALIZABLEDEVICE_HPP
