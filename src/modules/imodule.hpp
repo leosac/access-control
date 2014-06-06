@@ -12,7 +12,7 @@
 
 #include <string>
 
-class IModule : public IEventListener, public IXmlSerializable
+class IModule : public IXmlSerializable
 {
 public:
     typedef IModule* (*InitFunc)(ICore&, const std::string&);

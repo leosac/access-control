@@ -8,6 +8,7 @@
 #define JOURNALLOGGER_HPP
 
 #include "modules/imodule.hpp"
+#include "core/event.hpp"
 
 class JournalLogger : public IModule
 {
@@ -19,7 +20,6 @@ public:
     JournalLogger& operator=(const JournalLogger& other) = delete;
 
 public:
-    virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;

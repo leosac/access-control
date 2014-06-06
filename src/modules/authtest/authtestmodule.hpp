@@ -17,21 +17,20 @@ public:
     typedef std::vector<Byte> CardId;
 
 public:
-    explicit AuthTestModule(IEventListener& listener, const std::string& name);
+    explicit AuthTestModule(ICore& listener, const std::string& name);
     ~AuthTestModule() = default;
 
     AuthTestModule(const AuthTestModule& other) = delete;
     AuthTestModule& operator=(const AuthTestModule& other) = delete;
 
 public:
-    virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
 
 private:
-    IEventListener&         _listener;
+    ICore&                  _core;
     Authenticator           _auth;
     const std::string       _name;
 };

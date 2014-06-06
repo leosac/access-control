@@ -24,14 +24,13 @@ public:
 
 public:
     virtual void                notifyCardRead(const CardId& cardId) override;
-    virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
 
 private:
-    IEventListener&     _listener;
+    ICore&              _listener;
     const std::string   _name;
     unsigned int        _hiGPIO;
     unsigned int        _loGPIO;

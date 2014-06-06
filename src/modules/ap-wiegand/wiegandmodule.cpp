@@ -30,12 +30,7 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             oss << ' ';
         oss << static_cast<unsigned int>(cardId[i]);
     }
-    _listener.notify(Event(oss.str(), _name, _target));
-}
-
-void WiegandModule::notify(const Event& event)
-{
-    static_cast<void>(event);
+    // DO SOMETHING FIXME
 }
 
 const std::string& WiegandModule::getName() const

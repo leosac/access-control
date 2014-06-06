@@ -12,11 +12,11 @@
 #include <tclap/CmdLine.h>
 
 #include "osac.hpp"
-#include "tools/unixfs.hpp"
 #include "tools/log.hpp"
+#include "tools/runtimeoptions.hpp"
+#include "tools/unixfs.hpp"
 #include "core/core.hpp"
 #include "exception/osacexception.hpp"
-#include "runtimeoptions.hpp"
 
 static const std::string  DefaultCoreCfg = UnixFs::getCWD() + "/cfg/default.xml";
 static const std::string  DefaultHwCfg = UnixFs::getCWD() + "/cfg/hardware.xml";

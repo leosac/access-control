@@ -17,31 +17,10 @@
 #include <exception/moduleexception.hpp>
 
 DoorModule::DoorModule(ICore& core, const std::string& name)
-:   _listener(core),
+:   _core(core),
     _hwmanager(core.getHWManager()),
     _name(name)
 {}
-
-void DoorModule::notify(const Event& event)
-{
-    std::istringstream  iss(event.message);
-    std::string         uidstr;
-    std::string         code;
-    std::string         csn;
-
-    iss >> uidstr;
-    iss >> code;
-    std::getline(iss, csn);
-    if (code == "request")
-    {
-        if (!isDoorOpenable())
-            _listener.notify(Event(uidstr + " denied", _name));
-        else
-            _listener.notify(Event(uidstr + " askauth " + csn, _name));
-    }
-    else if (code == "open")
-        open();
-}
 
 const std::string& DoorModule::getName() const
 {

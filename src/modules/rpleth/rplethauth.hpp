@@ -33,14 +33,13 @@ public:
     typedef std::vector<Byte> CardId;
 
 public:
-    explicit RplethAuth(IEventListener& listener, const std::string& name);
+    explicit RplethAuth(ICore& core, const std::string& name);
     ~RplethAuth() = default;
 
     RplethAuth(const RplethAuth& other) = delete;
     RplethAuth& operator=(const RplethAuth& other) = delete;
 
 public:
-    virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
@@ -55,7 +54,7 @@ private:
     void                handleCardIdQueue();
 
 private:
-    IEventListener&         _listener;
+    ICore&                  _core;
     const std::string       _name;
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;

@@ -7,14 +7,14 @@
 #ifndef ICORE_HPP
 #define ICORE_HPP
 
-#include "modules/ieventlistener.hpp"
 #include "hardware/ihwmanager.hpp"
 
-class ICore : public IEventListener
+class ICore
 {
 public:
     virtual ~ICore() {}
     virtual IHWManager& getHWManager() = 0;
+//     virtual void    sendAuthRequest(AuthRequest& request);
 };
 
 #endif // ICORE_HPP

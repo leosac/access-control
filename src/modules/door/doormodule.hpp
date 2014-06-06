@@ -27,7 +27,6 @@ public:
     DoorModule& operator=(const DoorModule& other) = delete;
 
 public:
-    virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
@@ -38,7 +37,7 @@ private:
     bool    isDoorOpenable();
 
 private:
-    IEventListener&     _listener;
+    ICore&              _core;
     IHWManager&         _hwmanager;
     const std::string   _name;
     Led*                _grantedLed;
