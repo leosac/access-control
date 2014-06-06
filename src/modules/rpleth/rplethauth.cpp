@@ -18,8 +18,8 @@ static void launch(RplethAuth* instance)
     instance->run();
 }
 
-RplethAuth::RplethAuth(IEventListener& listener, const std::string& name)
-:   _listener(listener),
+RplethAuth::RplethAuth(ICore& core, const std::string& name)
+:   _core(core),
     _name(name),
     _isRunning(true),
     _serverSocket(nullptr),
@@ -27,26 +27,6 @@ RplethAuth::RplethAuth(IEventListener& listener, const std::string& name)
     _fdMax(0),
     _timeout(DefaultTimeoutMs)
 {}
-
-void RplethAuth::notify(const Event& event)
-{
-    std::istringstream  iss(event.message);
-    CardId              cid;
-    unsigned int        val;
-    std::string         uidstr;
-    std::string         opcode;
-
-    iss >> uidstr;
-    iss >> opcode;
-
-    while (iss >> val)
-        cid.push_back(static_cast<Byte>(val));
-
-    std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
-    _cardIdQueue.push(cid);
-
-    _listener.notify(Event(uidstr + " granted", _name));
-}
 
 const std::string& RplethAuth::getName() const
 {
@@ -99,18 +79,16 @@ void RplethAuth::run()
             {
                 if (FD_ISSET(it->socket->getHandle(), &_rSet))
                 {
-                    try
-                    {
+                    try {
                         readRet = it->socket->recv(_buffer, RingBufferSize);
                         it->buffer.write(_buffer, readRet);
                         handleClientMessage(*it);
                     }
-                    catch (const ModuleException& e)
-                    {
+                    catch (const ModuleException& e) {
                         it->socket->close();
                         delete it->socket;
                         _clients.erase(it);
-                        _listener.notify(Event("Client disconnected", "Auth"));
+//                         _core.notify(Event("Client disconnected", "Auth"));
                         break;
                     }
                 }
@@ -118,7 +96,7 @@ void RplethAuth::run()
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
                 _clients.push_back(Client(_serverSocket->accept()));
-                _listener.notify(Event("Client connected", "Auth"));
+//                 _core.notify(Event("Client connected", "Auth"));
             }
         }
     }

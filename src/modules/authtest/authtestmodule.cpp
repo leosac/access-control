@@ -8,30 +8,10 @@
 
 #include <sstream>
 
-AuthTestModule::AuthTestModule(IEventListener& listener, const std::string& name)
-:   _listener(listener),
+AuthTestModule::AuthTestModule(ICore& core, const std::string& name)
+:   _core(core),
     _name(name)
 {}
-
-void AuthTestModule::notify(const Event& event)
-{
-    std::istringstream  iss(event.message);
-    CardId              cid;
-    unsigned int        val;
-    std::string         uidstr;
-    std::string         opcode;
-
-    iss >> uidstr;
-    iss >> opcode;
-
-    while (iss >> val)
-        cid.push_back(static_cast<Byte>(val));
-
-    if (_auth.hasAccess(cid))
-        _listener.notify(Event(uidstr + " granted", _name));
-    else
-        _listener.notify(Event(uidstr + " denied", _name));
-}
 
 const std::string& AuthTestModule::getName() const
 {

@@ -15,7 +15,7 @@ JournalLogger::JournalLogger(const std::string& name, Event::LogLevel logLevel)
 :   _name(name),
     _logLevel(logLevel)
 {}
-
+/*
 void JournalLogger::notify(const Event& event)
 {
     std::ostringstream  oss;
@@ -46,7 +46,7 @@ void JournalLogger::notify(const Event& event)
     if (!event.source.empty())
         std::clog << event.source << " said ";
     std::clog << '\"' << event.message << '\"' << std::endl;
-}
+}*/
 
 const std::string& JournalLogger::getName() const
 {

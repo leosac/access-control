@@ -19,7 +19,6 @@ public:
     ExampleModule& operator=(const ExampleModule& other) = delete;
 
 public:
-    virtual void                notify(const Event& event) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;

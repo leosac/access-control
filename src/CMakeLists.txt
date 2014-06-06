@@ -3,11 +3,10 @@ set(OSAC_BIN osac)
 set(OSAC_SRCS
     main.cpp
     osac.cpp
-    runtimeoptions.cpp
     config/xmlconfig.cpp
-    core/authrequest.cpp
     core/core.cpp
     core/event.cpp
+    core/modulemanager.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
     hardware/device/button.cpp
@@ -16,6 +15,7 @@ set(OSAC_SRCS
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
     signal/signalhandler.cpp
+    tools/runtimeoptions.cpp
     tools/version.cpp
     tools/unixsyscall.cpp
     tools/unixfs.cpp
