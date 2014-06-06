@@ -14,7 +14,6 @@
 #include <atomic>
 #include <mutex>
 
-#include "event.hpp"
 #include "icore.hpp"
 #include "modulemanager.hpp"
 #include "hardware/hwmanager.hpp"
