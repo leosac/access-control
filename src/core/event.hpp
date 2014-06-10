@@ -10,6 +10,8 @@
 #include <string>
 #include <chrono>
 
+using std::chrono::system_clock;
+
 class Event
 {
 public:
@@ -19,7 +21,6 @@ public:
         Info,
         Debug
     };
-    typedef std::chrono::system_clock::time_point Date;
 
 public:
     explicit Event(const std::string& msg, const std::string& src = std::string(), const std::string& dest = std::string(), LogLevel level = LogLevel::Debug);
@@ -32,11 +33,11 @@ public:
     static const std::string&   getLogLevelString(Event::LogLevel level);
 
 public:
-    std::string         message;
-    std::string         source;
-    std::string         destination;
-    LogLevel            logLevel;
-    Date                date;
+    std::string                 message;
+    std::string                 source;
+    std::string                 destination;
+    LogLevel                    logLevel;
+    system_clock::time_point    date;
 };
 
 #endif // EVENT_HPP

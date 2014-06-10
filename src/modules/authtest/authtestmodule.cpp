@@ -34,3 +34,8 @@ void AuthTestModule::deserialize(const ptree& node)
 {
     _auth.deserialize(node.get_child("properties").get_child("auth"));
 }
+
+void AuthTestModule::authenticate(const AuthRequest& ar)
+{
+    static_cast<void>(ar);
+}

@@ -4,6 +4,8 @@ set(OSAC_SRCS
     main.cpp
     osac.cpp
     config/xmlconfig.cpp
+    core/authprotocol.cpp
+    core/authrequest.cpp
     core/core.cpp
     core/event.cpp
     core/modulemanager.cpp
@@ -38,6 +40,10 @@ set_target_properties(${OSAC_BIN} PROPERTIES
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${OSAC_BIN} dl pthread ${Boost_LIBRARIES})
+
+install(FILES ${OSAC_BIN} DESTINATION bin/osac)
+install(DIRECTORY . DESTINATION bin/osac FILES_MATCHING PATTERN "*.so")
+install(DIRECTORY cfg DESTINATION share/osac FILES_MATCHING PATTERN "*.xml")
 
 # Build modules
 if(NOT NO_MODULE)
