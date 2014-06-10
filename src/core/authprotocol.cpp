@@ -21,30 +21,42 @@ AuthProtocol::AuthProtocol()
     _registrationHandler[IModule::ModuleType::ActivityMonitor] = &AuthProtocol::registerActivityMonitorModule;
 }
 
+void AuthProtocol::logMessage(const std::string& message)
+{
+    for (auto logger : _loggerModules)
+        logger->log(message);
+}
+
 void AuthProtocol::createAuthRequest(const std::string& content, const std::string& target)
 {
     AuthRequest ar(_authCounter, content, target);
 
-    _requestList.emplace(_authCounter, ar);
+    _requests.emplace(_authCounter, ar);
     ++_authCounter;
 }
 
 void AuthProtocol::authorize(AuthRequest::Uid id, bool granted)
 {
-    // TODO
+    try {
+        AuthRequest&    ar(_requests.at(id));
 
-    static_cast<void>(id);
-    static_cast<void>(granted);
+        // TODO
+        static_cast<void>(granted);
+        ar.setState(AuthRequest::Closed);
+    }
+    catch (const std::logic_error& e) {
+        // TODO
+    }
 }
 
 void AuthProtocol::sync()
 {
-    for (auto it = _requestList.begin(); it != _requestList.end();)
+    for (auto it = _requests.begin(); it != _requests.end();)
     {
         AuthRequest& ar(it->second);
 
         if (ar.getState() == AuthRequest::Closed)
-            it = _requestList.erase(it);
+            it = _requests.erase(it);
         else
         {
             processAuthRequest(ar);
@@ -52,9 +64,6 @@ void AuthProtocol::sync()
         }
     }
 }
-
-//     if (!_authModule)
-//         throw (CoreException("No auth module loaded"));
 
 void AuthProtocol::registerModule(IModule* module)
 {

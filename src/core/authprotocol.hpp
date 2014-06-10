@@ -29,8 +29,9 @@ public:
     AuthProtocol& operator=(const AuthProtocol& other) = delete;
 
 public:
-    void    createAuthRequest(const std::string& content, const std::string& target) override;
-    void    authorize(AuthRequest::Uid id, bool granted) override;
+    virtual void    logMessage(const std::string& message) override;
+    virtual void    createAuthRequest(const std::string& content, const std::string& target) override;
+    virtual void    authorize(AuthRequest::Uid id, bool granted) override;
 
 public:
     void    sync();
@@ -46,7 +47,7 @@ private:
 
 private:
     AuthRequest::Uid                            _authCounter;
-    std::map<AuthRequest::Uid, AuthRequest>     _requestList;
+    std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
     IAuthModule*                                _authModule;
