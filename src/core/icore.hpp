@@ -17,7 +17,7 @@ class ICore
 public:
     virtual ~ICore() {}
     virtual IHWManager&     getHWManager() = 0;
-    virtual IAuthProtocol&   getAuthProtocol() = 0;
+    virtual IAuthProtocol&  getAuthProtocol() = 0;
 };
 
 #endif // ICORE_HPP

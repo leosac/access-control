@@ -17,7 +17,7 @@ public:
     typedef std::vector<Byte> CardId;
 
 public:
-    explicit AuthTestModule(ICore& listener, const std::string& name);
+    explicit AuthTestModule(ICore& core, const std::string& name);
     ~AuthTestModule() = default;
 
     AuthTestModule(const AuthTestModule& other) = delete;

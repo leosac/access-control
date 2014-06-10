@@ -13,7 +13,7 @@ class ILoggerModule : public IModule
 {
 public:
     virtual ~ILoggerModule() {}
-    virtual void    log(const std::string& message) = 0; // FIXME
+    virtual void    log(const std::string& message) = 0;
 };
 
 #endif // ILOGGERMODULE_HPP

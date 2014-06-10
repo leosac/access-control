@@ -11,7 +11,6 @@
 #include <ctime>
 
 #include "tools/log.hpp"
-#include "core/icore.hpp"
 
 #include "hardware/device/gpio/gpio.hpp" // FIXME Debug
 #include "hardware/device/led.hpp"
@@ -82,11 +81,11 @@ void DoorModule::open()
 
 bool DoorModule::isDoorOpenable()
 {
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    std::time_t     tt = std::chrono::system_clock::to_time_t(now);
-    std::tm         local_tm = *std::localtime(&tt);
-    int             day = local_tm.tm_wday;
-    int             hour = local_tm.tm_hour;
+    system_clock::time_point    now = system_clock::now();
+    std::time_t                 tt = system_clock::to_time_t(now);
+    std::tm                     local_tm = *std::localtime(&tt);
+    int                         day = local_tm.tm_wday;
+    int                         hour = local_tm.tm_hour;
 
     if (!_days[day].open)
     {
