@@ -35,12 +35,11 @@ public:
     Core& operator=(const Core& other) = delete;
 
 public:
-    virtual IHWManager& getHWManager() override;
-    virtual void        sendAuthRequest(const std::string& request) override;
-    virtual void        authorize(AuthRequest::Uid id, bool granted) override;
-    virtual void        handleSignal(int signal) override;
-    virtual void        serialize(ptree& node) override;
-    virtual void        deserialize(const ptree& node) override;
+    virtual IHWManager&     getHWManager() override;
+    virtual AuthProtocol&   getAuthProtocol() override;
+    virtual void            handleSignal(int signal) override;
+    virtual void            serialize(ptree& node) override;
+    virtual void            deserialize(const ptree& node) override;
 
 public:
     void    run();

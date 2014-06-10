@@ -6,9 +6,10 @@
 
 #include "authrequest.hpp"
 
-AuthRequest::AuthRequest(Uid id, const std::string& content)
+AuthRequest::AuthRequest(Uid id, const std::string& content, const std::string& target)
 :   _uid(id),
     _content(content),
+    _target(target),
     _state(0),
     _date(system_clock::now())
 {}

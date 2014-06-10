@@ -34,14 +34,9 @@ IHWManager& Core::getHWManager()
     return (_hwManager);
 }
 
-void Core::sendAuthRequest(const std::string& request)
+AuthProtocol& Core::getAuthProtocol()
 {
-    _authProtocol.createAuthRequest(request);
-}
-
-void Core::authorize(AuthRequest::Uid id, bool granted)
-{
-    // TODO
+    return (_authProtocol);
 }
 
 void Core::handleSignal(int signal)
