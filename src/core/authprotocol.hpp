@@ -12,12 +12,12 @@
 #include <list>
 
 #include "modules/imodule.hpp"
-#include "authrequest.hpp"
+#include "iauthprotocol.hpp"
 
 class IAuthModule;
 class ILoggerModule;
 
-class AuthProtocol
+class AuthProtocol : public IAuthProtocol
 {
     typedef void (AuthProtocol::*RegisterFunc)(IModule*);
 
@@ -29,13 +29,15 @@ public:
     AuthProtocol& operator=(const AuthProtocol& other) = delete;
 
 public:
-    void    createAuthRequest(const std::string& content);
+    void    createAuthRequest(const std::string& content, const std::string& target) override;
+    void    authorize(AuthRequest::Uid id, bool granted) override;
 
 public:
     void    sync();
     void    registerModule(IModule* module);
 
 private:
+    void    processAuthRequest(AuthRequest& ar);
     void    registerDoorModule(IModule* module);
     void    registerAccessPointModule(IModule* module);
     void    registerAuthModule(IModule* module);

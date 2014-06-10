@@ -23,7 +23,7 @@ public:
     };
 
 public:
-    explicit AuthRequest(Uid id, const std::string& content);
+    explicit AuthRequest(Uid id, const std::string& content, const std::string& target);
     ~AuthRequest() = default;
 
     AuthRequest(const AuthRequest& other) = default;
@@ -39,6 +39,7 @@ public:
 private:
     Uid                         _uid;
     std::string                 _content;
+    std::string                 _target;
     int                         _state;
     system_clock::time_point    _date;
 };

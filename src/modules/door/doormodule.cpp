@@ -11,10 +11,11 @@
 #include <ctime>
 
 #include "tools/log.hpp"
+#include "core/icore.hpp"
 
 #include "hardware/device/gpio/gpio.hpp" // FIXME Debug
-#include <hardware/device/led.hpp>
-#include <exception/moduleexception.hpp>
+#include "hardware/device/led.hpp"
+#include "exception/moduleexception.hpp"
 
 DoorModule::DoorModule(ICore& core, const std::string& name)
 :   _core(core),

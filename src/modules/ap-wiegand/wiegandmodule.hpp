@@ -9,6 +9,7 @@
 
 #include "modules/imodule.hpp"
 #include "hardware/device/iwiegandlistener.hpp"
+#include "hardware/ihwmanager.hpp"
 
 class Led;
 class WiegandReader;

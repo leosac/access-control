@@ -21,12 +21,20 @@ AuthProtocol::AuthProtocol()
     _registrationHandler[IModule::ModuleType::ActivityMonitor] = &AuthProtocol::registerActivityMonitorModule;
 }
 
-void AuthProtocol::createAuthRequest(const std::string& content)
+void AuthProtocol::createAuthRequest(const std::string& content, const std::string& target)
 {
-    AuthRequest ar(_authCounter, content);
+    AuthRequest ar(_authCounter, content, target);
 
     _requestList.emplace(_authCounter, ar);
     ++_authCounter;
+}
+
+void AuthProtocol::authorize(AuthRequest::Uid id, bool granted)
+{
+    // TODO
+
+    static_cast<void>(id);
+    static_cast<void>(granted);
 }
 
 void AuthProtocol::sync()
@@ -39,7 +47,7 @@ void AuthProtocol::sync()
             it = _requestList.erase(it);
         else
         {
-            // FIXME
+            processAuthRequest(ar);
             ++it;
         }
     }
@@ -55,6 +63,11 @@ void AuthProtocol::registerModule(IModule* module)
     if (!func)
         throw (AuthProtocolException("Unknown module type"));
     ((*this).*func)(module);
+}
+
+void AuthProtocol::processAuthRequest(AuthRequest& ar)
+{
+    static_cast<void>(ar);
 }
 
 void AuthProtocol::registerDoorModule(IModule* /*module*/) {}
