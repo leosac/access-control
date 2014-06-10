@@ -44,6 +44,7 @@ public:
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
+    virtual void                authenticate(const AuthRequest& ar) override;
 
 public:
     void                run();

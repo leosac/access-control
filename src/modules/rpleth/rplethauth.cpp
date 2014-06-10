@@ -58,6 +58,20 @@ void RplethAuth::deserialize(const ptree& node)
     _networkThread = std::thread(&launch, this);
 }
 
+void RplethAuth::authenticate(const AuthRequest& ar)
+{
+    std::istringstream          iss(ar.getContent());
+    CardId                      cid;
+    unsigned int                byte;
+    std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
+
+    while (iss >> byte)
+        cid.push_back(static_cast<Byte>(byte));
+
+    _cardIdQueue.push(cid);
+    _core.authorize(ar.getId(), true);
+}
+
 void RplethAuth::run()
 {
     std::size_t     readRet;

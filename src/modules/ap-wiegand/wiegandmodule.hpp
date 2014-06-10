@@ -30,7 +30,7 @@ public:
     virtual void                deserialize(const ptree& node) override;
 
 private:
-    ICore&              _listener;
+    ICore&              _core;
     const std::string   _name;
     unsigned int        _hiGPIO;
     unsigned int        _loGPIO;

@@ -12,7 +12,7 @@
 #include "exception/moduleexception.hpp"
 
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
-:   _listener(core),
+:   _core(core),
     _name(name),
     _hiGPIO(0),
     _loGPIO(0),
@@ -22,7 +22,7 @@ WiegandModule::WiegandModule(ICore& core, const std::string& name)
 
 void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
 {
-    std::ostringstream  oss;
+    std::ostringstream  oss; // FIXME encode in xml
 
     for (std::size_t i = 0; i < cardId.size(); ++i)
     {
@@ -30,7 +30,7 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             oss << ' ';
         oss << static_cast<unsigned int>(cardId[i]);
     }
-    // DO SOMETHING FIXME
+    _core.sendAuthRequest(oss.str());
 }
 
 const std::string& WiegandModule::getName() const

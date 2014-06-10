@@ -76,7 +76,7 @@ void Authenticator::deserializeCard(const std::string& card)
     std::string         csnString(card);
     std::istringstream  iss;
     CSN                 csn;
-    unsigned            byte;
+    unsigned int        byte;
 
     std::replace(csnString.begin(), csnString.end(), ':', ' ');
     iss.str(csnString);
