@@ -48,3 +48,8 @@ const std::string& AuthRequest::getContent() const
 {
     return (_content);
 }
+
+system_clock::time_point AuthRequest::getDate()
+{
+    return (_date);
+}

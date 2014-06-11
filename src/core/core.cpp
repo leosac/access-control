@@ -41,8 +41,7 @@ ModuleProtocol& Core::getModuleProtocol()
 
 void Core::handleSignal(int signal)
 {
-    if (_isRunning)
-        _isRunning = false;
+    _isRunning = false;
     LOG() << "caught signal (" << signal << ')';
 }
 
