@@ -10,14 +10,14 @@
 #include <string>
 
 #include "hardware/ihwmanager.hpp"
-#include "iauthprotocol.hpp"
+#include "imoduleprotocol.hpp"
 
 class ICore
 {
 public:
     virtual ~ICore() {}
-    virtual IHWManager&     getHWManager() = 0;
-    virtual IAuthProtocol&  getAuthProtocol() = 0;
+    virtual IHWManager&         getHWManager() = 0;
+    virtual IModuleProtocol&    getModuleProtocol() = 0;
 };
 
 #endif // ICORE_HPP

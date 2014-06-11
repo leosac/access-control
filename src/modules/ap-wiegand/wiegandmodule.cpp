@@ -10,7 +10,7 @@
 
 #include "hardware/device/wiegandreader.hpp"
 #include "exception/moduleexception.hpp"
-#include "core/authprotocol.hpp"
+#include "core/moduleprotocol.hpp"
 
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _core(core),
@@ -31,7 +31,7 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             oss << ' ';
         oss << static_cast<unsigned int>(cardId[i]);
     }
-    _core.getAuthProtocol().createAuthRequest(oss.str(), _target);
+    _core.getModuleProtocol().createAuthRequest(oss.str(), _target);
 }
 
 const std::string& WiegandModule::getName() const

@@ -69,7 +69,7 @@ void RplethAuth::authenticate(const AuthRequest& ar)
         cid.push_back(static_cast<Byte>(byte));
 
     _cardIdQueue.push(cid);
-    _core.getAuthProtocol().authorize(ar.getId(), true);
+    _core.getModuleProtocol().authorize(ar.getId(), true);
 }
 
 void RplethAuth::run()
