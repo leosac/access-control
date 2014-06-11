@@ -11,9 +11,8 @@
 #include <ctime>
 #include <chrono>
 
-JournalLogger::JournalLogger(const std::string& name, Event::LogLevel logLevel)
-:   _name(name),
-    _logLevel(logLevel)
+JournalLogger::JournalLogger(const std::string& name)
+:   _name(name)
 {}
 /*
 void JournalLogger::notify(const Event& event)
