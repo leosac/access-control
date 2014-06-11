@@ -30,13 +30,14 @@ public:
     AuthRequest& operator=(const AuthRequest& other) = default;
 
 public:
-    bool                operator<(const AuthRequest& other) const;
-    int                 getState() const;
-    void                setState(int state);
-    const std::string&  getTarget() const;
-    void                setTarget(const std::string& target);
-    Uid                 getId() const;
-    const std::string&  getContent() const;
+    bool                        operator<(const AuthRequest& other) const;
+    int                         getState() const;
+    void                        setState(int state);
+    const std::string&          getTarget() const;
+    void                        setTarget(const std::string& target);
+    Uid                         getId() const;
+    const std::string&          getContent() const;
+    system_clock::time_point    getDate();
 
 private:
     Uid                         _uid;

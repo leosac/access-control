@@ -6,6 +6,8 @@
 
 #include "moduleprotocol.hpp"
 
+#include <chrono>
+
 #include "exception/moduleprotocolexception.hpp"
 
 #include "modules/iauthmodule.hpp"
@@ -76,7 +78,11 @@ void ModuleProtocol::registerModule(IModule* module)
 
 void ModuleProtocol::processAuthRequest(AuthRequest& ar)
 {
-    static_cast<void>(ar);
+    if (ar.getDate() + std::chrono::seconds(5) < system_clock::now())
+    {
+        ar.setState(AuthRequest::Closed);
+        logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
+    }
 }
 
 void ModuleProtocol::registerDoorModule(IModule* /*module*/) {}
