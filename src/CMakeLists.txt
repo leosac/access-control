@@ -6,7 +6,6 @@ set(OSAC_SRCS
     config/xmlconfig.cpp
     core/authrequest.cpp
     core/core.cpp
-    core/event.cpp
     core/modulemanager.cpp
     core/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp

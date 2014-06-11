@@ -8,12 +8,11 @@
 #define JOURNALLOGGER_HPP
 
 #include "modules/imodule.hpp"
-#include "core/event.hpp"
 
 class JournalLogger : public IModule
 {
 public:
-    explicit JournalLogger(const std::string& name, Event::LogLevel logLevel = Event::LogLevel::Debug);
+    explicit JournalLogger(const std::string& name);
     ~JournalLogger() = default;
 
     JournalLogger(const JournalLogger& other) = delete;
@@ -27,7 +26,6 @@ public:
 
 private:
     const std::string   _name;
-    Event::LogLevel     _logLevel;
 };
 
 #endif // JOURNALLOGGER_HPP

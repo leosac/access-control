@@ -29,6 +29,16 @@ void AuthRequest::setState(int state)
     _state = state;
 }
 
+const std::string& AuthRequest::getTarget() const
+{
+    return (_target);
+}
+
+void AuthRequest::setTarget(const std::string& target)
+{
+    _target = target;
+}
+
 AuthRequest::Uid AuthRequest::getId() const
 {
     return (_uid);
