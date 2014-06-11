@@ -18,8 +18,8 @@ extern "C" {
 
 #include "exception/gpioexception.hpp"
 #include "igpiolistener.hpp"
-#include "tools/log.hpp"
 #include "tools/unixsyscall.hpp"
+#include "tools/log.hpp"
 
 static void launch(GPIOManager* instance)
 {

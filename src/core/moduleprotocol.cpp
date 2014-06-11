@@ -14,7 +14,8 @@
 #include "modules/iloggermodule.hpp"
 
 ModuleProtocol::ModuleProtocol()
-:   _authCounter(0)
+:   _authCounter(0),
+    _authModule(nullptr)
 {
     _registrationHandler[IModule::ModuleType::Door] = &ModuleProtocol::registerDoorModule;
     _registrationHandler[IModule::ModuleType::AccessPoint] = &ModuleProtocol::registerAccessPointModule;

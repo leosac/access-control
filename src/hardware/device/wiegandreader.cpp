@@ -8,9 +8,11 @@
 
 #include <cstring>
 
-WiegandReader::WiegandReader(const std::string& name, IGPIOObservable& gpioProvider)
+#include "tools/log.hpp" // FIXME
+
+WiegandReader::WiegandReader(const std::string& name, IGPIOObservable& gpioObservable)
 :   _name(name),
-    _gpioProvider(gpioProvider)
+    _gpioObservable(gpioObservable)
 {}
 
 void WiegandReader::notify(int gpioNo)
@@ -52,8 +54,8 @@ void WiegandReader::deserialize(const ptree& node)
 {
     _hiGpio = node.get<int>("higpio");
     _loGpio = node.get<int>("logpio");
-    _gpioProvider.registerListener(this, _hiGpio, GPIO::Rising);
-    _gpioProvider.registerListener(this, _loGpio, GPIO::Rising);
+    _gpioObservable.registerListener(this, _hiGpio, GPIO::Rising);
+    _gpioObservable.registerListener(this, _loGpio, GPIO::Rising);
     reset();
 }
 

@@ -25,7 +25,7 @@ class WiegandReader : public IGPIOListener, public ISerializableDevice
     static const int    DataBufferSize = 10;
 
 public:
-    explicit WiegandReader(const std::string& name, IGPIOObservable& gpioProvider);
+    explicit WiegandReader(const std::string& name, IGPIOObservable& gpioObservable);
     ~WiegandReader() = default;
 
     WiegandReader(const WiegandReader& other) = delete;
@@ -46,7 +46,7 @@ private:
 private:
     const std::string               _name;
     std::list<IWiegandListener*>    _listener;
-    IGPIOObservable&                _gpioProvider;
+    IGPIOObservable&                _gpioObservable;
     Byte                            _buffer[DataBufferSize];
     std::size_t                     _bitIdx;
     int                             _hiGpio;
