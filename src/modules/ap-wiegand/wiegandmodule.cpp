@@ -31,7 +31,7 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             oss << ' ';
         oss << static_cast<unsigned int>(cardId[i]);
     }
-    _core.getModuleProtocol().createAuthRequest(oss.str(), _target);
+    _core.getModuleProtocol().createAuthRequest(_name, _target, oss.str());
 }
 
 const std::string& WiegandModule::getName() const

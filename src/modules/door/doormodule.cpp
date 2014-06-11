@@ -79,6 +79,11 @@ void DoorModule::open()
     _grantedLed->blink(); // DEBUG
 }
 
+bool DoorModule::isAuthRequired() const
+{
+    return (true); // FIXME
+}
+
 bool DoorModule::isDoorOpenable()
 {
     system_clock::time_point    now = system_clock::now();

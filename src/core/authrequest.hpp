@@ -23,7 +23,7 @@ public:
     };
 
 public:
-    explicit AuthRequest(Uid id, const std::string& content, const std::string& target);
+    explicit AuthRequest(Uid id, const std::string& source, const std::string& target, const std::string& content);
     ~AuthRequest() = default;
 
     AuthRequest(const AuthRequest& other) = default;
@@ -31,18 +31,20 @@ public:
 
 public:
     bool                        operator<(const AuthRequest& other) const;
+    Uid                         getId() const;
     int                         getState() const;
     void                        setState(int state);
     const std::string&          getTarget() const;
     void                        setTarget(const std::string& target);
-    Uid                         getId() const;
+    const std::string&          getSource() const;
     const std::string&          getContent() const;
     system_clock::time_point    getDate();
 
 private:
     Uid                         _uid;
-    std::string                 _content;
+    std::string                 _source;
     std::string                 _target;
+    std::string                 _content;
     int                         _state;
     system_clock::time_point    _date;
 };
