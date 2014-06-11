@@ -6,10 +6,11 @@
 
 #include "authrequest.hpp"
 
-AuthRequest::AuthRequest(Uid id, const std::string& content, const std::string& target)
+AuthRequest::AuthRequest(Uid id, const std::string& source, const std::string& target, const std::string& content)
 :   _uid(id),
-    _content(content),
+    _source(source),
     _target(target),
+    _content(content),
     _state(0),
     _date(system_clock::now())
 {}
@@ -17,6 +18,11 @@ AuthRequest::AuthRequest(Uid id, const std::string& content, const std::string& 
 bool AuthRequest::operator<(const AuthRequest& other) const
 {
     return (_date < other._date);
+}
+
+AuthRequest::Uid AuthRequest::getId() const
+{
+    return (_uid);
 }
 
 int AuthRequest::getState() const
@@ -39,9 +45,9 @@ void AuthRequest::setTarget(const std::string& target)
     _target = target;
 }
 
-AuthRequest::Uid AuthRequest::getId() const
+const std::string& AuthRequest::getSource() const
 {
-    return (_uid);
+    return (_source);
 }
 
 const std::string& AuthRequest::getContent() const

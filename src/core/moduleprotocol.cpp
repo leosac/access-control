@@ -12,6 +12,7 @@
 
 #include "modules/iauthmodule.hpp"
 #include "modules/iloggermodule.hpp"
+#include "modules/idoormodule.hpp"
 
 ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
@@ -30,9 +31,9 @@ void ModuleProtocol::logMessage(const std::string& message)
         logger->log(message);
 }
 
-void ModuleProtocol::createAuthRequest(const std::string& content, const std::string& target)
+void ModuleProtocol::createAuthRequest(const std::string& source, const std::string& target, const std::string& content)
 {
-    AuthRequest ar(_authCounter, content, target);
+    AuthRequest ar(_authCounter, source, target, content);
 
     _requests.emplace(_authCounter, ar);
     ++_authCounter;
@@ -43,7 +44,6 @@ void ModuleProtocol::authorize(AuthRequest::Uid id, bool granted)
     try {
         AuthRequest&    ar(_requests.at(id));
 
-        // TODO
         static_cast<void>(granted);
         ar.setState(AuthRequest::Closed);
     }
@@ -86,7 +86,14 @@ void ModuleProtocol::processAuthRequest(AuthRequest& ar)
     }
 }
 
-void ModuleProtocol::registerDoorModule(IModule* /*module*/) {}
+void ModuleProtocol::registerDoorModule(IModule* module)
+{
+    IDoorModule* door;
+
+    if (!(door = dynamic_cast<IDoorModule*>(module)))
+        throw (ModuleProtocolException("Invalid Door module"));
+    _doorModules.emplace(door->getName(), door);
+}
 
 void ModuleProtocol::registerAccessPointModule(IModule* /*module*/) {}
 

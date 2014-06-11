@@ -7,11 +7,11 @@
 #ifndef DOORMODULE_HPP
 #define DOORMODULE_HPP
 
-#include "modules/imodule.hpp"
+#include "modules/idoormodule.hpp"
 
 class Led;
 
-class DoorModule : public IModule
+class DoorModule : public IDoorModule
 {
     typedef struct {
         bool    open;
@@ -31,9 +31,11 @@ public:
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
+    virtual bool                isAuthRequired() const override;
+    virtual void                open() override;
+
 
 private:
-    void    open();
     bool    isDoorOpenable();
 
 private:

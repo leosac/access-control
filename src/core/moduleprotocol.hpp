@@ -14,6 +14,7 @@
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
 
+class IDoorModule;
 class IAuthModule;
 class ILoggerModule;
 
@@ -30,7 +31,7 @@ public:
 
 public:
     virtual void    logMessage(const std::string& message) override;
-    virtual void    createAuthRequest(const std::string& content, const std::string& target) override;
+    virtual void    createAuthRequest(const std::string& source, const std::string& target, const std::string& content) override;
     virtual void    authorize(AuthRequest::Uid id, bool granted) override;
 
 public:
@@ -50,6 +51,7 @@ private:
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
+    std::map<std::string, IDoorModule*>         _doorModules;
     IAuthModule*                                _authModule;
 };
 
