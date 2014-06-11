@@ -34,7 +34,7 @@ IHWManager& Core::getHWManager()
     return (_hwManager);
 }
 
-AuthProtocol& Core::getAuthProtocol()
+ModuleProtocol& Core::getModuleProtocol()
 {
     return (_authProtocol);
 }

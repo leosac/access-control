@@ -13,7 +13,7 @@
 
 #include "icore.hpp"
 #include "modulemanager.hpp"
-#include "authprotocol.hpp"
+#include "moduleprotocol.hpp"
 #include "hardware/hwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 #include "tools/runtimeoptions.hpp"
@@ -36,7 +36,7 @@ public:
 
 public:
     virtual IHWManager&     getHWManager() override;
-    virtual AuthProtocol&   getAuthProtocol() override;
+    virtual ModuleProtocol& getModuleProtocol() override;
     virtual void            handleSignal(int signal) override;
     virtual void            serialize(ptree& node) override;
     virtual void            deserialize(const ptree& node) override;
@@ -45,14 +45,14 @@ public:
     void    run();
 
 private:
-    RuntimeOptions&                             _options;
-    HWManager                                   _hwManager;
-    XmlConfig                                   _coreConfig;
-    XmlConfig                                   _hwconfig;
-    ModuleManager                               _moduleMgr;
-    AuthProtocol                                _authProtocol;
-    std::atomic<bool>                           _isRunning;
-    std::list<std::string>                      _libsDirectories;
+    RuntimeOptions&         _options;
+    HWManager               _hwManager;
+    XmlConfig               _coreConfig;
+    XmlConfig               _hwconfig;
+    ModuleManager           _moduleMgr;
+    ModuleProtocol          _authProtocol;
+    std::atomic<bool>       _isRunning;
+    std::list<std::string>  _libsDirectories;
 };
 
 #endif // CORE_HPP
