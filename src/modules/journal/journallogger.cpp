@@ -66,3 +66,8 @@ void JournalLogger::deserialize(const ptree& node)
 {
     static_cast<void>(node);
 }
+
+void JournalLogger::log(const std::string& message)
+{
+    std::clog << message << std::endl;
+}

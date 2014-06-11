@@ -2,14 +2,14 @@
 <hardware>
     <device type="button" name="testButtonA"/>
     <device type="button" name="testButtonB"/>
-    <device type="led" name="led1">
+<!--    <device type="led" name="led1">
         <gpio>18</gpio>
     </device>
     <device type="led" name="led2">
         <gpio>17</gpio>
-    </device>
+    </device>-->
     <device type="wiegandreader" name="readerA">
-        <higpio>15</higpio>
-        <logpio>14</logpio>
+        <higpio>1</higpio>
+        <logpio>2</logpio>
     </device>
 </hardware>

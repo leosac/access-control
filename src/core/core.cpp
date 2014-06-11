@@ -87,22 +87,27 @@ void Core::deserialize(const ptree& node)
 
 void Core::run()
 {
-    _hwconfig.deserialize();
-    LOG() << "devices are up";
-    _hwManager.start();
-    LOG() << "hwmanager started";
-    _coreConfig.deserialize();
-    LOG() << "core config loaded";
-    SignalHandler::registerCallback(this);
-    LOG() << "starting core loop";
-    _isRunning = true;
-    while (_isRunning)
-    {
-        sleep_for(milliseconds(IdleSleepTimeMs));
-        _authProtocol.sync();
+    try {
+        _hwconfig.deserialize();
+        LOG() << "devices are up";
+        _hwManager.start();
+        LOG() << "hwmanager started";
+        _coreConfig.deserialize();
+        LOG() << "core config loaded";
+        SignalHandler::registerCallback(this);
+        LOG() << "starting core loop";
+        _isRunning = true;
+        while (_isRunning)
+        {
+            sleep_for(milliseconds(IdleSleepTimeMs));
+            _authProtocol.sync();
+        }
+        LOG() << "exiting core loop";
+        _hwManager.stop();
+        _coreConfig.serialize();
+        _hwconfig.serialize();
     }
-    LOG() << "exiting core loop";
-    _hwManager.stop();
-    _coreConfig.serialize();
-    _hwconfig.serialize();
+    catch (const OSACException& e) {
+        std::cout << e.what() << std::endl;
+    }
 }

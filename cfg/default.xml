@@ -25,7 +25,7 @@
             </auth>
         </properties>
     </module>
-    <module file="libdoor.so">
+<!--    <module file="libdoor.so">
         <alias>doorA</alias>
         <properties>
             <grantedLed>led1</grantedLed>
@@ -36,5 +36,5 @@
         <properties>
             <grantedLed>led2</grantedLed>
         </properties>
-    </module>
+    </module>-->
 </core>

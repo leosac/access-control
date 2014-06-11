@@ -7,9 +7,9 @@
 #ifndef JOURNALLOGGER_HPP
 #define JOURNALLOGGER_HPP
 
-#include "modules/imodule.hpp"
+#include "modules/iloggermodule.hpp"
 
-class JournalLogger : public IModule
+class JournalLogger : public ILoggerModule
 {
 public:
     explicit JournalLogger(const std::string& name);
@@ -23,6 +23,7 @@ public:
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
+    virtual void                log(const std::string& message) override;
 
 private:
     const std::string   _name;

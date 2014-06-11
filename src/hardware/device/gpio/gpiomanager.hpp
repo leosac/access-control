@@ -1,7 +1,7 @@
 /**
  * \file gpiomanager.hpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief GPIO device managerclass
+ * \brief GPIO device manager class
  */
 
 #ifndef GPIOMANAGER_HPP
