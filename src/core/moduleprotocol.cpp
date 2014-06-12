@@ -9,10 +9,11 @@
 #include <chrono>
 
 #include "exception/moduleprotocolexception.hpp"
-
+#include "tools/log.hpp"
 #include "modules/iauthmodule.hpp"
 #include "modules/iloggermodule.hpp"
 #include "modules/idoormodule.hpp"
+#include "modules/iaccesspointmodule.hpp"
 
 ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
@@ -48,7 +49,7 @@ void ModuleProtocol::authorize(AuthRequest::Uid id, bool granted)
         ar.setState(AuthRequest::Closed);
     }
     catch (const std::logic_error& e) {
-        // TODO
+        logMessage(e.what());
     }
 }
 
@@ -77,13 +78,54 @@ void ModuleProtocol::registerModule(IModule* module)
     ((*this).*func)(module);
 }
 
+void ModuleProtocol::printDebug()
+{
+    LOG() << "Registered modules:";
+    LOG() << "AuthModule " << _authModule->getName();
+    for (auto a : _doorModules)
+        LOG() << "Door " << a.second->getName();
+    for (auto a : _apModules)
+        LOG() << "AccessPoint " << a.second->getName();
+    for (auto a : _loggerModules)
+        LOG() << "Logger " << a->getName();
+}
+
 void ModuleProtocol::processAuthRequest(AuthRequest& ar)
 {
-    if (ar.getDate() + std::chrono::seconds(5) < system_clock::now())
+    if ((ar.getDate() + std::chrono::seconds(5)) < system_clock::now())
     {
         ar.setState(AuthRequest::Closed);
         logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
+        return ;
     }
+
+    return ;// FIXME
+
+    if (!_doorModules.count(ar.getTarget()))
+    {
+        ar.setState(AuthRequest::Closed);
+        logMessage("No such door");
+        return ;
+    }
+    IDoorModule*    door = _doorModules.at(ar.getTarget());
+
+    if (!door->isAuthRequired())
+    {
+        door->open();
+        logMessage("No auth required, opening");
+        ar.setState(AuthRequest::Closed);
+        return ;
+    }
+
+    if (_authModule->authenticate(ar))
+    {
+        logMessage("Access granted");
+        door->open();
+    }
+    else
+        logMessage("Access denied");
+
+    ar.setState(AuthRequest::Closed);
 }
 
 void ModuleProtocol::registerDoorModule(IModule* module)
@@ -95,7 +137,14 @@ void ModuleProtocol::registerDoorModule(IModule* module)
     _doorModules.emplace(door->getName(), door);
 }
 
-void ModuleProtocol::registerAccessPointModule(IModule* /*module*/) {}
+void ModuleProtocol::registerAccessPointModule(IModule* module)
+{
+    IAccessPointModule* ap;
+
+    if (!(ap = dynamic_cast<IAccessPointModule*>(module)))
+        throw (ModuleProtocolException("Invalid AccessPoint module"));
+    _apModules.emplace(ap->getName(), ap);
+}
 
 void ModuleProtocol::registerAuthModule(IModule* module)
 {
@@ -117,4 +166,7 @@ void ModuleProtocol::registerLoggerModule(IModule* module)
     _loggerModules.push_back(logger);
 }
 
-void ModuleProtocol::registerActivityMonitorModule(IModule* /*module*/) {}
+void ModuleProtocol::registerActivityMonitorModule(IModule* module)
+{
+    static_cast<void>(module);
+}

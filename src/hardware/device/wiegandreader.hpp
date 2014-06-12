@@ -9,12 +9,12 @@
 
 #include <list>
 
+#include "tools/bufferutils.hpp"
 #include "gpio/igpiolistener.hpp"
 #include "gpio/igpioobservable.hpp"
 #include "hardware/iserializabledevice.hpp"
 
-#include "iwiegandlistener.hpp"
-#include "tools/bufferutils.hpp"
+class IWiegandListener;
 
 /* NOTE This class is very likely to be created by the main thread,
  * but controlled by the polling thread
@@ -40,12 +40,16 @@ public:
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
 
+public:
+    void    registerListener(IWiegandListener* listener);
+    void    unregisterListener(IWiegandListener* listener);
+
 private:
     void    reset();
 
 private:
     const std::string               _name;
-    std::list<IWiegandListener*>    _listener;
+    std::list<IWiegandListener*>    _listeners;
     IGPIOObservable&                _gpioObservable;
     Byte                            _buffer[DataBufferSize];
     std::size_t                     _bitIdx;

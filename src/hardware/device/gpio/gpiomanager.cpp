@@ -35,6 +35,8 @@ GPIOManager::~GPIOManager()
 {
     for (auto gpio : _polledGpio)
         delete gpio.second;
+    for (auto gpio : _reservedGpio)
+        delete gpio.second;
 }
 
 void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::EdgeMode mode)
@@ -59,7 +61,16 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
 
 GPIO* GPIOManager::getGPIO(int idx)
 {
-    return (new GPIO(idx));
+    // TODO Prevent conflict between reserved and polled
+
+    if (_reservedGpio.count(idx) > 0)
+        return (_reservedGpio.at(idx));
+    else
+    {
+        GPIO*   gpio = new GPIO(idx);
+        _reservedGpio[idx] = gpio;
+        return (gpio);
+    }
 }
 
 void GPIOManager::startPolling()

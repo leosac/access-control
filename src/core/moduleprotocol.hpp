@@ -14,6 +14,7 @@
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
 
+class IAccessPointModule;
 class IDoorModule;
 class IAuthModule;
 class ILoggerModule;
@@ -37,6 +38,7 @@ public:
 public:
     void    sync();
     void    registerModule(IModule* module);
+    void    printDebug();
 
 private:
     void    processAuthRequest(AuthRequest& ar);
@@ -52,6 +54,7 @@ private:
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
     std::map<std::string, IDoorModule*>         _doorModules;
+    std::map<std::string, IAccessPointModule*>  _apModules;
     IAuthModule*                                _authModule;
 };
 

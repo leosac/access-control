@@ -8,7 +8,7 @@
 
 #include <cstring>
 
-#include "tools/log.hpp" // FIXME
+#include "iwiegandlistener.hpp"
 
 WiegandReader::WiegandReader(const std::string& name, IGPIOObservable& gpioObservable)
 :   _name(name),
@@ -33,7 +33,7 @@ void WiegandReader::timeout()
 
         for (std::size_t i = 0; i < size; ++i)
             c[i] = _buffer[size - i - 1];
-        for (auto& listener : _listener)
+        for (auto& listener : _listeners)
             listener->notifyCardRead(c);
         reset();
     }
@@ -57,6 +57,16 @@ void WiegandReader::deserialize(const ptree& node)
     _gpioObservable.registerListener(this, _hiGpio, GPIO::Rising);
     _gpioObservable.registerListener(this, _loGpio, GPIO::Rising);
     reset();
+}
+
+void WiegandReader::registerListener(IWiegandListener* listener)
+{
+    _listeners.push_back(listener);
+}
+
+void WiegandReader::unregisterListener(IWiegandListener* listener)
+{
+    _listeners.remove(listener);
 }
 
 void WiegandReader::reset()
