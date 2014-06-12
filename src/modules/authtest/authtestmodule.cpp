@@ -5,11 +5,13 @@
  */
 
 #include "authtestmodule.hpp"
+#include "core/moduleprotocol/authcommands/authcmdgrantaccess.hpp"
+#include "core/moduleprotocol/authcommands/authcmddenyaccess.hpp"
 
 #include <sstream>
 
 AuthTestModule::AuthTestModule(ICore& core, const std::string& name)
-:   _core(core),
+:   _protocol(core.getModuleProtocol()),
     _name(name)
 {}
 
@@ -35,7 +37,7 @@ void AuthTestModule::deserialize(const ptree& node)
     _auth.deserialize(node.get_child("properties").get_child("auth"));
 }
 
-bool AuthTestModule::authenticate(const AuthRequest& ar)
+void AuthTestModule::authenticate(const AuthRequest& ar)
 {
     std::istringstream          iss(ar.getContent());
     CardId                      cid;
@@ -44,5 +46,8 @@ bool AuthTestModule::authenticate(const AuthRequest& ar)
     while (iss >> byte)
         cid.push_back(static_cast<Byte>(byte));
 
-    return (_auth.hasAccess(cid));
+    if (_auth.hasAccess(cid))
+        _protocol.pushAuthCommand(new AuthCmdGrantAccess(&_protocol, ar.getId()));
+    else
+        _protocol.pushAuthCommand(new AuthCmdDenyAccess(&_protocol, ar.getId()));
 }

@@ -10,14 +10,15 @@
 #include <string>
 
 #include "authrequest.hpp"
+#include "authcommands/aauthcommand.hpp"
+#include "authcommands/iauthcommandhandler.hpp"
 
-class IModuleProtocol
+class IModuleProtocol : public IAuthCommandHandler
 {
 public:
     virtual ~IModuleProtocol() {}
     virtual void    logMessage(const std::string& message) = 0;
-    virtual void    createAuthRequest(const std::string& source, const std::string& target, const std::string& content) = 0;
-    virtual void    authorize(AuthRequest::Uid id, bool granted) = 0;
+    virtual void    pushAuthCommand(AAuthCommand* command) = 0;
 };
 
 #endif // IMODULEPROTOCOL_HPP

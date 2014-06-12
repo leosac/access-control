@@ -18,6 +18,10 @@ public:
     typedef unsigned long Uid;
     enum State {
         New = 0,
+        Waiting,
+        AskAuth,
+        Authorized,
+        Denied,
         Closed
         // FIXME
     };

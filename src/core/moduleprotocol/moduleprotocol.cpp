@@ -32,7 +32,14 @@ void ModuleProtocol::logMessage(const std::string& message)
         logger->log(message);
 }
 
-void ModuleProtocol::createAuthRequest(const std::string& source, const std::string& target, const std::string& content)
+void ModuleProtocol::pushAuthCommand(AAuthCommand* command)
+{
+    std::lock_guard<std::mutex> lg(_authCommandsMutex);
+
+    _authCommands.push(command);
+}
+
+void ModuleProtocol::cmdCreateAuthRequest(const std::string& source, const std::string& target, const std::string& content)
 {
     AuthRequest ar(_authCounter, source, target, content);
 
@@ -40,13 +47,16 @@ void ModuleProtocol::createAuthRequest(const std::string& source, const std::str
     ++_authCounter;
 }
 
-void ModuleProtocol::authorize(AuthRequest::Uid id, bool granted)
+void ModuleProtocol::cmdAuthorize(AuthRequest::Uid id, bool granted)
 {
     try {
         AuthRequest&    ar(_requests.at(id));
 
         static_cast<void>(granted);
-        ar.setState(AuthRequest::Closed);
+        if (granted)
+            ar.setState(AuthRequest::Authorized);
+        else
+            ar.setState(AuthRequest::Denied);
     }
     catch (const std::logic_error& e) {
         logMessage(e.what());
@@ -55,6 +65,7 @@ void ModuleProtocol::authorize(AuthRequest::Uid id, bool granted)
 
 void ModuleProtocol::sync()
 {
+    processCommands();
     for (auto it = _requests.begin(); it != _requests.end();)
     {
         AuthRequest& ar(it->second);
@@ -90,6 +101,22 @@ void ModuleProtocol::printDebug()
         LOG() << "Logger " << a->getName();
 }
 
+void ModuleProtocol::processCommands()
+{
+    std::lock_guard<std::mutex> lg(_authCommandsMutex);
+    ICommand*                   cmd;
+
+    while (!_authCommands.empty())
+    {
+        cmd = _authCommands.front();
+        _authCommands.pop();
+        _authCommandsMutex.unlock();
+        cmd->execute();
+        delete cmd;
+        _authCommandsMutex.lock();
+    }
+}
+
 void ModuleProtocol::processAuthRequest(AuthRequest& ar)
 {
     if ((ar.getDate() + std::chrono::seconds(5)) < system_clock::now())
@@ -98,39 +125,48 @@ void ModuleProtocol::processAuthRequest(AuthRequest& ar)
         logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
         return ;
     }
-
-    return ;// FIXME
-
-    if (!_doorModules.count(ar.getTarget()))
+    else if (ar.getState() == AuthRequest::New)
     {
-        ar.setState(AuthRequest::Closed);
-        logMessage("No such door");
+        if (!_doorModules.count(ar.getTarget()))
+        {
+            ar.setState(AuthRequest::Closed);
+            logMessage("No such door " + ar.getTarget());
+            return ;
+        }
+        IDoorModule*    door = _doorModules.at(ar.getTarget());
+
+        if (door->isAuthRequired())
+        {
+            ar.setState(AuthRequest::Waiting);
+            _authModule->authenticate(ar);
+        }
+    }
+    else if (ar.getState() == AuthRequest::Waiting)
         return ;
-    }
-    IDoorModule*    door = _doorModules.at(ar.getTarget());
-
-    if (!door->isAuthRequired())
+    else if (ar.getState() == AuthRequest::AskAuth)
     {
+        ar.setState(AuthRequest::Waiting);
+        _authModule->authenticate(ar);
+    }
+    else if (ar.getState() == AuthRequest::Authorized)
+    {
+        if (!_doorModules.count(ar.getTarget()))
+        {
+            ar.setState(AuthRequest::Closed);
+            logMessage("No such door " + ar.getTarget());
+            return ;
+        }
+        IDoorModule*    door = _doorModules.at(ar.getTarget());
         door->open();
-        logMessage("No auth required, opening");
         ar.setState(AuthRequest::Closed);
-        return ;
     }
-
-    if (_authModule->authenticate(ar))
-    {
-        logMessage("Access granted");
-        door->open();
-    }
-    else
-        logMessage("Access denied");
-
-    ar.setState(AuthRequest::Closed);
+    else if (ar.getState() == AuthRequest::Denied)
+        ar.setState(AuthRequest::Closed);
 }
 
 void ModuleProtocol::registerDoorModule(IModule* module)
 {
-    IDoorModule* door;
+    IDoorModule*    door;
 
     if (!(door = dynamic_cast<IDoorModule*>(module)))
         throw (ModuleProtocolException("Invalid Door module"));

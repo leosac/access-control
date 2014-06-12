@@ -10,6 +10,8 @@
 #include <map>
 #include <string>
 #include <list>
+#include <mutex>
+#include <queue>
 
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
@@ -32,8 +34,11 @@ public:
 
 public:
     virtual void    logMessage(const std::string& message) override;
-    virtual void    createAuthRequest(const std::string& source, const std::string& target, const std::string& content) override;
-    virtual void    authorize(AuthRequest::Uid id, bool granted) override;
+    virtual void    pushAuthCommand(AAuthCommand* command) override;
+
+public:
+    virtual void    cmdCreateAuthRequest(const std::string& source, const std::string& target, const std::string& content) override;
+    virtual void    cmdAuthorize(AuthRequest::Uid id, bool granted) override;
 
 public:
     void    sync();
@@ -41,6 +46,7 @@ public:
     void    printDebug();
 
 private:
+    void    processCommands();
     void    processAuthRequest(AuthRequest& ar);
     void    registerDoorModule(IModule* module);
     void    registerAccessPointModule(IModule* module);
@@ -51,6 +57,8 @@ private:
 private:
     AuthRequest::Uid                            _authCounter;
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
+    std::mutex                                  _authCommandsMutex;
+    std::queue<AAuthCommand*>                   _authCommands;
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
     std::map<std::string, IDoorModule*>         _doorModules;

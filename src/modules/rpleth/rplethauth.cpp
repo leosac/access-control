@@ -11,6 +11,7 @@
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
 #include "tools/unixsyscall.hpp"
+#include "tools/unlock_guard.hpp"
 #include "exception/moduleexception.hpp"
 
 static void launch(RplethAuth* instance)
@@ -167,12 +168,14 @@ void RplethAuth::handleCardIdQueue()
     {
         cid = _cardIdQueue.front();
         _cardIdQueue.pop();
-        _cardIdQueueMutex.unlock();
-        packet.dataLen = cid.size();
-        packet.data = cid;
-        size = RplethProtocol::encodeCommand(packet, _buffer, RingBufferSize);
-        for (auto& client : _clients)
-            client.socket->send(_buffer, size);
-        _cardIdQueueMutex.lock();
+        {
+            unlock_guard<std::mutex>    ulg(_cardIdQueueMutex);
+
+            packet.dataLen = cid.size();
+            packet.data = cid;
+            size = RplethProtocol::encodeCommand(packet, _buffer, RingBufferSize);
+            for (auto& client : _clients)
+                client.socket->send(_buffer, size);
+        }
     }
 }
