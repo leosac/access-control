@@ -48,6 +48,7 @@ void WiegandModule::serialize(ptree& node)
 {
     ptree& properties = node.add("properties", std::string());
 
+    _interface->unregisterListener(this);
     properties.put("target", _target);
     properties.put("readerDevice", _interfaceName);
 }
@@ -59,4 +60,7 @@ void WiegandModule::deserialize(const ptree& node)
     _interfaceName = properties.get<std::string>("readerDevice");
     if (!(_interface = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_interfaceName))))
         throw (ModuleException("could not get reader device"));
+    _interface->registerListener(this);
+
+    _core.getModuleProtocol().createAuthRequest(_name, _target, "LOL"); // Debug
 }

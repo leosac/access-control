@@ -69,5 +69,5 @@ void JournalLogger::deserialize(const ptree& node)
 
 void JournalLogger::log(const std::string& message)
 {
-    std::clog << message << std::endl;
+    std::cout << message << std::endl; // FIXME
 }

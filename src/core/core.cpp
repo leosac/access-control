@@ -95,6 +95,7 @@ void Core::run()
         _coreConfig.deserialize();
         LOG() << "core config loaded";
         SignalHandler::registerCallback(this);
+        _authProtocol.printDebug();
         LOG() << "starting core loop";
         _isRunning = true;
         while (_isRunning)

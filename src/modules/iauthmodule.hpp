@@ -17,7 +17,7 @@ class IAuthModule : public IModule
 {
 public:
     virtual ~IAuthModule() {}
-    virtual void    authenticate(const AuthRequest& ar) = 0;
+    virtual bool    authenticate(const AuthRequest& ar) = 0;
 };
 
 #endif // IAUTHMODULE_HPP

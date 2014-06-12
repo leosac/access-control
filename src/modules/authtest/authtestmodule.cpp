@@ -35,7 +35,14 @@ void AuthTestModule::deserialize(const ptree& node)
     _auth.deserialize(node.get_child("properties").get_child("auth"));
 }
 
-void AuthTestModule::authenticate(const AuthRequest& ar)
+bool AuthTestModule::authenticate(const AuthRequest& ar)
 {
-    static_cast<void>(ar);
+    std::istringstream          iss(ar.getContent());
+    CardId                      cid;
+    unsigned int                byte;
+
+    while (iss >> byte)
+        cid.push_back(static_cast<Byte>(byte));
+
+    return (_auth.hasAccess(cid));
 }

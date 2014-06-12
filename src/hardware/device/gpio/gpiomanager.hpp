@@ -61,6 +61,7 @@ private:
     std::thread             _pollThread;
     int                     _pollTimeout;
     std::map<int, GPIO*>    _polledGpio;
+    std::map<int, GPIO*>    _reservedGpio;
     std::list<ListenerInfo> _listeners;
     std::vector<PollFdSet>  _fdset;
 };
