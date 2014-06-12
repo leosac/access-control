@@ -13,6 +13,7 @@ class IMonitorModule : public IModule
 {
 public:
     virtual ~IMonitorModule() {}
+    virtual void    blink() = 0;
 };
 
 #endif // IMONITORMODULE_HPP
