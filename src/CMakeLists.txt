@@ -4,10 +4,14 @@ set(OSAC_SRCS
     main.cpp
     osac.cpp
     config/xmlconfig.cpp
-    core/authrequest.cpp
     core/core.cpp
     core/modulemanager.cpp
-    core/moduleprotocol.cpp
+    core/moduleprotocol/authcommands/aauthcommand.cpp
+    core/moduleprotocol/authcommands/authcmdcreaterequest.cpp
+    core/moduleprotocol/authcommands/authcmdgrantaccess.cpp
+    core/moduleprotocol/authcommands/authcmddenyaccess.cpp
+    core/moduleprotocol/authrequest.cpp
+    core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
     hardware/device/button.cpp

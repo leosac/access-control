@@ -13,7 +13,7 @@
 
 #include "icore.hpp"
 #include "modulemanager.hpp"
-#include "moduleprotocol.hpp"
+#include "moduleprotocol/moduleprotocol.hpp"
 #include "hardware/hwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 #include "tools/runtimeoptions.hpp"

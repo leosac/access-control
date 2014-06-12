@@ -10,7 +10,7 @@
 #include <string>
 
 #include "hardware/ihwmanager.hpp"
-#include "imoduleprotocol.hpp"
+#include "moduleprotocol/imoduleprotocol.hpp"
 
 class ICore
 {
