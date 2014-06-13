@@ -48,7 +48,7 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
     listener.mode = mode;
     listener.fdIdx = 0;
 
-    if (!_polledGpio[gpioNo])
+    if (!_polledGpio.count(gpioNo))
     {
         GPIO*   gpio = new GPIO(gpioNo);
 

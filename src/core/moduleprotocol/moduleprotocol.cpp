@@ -10,10 +10,13 @@
 
 #include "exception/moduleprotocolexception.hpp"
 #include "tools/log.hpp"
+
+#include "core/moduleprotocol/authcommands/aauthcommand.hpp"
 #include "modules/iauthmodule.hpp"
 #include "modules/iloggermodule.hpp"
 #include "modules/idoormodule.hpp"
 #include "modules/iaccesspointmodule.hpp"
+#include "modules/imonitormodule.hpp"
 
 ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
@@ -30,6 +33,12 @@ void ModuleProtocol::logMessage(const std::string& message)
 {
     for (auto logger : _loggerModules)
         logger->log(message);
+}
+
+void ModuleProtocol::notifyMonitor(ModuleProtocol::ActivityType type)
+{
+    for (auto monitor : _monitorModules)
+        monitor->notify(type);
 }
 
 void ModuleProtocol::pushAuthCommand(AAuthCommand* command)
@@ -65,10 +74,15 @@ void ModuleProtocol::cmdAuthorize(AuthRequest::Uid id, bool granted)
 
 void ModuleProtocol::sync()
 {
+    notifyMonitor(ActivityType::System);
     processCommands();
     for (auto it = _requests.begin(); it != _requests.end();)
     {
         AuthRequest& ar(it->second);
+
+
+        it = _requests.erase(it);
+        continue; // FIXME
 
         if (ar.getState() == AuthRequest::Closed)
             it = _requests.erase(it);
@@ -204,5 +218,9 @@ void ModuleProtocol::registerLoggerModule(IModule* module)
 
 void ModuleProtocol::registerActivityMonitorModule(IModule* module)
 {
-    static_cast<void>(module);
+    IMonitorModule* monitor;
+
+    if (!(monitor = dynamic_cast<IMonitorModule*>(module)))
+        throw (ModuleProtocolException("Invalid Activity Monitor module"));
+    _monitorModules.push_back(monitor);
 }

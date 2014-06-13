@@ -9,7 +9,7 @@
 
 #include "modules/imonitormodule.hpp"
 
-class Led;
+class SystemLed;
 
 class LedMonitorModule : public IMonitorModule
 {
@@ -25,13 +25,13 @@ public:
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
-    virtual void                blink() override;
+    virtual void                notify(IModuleProtocol::ActivityType type) override;
 
 private:
     ICore&              _core;
     IHWManager&         _hwmanager;
     const std::string   _name;
-    Led*                _led;
+    SystemLed*          _led;
     std::string         _ledName;
 };
 

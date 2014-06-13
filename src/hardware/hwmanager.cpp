@@ -13,6 +13,7 @@
 
 #include "device/button.hpp"
 #include "device/led.hpp"
+#include "device/systemled.hpp"
 #include "device/wiegandreader.hpp"
 
 void HWManager::serialize(ptree& node)
@@ -51,6 +52,7 @@ void HWManager::deserialize(const ptree& node)
                 throw (DeviceException("device with duplicate name \'" + name + '\''));
             dev.instance->deserialize(v.second);
             _devices[name] = dev;
+            LOG() << "Device " << name << " of type " << type << " loaded";
         }
     }
 }
@@ -58,20 +60,28 @@ void HWManager::deserialize(const ptree& node)
 void HWManager::start()
 {
 #ifndef NO_HW
-    _gpioManager.startPolling();
+//     _gpioManager.startPolling();
 #endif
 }
 
 void HWManager::stop()
 {
 #ifndef NO_HW
-    _gpioManager.stopPolling();
+//     _gpioManager.stopPolling();
 #endif
 }
 
 IDevice* HWManager::getDevice(const std::string& name)
 {
-    return (_devices.at(name).instance);
+    ISerializableDevice*    instance;
+
+    try {
+        instance = _devices.at(name).instance;
+    }
+    catch (const std::out_of_range& e) {
+        throw (DeviceException("Bad device name: " + name));
+    }
+    return (instance);
 }
 
 ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::string& name)
@@ -82,6 +92,8 @@ ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::
         return (new WiegandReader(name, _gpioManager));
     else if (type == "led")
         return (new Led(name, _gpioManager));
+    else if (type == "systemled")
+        return (new SystemLed(name));
     else
         return (nullptr);
 }

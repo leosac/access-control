@@ -48,12 +48,13 @@ void ModuleManager::unloadLibraries()
 
 IModule* ModuleManager::loadModule(ICore& core, const std::string& libname, const std::string& alias)
 {
-    DynamicLibrary*     lib = _dynlibs.at(libname);
     IModule::InitFunc   func;
     IModule*            module = nullptr;
+    DynamicLibrary*     lib = nullptr;
 
-    if (!lib)
-        throw (ModuleException("Invalid source library"));
+    if (!_dynlibs.count(libname))
+        throw (ModuleException("Invalid source library: " + libname));
+    lib = _dynlibs.at(libname);
     if (_modules.count(alias) > 0)
         throw (ModuleException("A module named \'" + alias + "\' already exists"));
     try {

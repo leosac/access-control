@@ -12,6 +12,7 @@
 #include "tools/log.hpp"
 
 #include "hardware/device/led.hpp"
+#include "hardware/device/systemled.hpp"
 #include "exception/moduleexception.hpp"
 
 LedMonitorModule::LedMonitorModule(ICore& core, const std::string& name)
@@ -34,20 +35,24 @@ void LedMonitorModule::serialize(ptree& node)
 {
     ptree& properties = node.add("properties", std::string());
 
-    properties.put<std::string>("led", _ledName);
+    _led->setBrightness(0);
+    properties.put<std::string>("sysled", _ledName);
 }
 
 void LedMonitorModule::deserialize(const ptree& node)
 {
     ptree properties = node.get_child("properties");
 
-    _ledName = properties.get<std::string>("led");
-    if (!(_led = dynamic_cast<Led*>(_hwmanager.getDevice(_ledName))))
+    _ledName = properties.get<std::string>("sysled");
+    if (!(_led = dynamic_cast<SystemLed*>(_hwmanager.getDevice(_ledName))))
         throw (ModuleException("could not retrieve device \'" + _ledName + '\''));
+    _led->setBrightness(255);
 }
 
-void LedMonitorModule::blink()
+void LedMonitorModule::notify(IModuleProtocol::ActivityType type)
 {
-    // TODO
-}
+    static_cast<void>(type);
 
+    LOG() << "Notified !";
+    _led->blink();
+}

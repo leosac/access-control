@@ -63,7 +63,4 @@ void WiegandModule::deserialize(const ptree& node)
     if (!(_interface = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_interfaceName))))
         throw (ModuleException("could not get reader device"));
     _interface->registerListener(this);
-
-    // FIXME
-    _core.getModuleProtocol().pushAuthCommand(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, "24:54:EF:DE"));
 }
