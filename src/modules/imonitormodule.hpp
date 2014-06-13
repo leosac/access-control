@@ -13,7 +13,8 @@ class IMonitorModule : public IModule
 {
 public:
     virtual ~IMonitorModule() {}
-    virtual void    blink() = 0;
+    virtual void    notify(IModuleProtocol::ActivityType type) = 0;
+
 };
 
 #endif // IMONITORMODULE_HPP

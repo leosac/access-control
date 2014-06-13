@@ -1,9 +1,28 @@
 <?xml version="1.0"?>
 <core>
     <plugindir>.</plugindir>
+    <module file="libdoor.so">
+        <alias>doorA</alias>
+        <properties>
+            <grantedLed>led1</grantedLed>
+        </properties>
+    </module>
+    <module file="libdoor.so">
+        <alias>doorB</alias>
+        <properties>
+            <grantedLed>led2</grantedLed>
+        </properties>
+    </module>
     <module file="libjournal.so">
         <alias>log</alias>
         <properties>
+        </properties>
+    </module>
+    <module file="libledmonitor.so">
+        <alias>monitor</alias>
+        <properties>
+            <sysled>blue</sysled>
+            <sysled>green</sysled>
         </properties>
     </module>
     <module file="libwiegand.so">
@@ -23,18 +42,6 @@
                 <card>BA:5E:Be:ef</card>
                 <card>40:a0:83:80</card>
             </auth>
-        </properties>
-    </module>
-    <module file="libdoor.so">
-        <alias>doorA</alias>
-        <properties>
-            <grantedLed>led1</grantedLed>
-        </properties>
-    </module>
-    <module file="libdoor.so">
-        <alias>doorB</alias>
-        <properties>
-            <grantedLed>led2</grantedLed>
         </properties>
     </module>
 </core>

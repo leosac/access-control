@@ -17,6 +17,7 @@ set(OSAC_SRCS
     hardware/device/button.cpp
     hardware/device/led.cpp
     hardware/device/wiegandreader.cpp
+    hardware/device/systemled.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
     signal/signalhandler.cpp

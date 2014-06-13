@@ -19,6 +19,7 @@
 class IAccessPointModule;
 class IDoorModule;
 class IAuthModule;
+class IMonitorModule;
 class ILoggerModule;
 
 class ModuleProtocol : public IModuleProtocol
@@ -34,6 +35,7 @@ public:
 
 public:
     virtual void    logMessage(const std::string& message) override;
+    virtual void    notifyMonitor(IModuleProtocol::ActivityType type) override;
     virtual void    pushAuthCommand(AAuthCommand* command) override;
 
 public:
@@ -43,7 +45,7 @@ public:
 public:
     void    sync();
     void    registerModule(IModule* module);
-    void    printDebug();
+    void    printDebug(); // FIXME
 
 private:
     void    processCommands();
@@ -59,8 +61,11 @@ private:
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::mutex                                  _authCommandsMutex;
     std::queue<AAuthCommand*>                   _authCommands;
+
+private:
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
+    std::list<IMonitorModule*>                  _monitorModules;
     std::map<std::string, IDoorModule*>         _doorModules;
     std::map<std::string, IAccessPointModule*>  _apModules;
     IAuthModule*                                _authModule;
