@@ -54,8 +54,8 @@ void WiegandReader::deserialize(const ptree& node)
 {
     _hiGpio = node.get<int>("higpio");
     _loGpio = node.get<int>("logpio");
-    _gpioObservable.registerListener(this, _hiGpio, GPIO::Rising);
-    _gpioObservable.registerListener(this, _loGpio, GPIO::Rising);
+    _gpioObservable.registerListener(this, _hiGpio, GPIO::EdgeMode::Rising);
+    _gpioObservable.registerListener(this, _loGpio, GPIO::EdgeMode::Rising);
     reset();
 }
 

@@ -31,8 +31,8 @@ public:
     void            blink();
     int             getBrightness() const;
     void            setBrightness(int value);
-    std::string     getTrigger() const;
-    void            setTrigger(const std::string& trigger);
+    std::string     getActiveTrigger() const;
+    void            setActiveTrigger(const std::string& trigger);
     int             getDelayOn() const;
     void            setDelayOn(int delay);
     int             getDelayOff() const;

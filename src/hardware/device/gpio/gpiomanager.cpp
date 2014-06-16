@@ -52,7 +52,7 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
     {
         GPIO*   gpio = new GPIO(gpioNo);
 
-        gpio->setDirection(GPIO::In);
+        gpio->setDirection(GPIO::Direction::In);
         gpio->setEdgeMode(mode);
         _polledGpio[gpioNo] = gpio;
     }

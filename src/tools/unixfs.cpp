@@ -15,7 +15,6 @@ extern "C" {
 #include <algorithm>
 
 #include "unixsyscall.hpp"
-#include "exception/fsexception.hpp"
 
 std::string UnixFs::getCWD()
 {
@@ -71,4 +70,13 @@ std::string UnixFs::stripPath(const std::string& filename)
         return (filename);
     else
         return (filename.substr(pos + 1));
+}
+
+std::string UnixFs::readAll(const std::string& path)
+{
+    std::ifstream   file(path);
+
+    if (!file.good())
+        throw (FsException("could not open " + path + '\''));
+    return (std::string(std::istreambuf_iterator<char>(static_cast<std::istream&>(file)), std::istreambuf_iterator<char>()));
 }

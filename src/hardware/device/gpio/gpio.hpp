@@ -24,11 +24,11 @@ class GPIO
     static const std::string    EdgeStrings[EdgeModes];
 
 public:
-    enum Direction {
+    enum class Direction {
         In = 0,
         Out
     };
-    enum EdgeMode {
+    enum class EdgeMode : int {
         None = 0,
         Rising,
         Falling,

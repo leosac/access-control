@@ -11,6 +11,7 @@
 
 #include "exception/deviceexception.hpp"
 #include "tools/log.hpp"
+#include "tools/unixfs.hpp"
 
 using std::this_thread::sleep_for;
 using std::chrono::milliseconds;
@@ -42,7 +43,7 @@ void SystemLed::deserialize(const ptree& node)
 
     test(); // FIXME
 
-    setTrigger("timer");
+    setActiveTrigger("timer");
 }
 
 void SystemLed::blink()
@@ -54,56 +55,77 @@ void SystemLed::blink()
 
 int SystemLed::getBrightness() const
 {
-    std::fstream    file(_brightnessFile, std::ios::in);
-    int             brightness;
-
-    if (!file.good())
-        throw (DeviceException("could not open " + _brightnessFile));
-    file.seekp(0);
-    file >> brightness;
-    return (brightness);
+    return (UnixFs::readSysFsValue<int>(_brightnessFile));
 }
 
 void SystemLed::setBrightness(int value)
 {
-    std::fstream    file(_brightnessFile, std::ios::out);
-
-    if (!file.good())
-        throw (DeviceException("could not open " + _brightnessFile));
-    file.seekp(0);
-    file << value;
+    UnixFs::writeSysFsValue<int>(_brightnessFile, value);
 }
 
-std::string SystemLed::getTrigger() const
+std::string SystemLed::getActiveTrigger() const
 {
-    std::fstream    file(_triggerFile, std::ios::in);
-    std::string     trigger;
+    std::ifstream   file(_triggerFile);
+    std::string     ret;
+    std::size_t     size;
 
     if (!file.good())
-        throw (DeviceException("could not open " + _triggerFile));
-    file.seekp(0);
-    file >> trigger;
-    return (trigger);
+        throw (DeviceException("could not open " + _triggerFile + '\''));
+    while (file >> ret)
+    {
+        if (ret[0] == '[')
+        {
+            size = ret.length();
+            if (size < 3)
+                throw (DeviceException("Invalid trigger return"));
+            return (ret.substr(1, size - 2));
+        }
+    }
+    throw (DeviceException("Invalid trigger return"));
 }
 
-void SystemLed::setTrigger(const std::string& trigger)
+void SystemLed::setActiveTrigger(const std::string& trigger)
 {
-    std::fstream    file(_triggerFile, std::ios::out);
+    UnixFs::writeSysFsValue<std::string>(_triggerFile, trigger);
+}
 
-    if (!file.good())
-        throw (DeviceException("could not open " + _triggerFile));
-    file.seekp(0);
-    file << trigger;
+int SystemLed::getDelayOn() const
+{
+    return (UnixFs::readSysFsValue<int>(_delayOnFile));
+}
+
+void SystemLed::setDelayOn(int value)
+{
+    UnixFs::writeSysFsValue<int>(_delayOnFile, value);
+}
+
+int SystemLed::getDelayOff() const
+{
+    return (UnixFs::readSysFsValue<int>(_delayOffFile));
+}
+
+void SystemLed::setDelayOff(int value)
+{
+    UnixFs::writeSysFsValue<int>(_delayOffFile, value);
 }
 
 void SystemLed::test()
 {
-    LOG() << "Trigger=" << getTrigger();
-    setTrigger("timer");
-    LOG() << "Trigger=" << getTrigger();
-    setTrigger("none");
-    LOG() << "Trigger=" << getTrigger();
+    LOG() << "Brightness=" << getBrightness();
+    setBrightness(0);
+    LOG() << "Brightness=" << getBrightness();
+    setBrightness(128);
+    LOG() << "Brightness=" << getBrightness();
+    setBrightness(255);
+    LOG() << "Brightness=" << getBrightness();
 
+    LOG() << "Trigger=" << getActiveTrigger();
+    setActiveTrigger("timer");
+    LOG() << "Trigger=" << getActiveTrigger();
+    setActiveTrigger("none");
+    LOG() << "Trigger=" << getActiveTrigger();
+    setActiveTrigger("timer");
+    LOG() << "Trigger=" << getActiveTrigger();
 
     LOG() << "Brightness=" << getBrightness();
     setBrightness(0);
@@ -112,48 +134,4 @@ void SystemLed::test()
     LOG() << "Brightness=" << getBrightness();
     setBrightness(255);
     LOG() << "Brightness=" << getBrightness();
-}
-
-int SystemLed::getDelayOn() const
-{
-    std::fstream    file(_delayOnFile, std::ios::in);
-    int             delayOn;
-
-    if (!file.good())
-        throw (DeviceException("could not open " + _delayOnFile));
-    file.seekp(0);
-    file >> delayOn;
-    return (delayOn);
-}
-
-void SystemLed::setDelayOn(int value)
-{
-    std::fstream    file(_delayOnFile, std::ios::out);
-
-    if (!file.good())
-        throw (DeviceException("could not open " + _delayOnFile));
-    file.seekp(0);
-    file << value;
-}
-
-int SystemLed::getDelayOff() const
-{
-    std::fstream    file(_delayOffFile, std::ios::in);
-    int             delayOff;
-
-    if (!file.good())
-        throw (DeviceException("could not open " + _delayOffFile));
-    file.seekp(0);
-    file >> delayOff;
-    return (delayOff);
-}
-
-void SystemLed::setDelayOff(int value)
-{
-    std::fstream    file(_delayOffFile, std::ios::out);
-
-    if (!file.good())
-        throw (DeviceException("could not open " + _delayOffFile));
-    file.seekp(0);
-    file << value;
 }
