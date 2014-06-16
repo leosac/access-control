@@ -48,8 +48,7 @@ GPIO::GPIO(int pinNo/*, const std::string& sysfsName*/)
 
 GPIO::~GPIO()
 {
-    try
-    {
+    try {
         if (::close(_pollFd) == -1)
             throw (GpioException(UnixSyscall::getErrorString("close", errno)));
         if (exists())
