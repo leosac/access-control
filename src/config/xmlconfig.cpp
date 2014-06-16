@@ -32,13 +32,11 @@ void XmlConfig::serialize()
 
     if (!cfg.good())
         throw (ConfigException(_file, "Could not open file"));
-    try
-    {
+    try {
         _object.serialize(pt);
         write_xml(cfg, pt, settings);
     }
-    catch (const ptree_error& e)
-    {
+    catch (const ptree_error& e) {
         throw (ConfigException(_file, e.what()));
     }
 }
@@ -50,13 +48,11 @@ void XmlConfig::deserialize()
 
     if (!cfg.good())
         throw (ConfigException(_file, "Could not open file"));
-    try
-    {
+    try {
         read_xml(cfg, pt, trim_whitespace | no_comments);
         _object.deserialize(pt);
     }
-    catch (ptree_error& e)
-    {
+    catch (ptree_error& e) {
         throw (ConfigException(_file, e.what()));
     }
 }
