@@ -73,7 +73,7 @@ int GPIO::getPollFd() const
     return (_pollFd);
 }
 
-GPIO::Direction GPIO::getDirection()
+GPIO::Direction GPIO::getDirection() const
 {
     std::string     ret = UnixFs::readSysFsValue<std::string>(_directionFile);
 
@@ -85,7 +85,7 @@ GPIO::Direction GPIO::getDirection()
         throw (GpioException("direction read error (read " + ret + ')'));
 }
 
-void GPIO::setDirection(Direction direction)
+void GPIO::setDirection(Direction direction) const
 {
     if (direction == Direction::In)
         UnixFs::writeSysFsValue<std::string>(_directionFile, "in");
@@ -95,7 +95,7 @@ void GPIO::setDirection(Direction direction)
         throw (GpioException("invalid direction parameter"));
 }
 
-bool GPIO::getValue()
+bool GPIO::getValue() const
 {
     std::string     ret = UnixFs::readSysFsValue<std::string>(_valueFile);
 
@@ -107,12 +107,12 @@ bool GPIO::getValue()
         throw (GpioException("invalid value"));
 }
 
-void GPIO::setValue(bool state)
+void GPIO::setValue(bool state) const
 {
     UnixFs::writeSysFsValue<std::string>(_valueFile, ((state) ? ("1") : ("0")));
 }
 
-bool GPIO::isActiveLow()
+bool GPIO::isActiveLow() const
 {
     std::string     ret = UnixFs::readSysFsValue<std::string>(_activeLowFile);
 
@@ -124,12 +124,12 @@ bool GPIO::isActiveLow()
         throw (GpioException("invalid active state"));
 }
 
-void GPIO::setActiveLow(bool state)
+void GPIO::setActiveLow(bool state) const
 {
     UnixFs::writeSysFsValue<std::string>(_activeLowFile, ((state) ? ("1") : ("0")));
 }
 
-GPIO::EdgeMode GPIO::getEdgeMode()
+GPIO::EdgeMode GPIO::getEdgeMode() const
 {
     std::string     ret = UnixFs::readSysFsValue<std::string>(_edgeFile);
 
@@ -141,26 +141,24 @@ GPIO::EdgeMode GPIO::getEdgeMode()
     throw (GpioException("invalid edge mode"));
 }
 
-void GPIO::setEdgeMode(EdgeMode mode)
+void GPIO::setEdgeMode(EdgeMode mode) const
 {
     UnixFs::writeSysFsValue<std::string>(_edgeFile, EdgeStrings[static_cast<int>(mode)]);
 }
 
-bool GPIO::exists()
+bool GPIO::exists() const
 {
     std::fstream    gpio(_path);
-    bool            rslt;
 
-    rslt = gpio.good();
-    return (rslt);
+    return (gpio.good());
 }
 
-void GPIO::exportGpio()
+void GPIO::exportGpio() const
 {
     UnixFs::writeSysFsValue<int>(ExportPath, _pinNo);
 }
 
-void GPIO::unexportGpio()
+void GPIO::unexportGpio() const
 {
     UnixFs::writeSysFsValue<int>(UnexportPath, _pinNo);
 }

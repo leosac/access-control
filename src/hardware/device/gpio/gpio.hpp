@@ -48,19 +48,19 @@ public:
     int                 getPollFd() const;
 
 public:
-    Direction   getDirection();
-    void        setDirection(Direction direction);
-    bool        getValue();
-    void        setValue(bool state);
-    bool        isActiveLow();
-    void        setActiveLow(bool state);
-    EdgeMode    getEdgeMode();
-    void        setEdgeMode(EdgeMode mode);
+    Direction   getDirection() const;
+    void        setDirection(Direction direction) const;
+    bool        getValue() const;
+    void        setValue(bool state) const;
+    bool        isActiveLow() const;
+    void        setActiveLow(bool state) const;
+    EdgeMode    getEdgeMode() const;
+    void        setEdgeMode(EdgeMode mode) const;
 
 private:
-    bool    exists();
-    void    exportGpio();
-    void    unexportGpio();
+    bool    exists() const;
+    void    exportGpio() const;
+    void    unexportGpio() const;
 
 private:
     const int           _pinNo;

@@ -29,14 +29,16 @@ public:
 
 public:
     void            blink();
+
+public:
     int             getBrightness() const;
-    void            setBrightness(int value);
+    void            setBrightness(int value) const;
     std::string     getActiveTrigger() const;
-    void            setActiveTrigger(const std::string& trigger);
+    void            setActiveTrigger(const std::string& trigger) const;
     int             getDelayOn() const;
-    void            setDelayOn(int delay);
+    void            setDelayOn(int delay) const;
     int             getDelayOff() const;
-    void            setDelayOff(int delay);
+    void            setDelayOff(int delay) const;
 
 private:
     void    test();
