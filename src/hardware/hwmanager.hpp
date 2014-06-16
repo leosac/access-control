@@ -34,15 +34,17 @@ public:
     virtual void deserialize(const ptree& node) override;
 
 public:
-    virtual void        start() override;
-    virtual void        stop() override;
-    virtual IDevice*    getDevice(const std::string& name) override;
+    virtual void                start() override;
+    virtual void                stop() override;
+    virtual IDevice*            getDevice(const std::string& name) override;
+    virtual const PlatformInfo& getPlatformInfo() const override;
 
 private:
     ISerializableDevice*    buildDevice(const std::string& type, const std::string& name);
 
 private:
     GPIOManager                     _gpioManager;
+    PlatformInfo                    _platform;
     std::map<std::string, Device>   _devices;
 };
 

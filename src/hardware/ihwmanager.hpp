@@ -18,10 +18,16 @@ class GPIO;
 class IHWManager
 {
 public:
+    typedef struct {
+        std::string name;
+    } PlatformInfo;
+
+public:
     virtual ~IHWManager() {}
-    virtual void        start() = 0;
-    virtual void        stop() = 0;
-    virtual IDevice*    getDevice(const std::string& name) = 0;
+    virtual void                start() = 0;
+    virtual void                stop() = 0;
+    virtual IDevice*            getDevice(const std::string& name) = 0;
+    virtual const PlatformInfo& getPlatformInfo() const = 0;
 };
 
 #endif // IHWMANAGER_HPP

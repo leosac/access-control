@@ -18,32 +18,39 @@
 
 void HWManager::serialize(ptree& node)
 {
-    ptree hardware;
+    ptree root = node.put("hardware", std::string());
+    ptree platform = root.put("platform", std::string());
+    ptree devices = root.put("devices", std::string());
 
+    platform.put("<xmlattr>.name", _platform.name);
     for (auto& dev : _devices)
     {
-        ptree& devNode = hardware.add("device", std::string());
+        ptree& devNode = devices.add("device", std::string());
 
         devNode.put("<xmlattr>.name", dev.first);
         devNode.put("<xmlattr>.type", dev.second.type);
         dev.second.instance->serialize(devNode);
         delete dev.second.instance;
     }
-    node.put_child("hardware", hardware);
     _devices.clear();
 }
 
 void HWManager::deserialize(const ptree& node)
 {
-    ptree hardware = node.get_child("hardware");
+    ptree root = node.get_child("hardware");
+    ptree devices = root.get_child("devices");
+    ptree platform = root.get_child("platform");
 
-    for (const auto& v : hardware)
+    _platform.name = platform.get<std::string>("<xmlattr>.name");
+    LOG() << "current platform: " << _platform.name;
+
+    for (const auto& v : devices)
     {
         if (v.first == "device")
         {
-            Device                  dev;
-            std::string             name(v.second.get<std::string>("<xmlattr>.name"));
-            std::string             type(v.second.get<std::string>("<xmlattr>.type"));
+            Device      dev;
+            std::string name(v.second.get<std::string>("<xmlattr>.name"));
+            std::string type(v.second.get<std::string>("<xmlattr>.type"));
 
             if (!(dev.instance = buildDevice(type, name)))
                 throw (DeviceException("unable to load device of type \'" + type + '\''));
@@ -60,14 +67,14 @@ void HWManager::deserialize(const ptree& node)
 void HWManager::start()
 {
 #ifndef NO_HW
-//     _gpioManager.startPolling();
+    _gpioManager.startPolling();
 #endif
 }
 
 void HWManager::stop()
 {
 #ifndef NO_HW
-//     _gpioManager.stopPolling();
+    _gpioManager.stopPolling();
 #endif
 }
 
@@ -82,6 +89,11 @@ IDevice* HWManager::getDevice(const std::string& name)
         throw (DeviceException("Bad device name: " + name));
     }
     return (instance);
+}
+
+const IHWManager::PlatformInfo& HWManager::getPlatformInfo() const
+{
+    return (_platform);
 }
 
 ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::string& name)
