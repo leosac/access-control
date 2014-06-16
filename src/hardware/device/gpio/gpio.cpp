@@ -11,11 +11,10 @@ extern "C" {
 #include <unistd.h>
 }
 
-#include <fstream>
-
 #include "exception/gpioexception.hpp"
 #include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
+#include "tools/unixfs.hpp"
 
 const std::string   GPIO::ExportPath        = "/sys/class/gpio/export";
 const std::string   GPIO::UnexportPath      = "/sys/class/gpio/unexport";
@@ -76,45 +75,30 @@ int GPIO::getPollFd() const
 
 GPIO::Direction GPIO::getDirection()
 {
-    std::string     ret;
-    std::fstream    file(_directionFile, std::ios::in);
+    std::string     ret = UnixFs::readSysFsValue<std::string>(_directionFile);
 
-    if (!file.good())
-        throw (GpioException("could not open " + _directionFile));
-    file.seekp(0);
-    file >> ret;
     if (ret == "in")
-        return (In);
+        return (Direction::In);
     else if (ret == "out")
-        return (Out);
+        return (Direction::Out);
     else
-        throw (GpioException("direction read error (read " + ret + ")"));
+        throw (GpioException("direction read error (read " + ret + ')'));
 }
 
 void GPIO::setDirection(Direction direction)
 {
-    std::fstream    file(_directionFile, std::ios::out);
-
-    if (!file.good())
-        throw (GpioException("could not open " + _directionFile));
-    file.seekp(0);
-    if (direction == In)
-        file << "in";
-    else if (direction == Out)
-        file << "out";
+    if (direction == Direction::In)
+        UnixFs::writeSysFsValue<std::string>(_directionFile, "in");
+    else if (direction == Direction::Out)
+        UnixFs::writeSysFsValue<std::string>(_directionFile, "out");
     else
         throw (GpioException("invalid direction parameter"));
 }
 
 bool GPIO::getValue()
 {
-    std::string     ret;
-    std::fstream    file(_valueFile, std::ios::in);
+    std::string     ret = UnixFs::readSysFsValue<std::string>(_valueFile);
 
-    if (!file.good())
-        throw (GpioException("could not open " + _valueFile));
-    file.seekp(0);
-    file >> ret;
     if (ret == "1")
         return (true);
     else if (ret == "0")
@@ -125,23 +109,13 @@ bool GPIO::getValue()
 
 void GPIO::setValue(bool state)
 {
-    std::fstream    file(_valueFile, std::ios::out);
-
-    if (!file.good())
-        throw (GpioException("could not open " + _valueFile));
-    file.seekp(0);
-    file << ((state) ? ("1") : ("0"));
+    UnixFs::writeSysFsValue<std::string>(_valueFile, ((state) ? ("1") : ("0")));
 }
 
 bool GPIO::isActiveLow()
 {
-    std::string     ret;
-    std::fstream    file(_activeLowFile, std::ios::in);
+    std::string     ret = UnixFs::readSysFsValue<std::string>(_activeLowFile);
 
-    if (!file.good())
-        throw (GpioException("could not open " + _activeLowFile));
-    file.seekp(0);
-    file >> ret;
     if (ret == "0")
         return (false);
     else if (ret == "1")
@@ -152,23 +126,13 @@ bool GPIO::isActiveLow()
 
 void GPIO::setActiveLow(bool state)
 {
-    std::fstream    file(_activeLowFile, std::ios::out);
-
-    if (!file.good())
-        throw (GpioException("could not open " + _activeLowFile));
-    file.seekp(0);
-    file << ((state) ? ("1") : ("0"));
+    UnixFs::writeSysFsValue<std::string>(_activeLowFile, ((state) ? ("1") : ("0")));
 }
 
 GPIO::EdgeMode GPIO::getEdgeMode()
 {
-    std::string     ret;
-    std::fstream    file(_edgeFile, std::ios::in);
+    std::string     ret = UnixFs::readSysFsValue<std::string>(_edgeFile);
 
-    if (!file.good())
-        throw (GpioException("could not open " + _edgeFile));
-    file.seekp(0);
-    file >> ret;
     for (int i = 0; i < EdgeModes; ++i)
     {
         if (ret == EdgeStrings[i])
@@ -179,16 +143,7 @@ GPIO::EdgeMode GPIO::getEdgeMode()
 
 void GPIO::setEdgeMode(EdgeMode mode)
 {
-    std::fstream    file(_edgeFile, std::ios::out);
-
-    if (!file.good())
-        throw (GpioException("could not open " + _edgeFile));
-
-    if (mode < 0 || mode >= EdgeModes)
-        throw (GpioException("invalid edge mode parameter"));
-
-    file.seekp(0);
-    file << EdgeStrings[mode];
+    UnixFs::writeSysFsValue<std::string>(_edgeFile, EdgeStrings[static_cast<int>(mode)]);
 }
 
 bool GPIO::exists()
@@ -202,20 +157,10 @@ bool GPIO::exists()
 
 void GPIO::exportGpio()
 {
-    std::fstream    ex(ExportPath, std::ios::out);
-
-    LOG() << "Opening file " << ExportPath;
-    if (!ex.good())
-        throw (GpioException("could not export gpio " + std::to_string(_pinNo)));
-    ex << std::to_string(_pinNo);
+    UnixFs::writeSysFsValue<int>(ExportPath, _pinNo);
 }
 
 void GPIO::unexportGpio()
 {
-    std::fstream    unex(UnexportPath, std::ios::out);
-
-    LOG() << "Opening file " << UnexportPath;
-    if (!unex.good())
-        throw (GpioException("could not unexport gpio " + std::to_string(_pinNo)));
-    unex << std::to_string(_pinNo);
+    UnixFs::writeSysFsValue<int>(UnexportPath, _pinNo);
 }

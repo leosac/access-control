@@ -9,6 +9,9 @@
 
 #include <string>
 #include <list>
+#include <fstream>
+
+#include "exception/fsexception.hpp"
 
 class UnixFs
 {
@@ -38,6 +41,49 @@ public:
      * @return filename without path
      */
     static std::string  stripPath(const std::string& filename);
+
+    /**
+     * read all file contents and put it in a string
+     * @param path Path of the file
+     * @return file contents
+     */
+    static std::string  readAll(const std::string& path);
+
+    /**
+     * read value from a sysfs file
+     * @param path Path of the sysfs target
+     * @return Value read
+     */
+    template <typename T>
+    static T    readSysFsValue(const std::string& path)
+    {
+        std::ifstream   file(path);
+        T               val;
+
+        if (!file.good())
+            throw (FsException("could not open \'" + path + '\''));
+        file >> val;
+        file.clear();
+        file.seekg(0);
+        return (val);
+    }
+
+    /**
+     * write value to a sysfs file
+     * @param path Path of the sysfs target
+     * @param val Value to write
+     */
+    template <typename T>
+    static void writeSysFsValue(const std::string& path, const T& val)
+    {
+        std::ofstream   file(path);
+
+        if (!file.good())
+            throw (FsException("could not open " + path + '\''));
+        file << val;
+        file.clear();
+        file.seekp(0);
+    }
 };
 
 #endif // UNIXFS_HPP
