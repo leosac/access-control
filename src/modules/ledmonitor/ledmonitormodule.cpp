@@ -33,17 +33,13 @@ IModule::ModuleType LedMonitorModule::getType() const
 
 void LedMonitorModule::serialize(ptree& node)
 {
-    ptree& properties = node.add("properties", std::string());
-
     _led->setBrightness(0);
-    properties.put<std::string>("sysled", _ledName);
+    node.put<std::string>("sysled", _ledName);
 }
 
 void LedMonitorModule::deserialize(const ptree& node)
 {
-    ptree properties = node.get_child("properties");
-
-    _ledName = properties.get<std::string>("sysled");
+    _ledName = node.get<std::string>("sysled");
     if (!(_led = dynamic_cast<SystemLed*>(_hwmanager.getDevice(_ledName))))
         throw (ModuleException("could not retrieve device \'" + _ledName + '\''));
     _led->setBrightness(255);

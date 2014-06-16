@@ -57,7 +57,7 @@ void Core::serialize(ptree& node)
 
         child.put("<xmlattr>.file", module.second.libname);
         child.put("alias", module.first);
-        module.second.instance->serialize(child);
+        module.second.instance->serialize(child.put("properties", std::string()));
     }
     node.put_child("core", core);
     _moduleMgr.unloadModules();
@@ -74,13 +74,13 @@ void Core::deserialize(const ptree& node)
             _libsDirectories.push_back(v.second.data());
     }
     _moduleMgr.loadLibraries(_libsDirectories);
-    for (auto& v : node.get_child("core"))
+    for (const auto& v : node.get_child("core"))
     {
         if (v.first == "module")
         {
             module = _moduleMgr.loadModule(*this, v.second.get<std::string>("<xmlattr>.file", "default"), v.second.get<std::string>("alias"));
             _authProtocol.registerModule(module);
-            module->deserialize(v.second);
+            module->deserialize(v.second.get_child("properties"));
         }
     }
 }

@@ -27,14 +27,12 @@ IModule::ModuleType AuthTestModule::getType() const
 
 void AuthTestModule::serialize(ptree& node)
 {
-    ptree& child = node.add("properties", std::string());
-
-    _auth.serialize(child);
+    _auth.serialize(node);
 }
 
 void AuthTestModule::deserialize(const ptree& node)
 {
-    _auth.deserialize(node.get_child("properties").get_child("auth"));
+    _auth.deserialize(node.get_child("auth"));
 }
 
 void AuthTestModule::authenticate(const AuthRequest& ar)

@@ -24,7 +24,7 @@ RplethAuth::RplethAuth(ICore& core, const std::string& name)
     _name(name),
     _isRunning(true),
     _serverSocket(nullptr),
-    _port(DefaultPort),
+    _port(0),
     _fdMax(0),
     _timeout(DefaultTimeoutMs)
 {}
@@ -41,9 +41,7 @@ IModule::ModuleType RplethAuth::getType() const
 
 void RplethAuth::serialize(ptree& node)
 {
-    ptree& child = node.add("properties", std::string());
-
-    child.put("port", _port);
+    node.put("port", _port);
 
     _isRunning = false;
     _networkThread.join();
@@ -51,11 +49,7 @@ void RplethAuth::serialize(ptree& node)
 
 void RplethAuth::deserialize(const ptree& node)
 {
-    for (const auto& v : node)
-    {
-        if (v.first == "properties")
-            _port = v.second.get<Rezzo::UnixSocket::Port>("port");
-    }
+    _port = node.get<Rezzo::UnixSocket::Port>("port", DefaultPort);
     _networkThread = std::thread(&launch, this);
 }
 
