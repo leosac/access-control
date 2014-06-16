@@ -9,7 +9,9 @@
 
 #include "gpio.hpp"
 
+extern "C" {
 #include <poll.h>
+}
 
 #include <atomic>
 #include <thread>
@@ -24,7 +26,7 @@ class IGPIOListener;
 
 class GPIOManager : public IGPIOObservable, public IGPIOProvider
 {
-    static const int            DefaultTimeout = 100;
+    static const int            DefaultTimeout = 30;
     static const unsigned int   PollBufferSize = 64;
 
 public:
