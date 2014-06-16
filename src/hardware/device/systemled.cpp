@@ -58,7 +58,7 @@ int SystemLed::getBrightness() const
     return (UnixFs::readSysFsValue<int>(_brightnessFile));
 }
 
-void SystemLed::setBrightness(int value)
+void SystemLed::setBrightness(int value) const
 {
     UnixFs::writeSysFsValue<int>(_brightnessFile, value);
 }
@@ -84,7 +84,7 @@ std::string SystemLed::getActiveTrigger() const
     throw (DeviceException("Invalid trigger return"));
 }
 
-void SystemLed::setActiveTrigger(const std::string& trigger)
+void SystemLed::setActiveTrigger(const std::string& trigger) const
 {
     UnixFs::writeSysFsValue<std::string>(_triggerFile, trigger);
 }
@@ -94,7 +94,7 @@ int SystemLed::getDelayOn() const
     return (UnixFs::readSysFsValue<int>(_delayOnFile));
 }
 
-void SystemLed::setDelayOn(int value)
+void SystemLed::setDelayOn(int value) const
 {
     UnixFs::writeSysFsValue<int>(_delayOnFile, value);
 }
@@ -104,34 +104,14 @@ int SystemLed::getDelayOff() const
     return (UnixFs::readSysFsValue<int>(_delayOffFile));
 }
 
-void SystemLed::setDelayOff(int value)
+void SystemLed::setDelayOff(int value) const
 {
     UnixFs::writeSysFsValue<int>(_delayOffFile, value);
 }
 
 void SystemLed::test()
 {
-    LOG() << "Brightness=" << getBrightness();
-    setBrightness(0);
-    LOG() << "Brightness=" << getBrightness();
-    setBrightness(128);
-    LOG() << "Brightness=" << getBrightness();
-    setBrightness(255);
-    LOG() << "Brightness=" << getBrightness();
-
     LOG() << "Trigger=" << getActiveTrigger();
     setActiveTrigger("timer");
     LOG() << "Trigger=" << getActiveTrigger();
-    setActiveTrigger("none");
-    LOG() << "Trigger=" << getActiveTrigger();
-    setActiveTrigger("timer");
-    LOG() << "Trigger=" << getActiveTrigger();
-
-    LOG() << "Brightness=" << getBrightness();
-    setBrightness(0);
-    LOG() << "Brightness=" << getBrightness();
-    setBrightness(128);
-    LOG() << "Brightness=" << getBrightness();
-    setBrightness(255);
-    LOG() << "Brightness=" << getBrightness();
 }
