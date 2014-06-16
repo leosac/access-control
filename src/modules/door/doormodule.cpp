@@ -34,8 +34,6 @@ IModule::ModuleType DoorModule::getType() const
 
 void DoorModule::serialize(ptree& node)
 {
-    ptree& properties = node.add("properties", std::string());
-
     for (std::size_t i = 0; i < 7; ++i)
     {
         ptree ptre;
@@ -44,22 +42,20 @@ void DoorModule::serialize(ptree& node)
         ptre.put<bool>("<xmlattr>.opened", _days[i].open);
         ptre.put<int>("<xmlattr>.start", _days[i].start);
         ptre.put<int>("<xmlattr>.end", _days[i].end);
-        properties.add_child("day", ptre);
+        node.add_child("day", ptre);
     }
-    properties.put<std::string>("grantedLed", _grantedLedName);
+    node.put<std::string>("grantedLed", _grantedLedName);
 }
 
 void DoorModule::deserialize(const ptree& node)
 {
-    ptree properties = node.get_child("properties");
-
     for (std::size_t i = 0; i < 7; ++i)
     {
         _days[i].open = false;
         _days[i].start = 0;
         _days[i].end = 24;
     }
-    for (const auto& v : properties)
+    for (const auto& v : node)
     {
         if (v.first == "day")
         {
@@ -69,7 +65,7 @@ void DoorModule::deserialize(const ptree& node)
             _days[idx].end = v.second.get<int>("<xmlattr>.end", 24);
         }
     }
-    _grantedLedName = properties.get<std::string>("grantedLed");
+    _grantedLedName = node.get<std::string>("grantedLed");
     if (!(_grantedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_grantedLedName))))
         throw (ModuleException("could not retrieve device \'" + _grantedLedName + '\''));
 }

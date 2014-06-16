@@ -48,9 +48,7 @@ void SystemLed::deserialize(const ptree& node)
 
 void SystemLed::blink()
 {
-    setBrightness(0);
-    sleep_for(milliseconds(1));
-    setBrightness(255);
+    // TODO
 }
 
 int SystemLed::getBrightness() const

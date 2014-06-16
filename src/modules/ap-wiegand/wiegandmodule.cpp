@@ -48,19 +48,15 @@ IModule::ModuleType WiegandModule::getType() const
 
 void WiegandModule::serialize(ptree& node)
 {
-    ptree& properties = node.add("properties", std::string());
-
     _interface->unregisterListener(this);
-    properties.put("target", _target);
-    properties.put("readerDevice", _interfaceName);
+    node.put("target", _target);
+    node.put("readerDevice", _interfaceName);
 }
 
 void WiegandModule::deserialize(const ptree& node)
 {
-    ptree properties = node.get_child("properties");
-
-    _interfaceName = properties.get<std::string>("readerDevice");
-    _target = properties.get<std::string>("target");
+    _interfaceName = node.get<std::string>("readerDevice");
+    _target = node.get<std::string>("target");
     if (!(_interface = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_interfaceName))))
         throw (ModuleException("could not get reader device"));
     _interface->registerListener(this);
