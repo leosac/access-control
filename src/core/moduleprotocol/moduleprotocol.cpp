@@ -10,13 +10,14 @@
 
 #include "exception/moduleprotocolexception.hpp"
 #include "tools/log.hpp"
-
-#include "core/moduleprotocol/authcommands/aauthcommand.hpp"
+#include "authcommands/aauthcommand.hpp"
 #include "modules/iauthmodule.hpp"
 #include "modules/iloggermodule.hpp"
 #include "modules/idoormodule.hpp"
 #include "modules/iaccesspointmodule.hpp"
 #include "modules/imonitormodule.hpp"
+
+const int ModuleProtocol::AuthRequestValidity = 5;
 
 ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
@@ -133,7 +134,7 @@ void ModuleProtocol::processCommands()
 
 void ModuleProtocol::processAuthRequest(AuthRequest& ar)
 {
-    if ((ar.getDate() + std::chrono::seconds(5)) < system_clock::now())
+    if ((ar.getDate() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
     {
         ar.setState(AuthRequest::Closed);
         logMessage("AR timed out: uid=" + std::to_string(ar.getId()));

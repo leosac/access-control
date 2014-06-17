@@ -24,6 +24,7 @@ class ILoggerModule;
 
 class ModuleProtocol : public IModuleProtocol
 {
+    static const int AuthRequestValidity;
     typedef void (ModuleProtocol::*RegisterFunc)(IModule*);
 
 public:
