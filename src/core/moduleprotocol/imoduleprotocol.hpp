@@ -17,8 +17,9 @@ class AAuthCommand;
 class IModuleProtocol : public IAuthCommandHandler
 {
 public:
-    enum class ActivityType {
-        System,
+    static const int ActivityTypes = 2;
+    enum class ActivityType : int {
+        System = 0,
         Auth
     };
 
