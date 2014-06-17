@@ -13,9 +13,6 @@
 #include "tools/log.hpp"
 #include "tools/unixfs.hpp"
 
-using std::this_thread::sleep_for;
-using std::chrono::milliseconds;
-
 const std::string SystemLed::DevicePathPrefix = "/sys/class/leds/";
 
 SystemLed::SystemLed(const std::string& name)
@@ -40,10 +37,6 @@ void SystemLed::deserialize(const ptree& node)
     _triggerFile = _path + "trigger";
     _delayOnFile = _path + "delay_on";
     _delayOffFile = _path + "delay_off";
-
-    test(); // FIXME
-
-    setActiveTrigger("timer");
 }
 
 void SystemLed::blink()
@@ -92,9 +85,9 @@ int SystemLed::getDelayOn() const
     return (UnixFs::readSysFsValue<int>(_delayOnFile));
 }
 
-void SystemLed::setDelayOn(int value) const
+void SystemLed::setDelayOn(int milliseconds) const
 {
-    UnixFs::writeSysFsValue<int>(_delayOnFile, value);
+    UnixFs::writeSysFsValue<int>(_delayOnFile, milliseconds);
 }
 
 int SystemLed::getDelayOff() const
@@ -102,14 +95,7 @@ int SystemLed::getDelayOff() const
     return (UnixFs::readSysFsValue<int>(_delayOffFile));
 }
 
-void SystemLed::setDelayOff(int value) const
+void SystemLed::setDelayOff(int milliseconds) const
 {
-    UnixFs::writeSysFsValue<int>(_delayOffFile, value);
-}
-
-void SystemLed::test()
-{
-    LOG() << "Trigger=" << getActiveTrigger();
-    setActiveTrigger("timer");
-    LOG() << "Trigger=" << getActiveTrigger();
+    UnixFs::writeSysFsValue<int>(_delayOffFile, milliseconds);
 }

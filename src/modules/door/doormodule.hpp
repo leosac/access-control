@@ -9,6 +9,7 @@
 
 #include "modules/idoormodule.hpp"
 
+class Button;
 class Led;
 
 class DoorModule : public IDoorModule
@@ -19,6 +20,12 @@ class DoorModule : public IDoorModule
         int     end;
     } Day;
 
+    typedef struct {
+        std::string     doorRelay;
+        std::string     doorButton;
+        std::string     grantedLed;
+        std::string     deniedLed;
+    } Config;
 public:
     explicit DoorModule(ICore& core, const std::string& name);
     ~DoorModule() = default;
@@ -34,16 +41,21 @@ public:
     virtual bool                isAuthRequired() const override;
     virtual void                open() override;
 
-
 private:
+    void    loadDoorRelay();
+    void    loadDoorButton();
+    void    loadGrantedLed();
+    void    loadDeniedLed();
     bool    isDoorOpenable();
 
 private:
     ICore&              _core;
     IHWManager&         _hwmanager;
     const std::string   _name;
+    Button*             _doorButton;
     Led*                _grantedLed;
-    std::string         _grantedLedName;
+    Led*                _deniedLed;
+    Config              _config;
     Day                 _days[7];
 };
 
