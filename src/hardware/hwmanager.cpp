@@ -18,9 +18,9 @@
 
 void HWManager::serialize(ptree& node)
 {
-    ptree root = node.put("hardware", std::string());
-    ptree platform = root.put("platform", std::string());
-    ptree devices = root.put("devices", std::string());
+    ptree root;
+    ptree platform;
+    ptree devices;
 
     platform.put("<xmlattr>.name", _platform.name);
     for (auto& dev : _devices)
@@ -32,6 +32,9 @@ void HWManager::serialize(ptree& node)
         dev.second.instance->serialize(devNode);
         delete dev.second.instance;
     }
+    root.put_child("platform", platform);
+    root.put_child("devices", devices);
+    node.put_child("hardware", root);
     _devices.clear();
 }
 

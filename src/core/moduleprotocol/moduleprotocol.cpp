@@ -137,7 +137,7 @@ void ModuleProtocol::processAuthRequest(AuthRequest& ar)
     {
         ar.setState(AuthRequest::Closed);
         logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
-        return ;
+        return;
     }
     else if (ar.getState() == AuthRequest::New)
     {
@@ -145,7 +145,7 @@ void ModuleProtocol::processAuthRequest(AuthRequest& ar)
         {
             ar.setState(AuthRequest::Closed);
             logMessage("No such door " + ar.getTarget());
-            return ;
+            return;
         }
         IDoorModule*    door = _doorModules.at(ar.getTarget());
 
@@ -156,7 +156,7 @@ void ModuleProtocol::processAuthRequest(AuthRequest& ar)
         }
     }
     else if (ar.getState() == AuthRequest::Waiting)
-        return ;
+        return;
     else if (ar.getState() == AuthRequest::AskAuth)
     {
         ar.setState(AuthRequest::Waiting);
@@ -168,7 +168,7 @@ void ModuleProtocol::processAuthRequest(AuthRequest& ar)
         {
             ar.setState(AuthRequest::Closed);
             logMessage("No such door " + ar.getTarget());
-            return ;
+            return;
         }
         IDoorModule*    door = _doorModules.at(ar.getTarget());
         door->open();

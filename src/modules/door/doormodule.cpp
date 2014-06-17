@@ -14,12 +14,16 @@
 
 #include "hardware/device/gpio/gpio.hpp" // FIXME Debug
 #include "hardware/device/led.hpp"
+#include "hardware/device/button.hpp"
 #include "exception/moduleexception.hpp"
 
 DoorModule::DoorModule(ICore& core, const std::string& name)
 :   _core(core),
     _hwmanager(core.getHWManager()),
-    _name(name)
+    _name(name),
+    _doorButton(nullptr),
+    _grantedLed(nullptr),
+    _deniedLed(nullptr)
 {}
 
 const std::string& DoorModule::getName() const
@@ -44,7 +48,10 @@ void DoorModule::serialize(ptree& node)
         ptre.put<int>("<xmlattr>.end", _days[i].end);
         node.add_child("day", ptre);
     }
-    node.put<std::string>("grantedLed", _grantedLedName);
+    node.put<std::string>("doorRelay", _config.doorRelay);
+    node.put<std::string>("doorButton", _config.doorButton);
+    node.put<std::string>("grantedLed", _config.grantedLed);
+    node.put<std::string>("deniedLed", _config.deniedLed);
 }
 
 void DoorModule::deserialize(const ptree& node)
@@ -65,19 +72,55 @@ void DoorModule::deserialize(const ptree& node)
             _days[idx].end = v.second.get<int>("<xmlattr>.end", 24);
         }
     }
-    _grantedLedName = node.get<std::string>("grantedLed");
-    if (!(_grantedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_grantedLedName))))
-        throw (ModuleException("could not retrieve device \'" + _grantedLedName + '\''));
-}
+    _config.doorRelay = node.get<std::string>("doorRelay", "none");
+    _config.doorButton = node.get<std::string>("doorButton", "none");
+    _config.grantedLed = node.get<std::string>("grantedLed", "none");
+    _config.deniedLed = node.get<std::string>("deniedLed", "none");
 
-void DoorModule::open()
-{
-    _grantedLed->blink(); // DEBUG
+    loadDoorRelay();
+    loadDoorButton();
+    loadGrantedLed();
+    loadDeniedLed();
 }
 
 bool DoorModule::isAuthRequired() const
 {
     return (true); // FIXME
+}
+
+void DoorModule::open()
+{
+    if (_grantedLed)
+        _grantedLed->blink(); // DEBUG
+}
+
+void DoorModule::loadDoorRelay()
+{
+    // TODO
+}
+
+void DoorModule::loadDoorButton()
+{
+    if (_config.doorButton == "none")
+        return;
+    if (!(_doorButton = dynamic_cast<Button*>(_hwmanager.getDevice(_config.doorButton))))
+        throw (ModuleException("could not retrieve device \'" + _config.doorButton + '\''));
+}
+
+void DoorModule::loadGrantedLed()
+{
+    if (_config.grantedLed == "none")
+        return;
+    if (!(_grantedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_config.grantedLed))))
+        throw (ModuleException("could not retrieve device \'" + _config.grantedLed + '\''));
+}
+
+void DoorModule::loadDeniedLed()
+{
+    if (_config.deniedLed == "none")
+        return;
+    if (!(_deniedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_config.deniedLed))))
+        throw (ModuleException("could not retrieve device \'" + _config.deniedLed + '\''));
 }
 
 bool DoorModule::isDoorOpenable()

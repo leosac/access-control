@@ -36,12 +36,9 @@ public:
     std::string     getActiveTrigger() const;
     void            setActiveTrigger(const std::string& trigger) const;
     int             getDelayOn() const;
-    void            setDelayOn(int delay) const;
+    void            setDelayOn(int milliseconds) const;
     int             getDelayOff() const;
-    void            setDelayOff(int delay) const;
-
-private:
-    void    test();
+    void            setDelayOff(int milliseconds) const;
 
 private:
     const std::string   _name;
