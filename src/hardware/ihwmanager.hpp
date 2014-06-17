@@ -11,10 +11,6 @@
 
 class IDevice;
 
-class IWiegandListener;
-class WiegandInterface;
-class GPIO;
-
 class IHWManager
 {
 public:
