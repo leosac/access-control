@@ -88,6 +88,7 @@ void Core::deserialize(const ptree& node)
 void Core::run()
 {
     try {
+        _isRunning = true;
         _hwconfig.deserialize();
         LOG() << "devices are up";
         _hwManager.start();
@@ -97,7 +98,6 @@ void Core::run()
         SignalHandler::registerCallback(this);
         _authProtocol.printDebug();
         LOG() << "starting core loop";
-        _isRunning = true;
         while (_isRunning)
         {
             sleep_for(milliseconds(IdleSleepTimeMs));

@@ -75,7 +75,6 @@ void ModuleProtocol::cmdAuthorize(AuthRequest::Uid id, bool granted)
 
 void ModuleProtocol::sync()
 {
-    notifyMonitor(ActivityType::System);
     processCommands();
     for (auto it = _requests.begin(); it != _requests.end();)
     {
@@ -114,6 +113,8 @@ void ModuleProtocol::printDebug()
         LOG() << "AccessPoint " << a.second->getName();
     for (auto a : _loggerModules)
         LOG() << "Logger " << a->getName();
+    for (auto a : _monitorModules)
+        LOG() << "Monitor " << a->getName();
 }
 
 void ModuleProtocol::processCommands()

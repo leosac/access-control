@@ -7,12 +7,20 @@
 #ifndef LEDMONITORMODULE_HPP
 #define LEDMONITORMODULE_HPP
 
+#include <map>
+
 #include "modules/imonitormodule.hpp"
 
 class SystemLed;
 
 class LedMonitorModule : public IMonitorModule
 {
+    static const std::string TypeStrings[IModuleProtocol::ActivityTypes];
+    typedef struct {
+        std::string deviceName;
+        SystemLed*  instance;
+    } MonitorLed;
+
 public:
     explicit LedMonitorModule(ICore& core, const std::string& name);
     ~LedMonitorModule() = default;
@@ -28,11 +36,10 @@ public:
     virtual void                notify(IModuleProtocol::ActivityType type) override;
 
 private:
-    ICore&              _core;
-    IHWManager&         _hwmanager;
-    const std::string   _name;
-    SystemLed*          _led;
-    std::string         _ledName;
+    ICore&                                              _core;
+    IHWManager&                                         _hwmanager;
+    const std::string                                   _name;
+    std::map<IModuleProtocol::ActivityType, MonitorLed> _leds;
 };
 
 #endif // LEDMONITORMODULE_HPP

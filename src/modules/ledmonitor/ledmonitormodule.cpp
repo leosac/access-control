@@ -15,6 +15,11 @@
 #include "hardware/device/systemled.hpp"
 #include "exception/moduleexception.hpp"
 
+const std::string   LedMonitorModule::TypeStrings[IModuleProtocol::ActivityTypes] = {
+    "system",
+    "auth"
+};
+
 LedMonitorModule::LedMonitorModule(ICore& core, const std::string& name)
 :   _core(core),
     _hwmanager(core.getHWManager()),
@@ -33,22 +38,48 @@ IModule::ModuleType LedMonitorModule::getType() const
 
 void LedMonitorModule::serialize(ptree& node)
 {
-    _led->setBrightness(0);
-    node.put<std::string>("sysled", _ledName);
+    for (auto led : _leds)
+    {
+        ptree& lednode = node.add("led", std::string());
+
+        lednode.put("<xmlattr>.type", TypeStrings[static_cast<int>(led.first)]);
+        lednode.put("<xmlattr>.device", led.second.deviceName);
+        led.second.instance->setBrightness(0);
+    }
+    _leds.clear();
 }
 
 void LedMonitorModule::deserialize(const ptree& node)
 {
-    _ledName = node.get<std::string>("sysled");
-    if (!(_led = dynamic_cast<SystemLed*>(_hwmanager.getDevice(_ledName))))
-        throw (ModuleException("could not retrieve device \'" + _ledName + '\''));
-    _led->setBrightness(255);
+    for (const auto& v : node)
+    {
+        MonitorLed  newLed;
+        std::string typeString;
+
+        if (v.first != "led")
+            continue;
+        newLed.deviceName = v.second.get<std::string>("<xmlattr>.device");
+        if (!(newLed.instance = dynamic_cast<SystemLed*>(_hwmanager.getDevice(newLed.deviceName))))
+            throw (ModuleException("could not retrieve device \'" + newLed.deviceName + '\''));
+        typeString = v.second.get<std::string>("<xmlattr>.type");
+        for (int i = 0; i < IModuleProtocol::ActivityTypes; ++i)
+        {
+            if (TypeStrings[i] == typeString)
+            {
+                IModuleProtocol::ActivityType type = static_cast<IModuleProtocol::ActivityType>(i);
+                if (_leds.count(type) > 0)
+                    throw (ModuleException("led already registered for type \'" + typeString + '\''));
+                newLed.instance->setBrightness(255);
+                _leds.emplace(type, newLed);
+                break;
+            }
+        }
+    }
 }
 
 void LedMonitorModule::notify(IModuleProtocol::ActivityType type)
 {
-    static_cast<void>(type);
-
-    LOG() << "Notified !";
-    _led->blink();
+    if (!_leds.count(type))
+        return;
+    _leds.at(type).instance->blink();
 }

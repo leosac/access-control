@@ -3,35 +3,30 @@
     <plugindir>.</plugindir>
     <module file="libdoor.so">
         <alias>doorA</alias>
-        <properties>
-            <grantedLed>led1</grantedLed>
-        </properties>
+        <properties/>
     </module>
     <module file="libdoor.so">
         <alias>doorB</alias>
-        <properties>
-            <grantedLed>led2</grantedLed>
-        </properties>
+        <properties/>
     </module>
     <module file="libjournal.so">
         <alias>log</alias>
-        <properties>
-        </properties>
+        <properties/>
     </module>
     <module file="libledmonitor.so">
         <alias>monitor</alias>
         <properties>
-            <sysled>blue</sysled>
-            <sysled>green</sysled>
+            <led type="system" device="green"/>
+            <led type="auth" device="blue"/>
         </properties>
     </module>
-    <module file="libwiegand.so">
+<!--    <module file="libwiegand.so">
         <alias>reader</alias>
         <properties>
             <target>doorA</target>
             <readerDevice>readerA</readerDevice>
         </properties>
-    </module>
+    </module>-->
     <module file="libauthtest.so">
         <alias>authtest</alias>
         <properties>
