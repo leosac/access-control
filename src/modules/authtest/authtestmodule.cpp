@@ -45,7 +45,7 @@ void AuthTestModule::authenticate(const AuthRequest& ar)
         cid.push_back(static_cast<Byte>(byte));
 
     if (_auth.hasAccess(cid))
-        _protocol.pushAuthCommand(new AuthCmdGrantAccess(&_protocol, ar.getId()));
+        _protocol.pushCommand(new AuthCmdGrantAccess(&_protocol, ar.getId()));
     else
-        _protocol.pushAuthCommand(new AuthCmdDenyAccess(&_protocol, ar.getId()));
+        _protocol.pushCommand(new AuthCmdDenyAccess(&_protocol, ar.getId()));
 }
