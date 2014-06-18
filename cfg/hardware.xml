@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <hardware>
-    <platform name="CubieBoard2">
-
-    </platform>
+    <platform name="CubieBoard2"/>
     <devices>
 <!--        <device type="button" name="testButtonA"/>
         <device type="button" name="testButtonB"/>-->
