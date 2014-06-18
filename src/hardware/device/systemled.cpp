@@ -28,6 +28,7 @@ const std::string& SystemLed::getName() const
 
 void SystemLed::serialize(ptree& node)
 {
+    setBrightness(0);
     node.put<std::string>("<xmlattr>.ledname", _ledName);
 }
 
@@ -39,6 +40,9 @@ void SystemLed::deserialize(const ptree& node)
     _triggerFile = _path + "trigger";
     _delayOnFile = _path + "delay_on";
     _delayOffFile = _path + "delay_off";
+
+    setBrightness(255);
+    setActiveTrigger("timer");
 }
 
 void SystemLed::blink()

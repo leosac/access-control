@@ -11,7 +11,7 @@
 #include "hardware/device/wiegandreader.hpp"
 #include "exception/moduleexception.hpp"
 #include "core/moduleprotocol/moduleprotocol.hpp"
-#include <core/moduleprotocol/authcommands/authcmdcreaterequest.hpp>
+#include "core/moduleprotocol/authcommands/authcmdcreaterequest.hpp"
 
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _core(core),
