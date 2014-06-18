@@ -1,6 +1,7 @@
 set(DOOR_BIN door)
 
 set(DOOR_SRCS
+    doorconfig.cpp
     doormodule.cpp
     init.cpp
 )

@@ -3,11 +3,15 @@
     <plugindir>.</plugindir>
     <module file="libdoor.so">
         <alias>doorA</alias>
-        <properties/>
+        <properties>
+            <doorconf>cfg/doorA.conf</doorconf>
+        </properties>
     </module>
     <module file="libdoor.so">
         <alias>doorB</alias>
-        <properties/>
+        <properties>
+            <doorconf>cfg/doorB.conf</doorconf>
+        </properties>
     </module>
     <module file="libjournal.so">
         <alias>log</alias>

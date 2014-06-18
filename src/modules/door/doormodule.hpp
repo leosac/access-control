@@ -8,6 +8,7 @@
 #define DOORMODULE_HPP
 
 #include "modules/idoormodule.hpp"
+#include "doorconfig.hpp"
 
 class Button;
 class Led;
@@ -15,16 +16,11 @@ class Led;
 class DoorModule : public IDoorModule
 {
     typedef struct {
-        bool    open;
-        int     start;
-        int     end;
-    } Day;
-
-    typedef struct {
         std::string     doorRelay;
         std::string     doorButton;
         std::string     grantedLed;
         std::string     deniedLed;
+        std::string     doorConf;
     } Config;
 public:
     explicit DoorModule(ICore& core, const std::string& name);
@@ -52,11 +48,12 @@ private:
     ICore&              _core;
     IHWManager&         _hwmanager;
     const std::string   _name;
+    std::string         _configFile;
+    DoorConfig          _doorConfig;
     Button*             _doorButton;
     Led*                _grantedLed;
     Led*                _deniedLed;
     Config              _config;
-    Day                 _days[7];
 };
 
 #endif // DOORMODULE_HPP
