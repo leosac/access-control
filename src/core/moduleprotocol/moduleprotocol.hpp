@@ -51,6 +51,8 @@ public:
 private:
     void    processCommands();
     void    processAuthRequest(AuthRequest& ar);
+
+private:
     void    registerDoorModule(IModule* module);
     void    registerAccessPointModule(IModule* module);
     void    registerAuthModule(IModule* module);

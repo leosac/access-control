@@ -44,7 +44,6 @@ void LedMonitorModule::serialize(ptree& node)
 
         lednode.put("<xmlattr>.type", TypeStrings[static_cast<int>(led.first)]);
         lednode.put("<xmlattr>.device", led.second.deviceName);
-        led.second.instance->setBrightness(0);
     }
     _leds.clear();
 }
@@ -69,6 +68,7 @@ void LedMonitorModule::deserialize(const ptree& node)
                 IModuleProtocol::ActivityType type = static_cast<IModuleProtocol::ActivityType>(i);
                 if (_leds.count(type) > 0)
                     throw (ModuleException("led already registered for type \'" + typeString + '\''));
+                newLed.instance->setActiveTrigger("none");
                 newLed.instance->setBrightness(255);
                 _leds.emplace(type, newLed);
                 break;
