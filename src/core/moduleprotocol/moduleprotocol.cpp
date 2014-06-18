@@ -42,11 +42,11 @@ void ModuleProtocol::notifyMonitor(ModuleProtocol::ActivityType type)
         monitor->notify(type);
 }
 
-void ModuleProtocol::pushAuthCommand(AAuthCommand* command)
+void ModuleProtocol::pushCommand(ICommand* command)
 {
-    std::lock_guard<std::mutex> lg(_authCommandsMutex);
+    std::lock_guard<std::mutex> lg(_commandsMutex);
 
-    _authCommands.push(command);
+    _commands.push(command);
 }
 
 void ModuleProtocol::cmdCreateAuthRequest(const std::string& source, const std::string& target, const std::string& content)
@@ -119,17 +119,17 @@ void ModuleProtocol::printDebug()
 
 void ModuleProtocol::processCommands()
 {
-    std::lock_guard<std::mutex> lg(_authCommandsMutex);
+    std::lock_guard<std::mutex> lg(_commandsMutex);
     ICommand*                   cmd;
 
-    while (!_authCommands.empty())
+    while (!_commands.empty())
     {
-        cmd = _authCommands.front();
-        _authCommands.pop();
-        _authCommandsMutex.unlock();
+        cmd = _commands.front();
+        _commands.pop();
+        _commandsMutex.unlock();
         cmd->execute();
         delete cmd;
-        _authCommandsMutex.lock();
+        _commandsMutex.lock();
     }
 }
 

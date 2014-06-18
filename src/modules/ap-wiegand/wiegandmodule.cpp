@@ -32,7 +32,7 @@ void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
             oss << ' ';
         oss << static_cast<unsigned int>(cardId[i]);
     }
-    _core.getModuleProtocol().pushAuthCommand(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, oss.str()));
+    _core.getModuleProtocol().pushCommand(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, oss.str()));
     _core.getModuleProtocol().notifyMonitor(IModuleProtocol::ActivityType::Auth); // DEBUG
 }
 
