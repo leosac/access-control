@@ -2,7 +2,6 @@ set(WIEGAND_BIN wiegand)
 
 set(WIEGAND_SRCS
     wiegandmodule.cpp
-    wiegandrequester.cpp
     init.cpp
 )
 
