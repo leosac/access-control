@@ -80,10 +80,6 @@ void ModuleProtocol::sync()
     {
         AuthRequest& ar(it->second);
 
-
-        it = _requests.erase(it);
-        continue; // FIXME
-
         if (ar.getState() == AuthRequest::Closed)
             it = _requests.erase(it);
         else

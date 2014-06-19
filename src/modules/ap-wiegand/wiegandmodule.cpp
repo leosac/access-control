@@ -6,35 +6,18 @@
 
 #include "wiegandmodule.hpp"
 
-#include <sstream>
-
-#include "hardware/device/wiegandreader.hpp"
 #include "exception/moduleexception.hpp"
 #include "core/moduleprotocol/moduleprotocol.hpp"
 #include "core/moduleprotocol/authcommands/authcmdcreaterequest.hpp"
+#include "hardware/device/wiegandreader.hpp"
 
 WiegandModule::WiegandModule(ICore& core, const std::string& name)
 :   _core(core),
     _name(name),
     _hiGPIO(0),
     _loGPIO(0),
-    _hwmanager(core.getHWManager()),
-    _interface(nullptr)
+    _hwmanager(core.getHWManager())
 {}
-
-void WiegandModule::notifyCardRead(const IWiegandListener::CardId& cardId)
-{
-    std::ostringstream  oss; // FIXME encode in xml
-
-    for (std::size_t i = 0; i < cardId.size(); ++i)
-    {
-        if (i > 0)
-            oss << ' ';
-        oss << static_cast<unsigned int>(cardId[i]);
-    }
-    _core.getModuleProtocol().pushCommand(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, oss.str()));
-    _core.getModuleProtocol().notifyMonitor(IModuleProtocol::ActivityType::Auth); // DEBUG
-}
 
 const std::string& WiegandModule::getName() const
 {
@@ -48,16 +31,26 @@ IModule::ModuleType WiegandModule::getType() const
 
 void WiegandModule::serialize(ptree& node)
 {
-    _interface->unregisterListener(this);
+    _requesterList.clear();
     node.put("target", _target);
-    node.put("readerDevice", _interfaceName);
+    node.put("readerDevice", _deviceName);
 }
 
 void WiegandModule::deserialize(const ptree& node)
 {
-    _interfaceName = node.get<std::string>("readerDevice");
+    WiegandReader*  device;
+
+    _deviceName = node.get<std::string>("readerDevice");
     _target = node.get<std::string>("target");
-    if (!(_interface = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_interfaceName))))
+    if (!(device = dynamic_cast<WiegandReader*>(_hwmanager.getDevice(_deviceName))))
         throw (ModuleException("could not get reader device"));
-    _interface->registerListener(this);
+    _requesterList.push_back(WiegandRequester(*this, device));
+}
+
+void WiegandModule::notifyAccess(const std::string& request)
+{
+    std::lock_guard<std::mutex> lg(_notifyMutex);
+
+    _core.getModuleProtocol().pushCommand(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, request));
+    _core.getModuleProtocol().notifyMonitor(IModuleProtocol::ActivityType::Auth);
 }
