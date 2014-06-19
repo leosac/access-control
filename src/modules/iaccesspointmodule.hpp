@@ -10,12 +10,12 @@
 #include "imodule.hpp"
 
 #include <string>
-#include <vector>
 
 class IAccessPointModule : public IModule
 {
 public:
     virtual ~IAccessPointModule() {}
+    virtual void    notifyAccess(const std::string& request) = 0;
 };
 
 #endif // IACCESSPOINTMODULE_HPP

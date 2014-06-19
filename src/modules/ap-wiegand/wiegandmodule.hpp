@@ -7,14 +7,14 @@
 #ifndef WIEGANDMODULE_HPP
 #define WIEGANDMODULE_HPP
 
+#include <list>
+#include <mutex>
+
 #include "modules/iaccesspointmodule.hpp"
-#include "hardware/device/iwiegandlistener.hpp"
+#include "wiegandrequester.hpp"
 #include "hardware/ihwmanager.hpp"
 
-class Led;
-class WiegandReader;
-
-class WiegandModule : public IAccessPointModule, public IWiegandListener
+class WiegandModule : public IAccessPointModule
 {
 public:
     explicit WiegandModule(ICore& core, const std::string& name);
@@ -24,21 +24,22 @@ public:
     WiegandModule& operator=(const WiegandModule& other) = delete;
 
 public:
-    virtual void                notifyCardRead(const CardId& cardId) override;
     virtual const std::string&  getName() const override;
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
+    virtual void                notifyAccess(const std::string& request) override;
 
 private:
-    ICore&              _core;
-    const std::string   _name;
-    unsigned int        _hiGPIO;
-    unsigned int        _loGPIO;
-    std::string         _target;
-    IHWManager&         _hwmanager;
-    WiegandReader*      _interface;
-    std::string         _interfaceName;
+    ICore&                      _core;
+    const std::string           _name;
+    unsigned int                _hiGPIO;
+    unsigned int                _loGPIO;
+    std::string                 _target;
+    IHWManager&                 _hwmanager;
+    std::string                 _deviceName;
+    std::mutex                  _notifyMutex;
+    std::list<WiegandRequester> _requesterList;
 };
 
 #endif // WIEGANDMODULE_HPP
