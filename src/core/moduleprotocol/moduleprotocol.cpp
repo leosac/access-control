@@ -92,7 +92,7 @@ void ModuleProtocol::notifyMonitor(ModuleProtocol::ActivityType type)
         monitor->notify(type);
 }
 
-void ModuleProtocol::pushCommand(ICommand* command)
+void ModuleProtocol::pushCommand(ICommand::Ptr command)
 {
     std::lock_guard<std::mutex> lg(_commandsMutex);
 
@@ -159,7 +159,7 @@ void ModuleProtocol::registerModule(IModule* module)
 void ModuleProtocol::processCommands()
 {
     std::lock_guard<std::mutex> lg(_commandsMutex);
-    ICommand*                   cmd;
+    ICommand::Ptr               cmd;
 
     while (!_commands.empty())
     {
@@ -167,7 +167,6 @@ void ModuleProtocol::processCommands()
         _commands.pop();
         _commandsMutex.unlock();
         cmd->execute();
-        delete cmd;
         _commandsMutex.lock();
     }
 }

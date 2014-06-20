@@ -15,7 +15,6 @@
 
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
-#include "core/icommand.hpp"
 #include "tools/dfautomata.hpp"
 
 class IAccessPointModule;
@@ -39,7 +38,7 @@ public:
 public:
     virtual void    logMessage(const std::string& message) override;
     virtual void    notifyMonitor(IModuleProtocol::ActivityType type) override;
-    virtual void    pushCommand(ICommand* command) override;
+    virtual void    pushCommand(ICommand::Ptr command) override;
 
 public:
     virtual void    cmdCreateAuthRequest(const std::string& source, const std::string& target, const std::string& content) override;
@@ -63,7 +62,7 @@ private:
     AuthRequest::Uid                            _authCounter;
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::mutex                                  _commandsMutex;
-    std::queue<ICommand*>                       _commands;
+    std::queue<ICommand::Ptr>                   _commands;
     DFAutomata<AuthRequest, int, int>           _authLogic;
 
 private:

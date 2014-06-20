@@ -17,9 +17,10 @@
 template <class UserType, class IdxType, class TransitionType>
 class DFAutomata
 {
+    typedef std::map<IdxType, std::map<TransitionType, IdxType> > TransitionMap;
+
 public:
     typedef std::function<void(UserType&)> Node;
-    typedef std::map<IdxType, std::map<TransitionType, IdxType> > TransitionMap;
 
 public:
     explicit DFAutomata() = default;

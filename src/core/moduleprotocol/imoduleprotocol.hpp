@@ -11,8 +11,7 @@
 
 #include "authrequest.hpp"
 #include "authcommands/iauthcommandhandler.hpp"
-
-class ICommand;
+#include "core/icommand.hpp"
 
 class IModuleProtocol : public IAuthCommandHandler
 {
@@ -27,7 +26,7 @@ public:
     virtual ~IModuleProtocol() {}
     virtual void    logMessage(const std::string& message) = 0;
     virtual void    notifyMonitor(ActivityType type) = 0;
-    virtual void    pushCommand(ICommand* command) = 0;
+    virtual void    pushCommand(ICommand::Ptr command) = 0;
 };
 
 #endif // IMODULEPROTOCOL_HPP

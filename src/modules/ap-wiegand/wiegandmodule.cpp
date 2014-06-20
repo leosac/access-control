@@ -53,6 +53,6 @@ void WiegandModule::notifyAccess(const std::string& request)
 {
     std::lock_guard<std::mutex> lg(_notifyMutex);
 
-    _core.getModuleProtocol().pushCommand(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, request));
+    _core.getModuleProtocol().pushCommand(ICommand::Ptr(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, request)));
     _core.getModuleProtocol().notifyMonitor(IModuleProtocol::ActivityType::Auth);
 }
