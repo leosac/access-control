@@ -17,13 +17,12 @@ class AuthRequest
 public:
     typedef unsigned long Uid;
     enum State {
-        New = 0,
+        New = 1, // NOTE 0 is used as error value for DFAutomata
         Waiting,
         AskAuth,
         Authorized,
         Denied,
         Closed
-        // FIXME
     };
 
 public:

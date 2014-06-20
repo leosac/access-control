@@ -99,6 +99,9 @@ const IHWManager::PlatformInfo& HWManager::getPlatformInfo() const
     return (_platform);
 }
 
+/*
+ * NOTE This factory can be improved easily
+ */
 ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::string& name)
 {
     if (type == "button")

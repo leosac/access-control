@@ -9,10 +9,11 @@
 
 #include "hardware/device/iwiegandlistener.hpp"
 #include "modules/iaccesspointmodule.hpp"
+#include "modules/iaccessrequester.hpp"
 
 class WiegandReader;
 
-class WiegandRequester : public IWiegandListener
+class WiegandRequester : public IWiegandListener, public IAccessRequester
 {
 public:
     explicit WiegandRequester(IAccessPointModule& accessPoint, WiegandReader* device);

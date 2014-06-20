@@ -16,6 +16,7 @@
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
 #include "core/icommand.hpp"
+#include "tools/dfautomata.hpp"
 
 class IAccessPointModule;
 class IDoorModule;
@@ -47,11 +48,9 @@ public:
 public:
     void    sync();
     void    registerModule(IModule* module);
-    void    printDebug(); // FIXME
 
 private:
     void    processCommands();
-    void    processAuthRequest(AuthRequest& ar);
 
 private:
     void    registerDoorModule(IModule* module);
@@ -65,6 +64,7 @@ private:
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::mutex                                  _commandsMutex;
     std::queue<ICommand*>                       _commands;
+    DFAutomata<AuthRequest, int, int>           _authLogic;
 
 private:
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;

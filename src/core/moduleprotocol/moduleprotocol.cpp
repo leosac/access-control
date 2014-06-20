@@ -19,6 +19,13 @@
 
 const int ModuleProtocol::AuthRequestValidity = 5;
 
+enum Transition {
+    Authorize,
+    Deny,
+    AskAuth,
+    Close
+};
+
 ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
     _authModule(nullptr)
@@ -28,6 +35,49 @@ ModuleProtocol::ModuleProtocol()
     _registrationHandler[IModule::ModuleType::Auth] = &ModuleProtocol::registerAuthModule;
     _registrationHandler[IModule::ModuleType::Logger] = &ModuleProtocol::registerLoggerModule;
     _registrationHandler[IModule::ModuleType::ActivityMonitor] = &ModuleProtocol::registerActivityMonitorModule;
+
+    _authLogic.addNode(AuthRequest::New, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: New";
+        if (!_doorModules.count(request.getTarget()))
+        {
+            request.setState(0);
+            logMessage("No such door " + request.getTarget());
+            return;
+        }
+        IDoorModule*    door = _doorModules.at(request.getTarget());
+
+        if (door->isAuthRequired())
+            _authModule->authenticate(request);
+        else
+            request.setState(_authLogic.update(request, request.getState(), Authorize));
+    } );
+
+    _authLogic.addNode(AuthRequest::AskAuth, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: AskAuth";
+        _authModule->authenticate(request);
+    } );
+
+    _authLogic.addNode(AuthRequest::Authorized, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: Authorized";
+        notifyMonitor(ActivityType::Auth);
+        if (!_doorModules.count(request.getTarget()))
+        {
+            request.setState(0);
+            logMessage("No such door " + request.getTarget());
+            return;
+        }
+        IDoorModule*    door = _doorModules.at(request.getTarget());
+        door->open();
+    } );
+
+    _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);
+    _authLogic.addTransition(AuthRequest::New, Deny, AuthRequest::Denied);
+    _authLogic.addTransition(AuthRequest::New, AskAuth, AuthRequest::AskAuth);
+    _authLogic.addTransition(AuthRequest::AskAuth, Authorize, AuthRequest::Authorized);
+    _authLogic.addTransition(AuthRequest::AskAuth, Deny, AuthRequest::Denied);
 }
 
 void ModuleProtocol::logMessage(const std::string& message)
@@ -55,22 +105,22 @@ void ModuleProtocol::cmdCreateAuthRequest(const std::string& source, const std::
 
     _requests.emplace(_authCounter, ar);
     ++_authCounter;
+
+    _authLogic.startNode(_requests.at(ar.getId()), AuthRequest::New);
+    LOG() << "CMD: AR created id=" << ar.getId();
 }
 
 void ModuleProtocol::cmdAuthorize(AuthRequest::Uid id, bool granted)
 {
-    try {
-        AuthRequest&    ar(_requests.at(id));
+    if (!_requests.count(id))
+    {
+        logMessage("Bad auth request id: " + std::to_string(id));
+        return;
+    }
 
-        static_cast<void>(granted);
-        if (granted)
-            ar.setState(AuthRequest::Authorized);
-        else
-            ar.setState(AuthRequest::Denied);
-    }
-    catch (const std::logic_error& e) {
-        logMessage(e.what());
-    }
+    AuthRequest&    ar(_requests.at(id));
+
+    ar.setState(_authLogic.update(ar, ar.getState(), granted ? Authorize : Deny));
 }
 
 void ModuleProtocol::sync()
@@ -80,11 +130,18 @@ void ModuleProtocol::sync()
     {
         AuthRequest& ar(it->second);
 
-        if (ar.getState() == AuthRequest::Closed)
+        if (!ar.getState())
+        {
+            LOG() << "AR id=" << ar.getId() << " erased";
             it = _requests.erase(it);
+        }
         else
         {
-            processAuthRequest(ar);
+            if ((ar.getDate() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
+            {
+                ar.setState(0);
+                logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
+            }
             ++it;
         }
     }
@@ -97,20 +154,6 @@ void ModuleProtocol::registerModule(IModule* module)
     if (!func)
         throw (ModuleProtocolException("Unknown module type"));
     ((*this).*func)(module);
-}
-
-void ModuleProtocol::printDebug()
-{
-    LOG() << "Registered modules:";
-    LOG() << "AuthModule " << _authModule->getName();
-    for (auto a : _doorModules)
-        LOG() << "Door " << a.second->getName();
-    for (auto a : _apModules)
-        LOG() << "AccessPoint " << a.second->getName();
-    for (auto a : _loggerModules)
-        LOG() << "Logger " << a->getName();
-    for (auto a : _monitorModules)
-        LOG() << "Monitor " << a->getName();
 }
 
 void ModuleProtocol::processCommands()
@@ -127,53 +170,6 @@ void ModuleProtocol::processCommands()
         delete cmd;
         _commandsMutex.lock();
     }
-}
-
-void ModuleProtocol::processAuthRequest(AuthRequest& ar)
-{
-    if ((ar.getDate() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
-    {
-        ar.setState(AuthRequest::Closed);
-        logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
-        return;
-    }
-    else if (ar.getState() == AuthRequest::New)
-    {
-        if (!_doorModules.count(ar.getTarget()))
-        {
-            ar.setState(AuthRequest::Closed);
-            logMessage("No such door " + ar.getTarget());
-            return;
-        }
-        IDoorModule*    door = _doorModules.at(ar.getTarget());
-
-        if (door->isAuthRequired())
-        {
-            ar.setState(AuthRequest::Waiting);
-            _authModule->authenticate(ar);
-        }
-    }
-    else if (ar.getState() == AuthRequest::Waiting)
-        return;
-    else if (ar.getState() == AuthRequest::AskAuth)
-    {
-        ar.setState(AuthRequest::Waiting);
-        _authModule->authenticate(ar);
-    }
-    else if (ar.getState() == AuthRequest::Authorized)
-    {
-        if (!_doorModules.count(ar.getTarget()))
-        {
-            ar.setState(AuthRequest::Closed);
-            logMessage("No such door " + ar.getTarget());
-            return;
-        }
-        IDoorModule*    door = _doorModules.at(ar.getTarget());
-        door->open();
-        ar.setState(AuthRequest::Closed);
-    }
-    else if (ar.getState() == AuthRequest::Denied)
-        ar.setState(AuthRequest::Closed);
 }
 
 void ModuleProtocol::registerDoorModule(IModule* module)

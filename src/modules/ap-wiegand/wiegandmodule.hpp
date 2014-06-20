@@ -11,11 +11,14 @@
 #include <mutex>
 
 #include "modules/iaccesspointmodule.hpp"
-#include "wiegandrequester.hpp"
+#include "modules/iaccessrequester.hpp"
 #include "hardware/ihwmanager.hpp"
+#include "wiegandrequester.hpp"
 
 class WiegandModule : public IAccessPointModule
 {
+    typedef std::list<IAccessRequester*> RequesterList;
+
 public:
     explicit WiegandModule(ICore& core, const std::string& name);
     ~WiegandModule() = default;
@@ -31,15 +34,15 @@ public:
     virtual void                notifyAccess(const std::string& request) override;
 
 private:
-    ICore&                      _core;
-    const std::string           _name;
-    unsigned int                _hiGPIO;
-    unsigned int                _loGPIO;
-    std::string                 _target;
-    IHWManager&                 _hwmanager;
-    std::string                 _deviceName;
-    std::mutex                  _notifyMutex;
-    std::list<WiegandRequester> _requesterList;
+    ICore&              _core;
+    const std::string   _name;
+    unsigned int        _hiGPIO;
+    unsigned int        _loGPIO;
+    std::string         _target;
+    IHWManager&         _hwmanager;
+    std::string         _deviceName;
+    std::mutex          _notifyMutex;
+    RequesterList       _requesterList;
 };
 
 #endif // WIEGANDMODULE_HPP
