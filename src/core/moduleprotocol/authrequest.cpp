@@ -11,7 +11,7 @@ AuthRequest::AuthRequest(Uid id, const std::string& source, const std::string& t
     _source(source),
     _target(target),
     _content(content),
-    _state(0),
+    _state(AuthRequest::New),
     _date(system_clock::now())
 {}
 

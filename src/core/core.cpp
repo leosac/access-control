@@ -96,8 +96,8 @@ void Core::run()
         _coreConfig.deserialize();
         LOG() << "core config loaded";
         SignalHandler::registerCallback(this);
-        _authProtocol.printDebug();
         LOG() << "starting core loop";
+        _authProtocol.cmdCreateAuthRequest("fakeSource", "doorA", "DE:AD:BE:EF"); // TEST
         while (_isRunning)
         {
             sleep_for(milliseconds(IdleSleepTimeMs));

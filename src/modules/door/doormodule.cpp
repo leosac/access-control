@@ -9,7 +9,7 @@
 #include <sstream>
 
 #include "config/xmlconfig.hpp"
-
+#include "tools/log.hpp"
 #include "hardware/device/led.hpp"
 #include "hardware/device/button.hpp"
 #include "exception/moduleexception.hpp"
@@ -72,6 +72,7 @@ void DoorModule::open()
 {
     if (_grantedLed)
         _grantedLed->blink(); // DEBUG
+    LOG() << "DOOR OPENED !";
 }
 
 void DoorModule::loadDoorRelay()
