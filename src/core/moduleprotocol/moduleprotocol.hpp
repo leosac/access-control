@@ -15,7 +15,7 @@
 
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
-#include "tools/dfautomata.hpp"
+#include "tools/dfautomaton.hpp"
 
 class IAccessPointModule;
 class IDoorModule;
@@ -63,7 +63,7 @@ private:
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::mutex                                  _commandsMutex;
     std::queue<ICommand::Ptr>                   _commands;
-    DFAutomata<AuthRequest, int, int>           _authLogic;
+    DFAutomaton<AuthRequest, int, int>          _authLogic;
 
 private:
     std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;

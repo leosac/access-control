@@ -19,10 +19,6 @@
 #include "tools/runtimeoptions.hpp"
 #include "config/xmlconfig.hpp"
 
-class ILoggerModule;
-class IAuthModule;
-class IModule;
-
 class Core : public ICore, public ISignalCallback, public IXmlSerializable
 {
     static const int IdleSleepTimeMs = 5;
