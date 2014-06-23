@@ -79,8 +79,8 @@ std::string SystemLed::getActiveTrigger() const
         if (ret[0] == '[')
         {
             size = ret.length();
-            if (size < 3)
-                throw (DeviceException("Invalid trigger return"));
+            if (size < 3 || ret[size - 1] != ']')
+                throw (DeviceException("Invalid trigger return \'" + ret + '\''));
             return (ret.substr(1, size - 2));
         }
     }

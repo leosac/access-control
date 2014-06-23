@@ -8,6 +8,7 @@
 #include "core/moduleprotocol/authcommands/authcmdgrantaccess.hpp"
 #include "core/moduleprotocol/authcommands/authcmddenyaccess.hpp"
 #include "config/xmlconfig.hpp"
+#include "tools/log.hpp"
 
 #include <sstream>
 
@@ -48,6 +49,8 @@ void AuthTestModule::authenticate(const AuthRequest& ar)
     std::istringstream          iss(ar.getContent());
     CardId                      cid;
     unsigned int                byte;
+
+    LOG() << "AR content=" << ar.getContent();
 
     while (iss >> byte)
         cid.push_back(static_cast<Byte>(byte));

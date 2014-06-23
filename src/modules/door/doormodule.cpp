@@ -11,6 +11,7 @@
 #include "config/xmlconfig.hpp"
 #include "tools/log.hpp"
 #include "hardware/device/led.hpp"
+#include "hardware/device/buzzer.hpp"
 #include "hardware/device/button.hpp"
 #include "exception/moduleexception.hpp"
 
@@ -20,7 +21,8 @@ DoorModule::DoorModule(ICore& core, const std::string& name)
     _name(name),
     _doorButton(nullptr),
     _grantedLed(nullptr),
-    _deniedLed(nullptr)
+    _deniedLed(nullptr),
+    _buzzer(nullptr)
 {}
 
 const std::string& DoorModule::getName() const
@@ -44,6 +46,7 @@ void DoorModule::serialize(ptree& node)
     node.put<std::string>("doorButton", _config.doorButton);
     node.put<std::string>("grantedLed", _config.grantedLed);
     node.put<std::string>("deniedLed", _config.deniedLed);
+    node.put<std::string>("buzzer", _config.buzzer);
 }
 
 void DoorModule::deserialize(const ptree& node)
@@ -54,10 +57,12 @@ void DoorModule::deserialize(const ptree& node)
     _config.doorButton = node.get<std::string>("doorButton", "none");
     _config.grantedLed = node.get<std::string>("grantedLed", "none");
     _config.deniedLed = node.get<std::string>("deniedLed", "none");
+    _config.buzzer = node.get<std::string>("buzzer", "none");
     loadDoorRelay();
     loadDoorButton();
     loadGrantedLed();
     loadDeniedLed();
+    loadBuzzer();
 
     XmlConfig   conf(_config.doorConf, _doorConfig);
     conf.deserialize();
@@ -73,6 +78,10 @@ void DoorModule::open()
     if (_grantedLed)
         _grantedLed->blink(); // DEBUG
     LOG() << "DOOR OPENED !";
+    if (_buzzer)
+        _buzzer->beep(2000, 500);
+    else
+        LOG() << "There's no buzzer to buzz.";
 }
 
 void DoorModule::loadDoorRelay()
@@ -102,4 +111,12 @@ void DoorModule::loadDeniedLed()
         return;
     if (!(_deniedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_config.deniedLed))))
         throw (ModuleException("could not retrieve device \'" + _config.deniedLed + '\''));
+}
+
+void DoorModule::loadBuzzer()
+{
+    if (_config.buzzer == "none")
+        return;
+    if (!(_buzzer = dynamic_cast<Buzzer*>(_hwmanager.getDevice(_config.buzzer))))
+        throw (ModuleException("could not retrieve device \'" + _config.buzzer + '\''));
 }

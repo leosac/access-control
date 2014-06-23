@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 set(CONFIG_FILES
     default.xml
-    hardware.xml
+    hardwareCubie2.xml
+    hardwarePi.xml
+    auth.conf
     doorA.conf
     doorB.conf
 )
