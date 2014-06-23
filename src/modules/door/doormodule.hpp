@@ -10,6 +10,7 @@
 #include "modules/idoormodule.hpp"
 #include "doorconfig.hpp"
 
+class Buzzer;
 class Button;
 class Led;
 
@@ -21,6 +22,7 @@ class DoorModule : public IDoorModule
         std::string     grantedLed;
         std::string     deniedLed;
         std::string     doorConf;
+        std::string     buzzer;
     } Config;
 public:
     explicit DoorModule(ICore& core, const std::string& name);
@@ -42,7 +44,7 @@ private:
     void    loadDoorButton();
     void    loadGrantedLed();
     void    loadDeniedLed();
-    bool    isDoorOpenable();
+    void    loadBuzzer();
 
 private:
     ICore&              _core;
@@ -53,6 +55,7 @@ private:
     Button*             _doorButton;
     Led*                _grantedLed;
     Led*                _deniedLed;
+    Buzzer*             _buzzer;
     Config              _config;
 };
 

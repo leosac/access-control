@@ -9,7 +9,7 @@
 #include <thread>
 
 #include "hardware/device/gpio/gpio.hpp"
-#include "exception/moduleexception.hpp"
+#include "exception/deviceexception.hpp"
 
 Led::Led(const std::string& name, IGPIOProvider& gpioProvider)
 :   _name(name),
@@ -30,7 +30,7 @@ void Led::deserialize(const ptree& node)
 {
     _gpioNo = node.get<int>("gpio");
     if (!(_gpio = _gpioProvider.getGPIO(_gpioNo)))
-        throw (ModuleException("could not get GPIO device"));
+        throw (DeviceException("could not get GPIO device"));
 }
 
 void Led::blink()

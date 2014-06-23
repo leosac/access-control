@@ -106,9 +106,14 @@ bool GPIO::getValue() const
         throw (GpioException("invalid value"));
 }
 
-void GPIO::setValue(bool state) const
+void GPIO::setValue(bool value) const
 {
-    UnixFs::writeSysFsValue<std::string>(_valueFile, ((state) ? ("1") : ("0")));
+    UnixFs::writeSysFsValue<std::string>(_valueFile, ((value) ? ("1") : ("0")));
+}
+
+void GPIO::setValue(Value value) const
+{
+    setValue((value == Value::High));
 }
 
 bool GPIO::isActiveLow() const

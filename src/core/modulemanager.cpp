@@ -15,13 +15,9 @@
 #include "modules/iauthmodule.hpp"
 #include "modules/iloggermodule.hpp"
 
-ModuleManager::ModuleManager()
-{
-}
-
 void ModuleManager::loadLibraries(const std::list<std::string>& directories)
 {
-    std::string     libname;
+    std::string libname;
 
     for (auto& folder : directories)
     {

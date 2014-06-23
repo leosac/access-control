@@ -15,6 +15,7 @@
 #include "device/led.hpp"
 #include "device/systemled.hpp"
 #include "device/wiegandreader.hpp"
+#include "device/buzzer.hpp"
 
 void HWManager::serialize(ptree& node)
 {
@@ -112,6 +113,8 @@ ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::
         return (new Led(name, _gpioManager));
     else if (type == "systemled")
         return (new SystemLed(name));
+    else if (type == "buzzer")
+        return (new Buzzer(name, _gpioManager));
     else
         return (nullptr);
 }

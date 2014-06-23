@@ -28,6 +28,10 @@ public:
         In = 0,
         Out
     };
+    enum class Value {
+        Low = 0,
+        High
+    };
     enum class EdgeMode : int {
         None = 0,
         Rising,
@@ -51,7 +55,8 @@ public:
     Direction   getDirection() const;
     void        setDirection(Direction direction) const;
     bool        getValue() const;
-    void        setValue(bool state) const;
+    void        setValue(bool value) const;
+    void        setValue(Value value) const;
     bool        isActiveLow() const;
     void        setActiveLow(bool state) const;
     EdgeMode    getEdgeMode() const;

@@ -15,6 +15,7 @@ set(OSAC_SRCS
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
     hardware/device/button.cpp
+    hardware/device/buzzer.cpp
     hardware/device/led.cpp
     hardware/device/wiegandreader.cpp
     hardware/device/systemled.cpp

@@ -24,8 +24,8 @@ public:
 
 public:
     virtual const std::string&  getName() const override;
-    virtual void                deserialize(const ptree& node) override;
     virtual void                serialize(ptree& node) override;
+    virtual void                deserialize(const ptree& node) override;
 
 public:
     void            blink();

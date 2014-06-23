@@ -26,7 +26,7 @@ public:
     } Module;
 
 public:
-    explicit ModuleManager();
+    explicit ModuleManager() = default;
     ~ModuleManager() = default;
 
     ModuleManager(const ModuleManager& other) = delete;
