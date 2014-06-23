@@ -25,6 +25,9 @@ public:
     virtual void                deserialize(const ptree& node) override;
 
 public:
+    /**
+     *  FIXME uses blocking logic
+     */
     void    beep(unsigned int frequency, unsigned int durationMs);
 
 private:

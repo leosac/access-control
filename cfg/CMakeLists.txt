@@ -5,6 +5,7 @@ set(CONFIG_FILES
     default.xml
     hardwareCubie2.xml
     hardwarePi.xml
+    hardwareDebug.xml
     auth.conf
     doorA.conf
     doorB.conf
