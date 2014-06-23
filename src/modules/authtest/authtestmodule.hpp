@@ -34,6 +34,7 @@ private:
     IModuleProtocol&        _protocol;
     Authenticator           _auth;
     const std::string       _name;
+    std::string             _configPath;
 };
 
 #endif // AUTHTESTMODULE_HPP
