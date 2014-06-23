@@ -25,7 +25,7 @@ void Authenticator::serialize(ptree& node)
 
 void Authenticator::deserialize(const ptree& node)
 {
-    for (const auto& v : node)
+    for (const auto& v : node.get_child("auth"))
     {
         if (v.first == "card")
             deserializeCard(v.second.data());

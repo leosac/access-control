@@ -7,6 +7,7 @@
 #include "authtestmodule.hpp"
 #include "core/moduleprotocol/authcommands/authcmdgrantaccess.hpp"
 #include "core/moduleprotocol/authcommands/authcmddenyaccess.hpp"
+#include "config/xmlconfig.hpp"
 
 #include <sstream>
 
@@ -27,12 +28,19 @@ IModule::ModuleType AuthTestModule::getType() const
 
 void AuthTestModule::serialize(ptree& node)
 {
+    XmlConfig   conf(_configPath, _auth);
+    conf.serialize();
+
+    node.put<std::string>("configpath", _configPath);
     _auth.serialize(node);
 }
 
 void AuthTestModule::deserialize(const ptree& node)
 {
-    _auth.deserialize(node.get_child("auth"));
+    _configPath = node.get<std::string>("configpath");
+
+    XmlConfig   conf(_configPath, _auth);
+    conf.deserialize();
 }
 
 void AuthTestModule::authenticate(const AuthRequest& ar)
