@@ -40,8 +40,8 @@ void Buzzer::deserialize(const ptree& node)
 
 void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)
 {
-//     unsigned int period = 1000 / frequencyHz;
-//     unsigned int loops = durationMs / period;
+//     unsigned int period = 1000 / frequencyHz; FIXME
+//     unsigned int loops = durationMs / period; FIXME
 
     unsigned int loops = 1000;
 

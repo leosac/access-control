@@ -41,8 +41,8 @@ void SystemLed::deserialize(const ptree& node)
     _delayOnFile = _path + "delay_on";
     _delayOffFile = _path + "delay_off";
 
-    setBrightness(255);
-    setActiveTrigger("timer");
+    setBrightness(0);
+    setActiveTrigger("none");
 }
 
 void SystemLed::blink()
