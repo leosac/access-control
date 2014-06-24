@@ -22,7 +22,8 @@ public:
         AskAuth,
         Authorized,
         Denied,
-        Closed
+        Closed,
+        CheckDoor
     };
 
 public:
@@ -41,7 +42,8 @@ public:
     void                        setTarget(const std::string& target);
     const std::string&          getSource() const;
     const std::string&          getContent() const;
-    system_clock::time_point    getDate();
+    void                        resetTime();
+    system_clock::time_point    getTime() const;
 
 private:
     Uid                         _uid;
@@ -49,7 +51,7 @@ private:
     std::string                 _target;
     std::string                 _content;
     int                         _state;
-    system_clock::time_point    _date;
+    system_clock::time_point    _time;
 };
 
 #endif // AUTHREQUEST_HPP

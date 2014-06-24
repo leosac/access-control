@@ -12,12 +12,12 @@ AuthRequest::AuthRequest(Uid id, const std::string& source, const std::string& t
     _target(target),
     _content(content),
     _state(AuthRequest::New),
-    _date(system_clock::now())
+    _time(system_clock::now())
 {}
 
 bool AuthRequest::operator<(const AuthRequest& other) const
 {
-    return (_date < other._date);
+    return (_time < other._time);
 }
 
 AuthRequest::Uid AuthRequest::getId() const
@@ -55,7 +55,12 @@ const std::string& AuthRequest::getContent() const
     return (_content);
 }
 
-system_clock::time_point AuthRequest::getDate()
+void AuthRequest::resetTime()
 {
-    return (_date);
+    _time = system_clock::now();
+}
+
+system_clock::time_point AuthRequest::getTime() const
+{
+    return (_time);
 }

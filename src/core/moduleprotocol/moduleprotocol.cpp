@@ -22,6 +22,7 @@ const int ModuleProtocol::AuthRequestValidity = 5;
 enum Transition {
     Authorize,
     Deny,
+    Timeout,
     AskAuth,
     Close
 };
@@ -61,6 +62,7 @@ ModuleProtocol::ModuleProtocol()
 
     _authLogic.addNode(AuthRequest::Authorized, [this] (AuthRequest& request)
     {
+        request.resetTime();
         LOG() << "DFA EXEC: Authorized";
         notifyMonitor(ActivityType::Auth);
         if (!_doorModules.count(request.getTarget()))
@@ -73,11 +75,27 @@ ModuleProtocol::ModuleProtocol()
         door->open();
     } );
 
+    _authLogic.addNode(AuthRequest::CheckDoor, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: CheckDoor";
+        notifyMonitor(ActivityType::Auth);
+        if (!_doorModules.count(request.getTarget()))
+        {
+            request.setState(0);
+            logMessage("No such door " + request.getTarget());
+            return;
+        }
+        IDoorModule*    door = _doorModules.at(request.getTarget());
+        if (door->isOpen())
+            door->alarm();
+    } );
+
     _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);
     _authLogic.addTransition(AuthRequest::New, Deny, AuthRequest::Denied);
     _authLogic.addTransition(AuthRequest::New, AskAuth, AuthRequest::AskAuth);
     _authLogic.addTransition(AuthRequest::AskAuth, Authorize, AuthRequest::Authorized);
     _authLogic.addTransition(AuthRequest::AskAuth, Deny, AuthRequest::Denied);
+    _authLogic.addTransition(AuthRequest::Authorized, Timeout, AuthRequest::CheckDoor);
 }
 
 void ModuleProtocol::logMessage(const std::string& message)
@@ -137,7 +155,7 @@ void ModuleProtocol::sync()
         }
         else
         {
-            if ((ar.getDate() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
+            if ((ar.getTime() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
             {
                 ar.setState(0);
                 logMessage("AR timed out: uid=" + std::to_string(ar.getId()));

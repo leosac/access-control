@@ -80,12 +80,22 @@ void DoorModule::open()
     if (_grantedLed)
         _grantedLed->blink(); // DEBUG
     LOG() << "DOOR OPENED !";
-    if (_buzzer)
-        _buzzer->beep(2000, 500);
-    else
-        LOG() << "There's no buzzer to buzz.";
     if (_doorRelay)
         _doorRelay->open(); // FIXME
+}
+
+bool DoorModule::isOpen() const
+{
+//     return (_doorSensor->isOpen()); FIXME FIXME FIXME
+    return (false);
+}
+
+void DoorModule::alarm()
+{
+    if (_buzzer)
+        _buzzer->beep(10000, 500);
+    else
+        LOG() << "There's no buzzer to buzz.";
 }
 
 void DoorModule::loadDoorRelay()
