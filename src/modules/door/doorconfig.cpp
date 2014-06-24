@@ -13,7 +13,7 @@
 
 using std::chrono::system_clock;
 
-void DoorConfig::serialize(boost::property_tree::ptree& node)
+void DoorConfig::serialize(ptree& node)
 {
     for (std::size_t i = 0; i < 7; ++i)
     {
@@ -27,7 +27,7 @@ void DoorConfig::serialize(boost::property_tree::ptree& node)
     }
 }
 
-void DoorConfig::deserialize(const boost::property_tree::ptree& node)
+void DoorConfig::deserialize(const ptree& node)
 {
     for (std::size_t i = 0; i < 7; ++i)
     {
