@@ -43,6 +43,9 @@ void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)
 //     unsigned int period = 1000 / frequencyHz; FIXME
 //     unsigned int loops = durationMs / period; FIXME
 
+    static_cast<void>(frequencyHz);
+    static_cast<void>(durationMs);
+
     unsigned int loops = 1000;
 
     for (unsigned int i = 0; i < loops; ++i)

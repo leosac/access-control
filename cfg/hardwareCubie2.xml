@@ -1,20 +1,52 @@
 <?xml version="1.0"?>
 <hardware>
-    <platform name="CubieBoard2"/>
+    <platform name="CubieBoard2">
+        <gpioalias id="1">gpio1_pd0</gpioalias>
+        <gpioalias id="2">gpio2_pd1</gpioalias>
+        <gpioalias id="3">gpio3_pd2</gpioalias>
+        <gpioalias id="4">gpio4_pd3</gpioalias>
+        <gpioalias id="5">gpio5_pd4</gpioalias>
+        <gpioalias id="6">gpio6_pd5</gpioalias>
+        <gpioalias id="7">gpio7_pd6</gpioalias>
+        <gpioalias id="8">gpio8_pd7</gpioalias>
+        <gpioalias id="9">gpio9_pd8</gpioalias>
+        <gpioalias id="10">gpio10_pd9</gpioalias>
+        <gpioalias id="11">gpio11_pd10</gpioalias>
+        <gpioalias id="12">gpio12_pd11</gpioalias>
+        <gpioalias id="13">gpio13_pd12</gpioalias>
+        <gpioalias id="14">gpio14_pd13</gpioalias>
+        <gpioalias id="15">gpio15_pd14</gpioalias>
+        <gpioalias id="16">gpio16_pd15</gpioalias>
+        <gpioalias id="17">gpio17_pd16</gpioalias>
+        <gpioalias id="18">gpio18_pd17</gpioalias>
+        <gpioalias id="19">gpio19_pd18</gpioalias>
+        <gpioalias id="20">gpio20_pd19</gpioalias>
+        <gpioalias id="21">gpio21_pd20</gpioalias>
+        <gpioalias id="22">gpio22_pd21</gpioalias>
+        <gpioalias id="23">gpio23_pd22</gpioalias>
+        <gpioalias id="24">gpio24_pd23</gpioalias>
+        <gpioalias id="25">gpio25_pd24</gpioalias>
+        <gpioalias id="26">gpio26_pd25</gpioalias>
+        <gpioalias id="27">gpio27_pd26</gpioalias>
+        <gpioalias id="28">gpio28_pd27</gpioalias>
+    </platform>
     <devices>
-<!--        <device type="button" name="testButtonA"/>
-        <device type="button" name="testButtonB"/>-->
-<!--        <device type="led" name="led1">
+        <device type="button" name="testButtonA"/>
+        <device type="button" name="testButtonB"/>
+        <device type="led" name="led1">
             <gpio>1</gpio>
         </device>
         <device type="led" name="led2">
-            <gpio>1</gpio>
-        </device>-->
-    <device type="systemled" name="green" ledname="green:ph20:led1"/>
-    <device type="systemled" name="blue" ledname="blue:ph21:led2"/>
-<!--        <device type="wiegandreader" name="readerA">
-            <higpio>1</higpio>
-            <logpio>2</logpio>
-        </device>-->
+            <gpio>2</gpio>
+        </device>
+        <device type="buzzer" name="buzzerA">
+            <gpio>18</gpio>
+        </device>
+        <device type="systemled" name="green" ledname="green:ph20:led1"/>
+        <device type="systemled" name="blue" ledname="blue:ph21:led2"/>
+        <device type="wiegandreader" name="readerA">
+            <higpio>10</higpio>
+            <logpio>11</logpio>
+        </device>
     </devices>
 </hardware>

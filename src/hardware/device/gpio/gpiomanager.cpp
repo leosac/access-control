@@ -50,10 +50,11 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
 
     if (!_polledGpio.count(gpioNo))
     {
-        GPIO*   gpio = new GPIO(gpioNo);
+        GPIO*   gpio = instanciateGpio(gpioNo);
 
         gpio->setDirection(GPIO::Direction::In);
-        gpio->setEdgeMode(mode);
+//         gpio->setEdgeMode(mode); FIXME
+        static_cast<void>(mode); // FIXME
         _polledGpio[gpioNo] = gpio;
     }
     _listeners.push_back(listener);
@@ -67,10 +68,21 @@ GPIO* GPIOManager::getGPIO(int idx)
         return (_reservedGpio.at(idx));
     else
     {
-        GPIO*   gpio = new GPIO(idx);
+        GPIO*   gpio = instanciateGpio(idx);
         _reservedGpio[idx] = gpio;
         return (gpio);
     }
+}
+
+const GPIOManager::GpioAliases& GPIOManager::getGpioAliases() const
+{
+    return (_gpioAliases);
+}
+
+void GPIOManager::setGpioAlias(int gpioNo, const std::string& alias)
+{
+    _gpioAliases[gpioNo] = alias;
+    LOG() << "Gpio " << gpioNo << " alias is now " << alias;
 }
 
 void GPIOManager::startPolling()
@@ -120,6 +132,14 @@ void GPIOManager::pollLoop()
             }
         }
     }
+}
+
+GPIO* GPIOManager::instanciateGpio(int gpioNo)
+{
+    if (_gpioAliases.count(gpioNo) > 0)
+        return (new GPIO(gpioNo, _gpioAliases.at(gpioNo)));
+    else
+        return (new GPIO(gpioNo, "gpio" + std::to_string(gpioNo)));
 }
 
 void GPIOManager::timeout()
