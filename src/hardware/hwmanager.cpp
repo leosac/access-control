@@ -24,6 +24,12 @@ void HWManager::serialize(ptree& node)
     ptree platform;
     ptree devices;
 
+    for (auto& alias : _gpioManager.getGpioAliases())
+    {
+        ptree& aliasNode = platform.add("gpioalias", alias.second);
+
+        aliasNode.put("<xmlattr>.id", alias.first);
+    }
     platform.put("<xmlattr>.name", _platform.name);
     for (auto& dev : _devices)
     {
@@ -49,6 +55,11 @@ void HWManager::deserialize(const ptree& node)
     _platform.name = platform.get<std::string>("<xmlattr>.name");
     LOG() << "current platform: " << _platform.name;
 
+    for (const auto& v : platform)
+    {
+        if (v.first == "gpioalias")
+            _gpioManager.setGpioAlias(v.second.get<int>("<xmlattr>.id"), v.second.data());
+    }
     for (const auto& v : devices)
     {
         if (v.first == "device")
@@ -71,14 +82,14 @@ void HWManager::deserialize(const ptree& node)
 
 void HWManager::start()
 {
-#ifndef NO_HW
+#ifndef OSAC_NO_HW
     _gpioManager.startPolling();
 #endif
 }
 
 void HWManager::stop()
 {
-#ifndef NO_HW
+#ifndef OSAC_NO_HW
     _gpioManager.stopPolling();
 #endif
 }

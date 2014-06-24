@@ -30,6 +30,7 @@ class GPIOManager : public IGPIOObservable, public IGPIOProvider
     static const unsigned int   PollBufferSize = 64;
 
 public:
+    typedef struct std::map<int, std::string> GpioAliases;
     typedef struct pollfd PollFdSet;
     typedef struct {
         IGPIOListener*  instance;
@@ -50,11 +51,16 @@ public:
     virtual GPIO*   getGPIO(int gpioNo) override;
 
 public:
+    const GpioAliases&  getGpioAliases() const;
+    void                setGpioAlias(int gpioNo, const std::string& alias);
+
+public:
     void    startPolling();
     void    stopPolling();
     void    pollLoop();
 
 private:
+    GPIO*   instanciateGpio(int gpioNo);
     void    timeout();
     void    buildFdSet();
 
@@ -64,6 +70,7 @@ private:
     int                     _pollTimeout;
     std::map<int, GPIO*>    _polledGpio;
     std::map<int, GPIO*>    _reservedGpio;
+    GpioAliases             _gpioAliases;
     std::list<ListenerInfo> _listeners;
     std::vector<PollFdSet>  _fdset;
 };

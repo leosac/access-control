@@ -30,9 +30,9 @@ const std::string   GPIO::EdgeStrings[EdgeModes] = {
     "both"
 };
 
-GPIO::GPIO(int pinNo/*, const std::string& sysfsName*/)
+GPIO::GPIO(int pinNo, const std::string& sysfsName)
 :   _pinNo(pinNo),
-    _path(GpioPathPrefix + "gpio" + std::to_string(_pinNo)),
+    _path(GpioPathPrefix + sysfsName),
     _directionFile(_path + '/' + DirectionFilename),
     _valueFile(_path + '/' + ValueFilename),
     _activeLowFile(_path + '/' + ActiveLowFilename),

@@ -23,12 +23,12 @@ find_package(Boost 1.41.0 REQUIRED)
 list(APPEND CMAKE_CXX_FLAGS ${CXX11_FLAGS})
 
 #Build Options
-option(NO_HW        "no-hardware" OFF)
-option(NO_MODULES   "no-modules" OFF)
+option(OSAC_NO_HW        "no-hardware" OFF)
+option(OSAC_NO_MODULES   "no-modules" OFF)
 
 #Define the corresponding macro
-if(NO_HW)
-    add_definitions(-DNO_HW)
+if(OSAC_NO_HW)
+    add_definitions(-DOSAC_NO_HW)
 endif()
 
 add_definitions(-DOSAC_VERSION_MAJOR=0)

@@ -40,7 +40,7 @@ public:
     };
 
 public:
-    explicit GPIO(int pinNo/*, const std::string& sysfsName*/);
+    explicit GPIO(int pinNo, const std::string& sysfsName);
     ~GPIO();
 
     GPIO(const GPIO& other) = delete;
