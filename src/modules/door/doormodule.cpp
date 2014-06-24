@@ -13,12 +13,14 @@
 #include "hardware/device/led.hpp"
 #include "hardware/device/buzzer.hpp"
 #include "hardware/device/button.hpp"
+#include "hardware/device/relay.hpp"
 #include "exception/moduleexception.hpp"
 
 DoorModule::DoorModule(ICore& core, const std::string& name)
 :   _core(core),
     _hwmanager(core.getHWManager()),
     _name(name),
+    _doorRelay(nullptr),
     _doorButton(nullptr),
     _grantedLed(nullptr),
     _deniedLed(nullptr),
@@ -82,11 +84,16 @@ void DoorModule::open()
         _buzzer->beep(2000, 500);
     else
         LOG() << "There's no buzzer to buzz.";
+    if (_doorRelay)
+        _doorRelay->open(); // FIXME
 }
 
 void DoorModule::loadDoorRelay()
 {
-    // TODO
+    if (_config.doorRelay == "none")
+        return;
+    if (!(_doorRelay = dynamic_cast<Relay*>(_hwmanager.getDevice(_config.doorRelay))))
+        throw (ModuleException("could not retrieve device \'" + _config.doorRelay + '\''));
 }
 
 void DoorModule::loadDoorButton()

@@ -10,6 +10,7 @@
 #include "modules/idoormodule.hpp"
 #include "doorconfig.hpp"
 
+class Relay;
 class Buzzer;
 class Button;
 class Led;
@@ -52,6 +53,7 @@ private:
     const std::string   _name;
     std::string         _configFile;
     DoorConfig          _doorConfig;
+    Relay*              _doorRelay;
     Button*             _doorButton;
     Led*                _grantedLed;
     Led*                _deniedLed;
