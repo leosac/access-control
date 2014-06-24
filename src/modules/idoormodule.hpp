@@ -18,6 +18,8 @@ public:
     virtual ~IDoorModule() {}
     virtual void    open() = 0;
     virtual bool    isAuthRequired() const = 0;
+    virtual bool    isOpen() const = 0;
+    virtual void    alarm() = 0;
 };
 
 #endif // IDOORMODULE_HPP

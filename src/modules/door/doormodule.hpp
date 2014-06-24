@@ -39,6 +39,8 @@ public:
     virtual void                deserialize(const ptree& node) override;
     virtual bool                isAuthRequired() const override;
     virtual void                open() override;
+    virtual bool                isOpen() const override;
+    virtual void                alarm() override;
 
 private:
     void    loadDoorRelay();
