@@ -20,6 +20,7 @@ class DoorModule : public IDoorModule
     typedef struct {
         std::string     doorRelay;
         std::string     doorButton;
+        std::string     doorSensor;
         std::string     grantedLed;
         std::string     deniedLed;
         std::string     doorConf;
@@ -43,13 +44,6 @@ public:
     virtual void                alarm() override;
 
 private:
-    void    loadDoorRelay();
-    void    loadDoorButton();
-    void    loadGrantedLed();
-    void    loadDeniedLed();
-    void    loadBuzzer();
-
-private:
     ICore&              _core;
     IHWManager&         _hwmanager;
     const std::string   _name;
@@ -57,6 +51,7 @@ private:
     DoorConfig          _doorConfig;
     Relay*              _doorRelay;
     Button*             _doorButton;
+    Button*             _doorSensor;
     Led*                _grantedLed;
     Led*                _deniedLed;
     Buzzer*             _buzzer;

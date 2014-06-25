@@ -16,12 +16,26 @@
 #include "hardware/device/relay.hpp"
 #include "exception/moduleexception.hpp"
 
+template <typename T>
+static T* loadOptionnalDevice(const std::string& name, IHWManager& HWManager)
+{
+    T* ptr;
+
+    if (name == "none")
+        return (nullptr);
+    else if ((ptr = dynamic_cast<T*>(HWManager.getDevice(name))))
+        return (ptr);
+    else
+        throw (ModuleException("could not retrieve device \'" + name + '\''));
+}
+
 DoorModule::DoorModule(ICore& core, const std::string& name)
 :   _core(core),
     _hwmanager(core.getHWManager()),
     _name(name),
     _doorRelay(nullptr),
     _doorButton(nullptr),
+    _doorSensor(nullptr),
     _grantedLed(nullptr),
     _deniedLed(nullptr),
     _buzzer(nullptr)
@@ -46,6 +60,7 @@ void DoorModule::serialize(ptree& node)
     node.put<std::string>("doorconf", _config.doorConf);
     node.put<std::string>("doorRelay", _config.doorRelay);
     node.put<std::string>("doorButton", _config.doorButton);
+    node.put<std::string>("doorSensor", _config.doorSensor);
     node.put<std::string>("grantedLed", _config.grantedLed);
     node.put<std::string>("deniedLed", _config.deniedLed);
     node.put<std::string>("buzzer", _config.buzzer);
@@ -53,18 +68,20 @@ void DoorModule::serialize(ptree& node)
 
 void DoorModule::deserialize(const ptree& node)
 {
-
     _config.doorConf = node.get<std::string>("doorconf");
     _config.doorRelay = node.get<std::string>("doorRelay", "none");
     _config.doorButton = node.get<std::string>("doorButton", "none");
+    _config.doorSensor = node.get<std::string>("doorSensor", "none");
     _config.grantedLed = node.get<std::string>("grantedLed", "none");
     _config.deniedLed = node.get<std::string>("deniedLed", "none");
     _config.buzzer = node.get<std::string>("buzzer", "none");
-    loadDoorRelay();
-    loadDoorButton();
-    loadGrantedLed();
-    loadDeniedLed();
-    loadBuzzer();
+
+    _doorRelay = loadOptionnalDevice<Relay>(_config.doorRelay, _hwmanager);
+    _doorButton = loadOptionnalDevice<Button>(_config.doorButton, _hwmanager);
+    _doorSensor = loadOptionnalDevice<Button>(_config.doorSensor, _hwmanager);
+    _grantedLed = loadOptionnalDevice<Led>(_config.grantedLed, _hwmanager);
+    _deniedLed = loadOptionnalDevice<Led>(_config.deniedLed, _hwmanager);
+    _buzzer = loadOptionnalDevice<Buzzer>(_config.buzzer, _hwmanager);
 
     XmlConfig   conf(_config.doorConf, _doorConfig);
     conf.deserialize();
@@ -97,44 +114,4 @@ void DoorModule::alarm()
     else
         LOG() << "There's no buzzer to buzz.";
     _core.getModuleProtocol().logMessage("Door should be closed !!");
-}
-
-void DoorModule::loadDoorRelay()
-{
-    if (_config.doorRelay == "none")
-        return;
-    if (!(_doorRelay = dynamic_cast<Relay*>(_hwmanager.getDevice(_config.doorRelay))))
-        throw (ModuleException("could not retrieve device \'" + _config.doorRelay + '\''));
-}
-
-void DoorModule::loadDoorButton()
-{
-    if (_config.doorButton == "none")
-        return;
-    if (!(_doorButton = dynamic_cast<Button*>(_hwmanager.getDevice(_config.doorButton))))
-        throw (ModuleException("could not retrieve device \'" + _config.doorButton + '\''));
-}
-
-void DoorModule::loadGrantedLed()
-{
-    if (_config.grantedLed == "none")
-        return;
-    if (!(_grantedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_config.grantedLed))))
-        throw (ModuleException("could not retrieve device \'" + _config.grantedLed + '\''));
-}
-
-void DoorModule::loadDeniedLed()
-{
-    if (_config.deniedLed == "none")
-        return;
-    if (!(_deniedLed = dynamic_cast<Led*>(_hwmanager.getDevice(_config.deniedLed))))
-        throw (ModuleException("could not retrieve device \'" + _config.deniedLed + '\''));
-}
-
-void DoorModule::loadBuzzer()
-{
-    if (_config.buzzer == "none")
-        return;
-    if (!(_buzzer = dynamic_cast<Buzzer*>(_hwmanager.getDevice(_config.buzzer))))
-        throw (ModuleException("could not retrieve device \'" + _config.buzzer + '\''));
 }
