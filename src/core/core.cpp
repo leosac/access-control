@@ -16,9 +16,6 @@
 #include "exception/coreexception.hpp"
 #include "exception/signalexception.hpp"
 
-using std::this_thread::sleep_for;
-using std::chrono::milliseconds;
-
 const int Core::IdleSleepTimeMs;
 
 Core::Core(RuntimeOptions& options)
@@ -100,7 +97,7 @@ void Core::run()
         _authProtocol.cmdCreateAuthRequest("fakeSource", "doorA", "DE:AD:BE:EF"); // TEST
         while (_isRunning)
         {
-            sleep_for(milliseconds(IdleSleepTimeMs));
+            std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
             _authProtocol.sync();
         }
         LOG() << "exiting core loop";

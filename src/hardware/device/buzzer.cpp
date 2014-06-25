@@ -10,8 +10,6 @@
 #include "exception/deviceexception.hpp"
 #include <thread>
 
-using std::this_thread::sleep_for;
-
 Buzzer::Buzzer(const std::string& name, IGPIOProvider& gpioProvider)
 :   AGpioDevice(name, gpioProvider)
 {}
@@ -43,8 +41,8 @@ void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)
     for (unsigned int i = 0; i < loops; ++i)
     {
         _gpio->setValue(GPIO::Value::High);
-        sleep_for(std::chrono::microseconds(100));
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
         _gpio->setValue(GPIO::Value::Low);
-        sleep_for(std::chrono::microseconds(100));
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }

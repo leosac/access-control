@@ -25,7 +25,14 @@ void Relay::deserialize(const ptree& node)
 
 void Relay::open()
 {
-    _gpio->setValue(GPIO::Value::High);
+    if (_openMutex.try_lock())
+        _openThread = std::thread([this] ()
+        {
+            _gpio->setValue(GPIO::Value::High);
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            _gpio->setValue(GPIO::Value::Low);
+            _openMutex.unlock();
+        } );
 }
 
 void Relay::close()
@@ -36,4 +43,14 @@ void Relay::close()
 void Relay::setOpen(bool state)
 {
     _gpio->setValue(state);
+}
+
+bool Relay::isOpen()
+{
+    if (_openMutex.try_lock())
+    {
+        _openMutex.unlock();
+        return (false);
+    }
+    return (true);
 }

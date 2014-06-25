@@ -13,8 +13,6 @@
 #include "tools/log.hpp"
 #include "tools/unixfs.hpp"
 
-using std::this_thread::sleep_for;
-
 const std::string SystemLed::DevicePathPrefix = "/sys/class/leds/";
 
 SystemLed::SystemLed(const std::string& name)
@@ -48,11 +46,11 @@ void SystemLed::deserialize(const ptree& node)
 void SystemLed::blink()
 {
     setBrightness(0);
-    sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     setBrightness(255);
-    sleep_for(std::chrono::milliseconds(80));
+    std::this_thread::sleep_for(std::chrono::milliseconds(80));
     setBrightness(0);
-    sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     setBrightness(255);
 }
 
