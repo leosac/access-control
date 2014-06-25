@@ -10,26 +10,17 @@
 #include "exception/deviceexception.hpp"
 
 Relay::Relay(const std::string& name, IGPIOProvider& gpioObservable)
-:   _name(name),
-    _gpioProvider(gpioObservable)
+:   AGpioDevice(name, gpioObservable)
 {}
-
-const std::string& Relay::getName() const
-{
-    return (_name);
-}
 
 void Relay::serialize(ptree& node)
 {
-    node.put<int>("gpio", _gpioNo);
+    AGpioDevice::serialize(node);
 }
 
 void Relay::deserialize(const ptree& node)
 {
-    _gpioNo = node.get<int>("gpio");
-    if (!(_gpio = _gpioProvider.getGPIO(_gpioNo)))
-        throw (DeviceException("could not get GPIO device"));
-    _gpio->setDirection(GPIO::Direction::Out);
+    AGpioDevice::deserialize(node);
 }
 
 void Relay::open()

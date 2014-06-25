@@ -14,6 +14,7 @@ set(OSAC_SRCS
     core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
+    hardware/device/agpiodevice.cpp
     hardware/device/button.cpp
     hardware/device/buzzer.cpp
     hardware/device/led.cpp

@@ -8,27 +8,22 @@
 #ifndef BUTTON_HPP
 #define BUTTON_HPP
 
-#include "hardware/iserializabledevice.hpp"
+#include "agpiodevice.hpp"
 
-class GPIO;
-class Button : public ISerializableDevice
+class Button : public AGpioDevice
 {
 public:
-    explicit Button(const std::string& name);
+    explicit Button(const std::string& name, IGPIOProvider& gpioProvider);
     ~Button() = default;
 
     Button(const Button& other) = delete;
     Button& operator=(const Button& other) = delete;
 
 public:
-    virtual const std::string&  getName() const override;
-    virtual void                serialize(ptree& node) override;
-    virtual void                deserialize(const ptree& node) override;
+    virtual void    deserialize(const ptree& node) override;
 
-private:
-    const std::string   _name;
-    int                 _gpioNo;
-    GPIO*               _gpio;
+public:
+    bool    isPressed() const;
 };
 
 #endif // BUTTON_HPP

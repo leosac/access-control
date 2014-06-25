@@ -12,25 +12,17 @@
 #include "exception/deviceexception.hpp"
 
 Led::Led(const std::string& name, IGPIOProvider& gpioProvider)
-:   _name(name),
-    _gpioProvider(gpioProvider)
+:   AGpioDevice(name, gpioProvider)
 {}
-
-const std::string& Led::getName() const
-{
-    return (_name);
-}
 
 void Led::serialize(ptree& node)
 {
-    node.put<int>("gpio", _gpioNo);
+    AGpioDevice::serialize(node);
 }
 
 void Led::deserialize(const ptree& node)
 {
-    _gpioNo = node.get<int>("gpio");
-    if (!(_gpio = _gpioProvider.getGPIO(_gpioNo)))
-        throw (DeviceException("could not get GPIO device"));
+    AGpioDevice::deserialize(node);
 }
 
 void Led::blink()

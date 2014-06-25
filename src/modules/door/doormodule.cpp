@@ -96,6 +96,7 @@ void DoorModule::alarm()
         _buzzer->beep(10000, 500);
     else
         LOG() << "There's no buzzer to buzz.";
+    _core.getModuleProtocol().logMessage("Door should be closed !!");
 }
 
 void DoorModule::loadDoorRelay()
