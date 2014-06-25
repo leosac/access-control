@@ -7,12 +7,9 @@
 #ifndef LED_HPP
 #define LED_HPP
 
-#include "hardware/iserializabledevice.hpp"
-#include "gpio/igpioprovider.hpp"
+#include "agpiodevice.hpp"
 
-class GPIO;
-
-class Led : public ISerializableDevice
+class Led : public AGpioDevice
 {
 public:
     explicit Led(const std::string& name, IGPIOProvider& gpioProvider);
@@ -22,18 +19,11 @@ public:
     Led& operator=(const Led& other) = delete;
 
 public:
-    virtual const std::string&  getName() const override;
-    virtual void                serialize(ptree& node) override;
-    virtual void                deserialize(const ptree& node) override;
+    virtual void    serialize(ptree& node) override;
+    virtual void    deserialize(const ptree& node) override;
 
 public:
     void    blink();
-
-private:
-    const std::string   _name;
-    IGPIOProvider&      _gpioProvider;
-    int                 _gpioNo;
-    GPIO*               _gpio;
 };
 
 #endif // LED_HPP

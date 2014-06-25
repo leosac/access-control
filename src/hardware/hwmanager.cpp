@@ -118,7 +118,7 @@ const IHWManager::PlatformInfo& HWManager::getPlatformInfo() const
 ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::string& name)
 {
     if (type == "button")
-        return (new Button(name));
+        return (new Button(name, _gpioManager));
     else if (type == "wiegandreader")
         return (new WiegandReader(name, _gpioManager));
     else if (type == "led")

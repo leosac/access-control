@@ -5,22 +5,20 @@
  */
 
 #include "button.hpp"
+#include "gpio/gpio.hpp"
+#include "exception/deviceexception.hpp"
 
-Button::Button(const std::string& name)
-:   _name(name)
+Button::Button(const std::string& name, IGPIOProvider& gpioProvider)
+:   AGpioDevice(name, gpioProvider)
 {}
-
-const std::string& Button::getName() const
-{
-    return (_name);
-}
-
-void Button::serialize(ptree& node)
-{
-    static_cast<void>(node); // FIXME
-}
 
 void Button::deserialize(const ptree& node)
 {
-    static_cast<void>(node); // FIXME
+    AGpioDevice::deserialize(node);
+    _gpio->setDirection(GPIO::Direction::In);
+}
+
+bool Button::isPressed() const
+{
+    return (_gpio->getValue() == false);
 }

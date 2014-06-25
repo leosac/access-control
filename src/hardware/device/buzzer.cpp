@@ -12,26 +12,18 @@
 
 using std::this_thread::sleep_for;
 
-Buzzer::Buzzer(const std::string& name, IGPIOProvider& gpioObservable)
-:   _name(name),
-    _gpioProvider(gpioObservable)
+Buzzer::Buzzer(const std::string& name, IGPIOProvider& gpioProvider)
+:   AGpioDevice(name, gpioProvider)
 {}
-
-const std::string& Buzzer::getName() const
-{
-    return (_name);
-}
 
 void Buzzer::serialize(ptree& node)
 {
-    node.put<int>("gpio", _gpioNo);
+    AGpioDevice::serialize(node);
 }
 
 void Buzzer::deserialize(const ptree& node)
 {
-    _gpioNo = node.get<int>("gpio");
-    if (!(_gpio = _gpioProvider.getGPIO(_gpioNo)))
-        throw (DeviceException("could not get GPIO device"));
+    AGpioDevice::deserialize(node);
     _gpio->setDirection(GPIO::Direction::Out);
 
     // TEST
