@@ -2,7 +2,6 @@
  * \file button.hpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief Button class declaration
- * TODO This class is NOT fully implemented
  */
 
 #ifndef BUTTON_HPP

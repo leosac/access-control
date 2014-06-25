@@ -31,13 +31,17 @@
         <gpioalias id="28">gpio28_pd27</gpioalias>
     </platform>
     <devices>
-        <device type="button" name="testButtonA"/>
-        <device type="button" name="testButtonB"/>
         <device type="led" name="led1">
             <gpio>1</gpio>
         </device>
         <device type="led" name="led2">
             <gpio>2</gpio>
+        </device>
+        <device type="button" name="testButtonA">
+            <gpio>3</gpio>
+        </device>
+        <device type="button" name="testButtonB">
+            <gpio>4</gpio>
         </device>
         <device type="buzzer" name="buzzerA">
             <gpio>18</gpio>

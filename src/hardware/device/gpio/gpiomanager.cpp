@@ -106,7 +106,10 @@ void GPIOManager::pollLoop()
     while (_isRunning)
     {
         if ((ret = ::poll(&_fdset[0], fdsetSize, _pollTimeout)) < 0)
-            throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
+        {
+            if (errno != EINTR)
+                throw (GpioException(UnixSyscall::getErrorString("poll", errno)));
+        }
         else if (!ret)
             timeout();
         else
