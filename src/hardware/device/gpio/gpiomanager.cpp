@@ -39,13 +39,12 @@ GPIOManager::~GPIOManager()
         delete gpio.second;
 }
 
-void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::EdgeMode mode)
+void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
 {
     ListenerInfo    listener;
 
     listener.instance = instance;
     listener.gpioNo = gpioNo;
-    listener.mode = mode;
     listener.fdIdx = 0;
 
     if (!_polledGpio.count(gpioNo))
@@ -53,8 +52,6 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::Ed
         GPIO*   gpio = instanciateGpio(gpioNo);
 
         gpio->setDirection(GPIO::Direction::In);
-//         gpio->setEdgeMode(mode); FIXME
-        static_cast<void>(mode); // FIXME
         _polledGpio[gpioNo] = gpio;
     }
     _listeners.push_back(listener);

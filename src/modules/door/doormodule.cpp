@@ -98,13 +98,12 @@ void DoorModule::open()
         _grantedLed->blink(); // DEBUG
     LOG() << "DOOR OPENED !";
     if (_doorRelay)
-        _doorRelay->open(); // FIXME
+        _doorRelay->open(); // FIXME Blocking logic
 }
 
 bool DoorModule::isOpen() const
 {
-//     return (_doorSensor->isOpen()); FIXME FIXME FIXME
-    return (false);
+    return (_doorSensor->isPressed());
 }
 
 void DoorModule::alarm()
