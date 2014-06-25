@@ -7,6 +7,10 @@
 #ifndef RELAY_HPP
 #define RELAY_HPP
 
+#include <thread>
+#include <atomic>
+#include <mutex>
+
 #include "agpiodevice.hpp"
 
 class Relay : public AGpioDevice
@@ -26,6 +30,11 @@ public:
     void    open();
     void    close();
     void    setOpen(bool state);
+    bool    isOpen();
+
+private:
+    std::thread         _openThread;
+    std::mutex          _openMutex;
 };
 
 #endif // RELAY_HPP

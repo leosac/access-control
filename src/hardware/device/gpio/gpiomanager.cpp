@@ -21,11 +21,6 @@ extern "C" {
 #include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
 
-static void launch(GPIOManager* instance)
-{
-    instance->pollLoop();
-}
-
 GPIOManager::GPIOManager()
 :   _isRunning(false),
     _pollTimeout(DefaultTimeout)
@@ -85,7 +80,7 @@ void GPIOManager::setGpioAlias(int gpioNo, const std::string& alias)
 void GPIOManager::startPolling()
 {
     _isRunning = true;
-    _pollThread = std::thread(&launch, this);
+    _pollThread = std::thread([this] () { pollLoop(); } );
 }
 
 void GPIOManager::stopPolling()

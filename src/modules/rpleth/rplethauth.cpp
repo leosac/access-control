@@ -14,11 +14,6 @@
 #include "tools/unlock_guard.hpp"
 #include "exception/moduleexception.hpp"
 
-static void launch(RplethAuth* instance)
-{
-    instance->run();
-}
-
 RplethAuth::RplethAuth(ICore& core, const std::string& name)
 :   _core(core),
     _name(name),
@@ -49,8 +44,8 @@ void RplethAuth::serialize(ptree& node)
 
 void RplethAuth::deserialize(const ptree& node)
 {
-    _port = node.get<Rezzo::UnixSocket::Port>("port", DefaultPort);
-    _networkThread = std::thread(&launch, this);
+    _port = node.get<Rezzo::UnixSocket::Port>("port", Rezzo::ISocket::Port(DefaultPort));
+    _networkThread = std::thread([this] () { run(); } );
 }
 
 void RplethAuth::authenticate(const AuthRequest& ar)
