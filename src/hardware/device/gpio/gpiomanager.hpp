@@ -56,9 +56,9 @@ public:
 public:
     void    startPolling();
     void    stopPolling();
-    void    pollLoop();
 
 private:
+    void    pollLoop();
     GPIO*   instanciateGpio(int gpioNo);
     void    timeout();
     void    buildFdSet();
