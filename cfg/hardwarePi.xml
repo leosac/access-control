@@ -2,21 +2,28 @@
 <hardware>
     <platform name="RaspberryPi rev2"/>
     <devices>
-        <device type="button" name="testButtonA"/>
-        <device type="button" name="testButtonB"/>
+        <device type="relay" name="relayA">
+            <gpio>2</gpio>
+        </device>
         <device type="led" name="led1">
-            <gpio>9</gpio>
+            <gpio>3</gpio>
         </device>
-        <device type="led" name="led2">
+        <device type="button" name="sensor">
+            <gpio>4</gpio>
+        </device>
+<!--        <device type="button" name="testButtonB">
+            <gpio>4</gpio>
+        </device>-->
+<!--        <device type="led" name="led2">
             <gpio>8</gpio>
-        </device>
+        </device>-->
         <device type="systemled" name="green" ledname="led0"/>
-        <device type="buzzer" name="buzzerA">
-            <gpio>18</gpio>
-        </device>
         <device type="wiegandreader" name="readerA">
             <higpio>15</higpio>
             <logpio>14</logpio>
+        </device>
+        <device type="buzzer" name="buzzerA">
+            <gpio>18</gpio>
         </device>
     </devices>
 </hardware>

@@ -22,10 +22,8 @@ void Buzzer::serialize(ptree& node)
 void Buzzer::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
-    _gpio->setDirection(GPIO::Direction::Out);
-
-    // TEST
-    beep(2000, 500);
+    _gpio->setDirection(GPIO::Direction::Out); // FIXME
+    beep(0,0); // FIXME
 }
 
 void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)
@@ -36,13 +34,17 @@ void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)
     static_cast<void>(frequencyHz);
     static_cast<void>(durationMs);
 
-    unsigned int loops = 1000;
-
-    for (unsigned int i = 0; i < loops; ++i)
+    std::thread thread([this] () // FIXME FIXME FIXME
     {
-        _gpio->setValue(GPIO::Value::High);
-        std::this_thread::sleep_for(std::chrono::microseconds(100));
-        _gpio->setValue(GPIO::Value::Low);
-        std::this_thread::sleep_for(std::chrono::microseconds(100));
-    }
+        unsigned int loops = 1000;
+
+        for (unsigned int i = 0; i < loops; ++i)
+        {
+            _gpio->setValue(GPIO::Value::High);
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            _gpio->setValue(GPIO::Value::Low);
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+        }
+    } );
+    thread.detach();
 }

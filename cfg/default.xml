@@ -6,6 +6,9 @@
         <properties>
             <doorconf>cfg/doorA.conf</doorconf>
             <buzzer>buzzerA</buzzer>
+            <doorRelay>relayA</doorRelay>
+            <doorSensor>sensor</doorSensor>
+            <grantedLed>led1</grantedLed>
         </properties>
     </module>
     <module file="libdoor.so">
@@ -16,7 +19,6 @@
             <doorButton>none</doorButton>
             <grantedLed>none</grantedLed>
             <deniedLed>none</deniedLed>
-            <buzzer>buzzerA</buzzer>
         </properties>
     </module>
     <module file="libjournal.so">

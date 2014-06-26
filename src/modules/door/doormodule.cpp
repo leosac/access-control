@@ -98,7 +98,9 @@ void DoorModule::open()
         _grantedLed->blink(); // DEBUG
     LOG() << "DOOR OPENED !";
     if (_doorRelay)
-        _doorRelay->open(); // FIXME Blocking logic
+        _doorRelay->open();
+    else
+        LOG() << "No relay to open !";
 }
 
 bool DoorModule::isOpen() const

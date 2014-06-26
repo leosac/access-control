@@ -33,10 +33,6 @@ namespace Rezzo
         typedef struct s_address {
             Port    port;
             Ip      ip;
-            bool operator==(const struct s_address& other) const
-            {
-                return (ip == other.ip && port == other.port);
-            }
             bool operator<(const struct s_address& other) const
             {
                 return (ip < other.ip);

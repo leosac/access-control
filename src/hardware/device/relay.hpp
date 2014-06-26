@@ -33,8 +33,8 @@ public:
     bool    isOpen();
 
 private:
-    std::thread         _openThread;
     std::mutex          _openMutex;
+    std::atomic<bool>   _isOpen;
 };
 
 #endif // RELAY_HPP

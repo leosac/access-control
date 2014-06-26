@@ -47,6 +47,7 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
         GPIO*   gpio = instanciateGpio(gpioNo);
 
         gpio->setDirection(GPIO::Direction::In);
+        gpio->setEdgeMode(GPIO::EdgeMode::Rising); // FIXME Patch for raspi device
         _polledGpio[gpioNo] = gpio;
     }
     _listeners.push_back(listener);

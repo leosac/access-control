@@ -7,10 +7,12 @@
 #include "relay.hpp"
 
 #include "gpio/gpio.hpp"
+#include "tools/log.hpp"
 #include "exception/deviceexception.hpp"
 
 Relay::Relay(const std::string& name, IGPIOProvider& gpioObservable)
-:   AGpioDevice(name, gpioObservable)
+:   AGpioDevice(name, gpioObservable),
+    _isOpen(false)
 {}
 
 void Relay::serialize(ptree& node)
@@ -21,18 +23,25 @@ void Relay::serialize(ptree& node)
 void Relay::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
+    _gpio->setDirection(GPIO::Direction::Out); // FIXME should be set in the config
 }
 
 void Relay::open()
 {
+    LOG() << "call";
     if (_openMutex.try_lock())
-        _openThread = std::thread([this] ()
+    {
+        std::thread thread([this] ()
         {
             _gpio->setValue(GPIO::Value::High);
+            LOG() << "Relay HIGH";
             std::this_thread::sleep_for(std::chrono::seconds(5));
             _gpio->setValue(GPIO::Value::Low);
-            _openMutex.unlock();
+            LOG() << "Relay LOW";
         } );
+        thread.detach();
+        _openMutex.unlock();
+    }
 }
 
 void Relay::close()
