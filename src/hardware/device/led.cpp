@@ -23,11 +23,20 @@ void Led::serialize(ptree& node)
 void Led::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
+    _gpio->setValue(false); // FIXME
 }
 
 void Led::blink()
 {
-    _gpio->setValue(true);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    _gpio->setValue(false);
+    std::thread thread([this] ()
+    {
+        _gpio->setValue(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
+        _gpio->setValue(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
+        _gpio->setValue(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
+        _gpio->setValue(false);
+    } );
+    thread.detach();
 }

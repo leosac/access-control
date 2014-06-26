@@ -157,8 +157,8 @@ void ModuleProtocol::sync()
         {
             if ((ar.getTime() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
             {
-                ar.setState(0);
-                logMessage("AR timed out: uid=" + std::to_string(ar.getId()));
+                ar.setState(_authLogic.update(ar, ar.getState(), Timeout));
+                LOG() << "AR timed out: uid=" << ar.getId();
             }
             ++it;
         }
