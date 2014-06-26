@@ -1,4 +1,6 @@
-# Open Source Access Control
+# Leosac
+
+Open Source Physical Access Control System
 
 ## Known issues
 

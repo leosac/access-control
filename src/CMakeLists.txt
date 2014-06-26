@@ -1,8 +1,8 @@
-set(OSAC_BIN osac)
+set(LEOSAC_BIN leosac)
 
-set(OSAC_SRCS
+set(LEOSAC_SRCS
     main.cpp
-    osac.cpp
+    leosac.cpp
     config/xmlconfig.cpp
     core/core.cpp
     core/modulemanager.cpp
@@ -30,26 +30,26 @@ set(OSAC_SRCS
     tools/unixfs.cpp
 )
 
-add_executable(${OSAC_BIN} ${OSAC_SRCS})
+add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 
-set(OSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(OSAC_COMPILE_FLAGS "${OSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef")
     endif()
 endif()
 
 #Set compilation flags for current target
-set_target_properties(${OSAC_BIN} PROPERTIES
-    COMPILE_FLAGS "${OSAC_COMPILE_FLAGS}"
+set_target_properties(${LEOSAC_BIN} PROPERTIES
+    COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}"
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(${OSAC_BIN} dl pthread ${Boost_LIBRARIES})
+target_link_libraries(${LEOSAC_BIN} dl pthread ${Boost_LIBRARIES})
 
-install(FILES ${OSAC_BIN} DESTINATION bin/osac)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION bin/osac FILES_MATCHING PATTERN "*.so")
+install(FILES ${LEOSAC_BIN} DESTINATION bin/leosac)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION bin/leosac FILES_MATCHING PATTERN "*.so")
 
 # Build modules
 if(NOT NO_MODULE)

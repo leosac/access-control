@@ -9,12 +9,12 @@
 
 #include <string>
 
-#include "osacexception.hpp"
+#include "leosacexception.hpp"
 
-class GpioException : public OSACException
+class GpioException : public LEOSACException
 {
 public:
-    GpioException(const std::string& message) : OSACException("Gpio::" + message) {}
+    GpioException(const std::string& message) : LEOSACException("Gpio::" + message) {}
     virtual ~GpioException() {}
 };
 

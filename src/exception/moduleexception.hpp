@@ -9,12 +9,12 @@
 
 #include <string>
 
-#include "osacexception.hpp"
+#include "leosacexception.hpp"
 
-class ModuleException : public OSACException
+class ModuleException : public LEOSACException
 {
 public:
-    ModuleException(const std::string& message) : OSACException("Module::" + message) {}
+    ModuleException(const std::string& message) : LEOSACException("Module::" + message) {}
     virtual ~ModuleException() {}
 };
 

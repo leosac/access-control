@@ -82,14 +82,14 @@ void HWManager::deserialize(const ptree& node)
 
 void HWManager::start()
 {
-#ifndef OSAC_NO_HW
+#ifndef LEOSAC_NO_HW
     _gpioManager.startPolling();
 #endif
 }
 
 void HWManager::stop()
 {
-#ifndef OSAC_NO_HW
+#ifndef LEOSAC_NO_HW
     _gpioManager.stopPolling();
 #endif
 }

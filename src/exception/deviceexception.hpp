@@ -9,12 +9,12 @@
 
 #include <string>
 
-#include "osacexception.hpp"
+#include "leosacexception.hpp"
 
-class DeviceException : public OSACException
+class DeviceException : public LEOSACException
 {
 public:
-    DeviceException(const std::string& message) : OSACException("Device::" + message) {}
+    DeviceException(const std::string& message) : LEOSACException("Device::" + message) {}
     virtual ~DeviceException() {}
 };
 

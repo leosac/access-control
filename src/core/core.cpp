@@ -8,7 +8,7 @@
 
 #include <thread>
 
-#include "osac.hpp"
+#include "leosac.hpp"
 #include "signal/signalhandler.hpp"
 #include "hardware/hwmanager.hpp"
 #include "tools/log.hpp"
@@ -105,7 +105,7 @@ void Core::run()
         _coreConfig.serialize();
         _hwconfig.serialize();
     }
-    catch (const OSACException& e) {
+    catch (const LEOSACException& e) {
         std::cout << e.what() << std::endl;
     }
 }

@@ -9,12 +9,12 @@
 
 #include <string>
 
-#include "osacexception.hpp"
+#include "leosacexception.hpp"
 
-class CoreException : public OSACException
+class CoreException : public LEOSACException
 {
 public:
-    CoreException(const std::string& message) : OSACException("Core::" + message) {}
+    CoreException(const std::string& message) : LEOSACException("Core::" + message) {}
     virtual ~CoreException() {}
 };
 
