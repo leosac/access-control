@@ -9,12 +9,12 @@
 
 #include <string>
 
-#include "osacexception.hpp"
+#include "leosacexception.hpp"
 
-class ConfigException : public OSACException
+class ConfigException : public LEOSACException
 {
 public:
-    ConfigException(const std::string& file, const std::string& message) : OSACException("Config::" + file + ": "  + message) {}
+    ConfigException(const std::string& file, const std::string& message) : LEOSACException("Config::" + file + ": "  + message) {}
     virtual ~ConfigException() {}
 };
 

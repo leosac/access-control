@@ -9,12 +9,12 @@
 // NOTE TCLAP is easily replacable by boost::program_options
 #include <tclap/CmdLine.h>
 
-#include "osac.hpp"
+#include "leosac.hpp"
 #include "tools/log.hpp"
 #include "tools/runtimeoptions.hpp"
 #include "tools/unixfs.hpp"
 #include "core/core.hpp"
-#include "exception/osacexception.hpp"
+#include "exception/leosacexception.hpp"
 
 static const std::string  DefaultCoreCfg = UnixFs::getCWD() + "/cfg/default.xml";
 static const std::string  DefaultHwCfg = UnixFs::getCWD() + "/cfg/hardware.xml";
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
     try {
         try {
-            TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', OSAC::getVersionString());
+            TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', LEOSAC::getVersionString());
             TCLAP::SwitchArg                verboseSwitch("v", "verbose", "Increase verbosity", false);
             TCLAP::ValueArg<std::string>    coreFile("f", "core-cfg", "Configuration file", false, DefaultCoreCfg, "string");
             TCLAP::ValueArg<std::string>    hwFile("g", "hw-cfg", "Hardware configuration file", false, DefaultHwCfg, "string");
@@ -39,13 +39,13 @@ int main(int argc, char** argv)
             options.setParam("hwcfg", hwFile.getValue());
         }
         catch (const TCLAP::ArgException &e) {
-            throw (OSACException(e.error()));
+            throw (LEOSACException(e.error()));
         }
         Core    core(options);
 
         core.run();
     }
-    catch (const OSACException& e) {
+    catch (const LEOSACException& e) {
         std::cerr << e.what() << std::endl;
     }
     return (0);

@@ -9,12 +9,12 @@
 
 #include <string>
 
-#include "osacexception.hpp"
+#include "leosacexception.hpp"
 
-class DynLibException : public OSACException
+class DynLibException : public LEOSACException
 {
 public:
-    DynLibException(const std::string& message) : OSACException("DynLib::" + message) {}
+    DynLibException(const std::string& message) : LEOSACException("DynLib::" + message) {}
     virtual ~DynLibException() {}
 };
 

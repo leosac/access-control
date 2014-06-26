@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(OSAC)
+project(LEOSAC)
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -23,21 +23,21 @@ find_package(Boost 1.41.0 REQUIRED)
 list(APPEND CMAKE_CXX_FLAGS ${CXX11_FLAGS})
 
 #Build Options
-option(OSAC_NO_HW        "no-hardware" OFF)
-option(OSAC_NO_MODULES   "no-modules" OFF)
+option(LEOSAC_NO_HW        "no-hardware" OFF)
+option(LEOSAC_NO_MODULES   "no-modules" OFF)
 
 #Define the corresponding macro
-if(OSAC_NO_HW)
-    add_definitions(-DOSAC_NO_HW)
+if(LEOSAC_NO_HW)
+    add_definitions(-DLEOSAC_NO_HW)
 endif()
 
-add_definitions(-DOSAC_VERSION_MAJOR=0)
-add_definitions(-DOSAC_VERSION_MINOR=1)
-add_definitions(-DOSAC_VERSION_PATCH=2)
+add_definitions(-DLEOSAC_VERSION_MAJOR=0)
+add_definitions(-DLEOSAC_VERSION_MINOR=1)
+add_definitions(-DLEOSAC_VERSION_PATCH=2)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OSAC_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OSAC_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${OSAC_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 
 add_subdirectory(src)
 add_subdirectory(cfg)
