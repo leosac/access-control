@@ -11,8 +11,7 @@
 AGpioDevice::AGpioDevice(const std::string& name, IGPIOProvider& gpioProvider)
 :   _gpio(nullptr),
     _name(name),
-    _gpioProvider(gpioProvider),
-    _gpioNo(0)
+    _gpioProvider(gpioProvider)
 {}
 
 const std::string& AGpioDevice::getName() const
@@ -22,12 +21,25 @@ const std::string& AGpioDevice::getName() const
 
 void AGpioDevice::serialize(ptree& node)
 {
-    node.put<int>("gpio", _gpioNo);
+    ptree   gpioNode;
+
+    gpioNode.put<int>("<xmlattr>.pin", _gpio->getPinNo());
+    gpioNode.put<std::string>("<xmlattr>.direction", _startDirection);
+    if (_startDirection == "out")
+        gpioNode.put<bool>("<xmlattr>.value", _startValue);
+    node.put_child("gpio", gpioNode);
 }
 
 void AGpioDevice::deserialize(const ptree& node)
 {
-    _gpioNo = node.get<int>("gpio");
-    if (!(_gpio = _gpioProvider.getGPIO(_gpioNo)))
+    const ptree&    gpioNode = node.get_child("gpio");
+    int             pin = gpioNode.get<int>("<xmlattr>.pin");
+
+    _startDirection = gpioNode.get<std::string>("<xmlattr>.direction", "out");
+    _startValue = gpioNode.get<bool>("<xmlattr>.value", false);
+    if (!(_gpio = _gpioProvider.getGPIO(pin)))
         throw (DeviceException("could not get GPIO device"));
+    _gpio->setDirection((_startDirection == "in") ? GPIO::Direction::In : GPIO::Direction::Out);
+    if (_startDirection == "out")
+        _gpio->setValue(_startValue);
 }

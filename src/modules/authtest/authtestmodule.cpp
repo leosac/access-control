@@ -46,15 +46,9 @@ void AuthTestModule::deserialize(const ptree& node)
 
 void AuthTestModule::authenticate(const AuthRequest& ar)
 {
-    std::istringstream          iss(ar.getContent());
-    CardId                      cid;
-    unsigned int                byte;
+    Authenticator::CSN  cid = _auth.deserializeCard(ar.getContent());
 
     LOG() << "AR content=" << ar.getContent();
-
-    while (iss >> byte)
-        cid.push_back(static_cast<Byte>(byte));
-
     if (_auth.hasAccess(cid))
         _protocol.pushCommand(ICommand::Ptr(new AuthCmdGrantAccess(&_protocol, ar.getId())));
     else

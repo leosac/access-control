@@ -28,7 +28,7 @@ void Authenticator::deserialize(const ptree& node)
     for (const auto& v : node.get_child("auth"))
     {
         if (v.first == "card")
-            deserializeCard(v.second.data());
+            authorizeCard(deserializeCard(v.second.data()));
     }
 }
 
@@ -71,7 +71,7 @@ std::string Authenticator::serializeCard(const Authenticator::CSN& csn)
     return (oss.str());
 }
 
-void Authenticator::deserializeCard(const std::string& card)
+Authenticator::CSN Authenticator::deserializeCard(const std::string& card)
 {
     std::string         csnString(card);
     std::istringstream  iss;
@@ -82,5 +82,5 @@ void Authenticator::deserializeCard(const std::string& card)
     iss.str(csnString);
     while (iss >> std::hex >> byte)
         csn.push_back(byte);
-    authorizeCard(csn);
+    return (csn);
 }
