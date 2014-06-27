@@ -9,8 +9,8 @@
 // NOTE TCLAP is easily replacable by boost::program_options
 #include <tclap/CmdLine.h>
 
-#include "leosac.hpp"
 #include "tools/log.hpp"
+#include "tools/leosac.hpp"
 #include "tools/runtimeoptions.hpp"
 #include "tools/unixfs.hpp"
 #include "core/core.hpp"

@@ -8,7 +8,6 @@
 
 #include <thread>
 
-#include "leosac.hpp"
 #include "signal/signalhandler.hpp"
 #include "hardware/hwmanager.hpp"
 #include "tools/log.hpp"
@@ -94,7 +93,6 @@ void Core::run()
         LOG() << "core config loaded";
         SignalHandler::registerCallback(this);
         LOG() << "starting core loop";
-        _authProtocol.cmdCreateAuthRequest("fakeSource", "doorA", "DE:AD:BE:EF"); // TEST
         while (_isRunning)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
@@ -106,6 +104,9 @@ void Core::run()
         _hwconfig.serialize();
     }
     catch (const LEOSACException& e) {
-        std::cout << e.what() << std::endl;
+        std::cerr << "Fatal exception:" << e.what() << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Unexpected exception caught:" << e.what() << std::endl;
     }
 }
