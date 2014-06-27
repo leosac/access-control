@@ -32,7 +32,8 @@ protected:
 private:
     const std::string   _name;
     IGPIOProvider&      _gpioProvider;
-    int                 _gpioNo;
+    std::string         _startDirection;
+    bool                _startValue;
 };
 
 #endif // AGPIODEVICE_HPP

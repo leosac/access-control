@@ -15,6 +15,7 @@
 
 class Authenticator : public IXmlSerializable
 {
+public:
     typedef std::vector<Byte>   CSN;
 
 public:
@@ -31,9 +32,9 @@ public:
     bool    hasAccess(const CSN& csn);
     void    authorizeCard(const CSN& csn);
 
-private:
-    std::string serializeCard(const CSN& csn);
-    void        deserializeCard(const std::string& card);
+public:
+    static std::string  serializeCard(const CSN& csn);
+    static CSN          deserializeCard(const std::string& card);
 
 private:
     std::list<CSN>  _csnList;
