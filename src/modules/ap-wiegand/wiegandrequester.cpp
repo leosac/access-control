@@ -7,6 +7,7 @@
 #include "wiegandrequester.hpp"
 
 #include <sstream>
+#include <iomanip>
 
 #include "hardware/device/wiegandreader.hpp"
 
@@ -29,8 +30,8 @@ void WiegandRequester::notifyCardRead(const IWiegandListener::CardId& cardId)
     for (std::size_t i = 0; i < cardId.size(); ++i)
     {
         if (i > 0)
-            oss << ' ';
-        oss << static_cast<unsigned int>(cardId[i]);
+            oss << ':';
+        oss << std::hex << std::setw(2) << static_cast<unsigned int>(cardId[i]);
     }
     _accessPoint.notifyAccess(oss.str());
 }
