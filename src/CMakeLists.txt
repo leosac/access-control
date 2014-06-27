@@ -2,7 +2,6 @@ set(LEOSAC_BIN leosac)
 
 set(LEOSAC_SRCS
     main.cpp
-    leosac.cpp
     config/xmlconfig.cpp
     core/core.cpp
     core/modulemanager.cpp
@@ -28,6 +27,7 @@ set(LEOSAC_SRCS
     tools/version.cpp
     tools/unixsyscall.cpp
     tools/unixfs.cpp
+    tools/leosac.cpp
 )
 
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
