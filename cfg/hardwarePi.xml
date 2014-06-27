@@ -11,12 +11,6 @@
         <device type="button" name="sensor">
             <gpio pin="4" direction="in"/>
         </device>
-<!--        <device type="button" name="testButtonB">
-            <gpio>4</gpio>
-        </device>-->
-<!--        <device type="led" name="led2">
-            <gpio>8</gpio>
-        </device>-->
         <device type="systemled" name="green" ledname="led0"/>
         <device type="wiegandreader" name="readerA">
             <higpio>15</higpio>

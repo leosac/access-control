@@ -11,16 +11,6 @@
             <grantedLed>led1</grantedLed>
         </properties>
     </module>
-    <module file="libdoor.so">
-        <alias>doorB</alias>
-        <properties>
-            <doorconf>cfg/doorB.conf</doorconf>
-            <doorRelay>none</doorRelay>
-            <doorButton>none</doorButton>
-            <grantedLed>none</grantedLed>
-            <deniedLed>none</deniedLed>
-        </properties>
-    </module>
     <module file="libjournal.so">
         <alias>log</alias>
         <properties/>
