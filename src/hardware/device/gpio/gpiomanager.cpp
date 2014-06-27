@@ -20,6 +20,7 @@ extern "C" {
 #include "igpiolistener.hpp"
 #include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
+#include <tools/leosac.hpp>
 
 GPIOManager::GPIOManager()
 :   _isRunning(false),
@@ -47,7 +48,8 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
         GPIO*   gpio = instanciateGpio(gpioNo);
 
         gpio->setDirection(GPIO::Direction::In);
-        gpio->setEdgeMode(GPIO::EdgeMode::Rising); // FIXME Patch for raspi device
+        if (Leosac::Platform == Leosac::LeosacPlatform::RaspberryPiRev2)
+            gpio->setEdgeMode(GPIO::EdgeMode::Rising);
         _polledGpio[gpioNo] = gpio;
     }
     _listeners.push_back(listener);

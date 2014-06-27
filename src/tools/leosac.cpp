@@ -9,14 +9,14 @@
 
 static std::string vstring = std::string();
 
-std::string& LEOSAC::getVersionString()
+std::string& Leosac::getVersionString()
 {
     if (vstring.empty())
         vstring = Version::buildVersionString(Major, Minor, Patch);
     return (vstring);
 }
 
-int LEOSAC::versionCompare(const std::string& v)
+int Leosac::versionCompare(const std::string& v)
 {
     return (Version::versionCompare(v, getVersionString()));
 }

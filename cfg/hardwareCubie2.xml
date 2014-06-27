@@ -31,26 +31,23 @@
         <gpioalias id="28">gpio28_pd27</gpioalias>
     </platform>
     <devices>
-        <device type="led" name="led1">
-            <gpio pin="1"/>
-        </device>
-        <device type="led" name="led2">
-            <gpio pin="2"/>
-        </device>
-        <device type="button" name="testButtonA">
-            <gpio pin="3" direction="in"/>
-        </device>
-        <device type="button" name="testButtonB">
-            <gpio pin="4" direction="in"/>
-        </device>
         <device type="buzzer" name="buzzerA">
-            <gpio pin="18"/>
+            <gpio pin="26"/>
+        </device>
+        <device type="led" name="led1">
+            <gpio pin="27"/>
+        </device>
+        <device type="relay" name="relayA">
+            <gpio pin="24"/>
+        </device>
+        <device type="button" name="sensor">
+            <gpio pin="22" direction="in"/>
         </device>
         <device type="systemled" name="green" ledname="green:ph20:led1"/>
         <device type="systemled" name="blue" ledname="blue:ph21:led2"/>
         <device type="wiegandreader" name="readerA">
-            <higpio>10</higpio>
-            <logpio>11</logpio>
+            <higpio>20</higpio>
+            <logpio>18</logpio>
         </device>
     </devices>
 </hardware>

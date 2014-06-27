@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 
     try {
         try {
-            TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', LEOSAC::getVersionString());
+            TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', Leosac::getVersionString());
             TCLAP::SwitchArg                verboseSwitch("v", "verbose", "Increase verbosity", false);
             TCLAP::ValueArg<std::string>    coreFile("f", "core-cfg", "Configuration file", false, DefaultCoreCfg, "string");
             TCLAP::ValueArg<std::string>    hwFile("g", "hw-cfg", "Hardware configuration file", false, DefaultHwCfg, "string");
