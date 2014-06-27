@@ -23,7 +23,10 @@ public:
     virtual void    deserialize(const ptree& node) override;
 
 public:
-    void    blink();
+    void    turnOn();
+    void    turnOn(unsigned int durationMs);
+    void    turnOff();
+    void    toggle();
 };
 
 #endif // LED_HPP

@@ -104,9 +104,9 @@ void Core::run()
         _hwconfig.serialize();
     }
     catch (const LEOSACException& e) {
-        std::cerr << "Fatal exception:" << e.what() << std::endl;
+        std::cerr << "Fatal exception: " << e.what() << std::endl;
     }
     catch (const std::exception& e) {
-        std::cerr << "Unexpected exception caught:" << e.what() << std::endl;
+        std::cerr << "Unexpected exception caught: " << e.what() << std::endl;
     }
 }

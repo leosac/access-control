@@ -7,6 +7,7 @@
 #include "led.hpp"
 
 #include <thread>
+#include <chrono>
 
 #include "hardware/device/gpio/gpio.hpp"
 #include "exception/deviceexception.hpp"
@@ -26,17 +27,28 @@ void Led::deserialize(const ptree& node)
     _gpio->setValue(false); // FIXME
 }
 
-void Led::blink()
+void Led::turnOn()
 {
-    std::thread thread([this] ()
+    _gpio->setValue(true);
+}
+
+void Led::turnOn(unsigned int durationMs)
+{
+    std::thread thread([this, durationMs] ()
     {
-        _gpio->setValue(true);
-        std::this_thread::sleep_for(std::chrono::milliseconds(400));
-        _gpio->setValue(false);
-        std::this_thread::sleep_for(std::chrono::milliseconds(400));
-        _gpio->setValue(true);
-        std::this_thread::sleep_for(std::chrono::milliseconds(400));
-        _gpio->setValue(false);
+        turnOn();
+        std::this_thread::sleep_for(std::chrono::milliseconds(durationMs));
+        turnOff();
     } );
     thread.detach();
+}
+
+void Led::turnOff()
+{
+    _gpio->setValue(false);
+}
+
+void Led::toggle()
+{
+    _gpio->setValue(!_gpio->getValue());
 }
