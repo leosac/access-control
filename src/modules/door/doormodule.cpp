@@ -94,11 +94,13 @@ bool DoorModule::isAuthRequired() const
 
 void DoorModule::open()
 {
+    unsigned int duration = 5000; // NOTE Ms FIXME Make this configurable
+
     if (_grantedLed)
-        _grantedLed->blink(); // DEBUG
+        _grantedLed->turnOn(duration); // DEBUG
     LOG() << "DOOR OPENED !";
     if (_doorRelay)
-        _doorRelay->open();
+        _doorRelay->open(duration);
     else
         LOG() << "No relay to open !";
 }

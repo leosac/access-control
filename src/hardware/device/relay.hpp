@@ -27,7 +27,7 @@ public:
     virtual void    deserialize(const ptree& node) override;
 
 public:
-    void    open();
+    void    open(unsigned int durationMs);
     void    close();
     void    setOpen(bool state);
     bool    isOpen();

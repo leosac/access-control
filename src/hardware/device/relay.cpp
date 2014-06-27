@@ -26,16 +26,16 @@ void Relay::deserialize(const ptree& node)
     _gpio->setDirection(GPIO::Direction::Out); // FIXME should be set in the config
 }
 
-void Relay::open()
+void Relay::open(unsigned int durationMs)
 {
     LOG() << "call";
     if (_openMutex.try_lock())
     {
-        std::thread thread([this] ()
+        std::thread thread([this, durationMs] ()
         {
             _gpio->setValue(GPIO::Value::High);
             LOG() << "Relay HIGH";
-            std::this_thread::sleep_for(std::chrono::seconds(5));
+            std::this_thread::sleep_for(std::chrono::milliseconds(durationMs));
             _gpio->setValue(GPIO::Value::Low);
             LOG() << "Relay LOW";
         } );
