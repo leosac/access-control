@@ -15,6 +15,8 @@ Button::Button(const std::string& name, IGPIOProvider& gpioProvider)
 void Button::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
+    if (_gpio->getDirection() != GPIO::Direction::In)
+        throw (DeviceException("Gpio direction must be IN"));
 }
 
 bool Button::isPressed() const

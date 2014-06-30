@@ -23,7 +23,6 @@ public:
     Relay& operator=(const Relay& other) = delete;
 
 public:
-    virtual void    serialize(ptree& node) override;
     virtual void    deserialize(const ptree& node) override;
 
 public:
