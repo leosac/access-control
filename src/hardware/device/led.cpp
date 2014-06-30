@@ -16,15 +16,12 @@ Led::Led(const std::string& name, IGPIOProvider& gpioProvider)
 :   AGpioDevice(name, gpioProvider)
 {}
 
-void Led::serialize(ptree& node)
-{
-    AGpioDevice::serialize(node);
-}
-
 void Led::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
-    _gpio->setValue(false); // FIXME
+    if (_gpio->getDirection() != GPIO::Direction::Out)
+        throw (DeviceException("Gpio direction must be OUT"));
+    _gpio->setValue(false);
 }
 
 void Led::turnOn()

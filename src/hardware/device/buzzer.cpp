@@ -14,15 +14,11 @@ Buzzer::Buzzer(const std::string& name, IGPIOProvider& gpioProvider)
 :   AGpioDevice(name, gpioProvider)
 {}
 
-void Buzzer::serialize(ptree& node)
-{
-    AGpioDevice::serialize(node);
-}
-
 void Buzzer::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
-    beep(0,0); // FIXME
+    if (_gpio->getDirection() != GPIO::Direction::Out)
+        throw (DeviceException("Gpio direction must be OUT"));
 }
 
 void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)

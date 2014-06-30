@@ -19,7 +19,6 @@ public:
     Buzzer& operator=(const Buzzer& other) = delete;
 
 public:
-    virtual void    serialize(ptree& node) override;
     virtual void    deserialize(const ptree& node) override;
 
 public:

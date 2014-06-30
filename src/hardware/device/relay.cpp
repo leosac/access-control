@@ -15,14 +15,11 @@ Relay::Relay(const std::string& name, IGPIOProvider& gpioObservable)
     _isOpen(false)
 {}
 
-void Relay::serialize(ptree& node)
-{
-    AGpioDevice::serialize(node);
-}
-
 void Relay::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
+    if (_gpio->getDirection() != GPIO::Direction::Out)
+        throw (DeviceException("Gpio direction must be OUT"));
 }
 
 void Relay::open(unsigned int durationMs)
