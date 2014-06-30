@@ -7,8 +7,10 @@
 #include "wiegandreader.hpp"
 
 #include <cstring>
+#include <bitset>
 
 #include "iwiegandlistener.hpp"
+#include "tools/log.hpp"
 
 WiegandReader::WiegandReader(const std::string& name, IGPIOObservable& gpioObservable)
 :   _name(name),
@@ -32,7 +34,11 @@ void WiegandReader::timeout()
         IWiegandListener::CardId    c(size);
 
         for (std::size_t i = 0; i < size; ++i)
+        {
             c[i] = _buffer[size - i - 1];
+            std::bitset<8> a(c[i]);
+            LOG() << '[' << i << "] "<< a;
+        }
         for (auto& listener : _listeners)
             listener->notifyCardRead(c);
         reset();
