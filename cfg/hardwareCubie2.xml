@@ -29,6 +29,20 @@
         <gpioalias id="26">gpio26_pd25</gpioalias>
         <gpioalias id="27">gpio27_pd26</gpioalias>
         <gpioalias id="28">gpio28_pd27</gpioalias>
+        <gpioalias id="29">gpio29_pg0</gpioalias>
+        <gpioalias id="30">gpio30_pg1</gpioalias>
+        <gpioalias id="31">gpio31_pg2</gpioalias>
+        <gpioalias id="32">gpio32_pg3</gpioalias>
+        <gpioalias id="33">gpio33_pi0</gpioalias>
+        <gpioalias id="34">gpio34_pi1</gpioalias>
+        <gpioalias id="35">gpio35_pi2</gpioalias>
+        <gpioalias id="36">gpio36_pi3</gpioalias>
+        <gpioalias id="37">gpio37_ph0</gpioalias>
+        <gpioalias id="38">gpio38_ph1</gpioalias>
+        <gpioalias id="39">gpio39_ph2</gpioalias>
+        <gpioalias id="40">gpio40_ph3</gpioalias>
+        <gpioalias id="41">gpio41_ph14</gpioalias>
+        <gpioalias id="42">gpio42_ph15</gpioalias>
     </platform>
     <devices>
         <device type="buzzer" name="buzzerA">
@@ -46,8 +60,8 @@
         <device type="systemled" name="green" ledname="green:ph20:led1"/>
         <device type="systemled" name="blue" ledname="blue:ph21:led2"/>
         <device type="wiegandreader" name="readerA">
-            <higpio>20</higpio>
-            <logpio>18</logpio>
+            <higpio>41</higpio>
+            <logpio>42</logpio>
         </device>
     </devices>
 </hardware>

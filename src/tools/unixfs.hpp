@@ -50,6 +50,12 @@ public:
     static std::string  readAll(const std::string& path);
 
     /**
+     * @param path Path of the file
+     * @return true is file exists
+     */
+    static bool         fileExists(const std::string& path);
+
+    /**
      * read value from a sysfs file
      * @param path Path of the sysfs target
      * @return Value read

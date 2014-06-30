@@ -41,8 +41,6 @@ int main(int argc, char** argv)
         catch (const TCLAP::ArgException &e) {
             throw (LEOSACException(e.error()));
         }
-        std::cout << "Platform=" << static_cast<int>(Leosac::Platform) << std::endl;
-        return (0);
         Core    core(options);
 
         core.run();

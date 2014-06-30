@@ -1,7 +1,7 @@
 /**
  * \file leosac.hpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief version handling
+ * \brief version and platform handling
  */
 
 #ifndef LEOSAC_HPP
