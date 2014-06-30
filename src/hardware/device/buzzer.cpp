@@ -22,7 +22,6 @@ void Buzzer::serialize(ptree& node)
 void Buzzer::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
-    _gpio->setDirection(GPIO::Direction::Out); // FIXME
     beep(0,0); // FIXME
 }
 
