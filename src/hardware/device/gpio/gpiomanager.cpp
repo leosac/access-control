@@ -48,7 +48,7 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
         GPIO*   gpio = instanciateGpio(gpioNo);
 
         gpio->setDirection(GPIO::Direction::In);
-        if (Leosac::Platform == Leosac::LeosacPlatform::RaspberryPiRev2)
+        if (Leosac::Platform == Leosac::PlatformType::RaspberryPi)
             gpio->setEdgeMode(GPIO::EdgeMode::Rising);
         _polledGpio[gpioNo] = gpio;
     }
