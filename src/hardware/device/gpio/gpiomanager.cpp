@@ -35,7 +35,7 @@ GPIOManager::~GPIOManager()
         delete gpio.second;
 }
 
-void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
+void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::EdgeMode mode)
 {
     ListenerInfo    listener;
 
@@ -49,8 +49,11 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
 
         gpio->setDirection(GPIO::Direction::In);
         if (!gpio->hasInterruptsSupport())
+        {
+            delete gpio;
             throw (GpioException("This gpio does not support interrupts: " + gpio->getPath()));
-        gpio->setEdgeMode(GPIO::EdgeMode::Rising);
+        }
+        gpio->setEdgeMode(mode);
         _polledGpio[gpioNo] = gpio;
     }
     _listeners.push_back(listener);
