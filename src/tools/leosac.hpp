@@ -18,15 +18,15 @@
 #endif
 
 #ifndef LEOSAC_VERSION_PATCH
-    #define LEOSAC_VERSION_PATCH 0
+#   define LEOSAC_VERSION_PATCH 0
 #endif
 
-#if defined(LEOSAC_PLATFORM_RASPI)
-#   define LEOSAC_PLATFORM (LeosacPlatform::RaspberryPiRev2)
+#if defined(LEOSAC_PLATFORM_RASPBERRYPI)
+#   define LEOSAC_PLATFORM  (PlatformType::RaspberryPi)
 #elif defined(LEOSAC_PLATFORM_CUBIEBOARD)
-#   define LEOSAC_PLATFORM (LeosacPlatform::CubieBoard)
+#   define LEOSAC_PLATFORM  (PlatformType::CubieBoard)
 #else
-#   define LEOSAC_PLATFORM (LeosacPlatform::Unknown)
+#   define LEOSAC_PLATFORM  (PlatformType::None)
 #endif
 
 namespace Leosac
@@ -35,12 +35,12 @@ namespace Leosac
     static const int Minor = LEOSAC_VERSION_MINOR;
     static const int Patch = LEOSAC_VERSION_PATCH;
 
-    enum class LeosacPlatform {
-        Unknown = 0,
-        RaspberryPiRev2,
+    enum class PlatformType {
+        None = 0,
+        RaspberryPi,
         CubieBoard
     };
-    static const LeosacPlatform Platform = LEOSAC_PLATFORM;
+    static const PlatformType Platform = LEOSAC_PLATFORM;
 
     /**
      * return LEOSAC version string formatted this way: MAJOR.MINOR.PATCH
