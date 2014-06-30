@@ -23,7 +23,6 @@ void Relay::serialize(ptree& node)
 void Relay::deserialize(const ptree& node)
 {
     AGpioDevice::deserialize(node);
-    _gpio->setDirection(GPIO::Direction::Out); // FIXME should be set in the config
 }
 
 void Relay::open(unsigned int durationMs)
