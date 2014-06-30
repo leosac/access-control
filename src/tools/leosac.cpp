@@ -1,7 +1,7 @@
 /**
  * \file leosac.cpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief version handling
+ * \brief version and platform handling
  */
 
 #include "leosac.hpp"

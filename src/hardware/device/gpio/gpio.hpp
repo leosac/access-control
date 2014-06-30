@@ -59,6 +59,7 @@ public:
     void        setValue(Value value) const;
     bool        isActiveLow() const;
     void        setActiveLow(bool state) const;
+    bool        hasInterruptsSupport() const;
     EdgeMode    getEdgeMode() const;
     void        setEdgeMode(EdgeMode mode) const;
 
@@ -75,6 +76,7 @@ private:
     const std::string   _activeLowFile;
     const std::string   _edgeFile;
     int                 _pollFd;
+    bool                _interruptsSupport;
 };
 
 #endif // GPIO_HPP

@@ -31,7 +31,7 @@ void WiegandRequester::notifyCardRead(const IWiegandListener::CardId& cardId)
     {
         if (i > 0)
             oss << ':';
-        oss << std::hex << std::setw(2) << static_cast<unsigned int>(cardId[i]);
+        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned int>(cardId[i]);
     }
     _accessPoint.notifyAccess(oss.str());
 }

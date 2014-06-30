@@ -44,6 +44,7 @@ GPIO::GPIO(int pinNo, const std::string& sysfsName)
     LOG() << "Opening file " << _valueFile;
     if ((_pollFd = ::open(_valueFile.c_str(), O_RDONLY | O_NONBLOCK)) == -1)
         throw (GpioException(UnixSyscall::getErrorString("open", errno)));
+    _interruptsSupport = UnixFs::fileExists(_edgeFile);
 }
 
 GPIO::~GPIO()
@@ -131,6 +132,11 @@ bool GPIO::isActiveLow() const
 void GPIO::setActiveLow(bool state) const
 {
     UnixFs::writeSysFsValue<std::string>(_activeLowFile, ((state) ? ("1") : ("0")));
+}
+
+bool GPIO::hasInterruptsSupport() const
+{
+    return (_interruptsSupport);
 }
 
 GPIO::EdgeMode GPIO::getEdgeMode() const

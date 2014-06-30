@@ -10,6 +10,7 @@
 
 #include "exception/deviceexception.hpp"
 #include "tools/log.hpp"
+#include "tools/leosac.hpp"
 
 #include "device/button.hpp"
 #include "device/led.hpp"
@@ -82,16 +83,14 @@ void HWManager::deserialize(const ptree& node)
 
 void HWManager::start()
 {
-#ifndef LEOSAC_NO_HW
-    _gpioManager.startPolling();
-#endif
+    if (Leosac::Platform != Leosac::PlatformType::None)
+        _gpioManager.startPolling();
 }
 
 void HWManager::stop()
 {
-#ifndef LEOSAC_NO_HW
-    _gpioManager.stopPolling();
-#endif
+    if (Leosac::Platform != Leosac::PlatformType::None)
+        _gpioManager.stopPolling();
 }
 
 IDevice* HWManager::getDevice(const std::string& name)

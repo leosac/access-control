@@ -80,3 +80,15 @@ std::string UnixFs::readAll(const std::string& path)
         throw (FsException("could not open " + path + '\''));
     return (std::string(std::istreambuf_iterator<char>(static_cast<std::istream&>(file)), std::istreambuf_iterator<char>()));
 }
+
+bool UnixFs::fileExists(const std::string& path)
+{
+    if (access(path.c_str(), F_OK) == -1)
+    {
+        if (errno == ENOENT)
+            return (false);
+        throw (FsException(UnixSyscall::getErrorString("access", errno)));
+    }
+    else
+        return (true);
+}

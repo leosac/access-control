@@ -33,13 +33,7 @@ find_package(Boost 1.41.0 REQUIRED)
 list(APPEND CMAKE_CXX_FLAGS ${CXX11_FLAGS})
 
 #Build Options
-option(LEOSAC_NO_HW        "no-hardware" OFF)
 option(LEOSAC_NO_MODULES   "no-modules" OFF)
-
-#Define the corresponding macro
-if(LEOSAC_NO_HW)
-    add_definitions(-DLEOSAC_NO_HW)
-endif()
 
 add_definitions(-DLEOSAC_VERSION_MAJOR=0)
 add_definitions(-DLEOSAC_VERSION_MINOR=1)

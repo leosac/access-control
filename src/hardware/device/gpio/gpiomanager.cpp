@@ -48,8 +48,9 @@ void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo)
         GPIO*   gpio = instanciateGpio(gpioNo);
 
         gpio->setDirection(GPIO::Direction::In);
-        if (Leosac::Platform == Leosac::PlatformType::RaspberryPi)
-            gpio->setEdgeMode(GPIO::EdgeMode::Rising);
+        if (!gpio->hasInterruptsSupport())
+            throw (GpioException("This gpio does not support interrupts: " + gpio->getPath()));
+        gpio->setEdgeMode(GPIO::EdgeMode::Rising);
         _polledGpio[gpioNo] = gpio;
     }
     _listeners.push_back(listener);
