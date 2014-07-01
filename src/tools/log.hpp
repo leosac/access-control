@@ -11,13 +11,15 @@
 #include <iostream>
 #include <sstream>
 
+#include "unixfs.hpp"
+
 class LogLine
 {
 public:
     LogLine(const char* file, const char* func, int line, std::ostream& out = std::cout)
     : _out(out)
     {
-        _stream << file << ':' << line << ": in function '" << func << "': ";
+        _stream << UnixFs::stripPath(file) << ':' << line << ": in function '" << func << "': ";
     }
 
     ~LogLine()

@@ -131,7 +131,7 @@ void GPIOManager::pollLoop()
                             listener.instance->notify(listener.gpioNo);
                     }
                 }
-                else if (_fdset[i].revents & POLLERR)
+                if (_fdset[i].revents & POLLERR)
                     LOG() << "poll(): POLLERR happened";
             }
         }
