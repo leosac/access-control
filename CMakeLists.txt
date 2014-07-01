@@ -11,6 +11,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
     message(WARNING "Please specify a build type\nExample: cmake .. -DCMAKE_BUILD_TYPE=Debug")
 endif()
 
+# Set correct hardware platform macro
 set(LEOSAC_PLATFORM CACHE STRING "Hardware platform on which to build Leosac")
 if (NOT LEOSAC_PLATFORM)
     message(WARNING "No hardware platform is specified\nExample: -DLEOSAC_PLATFORM=RaspberryPi")

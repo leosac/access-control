@@ -23,11 +23,12 @@ set(LEOSAC_SRCS
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
     signal/signalhandler.cpp
-    tools/runtimeoptions.cpp
-    tools/version.cpp
-    tools/unixsyscall.cpp
-    tools/unixfs.cpp
     tools/leosac.cpp
+    tools/runtimeoptions.cpp
+    tools/unixsyscall.cpp
+    tools/unixfilewatcher.cpp
+    tools/unixfs.cpp
+    tools/version.cpp
 )
 
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})

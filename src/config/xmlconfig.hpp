@@ -23,8 +23,9 @@ public:
     XmlConfig& operator=(const XmlConfig& other) = delete;
 
 public:
-    void    serialize();
-    void    deserialize();
+    void                serialize();
+    void                deserialize();
+    const std::string&  getFilename() const;
 
 private:
     const std::string   _file;

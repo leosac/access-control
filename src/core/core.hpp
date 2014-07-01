@@ -17,6 +17,7 @@
 #include "hardware/hwmanager.hpp"
 #include "signal/isignalcallback.hpp"
 #include "tools/runtimeoptions.hpp"
+#include "tools/unixfilewatcher.hpp"
 #include "config/xmlconfig.hpp"
 
 class Core : public ICore, public ISignalCallback, public IXmlSerializable
@@ -45,6 +46,7 @@ private:
     HWManager               _hwManager;
     XmlConfig               _coreConfig;
     XmlConfig               _hwconfig;
+    UnixFileWatcher         _fileWatcher;
     ModuleManager           _moduleMgr;
     ModuleProtocol          _authProtocol;
     std::atomic<bool>       _isRunning;

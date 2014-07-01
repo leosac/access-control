@@ -56,3 +56,8 @@ void XmlConfig::deserialize()
         throw (ConfigException(_file, e.what()));
     }
 }
+
+const std::string& XmlConfig::getFilename() const
+{
+    return (_file);
+}
