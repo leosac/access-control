@@ -36,6 +36,7 @@ UnixFileWatcher::~UnixFileWatcher()
 void UnixFileWatcher::start()
 {
     _isRunning = true;
+    LOG() << "inotify start";
     _thread = std::thread([this] () {
         run();
     } );
@@ -44,6 +45,7 @@ void UnixFileWatcher::start()
 void UnixFileWatcher::stop()
 {
     _isRunning = false;
+    LOG() << "inotify stop";
     _thread.join();
     for (auto watch : _watches)
     {
@@ -55,7 +57,7 @@ void UnixFileWatcher::stop()
 
 void UnixFileWatcher::watchFile(const std::string& path)
 {
-    std::uint32_t   mask = IN_MODIFY;
+    std::uint32_t   mask = IN_CLOSE_WRITE;
     WatchParams     params;
     UnixFd          watch;
 
@@ -71,7 +73,7 @@ bool UnixFileWatcher::fileHasChanged(const std::string& path) const
     for (auto& param : _watches)
     {
         if (param.second.path == path)
-            return ((param.second.mask & IN_MODIFY) > 0);
+            return ((param.second.mask & IN_CLOSE_WRITE) > 0);
     }
     throw (FsException("no registered watch for path:" + path));
 }

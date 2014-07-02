@@ -21,10 +21,12 @@ void Authenticator::serialize(ptree& node)
         ptre.put(std::string(), serializeCard(csn));
         child.add_child("card", ptre);
     }
+    _csnList.clear();
 }
 
 void Authenticator::deserialize(const ptree& node)
 {
+    _csnList.clear();
     for (const auto& v : node.get_child("auth"))
     {
         if (v.first == "card")

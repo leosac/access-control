@@ -9,6 +9,7 @@
 
 #include "modules/iauthmodule.hpp"
 #include "tools/bufferutils.hpp"
+#include "tools/unixfilewatcher.hpp"
 #include "authenticator.hpp"
 
 class AuthTestModule : public IAuthModule
@@ -32,6 +33,7 @@ public:
 
 private:
     IModuleProtocol&        _protocol;
+    UnixFileWatcher         _watcher;
     Authenticator           _auth;
     const std::string       _name;
     std::string             _configPath;

@@ -92,9 +92,6 @@ void Core::run()
         _coreConfig.deserialize();
         LOG() << "core config loaded";
         SignalHandler::registerCallback(this);
-        _fileWatcher.watchFile(_coreConfig.getFilename());
-        _fileWatcher.watchFile(_hwconfig.getFilename());
-        _fileWatcher.start();
         LOG() << "starting core loop";
         while (_isRunning)
         {
@@ -103,7 +100,6 @@ void Core::run()
             _authProtocol.sync();
         }
         LOG() << "exiting core loop";
-        _fileWatcher.stop();
         _hwManager.stop();
         _coreConfig.serialize();
         _hwconfig.serialize();
