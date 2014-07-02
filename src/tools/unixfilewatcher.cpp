@@ -22,6 +22,17 @@ UnixFileWatcher::UnixFileWatcher()
         throw (FsException(UnixSyscall::getErrorString("inotify_init", errno)));
 }
 
+UnixFileWatcher::~UnixFileWatcher()
+{
+    try {
+        if (close(_inotifyFd) == -1)
+            throw (FsException(UnixSyscall::getErrorString("close", errno)));
+    }
+    catch (const FsException& e) {
+        LOG() << "Exception caught: " << e.what();
+    }
+}
+
 void UnixFileWatcher::start()
 {
     _isRunning = true;
@@ -40,18 +51,42 @@ void UnixFileWatcher::stop()
             throw (FsException(UnixSyscall::getErrorString("inotify_rm_watch", errno)));
     }
     _watches.clear();
-    if (close(_inotifyFd) == -1)
-        throw (FsException(UnixSyscall::getErrorString("close", errno)));
 }
 
 void UnixFileWatcher::watchFile(const std::string& path)
 {
     std::uint32_t   mask = IN_MODIFY;
+    WatchParams     params;
     UnixFd          watch;
 
     if ((watch = inotify_add_watch(_inotifyFd, path.c_str(), mask)) == -1)
         throw (FsException(UnixSyscall::getErrorString("inotify_add_watch", errno)));
-    _watches[watch] = path;
+    params.path = path;
+    params.mask = 0;
+    _watches[watch] = params;
+}
+
+bool UnixFileWatcher::fileHasChanged(const std::string& path) const
+{
+    for (auto& param : _watches)
+    {
+        if (param.second.path == path)
+            return ((param.second.mask & IN_MODIFY) > 0);
+    }
+    throw (FsException("no registered watch for path:" + path));
+}
+
+void UnixFileWatcher::fileReset(const std::string& path)
+{
+    for (auto& param : _watches)
+    {
+        if (param.second.path == path)
+        {
+            param.second.mask = 0;
+            return;
+        }
+    }
+    throw (FsException("no registered watch for path:" + path));
 }
 
 std::size_t UnixFileWatcher::size() const
@@ -94,10 +129,7 @@ void UnixFileWatcher::run()
                 for (int i = 0; i < len;)
                 {
                     event = reinterpret_cast<inotify_event*>(&buf[i]);
-
-                    //TODO use event
-                    static_cast<void>(event);
-
+                    _watches.at(event->wd).mask |= event->mask;
                     i += sizeof(inotify_event) + event->len;
                 }
             }

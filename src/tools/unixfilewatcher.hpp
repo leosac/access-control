@@ -15,14 +15,17 @@
 class UnixFileWatcher
 {
     typedef int UnixFd;
-    typedef std::string WatchParams;
+    typedef struct {
+        std::string path;
+        int         mask;
+    } WatchParams;
     typedef std::map<UnixFd, WatchParams> Watches;
 
     static const long   DefaultTimeoutMs = 2000;
 
 public:
     explicit UnixFileWatcher();
-    ~UnixFileWatcher() = default;
+    ~UnixFileWatcher();
 
     UnixFileWatcher(const UnixFileWatcher& other) = delete;
     UnixFileWatcher& operator=(const UnixFileWatcher& other) = delete;
@@ -31,7 +34,11 @@ public:
     // TODO add event recovery methods
     void        start();
     void        stop();
+
+public:
     void        watchFile(const std::string& path);
+    bool        fileHasChanged(const std::string& path) const;
+    void        fileReset(const std::string& path);
     std::size_t size() const;
 
 private:
