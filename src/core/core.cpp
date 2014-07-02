@@ -99,6 +99,7 @@ void Core::run()
         while (_isRunning)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
+            // NOTE watch config files here, if needed
             _authProtocol.sync();
         }
         LOG() << "exiting core loop";
