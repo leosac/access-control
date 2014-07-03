@@ -16,8 +16,9 @@ class IDoorModule : public IModule
 {
 public:
     virtual ~IDoorModule() {}
-    virtual void    open() = 0;
     virtual bool    isAuthRequired() const = 0;
+    virtual void    open() = 0;
+    virtual void    deny() = 0;
     virtual bool    isOpen() const = 0;
     virtual void    alarm() = 0;
 };

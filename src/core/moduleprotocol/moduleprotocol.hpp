@@ -2,6 +2,8 @@
  * \file moduleprotocol.hpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief ModuleProtocol class declaration
+ * NOTE before unloading modules, make sure there's no access request still
+ * processing, or std::map out_of_range exceptions will start to appear.
  */
 
 #ifndef MODULEPROTOCOL_HPP

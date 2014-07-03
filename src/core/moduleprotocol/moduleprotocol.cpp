@@ -40,15 +40,7 @@ ModuleProtocol::ModuleProtocol()
     _authLogic.addNode(AuthRequest::New, [this] (AuthRequest& request)
     {
         LOG() << "DFA EXEC: New";
-        if (!_doorModules.count(request.getTarget()))
-        {
-            request.setState(0);
-            logMessage("No such door " + request.getTarget());
-            return;
-        }
-        IDoorModule*    door = _doorModules.at(request.getTarget());
-
-        if (door->isAuthRequired())
+        if (_doorModules.at(request.getTarget())->isAuthRequired())
             _authModule->authenticate(request);
         else
             request.setState(_authLogic.update(request, request.getState(), Authorize));
@@ -62,30 +54,25 @@ ModuleProtocol::ModuleProtocol()
 
     _authLogic.addNode(AuthRequest::Authorized, [this] (AuthRequest& request)
     {
-        request.resetTime();
         LOG() << "DFA EXEC: Authorized";
+        request.resetTime();
         notifyMonitor(ActivityType::Auth);
-        if (!_doorModules.count(request.getTarget()))
-        {
-            request.setState(0);
-            logMessage("No such door " + request.getTarget());
-            return;
-        }
-        IDoorModule*    door = _doorModules.at(request.getTarget());
-        door->open();
+        _doorModules.at(request.getTarget())->open();
+    } );
+
+    _authLogic.addNode(AuthRequest::Denied, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: Denied";
+        notifyMonitor(ActivityType::Auth);
+        _doorModules.at(request.getTarget())->deny();
     } );
 
     _authLogic.addNode(AuthRequest::CheckDoor, [this] (AuthRequest& request)
     {
         LOG() << "DFA EXEC: CheckDoor";
-        notifyMonitor(ActivityType::Auth);
-        if (!_doorModules.count(request.getTarget()))
-        {
-            request.setState(0);
-            logMessage("No such door " + request.getTarget());
-            return;
-        }
         IDoorModule*    door = _doorModules.at(request.getTarget());
+
+        notifyMonitor(ActivityType::Auth);
         if (door->isOpen())
             door->alarm();
     } );
@@ -121,6 +108,11 @@ void ModuleProtocol::cmdCreateAuthRequest(const std::string& source, const std::
 {
     AuthRequest ar(_authCounter, source, target, content);
 
+    if (!_doorModules.count(ar.getTarget()))
+    {
+        logMessage("No such door " + ar.getTarget());
+        return;
+    }
     _requests.emplace(_authCounter, ar);
     ++_authCounter;
 

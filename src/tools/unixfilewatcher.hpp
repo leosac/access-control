@@ -31,7 +31,6 @@ public:
     UnixFileWatcher& operator=(const UnixFileWatcher& other) = delete;
 
 public:
-    // TODO add event recovery methods
     void        start();
     void        stop();
 
