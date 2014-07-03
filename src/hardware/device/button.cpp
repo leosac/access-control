@@ -9,17 +9,28 @@
 #include "exception/deviceexception.hpp"
 
 Button::Button(const std::string& name, IGPIOProvider& gpioProvider)
-:   AGpioDevice(name, gpioProvider)
+:   _name(name),
+    _gpioDevice(gpioProvider)
 {}
+
+const std::string& Button::getName() const
+{
+    return (_name);
+}
+
+void Button::serialize(ptree& node)
+{
+    _gpioDevice.serialize(node);
+}
 
 void Button::deserialize(const ptree& node)
 {
-    AGpioDevice::deserialize(node);
-    if (_gpio->getDirection() != GPIO::Direction::In)
+    _gpioDevice.deserialize(node);
+    if (_gpioDevice.getGpio()->getDirection() != GPIO::Direction::In)
         throw (DeviceException("Gpio direction must be IN"));
 }
 
 bool Button::isPressed() const
 {
-    return (_gpio->getValue() == false);
+    return (_gpioDevice.getGpio()->getValue() == false);
 }

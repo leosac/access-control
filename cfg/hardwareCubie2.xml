@@ -55,13 +55,13 @@
             <gpio pin="24"/>
         </device>
         <device type="button" name="sensor">
-            <gpio pin="22" direction="in"/>
+            <gpio pin="22" direction="in" interruptmode="rising"/>
         </device>
         <device type="systemled" name="green" ledname="green:ph20:led1"/>
         <device type="systemled" name="blue" ledname="blue:ph21:led2"/>
         <device type="wiegandreader" name="readerA">
-            <higpio>41</higpio>
-            <logpio>42</logpio>
+            <higpio pin="41" direction="in" interruptmode="rising"/>
+            <logpio pin="42" direction="in" interruptmode="rising"/>
         </device>
     </devices>
 </hardware>

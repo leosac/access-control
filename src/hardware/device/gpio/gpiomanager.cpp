@@ -29,46 +29,28 @@ GPIOManager::GPIOManager()
 
 GPIOManager::~GPIOManager()
 {
-    for (auto gpio : _polledGpio)
-        delete gpio.second;
-    for (auto gpio : _reservedGpio)
+    for (auto gpio : _Gpios)
         delete gpio.second;
 }
 
-void GPIOManager::registerListener(IGPIOListener* instance, int gpioNo, GPIO::EdgeMode mode)
+void GPIOManager::registerListener(IGPIOListener* instance, GPIO* gpio)
 {
     ListenerInfo    listener;
 
     listener.instance = instance;
-    listener.gpioNo = gpioNo;
+    listener.gpioNo = gpio->getPinNo();
     listener.fdIdx = 0;
-
-    if (!_polledGpio.count(gpioNo))
-    {
-        GPIO*   gpio = instanciateGpio(gpioNo);
-
-        gpio->setDirection(GPIO::Direction::In);
-        if (!gpio->hasInterruptsSupport())
-        {
-            delete gpio;
-            throw (GpioException("This gpio does not support interrupts: " + gpio->getPath()));
-        }
-        gpio->setEdgeMode(mode);
-        _polledGpio[gpioNo] = gpio;
-    }
     _listeners.push_back(listener);
 }
 
 GPIO* GPIOManager::getGPIO(int idx)
 {
-    // TODO Prevent conflict between reserved and polled
-
-    if (_reservedGpio.count(idx) > 0)
-        return (_reservedGpio.at(idx));
+    if (_Gpios.count(idx) > 0)
+        return (_Gpios.at(idx));
     else
     {
         GPIO*   gpio = instanciateGpio(idx);
-        _reservedGpio[idx] = gpio;
+        _Gpios[idx] = gpio;
         return (gpio);
     }
 }
@@ -159,7 +141,7 @@ void GPIOManager::buildFdSet()
     _fdset.resize(_listeners.size());
     for (auto& listener : _listeners)
     {
-        _fdset[i].fd = _polledGpio[listener.gpioNo]->getPollFd();
+        _fdset[i].fd = _Gpios[listener.gpioNo]->getPollFd();
         _fdset[i].events = POLLPRI | POLLERR;
         _fdset[i].revents = 0;
         listener.fdIdx = i;

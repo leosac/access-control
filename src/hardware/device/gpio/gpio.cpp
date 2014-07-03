@@ -153,6 +153,8 @@ GPIO::EdgeMode GPIO::getEdgeMode() const
 
 void GPIO::setEdgeMode(EdgeMode mode) const
 {
+    if (!_interruptsSupport)
+        throw (GpioException("interrupt support not available for GPIO " + std::to_string(_pinNo)));
     UnixFs::writeSysFsValue<std::string>(_edgeFile, EdgeStrings[static_cast<int>(mode)]);
 }
 

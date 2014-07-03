@@ -29,7 +29,7 @@ class ILoggerModule;
 class ModuleProtocol : public IModuleProtocol
 {
     static const int AuthRequestValidity;
-    typedef void (ModuleProtocol::*RegisterFunc)(IModule*);
+    typedef std::function<void (IModule*)> RegisterFunc;
 
 public:
     explicit ModuleProtocol();
@@ -64,7 +64,7 @@ private:
     DFAutomaton<AuthRequest, int, int>          _authLogic;
 
 private:
-    std::map<IModule::ModuleType, std::function<void (IModule*)> > _registrationHandler;
+    std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
     std::list<IMonitorModule*>                  _monitorModules;
     std::map<std::string, IDoorModule*>         _doorModules;

@@ -12,16 +12,17 @@
 #include "iwiegandlistener.hpp"
 #include "tools/log.hpp"
 
-WiegandReader::WiegandReader(const std::string& name, IGPIOObservable& gpioObservable)
+WiegandReader::WiegandReader(const std::string& name, IGPIOProvider& gpioProvider)
 :   _name(name),
-    _gpioObservable(gpioObservable)
+    _hiGpio(gpioProvider, "higpio"),
+    _loGpio(gpioProvider, "logpio")
 {}
 
 void WiegandReader::notify(int gpioNo)
 {
     if (_bitIdx >= DataBufferSize * 8) // Buffer overflow
         reset();
-    if (gpioNo == _hiGpio)
+    if (gpioNo == _hiGpio.getGpio()->getPinNo())
        _buffer[_bitIdx / 8] |= (1 << (7 - _bitIdx % 8));
     ++_bitIdx;
 }
@@ -52,16 +53,17 @@ const std::string& WiegandReader::getName() const
 
 void WiegandReader::serialize(ptree& node)
 {
-    node.put<int>("higpio", _hiGpio);
-    node.put<int>("logpio", _loGpio);
+    _hiGpio.serialize(node);
+    _loGpio.serialize(node);
 }
 
 void WiegandReader::deserialize(const ptree& node)
 {
-    _hiGpio = node.get<int>("higpio");
-    _loGpio = node.get<int>("logpio");
-    _gpioObservable.registerListener(this, _hiGpio, GPIO::EdgeMode::Rising);
-    _gpioObservable.registerListener(this, _loGpio, GPIO::EdgeMode::Rising);
+    _hiGpio.deserialize(node);
+    _loGpio.deserialize(node);
+
+    _hiGpio.startListening(this);
+    _loGpio.startListening(this);
     reset();
 }
 

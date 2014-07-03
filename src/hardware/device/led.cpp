@@ -13,20 +13,30 @@
 #include "exception/deviceexception.hpp"
 
 Led::Led(const std::string& name, IGPIOProvider& gpioProvider)
-:   AGpioDevice(name, gpioProvider)
+:   _name(name),
+    _gpioDevice(gpioProvider)
 {}
+
+const std::string& Led::getName() const
+{
+    return (_name);
+}
+
+void Led::serialize(ptree& node)
+{
+    _gpioDevice.serialize(node);
+}
 
 void Led::deserialize(const ptree& node)
 {
-    AGpioDevice::deserialize(node);
-    if (_gpio->getDirection() != GPIO::Direction::Out)
+    _gpioDevice.deserialize(node);
+    if (_gpioDevice.getGpio()->getDirection() != GPIO::Direction::Out)
         throw (DeviceException("Gpio direction must be OUT"));
-    _gpio->setValue(false);
 }
 
 void Led::turnOn()
 {
-    _gpio->setValue(true);
+    _gpioDevice.getGpio()->setValue(true);
 }
 
 void Led::turnOn(unsigned int durationMs)
@@ -42,10 +52,10 @@ void Led::turnOn(unsigned int durationMs)
 
 void Led::turnOff()
 {
-    _gpio->setValue(false);
+    _gpioDevice.getGpio()->setValue(false);
 }
 
 void Led::toggle()
 {
-    _gpio->setValue(!_gpio->getValue());
+    _gpioDevice.getGpio()->setValue(!_gpioDevice.getGpio()->getValue());
 }
