@@ -97,12 +97,22 @@ void DoorModule::open()
     unsigned int duration = 5000; // NOTE Ms FIXME Make this configurable
 
     if (_grantedLed)
-        _grantedLed->turnOn(duration); // DEBUG
+        _grantedLed->turnOn(duration);
     LOG() << "DOOR OPENED !";
     if (_doorRelay)
         _doorRelay->open(duration);
     else
         LOG() << "No relay to open !";
+}
+
+void DoorModule::deny()
+{
+    unsigned int duration = 2000; // NOTE Ms FIXME Make this configurable
+
+    if (_deniedLed)
+        _deniedLed->turnOn(duration); // DEBUG
+    if (_buzzer)
+        _buzzer->beep(1000, 500); // FIXME
 }
 
 bool DoorModule::isOpen() const

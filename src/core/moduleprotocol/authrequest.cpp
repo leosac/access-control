@@ -40,11 +40,6 @@ const std::string& AuthRequest::getTarget() const
     return (_target);
 }
 
-void AuthRequest::setTarget(const std::string& target)
-{
-    _target = target;
-}
-
 const std::string& AuthRequest::getSource() const
 {
     return (_source);

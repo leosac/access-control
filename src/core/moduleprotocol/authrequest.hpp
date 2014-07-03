@@ -39,7 +39,6 @@ public:
     int                         getState() const;
     void                        setState(int state);
     const std::string&          getTarget() const;
-    void                        setTarget(const std::string& target);
     const std::string&          getSource() const;
     const std::string&          getContent() const;
     void                        resetTime();
