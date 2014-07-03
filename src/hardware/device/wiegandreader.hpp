@@ -11,7 +11,7 @@
 
 #include "tools/bufferutils.hpp"
 #include "gpio/igpiolistener.hpp"
-#include "gpio/igpioobservable.hpp"
+#include "gpiodevice.hpp"
 #include "hardware/iserializabledevice.hpp"
 
 class IWiegandListener;
@@ -25,7 +25,7 @@ class WiegandReader : public IGPIOListener, public ISerializableDevice
     static const int    DataBufferSize = 10;
 
 public:
-    explicit WiegandReader(const std::string& name, IGPIOObservable& gpioObservable);
+    explicit WiegandReader(const std::string& name, IGPIOProvider& gpioProvider);
     ~WiegandReader() = default;
 
     WiegandReader(const WiegandReader& other) = delete;
@@ -50,11 +50,10 @@ private:
 private:
     const std::string               _name;
     std::list<IWiegandListener*>    _listeners;
-    IGPIOObservable&                _gpioObservable;
     Byte                            _buffer[DataBufferSize];
     std::size_t                     _bitIdx;
-    int                             _hiGpio;
-    int                             _loGpio;
+    GpioDevice                      _hiGpio;
+    GpioDevice                      _loGpio;
 };
 
 #endif // WIEGANDREADER_HPP

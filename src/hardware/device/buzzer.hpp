@@ -7,9 +7,10 @@
 #ifndef BUZZER_HPP
 #define BUZZER_HPP
 
-#include "agpiodevice.hpp"
+#include "gpiodevice.hpp"
+#include "hardware/iserializabledevice.hpp"
 
-class Buzzer : public AGpioDevice
+class Buzzer : public ISerializableDevice
 {
 public:
     explicit Buzzer(const std::string& name, IGPIOProvider& gpioProvider);
@@ -19,10 +20,16 @@ public:
     Buzzer& operator=(const Buzzer& other) = delete;
 
 public:
-    virtual void    deserialize(const ptree& node) override;
+    virtual const std::string&  getName() const override;
+    virtual void                serialize(ptree& node) override;
+    virtual void                deserialize(const ptree& node) override;
 
 public:
     void    beep(unsigned int frequency, unsigned int durationMs);
+
+private:
+    const std::string   _name;
+    GpioDevice          _gpioDevice;
 };
 
 #endif // BUZZER_HPP

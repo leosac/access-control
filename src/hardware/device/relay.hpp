@@ -11,9 +11,10 @@
 #include <atomic>
 #include <mutex>
 
-#include "agpiodevice.hpp"
+#include "gpiodevice.hpp"
+#include "hardware/iserializabledevice.hpp"
 
-class Relay : public AGpioDevice
+class Relay : public ISerializableDevice
 {
 public:
     explicit Relay(const std::string& name, IGPIOProvider& gpioObservable);
@@ -23,7 +24,9 @@ public:
     Relay& operator=(const Relay& other) = delete;
 
 public:
-    virtual void    deserialize(const ptree& node) override;
+    virtual const std::string&  getName() const override;
+    virtual void                serialize(ptree& node) override;
+    virtual void                deserialize(const ptree& node) override;
 
 public:
     void    open(unsigned int durationMs);
@@ -32,6 +35,8 @@ public:
     bool    isOpen();
 
 private:
+    const std::string   _name;
+    GpioDevice          _gpioDevice;
     std::mutex          _openMutex;
     std::atomic<bool>   _isOpen;
 };
