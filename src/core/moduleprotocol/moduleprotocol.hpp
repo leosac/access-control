@@ -14,6 +14,7 @@
 #include <list>
 #include <mutex>
 #include <queue>
+#include <functional>
 
 #include "modules/imodule.hpp"
 #include "imoduleprotocol.hpp"
@@ -52,13 +53,8 @@ public:
 
 private:
     void    processCommands();
-
-private:
-    void    registerDoorModule(IModule* module);
-    void    registerAccessPointModule(IModule* module);
-    void    registerAuthModule(IModule* module);
-    void    registerLoggerModule(IModule* module);
-    void    registerActivityMonitorModule(IModule* module);
+    void    buildRegistrationHandler();
+    void    buildAuthLogic();
 
 private:
     AuthRequest::Uid                            _authCounter;
@@ -68,7 +64,7 @@ private:
     DFAutomaton<AuthRequest, int, int>          _authLogic;
 
 private:
-    std::map<IModule::ModuleType, RegisterFunc> _registrationHandler;
+    std::map<IModule::ModuleType, std::function<void (IModule*)> > _registrationHandler;
     std::list<ILoggerModule*>                   _loggerModules;
     std::list<IMonitorModule*>                  _monitorModules;
     std::map<std::string, IDoorModule*>         _doorModules;

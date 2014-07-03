@@ -31,58 +31,8 @@ ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
     _authModule(nullptr)
 {
-    _registrationHandler[IModule::ModuleType::Door] = &ModuleProtocol::registerDoorModule;
-    _registrationHandler[IModule::ModuleType::AccessPoint] = &ModuleProtocol::registerAccessPointModule;
-    _registrationHandler[IModule::ModuleType::Auth] = &ModuleProtocol::registerAuthModule;
-    _registrationHandler[IModule::ModuleType::Logger] = &ModuleProtocol::registerLoggerModule;
-    _registrationHandler[IModule::ModuleType::ActivityMonitor] = &ModuleProtocol::registerActivityMonitorModule;
-
-    _authLogic.addNode(AuthRequest::New, [this] (AuthRequest& request)
-    {
-        LOG() << "DFA EXEC: New";
-        if (_doorModules.at(request.getTarget())->isAuthRequired())
-            _authModule->authenticate(request);
-        else
-            request.setState(_authLogic.update(request, request.getState(), Authorize));
-    } );
-
-    _authLogic.addNode(AuthRequest::AskAuth, [this] (AuthRequest& request)
-    {
-        LOG() << "DFA EXEC: AskAuth";
-        _authModule->authenticate(request);
-    } );
-
-    _authLogic.addNode(AuthRequest::Authorized, [this] (AuthRequest& request)
-    {
-        LOG() << "DFA EXEC: Authorized";
-        request.resetTime();
-        notifyMonitor(ActivityType::Auth);
-        _doorModules.at(request.getTarget())->open();
-    } );
-
-    _authLogic.addNode(AuthRequest::Denied, [this] (AuthRequest& request)
-    {
-        LOG() << "DFA EXEC: Denied";
-        notifyMonitor(ActivityType::Auth);
-        _doorModules.at(request.getTarget())->deny();
-    } );
-
-    _authLogic.addNode(AuthRequest::CheckDoor, [this] (AuthRequest& request)
-    {
-        LOG() << "DFA EXEC: CheckDoor";
-        IDoorModule*    door = _doorModules.at(request.getTarget());
-
-        notifyMonitor(ActivityType::Auth);
-        if (door->isOpen())
-            door->alarm();
-    } );
-
-    _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);
-    _authLogic.addTransition(AuthRequest::New, Deny, AuthRequest::Denied);
-    _authLogic.addTransition(AuthRequest::New, AskAuth, AuthRequest::AskAuth);
-    _authLogic.addTransition(AuthRequest::AskAuth, Authorize, AuthRequest::Authorized);
-    _authLogic.addTransition(AuthRequest::AskAuth, Deny, AuthRequest::Denied);
-    _authLogic.addTransition(AuthRequest::Authorized, Timeout, AuthRequest::CheckDoor);
+    buildRegistrationHandler();
+    buildAuthLogic();
 }
 
 void ModuleProtocol::logMessage(const std::string& message)
@@ -159,11 +109,7 @@ void ModuleProtocol::sync()
 
 void ModuleProtocol::registerModule(IModule* module)
 {
-    RegisterFunc    func = _registrationHandler[module->getType()];
-
-    if (!func)
-        throw (ModuleProtocolException("Unknown module type"));
-    ((*this).*func)(module);
+    _registrationHandler.at(module->getType())(module);
 }
 
 void ModuleProtocol::processCommands()
@@ -181,49 +127,85 @@ void ModuleProtocol::processCommands()
     }
 }
 
-void ModuleProtocol::registerDoorModule(IModule* module)
+template <typename T>
+static T* castModule(IModule* module)
 {
-    IDoorModule*    door;
+    T* ptr;
 
-    if (!(door = dynamic_cast<IDoorModule*>(module)))
-        throw (ModuleProtocolException("Invalid Door module"));
-    _doorModules.emplace(door->getName(), door);
+    if ((ptr = dynamic_cast<T*>(module)))
+        return (ptr);
+    else
+        throw (ModuleProtocolException("could not cast"));
 }
 
-void ModuleProtocol::registerAccessPointModule(IModule* module)
+void ModuleProtocol::buildRegistrationHandler()
 {
-    IAccessPointModule* ap;
-
-    if (!(ap = dynamic_cast<IAccessPointModule*>(module)))
-        throw (ModuleProtocolException("Invalid AccessPoint module"));
-    _apModules.emplace(ap->getName(), ap);
+    _registrationHandler.emplace(IModule::ModuleType::Door, [this] (IModule* module)
+    {
+        IDoorModule* door = castModule<IDoorModule>(module);
+        _doorModules.emplace(door->getName(), door);
+    } );
+    _registrationHandler.emplace(IModule::ModuleType::AccessPoint, [this] (IModule* module)
+    {
+        IAccessPointModule* ap = castModule<IAccessPointModule>(module);
+        _apModules.emplace(ap->getName(), ap);
+    } );
+    _registrationHandler.emplace(IModule::ModuleType::Auth, [this] (IModule* module)
+    {
+        if (_authModule)
+            throw (ModuleProtocolException("Replacing existing Auth module"));
+        _authModule = castModule<IAuthModule>(module);
+    } );
+    _registrationHandler.emplace(IModule::ModuleType::Logger, [this] (IModule* module) { _loggerModules.push_back(castModule<ILoggerModule>(module)); } );
+    _registrationHandler.emplace(IModule::ModuleType::ActivityMonitor, [this] (IModule* module) { _monitorModules.push_back(castModule<IMonitorModule>(module)); } );
 }
 
-void ModuleProtocol::registerAuthModule(IModule* module)
+void ModuleProtocol::buildAuthLogic()
 {
-    IAuthModule*    auth;
+    _authLogic.addNode(AuthRequest::New, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: New";
+        if (_doorModules.at(request.getTarget())->isAuthRequired())
+            _authModule->authenticate(request);
+        else
+            request.setState(_authLogic.update(request, request.getState(), Authorize));
+    } );
 
-    if (!(auth = dynamic_cast<IAuthModule*>(module)))
-        throw (ModuleProtocolException("Invalid Auth module"));
-    if (_authModule)
-        throw (ModuleProtocolException("Replacing existing Auth module"));
-    _authModule = auth;
-}
+    _authLogic.addNode(AuthRequest::AskAuth, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: AskAuth";
+        _authModule->authenticate(request);
+    } );
 
-void ModuleProtocol::registerLoggerModule(IModule* module)
-{
-    ILoggerModule* logger;
+    _authLogic.addNode(AuthRequest::Authorized, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: Authorized";
+        request.resetTime();
+        notifyMonitor(ActivityType::Auth);
+        _doorModules.at(request.getTarget())->open();
+    } );
 
-    if (!(logger = dynamic_cast<ILoggerModule*>(module)))
-        throw (ModuleProtocolException("Invalid Logger module"));
-    _loggerModules.push_back(logger);
-}
+    _authLogic.addNode(AuthRequest::Denied, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: Denied";
+        notifyMonitor(ActivityType::Auth);
+        _doorModules.at(request.getTarget())->deny();
+    } );
 
-void ModuleProtocol::registerActivityMonitorModule(IModule* module)
-{
-    IMonitorModule* monitor;
+    _authLogic.addNode(AuthRequest::CheckDoor, [this] (AuthRequest& request)
+    {
+        LOG() << "DFA EXEC: CheckDoor";
+        IDoorModule*    door = _doorModules.at(request.getTarget());
 
-    if (!(monitor = dynamic_cast<IMonitorModule*>(module)))
-        throw (ModuleProtocolException("Invalid Activity Monitor module"));
-    _monitorModules.push_back(monitor);
+        notifyMonitor(ActivityType::Auth);
+        if (door->isOpen())
+            door->alarm();
+    } );
+
+    _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);
+    _authLogic.addTransition(AuthRequest::New, Deny, AuthRequest::Denied);
+    _authLogic.addTransition(AuthRequest::New, AskAuth, AuthRequest::AskAuth);
+    _authLogic.addTransition(AuthRequest::AskAuth, Authorize, AuthRequest::Authorized);
+    _authLogic.addTransition(AuthRequest::AskAuth, Deny, AuthRequest::Denied);
+    _authLogic.addTransition(AuthRequest::Authorized, Timeout, AuthRequest::CheckDoor);
 }

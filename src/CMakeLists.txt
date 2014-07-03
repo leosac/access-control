@@ -7,8 +7,8 @@ set(LEOSAC_SRCS
     core/modulemanager.cpp
     core/moduleprotocol/authcommands/aauthcommand.cpp
     core/moduleprotocol/authcommands/authcmdcreaterequest.cpp
-    core/moduleprotocol/authcommands/authcmdgrantaccess.cpp
     core/moduleprotocol/authcommands/authcmddenyaccess.cpp
+    core/moduleprotocol/authcommands/authcmdgrantaccess.cpp
     core/moduleprotocol/authrequest.cpp
     core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
