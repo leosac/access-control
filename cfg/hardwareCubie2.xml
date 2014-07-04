@@ -43,6 +43,7 @@
         <gpioalias id="40">gpio40_ph3</gpioalias>
         <gpioalias id="41">gpio41_ph14</gpioalias>
         <gpioalias id="42">gpio42_ph15</gpioalias>
+        <gpioalias id="43">gpio43_ph16</gpioalias>
     </platform>
     <devices>
         <device type="buzzer" name="buzzerA">
@@ -55,7 +56,7 @@
             <gpio pin="24"/>
         </device>
         <device type="button" name="sensor">
-            <gpio pin="22" direction="in" interruptmode="rising"/>
+            <gpio pin="43" direction="in" interruptmode="rising"/>
         </device>
         <device type="systemled" name="green" ledname="green:ph20:led1"/>
         <device type="systemled" name="blue" ledname="blue:ph21:led2"/>

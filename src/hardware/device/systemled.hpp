@@ -48,6 +48,7 @@ private:
     std::string         _triggerFile;
     std::string         _delayOnFile;
     std::string         _delayOffFile;
+    std::string         _startTrigger;
 };
 
 #endif // SYSTEMLED_HPP

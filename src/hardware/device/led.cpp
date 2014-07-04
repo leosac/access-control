@@ -14,7 +14,8 @@
 
 Led::Led(const std::string& name, IGPIOProvider& gpioProvider)
 :   _name(name),
-    _gpioDevice(gpioProvider)
+    _gpioDevice(gpioProvider),
+    _count(0)
 {}
 
 const std::string& Led::getName() const
@@ -43,9 +44,13 @@ void Led::turnOn(unsigned int durationMs)
 {
     std::thread thread([this, durationMs] ()
     {
-        turnOn();
+        if (!_count)
+            turnOn();
+        ++_count;
         std::this_thread::sleep_for(std::chrono::milliseconds(durationMs));
-        turnOff();
+        --_count;
+        if (!_count)
+            turnOff();
     } );
     thread.detach();
 }
