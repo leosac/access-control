@@ -10,7 +10,7 @@
 #include "gpiodevice.hpp"
 #include "hardware/iserializabledevice.hpp"
 
-class Button : public ISerializableDevice
+class Button : public ISerializableDevice, public IGPIOListener
 {
 public:
     explicit Button(const std::string& name, IGPIOProvider& gpioProvider);
@@ -23,6 +23,8 @@ public:
     virtual const std::string&  getName() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
+    virtual void                notify(int gpioNo) override;
+    virtual void                timeout() override;
 
 public:
     bool    isPressed() const;

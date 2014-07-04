@@ -5,7 +5,9 @@
  */
 
 #include "button.hpp"
+
 #include "gpio/gpio.hpp"
+#include "tools/log.hpp"
 #include "exception/deviceexception.hpp"
 
 Button::Button(const std::string& name, IGPIOProvider& gpioProvider)
@@ -28,6 +30,20 @@ void Button::deserialize(const ptree& node)
     _gpioDevice.deserialize(node);
     if (_gpioDevice.getGpio()->getDirection() != GPIO::Direction::In)
         throw (DeviceException("Gpio direction must be IN"));
+    _gpioDevice.startListening(this);
+}
+
+void Button::notify(int gpioNo)
+{
+    if (gpioNo == _gpioDevice.getGpio()->getPinNo())
+    {
+        LOG() << "Button pressed";
+    }
+}
+
+void Button::timeout()
+{
+    // do nothing
 }
 
 bool Button::isPressed() const

@@ -43,7 +43,7 @@
         <gpioalias id="40">gpio40_ph3</gpioalias>
         <gpioalias id="41">gpio41_ph14</gpioalias>
         <gpioalias id="42">gpio42_ph15</gpioalias>
-        <gpioalias id="43">gpio43_ph16</gpioalias>
+        <gpioalias id="43">gpio43_ph7</gpioalias>
     </platform>
     <devices>
         <device type="buzzer" name="buzzerA">
