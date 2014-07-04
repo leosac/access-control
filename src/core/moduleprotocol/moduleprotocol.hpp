@@ -29,7 +29,7 @@ class ILoggerModule;
 class ModuleProtocol : public IModuleProtocol
 {
     static const int AuthRequestValidity;
-    typedef std::function<void (IModule*)> RegisterFunc;
+    typedef std::function<void(IModule*)> RegisterFunc;
 
 public:
     explicit ModuleProtocol();
@@ -58,6 +58,7 @@ private:
 
 private:
     AuthRequest::Uid                            _authCounter;
+    std::chrono::system_clock::time_point       _reactivationTime;
     std::map<AuthRequest::Uid, AuthRequest>     _requests;
     std::mutex                                  _commandsMutex;
     std::queue<ICommand::Ptr>                   _commands;

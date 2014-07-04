@@ -29,6 +29,7 @@ enum Transition {
 
 ModuleProtocol::ModuleProtocol()
 :   _authCounter(0),
+    _reactivationTime(std::chrono::system_clock::now()),
     _authModule(nullptr)
 {
     buildRegistrationHandler();
@@ -58,16 +59,17 @@ void ModuleProtocol::cmdCreateAuthRequest(const std::string& source, const std::
 {
     AuthRequest ar(_authCounter, source, target, content);
 
-    if (!_doorModules.count(ar.getTarget()))
-    {
+    if (std::chrono::system_clock::now() < _reactivationTime)
+        logMessage("Simultaneous access request discarded");
+    else if (!_doorModules.count(ar.getTarget()))
         logMessage("No such door " + ar.getTarget());
-        return;
+    else
+    {
+        _requests.emplace(_authCounter, ar);
+        ++_authCounter;
+        _authLogic.startNode(_requests.at(ar.getId()), AuthRequest::New);
+        LOG() << "CMD: AR created id=" << ar.getId();
     }
-    _requests.emplace(_authCounter, ar);
-    ++_authCounter;
-
-    _authLogic.startNode(_requests.at(ar.getId()), AuthRequest::New);
-    LOG() << "CMD: AR created id=" << ar.getId();
 }
 
 void ModuleProtocol::cmdAuthorize(AuthRequest::Uid id, bool granted)
@@ -152,8 +154,8 @@ void ModuleProtocol::buildRegistrationHandler()
     } );
     _registrationHandler.emplace(IModule::ModuleType::Auth, [this] (IModule* module)
     {
-        if (_authModule)
-            throw (ModuleProtocolException("Replacing existing Auth module"));
+        if (_authModule != nullptr)
+            throw (ModuleProtocolException("Replacing existing Auth module '" + _authModule->getName() +  "' with '" + module->getName() + '\''));
         _authModule = castModule<IAuthModule>(module);
     } );
     _registrationHandler.emplace(IModule::ModuleType::Logger, [this] (IModule* module) { _loggerModules.push_back(castModule<ILoggerModule>(module)); } );
@@ -181,6 +183,7 @@ void ModuleProtocol::buildAuthLogic()
     {
         LOG() << "DFA EXEC: Authorized";
         request.resetTime();
+        _reactivationTime = std::chrono::system_clock::now() + std::chrono::seconds(5); // TODO get door open delay property
         notifyMonitor(ActivityType::Auth);
         _doorModules.at(request.getTarget())->open();
     } );

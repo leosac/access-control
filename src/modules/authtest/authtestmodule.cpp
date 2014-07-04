@@ -60,11 +60,10 @@ void AuthTestModule::authenticate(const AuthRequest& ar)
         LOG() << "auth config reloaded: " << _configPath;
         _watcher.fileReset(_configPath);
     }
-    else
-        LOG() << "auth config intact: " << _configPath;
     LOG() << "AR content=" << ar.getContent();
     if (_auth.hasAccess(cid))
         _protocol.pushCommand(ICommand::Ptr(new AuthCmdGrantAccess(&_protocol, ar.getId())));
     else
-        _protocol.pushCommand(ICommand::Ptr(new AuthCmdDenyAccess(&_protocol, ar.getId())));
+        _protocol.pushCommand(ICommand::Ptr(new AuthCmdGrantAccess(&_protocol, ar.getId()))); // TODO Changed to Grant for debug
+//         _protocol.pushCommand(ICommand::Ptr(new AuthCmdDenyAccess(&_protocol, ar.getId())));
 }

@@ -2,10 +2,13 @@
  * \file led.hpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
  * \brief Led class declaration
+ * NOTE not thread-safe on multiple long turn-ons.
  */
 
 #ifndef LED_HPP
 #define LED_HPP
+
+#include <atomic>
 
 #include "hardware/iserializabledevice.hpp"
 #include "gpiodevice.hpp"
@@ -33,6 +36,7 @@ public:
 private:
     const std::string   _name;
     GpioDevice          _gpioDevice;
+    std::atomic<int>    _count;
 };
 
 #endif // LED_HPP
