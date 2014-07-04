@@ -64,6 +64,6 @@ void AuthTestModule::authenticate(const AuthRequest& ar)
     if (_auth.hasAccess(cid))
         _protocol.pushCommand(ICommand::Ptr(new AuthCmdGrantAccess(&_protocol, ar.getId())));
     else
-        _protocol.pushCommand(ICommand::Ptr(new AuthCmdGrantAccess(&_protocol, ar.getId()))); // TODO Changed to Grant for debug
+        _protocol.pushCommand(ICommand::Ptr(new AuthCmdGrantAccess(&_protocol, ar.getId()))); // FIXME DEBUG Changed to Grant
 //         _protocol.pushCommand(ICommand::Ptr(new AuthCmdDenyAccess(&_protocol, ar.getId())));
 }
