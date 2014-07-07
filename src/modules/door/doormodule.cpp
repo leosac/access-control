@@ -95,7 +95,10 @@ void DoorModule::deserialize(const ptree& node)
             if (!_doorRelay)
                 return;
             if (!(_doorRelay->isOpen())) // FIXME Put condition on opened timer
+            {
                 alarm();
+                _core.getModuleProtocol().logMessage("Door should be closed", IModuleProtocol::Level::Warning);
+            }
         } );
     }
 
@@ -139,5 +142,5 @@ bool DoorModule::isOpen() const
 void DoorModule::alarm()
 {
     if (_buzzer && _buzzerEnabled)
-        _buzzer->beep(10000, 500);
+        _buzzer->beep(1000, 500);
 }

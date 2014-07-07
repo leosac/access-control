@@ -36,10 +36,15 @@ ModuleProtocol::ModuleProtocol()
     buildAuthLogic();
 }
 
-void ModuleProtocol::logMessage(const std::string& message)
+void ModuleProtocol::logMessage(const std::string& message, Level level)
 {
     for (auto logger : _loggerModules)
         logger->log(message);
+    if (level >= Level::Warning)
+    {
+        for (auto monitor : _monitorModules)
+            monitor->notify(ActivityType::System);
+    }
 }
 
 void ModuleProtocol::notifyMonitor(ModuleProtocol::ActivityType type)
