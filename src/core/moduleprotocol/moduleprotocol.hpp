@@ -39,7 +39,7 @@ public:
     ModuleProtocol& operator=(const ModuleProtocol& other) = delete;
 
 public:
-    virtual void    logMessage(const std::string& message) override;
+    virtual void    logMessage(const std::string& message, Level level = Level::Normal) override;
     virtual void    notifyMonitor(IModuleProtocol::ActivityType type) override;
     virtual void    pushCommand(ICommand::Ptr command) override;
 

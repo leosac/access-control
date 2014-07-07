@@ -21,10 +21,14 @@ public:
         System = 0,
         Auth
     };
+    enum class Level {
+        Normal = 0,
+        Warning
+    };
 
 public:
     virtual ~IModuleProtocol() {}
-    virtual void    logMessage(const std::string& message) = 0;
+    virtual void    logMessage(const std::string& message, Level level) = 0;
     virtual void    notifyMonitor(ActivityType type) = 0;
     virtual void    pushCommand(ICommand::Ptr command) = 0;
 };
