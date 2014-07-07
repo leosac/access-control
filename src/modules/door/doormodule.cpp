@@ -57,6 +57,9 @@ void DoorModule::serialize(ptree& node)
 
     conf.serialize();
 
+    if (_doorSensor)
+        _doorSensor->resetCallback();
+
     node.put<std::string>("doorconf", _config.doorConf);
     node.put<std::string>("doorRelay", _config.doorRelay);
     node.put<std::string>("doorButton", _config.doorButton);

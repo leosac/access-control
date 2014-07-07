@@ -34,6 +34,7 @@ public:
 public:
     bool    isPressed() const;
     void    setCallback(std::function<void()> callback);
+    void    resetCallback();
 
 private:
     const std::string   _name;

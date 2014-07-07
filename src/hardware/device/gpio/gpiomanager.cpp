@@ -33,15 +33,6 @@ GPIOManager::~GPIOManager()
         delete gpio.second;
 }
 
-void GPIOManager::registerListener(IGPIOListener* instance, GPIO* gpio)
-{
-    ListenerInfo    listener;
-
-    listener.instance = instance;
-    listener.gpioNo = gpio->getPinNo();
-    _listeners.push_back(listener);
-}
-
 GPIO* GPIOManager::getGPIO(int idx)
 {
     if (_Gpios.count(idx) > 0)
@@ -51,6 +42,30 @@ GPIO* GPIOManager::getGPIO(int idx)
         GPIO*   gpio = instanciateGpio(idx);
         _Gpios[idx] = gpio;
         return (gpio);
+    }
+}
+
+void GPIOManager::registerListener(IGPIOListener* instance, GPIO* gpio)
+{
+    ListenerInfo    listener;
+
+    listener.instance = instance;
+    listener.gpioNo = gpio->getPinNo();
+
+    std::lock_guard<std::mutex> lg(_listenerMutex);
+    _listeners.push_back(listener);
+}
+
+void GPIOManager::unregisterListener(IGPIOListener* listener, GPIO* gpio)
+{
+    std::lock_guard<std::mutex> lg(_listenerMutex);
+
+    for (auto it = _listeners.begin(); it != _listeners.end();)
+    {
+        if (listener == it->instance && gpio->getPinNo() == it->gpioNo)
+            it = _listeners.erase(it);
+        else
+            ++it;
     }
 }
 
@@ -101,7 +116,7 @@ void GPIOManager::pollLoop()
             {
                 if (_fdset[i].revents & POLLPRI)
                 {
-                    _fdset[i].revents = 0;
+                    _fdset[i].revents &= ~POLLPRI;
                     if ((ret = ::read(_fdset[i].fd, buffer, PollBufferSize - 1)) < 0)
                         throw (GpioException(UnixSyscall::getErrorString("read", errno)));
                     if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
@@ -113,7 +128,10 @@ void GPIOManager::pollLoop()
                     }
                 }
                 if (_fdset[i].revents & POLLERR)
+                {
+                    _fdset[i].revents &= ~POLLERR;
                     LOG() << "poll(): POLLERR happened";
+                }
             }
         }
     }
@@ -135,7 +153,8 @@ void GPIOManager::timeout()
 
 void GPIOManager::buildFdSet()
 {
-    int i = 0;
+    std::lock_guard<std::mutex> lg(_listenerMutex);
+    int                         i = 0;
 
     _fdset.resize(_listeners.size());
     for (auto& listener : _listeners)

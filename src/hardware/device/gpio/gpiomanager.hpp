@@ -18,6 +18,7 @@ extern "C" {
 #include <list>
 #include <vector>
 #include <map>
+#include <mutex>
 
 #include "igpioprovider.hpp"
 
@@ -45,8 +46,9 @@ public:
     GPIOManager& operator=(const GPIOManager& other) = delete;
 
 public:
-    virtual void    registerListener(IGPIOListener* listener, GPIO* gpio) override; // NOTE call this BEFORE starting to poll
     virtual GPIO*   getGPIO(int gpioNo) override;
+    virtual void    registerListener(IGPIOListener* listener, GPIO* gpio) override;
+    virtual void    unregisterListener(IGPIOListener* listener, GPIO* gpio) override;
 
 public:
     const GpioAliases&  getGpioAliases() const;
@@ -64,6 +66,7 @@ private:
 
 private:
     std::atomic<bool>       _isRunning;
+    std::mutex              _listenerMutex;
     std::thread             _pollThread;
     int                     _pollTimeout;
     std::map<int, GPIO*>    _Gpios;

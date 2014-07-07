@@ -101,8 +101,11 @@ void Core::run()
         }
         LOG() << "exiting core loop";
         _hwManager.stop();
+        LOG() << "hwmanager stopped";
         _coreConfig.serialize();
+        LOG() << "core config unloaded";
         _hwconfig.serialize();
+        LOG() << "devices are down";
     }
     catch (const LEOSACException& e) {
         std::cerr << "Fatal exception: " << e.what() << std::endl;

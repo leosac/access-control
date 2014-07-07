@@ -22,6 +22,7 @@ const std::string& Button::getName() const
 
 void Button::serialize(ptree& node)
 {
+    _gpioDevice.stopListening(this);
     _gpioDevice.serialize(node);
 }
 
@@ -49,4 +50,9 @@ bool Button::isPressed() const
 void Button::setCallback(std::function<void()> callback)
 {
     _callback = callback;
+}
+
+void Button::resetCallback()
+{
+    _callback = std::function<void()>();
 }
