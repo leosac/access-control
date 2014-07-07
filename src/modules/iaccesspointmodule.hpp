@@ -15,7 +15,8 @@ class IAccessPointModule : public IModule
 {
 public:
     virtual ~IAccessPointModule() {}
-    virtual void    notifyAccess(const std::string& request) = 0;
+    virtual void    notifyAccess(const std::string& request) = 0; // FIXME Remove this call
+    virtual void    notifyResponse(bool granted) = 0;
 };
 
 #endif // IACCESSPOINTMODULE_HPP

@@ -13,7 +13,6 @@ void Authenticator::serialize(ptree& node)
 {
     ptree& child = node.add("auth", std::string());
 
-    child.put("user", "test"); // FIXME
     for (const auto& csn : _csnList)
     {
         ptree ptre;

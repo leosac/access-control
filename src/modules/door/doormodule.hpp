@@ -40,7 +40,7 @@ public:
     virtual void                deserialize(const ptree& node) override;
     virtual bool                isAuthRequired() const override;
     virtual void                open() override;
-    virtual void                deny() override;
+    virtual void                denyAccess() override;
     virtual bool                isOpen() const override;
     virtual void                alarm() override;
 
@@ -57,6 +57,7 @@ private:
     Led*                _deniedLed;
     Buzzer*             _buzzer;
     Config              _config;
+    bool                _buzzerEnabled;
 };
 
 #endif // DOORMODULE_HPP

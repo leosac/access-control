@@ -18,7 +18,7 @@ public:
     virtual ~IDoorModule() {}
     virtual bool    isAuthRequired() const = 0;
     virtual void    open() = 0;
-    virtual void    deny() = 0;
+    virtual void    denyAccess() = 0;
     virtual bool    isOpen() const = 0;
     virtual void    alarm() = 0;
 };

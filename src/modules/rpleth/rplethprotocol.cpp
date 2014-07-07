@@ -32,7 +32,6 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
     packet.sum = buffer[SizeByteIdx + packet.dataLen + 1];
     packet.isGood = true; // The packet has enough information to be interpreted by the protocol
     buffer.fastForward(4 + packet.dataLen); // Circular buffer was actually read but indexes were not updated
-
     if (packet.type >= MaxType)
         packet.status = BadType;
     else if (packet.sum != packet.checksum())

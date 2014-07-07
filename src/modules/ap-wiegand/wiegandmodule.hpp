@@ -32,6 +32,7 @@ public:
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
     virtual void                notifyAccess(const std::string& request) override;
+    virtual void                notifyResponse(bool granted) override;
 
 private:
     ICore&              _core;

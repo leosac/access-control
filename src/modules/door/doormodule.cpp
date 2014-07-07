@@ -60,6 +60,7 @@ void DoorModule::serialize(ptree& node)
     if (_doorSensor)
         _doorSensor->resetCallback();
 
+    node.put<bool>("buzzer_enabled", _buzzerEnabled);
     node.put<std::string>("doorconf", _config.doorConf);
     node.put<std::string>("doorRelay", _config.doorRelay);
     node.put<std::string>("doorButton", _config.doorButton);
@@ -71,6 +72,7 @@ void DoorModule::serialize(ptree& node)
 
 void DoorModule::deserialize(const ptree& node)
 {
+    _buzzerEnabled = node.get<bool>("buzzer_enabled", "true");
     _config.doorConf = node.get<std::string>("doorconf");
     _config.doorRelay = node.get<std::string>("doorRelay", "none"); // NOTE optionnal ?
     _config.doorButton = node.get<std::string>("doorButton", "none");
@@ -119,13 +121,13 @@ void DoorModule::open()
         LOG() << "No relay to open !";
 }
 
-void DoorModule::deny()
+void DoorModule::denyAccess()
 {
     unsigned int duration = 2000; // NOTE Ms FIXME Make this configurable
 
     if (_deniedLed)
         _deniedLed->turnOn(duration); // DEBUG
-    if (_buzzer)
+    if (_buzzer && _buzzerEnabled)
         _buzzer->beep(1000, 500); // FIXME
 }
 
@@ -136,9 +138,6 @@ bool DoorModule::isOpen() const
 
 void DoorModule::alarm()
 {
-    if (_buzzer)
+    if (_buzzer && _buzzerEnabled)
         _buzzer->beep(10000, 500);
-    else
-        LOG() << "There's no buzzer to buzz.";
-    _core.getModuleProtocol().logMessage("Door should be closed !!");
 }
