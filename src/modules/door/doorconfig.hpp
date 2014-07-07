@@ -32,7 +32,7 @@ public:
     bool    isDoorOpenable() const;
 
 private:
-    Day _days[7];
+    Day     _days[7];
 };
 
 #endif // DOORCONFIG_HPP

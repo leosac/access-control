@@ -93,17 +93,11 @@ void ModuleProtocol::sync()
         AuthRequest& ar(it->second);
 
         if (!ar.getState())
-        {
-            LOG() << "AR id=" << ar.getId() << " erased";
             it = _requests.erase(it);
-        }
         else
         {
             if ((ar.getTime() + std::chrono::seconds(AuthRequestValidity)) < system_clock::now())
-            {
                 ar.setState(_authLogic.update(ar, ar.getState(), Timeout));
-                LOG() << "AR timed out: uid=" << ar.getId();
-            }
             ++it;
         }
     }
@@ -184,13 +178,15 @@ void ModuleProtocol::buildAuthLogic()
         LOG() << "DFA EXEC: Authorized";
         notifyMonitor(ActivityType::Auth);
         _doorModules.at(request.getTarget())->open();
+        _apModules.at(request.getSource())->notifyResponse(true);
     } );
 
     _authLogic.addNode(AuthRequest::Denied, [this] (AuthRequest& request)
     {
         LOG() << "DFA EXEC: Denied";
         notifyMonitor(ActivityType::Auth);
-        _doorModules.at(request.getTarget())->deny();
+        _doorModules.at(request.getTarget())->denyAccess();
+        _apModules.at(request.getSource())->notifyResponse(false);
     } );
 
     _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);

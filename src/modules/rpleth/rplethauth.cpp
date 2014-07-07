@@ -11,6 +11,7 @@
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
 #include "tools/unixsyscall.hpp"
+#include "tools/log.hpp"
 #include "tools/unlock_guard.hpp"
 #include "exception/moduleexception.hpp"
 
@@ -92,7 +93,7 @@ void RplethAuth::run()
                         it->socket->close();
                         delete it->socket;
                         _clients.erase(it);
-//                         _core.notify(Event("Client disconnected", "Auth"));
+                        LOG() << "Client disconnected";
                         break;
                     }
                 }
@@ -100,7 +101,7 @@ void RplethAuth::run()
             if (FD_ISSET(_serverSocket->getHandle(), &_rSet))
             {
                 _clients.push_back(Client(_serverSocket->accept()));
-//                 _core.notify(Event("Client connected", "Auth"));
+                LOG() << "Client connected";
             }
         }
     }

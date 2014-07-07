@@ -56,3 +56,8 @@ void WiegandModule::notifyAccess(const std::string& request)
     _core.getModuleProtocol().pushCommand(ICommand::Ptr(new AuthCmdCreateRequest(&_core.getModuleProtocol(), _name, _target, request)));
     _core.getModuleProtocol().notifyMonitor(IModuleProtocol::ActivityType::Auth);
 }
+
+void WiegandModule::notifyResponse(bool granted)
+{
+    static_cast<void>(granted);
+}
