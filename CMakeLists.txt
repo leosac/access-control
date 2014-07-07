@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(LEOSAC)
+project(LEOSAC CXX)
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -34,7 +34,13 @@ find_package(Boost 1.41.0 REQUIRED)
 list(APPEND CMAKE_CXX_FLAGS ${CXX11_FLAGS})
 
 #Build Options
-option(LEOSAC_NO_MODULES   "no-modules" OFF)
+option(LEOSAC_BUILD_MODULES "build-modules" ON)
+option(LEOSAC_GPROF         "gprof" OFF)
+
+if (LEOSAC_GPROF)
+    message(STATUS "Gprof flag active")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
+endif()
 
 add_definitions(-DLEOSAC_VERSION_MAJOR=0)
 add_definitions(-DLEOSAC_VERSION_MINOR=1)
