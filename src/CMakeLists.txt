@@ -35,6 +35,11 @@ add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 
 set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 
+#Add GProf compile flag
+if(LEOSAC_GPROF)
+    set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -pg")
+endif()
+
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
@@ -53,6 +58,6 @@ install(FILES ${LEOSAC_BIN} DESTINATION bin/leosac)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION bin/leosac FILES_MATCHING PATTERN "*.so")
 
 # Build modules
-if(NOT NO_MODULE)
+if(LEOSAC_BUILD_MODULES)
     add_subdirectory(modules)
 endif()

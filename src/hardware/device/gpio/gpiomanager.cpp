@@ -130,7 +130,7 @@ void GPIOManager::pollLoop()
                 if (_fdset[i].revents & POLLERR)
                 {
                     _fdset[i].revents &= ~POLLERR;
-                    LOG() << "poll(): POLLERR happened";
+                    LOG() << "poll(): POLLERR";
                 }
             }
         }
