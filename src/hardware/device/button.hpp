@@ -7,11 +7,15 @@
 #ifndef BUTTON_HPP
 #define BUTTON_HPP
 
+#include <functional>
+
 #include "gpiodevice.hpp"
 #include "hardware/iserializabledevice.hpp"
 
 class Button : public ISerializableDevice, public IGPIOListener
 {
+    typedef std::function<void()> Callback;
+
 public:
     explicit Button(const std::string& name, IGPIOProvider& gpioProvider);
     ~Button() = default;
@@ -26,12 +30,15 @@ public:
     virtual void                notify(int gpioNo) override;
     virtual void                timeout() override;
 
+
 public:
     bool    isPressed() const;
+    void    setCallback(std::function<void()> callback);
 
 private:
     const std::string   _name;
     GpioDevice          _gpioDevice;
+    Callback            _callback;
 };
 
 #endif // BUTTON_HPP

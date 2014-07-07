@@ -198,11 +198,10 @@ void ModuleProtocol::buildAuthLogic()
     _authLogic.addNode(AuthRequest::CheckDoor, [this] (AuthRequest& request)
     {
         LOG() << "DFA EXEC: CheckDoor";
-        IDoorModule*    door = _doorModules.at(request.getTarget());
-
+//         IDoorModule*    door = _doorModules.at(request.getTarget());
+        static_cast<void>(request);
         notifyMonitor(ActivityType::Auth);
-        if (door->isOpen())
-            door->alarm();
+        // FIXME RM THIS STATE
     } );
 
     _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);

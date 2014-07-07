@@ -39,7 +39,6 @@ void GPIOManager::registerListener(IGPIOListener* instance, GPIO* gpio)
 
     listener.instance = instance;
     listener.gpioNo = gpio->getPinNo();
-    listener.fdIdx = 0;
     _listeners.push_back(listener);
 }
 

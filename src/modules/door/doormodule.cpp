@@ -83,6 +83,17 @@ void DoorModule::deserialize(const ptree& node)
     _deniedLed = loadOptionnalDevice<Led>(_config.deniedLed, _hwmanager);
     _buzzer = loadOptionnalDevice<Buzzer>(_config.buzzer, _hwmanager);
 
+    if (_doorSensor)
+    {
+        _doorSensor->setCallback([this] ()
+        {
+            if (!_doorRelay)
+                return;
+            if (!(_doorRelay->isOpen())) // FIXME Put condition on opened timer
+                alarm();
+        } );
+    }
+
     XmlConfig   conf(_config.doorConf, _doorConfig);
     conf.deserialize();
 }

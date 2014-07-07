@@ -63,7 +63,7 @@ void Relay::setOpen(bool state)
 
 bool Relay::isOpen()
 {
-    if (_openMutex.try_lock())
+    if (_openMutex.try_lock()) // FIXME This logic does not work
     {
         _openMutex.unlock();
         return (false);

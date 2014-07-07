@@ -35,18 +35,18 @@ void Button::deserialize(const ptree& node)
 
 void Button::notify(int gpioNo)
 {
-    if (gpioNo == _gpioDevice.getGpio()->getPinNo())
-    {
-        LOG() << "Button pressed";
-    }
+    if (gpioNo == _gpioDevice.getGpio()->getPinNo() && _callback)
+        _callback();
 }
 
-void Button::timeout()
-{
-    // do nothing
-}
+void Button::timeout() {}
 
 bool Button::isPressed() const
 {
     return (_gpioDevice.getGpio()->getValue() == false);
+}
+
+void Button::setCallback(std::function<void()> callback)
+{
+    _callback = callback;
 }
