@@ -69,7 +69,7 @@ void DoorModule::serialize(ptree& node)
 void DoorModule::deserialize(const ptree& node)
 {
     _config.doorConf = node.get<std::string>("doorconf");
-    _config.doorRelay = node.get<std::string>("doorRelay", "none");
+    _config.doorRelay = node.get<std::string>("doorRelay", "none"); // NOTE optionnal ?
     _config.doorButton = node.get<std::string>("doorButton", "none");
     _config.doorSensor = node.get<std::string>("doorSensor", "none");
     _config.grantedLed = node.get<std::string>("grantedLed", "none");

@@ -15,11 +15,10 @@
 #include "modulemanager.hpp"
 #include "moduleprotocol/moduleprotocol.hpp"
 #include "hardware/hwmanager.hpp"
-#include "signal/isignalcallback.hpp"
 #include "tools/runtimeoptions.hpp"
 #include "config/xmlconfig.hpp"
 
-class Core : public ICore, public ISignalCallback, public IXmlSerializable
+class Core : public ICore, public IXmlSerializable
 {
     static const int IdleSleepTimeMs = 5;
 
@@ -33,11 +32,11 @@ public:
 public:
     virtual IHWManager&     getHWManager() override;
     virtual ModuleProtocol& getModuleProtocol() override;
-    virtual void            handleSignal(int signal) override;
     virtual void            serialize(ptree& node) override;
     virtual void            deserialize(const ptree& node) override;
 
 public:
+    void    handleSignal(int signal);
     void    run();
 
 private:

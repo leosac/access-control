@@ -8,8 +8,8 @@
 
 #include <thread>
 
-#include "signal/signalhandler.hpp"
 #include "hardware/hwmanager.hpp"
+#include "tools/signalhandler.hpp"
 #include "tools/log.hpp"
 
 #include "exception/coreexception.hpp"
@@ -91,7 +91,7 @@ void Core::run()
         LOG() << "hwmanager started";
         _coreConfig.deserialize();
         LOG() << "core config loaded";
-        SignalHandler::registerCallback(this);
+        SignalHandler::registerCallback([this] (int signal) { handleSignal(signal); } );
         LOG() << "starting core loop";
         while (_isRunning)
         {
