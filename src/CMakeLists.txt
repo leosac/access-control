@@ -22,9 +22,9 @@ set(LEOSAC_SRCS
     hardware/device/wiegandreader.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
-    signal/signalhandler.cpp
     tools/leosac.cpp
     tools/runtimeoptions.cpp
+    tools/signalhandler.cpp
     tools/unixsyscall.cpp
     tools/unixfilewatcher.cpp
     tools/unixfs.cpp
