@@ -182,8 +182,6 @@ void ModuleProtocol::buildAuthLogic()
     _authLogic.addNode(AuthRequest::Authorized, [this] (AuthRequest& request)
     {
         LOG() << "DFA EXEC: Authorized";
-        request.resetTime();
-        _reactivationTime = std::chrono::system_clock::now() + std::chrono::seconds(5); // TODO get door open delay property
         notifyMonitor(ActivityType::Auth);
         _doorModules.at(request.getTarget())->open();
     } );
@@ -195,19 +193,9 @@ void ModuleProtocol::buildAuthLogic()
         _doorModules.at(request.getTarget())->deny();
     } );
 
-    _authLogic.addNode(AuthRequest::CheckDoor, [this] (AuthRequest& request)
-    {
-        LOG() << "DFA EXEC: CheckDoor";
-//         IDoorModule*    door = _doorModules.at(request.getTarget());
-        static_cast<void>(request);
-        notifyMonitor(ActivityType::Auth);
-        // FIXME RM THIS STATE
-    } );
-
     _authLogic.addTransition(AuthRequest::New, Authorize, AuthRequest::Authorized);
     _authLogic.addTransition(AuthRequest::New, Deny, AuthRequest::Denied);
     _authLogic.addTransition(AuthRequest::New, AskAuth, AuthRequest::AskAuth);
     _authLogic.addTransition(AuthRequest::AskAuth, Authorize, AuthRequest::Authorized);
     _authLogic.addTransition(AuthRequest::AskAuth, Deny, AuthRequest::Denied);
-    _authLogic.addTransition(AuthRequest::Authorized, Timeout, AuthRequest::CheckDoor);
 }

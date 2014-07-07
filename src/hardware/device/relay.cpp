@@ -63,10 +63,5 @@ void Relay::setOpen(bool state)
 
 bool Relay::isOpen()
 {
-    if (_openMutex.try_lock()) // FIXME This logic does not work
-    {
-        _openMutex.unlock();
-        return (false);
-    }
-    return (true);
+    return (_gpioDevice.getGpio()->getValue()); // TODO Thread safety
 }
