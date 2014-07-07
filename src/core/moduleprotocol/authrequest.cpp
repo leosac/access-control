@@ -50,11 +50,6 @@ const std::string& AuthRequest::getContent() const
     return (_content);
 }
 
-void AuthRequest::resetTime()
-{
-    _time = system_clock::now();
-}
-
 system_clock::time_point AuthRequest::getTime() const
 {
     return (_time);

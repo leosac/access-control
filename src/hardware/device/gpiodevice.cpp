@@ -6,6 +6,7 @@
 
 #include "gpiodevice.hpp"
 #include "gpio/gpio.hpp"
+#include "tools/log.hpp"
 #include "exception/deviceexception.hpp"
 
 GpioDevice::GpioDevice(IGPIOProvider& gpioProvider, const std::string& name)
@@ -17,6 +18,8 @@ GpioDevice::GpioDevice(IGPIOProvider& gpioProvider, const std::string& name)
 void GpioDevice::serialize(ptree& node)
 {
     ptree   gpioNode;
+
+    LOG() << "Serialize GPIO " << _gpio->getPinNo();
 
     gpioNode.put<int>("<xmlattr>.pin", _gpio->getPinNo());
     gpioNode.put<std::string>("<xmlattr>.direction", _startDirection);
@@ -73,4 +76,9 @@ const GPIO* GpioDevice::getGpio() const
 void GpioDevice::startListening(IGPIOListener* listener)
 {
     _gpioProvider.registerListener(listener, _gpio);
+}
+
+void GpioDevice::stopListening(IGPIOListener* listener)
+{
+    _gpioProvider.unregisterListener(listener, _gpio);
 }

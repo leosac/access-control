@@ -29,6 +29,7 @@ public:
     GPIO*       getGpio();
     const GPIO* getGpio() const;
     void        startListening(IGPIOListener* listener);
+    void        stopListening(IGPIOListener* listener);
 
 protected:
     GPIO*   _gpio;

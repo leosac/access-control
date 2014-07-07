@@ -22,8 +22,7 @@ public:
         AskAuth,
         Authorized,
         Denied,
-        Closed,
-        CheckDoor
+        Closed
     };
 
 public:
@@ -41,7 +40,6 @@ public:
     const std::string&          getTarget() const;
     const std::string&          getSource() const;
     const std::string&          getContent() const;
-    void                        resetTime();
     system_clock::time_point    getTime() const;
 
 private:

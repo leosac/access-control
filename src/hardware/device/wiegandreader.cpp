@@ -53,6 +53,9 @@ const std::string& WiegandReader::getName() const
 
 void WiegandReader::serialize(ptree& node)
 {
+    _hiGpio.stopListening(this);
+    _loGpio.stopListening(this);
+
     _hiGpio.serialize(node);
     _loGpio.serialize(node);
 }

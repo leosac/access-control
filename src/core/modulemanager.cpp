@@ -87,7 +87,7 @@ void ModuleManager::loadLibrary(const std::string& path)
         throw (ModuleException("module already loaded (" + path + ')'));
     lib = new DynamicLibrary(path);
     try {
-        lib->open();
+        lib->open(DynamicLibrary::RelocationMode::Now);
     }
     catch (const DynLibException& e) {
         delete lib;
