@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 set(CONFIG_FILES
     default.xml
+    defaultDebug.xml
     hardwareCubie2.xml
     hardwarePi.xml
     hardwareDebug.xml

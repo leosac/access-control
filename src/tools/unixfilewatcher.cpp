@@ -114,7 +114,12 @@ void UnixFileWatcher::run()
         timeoutStruct.tv_sec = timeout / 1000;
         timeoutStruct.tv_usec = (timeout % 1000) * 1000;
         if ((ret = ::select(_inotifyFd + 1, &readSet, nullptr, nullptr, &timeoutStruct)) == -1)
-            throw (FsException(UnixSyscall::getErrorString("select", errno)));
+        {
+            if (errno != EINTR)
+                throw (FsException(UnixSyscall::getErrorString("select", errno)));
+            else
+                LOG() << UnixSyscall::getErrorString("select", errno);
+        }
         else if (ret > 0)
         {
             if (!FD_ISSET(_inotifyFd, &readSet))

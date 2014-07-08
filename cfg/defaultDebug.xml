@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<core>
+    <plugindir>.</plugindir>
+    <module file="libjournal.so">
+        <alias>log</alias>
+        <properties/>
+    </module>
+    <module file="libledmonitor.so">
+        <alias>monitor</alias>
+        <properties>
+        </properties>
+    </module>
+    <module file="libauthtest.so">
+        <alias>authtest</alias>
+        <properties>
+            <configpath>cfg/auth.conf</configpath>
+        </properties>
+    </module>
+</core>
