@@ -19,10 +19,21 @@
 static const std::string  DefaultCoreCfg = UnixFs::getCWD() + "/cfg/default.xml";
 static const std::string  DefaultHwCfg = UnixFs::getCWD() + "/cfg/hardware.xml";
 
+#include "tools/unixshellscript.hpp" // DEBUG
+
+void    script_test() // DEBUG
+{
+    UnixShellScript script("ls");
+
+    script.run("-l");
+    std::cout << "Exec: " << std::endl << script.getOutput();
+}
+
 int main(int argc, char** argv)
 {
     RuntimeOptions  options;
 
+    script_test(); // DEBUG
     try {
         try {
             TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', Leosac::getVersionString());

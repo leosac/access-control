@@ -5,6 +5,7 @@ set(LEOSAC_SRCS
     config/xmlconfig.cpp
     core/core.cpp
     core/modulemanager.cpp
+    core/netconfig/networkconfig.cpp
     core/moduleprotocol/authcommands/aauthcommand.cpp
     core/moduleprotocol/authcommands/authcmdcreaterequest.cpp
     core/moduleprotocol/authcommands/authcmddenyaccess.cpp
@@ -25,6 +26,7 @@ set(LEOSAC_SRCS
     tools/leosac.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
+    tools/unixshellscript.cpp
     tools/unixsyscall.cpp
     tools/unixfilewatcher.cpp
     tools/unixfs.cpp
