@@ -12,11 +12,12 @@
 #include <atomic>
 
 #include "icore.hpp"
+#include "config/xmlconfig.hpp"
 #include "modulemanager.hpp"
 #include "moduleprotocol/moduleprotocol.hpp"
+#include "netconfig/networkconfig.hpp"
 #include "hardware/hwmanager.hpp"
 #include "tools/runtimeoptions.hpp"
-#include "config/xmlconfig.hpp"
 
 class Core : public ICore, public IXmlSerializable
 {
@@ -44,6 +45,7 @@ private:
     HWManager               _hwManager;
     XmlConfig               _coreConfig;
     XmlConfig               _hwconfig;
+    NetworkConfig           _networkConfig;
     ModuleManager           _moduleMgr;
     ModuleProtocol          _authProtocol;
     std::atomic<bool>       _isRunning;
