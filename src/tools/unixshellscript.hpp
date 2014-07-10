@@ -21,10 +21,10 @@ public:
     UnixShellScript& operator=(const UnixShellScript& other) = delete;
 
 public:
-    int                 run(const std::string& args);
+    int                 run(const std::string& args = std::string());
     const std::string&  getOutput() const;
 
-public:
+private:
     const std::string   _script;
     std::string         _output;
 };

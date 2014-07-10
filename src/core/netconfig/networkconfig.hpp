@@ -22,13 +22,18 @@ public:
     virtual void    serialize(ptree& node) override;
     virtual void    deserialize(const ptree& node) override;
 
-private:
+public:
     void    reload();
+    void    setEnabled(bool state);
+    void    resetDefaultIp();
 
 private:
-    std::string _defaultIp;
-    std::string _ip;
+    bool        _enabled;
+    std::string _interface;
     bool        _dhcpEnabled;
+    std::string _ip;
+    std::string _netmask;
+    std::string _defaultIp;
 };
 
 #endif // NETWORKCONFIG_HPP

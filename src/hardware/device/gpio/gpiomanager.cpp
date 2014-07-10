@@ -118,7 +118,8 @@ void GPIOManager::pollLoop()
             {
                 if (_fdset[i].revents & POLLPRI)
                 {
-                    _fdset[i].revents &= ~POLLPRI;
+//                     _fdset[i].revents &= ~POLLPRI; FIXME
+                    _fdset[i].revents = 0; // FIXME
                     if ((ret = ::read(_fdset[i].fd, buffer, PollBufferSize - 1)) < 0)
                         throw (GpioException(UnixSyscall::getErrorString("read", errno)));
                     if (::lseek(_fdset[i].fd, 0, SEEK_SET) < 0)
@@ -129,11 +130,11 @@ void GPIOManager::pollLoop()
                             listener.instance->notify(listener.gpioNo);
                     }
                 }
-                if (_fdset[i].revents & POLLERR)
-                {
-                    _fdset[i].revents &= ~POLLERR;
-                    LOG() << "poll(): POLLERR";
-                }
+//                 if (_fdset[i].revents & POLLERR) FIXME
+//                 {
+//                     _fdset[i].revents &= ~POLLERR;
+//                     LOG() << "poll(): POLLERR";
+//                 }
             }
         }
     }
