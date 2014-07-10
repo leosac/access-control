@@ -55,6 +55,7 @@ void Core::serialize(ptree& node)
         child.put("alias", module.first);
         module.second.instance->serialize(child.put("properties", std::string()));
     }
+    _networkConfig.serialize(core.put("network", std::string()));
     node.put_child("core", core);
     _moduleMgr.unloadModules();
     _moduleMgr.unloadLibraries();
@@ -64,6 +65,7 @@ void Core::deserialize(const ptree& node)
 {
     IModule*    module;
 
+    _networkConfig.deserialize(node.get_child("core.network"));
     for (const auto& v : node.get_child("core"))
     {
         if (v.first == "plugindir")
@@ -91,6 +93,8 @@ void Core::run()
         LOG() << "hwmanager started";
         _coreConfig.deserialize();
         LOG() << "core config loaded";
+        _networkConfig.reload();
+        LOG() << "network loaded";
         SignalHandler::registerCallback([this] (int signal) { handleSignal(signal); } );
         LOG() << "starting core loop";
         while (_isRunning)
