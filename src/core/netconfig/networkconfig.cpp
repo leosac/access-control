@@ -69,7 +69,7 @@ void NetworkConfig::reload()
 
     apply.run(toCmdLine("mylamaisded", _interface, "1&>/dev/null"));
     if (!apply.getOutput().empty())
-        throw (ScriptException(apply.getOutput()));
+        LOG() << "ScriptOutput:\n" << apply.getOutput() << "\n";
 }
 
 void NetworkConfig::setEnabled(bool state)

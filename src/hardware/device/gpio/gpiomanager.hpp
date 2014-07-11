@@ -26,7 +26,7 @@ class IGPIOListener;
 
 class GPIOManager : public IGPIOProvider
 {
-    static const int            DefaultTimeout = 30;
+    static const int            DefaultTimeout = 100;
     static const unsigned int   PollBufferSize = 64;
 
 public:
