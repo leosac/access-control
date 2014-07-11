@@ -16,6 +16,7 @@ set(LEOSAC_SRCS
     hardware/hwmanager.cpp
     hardware/device/button.cpp
     hardware/device/buzzer.cpp
+    hardware/device/dipswitch.cpp
     hardware/device/gpiodevice.cpp
     hardware/device/led.cpp
     hardware/device/relay.cpp

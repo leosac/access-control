@@ -87,6 +87,8 @@ void Core::run()
 {
     try {
         _isRunning = true;
+        _hwManager.setStateHook(HWManager::HookType::DHCP, [this] (bool state) { _networkConfig.setDHCP(state); } );
+        _hwManager.setStateHook(HWManager::HookType::DefaultIp, [this] (bool state) { _networkConfig.setCustomIP(state); } );
         _hwconfig.deserialize();
         LOG() << "devices are up";
         _hwManager.start();
@@ -101,6 +103,7 @@ void Core::run()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
             // NOTE watch config files here, if needed
+            _hwManager.sync();
             _authProtocol.sync();
         }
         LOG() << "exiting core loop";

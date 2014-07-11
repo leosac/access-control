@@ -13,11 +13,12 @@
 #include "tools/leosac.hpp"
 
 #include "device/button.hpp"
+#include "device/buzzer.hpp"
+#include "device/dipswitch.hpp"
 #include "device/led.hpp"
+#include "device/relay.hpp"
 #include "device/systemled.hpp"
 #include "device/wiegandreader.hpp"
-#include "device/buzzer.hpp"
-#include "device/relay.hpp"
 
 void HWManager::serialize(ptree& node)
 {
@@ -79,6 +80,11 @@ void HWManager::deserialize(const ptree& node)
             LOG() << "Device " << name << " of type " << type << " loaded";
         }
     }
+    if (_masterDipSwitch)
+    {
+        for (auto hook : _hooks)
+        _masterDipSwitch->setCallback(static_cast<std::size_t>(hook.first), hook.second);
+    }
 }
 
 void HWManager::start()
@@ -128,6 +134,19 @@ ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::
         return (new Buzzer(name, _gpioManager));
     else if (type == "relay")
         return (new Relay(name, _gpioManager));
+    else if (type == "dip")
+        return ((_masterDipSwitch = new DIPSwitch(name, _gpioManager)));
     else
         return (nullptr);
+}
+
+void HWManager::setStateHook(HWManager::HookType type, HWManager::StateHook hook)
+{
+    _hooks[type] = hook;
+}
+
+void HWManager::sync()
+{
+    if (_masterDipSwitch)
+        _masterDipSwitch->readSwitches();
 }

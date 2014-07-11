@@ -11,6 +11,8 @@
 
 class NetworkConfig : public IXmlSerializable
 {
+    static const std::string    NetCfgFile;
+
 public:
     explicit NetworkConfig() = default;
     ~NetworkConfig() = default;
@@ -25,14 +27,15 @@ public:
 public:
     void    reload();
     void    setEnabled(bool state);
-    void    resetDefaultIp();
+    void    setDHCP(bool enabled);
+    void    setCustomIP(bool enabled);
 
 private:
     bool        _enabled;
     std::string _interface;
     bool        _dhcpEnabled;
-    std::string _ip;
     std::string _netmask;
+    std::string _ip;
     std::string _defaultIp;
 };
 

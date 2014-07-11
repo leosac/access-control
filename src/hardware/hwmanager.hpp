@@ -15,12 +15,21 @@
 #include "device/gpio/gpiomanager.hpp"
 #include "device/iwiegandlistener.hpp"
 
+class DIPSwitch;
+
 class HWManager : public IHWManager, public IXmlSerializable
 {
     typedef struct {
         std::string             type;
         ISerializableDevice*    instance;
     } Device;
+
+public:
+    typedef std::function<void(bool)> StateHook;
+    enum class HookType {
+        DHCP = 0,
+        DefaultIp
+    };
 
 public:
     explicit HWManager() = default;
@@ -39,6 +48,10 @@ public:
     virtual IDevice*            getDevice(const std::string& name) override;
     virtual const PlatformInfo& getPlatformInfo() const override;
 
+public:
+    void    setStateHook(HookType type, StateHook hook);
+    void    sync();
+
 private:
     ISerializableDevice*    buildDevice(const std::string& type, const std::string& name);
 
@@ -46,6 +59,8 @@ private:
     GPIOManager                     _gpioManager;
     PlatformInfo                    _platform;
     std::map<std::string, Device>   _devices;
+    std::map<HookType, StateHook>   _hooks;
+    DIPSwitch*                      _masterDipSwitch;
 };
 
 #endif // HWMANAGER_HPP

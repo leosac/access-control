@@ -141,6 +141,9 @@ bool GPIO::hasInterruptsSupport() const
 
 GPIO::EdgeMode GPIO::getEdgeMode() const
 {
+    if (!_interruptsSupport)
+        return (GPIO::EdgeMode::None);
+
     std::string     ret = UnixFs::readSysFsValue<std::string>(_edgeFile);
 
     for (int i = 0; i < EdgeModes; ++i)

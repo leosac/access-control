@@ -12,6 +12,8 @@
 #include "tools/unixshellscript.hpp"
 #include "exception/scriptexception.hpp"
 
+const std::string NetworkConfig::NetCfgFile = "interfaces";
+
 void NetworkConfig::serialize(ptree& node)
 {
     node.put<bool>("<xmlattr>.enabled", _enabled);
@@ -63,11 +65,11 @@ void NetworkConfig::reload()
     if (!_enabled)
         return;
 
-    builder.run(toCmdLine(_dhcpEnabled, "mylamaisded", _interface, _ip, _netmask, "1&>/dev/null"));
+    builder.run(toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, "1&>/dev/null"));
     if (!builder.getOutput().empty())
         throw (ScriptException(builder.getOutput()));
 
-    apply.run(toCmdLine("mylamaisded", _interface, "1&>/dev/null"));
+    apply.run(toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
     if (!apply.getOutput().empty())
         LOG() << "ScriptOutput:\n" << apply.getOutput() << "\n";
 }
@@ -77,7 +79,19 @@ void NetworkConfig::setEnabled(bool state)
     _enabled = state;
 }
 
-void NetworkConfig::resetDefaultIp()
+void NetworkConfig::setDHCP(bool enabled)
 {
+    LOG() << "DHCP";
+    if (_dhcpEnabled != enabled)
+    {
+        LOG() << "DHCP set to" << enabled;
+        _dhcpEnabled = enabled;
+        reload();
+    }
+}
+
+void NetworkConfig::setCustomIP(bool enabled)
+{
+    LOG() << "CustomIP set to" << enabled;
     _ip = _defaultIp;
 }

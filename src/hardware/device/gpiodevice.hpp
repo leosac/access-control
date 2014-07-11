@@ -21,6 +21,8 @@ public:
     GpioDevice(const GpioDevice& other) = delete;
     GpioDevice& operator=(const GpioDevice& other) = delete;
 
+    GpioDevice(GpioDevice&& other) = default;
+
 public:
     virtual void    serialize(ptree& node) override;
     virtual void    deserialize(const ptree& node) override;
