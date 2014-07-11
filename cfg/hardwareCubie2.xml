@@ -46,6 +46,11 @@
         <gpioalias id="43">gpio43_ph7</gpioalias>
     </platform>
     <devices>
+        <device type="dip" name="dipswitch">
+            <switches>2</switches>
+            <switch0 pin="1" direction="in"/>
+            <switch1 pin="2" direction="in"/>
+        </device>
         <device type="buzzer" name="buzzerA">
             <gpio pin="26"/>
         </device>
