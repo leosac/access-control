@@ -38,7 +38,10 @@ public:
 
 public:
     void    handleSignal(int signal);
-    void    run();
+    int     run();
+
+public:
+    void    setResetSwitch(bool enabled);
 
 private:
     RuntimeOptions&         _options;
@@ -49,6 +52,7 @@ private:
     ModuleManager           _moduleMgr;
     ModuleProtocol          _authProtocol;
     std::atomic<bool>       _isRunning;
+    bool                    _resetSwitch;
     std::list<std::string>  _libsDirectories;
 };
 

@@ -14,6 +14,11 @@
 
 const std::string NetworkConfig::NetCfgFile = "interfaces";
 
+NetworkConfig::NetworkConfig()
+:   _enabled(false),
+    _dhcpEnabled(false)
+{}
+
 void NetworkConfig::serialize(ptree& node)
 {
     node.put<bool>("<xmlattr>.enabled", _enabled);
@@ -22,6 +27,7 @@ void NetworkConfig::serialize(ptree& node)
     node.put<std::string>("ip", _ip);
     node.put<std::string>("netmask", _netmask);
     node.put<std::string>("default_ip", _defaultIp);
+    _enabled = false;
 }
 
 void NetworkConfig::deserialize(const ptree& node)

@@ -14,7 +14,7 @@ class NetworkConfig : public IXmlSerializable
     static const std::string    NetCfgFile;
 
 public:
-    explicit NetworkConfig() = default;
+    explicit NetworkConfig();
     ~NetworkConfig() = default;
 
     NetworkConfig(const NetworkConfig& other) = delete;

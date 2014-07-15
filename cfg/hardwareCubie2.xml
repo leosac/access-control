@@ -47,9 +47,10 @@
     </platform>
     <devices>
         <device type="dip" name="dipswitch">
-            <switches>2</switches>
-            <switch0 pin="1" direction="in"/>
-            <switch1 pin="2" direction="in"/>
+            <switches>3</switches>
+            <switch0 pin="25" direction="in"/>
+            <switch1 pin="28" direction="in"/>
+            <switch2 pin="23" direction="in"/>
         </device>
         <device type="buzzer" name="buzzerA">
             <gpio pin="26"/>

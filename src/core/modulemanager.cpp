@@ -83,6 +83,7 @@ void ModuleManager::loadLibrary(const std::string& path)
     std::string     libname(UnixFs::stripPath(path));
     DynamicLibrary* lib;
 
+    LOG() << "loading: " << libname;
     if (_dynlibs.count(libname) > 0)
         throw (ModuleException("module already loaded (" + path + ')'));
     lib = new DynamicLibrary(path);
