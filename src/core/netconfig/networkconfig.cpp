@@ -6,8 +6,6 @@
 
 #include "networkconfig.hpp"
 
-#include <sstream>
-
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
 #include "exception/scriptexception.hpp"
@@ -47,22 +45,6 @@ void NetworkConfig::deserialize(const ptree& node)
     LOG() << "default=" << _defaultIp;
 }
 
-template<typename T>
-static std::string toCmdLine(T value)
-{
-    std::ostringstream oss;
-
-    oss << value;
-    return (oss.str());
-}
-
-template<typename T, typename... Targs>
-static std::string toCmdLine(T value, Targs... args)
-{
-    if (sizeof...(args) > 0)
-        return (toCmdLine(value) + ' ' + toCmdLine(args...));
-}
-
 void NetworkConfig::reload()
 {
     UnixShellScript builder(UnixFs::getCWD() + '/' + "build_ipconfig.sh");
@@ -71,11 +53,11 @@ void NetworkConfig::reload()
     if (!_enabled)
         return;
 
-    builder.run(toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, "1&>/dev/null"));
+    builder.run(UnixShellScript::toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, "1&>/dev/null"));
     if (!builder.getOutput().empty())
         throw (ScriptException(builder.getOutput()));
 
-    apply.run(toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
+    apply.run(UnixShellScript::toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
     if (!apply.getOutput().empty())
         LOG() << "ScriptOutput:\n" << apply.getOutput() << "\n";
 }
