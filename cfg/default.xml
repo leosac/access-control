@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <core>
-    <network enabled="true">
+    <network enabled="false">
         <interface>eth0</interface>
         <dhcp>true</dhcp>
         <netmask>255.255.255.0</netmask>

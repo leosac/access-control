@@ -28,7 +28,8 @@ public:
     typedef std::function<void(bool)> StateHook;
     enum class HookType {
         DHCP = 0,
-        DefaultIp
+        DefaultIp,
+        Reset
     };
 
 public:

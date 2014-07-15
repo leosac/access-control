@@ -22,6 +22,7 @@ static const std::string  DefaultHwCfg = UnixFs::getCWD() + "/cfg/hardware.xml";
 int main(int argc, char** argv)
 {
     RuntimeOptions  options;
+    int             relaunch = 1;
 
     try {
         try {
@@ -41,9 +42,11 @@ int main(int argc, char** argv)
         catch (const TCLAP::ArgException &e) {
             throw (LEOSACException(e.error()));
         }
-        Core    core(options);
-
-        core.run();
+        while (relaunch)
+        {
+            Core    core(options);
+            relaunch = core.run();
+        }
     }
     catch (const LEOSACException& e) {
         std::cerr << e.what() << std::endl;

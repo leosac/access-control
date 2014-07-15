@@ -22,7 +22,8 @@ Core::Core(RuntimeOptions& options)
     _hwManager(),
     _coreConfig(options.getParam("corecfg"), *this),
     _hwconfig(options.getParam("hwcfg"), _hwManager),
-    _isRunning(false)
+    _isRunning(false),
+    _resetSwitch(false)
 {}
 
 IHWManager& Core::getHWManager()
@@ -63,16 +64,17 @@ void Core::serialize(ptree& node)
 
 void Core::deserialize(const ptree& node)
 {
-    IModule*    module;
+    const ptree&    coreNode = node.get_child("core");
+    IModule*        module;
 
-    _networkConfig.deserialize(node.get_child("core.network"));
-    for (const auto& v : node.get_child("core"))
+    _networkConfig.deserialize(coreNode.get_child("network"));
+    for (const auto& v : coreNode)
     {
         if (v.first == "plugindir")
             _libsDirectories.push_back(v.second.data());
     }
     _moduleMgr.loadLibraries(_libsDirectories);
-    for (const auto& v : node.get_child("core"))
+    for (const auto& v : coreNode)
     {
         if (v.first == "module")
         {
@@ -83,15 +85,25 @@ void Core::deserialize(const ptree& node)
     }
 }
 
-void Core::run()
+int Core::run()
 {
     try {
         _isRunning = true;
+        LOG() << "starting up...";
         _hwManager.setStateHook(HWManager::HookType::DHCP, [this] (bool state) { _networkConfig.setDHCP(state); } );
         _hwManager.setStateHook(HWManager::HookType::DefaultIp, [this] (bool state) { _networkConfig.setCustomIP(state); } );
+        _hwManager.setStateHook(HWManager::HookType::Reset, [this] (bool state) { setResetSwitch(state); } );
         _hwconfig.deserialize();
         LOG() << "devices are up";
         _hwManager.start();
+        do {
+            _hwManager.sync(); // Prevent execution when reset switch is set
+            if (_resetSwitch)
+            {
+                LOG() << "please disable reset switch to continue loading";
+                std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
+            }
+        } while (_resetSwitch);
         LOG() << "hwmanager started";
         _coreConfig.deserialize();
         LOG() << "core config loaded";
@@ -99,13 +111,15 @@ void Core::run()
         LOG() << "network loaded";
         SignalHandler::registerCallback([this] (int signal) { handleSignal(signal); } );
         LOG() << "starting core loop";
-        while (_isRunning)
+        while (_isRunning && !_resetSwitch)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(IdleSleepTimeMs));
             // NOTE watch config files here, if needed
             _hwManager.sync();
             _authProtocol.sync();
         }
+        if (_resetSwitch)
+            LOG() << "reset in progress...";
         LOG() << "exiting core loop";
         _hwManager.stop();
         LOG() << "hwmanager stopped";
@@ -113,6 +127,7 @@ void Core::run()
         LOG() << "core config unloaded";
         _hwconfig.serialize();
         LOG() << "devices are down";
+        return (_resetSwitch);
     }
     catch (const LEOSACException& e) {
         std::cerr << "Fatal exception: " << e.what() << std::endl;
@@ -120,4 +135,12 @@ void Core::run()
     catch (const std::exception& e) {
         std::cerr << "Unexpected exception caught: " << e.what() << std::endl;
     }
+    return (0);
+}
+
+void Core::setResetSwitch(bool enabled)
+{
+    _resetSwitch = enabled;
+    if (_resetSwitch)
+        LOG() << "factory reset detected";
 }
