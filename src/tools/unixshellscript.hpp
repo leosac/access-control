@@ -8,6 +8,7 @@
 #define UNIXSHELLSCRIPT_HPP
 
 #include <string>
+#include <sstream>
 
 class UnixShellScript
 {
@@ -23,6 +24,22 @@ public:
 public:
     int                 run(const std::string& args = std::string());
     const std::string&  getOutput() const;
+
+    template<typename T>
+    static std::string toCmdLine(T value)
+    {
+        std::ostringstream oss;
+
+        oss << value;
+        return (oss.str());
+    }
+
+    template<typename T, typename... Targs>
+    static std::string toCmdLine(T value, Targs... args)
+    {
+        if (sizeof...(args) > 0)
+            return (toCmdLine(value) + ' ' + toCmdLine(args...));
+    }
 
 private:
     const std::string   _script;

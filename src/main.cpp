@@ -13,6 +13,7 @@
 #include "tools/leosac.hpp"
 #include "tools/runtimeoptions.hpp"
 #include "tools/unixfs.hpp"
+#include "tools/unixshellscript.hpp"
 #include "core/core.hpp"
 #include "exception/leosacexception.hpp"
 
@@ -44,6 +45,11 @@ int main(int argc, char** argv)
         }
         while (relaunch)
         {
+            UnixShellScript backup("cp -f");
+
+            backup.run(UnixShellScript::toCmdLine(options.getParam("corecfg"), "core.cfg"));
+            backup.run(UnixShellScript::toCmdLine(options.getParam("hwcfg"), "hw.cfg"));
+
             Core    core(options);
             relaunch = core.run();
         }

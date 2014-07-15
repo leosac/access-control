@@ -20,8 +20,8 @@ const int Core::IdleSleepTimeMs;
 Core::Core(RuntimeOptions& options)
 :   _options(options),
     _hwManager(),
-    _coreConfig(options.getParam("corecfg"), *this),
-    _hwconfig(options.getParam("hwcfg"), _hwManager),
+    _coreConfig("core.cfg", *this),
+    _hwconfig("hw.cfg", _hwManager),
     _isRunning(false),
     _resetSwitch(false)
 {}
