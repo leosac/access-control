@@ -10,7 +10,7 @@ In progress...
 
 You will need a working Linux environment and the following packages:
 * GCC 4.8+ (any C++11-compatible compiler should do)
-* CMake 2.8 (and above)
+* CMake 2.8.8 (and above)
 * Boost 1.41 (and above)
 * TCLAP
 
