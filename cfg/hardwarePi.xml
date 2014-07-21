@@ -11,7 +11,7 @@
         <device type="button" name="sensor">
             <gpio pin="4" direction="in"/>
         </device>
-        <device type="systemled" name="green" ledname="led0"/>
+        <device type="sysfsled" name="green" ledname="led0"/>
         <device type="wiegandreader" name="readerA">
             <higpio>15</higpio>
             <logpio>14</logpio>

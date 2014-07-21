@@ -17,7 +17,7 @@
 #include "device/dipswitch.hpp"
 #include "device/led.hpp"
 #include "device/relay.hpp"
-#include "device/systemled.hpp"
+#include "device/sysfsled.hpp"
 #include "device/wiegandreader.hpp"
 
 void HWManager::serialize(ptree& node)
@@ -128,14 +128,14 @@ ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::
         return (new WiegandReader(name, _gpioManager));
     else if (type == "led")
         return (new Led(name, _gpioManager));
-    else if (type == "systemled")
-        return (new SystemLed(name));
+    else if (type == "sysfsled")
+        return (new SysFsLed(name));
     else if (type == "buzzer")
         return (new Buzzer(name, _gpioManager));
     else if (type == "relay")
         return (new Relay(name, _gpioManager));
     else if (type == "dip")
-        return ((_masterDipSwitch = new DIPSwitch(name, _gpioManager)));
+        return ((_masterDipSwitch = new DIPSwitch(name, _gpioManager))); // NOTE a little bit hacky, the last DIPSwitch instanciated becomes the master switch
     else
         return (nullptr);
 }

@@ -1,10 +1,10 @@
 /**
- * \file systemled.cpp
+ * \file sysfsled.cpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief SystemLed class implementation
+ * \brief SysFsLed class implementation
  */
 
-#include "systemled.hpp"
+#include "sysfsled.hpp"
 
 #include <fstream>
 #include <thread>
@@ -13,24 +13,24 @@
 #include "tools/log.hpp"
 #include "tools/unixfs.hpp"
 
-const std::string SystemLed::DevicePathPrefix = "/sys/class/leds/";
+const std::string SysFsLed::DevicePathPrefix = "/sys/class/leds/";
 
-SystemLed::SystemLed(const std::string& name)
+SysFsLed::SysFsLed(const std::string& name)
 :   _name(name)
 {}
 
-const std::string& SystemLed::getName() const
+const std::string& SysFsLed::getName() const
 {
     return (_name);
 }
 
-void SystemLed::serialize(ptree& node)
+void SysFsLed::serialize(ptree& node)
 {
     setActiveTrigger(_startTrigger);
     node.put<std::string>("<xmlattr>.ledname", _ledName);
 }
 
-void SystemLed::deserialize(const ptree& node)
+void SysFsLed::deserialize(const ptree& node)
 {
     _ledName = node.get<std::string>("<xmlattr>.ledname");
     _path = DevicePathPrefix + _ledName + '/';
@@ -44,7 +44,7 @@ void SystemLed::deserialize(const ptree& node)
     setActiveTrigger("none");
 }
 
-void SystemLed::blink()
+void SysFsLed::blink()
 {
     setBrightness(0);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -55,17 +55,17 @@ void SystemLed::blink()
     setBrightness(255);
 }
 
-int SystemLed::getBrightness() const
+int SysFsLed::getBrightness() const
 {
     return (UnixFs::readSysFsValue<int>(_brightnessFile));
 }
 
-void SystemLed::setBrightness(int value) const
+void SysFsLed::setBrightness(int value) const
 {
     UnixFs::writeSysFsValue<int>(_brightnessFile, value);
 }
 
-std::string SystemLed::getActiveTrigger() const
+std::string SysFsLed::getActiveTrigger() const
 {
     std::ifstream   file(_triggerFile);
     std::string     ret;
@@ -86,27 +86,27 @@ std::string SystemLed::getActiveTrigger() const
     throw (DeviceException("Invalid trigger return"));
 }
 
-void SystemLed::setActiveTrigger(const std::string& trigger) const
+void SysFsLed::setActiveTrigger(const std::string& trigger) const
 {
     UnixFs::writeSysFsValue<std::string>(_triggerFile, trigger);
 }
 
-int SystemLed::getDelayOn() const
+int SysFsLed::getDelayOn() const
 {
     return (UnixFs::readSysFsValue<int>(_delayOnFile));
 }
 
-void SystemLed::setDelayOn(int milliseconds) const
+void SysFsLed::setDelayOn(int milliseconds) const
 {
     UnixFs::writeSysFsValue<int>(_delayOnFile, milliseconds);
 }
 
-int SystemLed::getDelayOff() const
+int SysFsLed::getDelayOff() const
 {
     return (UnixFs::readSysFsValue<int>(_delayOffFile));
 }
 
-void SystemLed::setDelayOff(int milliseconds) const
+void SysFsLed::setDelayOff(int milliseconds) const
 {
     UnixFs::writeSysFsValue<int>(_delayOffFile, milliseconds);
 }

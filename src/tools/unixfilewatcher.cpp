@@ -135,7 +135,7 @@ void UnixFileWatcher::run()
             {
                 for (int i = 0; i < len;)
                 {
-                    event = reinterpret_cast<inotify_event*>(&buf[i]);
+                    event = reinterpret_cast<inotify_event*>(&buf[i]); // NOTE Alignment should not be an issue here
                     _watches.at(event->wd).mask |= event->mask;
                     i += sizeof(inotify_event) + event->len;
                 }

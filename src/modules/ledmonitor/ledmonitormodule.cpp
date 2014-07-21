@@ -12,7 +12,7 @@
 #include "tools/log.hpp"
 
 #include "hardware/device/led.hpp"
-#include "hardware/device/systemled.hpp"
+#include "hardware/device/sysfsled.hpp"
 #include "exception/moduleexception.hpp"
 
 const std::string   LedMonitorModule::TypeStrings[IModuleProtocol::ActivityTypes] = {
@@ -58,7 +58,7 @@ void LedMonitorModule::deserialize(const ptree& node)
         if (v.first != "led")
             continue;
         newLed.deviceName = v.second.get<std::string>("<xmlattr>.device");
-        if (!(newLed.instance = dynamic_cast<SystemLed*>(_hwmanager.getDevice(newLed.deviceName))))
+        if (!(newLed.instance = dynamic_cast<SysFsLed*>(_hwmanager.getDevice(newLed.deviceName))))
             throw (ModuleException("could not retrieve device \'" + newLed.deviceName + '\''));
         typeString = v.second.get<std::string>("<xmlattr>.type");
         for (int i = 0; i < IModuleProtocol::ActivityTypes; ++i)

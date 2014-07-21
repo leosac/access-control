@@ -11,14 +11,14 @@
 
 #include "modules/imonitormodule.hpp"
 
-class SystemLed;
+class SysFsLed;
 
 class LedMonitorModule : public IMonitorModule
 {
     static const std::string TypeStrings[IModuleProtocol::ActivityTypes];
     typedef struct {
         std::string deviceName;
-        SystemLed*  instance;
+        SysFsLed*  instance;
     } MonitorLed;
 
 public:

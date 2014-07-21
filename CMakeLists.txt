@@ -43,7 +43,7 @@ if (LEOSAC_GPROF)
 endif()
 
 add_definitions(-DLEOSAC_VERSION_MAJOR=0)
-add_definitions(-DLEOSAC_VERSION_MINOR=1)
+add_definitions(-DLEOSAC_VERSION_MINOR=2)
 add_definitions(-DLEOSAC_VERSION_PATCH=0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
