@@ -20,7 +20,7 @@ set(LEOSAC_SRCS
     hardware/device/gpiodevice.cpp
     hardware/device/led.cpp
     hardware/device/relay.cpp
-    hardware/device/systemled.cpp
+    hardware/device/sysfsled.cpp
     hardware/device/wiegandreader.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp

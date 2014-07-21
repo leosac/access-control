@@ -1,26 +1,26 @@
 /**
- * \file systemled.hpp
+ * \file sysfsled.hpp
  * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief SystemLed class declaration
+ * \brief SysFsLed class declaration
  */
 
-#ifndef SYSTEMLED_HPP
-#define SYSTEMLED_HPP
+#ifndef SYSFSLED_HPP
+#define SYSFSLED_HPP
 
 #include <cstdint>
 
 #include "hardware/iserializabledevice.hpp"
 
-class SystemLed : public ISerializableDevice
+class SysFsLed : public ISerializableDevice
 {
     static const std::string    DevicePathPrefix;
 
 public:
-    explicit SystemLed(const std::string& name);
-    ~SystemLed() = default;
+    explicit SysFsLed(const std::string& name);
+    ~SysFsLed() = default;
 
-    SystemLed(const SystemLed& other) = delete;
-    SystemLed& operator=(const SystemLed& other) = delete;
+    SysFsLed(const SysFsLed& other) = delete;
+    SysFsLed& operator=(const SysFsLed& other) = delete;
 
 public:
     virtual const std::string&  getName() const override;
@@ -51,4 +51,4 @@ private:
     std::string         _startTrigger;
 };
 
-#endif // SYSTEMLED_HPP
+#endif // SYSFSLED_HPP
