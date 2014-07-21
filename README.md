@@ -23,18 +23,6 @@ make
 ```
 The `LEOSAC_PLATFORM` var is set to 'None' by default, you can safely ignore it for now, or see **Advanced CMake flags** section for more info.
 
-## Install
-
-Pre-compiled packages are not available for now. You will have to follow instruction from the **Build from source** section first.
-You can change the install path specified in `-DCMAKE_INSTALL_PREFIX=/usr/local`, and then execute:
-```shell
-make install
-```
-If you have insufficient rights on the install directory, execute as root:
-```shell
-sudo make install
-```
-
 ### Advanced CMake flags
 
 These flags are mainly aimed for developers, and provide flexibility to the build process.
@@ -58,9 +46,21 @@ CMake will add [GNU Gprof](http://en.wikipedia.org/wiki/Gprof) compilation/linki
 
 Unset this flag if you don't want CMake to build Leosac modules.
 
+## Install
+
+Pre-compiled packages are not available for now. You will have to follow instructions from the **Build from source** section first.
+You can change the install path specified in `-DCMAKE_INSTALL_PREFIX=/usr/local`, and then execute:
+```shell
+make install
+```
+If you have insufficient rights on the install directory, try installing as root:
+```shell
+sudo make install
+```
+
 ## License
 
-This project is released under the Affero GPLv3 license.
+This project is released under the GNU Affero GPLv3 license.
 A copy of the license can be found in the root folder.
 
 ![alt text][logo]
