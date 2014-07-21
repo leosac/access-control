@@ -57,8 +57,7 @@ set_target_properties(${LEOSAC_BIN} PROPERTIES
 
 target_link_libraries(${LEOSAC_BIN} dl pthread ${Boost_LIBRARIES})
 
-install(FILES ${LEOSAC_BIN} DESTINATION bin/leosac)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} DESTINATION bin/leosac FILES_MATCHING PATTERN "*.so")
+install(TARGETS ${LEOSAC_BIN} DESTINATION bin/leosac)
 
 # Build modules
 if(LEOSAC_BUILD_MODULES)

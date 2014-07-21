@@ -16,10 +16,12 @@ install:
     - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
     - sudo apt-get install -qq libtclap-dev libboost-dev cmake
 before_script:
+    - mkdir install
     - mkdir build && pushd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_PLATFORM=Travis -DCMAKE_INSTALL_PREFIX=$PWD/install
+    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_PLATFORM=Travis -DCMAKE_INSTALL_PREFIX=$PWD/../install
 script:
-    - make
-    - sudo make install
+    - make && sudo make install
 notifications:
-    recipients: reports@islog.com
+  email:
+    - reports@islog.com
+    - ryp.sqrt@gmail.com
