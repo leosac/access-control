@@ -10,11 +10,11 @@ leosac  [-g <string>] [-f <string>] [-v] [--] [--version] [-h]`
 
 | Flag | Description          |
 | ------------- | ----------- |
-| -g, --hw-cfg | Core configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
-| -f, --core-cfg | Hardware configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
-| -v, -verbose | Increase verbosity |
-| --version | Displays version information and exits. |
-| -h, --help | Display usage information |
+| `-g`, `--hw-cfg` | Core configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
+| `-f`, `--core-cfg` | Hardware configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
+| `-v`, `--verbose` | Increase verbosity |
+| `--version` | Displays version information and exits. |
+| `-h`, `--help` | Display usage information |
 
 ## Build from source
 
