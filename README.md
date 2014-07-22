@@ -10,11 +10,11 @@ leosac  [-g <string>] [-f <string>] [-v] [--] [--version] [-h]`
 
 | Flag | Description          |
 | ------------- | ----------- |
-| **-g**, **--hw-cfg** | Core configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
-| **-f**, **--core-cfg** | Hardware configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
-| **-v**, **-verbose** | Increase verbosity |
-| **--version** | Displays version information and exits. |
-| **-h**, **--help** | Display usage information |
+| -g, --hw-cfg | Core configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
+| -f, --core-cfg | Hardware configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
+| -v, -verbose | Increase verbosity |
+| --version | Displays version information and exits. |
+| -h, --help | Display usage information |
 
 ## Build from source
 
@@ -39,7 +39,7 @@ These flags are mainly aimed for developers, and provide flexibility to the buil
 
 * `LEOSAC_PLATFORM`
 
-Leosac is mainly targeted for Linux ARM Boards, so you'll want to inform CMake if you're using a specific board. This is done by setting the `LEOSAC_PLATFORM` var when configuring CMake. If the platform is recognized, some features or optimisations may be enabled under-the-hood. Setting an invalid name will not break anything.
+Leosac is mainly targeted for Linux ARM Boards, so you'll want to inform CMake if you're using a specific board. This is done by setting the `LEOSAC_PLATFORM` var with your platform's name when configuring CMake. If the platform is recognized, some features or optimisations may be enabled under-the-hood. Setting an invalid name will not break anything.
 
 Available platforms (case insensitive):
 * None (Default value)
