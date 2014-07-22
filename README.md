@@ -1,10 +1,20 @@
 # Leosac [![Build Status](https://travis-ci.org/islog/leosac.png?branch=develop)](https://travis-ci.org/islog/leosac)
 
-Open Source Physical Access Control System
+For more information, go to the [wiki](https://github.com/islog/leosac/wiki)
 
 ## Usage
 
-In progress...
+```shell
+leosac  [-g <string>] [-f <string>] [-v] [--] [--version] [-h]`
+```
+
+| Flag | Description          |
+| ------------- | ----------- |
+| **-g**, **--hw-cfg** | Core configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
+| **-f**, **--core-cfg** | Hardware configuration file path ([more](https://github.com/islog/leosac/wiki/Configuration)) |
+| **-v**, **-verbose** | Increase verbosity |
+| **--version** | Displays version information and exits. |
+| **-h**, **--help** | Display usage information |
 
 ## Build from source
 
@@ -17,8 +27,8 @@ You will need a working Linux environment and the following packages:
 CMake takes care of the build process, here's a minimal procedure to compile Leosac:
 ```shell
 cd path/to/leosac
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DLEOSAC_PLATFORM=None -DCMAKE_INSTALL_PREFIX=/usr/local
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DLEOSAC_PLATFORM=None
 make
 ```
 The `LEOSAC_PLATFORM` var is set to 'None' by default, you can safely ignore it for now, or see **Advanced CMake flags** section for more info.
