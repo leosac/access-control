@@ -16,57 +16,9 @@ leosac  [-g <string>] [-f <string>] [-v] [--] [--version] [-h]`
 | `--version` | Displays version information and exits. |
 | `-h`, `--help` | Display usage information |
 
-## Build from source
+## Build and install
 
-You will need a working Linux environment and the following packages:
-* GCC 4.8+ (any C++11-compatible compiler should do)
-* CMake 2.8.8 (and above)
-* Boost 1.41 (and above)
-* TCLAP
-
-CMake takes care of the build process, here's a minimal procedure to compile Leosac:
-```shell
-cd path/to/leosac
-mkdir -p build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DLEOSAC_PLATFORM=None
-make
-```
-The `LEOSAC_PLATFORM` var is set to 'None' by default, you can safely ignore it for now, or see **Advanced CMake flags** section for more info.
-
-### Advanced CMake flags
-
-These flags are mainly aimed for developers, and provide flexibility to the build process.
-
-* `LEOSAC_PLATFORM`
-
-Leosac is mainly targeted for Linux ARM Boards, so you'll want to inform CMake if you're using a specific board. This is done by setting the `LEOSAC_PLATFORM` var with your platform's name when configuring CMake. If the platform is recognized, some features or optimisations may be enabled under-the-hood. Setting an invalid name will not break anything.
-
-Available platforms (case insensitive):
-* None (Default value)
-* RaspberryPi
-* CubieBoard
-
-Example:  `cmake .. -DLEOSAC_PLATFORM=Cubieboard`
-
-* `LEOSAC_GPROF`
-
-CMake will add [GNU Gprof](http://en.wikipedia.org/wiki/Gprof) compilation/linking flags. This flag is for debugging purpose only and should be coupled with `-DCMAKE_BUILD_TYPE=Debug`
-
-* `LEOSAC_BUILD_MODULES`
-
-Unset this flag if you don't want CMake to build Leosac modules.
-
-## Install
-
-Pre-compiled packages are not available for now. You will have to follow instructions from the **Build from source** section first.
-You can change the install path specified in `-DCMAKE_INSTALL_PREFIX=/usr/local`, and then execute:
-```shell
-make install
-```
-If you have insufficient rights on the install directory, try installing as root:
-```shell
-sudo make install
-```
+See the [wiki](https://github.com/islog/leosac/wiki/Build-and-install)
 
 ## License
 
