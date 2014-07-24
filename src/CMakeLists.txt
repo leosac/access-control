@@ -57,7 +57,7 @@ set_target_properties(${LEOSAC_BIN} PROPERTIES
 
 target_link_libraries(${LEOSAC_BIN} dl pthread ${Boost_LIBRARIES})
 
-install(TARGETS ${LEOSAC_BIN} DESTINATION bin/leosac)
+install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 
 # Build modules
 if(LEOSAC_BUILD_MODULES)

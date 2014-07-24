@@ -45,6 +45,7 @@ UnixFs::FileList UnixFs::listFiles(const std::string& folder, const std::string&
         path.append("/");
     if ((dir = opendir(path.c_str())) == nullptr)
         throw (FsException(UnixSyscall::getErrorString("opendir", errno)));
+    errno = 0;
     while((entry = readdir(dir)) != nullptr)
     {
         if (entry->d_type != DT_REG)
