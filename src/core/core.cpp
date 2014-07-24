@@ -90,6 +90,7 @@ int Core::run()
     try {
         _isRunning = true;
         LOG() << "starting up...";
+        LOG() << "cwd=" << UnixFs::getCWD();
         _hwManager.setStateHook(HWManager::HookType::DHCP, [this] (bool state) { _networkConfig.setDHCP(state); } );
         _hwManager.setStateHook(HWManager::HookType::DefaultIp, [this] (bool state) { _networkConfig.setCustomIP(state); } );
         _hwManager.setStateHook(HWManager::HookType::Reset, [this] (bool state) { setResetSwitch(state); } );

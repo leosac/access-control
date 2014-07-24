@@ -21,7 +21,15 @@ void ModuleManager::loadLibraries(const std::list<std::string>& directories)
 
     for (auto& folder : directories)
     {
-        UnixFs::FileList fl = UnixFs::listFiles(folder, ".so");
+        UnixFs::FileList fl;
+        try {
+            fl = UnixFs::listFiles(folder, ".so");
+        }
+        catch (const FsException& e) {
+            LOG() << e.what() << " when opening '" << folder << '\'';
+            continue;
+        }
+        LOG() << "searching for modules in " << folder;
         for (auto& path : fl)
             loadLibrary(path);
     }

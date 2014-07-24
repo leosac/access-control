@@ -8,11 +8,8 @@
         <device type="led" name="led1">
             <gpio pin="3"/>
         </device>
-        <device type="button" name="sensor">
-            <gpio pin="4" direction="in"/>
-        </device>
-        <device type="sysfsled" name="green" ledname="led0"/>
-        <device type="wiegandreader" name="readerA">
+        <device type="sysfsled" name="greenled" ledname="led0"/>
+        <device type="wiegandreader" name="r10reader">
             <higpio pin="15" direction="in" interruptmode="falling"/>
             <logpio pin="14" direction="in" interruptmode="falling"/>
         </device>

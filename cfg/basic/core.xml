@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<core>
+    <network enabled="false">
+        <interface>eth0</interface>
+        <dhcp>true</dhcp>
+        <netmask>255.255.255.0</netmask>
+        <ip>192.168.0.10</ip>
+        <default_ip>192.168.0.10</default_ip>
+    </network>
+    <plugindir>/usr/local/lib/leosac</plugindir>
+    <plugindir>/usr/lib/leosac</plugindir>
+    <plugindir>.</plugindir>
+    <module file="libdoor.so">
+        <alias>door</alias>
+        <properties>
+            <doorconf>cfg/door.conf</doorconf>
+            <buzzer>none</buzzer>
+            <doorRelay>relayA</doorRelay>
+            <grantedLed>led1</grantedLed>
+        </properties>
+    </module>
+    <module file="libjournal.so">
+        <alias>log</alias>
+        <properties/>
+    </module>
+    <module file="libledmonitor.so">
+        <alias>monitor</alias>
+        <properties>
+            <led type="system" device="green"/>
+        </properties>
+    </module>
+    <module file="libwiegand.so">
+        <alias>reader</alias>
+        <properties>
+            <target>door</target>
+            <readerDevice>r10reader</readerDevice>
+        </properties>
+    </module>
+    <module file="libauthtest.so">
+        <alias>authtest</alias>
+        <properties>
+            <configpath>cfg/auth.conf</configpath>
+        </properties>
+    </module>
+</core>
