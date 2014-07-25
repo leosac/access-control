@@ -23,6 +23,7 @@ void GpioDevice::serialize(ptree& node)
 
     gpioNode.put<int>("<xmlattr>.pin", _gpio->getPinNo());
     gpioNode.put<std::string>("<xmlattr>.direction", _startDirection);
+    gpioNode.put<bool>("<xmlattr>.activelow", _startActiveLow);
     if (_startDirection == "out")
         gpioNode.put<bool>("<xmlattr>.value", _startValue);
     else
@@ -47,9 +48,11 @@ void GpioDevice::deserialize(const ptree& node)
 
     _startDirection = gpioNode.get<std::string>("<xmlattr>.direction", "out");
     _startValue = gpioNode.get<bool>("<xmlattr>.value", false);
+    _startActiveLow = gpioNode.get<bool>("<xmlattr>.activelow", false);
     if (!(_gpio = _gpioProvider.getGPIO(pin)))
         throw (DeviceException("could not get GPIO device"));
     _gpio->setDirection((_startDirection == "in") ? GPIO::Direction::In : GPIO::Direction::Out);
+    _gpio->setActiveLow(_startActiveLow);
     if (_startDirection == "out")
         _gpio->setValue(_startValue);
     else

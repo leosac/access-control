@@ -41,6 +41,7 @@ private:
     IGPIOProvider&      _gpioProvider;
     std::string         _startDirection;
     bool                _startValue;
+    bool                _startActiveLow;
 };
 
 #endif // GPIODEVICE_HPP
