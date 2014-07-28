@@ -31,14 +31,13 @@ find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
 find_package(Boost 1.41.0 REQUIRED)
 
-list(APPEND CMAKE_CXX_FLAGS ${CXX11_FLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)
 option(LEOSAC_GPROF         "gprof" OFF)
 
 if (LEOSAC_GPROF)
-    message(STATUS "Gprof flag active")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
