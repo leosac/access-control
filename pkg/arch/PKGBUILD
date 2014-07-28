@@ -2,7 +2,7 @@
 
 _gitname=leosac
 pkgname=leosac-git
-pkgver=r194.bfe91a6
+pkgver=0
 pkgrel=1
 pkgdesc="Open source access control"
 arch=('any')
