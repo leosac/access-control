@@ -17,7 +17,7 @@
 
 class WiegandModule : public IAccessPointModule
 {
-    typedef std::list<IAccessRequester*> RequesterList;
+    using RequesterList = std::list<IAccessRequester*>;
 
 public:
     explicit WiegandModule(ICore& core, const std::string& name);

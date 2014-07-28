@@ -18,7 +18,7 @@ class UnixFs
     UnixFs() = delete;
 
 public:
-    typedef std::list<std::string> FileList;
+    using FileList = std::list<std::string>;
 
 public:
     /**

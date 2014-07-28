@@ -9,8 +9,6 @@
 
 #include <string>
 
-// NOTE This class WILL throw on kernels older than 2.6.33 due to the lack of edge mode support
-
 class GPIO
 {
     static const std::string    ExportPath;

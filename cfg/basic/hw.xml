@@ -10,8 +10,8 @@
         </device>
         <device type="sysfsled" name="greenled" ledname="led0"/>
         <device type="wiegandreader" name="r10reader">
-            <higpio pin="15" direction="in" interruptmode="falling"/>
             <logpio pin="14" direction="in" interruptmode="falling"/>
+            <higpio pin="15" direction="in" interruptmode="falling"/>
         </device>
         <device type="buzzer" name="buzzerA">
             <gpio pin="18"/>

@@ -15,7 +15,7 @@
 class IModule : public IXmlSerializable
 {
 public:
-    typedef IModule* (*InitFunc)(ICore&, const std::string&);
+    using InitFunc = IModule* (*)(ICore&, const std::string&);
     enum class ModuleType : unsigned int {
         Door = 0,
         AccessPoint,

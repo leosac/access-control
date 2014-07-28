@@ -55,7 +55,7 @@ void HWManager::deserialize(const ptree& node)
     ptree platform = root.get_child("platform");
 
     _platform.name = platform.get<std::string>("<xmlattr>.name");
-    LOG() << "current platform: " << _platform.name;
+    LOG() << "hw config platform name: " << _platform.name;
 
     for (const auto& v : platform)
     {

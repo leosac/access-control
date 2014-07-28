@@ -9,6 +9,6 @@
 
 #include <cstdint>
 
-typedef std::uint8_t Byte;
+using Byte = std::uint8_t;
 
 #endif // BUFFERUTILS_HPP

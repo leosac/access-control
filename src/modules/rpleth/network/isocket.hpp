@@ -28,16 +28,16 @@ namespace Rezzo
             UDP
         };
 
-        typedef std::uint16_t Port;
-        typedef std::uint32_t Ip;
-        typedef struct s_address {
+        using Port = std::uint16_t;
+        using Ip = std::uint32_t;
+        struct Address {
             Port    port;
             Ip      ip;
-            bool operator<(const struct s_address& other) const
+            bool operator<(const Address& other) const
             {
                 return (ip < other.ip);
             }
-        } Address;
+        };
 
     public:
         virtual ~ISocket() {}

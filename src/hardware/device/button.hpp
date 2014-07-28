@@ -14,7 +14,7 @@
 
 class Button : public ISerializableDevice, public IGPIOListener
 {
-    typedef std::function<void()> Callback;
+    using Callback = std::function<void()>;
 
 public:
     explicit Button(const std::string& name, IGPIOProvider& gpioProvider);

@@ -14,9 +14,9 @@ class IDevice;
 class IHWManager
 {
 public:
-    typedef struct {
+    struct PlatformInfo {
         std::string name;
-    } PlatformInfo;
+    };
 
 public:
     virtual ~IHWManager() {}

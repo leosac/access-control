@@ -14,7 +14,7 @@
 class IWiegandListener
 {
 public:
-    typedef std::vector<Byte> CardId;
+    using CardId = std::vector<Byte>;
 
 public:
     virtual ~IWiegandListener() {}

@@ -20,10 +20,10 @@ class DynamicLibrary;
 class ModuleManager
 {
 public:
-    typedef struct s_module {
+    struct Module {
         std::string libname;
         IModule*    instance;
-    } Module;
+    };
 
 public:
     explicit ModuleManager() = default;

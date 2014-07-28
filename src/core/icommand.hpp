@@ -12,7 +12,7 @@
 class ICommand
 {
 public:
-    typedef std::shared_ptr<ICommand> Ptr;
+    using Ptr = std::shared_ptr<ICommand>;
 
 public:
     virtual ~ICommand() {}

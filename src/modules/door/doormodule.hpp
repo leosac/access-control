@@ -17,7 +17,7 @@ class Led;
 
 class DoorModule : public IDoorModule
 {
-    typedef struct {
+    struct Config {
         std::string     doorRelay;
         std::string     doorButton;
         std::string     doorSensor;
@@ -25,7 +25,7 @@ class DoorModule : public IDoorModule
         std::string     deniedLed;
         std::string     doorConf;
         std::string     buzzer;
-    } Config;
+    };
 public:
     explicit DoorModule(ICore& core, const std::string& name);
     ~DoorModule() = default;

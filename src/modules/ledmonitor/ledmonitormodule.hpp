@@ -16,10 +16,10 @@ class SysFsLed;
 class LedMonitorModule : public IMonitorModule
 {
     static const std::string TypeStrings[IModuleProtocol::ActivityTypes];
-    typedef struct {
+    struct MonitorLed {
         std::string deviceName;
         SysFsLed*  instance;
-    } MonitorLed;
+    };
 
 public:
     explicit LedMonitorModule(ICore& core, const std::string& name);
