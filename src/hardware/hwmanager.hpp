@@ -19,13 +19,13 @@ class DIPSwitch;
 
 class HWManager : public IHWManager, public IXmlSerializable
 {
-    typedef struct {
+    struct Device {
         std::string             type;
         ISerializableDevice*    instance;
-    } Device;
+    };
 
 public:
-    typedef std::function<void(bool)> StateHook;
+    using StateHook = std::function<void(bool)>;
     enum class HookType {
         DHCP = 0,
         DefaultIp,

@@ -30,13 +30,13 @@ class GPIOManager : public IGPIOProvider
     static const unsigned int   PollBufferSize = 64;
 
 public:
-    typedef struct std::map<int, std::string> GpioAliases;
-    typedef struct pollfd PollFdSet;
-    typedef struct {
+    using GpioAliases = std::map<int, std::string>;
+    using PollFdSet = struct pollfd;
+    struct ListenerInfo {
         IGPIOListener*  instance;
         int             gpioNo;
         unsigned int    fdIdx;
-    } ListenerInfo;
+    };
 
 public:
     explicit GPIOManager();

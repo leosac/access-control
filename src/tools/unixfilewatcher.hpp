@@ -14,12 +14,12 @@
 
 class UnixFileWatcher
 {
-    typedef int UnixFd;
-    typedef struct {
+    using UnixFd = int;
+    struct WatchParams {
         std::string path;
         int         mask;
-    } WatchParams;
-    typedef std::map<UnixFd, WatchParams> Watches;
+    };
+    using Watches = std::map<UnixFd, WatchParams>;
 
     static const long   DefaultTimeoutMs = 2000;
 

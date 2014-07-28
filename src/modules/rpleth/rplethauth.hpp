@@ -23,14 +23,14 @@ class RplethAuth : public IAuthModule
     static const long                   DefaultTimeoutMs = 500;
     static const std::size_t            RingBufferSize = 512;
 
-    typedef struct s_client {
+    struct Client {
         Rezzo::ISocket* socket;
         CircularBuffer  buffer;
-        explicit s_client(Rezzo::ISocket* sock) : socket(sock), buffer(RingBufferSize) {}
-    } Client;
+        explicit Client(Rezzo::ISocket* sock) : socket(sock), buffer(RingBufferSize) {}
+    };
 
 public:
-    typedef std::vector<Byte> CardId;
+    using CardId = std::vector<Byte>;
 
 public:
     explicit RplethAuth(ICore& core, const std::string& name);

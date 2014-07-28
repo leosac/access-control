@@ -16,7 +16,7 @@
 class DIPSwitch : public ISerializableDevice
 {
 public:
-    typedef std::function<void(bool)> SwitchCallback;
+    using SwitchCallback = std::function<void(bool)>;
 
 public:
     explicit DIPSwitch(const std::string& name, IGPIOProvider& gpioProvider);

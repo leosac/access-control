@@ -15,7 +15,7 @@ using std::chrono::system_clock;
 class AuthRequest
 {
 public:
-    typedef unsigned long Uid;
+    using Uid = unsigned long;
     enum State {
         New = 1, // NOTE 0 is used as error value for DFAutomata
         Waiting,

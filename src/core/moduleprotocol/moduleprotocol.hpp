@@ -29,7 +29,7 @@ class ILoggerModule;
 class ModuleProtocol : public IModuleProtocol
 {
     static const int AuthRequestValidity;
-    typedef std::function<void(IModule*)> RegisterFunc;
+    using RegisterFunc = std::function<void(IModule*)>;
 
 public:
     explicit ModuleProtocol();

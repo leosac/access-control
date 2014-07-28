@@ -11,11 +11,11 @@
 
 class DoorConfig : public IXmlSerializable
 {
-    typedef struct {
+    struct Day {
         bool    open;
         int     start;
         int     end;
-    } Day;
+    };
 
 public:
     explicit DoorConfig() = default;

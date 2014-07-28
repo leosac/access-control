@@ -16,7 +16,7 @@
 class Authenticator : public IXmlSerializable
 {
 public:
-    typedef std::vector<Byte>   CSN;
+    using CSN = std::vector<Byte>;
 
 public:
     explicit Authenticator() = default;
