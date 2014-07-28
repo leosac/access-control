@@ -1,0 +1,37 @@
+# Maintainer: Thibault 'Ryp' Schueller  <ryp.sqrt@gmail.com>
+
+_gitname=leosac
+pkgname=leosac-git
+pkgver=r194.bfe91a6
+pkgrel=1
+pkgdesc="Open source access control"
+arch=('any')
+url="https://github.com/islog/${_gitname}"
+license=('AGPL3')
+depends=('boost' 'tclap')
+makedepends=('git cmake boost-libs')
+conflicts=('leosac')
+provides=('leosac')
+source="git+https://github.com/islog/${_gitname}.git"
+md5sums=('SKIP')
+
+pkgver() {
+    cd "${srcdir}/${_gitname}"
+#     git describe --long | sed -r 's/([^-]*-g)/r\1/;s/-/./g'
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+    mkdir -p build
+    pushd build
+    cmake "${srcdir}/${_gitname}"                   \
+        -DCMAKE_BUILD_TYPE=Release                  \
+        -DCMAKE_INSTALL_PREFIX="${pkgdir}/usr"      \
+        -DLEOSAC_PLATFORM=None
+    make
+}
+
+package() {
+    pushd build
+    make install
+}
