@@ -3,16 +3,15 @@
 _gitname=leosac
 pkgname=leosac-git
 pkgver=0
-pkgrel=1
+pkgrel=2
 pkgdesc="Open source access control"
-arch=('any')
-url="https://github.com/islog/${_gitname}"
+arch=('i686' 'x86_64')
+url="https://github.com/islog/leosac"
 license=('AGPL3')
-depends=('boost' 'tclap')
-makedepends=('git cmake boost-libs')
+makedepends=('git cmake boost tclap')
 conflicts=('leosac')
 provides=('leosac')
-source="git+https://github.com/islog/${_gitname}.git"
+source=('git+https://github.com/islog/leosac.git')
 md5sums=('SKIP')
 
 pkgver() {
