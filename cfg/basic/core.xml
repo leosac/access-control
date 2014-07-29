@@ -13,7 +13,7 @@
     <module file="libdoor.so">
         <alias>door</alias>
         <properties>
-            <doorconf>cfg/door.conf</doorconf>
+            <doorconf>/usr/local/share/leosac/cfg/basic/door.conf</doorconf>
             <buzzer>none</buzzer>
             <doorRelay>relayA</doorRelay>
             <grantedLed>led1</grantedLed>
@@ -39,7 +39,7 @@
     <module file="libauthtest.so">
         <alias>authtest</alias>
         <properties>
-            <configpath>cfg/auth.conf</configpath>
+            <configpath>/usr/local/share/leosac/cfg/basic/auth.conf</configpath>
         </properties>
     </module>
 </core>
