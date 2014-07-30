@@ -20,6 +20,10 @@ leosac  [-g <string>] [-f <string>] [-v] [--] [--version] [-h]`
 
 See the [wiki](https://github.com/islog/leosac/wiki/Build-and-install)
 
+## Issues
+
+Please report issues [here](https://github.com/islog/leosac/issues).
+
 ## License
 
 This project is released under the GNU Affero GPLv3 license.
