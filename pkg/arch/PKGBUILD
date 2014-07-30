@@ -2,10 +2,10 @@
 
 _gitname=leosac
 pkgname=leosac-git
-pkgver=0
-pkgrel=2
+pkgver=r197.212de55
+pkgrel=1
 pkgdesc="Open source access control"
-arch=('i686' 'x86_64')
+arch=('i686' 'x86_64' 'armv6h')
 url="https://github.com/islog/leosac"
 license=('AGPL3')
 makedepends=('git cmake boost tclap')
