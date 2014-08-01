@@ -1,7 +1,6 @@
 {
-    <dlopen>
+    dlopen
     Memcheck:Leak
-    match-leak-kinds: reachable
     fun:calloc
     obj:/usr/*lib*/libdl-2.*.so
     fun:dlopen
