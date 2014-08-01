@@ -20,9 +20,11 @@ install:
 before_script:
     - mkdir install
     - mkdir build && pushd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_PLATFORM=Travis -DCMAKE_INSTALL_PREFIX=$PWD/../install
+    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_PLATFORM=Travis -DCMAKE_INSTALL_PREFIX=/usr
 script:
-    - make && sudo make install
+    - make
+    - sudo make install
+    - ctest .
 notifications:
   email:
     - reports@islog.com
