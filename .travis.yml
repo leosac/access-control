@@ -20,7 +20,7 @@ install:
 before_script:
     - mkdir install
     - mkdir build && pushd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_PLATFORM=Travis -DCMAKE_INSTALL_PREFIX=/usr
+    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis
 script:
     - make
     - sudo make install
