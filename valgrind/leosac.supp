@@ -4,7 +4,7 @@
     match-leak-kinds: reachable
     fun:calloc
     obj:/usr/*lib*/libdl-2.*.so
-    fun:dlopen
+    fun:dlopen*
     ...
     fun:main
 }
