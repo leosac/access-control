@@ -53,5 +53,15 @@ int Version::versionCompare(std::string a, std::string b)
 
 bool Version::isVersionValid(const std::string& v)
 {
-    return (v.find_first_not_of(validChars) == std::string::npos);
+    if (v.find_first_not_of(validChars) != std::string::npos)
+        return (false);
+    if (v.empty())
+        return (false);
+    if (v.front() == '.' || v.back() == '.')
+        return (false);
+    if (std::count_if(v.begin(), v.end(), [] (char a) { return (a == '.');} ) != 2)
+        return (false);
+    if (v.find_first_of('.') + 1 == v.find_last_of('.'))
+        return (false);
+    return (true);
 }

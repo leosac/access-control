@@ -1,11 +1,17 @@
 find_package(GTest REQUIRED)
 
-list(APPEND TEST_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src ${GTEST_INCLUDE_DIRS})
+list(APPEND LEOSAC_TEST_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src ${GTEST_INCLUDE_DIRS})
 
-add_executable(mytest test.cpp)
-target_link_libraries(mytest leosac_lib ${GTEST_BOTH_LIBRARIES})
-set_target_properties(mytest PROPERTIES
-    COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}"
-    INCLUDE_DIRECTORIES "${TEST_INCLUDE_DIRECTORIES}")
+function(leosacCreateSingleSourceTest NAME)
+    set(TEST_NAME test-${NAME})
+    add_executable(${TEST_NAME} ${NAME}.cpp)
+    set_target_properties(${TEST_NAME} PROPERTIES
+        COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}"
+        INCLUDE_DIRECTORIES "${LEOSAC_TEST_INCLUDE_DIRECTORIES}")
+    target_link_libraries(${TEST_NAME} leosac_lib ${GTEST_BOTH_LIBRARIES})
+    add_test(NAME ${TEST_NAME}
+        COMMAND $<TARGET_FILE:${TEST_NAME}>)
+    unset(TEST_NAME)
+endfunction()
 
-add_test(NAME mytest COMMAND ${LEOSAC_BINARY_DIR}/mytest)
+leosacCreateSingleSourceTest(version)
