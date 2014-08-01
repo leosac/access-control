@@ -13,13 +13,11 @@ endif()
 
 # Set correct hardware platform macro
 set(LEOSAC_PLATFORM CACHE STRING "Hardware platform on which to build Leosac")
-if (NOT LEOSAC_PLATFORM)
+if(NOT LEOSAC_PLATFORM)
     message(WARNING "No hardware platform is specified\nExample: -DLEOSAC_PLATFORM=RaspberryPi")
 else()
     string(TOUPPER ${LEOSAC_PLATFORM} LEOSAC_PLATFORM_UPPERCASE)
     add_definitions(-DLEOSAC_PLATFORM_${LEOSAC_PLATFORM_UPPERCASE})
-    unset(LEOSAC_PLATFORM_STRING_UPPERCASE)
-    unset(LEOSAC_PLATFORM)
 endif()
 
 set(Boost_USE_STATIC_LIBS OFF)
@@ -35,9 +33,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)
+option(LEOSAC_BUILD_TESTS   "build-tests" OFF)
 option(LEOSAC_GPROF         "gprof" OFF)
 
-if (LEOSAC_GPROF)
+if(LEOSAC_GPROF)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
@@ -51,6 +50,11 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 
 add_subdirectory(src)
 add_subdirectory(cfg)
+
+if(LEOSAC_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <hardware>
-    <platform name="CubieBoard2">
+    <platform name="CubieBoard">
         <gpioalias id="1">gpio1_pd0</gpioalias>
         <gpioalias id="2">gpio2_pd1</gpioalias>
         <gpioalias id="3">gpio3_pd2</gpioalias>
@@ -44,14 +44,16 @@
         <gpioalias id="41">gpio41_ph14</gpioalias>
         <gpioalias id="42">gpio42_ph15</gpioalias>
         <gpioalias id="43">gpio43_ph7</gpioalias>
+        <gpioalias id="44">gpio44_pi11</gpioalias>
+        <gpioalias id="45">gpio45_pi13</gpioalias>
     </platform>
     <devices>
-        <device type="dip" name="dipswitch">
+<!--        <device type="dip" name="dipswitch">
             <switches>3</switches>
             <switch0 pin="25" direction="in"/>
             <switch1 pin="28" direction="in"/>
             <switch2 pin="23" direction="in"/>
-        </device>
+        </device>-->
         <device type="buzzer" name="buzzerA">
             <gpio pin="26"/>
         </device>
@@ -67,8 +69,8 @@
         <device type="sysfsled" name="green" ledname="green:ph20:led1"/>
         <device type="sysfsled" name="blue" ledname="blue:ph21:led2"/>
         <device type="wiegandreader" name="readerA">
-            <higpio pin="41" direction="in" interruptmode="falling"/>
-            <logpio pin="42" direction="in" interruptmode="falling"/>
+            <higpio pin="44" direction="in" interruptmode="falling"/>
+            <logpio pin="45" direction="in" interruptmode="falling"/>
         </device>
     </devices>
 </hardware>
