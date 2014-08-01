@@ -23,7 +23,7 @@ script:
     - make
 after_success:
     - sudo make install
-    - ctest
+    - ctest --output-on-failure
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
 branches:
   except:
