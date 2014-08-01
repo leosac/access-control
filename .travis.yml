@@ -16,7 +16,7 @@ install:
     - if [ "$CXX" == "clang++" ]; then sudo apt-get install -qq g++-4.8; fi # NOTE Hack to retrieve up-to-date libstdc++
     - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
     - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
-    - sudo apt-get install -qq libtclap-dev libboost-dev cmake
+    - sudo apt-get install -qq libtclap-dev libboost-dev libgtest-dev cmake
 before_script:
     - mkdir install
     - mkdir build && pushd build
