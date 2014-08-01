@@ -3,31 +3,19 @@ compiler:
     - gcc
     - clang
 before_install:
-    #- if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-    #- if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi # NOTE Hack to retrieve up-to-date libstdc++
-    #- if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
-    #- sudo add-apt-repository -y ppa:kalakris/cmake
-    - sudo apt-add-repository "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main"
+    - sudo apt-add-repository "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
     - sudo apt-get update -qq
 install:
-    # g++4.8
-    #- if [ "$CXX" == "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-    #- if [ "$CXX" == "g++" ]; then export CXX="g++-4.8"; fi
-    # clang 3.4
-    #- if [ "$CXX" == "clang++" ]; then sudo apt-get install -qq g++-4.8; fi # NOTE Hack to retrieve up-to-date libstdc++
-    #- if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
-    #- if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
     - sudo apt-get install -qq libgtest-dev
     #  NOTE gtest install workaround
-    - cd /usr/src/gtest
-    - sudo cmake .
-    - sudo make
-    - sudo mv libgtest* /usr/lib/
-    - cd "${TRAVIS_BUILD_DIR}"
+    #- cd /usr/src/gtest
+    #- sudo cmake .
+    #- sudo make
+    #- sudo mv libgtest* /usr/lib/
+    #- cd "${TRAVIS_BUILD_DIR}"
     # -- workaround end
-
 before_script:
     - mkdir build && pushd build
     - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis
@@ -36,7 +24,7 @@ script:
 after_success:
     - sudo make install
     - ctest
-    - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
+    - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
 branches:
   except:
     - master
