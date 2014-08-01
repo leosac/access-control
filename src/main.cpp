@@ -29,14 +29,17 @@ int main(int argc, char** argv)
         try {
             TCLAP::CmdLine                  cmd("Open Source Access Controller", ' ', Leosac::getVersionString());
             TCLAP::SwitchArg                verboseSwitch("v", "verbose", "Increase verbosity", false);
+            TCLAP::SwitchArg                testSwitch("t", "test-run", "Test run usable by valgrind", false);
             TCLAP::ValueArg<std::string>    coreFile("f", "core-cfg", "Configuration file", false, DefaultCoreCfg, "string");
             TCLAP::ValueArg<std::string>    hwFile("g", "hw-cfg", "Hardware configuration file", false, DefaultHwCfg, "string");
 
             cmd.add(verboseSwitch);
+            cmd.add(testSwitch);
             cmd.add(coreFile);
             cmd.add(hwFile);
             cmd.parse(argc, argv);
             options.setFlag(RuntimeOptions::Verbose, verboseSwitch.getValue());
+            options.setFlag(RuntimeOptions::TestRun, testSwitch.getValue());
             options.setParam("corecfg", coreFile.getValue());
             options.setParam("hwcfg", hwFile.getValue());
         }

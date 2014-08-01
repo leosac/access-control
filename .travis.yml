@@ -16,7 +16,7 @@ install:
     - if [ "$CXX" == "clang++" ]; then sudo apt-get install -qq g++-4.8; fi # NOTE Hack to retrieve up-to-date libstdc++
     - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
     - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
-    - sudo apt-get install -qq libtclap-dev libboost-dev cmake
+    - sudo apt-get install -qq cmake libtclap-dev libboost-dev valgrind
     - sudo apt-get install -qq libgtest-dev
     #  NOTE gtest install workaround
     - cd /usr/src/gtest
@@ -26,13 +26,17 @@ install:
     - cd "${TRAVIS_BUILD_DIR}"
     # -- workaround end
 before_script:
-    - mkdir install
     - mkdir build && pushd build
     - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis
 script:
     - make
+after_success:
     - sudo make install
-    - ctest .
+    - ctest
+    - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
+branches:
+  except:
+    - master
 notifications:
   email:
     - reports@islog.com

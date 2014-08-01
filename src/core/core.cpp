@@ -118,6 +118,8 @@ int Core::run()
             // NOTE watch config files here, if needed
             _hwManager.sync();
             _authProtocol.sync();
+            if (_options.isSet(RuntimeOptions::TestRun))
+                _isRunning = false;
         }
         if (_resetSwitch)
             LOG() << "reset in progress...";
