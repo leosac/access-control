@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 
-#include "tools/leosac.hpp"
 #include "tools/version.hpp"
 
 TEST(VersionTest, buildVersionString)
