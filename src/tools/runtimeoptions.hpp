@@ -19,6 +19,7 @@ class RuntimeOptions
 public:
     enum Flag {
         Verbose = 0,
+        TestRun,
         FlagCount
     };
 
