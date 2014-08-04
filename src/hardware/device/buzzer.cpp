@@ -33,24 +33,24 @@ void Buzzer::deserialize(const ptree& node)
         throw (DeviceException("Gpio direction must be OUT"));
 }
 
-void Buzzer::beep(unsigned int frequencyHz, unsigned int durationMs)
+void Buzzer::beep(float frequencyHz, unsigned int durationMs)
 {
-//     unsigned int period = 1000 / frequencyHz; FIXME
-//     unsigned int loops = durationMs / period; FIXME
-
-    static_cast<void>(frequencyHz);
-    static_cast<void>(durationMs);
-
-    std::thread thread([this] () // FIXME FIXME FIXME
+    float           period = 1000.0f / frequencyHz;
+    unsigned int    loops = durationMs / period;
+    int             dt = static_cast<int>(period * 500.0f);
+    
+    std::thread thread([this, loops, dt] ()
     {
-        unsigned int loops = 1000;
+        std::chrono::system_clock::time_point   t = std::chrono::system_clock::now();
 
         for (unsigned int i = 0; i < loops; ++i)
         {
+            t += std::chrono::microseconds(dt);
             _gpioDevice.getGpio()->setValue(GPIO::Value::High);
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            std::this_thread::sleep_until(t);
+            t += std::chrono::microseconds(dt);
             _gpioDevice.getGpio()->setValue(GPIO::Value::Low);
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            std::this_thread::sleep_until(t);
         }
     } );
     thread.detach();

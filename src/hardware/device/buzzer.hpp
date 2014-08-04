@@ -25,7 +25,7 @@ public:
     virtual void                deserialize(const ptree& node) override;
 
 public:
-    void    beep(unsigned int frequency, unsigned int durationMs);
+    void    beep(float frequencyHz, unsigned int durationMs);
 
 private:
     const std::string   _name;
