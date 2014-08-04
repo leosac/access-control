@@ -25,10 +25,12 @@ public:
     virtual void                deserialize(const ptree& node) override;
 
 public:
-    void    beep(float frequencyHz, unsigned int durationMs);
+    void    beep(unsigned int durationMs, float frequencyHz);
+    void    beep(unsigned int durationMs); // NOTE Use buzzer default frequency
 
 private:
     const std::string   _name;
+    float               _frequency;
     GpioDevice          _gpioDevice;
 };
 
