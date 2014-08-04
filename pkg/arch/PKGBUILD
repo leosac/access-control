@@ -16,7 +16,7 @@ md5sums=('SKIP')
 
 pkgver() {
     cd "${srcdir}/${_gitname}"
-#     git describe --long | sed -r 's/([^-]*-g)/r\1/;s/-/./g'
+#     git describe --long | sed -r 's/([^-]*-g)/r\1/;s/-/./g' # NOTE use this when tags are available
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 

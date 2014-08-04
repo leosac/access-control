@@ -13,6 +13,7 @@
 
 Buzzer::Buzzer(const std::string& name, IGPIOProvider& gpioProvider)
 :   _name(name),
+    _frequency(440.0f),
     _gpioDevice(gpioProvider)
 {}
 
@@ -24,6 +25,7 @@ const std::string& Buzzer::getName() const
 void Buzzer::serialize(ptree& node)
 {
     _gpioDevice.serialize(node);
+    node.put<float>("frequency", _frequency);
 }
 
 void Buzzer::deserialize(const ptree& node)
@@ -31,9 +33,10 @@ void Buzzer::deserialize(const ptree& node)
     _gpioDevice.deserialize(node);
     if (_gpioDevice.getGpio()->getDirection() != GPIO::Direction::Out)
         throw (DeviceException("Gpio direction must be OUT"));
+    _frequency = node.get<float>("frequency", _frequency);
 }
 
-void Buzzer::beep(float frequencyHz, unsigned int durationMs)
+void Buzzer::beep(unsigned int durationMs, float frequencyHz)
 {
     float           period = 1000.0f / frequencyHz;
     unsigned int    loops = durationMs / period;
@@ -54,4 +57,9 @@ void Buzzer::beep(float frequencyHz, unsigned int durationMs)
         }
     } );
     thread.detach();
+}
+
+void Buzzer::beep(unsigned int durationMs)
+{
+    beep(durationMs, _frequency);
 }
