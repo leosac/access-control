@@ -131,7 +131,7 @@ void DoorModule::denyAccess()
     if (_deniedLed)
         _deniedLed->turnOn(duration); // DEBUG
     if (_buzzer && _buzzerEnabled)
-        _buzzer->beep(1000, 500); // FIXME
+        _buzzer->beep(2048, 500); // FIXME
 }
 
 bool DoorModule::isOpen() const
@@ -142,5 +142,5 @@ bool DoorModule::isOpen() const
 void DoorModule::alarm()
 {
     if (_buzzer && _buzzerEnabled)
-        _buzzer->beep(1000, 500);
+        _buzzer->beep(2048, 500);
 }
