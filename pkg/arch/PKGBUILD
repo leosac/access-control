@@ -2,7 +2,7 @@
 
 _gitname=leosac
 pkgname=leosac-git
-pkgver=r197.212de55
+pkgver=r215.631327c
 pkgrel=1
 pkgdesc="Open source access control"
 arch=('i686' 'x86_64' 'armv6h')
@@ -15,7 +15,7 @@ source=('git+https://github.com/islog/leosac.git')
 md5sums=('SKIP')
 
 pkgver() {
-    cd "${srcdir}/${_gitname}"
+    cd "$srcdir/$_gitname"
 #     git describe --long | sed -r 's/([^-]*-g)/r\1/;s/-/./g' # NOTE use this when tags are available
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
@@ -23,9 +23,9 @@ pkgver() {
 build() {
     mkdir -p build
     pushd build
-    cmake "${srcdir}/${_gitname}"                   \
-        -DCMAKE_BUILD_TYPE=Release                  \
-        -DCMAKE_INSTALL_PREFIX="${pkgdir}/usr"      \
+    cmake "$srcdir/$_gitname"                   \
+        -DCMAKE_BUILD_TYPE=Release              \
+        -DCMAKE_INSTALL_PREFIX="$pkgdir/usr"    \
         -DLEOSAC_PLATFORM=None
     make
 }

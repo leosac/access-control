@@ -14,7 +14,6 @@ class IMonitorModule : public IModule
 public:
     virtual ~IMonitorModule() {}
     virtual void    notify(IModuleProtocol::ActivityType type) = 0;
-
 };
 
 #endif // IMONITORMODULE_HPP
