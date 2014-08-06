@@ -2,7 +2,7 @@
 
 _gitname=leosac
 pkgname=leosac-git
-pkgver=r215.631327c
+pkgver=0.3.0.r0.g7cb24fe
 pkgrel=1
 pkgdesc="Open source access control"
 arch=('i686' 'x86_64' 'armv6h')
@@ -16,8 +16,7 @@ md5sums=('SKIP')
 
 pkgver() {
     cd "$srcdir/$_gitname"
-#     git describe --long | sed -r 's/([^-]*-g)/r\1/;s/-/./g' # NOTE use this when tags are available
-    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+    git describe --long | sed -r 's/([^-]*-g)/r\1/;s/-/./g'
 }
 
 build() {
