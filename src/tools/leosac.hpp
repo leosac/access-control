@@ -21,12 +21,14 @@
 #   define LEOSAC_VERSION_PATCH 0
 #endif
 
-#if defined(LEOSAC_PLATFORM_RASPBERRYPI)
+#if defined(LEOSAC_PLATFORM_NOHARDWARE)
+#   define LEOSAC_PLATFORM  (PlatformType::NoHardware)
+#elif defined(LEOSAC_PLATFORM_RASPBERRYPI)
 #   define LEOSAC_PLATFORM  (PlatformType::RaspberryPi)
 #elif defined(LEOSAC_PLATFORM_CUBIEBOARD)
 #   define LEOSAC_PLATFORM  (PlatformType::CubieBoard)
 #else
-#   define LEOSAC_PLATFORM  (PlatformType::None)
+#   define LEOSAC_PLATFORM  (PlatformType::Unknown)
 #endif
 
 namespace Leosac
@@ -36,7 +38,8 @@ namespace Leosac
     static const int Patch = LEOSAC_VERSION_PATCH;
 
     enum class PlatformType {
-        None = 0,
+        Unknown = 0,
+        NoHardware,
         RaspberryPi,
         CubieBoard
     };

@@ -116,7 +116,7 @@ void GPIOManager::pollLoop()
         {
             for (unsigned int i = 0; i < fdsetSize; ++i)
             {
-                if (_fdset[i].revents & POLLPRI)
+                if (_fdset[i].revents & (POLLPRI | POLLERR ))
                 {
 //                     _fdset[i].revents &= ~POLLPRI; FIXME
                     _fdset[i].revents = 0; // FIXME

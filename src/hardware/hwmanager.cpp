@@ -89,14 +89,16 @@ void HWManager::deserialize(const ptree& node)
 
 void HWManager::start()
 {
-    if (Leosac::Platform != Leosac::PlatformType::None)
-        _gpioManager.startPolling();
+    if (Leosac::Platform == Leosac::PlatformType::NoHardware)
+        return;
+    _gpioManager.stopPolling();
 }
 
 void HWManager::stop()
 {
-    if (Leosac::Platform != Leosac::PlatformType::None)
-        _gpioManager.stopPolling();
+    if (Leosac::Platform == Leosac::PlatformType::NoHardware)
+        return;
+    _gpioManager.stopPolling();
 }
 
 IDevice* HWManager::getDevice(const std::string& name)
