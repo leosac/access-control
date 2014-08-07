@@ -91,7 +91,7 @@ void HWManager::start()
 {
     if (Leosac::Platform == Leosac::PlatformType::NoHardware)
         return;
-    _gpioManager.stopPolling();
+    _gpioManager.startPolling();
 }
 
 void HWManager::stop()
