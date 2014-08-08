@@ -27,6 +27,8 @@
 #   define LEOSAC_PLATFORM  (PlatformType::RaspberryPi)
 #elif defined(LEOSAC_PLATFORM_CUBIEBOARD)
 #   define LEOSAC_PLATFORM  (PlatformType::CubieBoard)
+#elif defined(LEOSAC_PLATFORM_BEAGLEBONEBLACK)
+#   define LEOSAC_PLATFORM  (PlatformType::BeagleBoneBlack)
 #else
 #   define LEOSAC_PLATFORM  (PlatformType::Unknown)
 #endif
@@ -41,7 +43,8 @@ namespace Leosac
         Unknown = 0,
         NoHardware,
         RaspberryPi,
-        CubieBoard
+        CubieBoard,
+        BeagleBoneBlack
     };
     static const PlatformType Platform = LEOSAC_PLATFORM;
 
