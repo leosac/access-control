@@ -1,0 +1,12 @@
+[Unit]
+Description=Leosac Deamon
+Documentation=http://www.github.com/islog/leosac/wiki
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/leosac -f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml
+WorkingDirectory=/tmp
+
+[Install]
+WantedBy=default.target
