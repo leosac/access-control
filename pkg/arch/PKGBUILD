@@ -2,7 +2,7 @@
 
 _gitname=leosac
 pkgname=leosac-git
-pkgver=0.3.0.r0.g7cb24fe
+pkgver=0.3.0.r6.g7b1d2da
 pkgrel=1
 pkgdesc="Open source access control"
 arch=('i686' 'x86_64' 'armv6h')
@@ -11,8 +11,12 @@ license=('AGPL3')
 makedepends=('git cmake boost tclap')
 conflicts=('leosac')
 provides=('leosac')
-source=('git+https://github.com/islog/leosac.git')
-md5sums=('SKIP')
+source=('git+https://github.com/islog/leosac.git'
+    leosacd.service
+    leosac.install)
+md5sums=('SKIP'
+    '3dc75a0229742e81704b6e2ae7155191'
+    '33be330e044ddbb2b7fcb660633961e0')
 
 pkgver() {
     cd "$srcdir/$_gitname"
@@ -31,5 +35,16 @@ build() {
 
 package() {
     pushd build
+    # Install leosac
     make install
+    # Install service file
+    install -m 755 -d "$pkgdir/usr/lib/systemd/system"
+    install -m 644 -t "$pkgdir/usr/lib/systemd/system"  \
+        "$srcdir/leosacd.service"
+    # Deamon configuration folder
+    install -m 755 -d "$pkgdir/etc/leosac.d"
+    install -m 644 -t "$pkgdir/etc/leosac.d"            \
+        "$pkgdir/usr/share/leosac/cfg/empty/core.xml"   \
+        "$pkgdir/usr/share/leosac/cfg/empty/hw.xml"
 }
+
