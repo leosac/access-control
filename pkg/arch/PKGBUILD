@@ -11,12 +11,13 @@ license=('AGPL3')
 makedepends=('git cmake boost tclap')
 conflicts=('leosac')
 provides=('leosac')
+install='leosac.install'
 source=('git+https://github.com/islog/leosac.git'
     leosacd.service
     leosac.install)
-md5sums=('SKIP'
-    '3dc75a0229742e81704b6e2ae7155191'
-    '33be330e044ddbb2b7fcb660633961e0')
+sha512sums=('SKIP'
+    '9efa0a4c5ebf200edf9f5f8bba1a577b0eccee69bd1e0696d207d903faf449643d1975ab33764fe17f96511df27a99ef5301afda9df12417385b0aa8e58ac01e'
+    '28a0e920471d76e9b61748b58982f77b8b5cfd6b8858fce28efaf6319dd229e939a144619d93cd01532454c2b33e7e2c9eea11032fa8a50873a09cdd923c1869')
 
 pkgver() {
     cd "$srcdir/$_gitname"
