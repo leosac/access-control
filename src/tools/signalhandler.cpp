@@ -7,22 +7,21 @@
 #include "signalhandler.hpp"
 
 extern "C" {
-#include <signal.h>
 #include <unistd.h>
 }
 
 #include "exception/signalexception.hpp"
 #include "tools/unixsyscall.hpp"
 
-static std::function<void (int)> sigCallback;
+static std::function<void (Signal)> sigCallback;
 
 static void fesser_e(int signal)
 {
     if (sigCallback)
-        sigCallback(signal);
+        sigCallback(static_cast<Signal>(signal));
 }
 
-void SignalHandler::registerCallback(std::function<void (int)> callback)
+void SignalHandler::registerCallback(Signal signal, std::function<void (Signal)> callback)
 {
     struct sigaction    act;
 
@@ -30,7 +29,7 @@ void SignalHandler::registerCallback(std::function<void (int)> callback)
     if (sigemptyset(&act.sa_mask) < 0)
         throw (SignalException(UnixSyscall::getErrorString("sigemptyset", errno)));
     act.sa_flags = SA_RESTART;
-    if (sigaction(SIGINT, &act, 0) < 0)
+    if (sigaction(static_cast<int>(signal), &act, 0) < 0)
         throw (SignalException(UnixSyscall::getErrorString("sigaction", errno)));
     sigCallback = callback;
 }

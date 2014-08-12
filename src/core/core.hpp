@@ -18,6 +18,7 @@
 #include "netconfig/networkconfig.hpp"
 #include "hardware/hwmanager.hpp"
 #include "tools/runtimeoptions.hpp"
+#include "tools/signalhandler.hpp"
 
 class Core : public ICore, public IXmlSerializable
 {
@@ -37,7 +38,7 @@ public:
     virtual void            deserialize(const ptree& node) override;
 
 public:
-    void    handleSignal(int signal);
+    void    handleSignal(Signal signal);
     int     run();
 
 public:

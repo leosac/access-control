@@ -1,5 +1,5 @@
 [Unit]
-Description=Leosac Deamon
+Description=Leosac daemon
 Documentation=http://www.github.com/islog/leosac/wiki
 After=default.target
 

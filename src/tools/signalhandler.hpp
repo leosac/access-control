@@ -9,12 +9,30 @@
 
 #include <functional>
 
+extern "C" {
+    #include <signal.h>
+}
+
+enum class Signal : int {
+    SigHup = SIGHUP,
+    SigInt = SIGINT,
+    SigQuit = SIGQUIT,
+    SigKill = SIGKILL,
+    SigSegv = SIGSEGV,
+    SigPipe = SIGPIPE,
+    SigTerm = SIGTERM,
+    SigUsr1 = SIGUSR1,
+    SigUsr2 = SIGUSR2,
+    SigStop = SIGSTOP
+};
+
 class SignalHandler
 {
     SignalHandler() = delete;
 
 public:
-    static void registerCallback(std::function<void (int)> callback);
+    static void registerCallback(Signal signal, std::function<void (Signal)> callback);
 };
 
 #endif // SIGNALHANDLER_HPP
+
