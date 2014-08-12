@@ -11,7 +11,7 @@
 ### END INIT INFO
 
 DAEMON=/usr/bin/leosac
-DAEMON_OPTS="-f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml"
+DAEMON_OPTS=""
 LEOSAC_PID_FILE=/var/run/leosac.pid
 LEOSAC_DIR="/etc/leosac.d"
 
