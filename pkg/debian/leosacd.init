@@ -1,0 +1,66 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:             leosacd
+# Required-Start:       $remote_fs $syslog
+# Required-Stop:        $remote_fs $syslog
+# Default-Start:        2 3 4 5
+# Default-Stop:         0 1 6
+# Short-Description:    Start daemon at boot time
+# Description:          Leosac daemon
+### END INIT INFO
+
+DAEMON=/usr/bin/leosac
+DAEMON_OPTS="-f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml"
+LEOSAC_PID_FILE=/var/run/leosac.pid
+LEOSAC_DIR="/etc/leosac.d"
+
+test -x "$DAEMON" || exit 0
+
+. /lib/lsb/init-functions
+
+start()
+{
+    log_daemon_msg "Starting leosac daemon"
+    if [ -s "$LEOSAC_PID_FILE" ] && kill -0 $(cat "$LEOSAC_PID_FILE") >/dev/null 2>&1; then
+        log_action_msg "Daemon is already running"
+        log_end_msg 0
+        exit 0
+    else
+        start-stop-daemon                                               \
+            --start --quiet --background --oknodo                       \
+            --make-pidfile --pidfile "$LEOSAC_PID_FILE"                 \
+            --chdir "$LEOSAC_DIR" --exec "$DAEMON" -- "$DAEMON_OPTS"
+        log_end_msg $?
+    fi
+}
+
+stop()
+{
+    log_daemon_msg "Stopping leosac daemon"
+    start-stop-daemon --stop --quiet --oknodo                           \
+        --pidfile "$LEOSAC_PID_FILE"
+    log_end_msg $?
+    rm -f "$LEOSAC_PID_FILE"
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|reload|force-reload)
+        stop
+        start
+        ;;
+    status)
+        status_of_proc -p "$LEOSAC_PID_FILE" "$DAEMON" leosacd
+        ;;
+    *)
+        log_action_msg "Usage: $0 {start|stop|restart|reload|force-reload|status}"
+        exit 1
+esac
+
+exit 0

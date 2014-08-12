@@ -9,7 +9,6 @@
 #include <thread>
 
 #include "hardware/hwmanager.hpp"
-#include "tools/signalhandler.hpp"
 #include "tools/log.hpp"
 
 #include "exception/coreexception.hpp"
@@ -36,10 +35,10 @@ ModuleProtocol& Core::getModuleProtocol()
     return (_authProtocol);
 }
 
-void Core::handleSignal(int signal)
+void Core::handleSignal(Signal signal)
 {
     _isRunning = false;
-    LOG() << "caught signal (" << signal << ')';
+    LOG() << "caught signal (" << static_cast<int>(signal) << ')';
 }
 
 void Core::serialize(ptree& node)
@@ -110,7 +109,9 @@ int Core::run()
         LOG() << "core config loaded";
         _networkConfig.reload();
         LOG() << "network loaded";
-        SignalHandler::registerCallback([this] (int signal) { handleSignal(signal); } );
+        auto callback = [this] (Signal signal) { handleSignal(signal); };
+        SignalHandler::registerCallback(Signal::SigInt, callback);
+        SignalHandler::registerCallback(Signal::SigTerm, callback);
         LOG() << "starting core loop";
         while (_isRunning && !_resetSwitch)
         {
