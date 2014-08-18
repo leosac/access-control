@@ -2,7 +2,7 @@
 
 _gitname=leosac
 pkgname=leosac-git
-pkgver=0.3.0.r11.g7904443
+pkgver=0.3.1
 pkgrel=1
 pkgdesc="Open source access control"
 arch=('i686' 'x86_64' 'armv6h')
@@ -17,7 +17,8 @@ source=('git+https://github.com/islog/leosac.git'
     leosac.install)
 sha512sums=('SKIP'
     'e459abfd8dec780fbacd77df9a273a1ea95bb9c323a0666113281fb5534c7b45a0e7b5ccd17c484d8c4e4518e7fe4617aa73887de892efa57a38540a43bc1e66'
-    '53a386f33283f7531d1ba0274d8520c8ed9e6bb04b6be45197e4e940ac33240ca27140450b52d8e8a2db3b04b99ce7b306dd095152e5a797c66b974968c3210a')
+    '53a386f33283f7531d1ba0274d8520c8ed9e6bb04b6be45197e4e940ac33240ca27140450b52d8e8a2db3b04b99ce7b306dd095152e5a797c66b974968c3210a'
+)
 
 pkgver() {
     cd "$srcdir/$_gitname"
