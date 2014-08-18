@@ -1,0 +1,15 @@
+#!/bin/sh
+
+echo "----------------------------------------------------------------"
+echo "To enable leosac daemon run these commands as root:"
+echo "update-rc.d leosacd defaults"
+echo "service leosacd start"
+echo ""
+echo "To disable run as root:"
+echo "service leosacd stop"
+echo "update-rc.d -f leosacd remove"
+echo ""
+echo "More info here:"
+echo "https://github.com/islog/leosac/wiki"
+echo "----------------------------------------------------------------"
+

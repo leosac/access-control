@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DLEOSAC_PLATFORM=None -DCMAKE_BUILD_TYPE=Release
+
+override_dh_auto_install:
+	dh_auto_install
+	install -m 755 -d "$$(pwd)/debian/leosac/etc/init.d"
+	install -m 755 -t "$$(pwd)/debian/leosac/etc/init.d" "pkg/debian/leosacd"
