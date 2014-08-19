@@ -11,7 +11,7 @@
 ### END INIT INFO
 
 DAEMON=/usr/bin/leosac
-DAEMON_OPTS=""
+DAEMON_OPTS="-f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml"
 LEOSAC_PID_FILE=/var/run/leosac.pid
 LEOSAC_DIR="/etc/leosac.d"
 
@@ -22,7 +22,7 @@ test -x "$DAEMON" || exit 0
 start()
 {
     log_daemon_msg "Starting leosac daemon"
-    if [ -s "$LEOSAC_PID_FILE" ] && kill -0 $(cat "$LEOSAC_PID_FILE") >/dev/null 2>&1; then
+    if [ -s "$LEOSAC_PID_FILE" ] && kill -0 $(cat "$LEOSAC_PID_FILE") > /dev/null 2>&1; then
         log_action_msg "Daemon is already running"
         log_end_msg 0
         exit 0
