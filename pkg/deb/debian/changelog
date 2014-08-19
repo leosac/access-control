@@ -1,5 +1,5 @@
-leosac (0.3.1-2) UNRELEASED; urgency=low
+leosac (0.3.2-1) UNRELEASED; urgency=low
 
-  * Fixed daemon setup.
+  * Fixed debian packaging setup.
 
  -- Thibault Schueller <ryp.sqrt@gmail.com>  Mon, 18 Aug 2014 17:37:40 +0200
