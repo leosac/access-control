@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+_INSTALL_PATH = $$(pwd)/debian/leosac
+
 %:
 	dh $@
 
@@ -8,5 +10,10 @@ override_dh_auto_configure:
 
 override_dh_auto_install:
 	dh_auto_install
-	install -m 755 -d "$$(pwd)/debian/leosac/etc/init.d"
-	install -m 755 -t "$$(pwd)/debian/leosac/etc/init.d" "pkg/debian/leosacd"
+	install -m 755 -d "$(_INSTALL_PATH)/etc/init.d"
+	install -m 755 -t "$(_INSTALL_PATH)/etc/init.d"                 \
+		"pkg/debian/leosacd"
+	install -m 755 -d "$(_INSTALL_PATH)/etc/leosac.d"
+	install -m 644 -t "$(_INSTALL_PATH)/etc/leosac.d"               \
+		"cfg/empty/core.xml"                                    \
+		"cfg/empty/hw.xml"
