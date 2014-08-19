@@ -5,7 +5,7 @@ After=default.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/leosac
+ExecStart=/usr/bin/leosac -f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml
 WorkingDirectory=/etc/leosac.d
 
 [Install]
