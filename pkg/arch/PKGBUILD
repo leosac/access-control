@@ -49,4 +49,3 @@ package() {
         "$pkgdir/usr/share/leosac/cfg/empty/core.xml"   \
         "$pkgdir/usr/share/leosac/cfg/empty/hw.xml"
 }
-
