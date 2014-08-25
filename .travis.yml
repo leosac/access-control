@@ -2,6 +2,13 @@ language: cpp
 compiler:
     - gcc
     - clang
+branches:
+  except:
+    - master
+notifications:
+  email:
+    - reports@islog.com
+    - ryp.sqrt@gmail.com
 before_install:
     - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
     - sudo apt-get update -qq
@@ -10,11 +17,11 @@ install:
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
     - sudo apt-get install -qq libgtest-dev
     #  NOTE gtest install workaround
-    - cd /usr/src/gtest
+    - pushd /usr/src/gtest
     - sudo cmake .
     - sudo make
     - sudo mv libgtest* /usr/lib/
-    - cd "${TRAVIS_BUILD_DIR}"
+    - popd
     # -- workaround end
 before_script:
     - mkdir build && pushd build
@@ -22,13 +29,22 @@ before_script:
 script:
     - make
 after_success:
+    # NOTE create fake package
     - sudo make install
     - ctest --output-on-failure
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
-branches:
-  except:
-    - master
-notifications:
-  email:
-    - reports@islog.com
-    - ryp.sqrt@gmail.com
+before_deploy:
+    - popd
+    - LEOSAC_DEB_PACKAGE="release-test.txt"
+    - echo "Travis test release" > ${LEOSAC_DEB_PACKAGE}
+deploy:
+  edge: true
+  provider: releases
+  api-key:
+    - secure: gzFPmcIiUb/RThwutCCtSxVseqOPYi1ezW00zYCjsKk1yglYO7NJ0kDP+/LcsGQ2pjyNQGXYdNaG5pEiZkHwZdvKiGkA9ktcL6lce36/P4dhsGR4R0w6/il/04vGVVvpvNTmtBOpV02qsmqxMrzcGyJkTVvgnnHbiInH+52PT4g=
+  file:
+    - "${TRAVIS_BUILD_DIR}/${LEOSAC_DEB_PACKAGE}"
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
