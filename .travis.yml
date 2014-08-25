@@ -35,16 +35,16 @@ after_success:
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
 before_deploy:
     - popd
-    - LEOSAC_DEB_PACKAGE="release-test.txt"
-    - echo "Travis test release" > ${LEOSAC_DEB_PACKAGE}
+    - LEOSAC_DEB="${TRAVIS_BUILD_DIR}/release-test.txt"
+    - echo "Travis test release" > ${LEOSAC_DEB}
 deploy:
   edge: true
   provider: releases
-  api-key:
-    - secure: gzFPmcIiUb/RThwutCCtSxVseqOPYi1ezW00zYCjsKk1yglYO7NJ0kDP+/LcsGQ2pjyNQGXYdNaG5pEiZkHwZdvKiGkA9ktcL6lce36/P4dhsGR4R0w6/il/04vGVVvpvNTmtBOpV02qsmqxMrzcGyJkTVvgnnHbiInH+52PT4g=
-  file:
-    - "${TRAVIS_BUILD_DIR}/${LEOSAC_DEB_PACKAGE}"
   skip_cleanup: true
+  api-key:
+    - secure: bNT1ZzHXLr+WF92XtjBVMkjR+r39RtGbKndyIcKj5nralHCSzYH+6y2QBydj3AGJ5KwldDYJuCh18EeXH+Rl9udqrFQptwBcMYW7B0S4fTxQMZu+z6wNSWxvoDeCN3iR86UfcmVtivv1tsQSNqWWQPz+tmjwNrceqPcG9kzS8KM=
+  file: "$LEOSAC_DEB"
   on:
+    repo: islog/leosac
     tags: true
     all_branches: true
