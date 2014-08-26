@@ -5,7 +5,7 @@ set -e
 test ! -d debian
 mkdir debian
 
-dch --create -v "${TRAVIS_TAG}-1" --package leosac "Travis auto-generated package" # Initial changelog
+dch --create -v "${TRAVIS_TAG}-1" --package leosac "Travis auto-generated package (commit ${TRAVIS_COMMIT})" # Initial changelog
 dch -r "Unforeseen Consequences" # Mark as release
 echo "9" > debian/compat
 cp pkg/deb/control      debian

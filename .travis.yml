@@ -46,7 +46,7 @@ deploy:
     tags: true
     all_branches: true
 before_deploy:
-    - cd "${TRAVIS_BUILD}/.."
+    - cd "${TRAVIS_BUILD_DIR}/"
     - mv leosac "leosac-${TRAVIS_TAG}"
     - pushd "leosac-${TRAVIS_TAG}"
     - bash scripts/travis_makepkg.sh
