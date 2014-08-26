@@ -5,6 +5,7 @@ compiler:
 branches:
   except:
     - master
+    - feature-travis-debianpkg
 notifications:
   email:
     - reports@islog.com
@@ -15,7 +16,6 @@ before_install:
 install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
-    - sudo apt-get install -qq build-essential dh-make dpkg-dev debhelper devscripts  # Deb Packaging
     - sudo apt-get install -qq libgtest-dev
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
@@ -30,14 +30,12 @@ before_script:
 script:
     - make
 after_success:
-    # NOTE create fake package
     - sudo make install
     - ctest --output-on-failure
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
 deploy:
   edge: true
   provider: releases
-  skip_cleanup: true
   api-key:
     - secure: bNT1ZzHXLr+WF92XtjBVMkjR+r39RtGbKndyIcKj5nralHCSzYH+6y2QBydj3AGJ5KwldDYJuCh18EeXH+Rl9udqrFQptwBcMYW7B0S4fTxQMZu+z6wNSWxvoDeCN3iR86UfcmVtivv1tsQSNqWWQPz+tmjwNrceqPcG9kzS8KM=
   file: "$LEOSAC_DEB"
@@ -46,9 +44,12 @@ deploy:
     tags: true
     all_branches: true
 before_deploy:
-    - cd "${TRAVIS_BUILD_DIR}/.."
-    - mv leosac "leosac-${TRAVIS_TAG}"
+    - sudo apt-get install -qq build-essential dh-make dpkg-dev debhelper devscripts
+    - PRISTINE_ARCHIVE="${TRAVIS_TAG}.tar.gz"
+    - wget https://github.com/islog/leosac/archive/${PRISTINE_ARCHIVE}
+    - tar -xf ${PRISTINE_ARCHIVE}
+    - mv {PRISTINE_ARCHIVE} leosac_${TRAVIS_TAG}.orig.tar.gz
     - pushd "leosac-${TRAVIS_TAG}"
     - bash scripts/travis_makepkg.sh
     - popd
-    - LEOSAC_DEB="`find * -name leosac_*.deb`"
+    - LEOSAC_DEB="`find * -maxdepth 0 -name leosac_*.deb`"
