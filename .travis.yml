@@ -15,6 +15,7 @@ before_install:
 install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
+    - sudo apt-get install -qq build-essential dh-make dpkg-dev debhelper devscripts  # Deb Packaging
     - sudo apt-get install -qq libgtest-dev
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
@@ -33,10 +34,6 @@ after_success:
     - sudo make install
     - ctest --output-on-failure
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
-before_deploy:
-    - popd
-    - LEOSAC_DEB="${TRAVIS_BUILD_DIR}/release-test.txt"
-    - echo "Travis test release" > ${LEOSAC_DEB}
 deploy:
   edge: true
   provider: releases
@@ -48,3 +45,10 @@ deploy:
     repo: islog/leosac
     tags: true
     all_branches: true
+before_deploy:
+    - cd "${TRAVIS_BUILD}/.."
+    - mv leosac "leosac-${TRAVIS_TAG}"
+    - pushd "leosac-${TRAVIS_TAG}"
+    - bash scripts/travis_makepkg.sh
+    - popd
+    - LEOSAC_DEB="`find * -name leosac_*.deb`"
