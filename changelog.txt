@@ -1,5 +1,5 @@
 ================================================================================
-    Leosac 0.3.3: not released yet (due date 2014-08-30)
+    Leosac 0.3.3: 2014-08-26
 --------------------------------------------------------------------------------
 - Use Travis CI to automate .deb packaging and automatic release attachments #29
 - Build debian package #28
