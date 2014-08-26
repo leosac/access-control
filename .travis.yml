@@ -45,11 +45,11 @@ deploy:
     all_branches: true
 before_deploy:
     - sudo apt-get install -qq build-essential dh-make dpkg-dev debhelper devscripts
-    - PRISTINE_ARCHIVE="${TRAVIS_TAG}.tar.gz"
+    - PRISTINE_ARCHIVE=${TRAVIS_TAG}.tar.gz
     - wget https://github.com/islog/leosac/archive/${PRISTINE_ARCHIVE}
     - tar -xf ${PRISTINE_ARCHIVE}
-    - mv {PRISTINE_ARCHIVE} leosac_${TRAVIS_TAG}.orig.tar.gz
-    - pushd "leosac-${TRAVIS_TAG}"
+    - mv ${PRISTINE_ARCHIVE} leosac_${TRAVIS_TAG}.orig.tar.gz
+    - pushd leosac-${TRAVIS_TAG}
     - bash scripts/travis_makepkg.sh
     - popd
     - LEOSAC_DEB="`find * -maxdepth 0 -name leosac_*.deb`"
