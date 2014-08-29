@@ -1,0 +1,29 @@
+# Options used by GitHub
+# --pygments --no-lsi --safe
+highlighter: pygments
+lsi: false
+safe: true
+
+# Exclude project-specific and source files when generating the site.
+exclude: 
+    - bootstrap/
+
+################################################################################
+# Global variables used site-wide
+################################################################################
+
+project:
+  name: Leosac
+  description: Open Source Physical Access Control System
+  download: https://github.com/islog/leosac/releases
+  fork: https://github.com/islog/leosac
+
+author:
+  name: Thibault Schueller
+  site: https://github.com/ryp
+  email: ryp.sqrt@gmail.com
+  github: ryp
+  twitter: schuel_t
+  linkedin: thibault-schueller
+
+navbar: false

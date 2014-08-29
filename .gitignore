@@ -1,0 +1,7 @@
+!.gitignore
+
+# Jekyll
+_site/
+
+# Bootstrap
+bootstrap
