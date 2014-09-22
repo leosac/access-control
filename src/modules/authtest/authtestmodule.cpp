@@ -32,7 +32,7 @@ void AuthTestModule::serialize(ptree& node)
     _watcher.stop();
 
     XmlConfig   conf(_configPath, _auth);
-    conf.serialize();
+    conf.save();
 
     node.put<std::string>("configpath", _configPath);
     _auth.serialize(node);
@@ -43,7 +43,7 @@ void AuthTestModule::deserialize(const ptree& node)
     _configPath = node.get<std::string>("configpath");
 
     XmlConfig   conf(_configPath, _auth);
-    conf.deserialize();
+    conf.load();
 
     _watcher.watchFile(_configPath);
     _watcher.start();
@@ -56,7 +56,7 @@ void AuthTestModule::authenticate(const AuthRequest& ar)
     if (_watcher.fileHasChanged(_configPath))
     {
         XmlConfig   conf(_configPath, _auth);
-        conf.deserialize();
+        conf.load();
         LOG() << "auth config reloaded: " << _configPath;
         _watcher.fileReset(_configPath);
     }

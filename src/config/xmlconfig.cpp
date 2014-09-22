@@ -24,7 +24,7 @@ XmlConfig::XmlConfig(const std::string& file, IXmlSerializable& object)
     _object(object)
 {}
 
-void XmlConfig::serialize()
+void XmlConfig::save()
 {
     std::ofstream               cfg(_file);
     ptree                       pt;
@@ -41,7 +41,7 @@ void XmlConfig::serialize()
     }
 }
 
-void XmlConfig::deserialize()
+void XmlConfig::load()
 {
     std::ifstream   cfg(_file);
     ptree           pt;
