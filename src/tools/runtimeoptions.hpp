@@ -12,6 +12,9 @@
 #include <string>
 #include <map>
 
+/**
+* Holds informations about runtime options, such as "is this a verbose run" or path to configurations files
+*/
 class RuntimeOptions
 {
     static const std::string    DefaultEmptyParam;
