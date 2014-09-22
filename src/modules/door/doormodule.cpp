@@ -55,7 +55,7 @@ void DoorModule::serialize(ptree& node)
 {
     XmlConfig   conf(_config.doorConf, _doorConfig);
 
-    conf.serialize();
+    conf.save();
 
     if (_doorSensor)
         _doorSensor->resetCallback();
@@ -103,7 +103,7 @@ void DoorModule::deserialize(const ptree& node)
     }
 
     XmlConfig   conf(_config.doorConf, _doorConfig);
-    conf.deserialize();
+    conf.load();
 }
 
 bool DoorModule::isAuthRequired() const

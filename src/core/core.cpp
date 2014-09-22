@@ -93,7 +93,7 @@ int Core::run()
         _hwManager.setStateHook(HWManager::HookType::DHCP, [this] (bool state) { _networkConfig.setDHCP(state); } );
         _hwManager.setStateHook(HWManager::HookType::DefaultIp, [this] (bool state) { _networkConfig.setCustomIP(state); } );
         _hwManager.setStateHook(HWManager::HookType::Reset, [this] (bool state) { setResetSwitch(state); } );
-        _hwconfig.deserialize();
+        _hwconfig.load();
         LOG() << "devices are up";
         _hwManager.start();
         do {
@@ -105,7 +105,7 @@ int Core::run()
             }
         } while (_resetSwitch);
         LOG() << "hwmanager started";
-        _coreConfig.deserialize();
+        _coreConfig.load();
         LOG() << "core config loaded";
         _networkConfig.reload();
         LOG() << "network loaded";
@@ -127,9 +127,9 @@ int Core::run()
         LOG() << "exiting core loop";
         _hwManager.stop();
         LOG() << "hwmanager stopped";
-        _coreConfig.serialize();
+        _coreConfig.save();
         LOG() << "core config unloaded";
-        _hwconfig.serialize();
+        _hwconfig.save();
         LOG() << "devices are down";
         return (_resetSwitch);
     }
