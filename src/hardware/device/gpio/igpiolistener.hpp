@@ -9,12 +9,23 @@
 
 #include "gpio.hpp"
 
+/**
+* Interface for object registered to a GPIOProvider.
+*/
 class IGPIOListener
 {
 public:
     virtual ~IGPIOListener() {}
-    virtual void    notify(int gpioNo) = 0; // NOTE An interrupt was caught
-    virtual void    timeout() = 0; // NOTE Called when poll() times out
+
+    /**
+    * Interrupt on GPIO number gpioNo detected.
+    */
+    virtual void    notify(int gpioNo) = 0;
+
+    /**
+    * The GPIOManager poll() call has timed out.
+    */
+    virtual void    timeout() = 0;
 };
 
 #endif // IGPIOLISTENER_HPP

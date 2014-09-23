@@ -31,6 +31,11 @@ public:
     virtual ModuleType          getType() const override;
     virtual void                serialize(ptree& node) override;
     virtual void                deserialize(const ptree& node) override;
+
+    /**
+    * Called by WiegandRequested to notify a access was attempted.
+    * This will build a AuthCommand and send it.
+    */
     virtual void                notifyAccess(const std::string& request) override;
     virtual void                notifyResponse(bool granted) override;
 
