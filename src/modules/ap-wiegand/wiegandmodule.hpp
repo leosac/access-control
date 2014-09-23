@@ -15,6 +15,9 @@
 #include "hardware/ihwmanager.hpp"
 #include "wiegandrequester.hpp"
 
+/**
+* Module that handle WiegandReader. it *looks* like it can only handle 1 reader.
+*/
 class WiegandModule : public IAccessPointModule
 {
     using RequesterList = std::list<IAccessRequester*>;

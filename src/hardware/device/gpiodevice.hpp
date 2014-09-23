@@ -12,6 +12,9 @@
 
 class GPIO;
 
+/**
+* General GPIO Device object. It is configurable from a config file and wraps a GPIO object.
+*/
 class GpioDevice : public IXmlSerializable
 {
 public:

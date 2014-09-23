@@ -55,7 +55,7 @@ bool Authenticator::hasAccess(const CSN& csn)
 }
 
 void Authenticator::authorizeCard(const Authenticator::CSN& csn)
-{make CXXFLAGS='-DTRAVIS_CI_BUILD' check
+{
     _csnList.push_back(csn);
 }
 

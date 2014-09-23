@@ -26,6 +26,8 @@ class IGPIOListener;
 
 /**
 * Poll on the GPIO (managed through sysfs) and notify its listener when interruption are received on any GPIO.
+*
+* The polling happens in a new thread.
 */
 class GPIOManager : public IGPIOProvider
 {
@@ -58,6 +60,9 @@ public:
     void                setGpioAlias(int gpioNo, const std::string& alias);
 
 public:
+    /**
+    * Start polling on GPIO. In a new thread.
+    */
     void    startPolling();
     void    stopPolling();
 

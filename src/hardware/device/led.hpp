@@ -13,6 +13,9 @@
 #include "hardware/iserializabledevice.hpp"
 #include "gpiodevice.hpp"
 
+/**
+* Represents a Led device, controlled through GPIO.
+*/
 class Led : public ISerializableDevice
 {
 public:
@@ -35,6 +38,9 @@ public:
 
 private:
     const std::string   _name;
+    /**
+    * The underlying device object that controls the LED. (gpio pins)
+    */
     GpioDevice          _gpioDevice;
     std::atomic<int>    _count;
 };

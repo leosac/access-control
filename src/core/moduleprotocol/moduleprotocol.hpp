@@ -26,6 +26,12 @@ class IAuthModule;
 class IMonitorModule;
 class ILoggerModule;
 
+/**
+* This module is the communication hub of the system.
+*
+* It receives authentication request from various requester and forward them to the auth module.
+* It handle the response and notifies the access point and the door module of the result.
+*/
 class ModuleProtocol : public IModuleProtocol
 {
     static const int AuthRequestValidity;
