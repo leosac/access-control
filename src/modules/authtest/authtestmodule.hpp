@@ -12,6 +12,9 @@
 #include "tools/unixfilewatcher.hpp"
 #include "authenticator.hpp"
 
+/**
+* Handle authentication request, and answer by sending a command to the ModuleProtocol.
+*/
 class AuthTestModule : public IAuthModule
 {
 public:

@@ -37,7 +37,15 @@ public:
     Uid                         getId() const;
     int                         getState() const;
     void                        setState(int state);
+
+    /**
+    * Returns the targeted device, meaning the device we are trying to access (door)
+    */
     const std::string&          getTarget() const;
+
+    /**
+    * Returns the source of the auth request, this should be the name of the access point that initiated the request.
+    */
     const std::string&          getSource() const;
     const std::string&          getContent() const;
     system_clock::time_point    getTime() const;

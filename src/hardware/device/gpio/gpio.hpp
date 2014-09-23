@@ -9,6 +9,9 @@
 
 #include <string>
 
+/**
+* Representation of a GPIO pin. Modifying its state require writing to SYSFS.
+*/
 class GPIO
 {
     static const std::string    ExportPath;
