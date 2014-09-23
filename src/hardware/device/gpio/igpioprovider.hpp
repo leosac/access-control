@@ -11,6 +11,9 @@
 
 class GPIO;
 
+/**
+* Provides an interface for implementing GPIO control code.
+*/
 class IGPIOProvider
 {
 public:

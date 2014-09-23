@@ -24,6 +24,9 @@ extern "C" {
 
 class IGPIOListener;
 
+/**
+* Poll on the GPIO (managed through sysfs) and notify its listener when interruption are received on any GPIO.
+*/
 class GPIOManager : public IGPIOProvider
 {
     static const int            DefaultTimeout = 100;

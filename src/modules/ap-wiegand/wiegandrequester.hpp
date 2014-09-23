@@ -13,6 +13,11 @@
 
 class WiegandReader;
 
+/**
+* Build auth request?
+* Listen to wiegand event from WiegandReader device, gather data and notify WiegandModule (IAccessPointModule)
+* that a card was read.
+*/
 class WiegandRequester : public IWiegandListener, public IAccessRequester
 {
 public:
