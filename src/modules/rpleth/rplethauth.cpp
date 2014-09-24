@@ -53,13 +53,15 @@ void RplethAuth::authenticate(const AuthRequest& ar)
 {
     std::istringstream          iss(ar.getContent());
     CardId                      cid;
-    unsigned int                byte;
+    std::uint8_t                byte;
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
 
     while (iss >> byte)
         cid.push_back(static_cast<Byte>(byte));
 
     _cardIdQueue.push(cid);
+    LOG() << "Card id length = " << cid.size();
+    LOG() << "Will authorized the cmd with id = " << std::string((char *)&cid[0], cid.size());
     _core.getModuleProtocol().cmdAuthorize(ar.getId(), true);
 }
 
