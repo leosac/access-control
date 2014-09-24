@@ -50,11 +50,17 @@ void RplethAuth::deserialize(const ptree& node)
 {
     _port = node.get<Rezzo::UnixSocket::Port>("port", Rezzo::ISocket::Port(DefaultPort));
     std::string green_led_device_name = node.get("greenLed", "");
+    std::string buzzer_device_name = node.get("buzzer", "");
 
     if (!green_led_device_name.empty())
     {
         greenLed_ = _core.getHWManager().getDevice(green_led_device_name);
     }
+    if (!buzzer_device_name.empty())
+    {
+        buzzer_ = _core.getHWManager().getDevice(buzzer_device_name);
+    }
+
 
     _networkThread = std::thread([this] () { run(); } );
 }

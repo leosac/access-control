@@ -18,6 +18,43 @@
 #include "network/isocket.hpp"
 #include "network/circularbuffer.hpp"
 
+/**
+* This is a AuthModule that (partially) implements Rpleth.
+*
+* @note
+* All access request are ACCEPTED. The card ID is extracted from
+* the AuthRequest, and send to connected clients.
+
+* @note
+* This module supports ONE wiegand reader. It can control the green led
+* and the buzzer of the device (by handling request from remote client).
+*
+* Configuration example:
+*
+* in `hardware.xml`:
+* @verbatim
+<device type="led" name="wiegand_green_led">
+    <gpio pin="3" activelow="1"/>
+</device>
+<device type="led" name="wiegand_buzzer">
+  <!-- This a the buzzer (BEEP) for the wiegand read. Led is the
+  device that make most sense -->
+  <gpio pin="25" activelow="1" />
+</device>
+@endverbatim
+*
+* in `core.xml`:
+* @verbatim
+ <module file="librpleth.so">
+     <alias>rpleth_frontend</alias>
+     <properties>
+        <port>4242</port>
+        <greenLed>wiegand_green_led</greenLed>
+        <buzzer>wiegand_buzzer</buzzer>
+      </properties>
+ </module>
+ @endverbatim
+*/
 class RplethAuth : public IAuthModule
 {
     static const Rezzo::ISocket::Port   DefaultPort = 9559;
