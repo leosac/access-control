@@ -50,6 +50,11 @@ private:
     void    run();
     void    buildSelectParams();
     void    handleClientMessage(Client& client);
+
+    /**
+    * This method will flush the cardIdQueue to the connected clients, effectively notifying them of
+    * activity by sending the card id that was read.
+    */
     void    handleCardIdQueue();
 
 private:
@@ -58,6 +63,10 @@ private:
     std::atomic<bool>       _isRunning;
     std::thread             _networkThread;
     Rezzo::ISocket*         _serverSocket;
+
+    /**
+    * This a queue of all card ID yet to be send over the network.
+    */
     std::queue<CardId>      _cardIdQueue;
     std::mutex              _cardIdQueueMutex;
     Rezzo::ISocket::Port    _port;

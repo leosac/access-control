@@ -14,6 +14,7 @@ extern "C" {
 
 #include <sstream>
 #include <cerrno>
+#include <cassert>
 
 #include "tools/unixsyscall.hpp"
 #include "exception/moduleexception.hpp"
@@ -39,7 +40,8 @@ UnixSocket::UnixSocket(Protocol protocol)
         protoName = "UDP";
         type = SOCK_DGRAM;
     }
-    if ((proto = getprotobyname(protoName.c_str())))
+    assert(protoName.size() == 3);
+    if ((proto = getprotobyname(protoName.c_str()))) // fixme: for some reason triggers valgrind invalid read
         protoId = proto->p_proto;
     if ((_handle = ::socket(AF_INET, type, protoId)) == -1)
         throw (ModuleException(UnixSyscall::getErrorString("socket", errno)));
