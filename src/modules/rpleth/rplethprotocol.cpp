@@ -1,17 +1,20 @@
 /**
- * \file rplethprotocol.cpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief Rpleth protocol implementation
- */
+* \file rplethprotocol.cpp
+* \author Thibault Schueller <ryp.sqrt@gmail.com>
+* \brief Rpleth protocol implementation
+*/
 
 #include "rplethprotocol.hpp"
+#include "rplethauth.hpp"
 
 #include <vector>
+#include <tools/log.hpp>
+#include <hardware/device/led.hpp>
 
-RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
+RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer)
 {
-    RplethPacket    packet(RplethPacket::Sender::Client);
-    std::size_t     toRead = buffer.toRead();
+    RplethPacket packet(RplethPacket::Sender::Client);
+    std::size_t toRead = buffer.toRead();
 
     packet.status = Success;
     packet.isGood = false;
@@ -39,7 +42,7 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
     return (packet);
 }
 
-std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size)
+std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buffer, std::size_t size)
 {
     if (size < packet.dataLen + 5U) // Buffer is too small
         return (0);
@@ -61,14 +64,50 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buff
         return (packet.dataLen + 4);
 }
 
-RplethPacket RplethProtocol::processClientPacket(const RplethPacket& packet)
+RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const RplethPacket &packet)
 {
     RplethPacket response = packet;
 
     response.sender = RplethPacket::Sender::Server;
     if (response.type == Rpleth && response.command == Ping)
+    {
         response.status = Success;
+    }
+    else if (response.type == HID && response.command == Greenled)
+    {
+        Led *led;
+        if ((led = dynamic_cast<Led *>(module->getGreenLed())))
+        {
+            assert(packet.data.size() > 0);
+            if (packet.data[0] == 0x01)
+                led->turnOn();
+            else if (packet.data[0] == 0x00)
+                led->turnOff();
+        }
+        else
+        {
+            LOG() << "Cannot turn green led on/off -- no such device";
+        }
+    }
+    else if (response.type == HID && response.command == Beep)
+    {
+        Led *led;
+        if ((led = dynamic_cast<Led *>(module->getBuzzer())))
+        {
+            assert(packet.data.size() > 0);
+            if (packet.data[0] == 0x01)
+                led->turnOn();
+            else if (packet.data[0] == 0x00)
+                led->turnOff();
+        }
+        else
+        {
+            LOG() << "Cannot BEEP -- no beep device.";
+        }
+    }
     else
+    {
         response.status = Success; // Default response
+    }
     return (response);
 }
