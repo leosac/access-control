@@ -7,6 +7,7 @@
 #include "rplethauth.hpp"
 
 #include <sstream>
+#include <iostream>
 
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
@@ -21,6 +22,8 @@ RplethAuth::RplethAuth(ICore& core, const std::string& name)
     _isRunning(true),
     _serverSocket(nullptr),
     _port(0),
+    greenLed_(nullptr),
+    buzzer_(nullptr),
     _fdMax(0),
     _timeout(DefaultTimeoutMs)
 {}
@@ -46,6 +49,19 @@ void RplethAuth::serialize(ptree& node)
 void RplethAuth::deserialize(const ptree& node)
 {
     _port = node.get<Rezzo::UnixSocket::Port>("port", Rezzo::ISocket::Port(DefaultPort));
+    std::string green_led_device_name = node.get("greenLed", "");
+    std::string buzzer_device_name = node.get("buzzer", "");
+
+    if (!green_led_device_name.empty())
+    {
+        greenLed_ = _core.getHWManager().getDevice(green_led_device_name);
+    }
+    if (!buzzer_device_name.empty())
+    {
+        buzzer_ = _core.getHWManager().getDevice(buzzer_device_name);
+    }
+
+
     _networkThread = std::thread([this] () { run(); } );
 }
 
@@ -56,8 +72,14 @@ void RplethAuth::authenticate(const AuthRequest& ar)
     unsigned int                byte;
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
 
-    while (iss >> byte)
+    while (!iss.eof())
+    {
+        iss >> std::hex >> byte;
         cid.push_back(static_cast<Byte>(byte));
+        // drop the colon delimeter
+        char trash;
+        iss >> trash;
+    }
 
     _cardIdQueue.push(cid);
     _core.getModuleProtocol().cmdAuthorize(ar.getId(), true);
@@ -137,7 +159,7 @@ void RplethAuth::handleClientMessage(RplethAuth::Client& client)
         packet = RplethProtocol::decodeCommand(client.buffer);
         if (!packet.isGood)
             break;
-        RplethPacket response = RplethProtocol::processClientPacket(packet);
+        RplethPacket response = RplethProtocol::processClientPacket(this, packet);
         std::size_t size = RplethProtocol::encodeCommand(response, _buffer, RingBufferSize);
         client.socket->send(_buffer, size);
     }
@@ -168,4 +190,14 @@ void RplethAuth::handleCardIdQueue()
                 client.socket->send(_buffer, size);
         }
     }
+}
+
+IDevice *RplethAuth::getBuzzer() const
+{
+    return buzzer_;
+}
+
+IDevice *RplethAuth::getGreenLed() const
+{
+    return greenLed_;
 }
