@@ -12,6 +12,7 @@
 #include <atomic>
 #include <queue>
 #include <mutex>
+#include <hardware/idevice.hpp>
 
 #include "modules/iauthmodule.hpp"
 #include "network/isocket.hpp"
@@ -69,7 +70,27 @@ private:
     */
     std::queue<CardId>      _cardIdQueue;
     std::mutex              _cardIdQueueMutex;
+
+    /**
+    * Network port we bind to, and listen to client.
+    */
     Rezzo::ISocket::Port    _port;
+    IDevice                 *greenLed_;
+    IDevice                 *buzzer_;
+
+public:
+    /**
+    * Retrieve the buzzer. May be null.
+    */
+    IDevice *getBuzzer() const;
+
+    /**
+    * Retrieve a pointer to the device handling the Green Led device.
+    * This pointer MAY be null.
+    */
+    IDevice * getGreenLed() const;
+
+private:
     std::list<Client>       _clients;
     fd_set                  _rSet;
     int                     _fdMax;
