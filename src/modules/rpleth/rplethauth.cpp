@@ -7,6 +7,7 @@
 #include "rplethauth.hpp"
 
 #include <sstream>
+#include <iostream>
 
 #include "network/unixsocket.hpp"
 #include "rplethprotocol.hpp"
@@ -53,15 +54,19 @@ void RplethAuth::authenticate(const AuthRequest& ar)
 {
     std::istringstream          iss(ar.getContent());
     CardId                      cid;
-    std::uint8_t                byte;
+    unsigned int                byte;
     std::lock_guard<std::mutex> lg(_cardIdQueueMutex);
 
-    while (iss >> byte)
+    while (!iss.eof())
+    {
+        iss >> std::hex >> byte;
         cid.push_back(static_cast<Byte>(byte));
+        // drop the colon delimeter
+        char trash;
+        iss >> trash;
+    }
 
     _cardIdQueue.push(cid);
-    LOG() << "Card id length = " << cid.size();
-    LOG() << "Will authorized the cmd with id = " << std::string((char *)&cid[0], cid.size());
     _core.getModuleProtocol().cmdAuthorize(ar.getId(), true);
 }
 
