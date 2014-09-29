@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <hardware>
-    <platform name="RaspberryPi rev2"/>
+    <platform name="raspberry_piface" />
     <devices>
+        <device type="led" name="led1">
+            <gpio pin="10"/>
+        </device>
         <device type="wiegandreader" name="r10reader">
             <logpio pin="2" />
             <higpio pin="0" />

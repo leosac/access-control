@@ -8,18 +8,12 @@
 
 void PFDigital::poll()
 {
+    uint8_t states;
+    bool timeout = (pifacedigital_wait_for_input2(&states, 200, 0) > 0 ? false : true);
 
-  //  LOG() << "WILL WAIT_FOR_INPUT";
-    std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    uint8_t ret = pifacedigital_wait_for_input(400, 0);
-    // we cannot know if wait_for_input timeout'd or not.
-    // we try to figure this out ourselve.
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-    auto msElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-    if (msElapsed >= 400)
+    if (timeout)
     {
-       // LOG() << "Timeout";
+        LOG() << "Timeout";
         for (int i = 0; i < 8; ++i)
         {
             for (auto &listener : listeners_[i])
@@ -30,20 +24,20 @@ void PFDigital::poll()
     }
     else
     {
-      //  std::cout << "Bit state: {";
+       // std::cout << "Bit state: {";
         for (int i = 0; i < 8; ++i)
         {
-         //   std::cout << (int) ((ret >> i) & 0x01);
+          //  std::cout << (int) ((states >> i) & 0x01);
             // LOG() << "Input (" << i << ")  --> " << ((ret >> i) & 0x01);
             for (auto &listener : listeners_[i])
             {
-                if (((ret >> i) & 0x01) == 0)
+                if (((states >> i) & 0x01) == 0)
                 {
                     listener->notify(i);
                 }
             }
         }
-     //   std::cout << "}" << std::endl;
+     //  std::cout << "}" << std::endl;
     }
     // process write order
     std::lock_guard<std::mutex> lock(order_queue_lock);
