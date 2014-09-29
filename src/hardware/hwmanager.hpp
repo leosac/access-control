@@ -7,6 +7,7 @@
 #ifndef HWMANAGER_HPP
 #define HWMANAGER_HPP
 
+#include <hardware/device/gpio/pfdigital.hpp>
 #include "ihwmanager.hpp"
 #include "config/xmlconfig.hpp"
 #include "config/ixmlserializable.hpp"
@@ -57,6 +58,7 @@ private:
     ISerializableDevice*    buildDevice(const std::string& type, const std::string& name);
 
 private:
+    PFDigital                       pfdigital_gpio_manager_;
     GPIOManager                     _gpioManager;
     PlatformInfo                    _platform;
     std::map<std::string, Device>   _devices;
