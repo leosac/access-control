@@ -97,14 +97,20 @@ void HWManager::start()
 {
     if (Leosac::Platform == Leosac::PlatformType::NoHardware)
         return;
-    _gpioManager.startPolling();
+    if (_platform.name == "raspberry_piface")
+        pfdigital_gpio_manager_.start_poll();
+    else
+        _gpioManager.startPolling();
 }
 
 void HWManager::stop()
 {
     if (Leosac::Platform == Leosac::PlatformType::NoHardware)
         return;
-    _gpioManager.stopPolling();
+    if (_platform.name == "raspberry_piface")
+        pfdigital_gpio_manager_.stop_poll();
+    else
+        _gpioManager.stopPolling();
 }
 
 IDevice* HWManager::getDevice(const std::string& name)
@@ -131,6 +137,8 @@ const IHWManager::PlatformInfo& HWManager::getPlatformInfo() const
 ISerializableDevice* HWManager::buildDevice(const std::string& type, const std::string& name)
 {
     IGPIOProvider *provider;
+    // use an other gpio manager is the platform is piface.
+    // this is rather hacky but should work for now.
     if (_platform.name == "raspberry_piface")
     {
         provider = &pfdigital_gpio_manager_;

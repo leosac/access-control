@@ -30,6 +30,7 @@ set(LEOSAC_LIB_SRCS
     hardware/device/gpio/gpio.cpp
     hardware/device/gpio/AGPIO.cpp
     hardware/device/gpio/pfdigital.cpp
+    hardware/device/gpio/PFDigitalGPIO.cpp
     tools/leosac.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp

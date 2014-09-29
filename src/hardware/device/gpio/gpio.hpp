@@ -42,27 +42,32 @@ public:
 
 public:
     explicit GPIO(int pinNo, const std::string& sysfsName);
+
+    /**
+    * This constructor is used by PFDigitalGPIO
+    */
+    explicit GPIO(int pinNo);
     ~GPIO();
 
     GPIO(const GPIO& other) = delete;
     GPIO& operator=(const GPIO& other) = delete;
 
 public:
-    int                 getPinNo() const;
-    const std::string&  getPath() const;
-    int                 getPollFd() const;
+    virtual int                 getPinNo() const;
+    virtual const std::string&  getPath() const;
+    virtual int                 getPollFd() const;
 
 public:
-    Direction   getDirection() const;
-    void        setDirection(Direction direction) const;
-    bool        getValue() const;
-    void        setValue(bool value) const;
-    void        setValue(Value value) const;
-    bool        isActiveLow() const;
-    void        setActiveLow(bool state) const;
-    bool        hasInterruptsSupport() const;
-    EdgeMode    getEdgeMode() const;
-    void        setEdgeMode(EdgeMode mode) const;
+    virtual Direction   getDirection() const;
+    virtual void        setDirection(Direction direction) const;
+    virtual bool        getValue() const;
+    virtual void        setValue(bool value) const;
+    virtual void        setValue(Value value) const;
+    virtual bool        isActiveLow() const;
+    virtual void        setActiveLow(bool state) const;
+    virtual bool        hasInterruptsSupport() const;
+    virtual EdgeMode    getEdgeMode() const;
+    virtual void        setEdgeMode(EdgeMode mode) const;
 
 private:
     bool    exists() const;
