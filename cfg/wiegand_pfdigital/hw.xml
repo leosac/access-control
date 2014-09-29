@@ -3,8 +3,8 @@
     <platform name="RaspberryPi rev2"/>
     <devices>
         <device type="wiegandreader" name="r10reader">
-            <logpio pin="1" />
-            <higpio pin="2" />
+            <logpio pin="2" />
+            <higpio pin="0" />
         </device>
     </devices>
 </hardware>

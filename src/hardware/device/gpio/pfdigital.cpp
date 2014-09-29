@@ -9,7 +9,7 @@
 void PFDigital::poll()
 {
 
-    LOG() << "WILL WAIT_FOR_INPUT";
+  //  LOG() << "WILL WAIT_FOR_INPUT";
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     uint8_t ret = pifacedigital_wait_for_input(100, 0);
     // we cannot know if wait_for_input timeout'd or not.
@@ -19,6 +19,7 @@ void PFDigital::poll()
 
     if (msElapsed >= 100)
     {
+       // LOG() << "Timeout";
         for (int i = 0; i < 8; ++i)
         {
             for (auto &listener : listeners_[i])
@@ -36,11 +37,14 @@ void PFDigital::poll()
             // LOG() << "Input (" << i << ")  --> " << ((ret >> i) & 0x01);
             for (auto &listener : listeners_[i])
             {
-                listener->notify(i);
+                if (((ret >> i) & 0x01) == 0)
+                {
+                    listener->notify(i);
+                }
             }
         }
+        std::cout << "}" << std::endl;
     }
-    std::cout << "}" << std::endl;
     // process write order
     std::lock_guard<std::mutex> lock(order_queue_lock);
     while (order_queue.size())
