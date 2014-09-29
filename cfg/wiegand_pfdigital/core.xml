@@ -14,7 +14,7 @@
             <doorconf>door.conf</doorconf>
             <buzzer>none</buzzer>
             <doorRelay>none</doorRelay>
-            <grantedLed>none</grantedLed>
+            <grantedLed>led1</grantedLed>
         </properties>
     </module>
     <module file="libjournal.so">
