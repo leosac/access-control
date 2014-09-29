@@ -74,7 +74,7 @@ private:
     void    exportGpio() const;
     void    unexportGpio() const;
 
-private:
+protected:
     const int           _pinNo;
     const std::string   _path;
     const std::string   _directionFile;
