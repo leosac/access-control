@@ -17,3 +17,18 @@ void PFDigital::poll()
 
     pifacedigital_close(0);
 }
+
+GPIO *PFDigital::getGPIO(int gpioNo)
+{
+    return nullptr;
+}
+
+void PFDigital::registerListener(IGPIOListener *listener, GPIO *gpio)
+{
+    listeners_[gpio->getPinNo()].push_back(listener);
+}
+
+void PFDigital::unregisterListener(IGPIOListener *listener, GPIO *gpio)
+{
+    listeners_[gpio->getPinNo()].remove(listener);
+}

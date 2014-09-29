@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<hardware>
+    <platform name="RaspberryPi rev2"/>
+    <devices>
+        <device type="led" name="led1">
+            <gpio pin="3"/>
+        </device>
+        <device type="wiegandreader" name="r10reader">
+            <logpio pin="1" direction="in" interruptmode="falling"/>
+            <higpio pin="2" direction="in" interruptmode="falling"/>
+        </device>
+    </devices>
+</hardware>
