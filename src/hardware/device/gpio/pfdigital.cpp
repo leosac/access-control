@@ -11,13 +11,13 @@ void PFDigital::poll()
 
   //  LOG() << "WILL WAIT_FOR_INPUT";
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-    uint8_t ret = pifacedigital_wait_for_input(100, 0);
+    uint8_t ret = pifacedigital_wait_for_input(400, 0);
     // we cannot know if wait_for_input timeout'd or not.
     // we try to figure this out ourselve.
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     auto msElapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    if (msElapsed >= 100)
+    if (msElapsed >= 400)
     {
        // LOG() << "Timeout";
         for (int i = 0; i < 8; ++i)
@@ -30,10 +30,10 @@ void PFDigital::poll()
     }
     else
     {
-        std::cout << "Bit state: {";
+      //  std::cout << "Bit state: {";
         for (int i = 0; i < 8; ++i)
         {
-            std::cout << (int) ((ret >> i) & 0x01);
+         //   std::cout << (int) ((ret >> i) & 0x01);
             // LOG() << "Input (" << i << ")  --> " << ((ret >> i) & 0x01);
             for (auto &listener : listeners_[i])
             {
@@ -43,16 +43,18 @@ void PFDigital::poll()
                 }
             }
         }
-        std::cout << "}" << std::endl;
+     //   std::cout << "}" << std::endl;
     }
     // process write order
     std::lock_guard<std::mutex> lock(order_queue_lock);
     while (order_queue.size())
     {
+        LOG() << "WRITING TO GPIO";
         std::pair<int, bool> p = order_queue.front();
         order_queue.pop();
+        assert(p.first >= 8 && p.first <= 15); // OUTPUT pin start at 8.
 
-        pifacedigital_write_bit(p.second ? 1 : 0, p.first, OUTPUT, 0);
+        pifacedigital_write_bit(p.second ? 1 : 0, p.first - 8, OUTPUT, 0);
     }
 }
 
