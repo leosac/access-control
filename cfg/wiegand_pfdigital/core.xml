@@ -15,6 +15,7 @@
             <buzzer>none</buzzer>
             <doorRelay>none</doorRelay>
             <grantedLed>led1</grantedLed>
+            <deniedLed>led2</deniedLed>
         </properties>
     </module>
     <module file="libjournal.so">
