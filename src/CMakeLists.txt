@@ -42,6 +42,20 @@ if (LEOSAC_PLATFORM)
     add_subdirectory(hardware/device/platforms)
 endif()
 
+
+## Finding libpifacedigital
+find_library(
+    LIB_PIFACE_DIGITAL pifacedigital
+    HINTS "../libpifacedigital"
+)
+
+if(${LIB_I_NEED} STREQUAL "LIB_I_NEED-NOTFOUND")
+    message(FATAL_ERROR "Couldn't find the 'pifacedigital' library")
+endif()
+
+message(STATUS "Found 'pifacedigitial' at: ${LIB_PIFACE_DIGITAL}")
+
+
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
 
@@ -69,7 +83,7 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
     INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
-target_link_libraries(${LEOSAC_LIB} dl pthread ${Boost_LIBRARIES})
+target_link_libraries(${LEOSAC_LIB} dl pthread ${Boost_LIBRARIES} ${LIB_PIFACE_DIGITAL})
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)
