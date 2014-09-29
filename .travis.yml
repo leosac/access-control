@@ -26,9 +26,9 @@ install:
     # -- workaround end
 before_script:
     - mkdir build && pushd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi;
 script:
-    - make
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make ;fi;
 after_success:
     - sudo make install
     - ctest --output-on-failure
@@ -53,3 +53,18 @@ before_deploy:
     - bash scripts/travis_makepkg.sh
     - popd
     - LEOSAC_DEB="`find * -maxdepth 0 -name leosac_*.deb`"
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "EW8MSkUc99OH4F9y/k8qZb1pzLx+UQRNl7JY4X57SXx6TWhYj9ufnddsS8md4yydU2m6vhW2o16lYOh/0EqMFB0+zj/5syc+gDprhQ7ahaECdBCqVQT9zB5PqGWE+Sv1JkZQ2eHBYEJhHnC7NXKcVEqT+N8O320m5mdWqfdA4Hs="
+
+addons:
+  coverity_scan:
+    project:
+      name: "islog/leosac"
+      description: "Build submitted via Travis CI"
+    notification_email: kapp.arno@gmail.com
+    build_command_prepend: "cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis"
+    build_command:   "make"
+    branch_pattern: develop
