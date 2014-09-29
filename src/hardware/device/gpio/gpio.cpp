@@ -47,6 +47,11 @@ GPIO::GPIO(int pinNo, const std::string& sysfsName)
     _interruptsSupport = UnixFs::fileExists(_edgeFile);
 }
 
+GPIO::GPIO(int pinNo) :
+_pinNo(pinNo)
+{
+}
+
 GPIO::~GPIO()
 {
     try {

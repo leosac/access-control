@@ -1,5 +1,6 @@
 #include "pfdigital.hpp"
 #include "pifacedigital.h"
+#include "PFDigitalGPIO.hpp"
 #include <cassert>
 #include <tools/log.hpp>
 
@@ -20,7 +21,8 @@ void PFDigital::poll()
 
 GPIO *PFDigital::getGPIO(int gpioNo)
 {
-    return nullptr;
+    LOG() << "Someone is asking a reference on PIN " << gpioNo;
+    return new PFDigitalGPIO(gpioNo);
 }
 
 void PFDigital::registerListener(IGPIOListener *listener, GPIO *gpio)
@@ -31,4 +33,30 @@ void PFDigital::registerListener(IGPIOListener *listener, GPIO *gpio)
 void PFDigital::unregisterListener(IGPIOListener *listener, GPIO *gpio)
 {
     listeners_[gpio->getPinNo()].remove(listener);
+}
+
+void PFDigital::start_poll()
+{
+    run_ = true;
+    _pollThread = std::thread([this] () { poll_loop(); } );
+}
+
+void PFDigital::stop_poll()
+{
+    run_ = false;
+    _pollThread.join();
+}
+
+PFDigital::PFDigital()
+{
+
+}
+
+void PFDigital::poll_loop()
+{
+    while (run_)
+    {
+    LOG() << "Polling...";
+        poll();
+    }
 }
