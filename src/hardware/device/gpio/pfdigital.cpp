@@ -23,11 +23,8 @@ void PFDigital::poll()
     }
     else
     {
-       // std::cout << "Bit state: {";
         for (int i = 0; i < 8; ++i)
         {
-          //  std::cout << (int) ((states >> i) & 0x01);
-            // LOG() << "Input (" << i << ")  --> " << ((ret >> i) & 0x01);
             for (auto &listener : listeners_[i])
             {
                 if (((states >> i) & 0x01) == 0)
@@ -36,18 +33,6 @@ void PFDigital::poll()
                 }
             }
         }
-     //  std::cout << "}" << std::endl;
-    }
-    // process write order
-    std::lock_guard<std::mutex> lock(order_queue_lock);
-    while (order_queue.size())
-    {
-        LOG() << "WRITING TO GPIO";
-        std::pair<int, bool> p = order_queue.front();
-        order_queue.pop();
-        assert(p.first >= 8 && p.first <= 15); // OUTPUT pin start at 8.
-
-        pifacedigital_write_bit(p.second ? 1 : 0, p.first - 8, OUTPUT, 0);
     }
 }
 
@@ -89,8 +74,8 @@ void PFDigital::poll_loop()
 {
     while (run_)
     {
-      //  LOG() << "Polling...";
         poll();
+        flush_write();
     }
 }
 
@@ -105,4 +90,18 @@ PFDigital::~PFDigital()
 {
     LOG() << "Shutting down PF digital GPIO manager.";
     pifacedigital_close(0);
+}
+
+void PFDigital::flush_write()
+{
+    std::lock_guard<std::mutex> lock(order_queue_lock);
+    while (order_queue.size())
+    {
+        LOG() << "WRITING TO GPIO";
+        std::pair<int, bool> p = order_queue.front();
+        order_queue.pop();
+        assert(p.first >= 8 && p.first <= 15); // OUTPUT pin start at 8.
+
+        pifacedigital_write_bit(p.second ? 1 : 0, p.first - 8, OUTPUT, 0);
+    }
 }
