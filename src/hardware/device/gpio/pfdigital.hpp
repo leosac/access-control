@@ -39,12 +39,23 @@ private:
 
     void poll_loop();
 
+
+    /**
+    * Since write to a GPIO are asynchronous, this flush pending write.
+    * This is done after each polliong phase.
+    */
+    void flush_write();
+
     bool run_;
     std::thread             _pollThread;
     std::mutex              order_queue_lock;
 
-    // the "write" GPIO value order queue.
-    // since we cant use libpifacedigital from multiple thread, we queue those write orders.
+    /**
+    * The "write" GPIO value order queue.
+    * Since we cant use libpifacedigital from multiple thread, we queue those write orders.
+    *
+    * The pair is (gpioNo, value).
+    */
     std::queue<std::pair<int, bool>> order_queue;
 
     /**
