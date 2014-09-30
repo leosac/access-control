@@ -49,7 +49,7 @@ endif()
 ## Finding libpifacedigital
 find_library(
     LIB_PIFACE_DIGITAL pifacedigital
-    HINTS "../libpifacedigital"
+    HINTS "${CMAKE_SOURCE_DIR}/libpifacedigital"
 )
 
 if(${LIB_PIFACE_DIGITAL} STREQUAL "LIB_PIFACE_DIGITAL-NOTFOUND")
@@ -61,7 +61,7 @@ message(STATUS "Found 'pifacedigitial' at: ${LIB_PIFACE_DIGITAL}")
 ## Finding libmcp23s17
 find_library(
     LIB_MCP23S17 mcp23s17
-    HINTS "../libmcp23s17"
+    HINTS "${CMAKE_SOURCE_DIR}/libmcp23s17"
 )
 
 if(${LIB_MCP23S17} STREQUAL "LIB_MCP23S17-NOTFOUND")

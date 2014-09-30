@@ -25,6 +25,9 @@ install:
     - popd
     # -- workaround end
 before_script:
+	## Manually build libpifacedigital and libmcp23s17
+    - pushd libpifacedigital; make; popd;
+    - pushd libmcp23s17; make; popd;
     - mkdir build && pushd build
 script:
     - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi
