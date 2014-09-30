@@ -3,13 +3,12 @@
 #include "PFDigitalGPIO.hpp"
 #include <cassert>
 #include <iostream>
-#include <chrono>
 #include <tools/log.hpp>
 
 void PFDigital::poll()
 {
     uint8_t states;
-    bool timeout = (pifacedigital_wait_for_input2(&states, 200, 0) > 0 ? false : true);
+    bool timeout = (pifacedigital_wait_for_input2(&states, 100, 0) > 0 ? false : true);
 
     if (timeout)
     {
@@ -104,5 +103,6 @@ void PFDigital::set_pin_value(int pinNo, bool v)
 
 PFDigital::~PFDigital()
 {
+    LOG() << "Shutting down PF digital GPIO manager.";
     pifacedigital_close(0);
 }

@@ -91,14 +91,14 @@ RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const Rplet
     }
     else if (response.type == HID && response.command == Beep)
     {
-        Led *led;
-        if ((led = dynamic_cast<Led *>(module->getBuzzer())))
+        Led *buzzer;
+        if ((buzzer = dynamic_cast<Led *>(module->getBuzzer())))
         {
             assert(packet.data.size() > 0);
             if (packet.data[0] == 0x01)
-                led->turnOn();
+                buzzer->turnOn();
             else if (packet.data[0] == 0x00)
-                led->turnOff();
+                buzzer->turnOff();
         }
         else
         {
