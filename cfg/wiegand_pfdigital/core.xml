@@ -14,17 +14,18 @@
             <doorconf>door.conf</doorconf>
             <buzzer>none</buzzer>
             <doorRelay>none</doorRelay>
-            <grantedLed>led1</grantedLed>
-            <deniedLed>led2</deniedLed>
+            <deniedLed>denied_led</deniedLed>
+            <grantedLed>wiegand_green</grantedLed>
         </properties>
     </module>
     <module file="libjournal.so">
         <alias>log</alias>
         <properties/>
     </module>
+    <!-- In this config, the door controls the wiegand led -->
     <module file="libwiegand.so">
         <alias>reader</alias>
-        <properties>
+        <properties>@
             <target>door</target>
             <readerDevice>r10reader</readerDevice>
         </properties>

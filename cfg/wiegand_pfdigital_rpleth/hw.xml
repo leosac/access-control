@@ -6,12 +6,19 @@
     -->
     <platform name="raspberry_piface" />
     <devices>
+        <!-- This is RELAY 1 -->
         <device type="led" name="wiegand_green">
-            <gpio pin="15"/>
+            <gpio pin="9"/>
         </device>
+        <!-- This is RELAY 2 -->
         <device type="led" name="wiegand_buzz">
-            <gpio pin="13"/>
+            <gpio pin="8"/>
         </device>
+
+        <device type="led" name="denied_led">
+            <gpio pin="15"></gpio>
+        </device>
+
         <device type="wiegandreader" name="r10reader">
             <logpio pin="2" />
             <higpio pin="0" />

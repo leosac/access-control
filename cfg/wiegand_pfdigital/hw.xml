@@ -6,11 +6,11 @@
     -->
     <platform name="raspberry_piface" />
     <devices>
-        <device type="led" name="led1">
-            <gpio pin="10"/>
+        <device type="led" name="wiegand_green">
+            <gpio pin="9"/>
         </device>
-        <device type="led" name="led2">
-            <gpio pin="12"/>
+        <device type="led" name="denied_led">
+            <gpio pin="15"></gpio>
         </device>
         <device type="wiegandreader" name="r10reader">
             <logpio pin="2" />
