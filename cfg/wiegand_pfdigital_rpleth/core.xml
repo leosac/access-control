@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<core>
+    <network enabled="false">
+        <interface>eth0</interface>
+        <dhcp>true</dhcp>
+        <netmask>255.255.255.0</netmask>
+        <ip>192.168.0.10</ip>
+        <default_ip>192.168.0.10</default_ip>
+    </network>
+    <plugindir>.</plugindir>
+    <module file="libdoor.so">
+        <alias>door</alias>
+        <properties>
+            <doorconf>door.conf</doorconf>
+            <buzzer>none</buzzer>
+            <doorRelay>none</doorRelay>
+            <grantedLed>none</grantedLed>
+            <deniedLed>none</deniedLed>
+        </properties>
+    </module>
+    <module file="libjournal.so">
+        <alias>log</alias>
+        <properties/>
+    </module>
+    <module file="libwiegand.so">
+        <alias>reader</alias>
+        <properties>
+            <target>door</target>
+            <readerDevice>r10reader</readerDevice>
+        </properties>
+    </module>
+     <module file="librpleth.so">
+     <alias>rpleth_frontend</alias>
+     <properties>
+        <port>4242</port>
+         <greenLed>wiegand_green</greenLed>
+         <buzzer>wiegand_buzz</buzzer>
+      </properties>
+ </module>
+</core>
