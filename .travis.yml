@@ -25,7 +25,6 @@ install:
     - popd
     # -- workaround end
 before_script:
-	## Manually build libpifacedigital and libmcp23s17
     - pushd libpifacedigital; make; popd;
     - pushd libmcp23s17; make; popd;
     - mkdir build && pushd build
