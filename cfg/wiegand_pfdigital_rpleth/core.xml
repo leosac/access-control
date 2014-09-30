@@ -27,8 +27,10 @@
         <properties>
             <target>door</target>
             <readerDevice>r10reader</readerDevice>
+            <deniedLed>denied_led</deniedLed>
         </properties>
     </module>
+    <!-- In current code, RPleth controls the reader's green led and buzzer. Yeah this is a bit weird -->
      <module file="librpleth.so">
      <alias>rpleth_frontend</alias>
      <properties>
