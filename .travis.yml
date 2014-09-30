@@ -26,9 +26,9 @@ install:
     # -- workaround end
 before_script:
     - mkdir build && pushd build
-    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi;
 script:
-    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then make ; fi;
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then make ; fi
 after_success:
     - sudo make install
     - ctest --output-on-failure
