@@ -28,5 +28,5 @@ const std::string& RuntimeOptions::getParam(const std::string& key) const
     if (_params.count(key) > 0)
         return (_params.at(key));
     else
-        throw (DefaultEmptyParam);
+        throw std::runtime_error("RuntimeOptions::getParam, " + DefaultEmptyParam);
 }

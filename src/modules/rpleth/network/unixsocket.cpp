@@ -130,6 +130,7 @@ void UnixSocket::close()
 
     if ((ret = ::close(_handle)) == -1)
         throw (ModuleException(UnixSyscall::getErrorString("close", errno)));
+    _handle = -1;
 }
 
 std::string UnixSocket::getIp() const
@@ -175,4 +176,18 @@ ISocket::Ip UnixSocket::resolveHostname(const std::string& host)
     return (addr_list[0]->s_addr);
 }
 
+    UnixSocket::~UnixSocket()
+    {
+        if (_handle != -1)
+        {
+            try
+            {
+                close();
+            }
+            catch (ModuleException &e)
+            {
+                
+            }
+        }
+    }
 }
