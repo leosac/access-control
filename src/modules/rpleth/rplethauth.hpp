@@ -13,6 +13,7 @@
 #include <queue>
 #include <mutex>
 #include <hardware/idevice.hpp>
+#include <hardware/device/led.hpp>
 
 #include "modules/iauthmodule.hpp"
 #include "network/isocket.hpp"
@@ -95,6 +96,12 @@ private:
     */
     void    handleCardIdQueue();
 
+    /**
+    * Controls the reader's buzzer and led and play some melody, letting user know
+    * the software is running.
+    */
+    void    play_test_card_melody();
+
 private:
     ICore&                  _core;
     const std::string       _name;
@@ -112,8 +119,8 @@ private:
     * Network port we bind to, and listen to client.
     */
     Rezzo::ISocket::Port    _port;
-    IDevice                 *greenLed_;
-    IDevice                 *buzzer_;
+    Led                 *greenLed_;
+    Led                 *buzzer_;
 
 public:
     /**
