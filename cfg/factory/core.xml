@@ -2,9 +2,9 @@
 <core>
     <network enabled="true">
         <interface>eth0</interface>
-        <dhcp>false</dhcp>
-        <netmask>255.255.0.0</netmask>
-        <ip>10.2.1.245</ip>
+        <dhcp>true</dhcp>
+        <netmask></netmask>
+        <ip></ip>
         <default_ip></default_ip>
     </network>
     <plugindir>.</plugindir>

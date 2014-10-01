@@ -60,6 +60,7 @@ void NetworkConfig::reload()
     apply.run(UnixShellScript::toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
     if (!apply.getOutput().empty())
         LOG() << "ScriptOutput:\n" << apply.getOutput() << "\n";
+    LOG() << "JUST LOAD IFCONFIG CONFIGURATION";
 }
 
 void NetworkConfig::setEnabled(bool state)

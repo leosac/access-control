@@ -55,6 +55,12 @@ int main(int argc, char** argv)
 
             Core    core(options);
             relaunch = core.run();
+
+            // Yet an other hack. dhclient "steals" the bound port of Rpleth and prevent the program
+            // to restart.
+            UnixShellScript kill("killall dhclient");
+            kill.run();
+           // std::this_thread::sleep_for(std::chrono::milliseconds(7000));
         }
     }
     catch (const LEOSACException& e) {
