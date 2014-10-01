@@ -102,6 +102,11 @@ private:
     */
     void    play_test_card_melody();
 
+    /**
+    * Called when detecting the reset card (hardcoded card number).
+    */
+    void    reset_application();
+
 private:
     ICore&                  _core;
     const std::string       _name;

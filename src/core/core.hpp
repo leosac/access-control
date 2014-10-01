@@ -24,6 +24,13 @@ class Core : public ICore, public IXmlSerializable
 {
     static const int IdleSleepTimeMs = 5;
 
+    /**
+    * Path to factory configuration file.
+    * Upon "factory reset", thoses files will be copied and will erase the config
+    * file specified as parameter.
+    */
+    const std::string rel_path_to_factory_conf = "./cfg/factory";
+
 public:
     explicit Core(RuntimeOptions& options);
     ~Core() = default;
@@ -36,6 +43,8 @@ public:
     virtual ModuleProtocol& getModuleProtocol() override;
     virtual void            serialize(ptree& node) override;
     virtual void            deserialize(const ptree& node) override;
+
+    virtual void            reset() override;
 
 public:
     void    handleSignal(Signal signal);

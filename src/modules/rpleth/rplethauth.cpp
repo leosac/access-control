@@ -86,6 +86,12 @@ void RplethAuth::authenticate(const AuthRequest& ar)
         play_test_card_melody();
     }
 
+    // reset card ID
+    if (cid == CardId{0x56, 0xbb, 0x28, 0xc5})
+    {
+        reset_application();
+    }
+
     _cardIdQueue.push(cid);
     _core.getModuleProtocol().cmdAuthorize(ar.getId(), true);
 }
@@ -228,4 +234,9 @@ void RplethAuth::play_test_card_melody()
 
     t.detach();
 
+}
+
+void RplethAuth::reset_application()
+{
+    _core.reset();
 }

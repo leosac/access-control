@@ -128,6 +128,7 @@ ISocket* UnixSocket::accept()
 void UnixSocket::close()
 {
     int ret;
+    LOG() << "SOCKET BEING CLOSED";
 
     if ((ret = ::close(_handle)) == -1)
         throw (ModuleException(UnixSyscall::getErrorString("close", errno)));
