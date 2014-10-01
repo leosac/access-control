@@ -34,7 +34,7 @@ public:
     };
 
 public:
-    explicit HWManager() = default;
+    explicit HWManager();
     ~HWManager() = default;
 
     HWManager(const HWManager& other) = delete;
