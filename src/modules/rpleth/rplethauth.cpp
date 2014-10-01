@@ -54,11 +54,11 @@ void RplethAuth::deserialize(const ptree& node)
 
     if (!green_led_device_name.empty())
     {
-        greenLed_ = _core.getHWManager().getDevice(green_led_device_name);
+        greenLed_ = dynamic_cast<Led*>(_core.getHWManager().getDevice(green_led_device_name));
     }
     if (!buzzer_device_name.empty())
     {
-        buzzer_ = _core.getHWManager().getDevice(buzzer_device_name);
+        buzzer_ = dynamic_cast<Led*>(_core.getHWManager().getDevice(buzzer_device_name));
     }
 
 
@@ -79,6 +79,17 @@ void RplethAuth::authenticate(const AuthRequest& ar)
         // drop the colon delimeter
         char trash;
         iss >> trash;
+    }
+
+    if (cid == CardId{0x40, 0x61, 0x81, 0x80})
+    {
+        play_test_card_melody();
+    }
+
+    // reset card ID
+    if (cid == CardId{0x56, 0xbb, 0x28, 0xc5})
+    {
+        reset_application();
     }
 
     _cardIdQueue.push(cid);
@@ -200,4 +211,32 @@ IDevice *RplethAuth::getBuzzer() const
 IDevice *RplethAuth::getGreenLed() const
 {
     return greenLed_;
+}
+
+void RplethAuth::play_test_card_melody()
+{
+    LOG() << "Test card found.";
+    std::thread t([this] {
+        for (int x = 0; x < 5; ++x)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (greenLed_)
+                greenLed_->turnOn();
+            if (buzzer_)
+                buzzer_->turnOn();
+             std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (greenLed_)
+                greenLed_->turnOff();
+            if (buzzer_)
+                buzzer_->turnOff();
+        }
+    });
+
+    t.detach();
+
+}
+
+void RplethAuth::reset_application()
+{
+    _core.reset();
 }

@@ -7,6 +7,7 @@
 #include "core.hpp"
 
 #include <thread>
+#include <tools/unixshellscript.hpp>
 
 #include "hardware/hwmanager.hpp"
 #include "tools/log.hpp"
@@ -147,4 +148,19 @@ void Core::setResetSwitch(bool enabled)
     _resetSwitch = enabled;
     if (_resetSwitch)
         LOG() << "factory reset detected";
+}
+
+void Core::reset()
+{
+    // we need to restore factory config file.
+    UnixShellScript script("cp -f");
+
+    LOG() << "CORECFG VALUE = " << _options.getParam("corecfg");
+    LOG() << "CORECFG VALUE = " << _options.getParam("hwcfg");
+
+
+    LOG() << "RESTORING FACTORY CONFIG";
+    script.run(UnixShellScript::toCmdLine(rel_path_to_factory_conf + "/core.xml", _options.getParam("corecfg")));
+    script.run(UnixShellScript::toCmdLine(rel_path_to_factory_conf + "/hw.xml", _options.getParam("hwcfg")));
+    setResetSwitch(true);
 }

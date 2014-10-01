@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<hardware>
+    <!-- if the platform name is "raspberry_piface", the hwManager will use an other GPIO provider (this is currenly
+    hardcoded into the application).
+    We use 0-7 for INPUT pin number, and 8-15 for OUTPUT pin number
+    -->
+    <platform name="raspberry_piface" />
+    <devices>
+        <device type="led" name="wiegand_green">
+            <gpio pin="11"/>
+        </device>
+        <device type="led" name="denied_led">
+            <gpio pin="15"></gpio>
+        </device>
+        <device type="wiegandreader" name="r10reader">
+            <logpio pin="2" />
+            <higpio pin="0" />
+        </device>
+    </devices>
+</hardware>

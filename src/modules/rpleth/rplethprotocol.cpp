@@ -73,7 +73,7 @@ RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const Rplet
     {
         response.status = Success;
     }
-    else if (response.type == HID && response.command == Greenled)
+    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Greenled)
     {
         Led *led;
         if ((led = dynamic_cast<Led *>(module->getGreenLed())))
@@ -89,16 +89,16 @@ RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const Rplet
             LOG() << "Cannot turn green led on/off -- no such device";
         }
     }
-    else if (response.type == HID && response.command == Beep)
+    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Beep)
     {
-        Led *led;
-        if ((led = dynamic_cast<Led *>(module->getBuzzer())))
+        Led *buzzer;
+        if ((buzzer = dynamic_cast<Led *>(module->getBuzzer())))
         {
             assert(packet.data.size() > 0);
             if (packet.data[0] == 0x01)
-                led->turnOn();
+                buzzer->turnOn();
             else if (packet.data[0] == 0x00)
-                led->turnOff();
+                buzzer->turnOff();
         }
         else
         {
