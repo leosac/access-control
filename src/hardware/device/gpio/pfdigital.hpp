@@ -15,7 +15,7 @@ public:
     void poll();
 
 PFDigital();
-    ~PFDigital();
+    virtual ~PFDigital();
 
     virtual GPIO *getGPIO(int gpioNo);
 

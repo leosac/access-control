@@ -186,7 +186,7 @@ ISocket::Ip UnixSocket::resolveHostname(const std::string& host)
             }
             catch (ModuleException &e)
             {
-                
+
             }
         }
     }
