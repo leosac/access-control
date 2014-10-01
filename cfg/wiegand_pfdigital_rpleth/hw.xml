@@ -8,11 +8,11 @@
     <devices>
         <!-- This is RELAY 1 -->
         <device type="led" name="wiegand_green">
-            <gpio pin="9"/>
+            <gpio pin="11"/>
         </device>
         <!-- This is RELAY 2 -->
         <device type="led" name="wiegand_buzz">
-            <gpio pin="8"/>
+            <gpio pin="10"/>
         </device>
 
         <device type="led" name="denied_led">

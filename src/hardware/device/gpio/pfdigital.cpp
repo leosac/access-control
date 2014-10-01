@@ -8,7 +8,7 @@
 void PFDigital::poll()
 {
     uint8_t states = 0xFF;
-    bool timeout = (pifacedigital_wait_for_input2(&states, 100, 0) > 0 ? false : true);
+    bool timeout = (pifacedigital_wait_for_input2(&states, 35, 0) > 0 ? false : true);
 
     if (timeout)
     {

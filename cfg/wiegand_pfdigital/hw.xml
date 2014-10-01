@@ -7,7 +7,7 @@
     <platform name="raspberry_piface" />
     <devices>
         <device type="led" name="wiegand_green">
-            <gpio pin="9"/>
+            <gpio pin="11"/>
         </device>
         <device type="led" name="denied_led">
             <gpio pin="15"></gpio>
