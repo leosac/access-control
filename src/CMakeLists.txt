@@ -28,6 +28,9 @@ set(LEOSAC_LIB_SRCS
     hardware/device/wiegandreader.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
+    hardware/device/gpio/AGPIO.cpp
+    hardware/device/gpio/pfdigital.cpp
+    hardware/device/gpio/PFDigitalGPIO.cpp
     tools/leosac.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
@@ -42,6 +45,33 @@ if (LEOSAC_PLATFORM)
     add_subdirectory(hardware/device/platforms)
 endif()
 
+
+## Finding libpifacedigital
+find_library(
+    LIB_PIFACE_DIGITAL pifacedigital
+    HINTS "${CMAKE_SOURCE_DIR}/libpifacedigital"
+)
+
+if(${LIB_PIFACE_DIGITAL} STREQUAL "LIB_PIFACE_DIGITAL-NOTFOUND")
+    message(FATAL_ERROR "Couldn't find the 'pifacedigital' library")
+endif()
+
+message(STATUS "Found 'pifacedigitial' at: ${LIB_PIFACE_DIGITAL}")
+
+## Finding libmcp23s17
+find_library(
+    LIB_MCP23S17 mcp23s17
+    HINTS "${CMAKE_SOURCE_DIR}/libmcp23s17"
+)
+
+if(${LIB_MCP23S17} STREQUAL "LIB_MCP23S17-NOTFOUND")
+    message(FATAL_ERROR "Couldn't find the 'mcp23s17' library")
+endif()
+
+message(STATUS "Found 'mcp23s17' at: ${LIB_MCP23S17}")
+
+
+
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
 
@@ -55,21 +85,32 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -g")
     endif()
 endif()
 
+## Add optimization flags
+if (CMAKE_BUILD_TYPE MATCHES "Opti")
+    if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2")
+    endif()
+endif()
+
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+${CMAKE_CURRENT_SOURCE_DIR}/libpifacedigital/src/
+${CMAKE_SOURCE_DIR}/libpifacedigital/src/
+)
+
 #Set compilation flags for current target
 set_target_properties(${LEOSAC_BIN} PROPERTIES
-    COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}"
-    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
+    COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
 set_target_properties(${LEOSAC_LIB} PROPERTIES
-    COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}"
-    INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
+    COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
-target_link_libraries(${LEOSAC_LIB} dl pthread ${Boost_LIBRARIES})
+target_link_libraries(${LEOSAC_LIB} dl pthread ${Boost_LIBRARIES} ${LIB_PIFACE_DIGITAL} ${LIB_MCP23S17})
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

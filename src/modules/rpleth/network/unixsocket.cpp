@@ -15,6 +15,7 @@ extern "C" {
 #include <sstream>
 #include <cerrno>
 #include <cassert>
+#include <tools/log.hpp>
 
 #include "tools/unixsyscall.hpp"
 #include "exception/moduleexception.hpp"
@@ -127,9 +128,11 @@ ISocket* UnixSocket::accept()
 void UnixSocket::close()
 {
     int ret;
+    LOG() << "SOCKET BEING CLOSED";
 
     if ((ret = ::close(_handle)) == -1)
         throw (ModuleException(UnixSyscall::getErrorString("close", errno)));
+    _handle = -1;
 }
 
 std::string UnixSocket::getIp() const
@@ -175,4 +178,18 @@ ISocket::Ip UnixSocket::resolveHostname(const std::string& host)
     return (addr_list[0]->s_addr);
 }
 
+    UnixSocket::~UnixSocket()
+    {
+        if (_handle != -1)
+        {
+            try
+            {
+                close();
+            }
+            catch (ModuleException &e)
+            {
+
+            }
+        }
+    }
 }

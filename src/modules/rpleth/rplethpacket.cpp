@@ -7,7 +7,13 @@
 #include "rplethpacket.hpp"
 
 RplethPacket::RplethPacket(Sender packetSender)
-:   sender(packetSender)
+        :      status(0),
+               type(0),
+               command(0),
+               dataLen(0),
+               sum(0),
+               isGood(false),
+               sender(packetSender)
 {}
 
 RplethPacket::RplethPacket(const RplethPacket& other)
