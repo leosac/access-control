@@ -174,3 +174,9 @@ void HWManager::sync()
     if (_masterDipSwitch)
         _masterDipSwitch->readSwitches();
 }
+
+HWManager::HWManager() :
+        _masterDipSwitch(nullptr)
+{
+
+}

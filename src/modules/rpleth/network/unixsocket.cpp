@@ -15,6 +15,7 @@ extern "C" {
 #include <sstream>
 #include <cerrno>
 #include <cassert>
+#include <tools/log.hpp>
 
 #include "tools/unixsyscall.hpp"
 #include "exception/moduleexception.hpp"
