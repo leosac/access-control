@@ -30,7 +30,11 @@ bool zModuleManager::initModules()
             {
             void *symptr = dynlib.second->getSymbol("start_module");
             assert(symptr);
-            zmqpp::actor new_module((bool (*)(zmqpp::socket *)) symptr);
+            std::function< bool (zmqpp::socket *) > actor_fun = std::bind(
+                    ((bool (*)(zmqpp::socket *, boost::property_tree::ptree )) symptr),
+            std::placeholders::_1, // placeholder for pipe
+                    modules_config_[dynlib.first]);
+            zmqpp::actor new_module(actor_fun);
 
             modules_.push_back(std::move(new_module));
             }
@@ -60,7 +64,8 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
         // fixme not clean enough.
         if (UnixFs::fileExists(path_entry + "/" + filename))
             {
-            load_library_file(path_entry + "/" + filename);
+            load_library_file(module_name, path_entry + "/" + filename);
+            modules_config_[module_name] = cfg;
             LOG() << "library file loaded (not init yet)";
             return true;
             }
@@ -70,15 +75,15 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
     return false;
     }
 
-void zModuleManager::load_library_file(const std::string &full_path)
+void zModuleManager::load_library_file(const std::string &module_name, const std::string &full_path)
     {
 
     std::string     libname(UnixFs::stripPath(full_path));
     DynamicLibrary* lib;
 
     LOG() << "Loading " << libname << "(full path: " << full_path << ")";
-    if (_dynlibs.count(libname) > 0)
-        throw (ModuleException("library already loaded at " + _dynlibs.at(libname)->getFilePath()));
+    if (_dynlibs.count(module_name) > 0)
+        throw (ModuleException("module already loaded at " + _dynlibs.at(libname)->getFilePath()));
     lib = new DynamicLibrary(full_path);
     try {
         lib->open(DynamicLibrary::RelocationMode::Now);
@@ -87,7 +92,7 @@ void zModuleManager::load_library_file(const std::string &full_path)
         delete lib;
         throw (ModuleException(e.what()));
     }
-    _dynlibs[libname] = lib;
+    _dynlibs[module_name] = lib;
     }
 
 void zModuleManager::stopModules()

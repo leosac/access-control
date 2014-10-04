@@ -9,7 +9,7 @@
 class SysFsGpioModule
     {
 public:
-    SysFsGpioModule(const ModuleConfig &cfg, zmqpp::socket *module_manager_pipe);
+    SysFsGpioModule(zmqpp::socket *module_manager_pipe);
 
 private:
     zmqpp::socket *pipe_;

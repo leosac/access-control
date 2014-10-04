@@ -1,27 +1,8 @@
 #include <memory>
 #include <zmqpp/message.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include "sysfsgpio.hpp"
 #include "zmqpp/actor.hpp"
-
-/**
-* runs in new module thread
-*/
-/*
-static bool __start_module(const ModuleConfig &cfg, zmqpp::socket *pipe)
-    {
-    try
-        {
-        SysFsGpioModule *module = new SysFsGpioModule(cfg, pipe);
-
-        module->run();
-        }
-    catch (std::exception &e)
-        {
-        return false;
-        }
-    return  true;
-    }
-*/
 
 /**
 * pipe is pipe back to module manager.
@@ -29,12 +10,14 @@ static bool __start_module(const ModuleConfig &cfg, zmqpp::socket *pipe)
 *
 * do signaling when ready
 */
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe)
+extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg)
     {
     // assume custom module startup code.
     // when reeady, signal parent
 
-    std::cout << "Init ok... sending OK" << std::endl;
+    SysFsGpioModule module(pipe);
+
+    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
 
     while (true)
@@ -55,4 +38,9 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
 
     std::cout << "module sysfsgpio shutying down" << std::endl;
     return true;
+    }
+
+SysFsGpioModule::SysFsGpioModule(zmqpp::socket *module_manager_pipe)
+    {
+
     }
