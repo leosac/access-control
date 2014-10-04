@@ -55,11 +55,16 @@ private:
     /**
     * This will load (actually calling dlopen()) the library file located at full_path.
     */
-    void    load_library_file(const std::string &full_path);
+    void    load_library_file(const std::string &module_name, const std::string &full_path);
 
 private:
     std::vector<std::string> path_;
     std::map<std::string, DynamicLibrary*>      _dynlibs;
+
+    /**
+    * Maps module configuration tree to module name.
+    */
+    std::map<std::string, boost::property_tree::ptree> modules_config_;
 
     /**
     * Since module live is their own thread, we use the actor pattern.
