@@ -2,7 +2,13 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <tools/runtimeoptions.hpp>
+#include <zmqpp/context.hpp>
 #include "zmodule_manager.hpp"
+
+/**
+* Global ZMQPP context. This is initialized in Kernel constructor.
+*/
+zmqpp::context *gl_leosac_ctx;
 
 /**
 * Core of Leosac. Handles module management and loading.
@@ -11,7 +17,7 @@ class Kernel
     {
 public:
     Kernel(const boost::property_tree::ptree &config);
-
+    ~Kernel();
     /**
     * Build a property tree from a runtime object object.
     * It assume the kernel-config (-k) switch points to an XML config file.
@@ -49,4 +55,6 @@ private:
     * Controls core main loop.
     */
     bool is_running_;
+
+    zmqpp::context ctx_;
     };

@@ -15,8 +15,10 @@ using boost::property_tree::xml_parser::trim_whitespace;
 using boost::property_tree::ptree;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
+ctx_(),
 config_(config),
-is_running_(true)
+is_running_(true),
+module_manager_(ctx_)
     {
 
     }
@@ -44,7 +46,7 @@ bool Kernel::run()
     if (!module_manager_init())
         return false;
 
-    SignalHandler::registerCallback(Signal::SigInt, [this] (Signal s) { this->is_running_ = false ;});
+    SignalHandler::registerCallback(Signal::SigInt, [this] (Signal) { this->is_running_ = false ;});
 
     while (is_running_);
 
@@ -54,33 +56,44 @@ bool Kernel::run()
 
 bool Kernel::module_manager_init()
     {
+    try
+        {
         ptree plugin_dirs = config_.get_child("plugin_directories");
 
-    for (const auto & plugin_dir : plugin_dirs)
-        {
-        std::string pname = plugin_dir.first;
-        std::string pvalue = plugin_dir.second.data();
+        for (const auto &plugin_dir : plugin_dirs)
+            {
+            std::string pname = plugin_dir.first;
+            std::string pvalue = plugin_dir.second.data();
 
-        assert(pname == "plugindir");
-        LOG() << "Adding {" << pvalue << "} in library path";
-        module_manager_.addToPath(pvalue);
+            assert(pname == "plugindir");
+            LOG() << "Adding {" << pvalue << "} in library path";
+            module_manager_.addToPath(pvalue);
+            }
+
+        for (const auto &module : config_.get_child("modules"))
+            {
+            std::string pname = module.first;
+            assert(pname == "module");
+
+            ptree module_conf = module.second;
+            std::string module_file = module_conf.get_child("file").data();
+
+            module_manager_.loadModule(module_conf);
+            }
         }
-
-    for (const auto & module : config_.get_child("modules"))
-        {
-        std::string pname = module.first;
-        assert(pname == "module");
-
-        ptree module_conf = module.second;
-        std::string module_file = module_conf.get_child("file").data();
-
-        module_manager_.loadModule(module_conf);
-        }
-
+        catch (std::exception& e) {
+            LOG() << "Error initializing module manager";
+            return false;
+            }
     if (!module_manager_.initModules())
         {
         module_manager_.stopModules();
         return false;
         }
     return true;
+    }
+
+Kernel::~Kernel()
+    {
+
     }

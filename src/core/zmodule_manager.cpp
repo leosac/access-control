@@ -5,6 +5,7 @@
 #include <exception/moduleexception.hpp>
 #include "zmodule_manager.hpp"
 #include <boost/property_tree/ptree.hpp>
+#include <zmqpp/context.hpp>
 
 void zModuleManager::unloadLibraries()
 {
@@ -31,9 +32,10 @@ bool zModuleManager::initModules()
             void *symptr = dynlib.second->getSymbol("start_module");
             assert(symptr);
             std::function< bool (zmqpp::socket *) > actor_fun = std::bind(
-                    ((bool (*)(zmqpp::socket *, boost::property_tree::ptree )) symptr),
+                    ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context & )) symptr),
             std::placeholders::_1, // placeholder for pipe
-                    modules_config_[dynlib.first]);
+                    modules_config_[dynlib.first],
+            std::ref(ctx_));
             zmqpp::actor new_module(actor_fun);
 
             modules_.push_back(std::move(new_module));
@@ -107,4 +109,10 @@ zModuleManager::~zModuleManager()
     {
     stopModules();
     unloadLibraries();
+    }
+
+zModuleManager::zModuleManager(zmqpp::context &ctx) :
+ctx_(ctx)
+    {
+
     }
