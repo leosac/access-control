@@ -41,3 +41,8 @@ void* DynamicLibrary::getSymbol(const std::string& symbol)
         throw (DynLibException(std::string("dlsym(): ") + err));
     return (sym);
 }
+
+const std::string &DynamicLibrary::getFilePath() const
+    {
+    return _file;
+    }

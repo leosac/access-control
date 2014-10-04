@@ -17,3 +17,4 @@ endfunction()
 
 leosacCreateSingleSourceTest(version)
 leosacCreateSingleSourceTest(automaton)
+#leosacCreateSingleSourceTest(ConfigTree)
