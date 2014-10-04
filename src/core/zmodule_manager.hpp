@@ -21,7 +21,11 @@
 class zModuleManager
     {
 public:
-
+    /**
+    * Contruct the module manager.
+    * @param ctx the zeroMQ context to pass around to module.
+    */
+    zModuleManager(zmqpp::context &ctx);
     ~zModuleManager();
 
     void        unloadLibraries();
@@ -70,4 +74,6 @@ private:
     * Since module live is their own thread, we use the actor pattern.
     */
     std::vector<zmqpp::actor> modules_;
+
+    zmqpp::context &ctx_;
 };

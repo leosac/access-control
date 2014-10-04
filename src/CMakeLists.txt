@@ -21,6 +21,7 @@ set(LEOSAC_LIB_SRCS
     core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
     hardware/hwmanager.cpp
+    hardware/device/FGPIO.cpp
     hardware/device/button.cpp
     hardware/device/buzzer.cpp
     hardware/device/dipswitch.cpp
