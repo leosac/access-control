@@ -56,6 +56,11 @@ public:
     */
     void*   getSymbol(const std::string& symbol);
 
+    /**
+    * Returns the full path from which the library was loaded.
+    */
+    const std::string &getFilePath() const;
+
 private:
     std::string _file;
     void*       _handle;
