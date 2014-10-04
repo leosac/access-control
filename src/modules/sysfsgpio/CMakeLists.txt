@@ -9,6 +9,6 @@ add_library(${SYSFSGPIO_BIN} SHARED ${SYSFSGPIO_SRCS})
 set_target_properties(${SYSFSGPIO_BIN} PROPERTIES
     COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
     )
-target_include_directories(${SYSFSGPIO_BIN} PUBLIC ${CMAKE_SOURCE_DIR}/src "${CMAKE_SOURCE_DIR}/zmqpp/src")
+#target_include_directories(${SYSFSGPIO_BIN} PUBLIC ${CMAKE_SOURCE_DIR}/src "${CMAKE_SOURCE_DIR}/zmqpp/src")
 
 install(TARGETS ${SYSFSGPIO_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})
