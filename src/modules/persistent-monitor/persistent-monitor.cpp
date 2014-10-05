@@ -55,10 +55,12 @@ zmqpp::context &zmq_ctx)
             zmqpp::message msg;
             sub.receive(msg);
 
+            LOG() << msg.parts() << "parts.";
             of << "New Entry: ";
             for (size_t i = 0; i < msg.parts(); ++i)
                 {
                 msg >> buf;
+                LOG() << "part " << i << ": " << buf;
                 of << buf;
                 }
             of << std::endl;
