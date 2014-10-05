@@ -20,7 +20,7 @@ zmqpp::context &zmq_ctx)
     // assume custom module startup code.
     // when reeady, signal parent
 
-    SysFsGpioModule module(cfg, pipe, zmq_ctx);
+   SysFsGpioModule module(cfg, pipe, zmq_ctx);
 
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
@@ -91,6 +91,7 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no) :
 sock_(ctx, zmqpp::socket_type::rep)
     {
+    LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
     std::string full_path = "/sys/class/gpio" + std::to_string(gpio_no);
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
