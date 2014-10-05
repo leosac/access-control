@@ -11,7 +11,7 @@ notifications:
     - reports@islog.com
     - ryp.sqrt@gmail.com
 before_install:
-    - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
+    - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main universe" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
     - sudo apt-get update -qq
 install:
     - sudo apt-get install -qq g++ clang cmake
