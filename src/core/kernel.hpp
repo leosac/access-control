@@ -4,6 +4,7 @@
 #include <tools/runtimeoptions.hpp>
 #include <zmqpp/context.hpp>
 #include "zmodule_manager.hpp"
+#include "MessageBus.hpp"
 
 /**
 * Global ZMQPP context. This is initialized in Kernel constructor.
@@ -36,10 +37,6 @@ public:
     bool run();
 
 private:
-    /**
-    * Global configuration.
-    */
-    boost::property_tree::ptree config_;
 
     /**
     * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -47,14 +44,27 @@ private:
     bool module_manager_init();
 
     /**
-    * Manages the different libraries (.so) we load, path to those libraries, modules instanciation.
+    * The application ZMQ context.
     */
-    zModuleManager module_manager_;
+    zmqpp::context ctx_;
+
+    /**
+    * Application wide (inproc) message bus.
+    */
+    MessageBus bus_;
+
+    /**
+    * Global configuration.
+    */
+    boost::property_tree::ptree config_;
 
     /**
     * Controls core main loop.
     */
     bool is_running_;
 
-    zmqpp::context ctx_;
+    /**
+    * Manages the different libraries (.so) we load, path to those libraries, modules instanciation.
+    */
+    zModuleManager module_manager_;
     };
