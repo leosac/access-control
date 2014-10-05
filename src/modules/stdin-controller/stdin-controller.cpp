@@ -57,8 +57,17 @@ zmqpp::context &zmq_ctx)
     while (true)
         {
         p.poll(-1);
+
+        if (p.has_input(*pipe))
+            {
+            break;
+            }
+
         if (p.has_input(0))
             {
+
+            if (std::cin.fail())
+                LOG() << "FAILED";
             //          std::string txt;
             // fixme bug if input is > buffer
             std::array<char, 4096> txt;
@@ -71,25 +80,29 @@ zmqpp::context &zmq_ctx)
 
             ss >> target;
             ss >> cmd1;
-            if (endpoints_.count(target) == 0)
+            if (!target.empty())
                 {
-                endpoints_[target] = std::shared_ptr<zmqpp::socket>(new zmqpp::socket(zmq_ctx, zmqpp::socket_type::req));
-                endpoints_[target]->connect("inproc://" + target);
+                if (endpoints_.count(target) == 0)
+                    {
+                    endpoints_[target] = std::shared_ptr<zmqpp::socket>(new zmqpp::socket(zmq_ctx, zmqpp::socket_type::req));
+                    endpoints_[target]->connect("inproc://" + target);
+                    }
+
+                LOG() << "Read {" << std::string(&txt[0]) << "}, target = " << target;
+
+                if (!send_request(endpoints_[target], cmd1))
+                    {
+                    endpoints_.erase(target);
+                    }
                 }
-
-            LOG() << "Read {" << std::string(&txt[0]) << "}, target = " << target;
-
-            if (!send_request(endpoints_[target], cmd1))
-                {
-                endpoints_.erase(target);
-                }
-
             }
-
-        if (p.has_input(*pipe))
+        else if (p.has_error(0))
             {
-            break;
+            LOG() << "stop polling on stdin";
+            p.remove(0);
+            continue;
             }
+
         }
 
     std::cout << "module std-controller shutting down" << std::endl;

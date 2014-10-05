@@ -48,7 +48,10 @@ bool Kernel::run()
 
     SignalHandler::registerCallback(Signal::SigInt, [this] (Signal) { this->is_running_ = false ;});
 
-    while (is_running_);
+    while (is_running_)
+        {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
 
     module_manager_.stopModules();
     return false ; // we dont want to restart;

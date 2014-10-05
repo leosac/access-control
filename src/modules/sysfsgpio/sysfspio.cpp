@@ -89,18 +89,21 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
     }
 
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no) :
-sock_(ctx, zmqpp::socket_type::rep)
+sock_(ctx, zmqpp::socket_type::rep),
+gpio_no_(gpio_no)
     {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
-    std::string full_path = "/sys/class/gpio" + std::to_string(gpio_no);
+    std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
+    LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
     assert(file_fd_ != -1);
     }
 
 SysFsGpioPin::~SysFsGpioPin()
     {
-    assert(::close(file_fd_));
+    if (::close(file_fd_) != 0)
+        LOG() << "fail to close fd " << file_fd_;
     }
 
 void SysFsGpioModule::export_gpio(int gpio_no)
@@ -112,11 +115,12 @@ SysFsGpioPin::SysFsGpioPin(SysFsGpioPin &&o) :
 sock_(std::move(o.sock_))
     {
     this->file_fd_ = o.file_fd_;
+    this->gpio_no_ = o.gpio_no_;
     }
 
 void SysFsGpioPin::set_direction(const std::string &direction)
     {
-    UnixFs::writeSysFsValue("/sys/class/gpio" + std::to_string(gpio_no_) + "/direction", direction);
+    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/direction", direction);
     }
 
 void SysFsGpioPin::handle_message()
@@ -138,19 +142,19 @@ void SysFsGpioPin::handle_message()
 
 bool SysFsGpioPin::turn_on()
     {
-    UnixFs::writeSysFsValue("/sys/class/gpio" + std::to_string(gpio_no_) + "/value", 1);
+    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", 1);
     return true;
     }
 
 bool SysFsGpioPin::turn_off()
     {
-    UnixFs::writeSysFsValue("/sys/class/gpio" + std::to_string(gpio_no_) + "/value", 0);
+    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", 0);
     return true;
     }
 
 bool SysFsGpioPin::toggle()
     {
-    int v = UnixFs::readSysFsValue<int>("/sys/class/gpio" + std::to_string(gpio_no_) + "/value");
-    UnixFs::writeSysFsValue("/sys/class/gpio" + std::to_string(gpio_no_) + "/value", v == 1 ? 0 : 1);
+    int v = UnixFs::readSysFsValue<int>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
+    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", v == 1 ? 0 : 1);
     return true;
     }
