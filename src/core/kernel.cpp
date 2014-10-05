@@ -81,7 +81,8 @@ bool Kernel::module_manager_init()
             ptree module_conf = module.second;
             std::string module_file = module_conf.get_child("file").data();
 
-            module_manager_.loadModule(module_conf);
+            if (!module_manager_.loadModule(module_conf))
+                return false;
             }
         }
         catch (ptree_error & e) {
