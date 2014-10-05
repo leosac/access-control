@@ -81,8 +81,8 @@ bool Kernel::module_manager_init()
             module_manager_.loadModule(module_conf);
             }
         }
-        catch (std::exception& e) {
-            LOG() << "Error initializing module manager";
+        catch (ptree_error & e) {
+            LOG() << "Invalid configuration file: " << e.what();
             return false;
             }
     if (!module_manager_.initModules())

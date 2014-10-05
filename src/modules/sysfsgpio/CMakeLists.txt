@@ -1,7 +1,7 @@
 set(SYSFSGPIO_BIN sysfsgpio)
 
 set(SYSFSGPIO_SRCS
-    sysfsgpio.cpp
+    sysfspio.cpp
 )
 
 add_library(${SYSFSGPIO_BIN} SHARED ${SYSFSGPIO_SRCS})
