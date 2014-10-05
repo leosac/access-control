@@ -96,7 +96,7 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
     {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
-    bus_push_.connect("zmq-bus-pull");
+    bus_push_.connect("inproc://zmq-bus-pull");
     std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
     LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
@@ -120,6 +120,8 @@ bus_push_(std::move(o.bus_push_))
     {
     this->file_fd_ = o.file_fd_;
     this->gpio_no_ = o.gpio_no_;
+    this->name_ = o.name_;
+    o.file_fd_ = -1;
     }
 
 void SysFsGpioPin::set_direction(const std::string &direction)
@@ -143,6 +145,7 @@ void SysFsGpioPin::handle_message()
         ok = toggle();
     sock_.send(ok ? "OK" : "KO");
     // publish new state.
+    LOG() << "gpio nammed {" << name_ << " will publish ";
     bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
     }
 
