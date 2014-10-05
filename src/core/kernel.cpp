@@ -16,6 +16,7 @@ using boost::property_tree::ptree;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
 ctx_(),
+bus_(ctx_),
 config_(config),
 is_running_(true),
 module_manager_(ctx_)

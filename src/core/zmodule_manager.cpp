@@ -36,11 +36,8 @@ bool zModuleManager::initModules()
             std::placeholders::_1, // placeholder for pipe
                     modules_config_[dynlib.first],
             std::ref(ctx_));
-            // fixme need zmqpp fixes so we can use stack variable instead
-            zmqpp::actor *new_module = new zmqpp::actor(actor_fun);
-
-            modules_.push_back(std::move(*new_module));
-            delete new_module; // has been moved.
+            zmqpp::actor new_module(actor_fun);
+            modules_.push_back(std::move(new_module));
 
             LOG() << "Module {" << dynlib.first << "} initialized.";
             }
