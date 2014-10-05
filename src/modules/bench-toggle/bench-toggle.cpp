@@ -57,10 +57,8 @@ zmqpp::context &zmq_ctx)
     sock->connect("inproc://" + endpoint_to_bench);
     LOG() << "should take about " << itr * wait_for << "ms to run";
     std::chrono::system_clock::time_point clock = std::chrono::system_clock::now();
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     for (int i = 0; i < itr; i++)
         {
-
         send_request(sock, "TOGGLE");
         std::this_thread::sleep_for(std::chrono::milliseconds(wait_for));
         }

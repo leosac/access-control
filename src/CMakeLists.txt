@@ -10,6 +10,7 @@ set(LEOSAC_LIB_SRCS
     #config/ConfigTree.cpp
     core/kernel.cpp
     core/zmodule_manager.cpp
+    core/MessageBus.cpp
     core/core.cpp
     core/modulemanager.cpp
     core/netconfig/networkconfig.cpp

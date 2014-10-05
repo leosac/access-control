@@ -22,6 +22,11 @@ struct SysFsGpioPin
     SysFsGpioPin(SysFsGpioPin &&o);
 
 
+    /**
+    * Read value from filesystem.
+    */
+    bool read_value();
+
     void set_direction(const std::string &direction);
 
     /**
@@ -56,6 +61,13 @@ struct SysFsGpioPin
     * listen to command from other component.
     */
     zmqpp::socket sock_;
+
+    /**
+    * PUSH socket to write to the bus.
+    */
+    zmqpp::socket bus_push_;
+
+    std::string name_;
     };
 
 /**

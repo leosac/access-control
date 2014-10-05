@@ -89,11 +89,14 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
     }
 
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no) :
-sock_(ctx, zmqpp::socket_type::rep),
-gpio_no_(gpio_no)
+        gpio_no_(gpio_no),
+        sock_(ctx, zmqpp::socket_type::rep),
+        bus_push_(ctx, zmqpp::socket_type::push),
+        name_(name)
     {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
+    bus_push_.connect("zmq-bus-pull");
     std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
     LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
@@ -112,7 +115,8 @@ void SysFsGpioModule::export_gpio(int gpio_no)
     }
 
 SysFsGpioPin::SysFsGpioPin(SysFsGpioPin &&o) :
-sock_(std::move(o.sock_))
+sock_(std::move(o.sock_)),
+bus_push_(std::move(o.bus_push_))
     {
     this->file_fd_ = o.file_fd_;
     this->gpio_no_ = o.gpio_no_;
@@ -138,6 +142,8 @@ void SysFsGpioPin::handle_message()
     else if (frame1 == "TOGGLE")
         ok = toggle();
     sock_.send(ok ? "OK" : "KO");
+    // publish new state.
+    bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
     }
 
 bool SysFsGpioPin::turn_on()
@@ -157,4 +163,9 @@ bool SysFsGpioPin::toggle()
     int v = UnixFs::readSysFsValue<int>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
     UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", v == 1 ? 0 : 1);
     return true;
+    }
+
+bool SysFsGpioPin::read_value()
+    {
+    return UnixFs::readSysFsValue<bool>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
     }
