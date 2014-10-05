@@ -17,7 +17,7 @@ install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
     - sudo apt-get install -qq libgtest-dev
-    - sudo apt-get install -qq libzmq-dev
+    - sudo apt-get install libzmq3-dev
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
     - sudo cmake .
