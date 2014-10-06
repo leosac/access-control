@@ -2,6 +2,7 @@ set(WIEGAND_BIN WIEGAND)
 
 set(WIEGAND_SRCS
     wiegand.cpp
+    WiegandReaderImpl.cpp
 )
 
 add_library(${WIEGAND_BIN} SHARED ${WIEGAND_SRCS})

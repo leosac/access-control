@@ -100,16 +100,37 @@ void PFGpioModule::handle_interrupt()
         if (((states >> i) & 0x01) == 0)
         {
             // this pin triggered interrupt
-            LOG() << "PIN " << i << " IS IN INTERRUPT MODE";
+          //  LOG() << "PIN " << i << " IS IN INTERRUPT MODE";
             bus_push_.send(zmqpp::message() << "S_TEST" << (std::string("OMG INTERRUPT ON PIN " + std::to_string(i))));
+
+            // signal interrupt if needed (ie the pin is registered in config
+            std::string gpio_name;
+            if (get_input_pin_name(gpio_name, i))
+            {
+                bus_push_.send(zmqpp::message() << std::string ("S_INT:" + gpio_name));
+            }
         }
     }
     states = pifacedigital_read_reg(INPUT, 0);
         for (int i = 0; i < 8; ++i)
     {
-       LOG() << "PIN " << i << " HAS VALUE: " << ((states >> i) & 0x01);
+   //    LOG() << "PIN " << i << " HAS VALUE: " << ((states >> i) & 0x01);
     }
     pifacedigital_read_reg(0x11, 0); // flush
+}
+
+
+bool PFGpioModule::get_input_pin_name(std::string &dest, int idx)
+{
+    for (auto &gpio : gpios_)
+    {
+        if (gpio.gpio_no_ == idx && gpio.direction_ == PFGpioPin::Direction::In)
+        {
+            dest = gpio.name_;
+            return true;
+        }
+    }
+    return false;
 }
 
 

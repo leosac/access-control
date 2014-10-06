@@ -125,10 +125,18 @@ private:
     zmqpp::socket bus_push_;
 
     /**
-    * PFDigital provide a fixed number of GPIO, so we use fixed length array to store them all.
-    * 0-7 are INPUT. 8-15 are OUTPUT.
+    * GPIO vector
     */
     std::vector<PFGpioPin> gpios_;
+
+
+    /**
+    * Should be removed someday...
+    * store the name of the input pin with id = idx in dest.
+    *
+    * returns true if it was succesful (pin exists), false otherwise.
+    */
+    bool get_input_pin_name(std::string &dest, int idx);
 
 
     /**
