@@ -29,7 +29,8 @@
                 <gpios>
                     <gpio>
                         <name>YELLOW</name>
-                        <no>15</no>
+                        <no>7</no>
+                        <direction>out</direction>
                     </gpio>
                 </gpios>
             </module_config>
