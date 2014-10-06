@@ -57,7 +57,7 @@ struct PFGpioPin
     };
 
 /**
-* Handle GPIO management over sysfs.
+* Handle GPIO management using PifaceDigital I/O extender.
 */
 class PFGpioModule
     {

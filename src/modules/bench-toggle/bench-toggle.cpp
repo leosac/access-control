@@ -50,7 +50,7 @@ zmqpp::context &zmq_ctx)
     int wait_for = cfg.get_child("module_config").get<int>("pause");
     pipe->send(zmqpp::signal::ok);
 
-    // fixme since module initializtion is not defined we need to wait.
+    // fixme since module order initialization is not defined we need to wait.
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     std::shared_ptr<zmqpp::socket> sock(new zmqpp::socket(zmq_ctx, zmqpp::socket_type::req));

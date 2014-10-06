@@ -22,6 +22,7 @@ zmqpp::context &zmq_ctx)
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     // file we write event to.
     std::string file_name = cfg.get_child("module_config").get<std::string>("file");
+        bool verbose = cfg.get_child("module_config").get<bool>("verbose", false);
     pipe->send(zmqpp::signal::ok);
 
     std::ofstream of(file_name);
@@ -55,12 +56,15 @@ zmqpp::context &zmq_ctx)
             zmqpp::message msg;
             sub.receive(msg);
 
-            LOG() << msg.parts() << "parts.";
             of << "New Entry: ";
+
             for (size_t i = 0; i < msg.parts(); ++i)
                 {
                 msg >> buf;
-                LOG() << "part " << i << ": " << buf;
+                    if (verbose)
+                    {
+                        LOG() << "Received (part " << i << ") : " << buf;
+                    }
                 of << buf;
                 }
             of << std::endl;
@@ -68,6 +72,6 @@ zmqpp::context &zmq_ctx)
         }
 
 
-    std::cout << "module sysfsgpio shutying down" << std::endl;
+    std::cout << "module Persistent-Monitor shutting down" << std::endl;
     return true;
     }

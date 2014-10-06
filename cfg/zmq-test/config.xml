@@ -8,6 +8,17 @@
         <module>
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
+
+        </module>
+
+        <module>
+            <name>MONITOR</name>
+            <file>libpersistent-monitor.so</file>
+
+            <module_config>
+                <file>MY_LOGS.txt</file>
+                <verbose>true</verbose>
+            </module_config>
         </module>
 
         <module>
@@ -23,6 +34,7 @@
                 </gpios>
             </module_config>
         </module>
+
     </modules>
 
 </kernel>
