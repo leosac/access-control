@@ -111,12 +111,12 @@ void PFGpioModule::handle_interrupt()
             }
         }
     }
-    states = pifacedigital_read_reg(INPUT, 0);
-        for (int i = 0; i < 8; ++i)
-    {
+  //  states = pifacedigital_read_reg(INPUT, 0);
+ //       for (int i = 0; i < 8; ++i)
+  //  {
    //    LOG() << "PIN " << i << " HAS VALUE: " << ((states >> i) & 0x01);
-    }
-    pifacedigital_read_reg(0x11, 0); // flush
+ //   }
+   // pifacedigital_read_reg(0x11, 0); // flush
 }
 
 

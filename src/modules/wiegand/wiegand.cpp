@@ -78,6 +78,8 @@ void WiegandReaderModule::run()
     {
         if (!reactor_.poll(1000))
         {
+            for (auto &reader : readers_)
+                reader.timeout();
             LOG() << "timeout";
         }
 

@@ -51,11 +51,11 @@ void WiegandReaderImpl::handle_bus_msg()
 void WiegandReaderImpl::timeout()
 {
     LOG() << "timeout, buffer size = " << counter_;
-/*    std::size_t                 size = ((counter_ - 1) / 8) + 1;
+  /*  std::size_t                 size = ((counter_ - 1) / 8) + 1;
 
     for (std::size_t i = 0; i < size; ++i)
         {
-            c[i] = _buffer[size - i - 1];
+            c[i] = buffer_[size - i - 1];
             std::bitset<8> a(c[i]);
             LOG() << '[' << i << "] "<< a;
         }*/
