@@ -62,7 +62,7 @@
 
         <module>
             <name>WIEGAND</name>
-            <file>libwiegand.so</file>
+            <file>libWIEGAND.so</file>
             <module_config>
                 <readers>
                     <reader>
