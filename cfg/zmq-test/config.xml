@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+        <kernel>
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <modules>
+        <module>
+            <name>STDIN</name>
+            <file>libstdin-controller.so</file>
+        </module>
+
+        <module>
+            <name>PIFACE-GPIO</name>
+            <file>libpifacedigital.so</file>
+
+            <module_config>
+                <gpios>
+                    <gpio>
+                        <name>YELLOW</name>
+                        <no>15</no>
+                    </gpio>
+                </gpios>
+            </module_config>
+        </module>
+    </modules>
+
+</kernel>
