@@ -123,15 +123,16 @@ void PFGpioModule::process_config(const boost::property_tree::ptree &cfg)
 
         std::string gpio_name = gpio_cfg.get_child("name").data();
         int gpio_no = std::stoi(gpio_cfg.get_child("no").data());
-        //std::string gpio_direction = gpio_cfg.get_child("direction").data();
+        std::string gpio_direction = gpio_cfg.get_child("direction").data();
 
         LOG() << "Creating GPIO " << gpio_name << ", with no " << gpio_no;//<< ". direction = " << gpio_direction;
 
         //export_gpio(gpio_no);
         PFGpioPin pin(ctx_, gpio_name, gpio_no);
 
-        //pin.set_direction(gpio_direction);
-
+        if (gpio_direction != "in" && gpio_direction != "out")
+            throw GpioException("Direction (" + gpio_direction + ") is invalid");
+        pin.set_direction(gpio_direction == "in" ? PFGpioPin::Direction::In : PFGpioPin::Direction::Out);
         gpios_.push_back(std::move(pin));
     }
 }
@@ -158,8 +159,8 @@ PFGpioPin::PFGpioPin(PFGpioPin &&o) :
 {
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
+    this->direction_ = o.direction_;
 }
-
 
 PFGpioPin &PFGpioPin::operator=(PFGpioPin &&o)
 {
@@ -168,7 +169,8 @@ PFGpioPin &PFGpioPin::operator=(PFGpioPin &&o)
 
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
-
+    this->direction_ = o.direction_;
+    
     return *this;
 }
 
@@ -196,23 +198,36 @@ void PFGpioPin::handle_message()
 
 bool PFGpioPin::turn_on()
 {
+    if (direction_ != Direction::Out)
+        return false;
     pifacedigital_digital_write(gpio_no_, 1);
     return true;
 }
 
 bool PFGpioPin::turn_off()
 {
+   if (direction_ != Direction::Out)
+        return false;
     pifacedigital_digital_write(gpio_no_, 0);
     return true;
 }
 
 bool PFGpioPin::toggle()
 {
-    uint8_t v = pifacedigital_digital_read(gpio_no_);
+   if (direction_ != Direction::Out)
+        return false;
+
+    uint8_t v = pifacedigital_read_bit(gpio_no_, OUTPUT, 0);
 
     if (v)
         pifacedigital_digital_write(gpio_no_, 0);
     else
         pifacedigital_digital_write(gpio_no_, 1);
     return true;
+}
+
+
+void PFGpioPin::set_direction(PFGpioPin::Direction d)
+{
+    direction_ = d;
 }

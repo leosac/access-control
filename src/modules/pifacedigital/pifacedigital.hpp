@@ -13,6 +13,11 @@
 */
 struct PFGpioPin
     {
+    enum class Direction {
+        In = 0,
+        Out
+    };
+
     PFGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no);
     ~PFGpioPin();
 
@@ -53,6 +58,16 @@ struct PFGpioPin
     zmqpp::socket bus_push_;
 
     std::string name_;
+
+    /**
+    * Set the direction of the GPIO pin. This doesn't really affect the GPIO direction
+    * as this is impossible with the Piface.
+    * This is here because Piface use 0-7 for INPUT and 0-7 for OUTPUT too. Direction allows us to figure out
+    * if this is an output or input pin.
+    */
+    void set_direction(Direction d);
+
+    Direction direction_;
 
     };
 
@@ -116,4 +131,5 @@ private:
     int interrupt_fd_;
 
     bool first_;
+
     };
