@@ -9,7 +9,7 @@
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
         </module>
-
+<!--
         <module>
             <name>BENCH</name>
             <file>libbench-toggle.so</file>
@@ -30,6 +30,7 @@
                 <verbose>true</verbose>
             </module_config>
         </module>
+        -->
 
         <module>
             <name>PIFACE-GPIO</name>
@@ -42,7 +43,34 @@
                         <no>7</no>
                         <direction>out</direction>
                     </gpio>
+
+                    <!-- Prepare GPIO for our Wiegand reader -->
+                    <gpio>
+                        <name>wiegand_data_high</name>
+                        <no>0</no>
+                        <direction>in</direction>
+                    </gpio>
+                    <gpio>
+                        <name>wiegand_data_low</name>
+                        <no>2</no>
+                        <direction>in</direction>
+                    </gpio>
+
                 </gpios>
+            </module_config>
+        </module>
+
+        <module>
+            <name>WIEGAND</name>
+            <file>libwiegand.so</file>
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>W1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                    </reader>
+                </readers>
             </module_config>
         </module>
 

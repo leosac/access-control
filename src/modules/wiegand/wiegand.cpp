@@ -22,7 +22,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
 
-  //  module.run();
+   module.run();
 
     std::cout << "module WiegandReader shutting down." << std::endl;
     return true;
@@ -33,7 +33,53 @@ WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,
         boost::property_tree::ptree const &cfg) :
         ctx_(ctx),
         pipe_(*pipe),
-        config_(cfg)
+        config_(cfg),
+        is_running_(true)
 {
+    process_config();
 
+    for (auto &reader : readers_)
+    {
+        reactor_.add(reader.bus_sub_, std::bind(&WiegandReaderImpl::handle_bus_msg, &reader));
+    }
+    reactor_.add(pipe_, std::bind(&WiegandReaderModule::handle_pipe, this));
+}
+
+void WiegandReaderModule::process_config()
+{
+     boost::property_tree::ptree module_config = config_.get_child("module_config");
+
+    for (auto &node : module_config.get_child("readers"))
+    {
+        boost::property_tree::ptree gpio_cfg = node.second;
+
+        std::string reader_name = gpio_cfg.get_child("name").data();
+        std::string gpio_high = gpio_cfg.get_child("high").data();
+        std::string gpio_low = gpio_cfg.get_child("low").data();
+
+        LOG() << "Creating READER " << reader_name;
+        WiegandReaderImpl reader(ctx_, gpio_high, gpio_low);
+        readers_.push_back(std::move(reader));
+    }
+}
+
+void WiegandReaderModule::handle_pipe()
+{
+    zmqpp::signal s;
+
+    pipe_.receive(s, true);
+    if (s == zmqpp::signal::stop)
+        is_running_ = false;
+}
+
+void WiegandReaderModule::run()
+{
+    while (is_running_)
+    {
+        if (!reactor_.poll(1000))
+        {
+            LOG() << "timeout";
+        }
+
+    }
 }

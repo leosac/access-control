@@ -17,6 +17,17 @@ public:
     FGPIO(zmqpp::context &ctx, const std::string &gpio_name);
 
     /**
+    * Disabled copy-constructor.
+    * Manually create a new facade using the GPIO's name instead.
+    */
+    FGPIO(const FGPIO &) = delete;
+
+    /**
+    * Default destructor, RAII does the job.
+    */
+    ~FGPIO() = default;
+
+    /**
     * Turn the GPIO ON by sending a message to the backend GPIO impl.
     */
     bool turnOn();
