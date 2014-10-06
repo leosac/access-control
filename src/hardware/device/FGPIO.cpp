@@ -3,7 +3,7 @@
 FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name) :
         backend_(ctx, zmqpp::socket_type::req)
 {
-    backend_.bind("inproc://" + gpio_name);
+    backend_.connect("inproc://" + gpio_name);
 }
 
 bool FGPIO::turnOn()
@@ -25,7 +25,6 @@ bool FGPIO::turnOff()
     backend_.receive(rep);
     if (rep == "OK")
         return true;
-    return false;
     return false;
 }
 

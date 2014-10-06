@@ -60,6 +60,12 @@ struct PFGpioPin
     std::string name_;
 
     /**
+    * Ask the PiFace device for this pin's value and return it.
+    */
+    bool read_value();
+
+
+    /**
     * Set the direction of the GPIO pin. This doesn't really affect the GPIO direction
     * as this is impossible with the Piface.
     * This is here because Piface use 0-7 for INPUT and 0-7 for OUTPUT too. Direction allows us to figure out

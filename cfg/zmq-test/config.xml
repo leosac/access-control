@@ -8,7 +8,17 @@
         <module>
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
+        </module>
 
+        <module>
+            <name>BENCH</name>
+            <file>libbench-toggle.so</file>
+
+            <module_config>
+              <iterations>100</iterations>
+              <target>YELLOW</target>
+              <pause>500</pause>
+            </module_config>
         </module>
 
         <module>

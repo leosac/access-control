@@ -170,7 +170,7 @@ PFGpioPin &PFGpioPin::operator=(PFGpioPin &&o)
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
     this->direction_ = o.direction_;
-    
+
     return *this;
 }
 
@@ -193,7 +193,7 @@ void PFGpioPin::handle_message()
     // publish new state.
     LOG() << "gpio nammed {" << name_ << " will publish ";
 
-    //bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
+    bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
 bool PFGpioPin::turn_on()
@@ -231,3 +231,10 @@ void PFGpioPin::set_direction(PFGpioPin::Direction d)
 {
     direction_ = d;
 }
+
+bool PFGpioPin::read_value()
+{
+    // pin's direction matter here (not read from same register).
+    return pifacedigital_read_bit(gpio_no_, direction_ == Direction::Out ? OUTPUT : INPUT, 0);
+}
+
