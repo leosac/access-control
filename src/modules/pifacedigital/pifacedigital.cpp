@@ -7,6 +7,7 @@
 #include "pifacedigital.hpp"
 #include "zmqpp/actor.hpp"
 #include "../../../libpifacedigital/src/pifacedigital.h"
+#include "../../../libmcp23s17/src/mcp23s17.h"
 #include "tools/unixsyscall.hpp"
 #include "exception/gpioexception.hpp"
 
@@ -53,11 +54,12 @@ PFGpioModule::PFGpioModule(const boost::property_tree::ptree &config,
     reactor_.add(pipe_, std::bind(&PFGpioModule::handle_pipe, this));
 
     assert(pifacedigital_enable_interrupts() == 0);
-    interrupt_fd_ = open("/sys/class/gpio/gpio25/value", O_RDONLY | O_NONBLOCK);
+    std::string path_to_gpio = "/sys/class/gpio/gpio" + std::to_string(GPIO_INTERRUPT_PIN) + "/value";
+    interrupt_fd_ = open(path_to_gpio.c_str(), O_RDONLY | O_NONBLOCK);
     assert(interrupt_fd_ > 0);
     pifacedigital_read_reg(0x11, 0);//flush
     first_ = true; // Ignore GPIO Initial Event
-    reactor_.add(interrupt_fd_, std::bind(&PFGpioModule::handle_interrupt, this), zmqpp::poller::poll_in);
+    reactor_.add(interrupt_fd_, std::bind(&PFGpioModule::handle_interrupt, this), zmqpp::poller::poll_pri);
 }
 
 void PFGpioModule::run()
@@ -106,7 +108,6 @@ void PFGpioModule::handle_interrupt()
         for (int i = 0; i < 8; ++i)
     {
        LOG() << "PIN " << i << " HAS VALUE: " << ((states >> i) & 0x01);
-
     }
     pifacedigital_read_reg(0x11, 0); // flush
 }
