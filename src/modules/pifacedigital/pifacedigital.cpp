@@ -101,7 +101,7 @@ void PFGpioModule::handle_interrupt()
         {
             // this pin triggered interrupt
             LOG() << "PIN " << i << " IS IN INTERRUPT MODE";
-            bus_push_.send(zmqpp::message() << "S_TEST" << "OMG INTERRUPT ON PIN " << i);
+            bus_push_.send(zmqpp::message() << "S_TEST" << (std::string("OMG INTERRUPT ON PIN " + std::to_string(i))));
         }
     }
     states = pifacedigital_read_reg(INPUT, 0);
