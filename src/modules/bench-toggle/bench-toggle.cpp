@@ -4,6 +4,7 @@
 #include <tools/log.hpp>
 #include <zmqpp/context.hpp>
 #include "zmqpp/zmqpp.hpp"
+#include "hardware/device/FGPIO.hpp"
 
 /**
 * Send the request to the target and handle the response.
@@ -57,9 +58,11 @@ zmqpp::context &zmq_ctx)
     sock->connect("inproc://" + endpoint_to_bench);
     LOG() << "should take about " << itr * wait_for << "ms to run";
     std::chrono::system_clock::time_point clock = std::chrono::system_clock::now();
+        FGPIO my_gpio(zmq_ctx, endpoint_to_bench);
     for (int i = 0; i < itr; i++)
         {
-        send_request(sock, "TOGGLE");
+       // send_request(sock, "TOGGLE");
+            my_gpio.toggle();
         std::this_thread::sleep_for(std::chrono::milliseconds(wait_for));
         }
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clock);
