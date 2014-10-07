@@ -100,6 +100,7 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
     catch (const DynLibException &e)
     {
         delete lib;
+        LOG() << "FAILURE, full path was:{" << full_path << "}";
         return nullptr;
     }
     return lib;
