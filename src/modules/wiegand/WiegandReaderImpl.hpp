@@ -18,7 +18,9 @@ public:
     * @param data_low_pin name of the GPIO connected to data low.
     */
     WiegandReaderImpl(zmqpp::context &ctx,
-            const std::string &data_high_pin, const std::string &data_low_pin);
+            const std::string &name,
+            const std::string &data_high_pin,
+            const std::string &data_low_pin);
 
     WiegandReaderImpl(const WiegandReaderImpl &) = delete;
 
@@ -36,10 +38,16 @@ public:
     void handle_bus_msg();
 
     /**
-    * Timeout (no more data burst to handle). This WiegandModule call this.
+    * Timeout (no more data burst to handle). The WiegandModule call this when polling on any wiegand reader times out.
+    * The reader shall publish an event if it received any meaningful message since the last timeout.
     */
     void timeout();
 private:
+
+    /**
+    * Socket to write to the message bus.
+    */
+    zmqpp::socket bus_push_;
 
     /**
     * When did we notice last activity on our input pin?
@@ -57,5 +65,11 @@ private:
     std::string topic_low_;
 
     std::array<uint8_t, 8> buffer_;
+
     int counter_;
+
+    /**
+    * Name of the device (defined in configuration)
+    */
+    std::string name_;
 };

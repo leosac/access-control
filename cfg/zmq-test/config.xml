@@ -20,7 +20,7 @@
               <pause>500</pause>
             </module_config>
         </module>
-
+        -->
         <module>
             <name>MONITOR</name>
             <file>libpersistent-monitor.so</file>
@@ -30,7 +30,7 @@
                 <verbose>true</verbose>
             </module_config>
         </module>
-        -->
+
 
         <module>
             <name>PIFACE-GPIO</name>
