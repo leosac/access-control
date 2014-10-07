@@ -20,7 +20,6 @@ AuthFileModule::AuthFileModule(zmqpp::context &ctx,
     reactor_.add(pipe_, std::bind(&AuthFileModule::handle_pipe, this));
 }
 
-
 AuthFileModule::~AuthFileModule()
 {
     for (auto authenticator : authenticators_)
@@ -28,7 +27,6 @@ AuthFileModule::~AuthFileModule()
         delete authenticator;
     }
 }
-
 
 void AuthFileModule::handle_pipe()
 {

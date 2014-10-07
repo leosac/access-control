@@ -18,6 +18,8 @@ name_(name)
 
     bus_sub_.subscribe(topic_high_);
     bus_sub_.subscribe(topic_low_);
+
+    std::fill(buffer_.begin(), buffer_.end(), 0);
 }
 
 
@@ -39,6 +41,7 @@ void WiegandReaderImpl::handle_bus_msg()
     std::string msg;
     bus_sub_.receive(msg);
 
+    assert(counter_ < 128); // hardcoded max limit
     if (msg == topic_high_)
     {
         buffer_[counter_ / 8] |= (1 << (7 - counter_ % 8));
