@@ -22,7 +22,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
 
-   module.run();
+    module.run();
 
     std::cout << "module WiegandReader shutting down." << std::endl;
     return true;
@@ -47,7 +47,7 @@ WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,
 
 void WiegandReaderModule::process_config()
 {
-     boost::property_tree::ptree module_config = config_.get_child("module_config");
+    boost::property_tree::ptree module_config = config_.get_child("module_config");
 
     for (auto &node : module_config.get_child("readers"))
     {
