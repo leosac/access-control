@@ -3,6 +3,7 @@ set(DOORMAN_BIN doorman)
 set(DOORMAN_SRCS
     init.cpp
     DoormanModule.cpp
+    DoormanInstance.cpp
 )
 
 add_library(${DOORMAN_BIN} SHARED ${DOORMAN_SRCS})

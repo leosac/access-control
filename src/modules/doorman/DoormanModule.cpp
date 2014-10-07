@@ -51,16 +51,41 @@ void DoormanModule::process_config()
 
     for (auto &node : module_config.get_child("instances"))
     {
-        boost::property_tree::ptree auth_instance_cfg = node.second;
+        // one doorman instance
+        boost::property_tree::ptree cfg_doorman = node.second;
 
-        std::string auth_ctx_name = auth_instance_cfg.get_child("name").data();
-        std::string auth_target_name = auth_instance_cfg.get_child("auth_source").data();
-        std::string auth_input_file = auth_instance_cfg.get_child("valid_input_file").data();
+        std::vector<std::string> auth_ctx_names;
+        std::vector<DoormanAction> actions;
+        std::string doorman_name = cfg_doorman.get_child("name").data();
+        int timeout = cfg_doorman.get<int>("timeout", 1000);
 
-        LOG() << "Creating Auth instance " << auth_ctx_name;
-        doormen_.push_back(new AuthFileInstance(ctx_,
-                auth_ctx_name,
-                auth_target_name,
-                auth_input_file));
+        for (auto &auth_contexts_node : cfg_doorman.get_child("auth_contexts"))
+        {
+            // each auth context we listen to
+            auth_ctx_names.push_back(auth_contexts_node.second.get<std::string>("name"));
+        }
+
+        for (auto &action_node : cfg_doorman.get_child("actions"))
+        {
+            // every action we take
+            boost::property_tree::ptree cfg_action = action_node.second;
+            DoormanAction a;
+
+            a.on_ = cfg_action.get<std::string>("on");
+            a.target_ = cfg_action.get<std::string>("target");
+            int frame_count = 1;
+            for (auto &cmd_node : cfg_action.get_child("cmd"))
+            {
+                // each frame in command
+                //fixme ORDER
+                //fixme ONLY ONE FRAME
+                a.cmd_.push_back(cmd_node.second.data());
+            }
+            actions.push_back(a);
+        }
+
+        LOG() << "Creating Doorman instance " << doorman_name;
+        doormen_.push_back(new DoormanInstance(ctx_,
+                doorman_name, auth_ctx_names, actions, timeout));
     }
 }

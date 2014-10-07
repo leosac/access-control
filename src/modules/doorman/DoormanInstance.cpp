@@ -12,9 +12,11 @@ timeout_(timeout),
 bus_sub_(ctx, zmqpp::socket_type::sub)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
+    for (auto &endpoint : auth_contexts)
+        bus_sub_.subscribe("S_" + endpoint);
 }
 
-socket &DoormanInstance::bus_sub()
+zmqpp::socket &DoormanInstance::bus_sub()
 {
     return bus_sub_;
 }
@@ -22,4 +24,13 @@ socket &DoormanInstance::bus_sub()
 void DoormanInstance::handle_bus_msg()
 {
     LOG() << "DOORMAN HERE";
+
+    for (auto &action : actions_)
+    {
+        LOG() << "ACTION";
+        for (auto &frame : action.cmd_)
+        {
+            LOG() << "would do : " << frame;
+        }
+    }
 }

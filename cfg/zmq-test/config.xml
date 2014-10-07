@@ -36,14 +36,16 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
             <!-- Doorman module: react to authentication broadcast -->
             <name>DOORMAN</name>
             <file>libdoorman.so</file>
-            <level>42</level>
+            <level>50</level>
 
             <module_config>
                 <instances>
                     <instance>
                         <name>DOORMAN_JARVIS_1</name>
                         <auth_contexts>
-                            <auth_context>AUTH_CONTEXT_1</auth_context>
+                            <auth_context>
+                                <name>AUTH_CONTEXT_1</name>
+                            </auth_context>
                         </auth_contexts>
                         <!-- If multiple auth context, this is the maximum delay we use to "match together" auth event -->
                         <timeout>1000</timeout>
