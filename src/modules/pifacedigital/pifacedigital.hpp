@@ -144,6 +144,9 @@ private:
     */
     int interrupt_fd_;
 
+    /**
+    * need to make sure this is needed
+    */
     bool first_;
 
     };

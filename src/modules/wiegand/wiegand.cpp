@@ -51,14 +51,14 @@ void WiegandReaderModule::process_config()
 
     for (auto &node : module_config.get_child("readers"))
     {
-        boost::property_tree::ptree gpio_cfg = node.second;
+        boost::property_tree::ptree reader_cfg = node.second;
 
-        std::string reader_name = gpio_cfg.get_child("name").data();
-        std::string gpio_high = gpio_cfg.get_child("high").data();
-        std::string gpio_low = gpio_cfg.get_child("low").data();
+        std::string reader_name = reader_cfg.get_child("name").data();
+        std::string gpio_high = reader_cfg.get_child("high").data();
+        std::string gpio_low = reader_cfg.get_child("low").data();
 
         LOG() << "Creating READER " << reader_name;
-        WiegandReaderImpl reader(ctx_, gpio_high, gpio_low);
+        WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low);
         readers_.push_back(std::move(reader));
     }
 }
@@ -76,11 +76,11 @@ void WiegandReaderModule::run()
 {
     while (is_running_)
     {
-        if (!reactor_.poll(1000))
+        if (!reactor_.poll(10))
         {
             for (auto &reader : readers_)
                 reader.timeout();
-            LOG() << "timeout";
+            //LOG() << "timeout";
         }
 
     }

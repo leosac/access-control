@@ -5,6 +5,11 @@
 
 /**
 * Module providing support for Wiegand Reader.
+* This module allows user to register multiple wiegand reader in the configuration file.
+*
+* Message passing protocol:
+*     1. Upon reception of what looks like a full wiegand frame, a message MUST be published to the application bus.
+*     2. This message SHALL contain the card-id that was read, in hexadecimal format, for example:
 */
 class WiegandReaderModule
 {
