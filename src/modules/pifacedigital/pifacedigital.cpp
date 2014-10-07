@@ -215,9 +215,8 @@ void PFGpioPin::handle_message()
     else if (frame1 == "TOGGLE")
         ok = toggle();
     sock_.send(ok ? "OK" : "KO");
-    // publish new state.
-    LOG() << "gpio nammed {" << name_ << " will publish ";
 
+    // publish new state.
     bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
