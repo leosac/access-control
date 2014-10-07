@@ -22,7 +22,6 @@ name_(name)
     std::fill(buffer_.begin(), buffer_.end(), 0);
 }
 
-
 WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
 bus_sub_(std::move(o.bus_sub_)),
 bus_push_(std::move(o.bus_push_)),
