@@ -10,6 +10,7 @@
 #include "../../../libmcp23s17/src/mcp23s17.h"
 #include "tools/unixsyscall.hpp"
 #include "exception/gpioexception.hpp"
+#include <pthread.h>
 
 /**
 * pipe is pipe back to module manager.
@@ -26,6 +27,10 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
 
+    // this thread need realtime priority so it doesn't miss interrupt.
+    struct sched_param p;
+    p.sched_priority = 20;
+    assert(pthread_setschedparam(pthread_self(), SCHED_RR, &p) == 0);
 
     module.run();
 
@@ -82,7 +87,6 @@ void PFGpioModule::handle_pipe()
 void PFGpioModule::handle_interrupt()
 {
     // get interrupt state.
-    LOG() << "BOAP";
     std::array<char, 64> buffer;
 
     if (::read(interrupt_fd_, &buffer[0], buffer.size()) < 0)
@@ -100,8 +104,8 @@ void PFGpioModule::handle_interrupt()
         if (((states >> i) & 0x01) == 0)
         {
             // this pin triggered interrupt
-          //  LOG() << "PIN " << i << " IS IN INTERRUPT MODE";
-            bus_push_.send(zmqpp::message() << "S_TEST" << (std::string("OMG INTERRUPT ON PIN " + std::to_string(i))));
+            //LOG() << "PIN " << i << " IS IN INTERRUPT MODE";
+            //bus_push_.send(zmqpp::message() << "S_TEST" << (std::string("OMG INTERRUPT ON PIN " + std::to_string(i))));
 
             // signal interrupt if needed (ie the pin is registered in config
             std::string gpio_name;
