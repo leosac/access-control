@@ -59,7 +59,7 @@ private:
     */
     std::string topic_low_;
 
-    std::array<uint8_t, 8> buffer_;
+    std::array<uint8_t, 16> buffer_;
 
     int counter_;
 
