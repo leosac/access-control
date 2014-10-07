@@ -45,13 +45,9 @@ void WiegandReaderImpl::handle_bus_msg()
     }
     else if (msg == topic_low_)
     {
-
+        // well, nothing to do here.
     }
     counter_++;
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last_pin_activity_);
-    last_pin_activity_ = std::chrono::system_clock::now();
-
-    LOG() << "Someting to read for wiegand reader";
 }
 
 void WiegandReaderImpl::timeout()
@@ -67,7 +63,8 @@ void WiegandReaderImpl::timeout()
     for (std::size_t i = 0; i < size; ++i)
         {
             card_hex << std::hex << static_cast<int>(buffer_[size - i - 1]);
-            card_hex << ":";
+            if (i + 1 < size)
+                card_hex << ":";
         }
 
     zmqpp::message msg;

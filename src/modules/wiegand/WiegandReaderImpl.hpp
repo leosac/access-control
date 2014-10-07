@@ -50,11 +50,6 @@ private:
     zmqpp::socket bus_push_;
 
     /**
-    * When did we notice last activity on our input pin?
-    */
-    std::chrono::system_clock::time_point last_pin_activity_;
-
-    /**
     * ZMQ topic-string to interrupt on HIGH gpio
     */
     std::string topic_high_;
