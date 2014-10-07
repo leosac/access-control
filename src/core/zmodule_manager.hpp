@@ -20,7 +20,7 @@
 * in its own thread.
 *
 * @note: Use the "level" property to define module initialization order.
-* This initialization order is mandatory, and the lower the value is, the sonner the module is loaded.
+* This initialization order is mandatory, and the lower the value is, the sooner the module is loaded.
 */
 class zModuleManager
     {
@@ -75,9 +75,9 @@ private:
     struct ModuleInfo
     {
         /**
-    * Name of the module, as specified in the configuration file.
-    */
-    std::string name_;
+        * Name of the module, as specified in the configuration file.
+        */
+        std::string name_;
 
         /**
         * Pointer to the library object.
