@@ -32,6 +32,33 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
             </module_config>
         </module>
 
+        <module>
+            <!-- Doorman module: react to authentication broadcast -->
+            <name>DOORMAN</name>
+            <file>libdoorman.so</file>
+            <level>42</level>
+
+            <module_config>
+                <instances>
+                    <instance>
+                        <name>DOORMAN_JARVIS_1</name>
+                        <auth_contexts>
+                            <auth_context>AUTH_CONTEXT_1</auth_context>
+                        </auth_contexts>
+                        <actions>
+                            <action>
+                                <target>YELLOW</target>
+                                <cmd>
+                                    <f1>TOGGLE</f1>
+                                </cmd>
+                            </action>
+                        </actions>
+
+                    </instance>
+                </instances>
+            </module_config>
+        </module>
+
         <!--
                 <module>
                     <name>BENCH</name>
