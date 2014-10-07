@@ -7,7 +7,6 @@ set(LEOSAC_SRCS
 
 set(LEOSAC_LIB_SRCS
     config/xmlconfig.cpp
-    #config/ConfigTree.cpp
     core/kernel.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
@@ -101,7 +100,6 @@ endif()
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-${CMAKE_CURRENT_SOURCE_DIR}/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/zmqpp/src/
 )
