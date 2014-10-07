@@ -33,12 +33,12 @@ public:
     bool turnOn();
 
     /**
-    * Turn the GPIO ON by sending a message to the backend GPIO impl.
+    * Turn the GPIO OFF by sending a message to the backend GPIO impl.
     */
     bool turnOff();
 
     /**
-    * Turn the GPIO ON by sending a message to the backend GPIO impl.
+    * Toggle the GPIO value by sending a message to the backend GPIO impl.
     */
     bool toggle();
 

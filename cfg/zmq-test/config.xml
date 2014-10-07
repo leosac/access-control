@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-        <kernel>
+<kernel>
     <plugin_directories>
         <plugindir>.</plugindir>
     </plugin_directories>
@@ -10,18 +10,44 @@
             <file>libstdin-controller.so</file>
             <level>40</level>
         </module>
-<!--
+
         <module>
-            <name>BENCH</name>
-            <file>libbench-toggle.so</file>
+            <name>AUTH-MANAGER-FILE</name>
+            <file>libauth-file.so</file>
+            <level>41</level>
 
             <module_config>
-              <iterations>100</iterations>
-              <target>YELLOW</target>
-              <pause>500</pause>
+                <instances>
+                    <!-- Multiple authentication instance are allowed -->
+                    <instance>
+                        <name>AUTH_CONTEXT_1</name>
+                        <!--
+                        File that contains (1 per line) the textual data that is valid.
+                        With a wiegand reader, it could be something like this "ab:0f:fa:12"
+                        -->
+                        <valid_input_file>valid-cards.txt</valid_input_file>
+
+                        <!-- Device we watch as input souce -->
+                        <auth-sources>
+                            <auth-source>MY_WIEGAND_1</auth-source>
+                        </auth-sources>
+                    </instance>
+                </instances>
             </module_config>
         </module>
-        -->
+
+        <!--
+                <module>
+                    <name>BENCH</name>
+                    <file>libbench-toggle.so</file>
+
+                    <module_config>
+                      <iterations>100</iterations>
+                      <target>YELLOW</target>
+                      <pause>500</pause>
+                    </module_config>
+                </module>
+                -->
         <module>
             <name>MONITOR</name>
             <file>libpersistent-monitor.so</file>
@@ -71,7 +97,7 @@
             <module_config>
                 <readers>
                     <reader>
-                        <name>W1</name>
+                        <name>MY_WIEGAND_1</name>
                         <high>wiegand_data_high</high>
                         <low>wiegand_data_low</low>
                     </reader>
