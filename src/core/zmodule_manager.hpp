@@ -3,9 +3,10 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 #include <dynlib/dynamiclibrary.hpp>
 #include <modules/moduleconfig.h>
-#include <boost/property_tree/ptree_fwd.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "zmqpp/actor.hpp"
 
@@ -17,6 +18,9 @@
 *
 * @note: Only the zModuleManager object has "direct access" to the module object. It is zmqpp::actor launch the module
 * in its own thread.
+*
+* @note: Use the "level" property to define module initialization order.
+* This initialization order is mandatory, and the lower the value is, the sonner the module is loaded.
 */
 class zModuleManager
     {
@@ -32,6 +36,7 @@ public:
 
     /**
     * Actually call the init_module() function of each library we loaded.
+    * The module initialization order in honored (see the "level" property).
     * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
     */
     bool        initModules();
@@ -58,17 +63,48 @@ public:
 private:
     /**
     * This will load (actually calling dlopen()) the library file located at full_path.
+    * It returns a DynamicLibrary pointer that can be used to retrieve symbol from the shared object.
+    * It it failed, returns nullptr.
     */
-    void    load_library_file(const std::string &module_name, const std::string &full_path);
-
-private:
-    std::vector<std::string> path_;
-    std::map<std::string, DynamicLibrary*>      _dynlibs;
+    DynamicLibrary    *load_library_file(const std::string &full_path);
 
     /**
-    * Maps module configuration tree to module name.
+    * Internal helper struct that store informations related to module
+    * that are useful to the module manager.
     */
-    std::map<std::string, boost::property_tree::ptree> modules_config_;
+    struct ModuleInfo
+    {
+        /**
+    * Name of the module, as specified in the configuration file.
+    */
+    std::string name_;
+
+        /**
+        * Pointer to the library object.
+        */
+        DynamicLibrary *lib_;
+
+        /**
+        * Config tree for the module.
+        */
+        boost::property_tree::ptree config_;
+
+        /**
+        * Comparaison operator: used by the module manager set.
+        * We do not really care about uniqueness, we use this
+        * to sort module by their loading priority.
+        */
+        bool operator<(const ModuleInfo &o) const
+        {
+            int level_me = config_.get<int>("level", 100);
+            int level_o = o.config_.get<int>("level", 100);
+
+            return level_me < level_o;
+        }
+    };
+
+    std::vector<std::string> path_;
+    std::set<ModuleInfo> BLABLA_;
 
     /**
     * Since module live is their own thread, we use the actor pattern.
