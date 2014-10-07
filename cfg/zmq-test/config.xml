@@ -8,6 +8,7 @@
         <module>
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
+            <level>40</level>
         </module>
 <!--
         <module>
@@ -24,6 +25,7 @@
         <module>
             <name>MONITOR</name>
             <file>libpersistent-monitor.so</file>
+            <level>1</level>
 
             <module_config>
                 <file>MY_LOGS.txt</file>
@@ -35,6 +37,7 @@
         <module>
             <name>PIFACE-GPIO</name>
             <file>libpifacedigital.so</file>
+            <level>2</level>
 
             <module_config>
                 <gpios>
@@ -63,6 +66,8 @@
         <module>
             <name>WIEGAND</name>
             <file>libWIEGAND.so</file>
+            <level>5</level>
+
             <module_config>
                 <readers>
                     <reader>

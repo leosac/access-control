@@ -61,11 +61,12 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
                 msg >> buf;
                 full_msg << "F" << i << ": {" << buf << "} ; ";
             }
-            of << full_msg.str();
             if (verbose)
             {
                 LOG() << full_msg.str();
             }
+            full_msg << std::endl;
+            of << full_msg.str();
         }
     }
 

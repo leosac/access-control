@@ -9,41 +9,43 @@
 
 void zModuleManager::unloadLibraries()
 {
-    for (auto& lib : _dynlibs)
+    for (auto& module_info : BLABLA_)
     {
         try {
-            lib.second->close();
+            module_info.lib_->close();
         }
         catch (const DynLibException& e) {
             throw (ModuleException(e.what()));
         }
-        delete lib.second;
+        //delete module_info.lib_;
+       // module_info.lib_ = nullptr;
     }
-    _dynlibs.clear();
+    BLABLA_.clear();
 }
 
 
 bool zModuleManager::initModules()
     {
-    for (auto & dynlib : _dynlibs)
+    for (auto & module_info : BLABLA_)
         {
         try
             {
-            void *symptr = dynlib.second->getSymbol("start_module");
+            void *symptr = module_info.lib_->getSymbol("start_module");
             assert(symptr);
             std::function< bool (zmqpp::socket *) > actor_fun = std::bind(
                     ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context & )) symptr),
             std::placeholders::_1, // placeholder for pipe
-                    modules_config_[dynlib.first],
-            std::ref(ctx_));
+                    module_info.config_,
+                    std::ref(ctx_));
             zmqpp::actor new_module(actor_fun);
             modules_.push_back(std::move(new_module));
 
-            LOG() << "Module {" << dynlib.first << "} initialized.";
+            LOG() << "Module {" << module_info.name_ << "} initialized. (level = " <<
+                    module_info.config_.get<int>("level", 100);
             }
         catch (std::exception &e)
             {
-            LOG() << "Unable to init module {" << dynlib.first << "}: " << e.what();
+            LOG() << "Unable to init module {" << module_info.name_ << "}: " << e.what();
             return false;
             }
         }
@@ -67,8 +69,13 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
         // fixme not clean enough.
         if (UnixFs::fileExists(path_entry + "/" + filename))
             {
-            load_library_file(module_name, path_entry + "/" + filename);
-            modules_config_[module_name] = cfg;
+                ModuleInfo module_info;
+
+                module_info.name_ = module_name;
+                module_info.config_ = cfg;
+                if (!(module_info.lib_ = load_library_file(path_entry + "/" + filename)))
+                    return false;
+                BLABLA_.insert(module_info);
             LOG() << "library file loaded (not init yet)";
             return true;
             }
@@ -78,24 +85,20 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
     return false;
     }
 
-void zModuleManager::load_library_file(const std::string &module_name, const std::string &full_path)
+DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
     {
+    DynamicLibrary* lib = nullptr;
 
-    std::string     libname(UnixFs::stripPath(full_path));
-    DynamicLibrary* lib;
-
-    LOG() << "Loading " << libname << "(full path: " << full_path << ")";
-    if (_dynlibs.count(module_name) > 0)
-        throw (ModuleException("module already loaded at " + _dynlibs.at(libname)->getFilePath()));
+    LOG() << "Loading library at: " << full_path;
     lib = new DynamicLibrary(full_path);
     try {
         lib->open(DynamicLibrary::RelocationMode::Now);
     }
     catch (const DynLibException& e) {
         delete lib;
-        throw (ModuleException(e.what()));
+        return nullptr;
     }
-    _dynlibs[module_name] = lib;
+        return lib;
     }
 
 void zModuleManager::stopModules()
