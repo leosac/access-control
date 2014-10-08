@@ -12,7 +12,8 @@ PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
         sock_(ctx, zmqpp::socket_type::rep),
         bus_push_(ctx, zmqpp::socket_type::push),
         name_(name),
-        direction_(direction)
+        direction_(direction),
+        default_value_(value)
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
@@ -24,13 +25,15 @@ PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
 
 PFDigitalPin::~PFDigitalPin()
 {
-
+    if (direction_ == Direction::Out)
+        default_value_ ? turn_on() : turn_off();
 }
 
 PFDigitalPin::PFDigitalPin(PFDigitalPin &&o) :
         sock_(std::move(o.sock_)),
         bus_push_(std::move(o.bus_push_)),
-        direction_(o.direction_)
+        direction_(o.direction_),
+        default_value_(o.default_value_)
 {
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
