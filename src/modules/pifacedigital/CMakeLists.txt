@@ -1,7 +1,8 @@
 set(PIFACEDIGITAL_BIN pifacedigital)
 
 set(PIFACEDIGITAL_SRCS
-    pifacedigital.cpp
+    PFDigitalModule.cpp
+    PFDigitalPin.cpp
 )
 
 add_library(${PIFACEDIGITAL_BIN} SHARED ${PIFACEDIGITAL_SRCS})

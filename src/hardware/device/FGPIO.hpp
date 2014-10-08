@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <chrono>
 #include <zmqpp/socket.hpp>
 
 /**
@@ -26,6 +27,11 @@ public:
     * Default destructor, RAII does the job.
     */
     ~FGPIO() = default;
+
+    /**
+    * Turn the GPIO ON and turn it OFF duration milliseconds later.
+    */
+    bool turnOn(std::chrono::milliseconds duration);
 
     /**
     * Turn the GPIO ON by sending a message to the backend GPIO impl.

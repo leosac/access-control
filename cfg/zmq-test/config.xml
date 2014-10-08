@@ -53,8 +53,13 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                             <action>
                                 <on>GRANTED</on>
                                 <target>YELLOW</target>
+                                <!--
                                 <cmd>
                                     <f1>TOGGLE</f1>
+                                </cmd> -->
+                                <cmd>
+                                    <f1>ON</f1>
+                                    <f2>3000</f2>
                                 </cmd>
                             </action>
                         </actions>
