@@ -104,6 +104,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <name>YELLOW</name>
                         <no>7</no>
                         <direction>out</direction>
+                        <value>1</value>
                     </gpio>
 
                     <!-- Prepare GPIO for our Wiegand reader -->

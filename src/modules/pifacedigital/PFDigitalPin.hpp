@@ -16,14 +16,28 @@ struct PFDigitalPin
         Out
     };
 
-    PFDigitalPin(zmqpp::context &ctx, const std::string &name, int gpio_no);
+    /**
+    * Create a new GPIO pin.
+    *
+    * @param ctx The ZeroMQ context
+    * @param name the name we defined for the PIN
+    * @param gpio_no The number of this GPIO
+    * @param direction Whether this an input or output pin.
+    * @param value the initial value of the pin. This only make sense if the pin is an output pin.
+    */
+    PFDigitalPin(zmqpp::context &ctx,
+            const std::string &name,
+            int gpio_no,
+            Direction direction,
+            bool value);
+
     ~PFDigitalPin();
 
     PFDigitalPin(const PFDigitalPin &) = delete;
     PFDigitalPin &operator=(const PFDigitalPin &) = delete;
 
     PFDigitalPin(PFDigitalPin &&o);
-    PFDigitalPin &operator=(PFDigitalPin &&o);
+    PFDigitalPin &operator=(PFDigitalPin &&) = delete;
 
     /**
     * Write to PFDigital to turn the gpio on.
@@ -62,15 +76,10 @@ struct PFDigitalPin
     */
     bool read_value();
 
-
     /**
-    * Set the direction of the GPIO pin. This doesn't really affect the GPIO direction
-    * as this is impossible with the Piface.
-    * This is here because Piface use 0-7 for INPUT and 0-7 for OUTPUT too. Direction allows us to figure out
-    * if this is an output or input pin.
+    * This is the direction of the GPIO pin.
+    * This cannot be modified once the GPIO has been created.
     */
-    void set_direction(Direction d);
-
-    Direction direction_;
+    const Direction direction_;
 
 };
