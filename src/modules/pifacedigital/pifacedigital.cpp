@@ -214,6 +214,8 @@ void PFGpioPin::handle_message()
         ok = turn_off();
     else if (frame1 == "TOGGLE")
         ok = toggle();
+    else // invalid cmd
+        ok = false;
     sock_.send(ok ? "OK" : "KO");
 
     // publish new state.

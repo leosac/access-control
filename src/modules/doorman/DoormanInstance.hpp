@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <map>
 #include <zmqpp/zmqpp.hpp>
 
 struct DoormanAction
@@ -55,6 +55,14 @@ public:
 
 private:
 
+    /**
+    * Send a command to a target and wait for response.
+    *
+    * @param target_name name of target object
+    * @param msg message containing command (and command parameter) to send
+    */
+    void command_send_recv(const std::string &target_name, zmqpp::message msg);
+
     std::string name_;
 
     std::vector<DoormanAction> actions_;
@@ -67,4 +75,9 @@ private:
     int timeout_;
 
     zmqpp::socket bus_sub_;
+
+    /**
+    * Socket (REP) connected to each target this doorman may have
+    */
+    std::map<std::string, zmqpp::socket> targets_;
 };
