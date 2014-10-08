@@ -40,6 +40,8 @@ struct PFDigitalPin
     PFDigitalPin(PFDigitalPin &&o);
     PFDigitalPin &operator=(PFDigitalPin &&) = delete;
 
+    void publish_state();
+
     /**
     * Let the GPIO pin perform internal task.
     * This is called by the PFDigitalModule in the main loop.
@@ -84,7 +86,7 @@ struct PFDigitalPin
     /**
     * PUSH socket to write to the bus.
     */
-    zmqpp::socket bus_push_;
+    zmqpp::socket *bus_push_;
 
     std::string name_;
 

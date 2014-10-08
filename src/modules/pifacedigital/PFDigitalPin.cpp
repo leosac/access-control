@@ -10,7 +10,7 @@ PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
         bool value) :
         gpio_no_(gpio_no),
         sock_(ctx, zmqpp::socket_type::rep),
-        bus_push_(ctx, zmqpp::socket_type::push),
+        bus_push_(new zmqpp::socket(ctx, zmqpp::socket_type::push)),
         name_(name),
         direction_(direction),
         default_value_(value),
@@ -18,7 +18,7 @@ PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
-    bus_push_.connect("inproc://zmq-bus-pull");
+    bus_push_->connect("inproc://zmq-bus-pull");
 
     if (direction == Direction::Out)
         value ? turn_on() : turn_off();
@@ -28,16 +28,19 @@ PFDigitalPin::~PFDigitalPin()
 {
     if (direction_ == Direction::Out)
         default_value_ ? turn_on() : turn_off();
+    delete bus_push_;
 }
 
 PFDigitalPin::PFDigitalPin(PFDigitalPin &&o) :
         sock_(std::move(o.sock_)),
-        bus_push_(std::move(o.bus_push_)),
         direction_(o.direction_),
         default_value_(o.default_value_)
 {
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
+    this->bus_push_ = o.bus_push_;
+
+    o.bus_push_ = nullptr;
 }
 
 void PFDigitalPin::handle_message()
@@ -57,9 +60,6 @@ void PFDigitalPin::handle_message()
     else // invalid cmd
         ok = false;
     sock_.send(ok ? "OK" : "KO");
-
-    // publish new state.
-    bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
 bool PFDigitalPin::turn_on(zmqpp::message *msg /* = nullptr */)
@@ -76,6 +76,8 @@ bool PFDigitalPin::turn_on(zmqpp::message *msg /* = nullptr */)
         want_update_ = true;
     }
     pifacedigital_digital_write(gpio_no_, 1);
+
+    publish_state();
     return true;
 }
 
@@ -84,6 +86,8 @@ bool PFDigitalPin::turn_off()
     if (direction_ != Direction::Out)
         return false;
     pifacedigital_digital_write(gpio_no_, 0);
+
+    publish_state();
     return true;
 }
 
@@ -98,6 +102,8 @@ bool PFDigitalPin::toggle()
         pifacedigital_digital_write(gpio_no_, 0);
     else
         pifacedigital_digital_write(gpio_no_, 1);
+
+    publish_state();
     return true;
 }
 
@@ -120,4 +126,10 @@ std::chrono::system_clock::time_point PFDigitalPin::next_update()
     if (want_update_)
         return next_update_time_;
     return std::chrono::system_clock::time_point::max();
+}
+
+void PFDigitalPin::publish_state()
+{
+    if (bus_push_)
+        bus_push_->send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
