@@ -3,15 +3,23 @@
 #include "pifacedigital.h"
 #include "tools/log.hpp"
 
-PFDigitalPin::PFDigitalPin(zmqpp::context &ctx, const std::string &name, int gpio_no) :
+PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
+        const std::string &name,
+        int gpio_no,
+        Direction direction,
+        bool value) :
         gpio_no_(gpio_no),
         sock_(ctx, zmqpp::socket_type::rep),
         bus_push_(ctx, zmqpp::socket_type::push),
-        name_(name)
+        name_(name),
+        direction_(direction)
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
     bus_push_.connect("inproc://zmq-bus-pull");
+
+    if (direction == Direction::Out)
+        value ? turn_on() : turn_off();
 }
 
 PFDigitalPin::~PFDigitalPin()
@@ -21,25 +29,12 @@ PFDigitalPin::~PFDigitalPin()
 
 PFDigitalPin::PFDigitalPin(PFDigitalPin &&o) :
         sock_(std::move(o.sock_)),
-        bus_push_(std::move(o.bus_push_))
+        bus_push_(std::move(o.bus_push_)),
+        direction_(o.direction_)
 {
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
-    this->direction_ = o.direction_;
 }
-
-PFDigitalPin &PFDigitalPin::operator=(PFDigitalPin &&o)
-{
-    sock_ = std::move(o.sock_);
-    bus_push_ = std::move(o.bus_push_);
-
-    this->gpio_no_ = o.gpio_no_;
-    this->name_ = o.name_;
-    this->direction_ = o.direction_;
-
-    return *this;
-}
-
 
 void PFDigitalPin::handle_message()
 {
@@ -91,12 +86,6 @@ bool PFDigitalPin::toggle()
     else
         pifacedigital_digital_write(gpio_no_, 1);
     return true;
-}
-
-
-void PFDigitalPin::set_direction(PFDigitalPin::Direction d)
-{
-    direction_ = d;
 }
 
 bool PFDigitalPin::read_value()

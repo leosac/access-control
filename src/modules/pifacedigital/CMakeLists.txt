@@ -1,6 +1,7 @@
 set(PIFACEDIGITAL_BIN pifacedigital)
 
 set(PIFACEDIGITAL_SRCS
+    init.cpp
     PFDigitalModule.cpp
     PFDigitalPin.cpp
 )
