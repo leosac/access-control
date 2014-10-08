@@ -82,7 +82,7 @@ void PFDigitalModule::handle_interrupt()
     {
         if (((states >> i) & 0x01) == 0)
         {
-            // signal interrupt if needed (ie the pin is registered in config
+            // signal interrupt if needed (ie the pin is registered in config)
             std::string gpio_name;
             if (get_input_pin_name(gpio_name, i))
             {

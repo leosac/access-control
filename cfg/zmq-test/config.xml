@@ -28,6 +28,12 @@
 With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <valid_input_file>valid-cards.txt</valid_input_file>
                     </instance>
+
+                    <instance>
+                        <name>AUTH_CTX_2</name>
+                        <auth_source>MY_WIEGAND_2</auth_source>
+                        <valid_input_file>alternative-cards.txt</valid_input_file>
+                    </instance>
                 </instances>
             </module_config>
         </module>
@@ -51,19 +57,57 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <timeout>1000</timeout>
                         <actions>
                             <action>
-                                <on>GRANTED</on>
-                                <target>YELLOW</target>
-                                <!--
-                                <cmd>
-                                    <f1>TOGGLE</f1>
-                                </cmd> -->
+                                <on>DENIED</on>
+                                <target>wiegand_buzzer</target>
                                 <cmd>
                                     <f1>ON</f1>
-                                    <f2>3000</f2>
+                                    <f2>500</f2>
+                                </cmd>
+                            </action>
+                            <action>
+                                <on>GRANTED</on>
+                                <target>wiegand_green</target>
+                                <cmd>
+                                    <f1>ON</f1>
+                                    <f2>1000</f2>
+                                </cmd>
+                            </action>
+                            <action>
+                                <on>DENIED</on>
+                                <target>RED</target>
+                                <cmd>
+                                    <f1>ON</f1>
+                                    <f2>2000</f2>
                                 </cmd>
                             </action>
                         </actions>
-
+                    </instance>
+                    <instance>
+                        <name>DOORMAN_2</name>
+                        <auth_contexts>
+                            <auth_context>
+                                <name>AUTH_CTX_2</name>
+                            </auth_context>
+                        </auth_contexts>
+                        <!-- If multiple auth context, this is the maximum delay we use to "match together" auth event -->
+                        <timeout>1000</timeout>
+                        <actions>
+                            <action>
+                                <on>GRANTED</on>
+                                <target>YELLOW</target>
+                                <cmd>
+                                    <f1>TOGGLE</f1>
+                                </cmd>
+                            </action>
+                            <action>
+                                <on>DENIED</on>
+                                <target>RED</target>
+                                <cmd>
+                                    <f1>ON</f1>
+                                    <f2>2000</f2>
+                                </cmd>
+                            </action>
+                        </actions>
                     </instance>
                 </instances>
             </module_config>
@@ -88,7 +132,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
 
             <module_config>
                 <file>MY_LOGS.txt</file>
-                <verbose>true</verbose>
+                <verbose>false</verbose>
             </module_config>
         </module>
 
@@ -101,10 +145,31 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
             <module_config>
                 <gpios>
                     <gpio>
+                        <name>RED</name>
+                        <no>4</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
                         <name>YELLOW</name>
                         <no>7</no>
                         <direction>out</direction>
-                        <value>1</value>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>wiegand_green</name>
+                        <no>3</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>wiegand_buzzer</name>
+                        <no>2</no>
+                        <direction>out</direction>
+                        <value>false</value>
                     </gpio>
 
                     <!-- Prepare GPIO for our Wiegand reader -->
@@ -116,6 +181,17 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                     <gpio>
                         <name>wiegand_data_low</name>
                         <no>2</no>
+                        <direction>in</direction>
+                    </gpio>
+
+                    <gpio>
+                        <name>wiegand2_data_high</name>
+                        <no>4</no>
+                        <direction>in</direction>
+                    </gpio>
+                    <gpio>
+                        <name>wiegand2_data_low</name>
+                        <no>5</no>
                         <direction>in</direction>
                     </gpio>
 
@@ -135,6 +211,13 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <high>wiegand_data_high</high>
                         <low>wiegand_data_low</low>
                     </reader>
+
+                    <reader>
+                        <name>MY_WIEGAND_2</name>
+                        <high>wiegand2_data_high</high>
+                        <low>wiegand2_data_low</low>
+                    </reader>
+
                 </readers>
             </module_config>
         </module>
