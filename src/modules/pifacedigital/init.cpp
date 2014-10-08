@@ -17,8 +17,8 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
 
     // this thread need realtime priority so it doesn't miss interrupt.
     struct sched_param p;
-    p.sched_priority = 20;
-    assert(pthread_setschedparam(pthread_self(), SCHED_RR, &p) == 0);
+    p.sched_priority = 90;
+    assert(pthread_setschedparam(pthread_self(), SCHED_FIFO, &p) == 0);
 
     module.run();
 

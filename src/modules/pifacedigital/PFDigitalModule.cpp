@@ -33,11 +33,28 @@ PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
     reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this), zmqpp::poller::poll_pri);
 }
 
+int PFDigitalModule::compute_timeout()
+{
+    std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
+
+    for (auto &gpio_pin : gpios_)
+    {
+        if (gpio_pin.next_update() < tp)
+            tp = gpio_pin.next_update();
+    }
+    return std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
+}
+
 void PFDigitalModule::run()
 {
     while (is_running_)
     {
-      reactor_.poll(-1);
+        reactor_.poll(compute_timeout());
+        for (auto &gpio_pin : gpios_)
+        {
+            if (gpio_pin.next_update() < std::chrono::system_clock::now())
+                gpio_pin.update();
+        }
     }
 }
 

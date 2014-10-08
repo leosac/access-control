@@ -13,7 +13,8 @@ PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
         bus_push_(ctx, zmqpp::socket_type::push),
         name_(name),
         direction_(direction),
-        default_value_(value)
+        default_value_(value),
+        want_update_(false)
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
@@ -48,7 +49,7 @@ void PFDigitalPin::handle_message()
     msg >> frame1;
     bool ok = false;
     if (frame1 == "ON")
-        ok = turn_on();
+        ok = turn_on(&msg);
     else if (frame1 == "OFF")
         ok = turn_off();
     else if (frame1 == "TOGGLE")
@@ -61,10 +62,19 @@ void PFDigitalPin::handle_message()
     bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
-bool PFDigitalPin::turn_on()
+bool PFDigitalPin::turn_on(zmqpp::message *msg /* = nullptr */)
 {
     if (direction_ != Direction::Out)
         return false;
+
+    if (msg && msg->parts() > 1)
+    {
+        // optional parameter is present
+        std::string duration;
+        *msg >> duration;
+        next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(std::stoi(duration));
+        want_update_ = true;
+    }
     pifacedigital_digital_write(gpio_no_, 1);
     return true;
 }
@@ -97,3 +107,17 @@ bool PFDigitalPin::read_value()
     return pifacedigital_read_bit(gpio_no_, direction_ == Direction::Out ? OUTPUT : INPUT, 0);
 }
 
+
+void PFDigitalPin::update()
+{
+    LOG() << "UPDATING";
+    turn_off();
+    want_update_ = false;
+}
+
+std::chrono::system_clock::time_point PFDigitalPin::next_update()
+{
+    if (want_update_)
+        return next_update_time_;
+    return std::chrono::system_clock::time_point::max();
+}
