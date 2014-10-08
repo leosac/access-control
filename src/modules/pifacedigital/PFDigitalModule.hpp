@@ -64,6 +64,12 @@ private:
     void process_config(const boost::property_tree::ptree &cfg);
 
     /**
+    * Compute the poll timeout (in milliseconds) and returns it.
+    * This timeout is calculated by calling `next_update()` on the available GPIO.
+    */
+    int compute_timeout();
+
+    /**
     * A reference to our ZeroMQ context.
     */
     zmqpp::context &ctx_;

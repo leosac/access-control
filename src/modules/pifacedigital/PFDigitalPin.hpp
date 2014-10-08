@@ -2,6 +2,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <string>
+#include <chrono>
 
 /**
 * This is a implementation class. It's not exposed to the user and is for this
@@ -40,9 +41,25 @@ struct PFDigitalPin
     PFDigitalPin &operator=(PFDigitalPin &&) = delete;
 
     /**
-    * Write to PFDigital to turn the gpio on.
+    * Let the GPIO pin perform internal task.
+    * This is called by the PFDigitalModule in the main loop.
+    *
+    * @note For example we use this to perform "auto turn off" after receiving a "ON" command with a `duration` parameter.
+    * @note the previous example is the only use case for now, so we lack code determining what to do on update.
     */
-    bool turn_on();
+    void update();
+
+    /**
+    * This method shall returns the number of the time point at which we want to be updated.
+    * If you do not want to be updated, return time_point::max() basically making sure we wont be called.
+    */
+    std::chrono::system_clock::time_point next_update();
+
+    /**
+    * Write to PFDigital to turn the gpio on.
+    * @param msg optional pointer to the source message. We can extract optional parameter, if any
+    */
+    bool turn_on(zmqpp::message *msg = nullptr);
 
     /**
     * Write to PFDigital turn the gpio off.
@@ -87,4 +104,14 @@ struct PFDigitalPin
     * We store this to reset the pin its initial state upon unloading the module.
     */
     bool default_value_;
+
+    /**
+    * Time point of next wished update.
+    */
+    std::chrono::system_clock::time_point next_update_time_;
+
+    /**
+    * Does this object wants to be `update()`d ?
+    */
+    bool want_update_;
 };

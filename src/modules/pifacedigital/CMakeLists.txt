@@ -6,6 +6,13 @@ set(PIFACEDIGITAL_SRCS
     PFDigitalPin.cpp
 )
 
+
+## test to fix clion
+set(PIFACEDIGITAL_INCL
+PFDigitalModule.hpp
+PFDigitalPin.hpp
+)
+
 add_library(${PIFACEDIGITAL_BIN} SHARED ${PIFACEDIGITAL_SRCS})
 
 set_target_properties(${PIFACEDIGITAL_BIN} PROPERTIES
