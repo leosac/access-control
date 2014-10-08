@@ -82,4 +82,9 @@ struct PFDigitalPin
     */
     const Direction direction_;
 
+    /**
+    * The default value of the pin, it is only relevant is the pin is output.
+    * We store this to reset the pin its initial state upon unloading the module.
+    */
+    bool default_value_;
 };
