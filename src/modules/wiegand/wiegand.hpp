@@ -1,6 +1,7 @@
 #pragma once
 
 #include "zmqpp/zmqpp.hpp"
+#include <boost/property_tree/ptree.hpp>
 #include "WiegandReaderImpl.hpp"
 
 /**

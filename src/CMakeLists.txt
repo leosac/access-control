@@ -103,6 +103,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 ${CMAKE_SOURCE_DIR}/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/libmcp23s17/src/
 ${CMAKE_SOURCE_DIR}/zmqpp/src/
+${CMAKE_SOURCE_DIR}/libzmq/include
 )
 
 #Set compilation flags for current target
