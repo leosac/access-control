@@ -28,7 +28,7 @@ install:
 before_script:
 ## for now use own fork of libzmq
     - git clone git://github.com/xaqq/libzmq.git
-    - pushd libzmq
+    - pushd libzmq && git checkout pollpri
     - ./autogen.sh
     - ./configure && make -j4
     - sudo make install
