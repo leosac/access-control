@@ -21,6 +21,7 @@ set(LEOSAC_LIB_SRCS
 #    core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
 #    hardware/hwmanager.cpp
+    modules/BaseModule.cpp
     hardware/device/FGPIO.cpp
     hardware/device/FLED.cpp
     hardware/device/button.cpp
