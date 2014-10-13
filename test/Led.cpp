@@ -20,58 +20,6 @@ bool run_module(zmqpp::context *ctx, zmqpp::socket *pipe)
         return test_run_module<LEDModule>(ctx, pipe, cfg);
     }
 
-bool bus_read_extract(zmqpp::message *m)
-{
-    return true;
-}
-
-template<typename T, typename ...Content>
-bool bus_read_extract(zmqpp::message *m, T first_arg, Content... content)
-{
-    T value;
-    *m >> value;
-
-    if (value != first_arg)
-    {
-        std::cout << "LAM2A {" << value << "}, {" << first_arg << "}" << std::endl;
-        return false;
-    }
-    return bus_read_extract(m, content...);
-}
-
-template<typename ...Content>
-bool bus_read_extract(zmqpp::message *m, const char * first_arg, Content... content)
-{
-    std::string value;
-    *m >> value;
-
-    if (strcmp(value.c_str(), first_arg) != 0)
-    {
-        std::cout << "LAM3{" << value << "}, {" << first_arg << "}" << std::endl;
-        return false;
-    }
-    return bus_read_extract(m, content...);
-}
-
-/**
-* Make a blocking read on the bus, return true if content match the message.
-* false otherwise.
-* false if cannot read.
-*/
-template<typename ...Content>
-bool bus_read(zmqpp::socket &sub, Content... content)
-{
-    zmqpp::message msg;
-
-    if (!sub.receive(msg))
-    {
-        std::cout << "LAMA" << std::endl;
-        return false;
-    }
-
-    return bus_read_extract(&msg, content...);
-}
-
 /**
 * Test that we can turn a led ON, and that it will tell the GPIO to turn ON.
 */
