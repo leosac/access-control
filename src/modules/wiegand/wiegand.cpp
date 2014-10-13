@@ -8,10 +8,8 @@
 #include "zmqpp/actor.hpp"
 
 /**
-* pipe is pipe back to module manager.
-* this function is called in its own thread.
-*
-* do signaling when ready
+* Entry point of wiegand module.
+* This module provide support for controlling WiegandReader.
 */
 extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
         boost::property_tree::ptree cfg,
