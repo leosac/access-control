@@ -1,8 +1,6 @@
 #include <tools/runtimeoptions.hpp>
 #include <modules/wiegand/wiegand.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include "gtest/gtest.h"
-#include "core/MessageBus.hpp"
+#include "helper/TestHelper.hpp"
 
 bool run_module(zmqpp::context *ctx, zmqpp::socket *pipe)
     {
@@ -15,38 +13,18 @@ bool run_module(zmqpp::context *ctx, zmqpp::socket *pipe)
     readers_cfg.add_child("reader", reader1_cfg);
     module_cfg.add_child("readers", readers_cfg);
     cfg.add_child("module_config", module_cfg);
-    WiegandReaderModule module(*ctx, pipe, cfg);
 
-    pipe->send(zmqpp::signal::ok);
-    module.run();
-    return true;
+        return test_run_module<WiegandReaderModule>(ctx, pipe, cfg);
     }
 
-class GPIOEmulation
-    {
-public:
-    GPIOEmulation(zmqpp::socket &push, const std::string &n) :
-    name_(n),
-    push_(push)
-        {};
-
-    void interrupt()
-        {
-        push_.send("S_INT:" + name_);
-        }
-
-    std::string name_;
-    zmqpp::socket &push_;
-    };
-
-TEST(WiegandReaderTest, readCard)
+TEST(WiegandReader, readCard)
 {
     zmqpp::context ctx;
     MessageBus bus(ctx);
     zmqpp::socket bus_push(ctx, zmqpp::socket_type::push);
     zmqpp::socket bus_sub(ctx, zmqpp::socket_type::sub);
 
-    std::vector<GPIOEmulation> gpios;
+    std::vector<FakeGPIO> gpios;
 
     gpios.push_back({bus_push, "GPIO_HIGH"});
     gpios.push_back({bus_push, "GPIO_LOW"});
@@ -59,7 +37,7 @@ TEST(WiegandReaderTest, readCard)
 
     for (int i = 0 ; i < 32; i++)
         {
-        gpios[0].interrupt(); // building card id ff:ff:ff:ff
+gpios[0].interrupt(); // building card id ff:ff:ff:ff
         }
 
     zmqpp::message m;
@@ -71,5 +49,24 @@ TEST(WiegandReaderTest, readCard)
     ASSERT_EQ("S_WIEGAND_1", topic);
     ASSERT_EQ("ff:ff:ff:ff", content);
 
+    for (int i = 0 ; i < 32; i++)
+        {
+if (i >= 24)
+{
+gpios[0].interrupt();
+}
+else
+{
+gpios[1].interrupt();
+}
+        }
+
+zmqpp::message m2;
+    bus_sub.receive(m2);
+
+    ASSERT_EQ(2, m2.parts());
+m2 >> topic >> content;
+    ASSERT_EQ("S_WIEGAND_1", topic);
+    ASSERT_EQ("ff:00:00:00", content);
     ASSERT_TRUE(a.stop(true));
     }
