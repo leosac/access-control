@@ -50,13 +50,15 @@ void LedImpl::update()
 {
     LOG() << "UPDATING LED";
 
-    gpio_.toggle();
-    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
     if (std::chrono::system_clock::now() > blink_end_)
     {
         want_update_ = false;
         gpio_.turnOff();
+        return;
     }
+
+    gpio_.toggle();
+    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
 }
 
 std::chrono::system_clock::time_point LedImpl::next_update()
@@ -77,24 +79,34 @@ zmqpp::message LedImpl::send_to_backend(zmqpp::message &msg)
 
 bool LedImpl::start_blink(zmqpp::message *msg)
 {
-    assert(msg->parts() > 2);
+    std::string tmp;
+    int duration;
+
+    if (msg->parts() > 1)
+    {
+        *msg >> tmp;
+        duration = std::stoi(tmp);
+    }
+    else
+    {
+        duration = default_blink_duration_;
+    }
+
     if (msg->parts() > 2)
     {
-        std::string duration;
-        std::string speed;
-
-        *msg >> duration;
-        *msg >> speed;
-        blink_speed_  = std::stoi(speed);
-
-        assert(speed < duration);
-
-        blink_end_ = std::chrono::system_clock::now() + std::chrono::milliseconds(std::stoi(duration));
-        next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
-        want_update_ = true;
-        //send_to_backend(zmqpp::message() << "TOGGLE");
-        gpio_.toggle();
-        return true;
+        *msg >> tmp;
+        blink_speed_ = std::stoi(tmp);
     }
-    return false;
+    else
+    {
+        blink_speed_ = default_blink_speed_;
+    }
+
+    assert(blink_speed_ < duration);
+
+    blink_end_ = std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
+    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
+    want_update_ = true;
+    gpio_.toggle();
+    return true;
 }

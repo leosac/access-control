@@ -77,8 +77,6 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                                 <target>MY_LED</target>
                                 <cmd>
                                     <f1>BLINK</f1>
-                                    <f2>2000</f2>
-                                    <f3>200</f3>
                                 </cmd>
                             </action>
                         </actions>
@@ -210,7 +208,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <name>MY_LED</name>
                         <gpio>RED</gpio>
                         <default_blink_duration>5000</default_blink_duration>
-                        <default_blink_speed>400</default_blink_speed>
+                        <default_blink_speed>1000</default_blink_speed>
                     </led>
                 </leds>
             </module_config>
