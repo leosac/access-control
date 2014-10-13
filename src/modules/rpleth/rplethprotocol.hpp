@@ -29,7 +29,6 @@ public:
         LCD     = 0x02,
         MaxType
     };
-
     enum RplethCommands {
         DHCPState   = 0x01,
         SetDHCP     = 0x02,
@@ -56,7 +55,9 @@ public:
         Disconnect      = 0x09,
         GetReaderType   = 0x0a,
         GetCSN          = 0x0b,
-        SetCardType     = 0x0c
+        SetCardType     = 0x0c,
+        SendCards      = 0x0d, // text, separated by a pipe
+        ReceiveUnpresentedCards = 0x0e
     };
 
     enum StatusCode {
