@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
 
@@ -64,7 +65,7 @@ void WiegandReaderImpl::timeout()
     // we need to reverse the order
     for (std::size_t i = 0; i < size; ++i)
         {
-            card_hex << std::hex << static_cast<int>(buffer_[size - i - 1]);
+            card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(buffer_[size - i - 1]);
             if (i + 1 < size)
                 card_hex << ":";
         }
