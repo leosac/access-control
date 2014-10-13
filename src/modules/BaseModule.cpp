@@ -5,7 +5,8 @@ BaseModule::BaseModule(zmqpp::context &ctx,
         boost::property_tree::ptree const &cfg) :
 ctx_(ctx),
 pipe_(*pipe),
-config_(cfg)
+config_(cfg),
+is_running_(true)
 {
     reactor_.add(pipe_, std::bind(&BaseModule::handle_pipe, this));
 }

@@ -21,14 +21,12 @@ TEST(WiegandReader, readCard)
 {
     zmqpp::context ctx;
     MessageBus bus(ctx);
-    zmqpp::socket bus_push(ctx, zmqpp::socket_type::push);
-    zmqpp::socket bus_sub(ctx, zmqpp::socket_type::sub);
+zmqpp::socket bus_sub(ctx, zmqpp::socket_type::sub);
 
-    std::vector<FakeGPIO> gpios;
+    std::vector<std::shared_ptr<FakeGPIO>> gpios;
 
-    gpios.push_back({bus_push, "GPIO_HIGH"});
-    gpios.push_back({bus_push, "GPIO_LOW"});
-    bus_push.connect("inproc://zmq-bus-pull");
+    gpios.push_back(std::shared_ptr<FakeGPIO> (new FakeGPIO(ctx, "GPIO_HIGH")));
+    gpios.push_back(std::shared_ptr<FakeGPIO> (new FakeGPIO(ctx, "GPIO_LOW")));
 
     bus_sub.connect("inproc://zmq-bus-pub");
     bus_sub.subscribe("S_WIEGAND_1");
@@ -37,7 +35,7 @@ TEST(WiegandReader, readCard)
 
     for (int i = 0 ; i < 32; i++)
         {
-gpios[0].interrupt(); // building card id ff:ff:ff:ff
+gpios[0]->interrupt(); // building card id ff:ff:ff:ff
         }
 
     zmqpp::message m;
@@ -53,11 +51,15 @@ gpios[0].interrupt(); // building card id ff:ff:ff:ff
         {
 if (i >= 24)
 {
-gpios[0].interrupt();
+gpios[0]->interrupt();
 }
 else
 {
-gpios[1].interrupt();
+gpios[1]->interrupt();
+
+//required because zmq sockets do fair-queuing.
+// its not a problem either, because the hardware will pause too.
+std::this_thread::sleep_for(std::chrono::milliseconds(2));
 }
         }
 
