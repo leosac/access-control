@@ -13,7 +13,7 @@
 * All you need is the GPIO name defined in the configuration file to create a facade.
 *
 * Since Leosac works through message passing, we have to define messages specifications.
-
+*
 * ### Find below the GPIO related specs:
 *
 * Commands are sent (and response received) using REQ/REP socket. Here is a message specs:
