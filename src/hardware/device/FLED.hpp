@@ -59,6 +59,7 @@
 */
 class FLED
 {
+public:
     FLED(zmqpp::context &ctx, const std::string &gpio_name);
 
     /**
