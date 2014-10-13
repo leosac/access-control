@@ -38,14 +38,7 @@ zmqpp::socket bus_sub(ctx, zmqpp::socket_type::sub);
 gpios[0]->interrupt(); // building card id ff:ff:ff:ff
         }
 
-    zmqpp::message m;
-    bus_sub.receive(m);
-
-    std::string topic, content;
-    ASSERT_EQ(2, m.parts());
-        m >> topic >> content;
-    ASSERT_EQ("S_WIEGAND_1", topic);
-    ASSERT_EQ("ff:ff:ff:ff", content);
+ASSERT_TRUE(bus_read(bus_sub, "S_WIEGAND_1", "ff:ff:ff:ff"));
 
     for (int i = 0 ; i < 32; i++)
         {
@@ -63,12 +56,6 @@ std::this_thread::sleep_for(std::chrono::milliseconds(2));
 }
         }
 
-zmqpp::message m2;
-    bus_sub.receive(m2);
-
-    ASSERT_EQ(2, m2.parts());
-m2 >> topic >> content;
-    ASSERT_EQ("S_WIEGAND_1", topic);
-    ASSERT_EQ("ff:00:00:00", content);
+ASSERT_TRUE(bus_read(bus_sub, "S_WIEGAND_1", "ff:00:00:00"));
     ASSERT_TRUE(a.stop(true));
     }
