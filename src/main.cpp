@@ -16,7 +16,6 @@
 #include "tools/runtimeoptions.hpp"
 #include "tools/unixfs.hpp"
 #include "tools/unixshellscript.hpp"
-#include "core/core.hpp"
 #include "exception/leosacexception.hpp"
 
 static const std::string  DefaultCoreCfg = UnixFs::getCWD() + "/cfg/default.xml";
