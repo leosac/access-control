@@ -86,29 +86,65 @@ bool FLED::blink(int duration, int speed)
 
 bool FLED::isOn()
 {
-    zmqpp::message rep;
-    std::string st;
+    State st = state();
 
-    backend_.send("STATE");
-    backend_.receive(rep);
-
-    rep >> st;
-    if (st == "BLINKING")
-    {
-        assert(rep.parts() == 4);
-        // duration / speed / "real state"
-        rep >> st >> st >> st;
-    }
-    else
-        assert(rep.parts() == 1);
-    if (st == "ON")
-        return true;
-    if (st == "OFF")
+    if (st.st == State::BLINKING)
+        return st.value;
+    if (st.st == State::OFF)
         return false;
+    if (st.st == State::ON)
+        return true;
     assert(0);
 }
 
 bool FLED::isOff()
 {
     return !isOn();
+}
+
+bool FLED::isBlinking()
+{
+    return state().st == State::BLINKING;
+}
+
+FLED::State FLED::state()
+{
+    FLED::State led_state;
+
+    zmqpp::message rep;
+    std::string status_str;
+
+    backend_.send("STATE");
+    backend_.receive(rep);
+
+    rep >> status_str;
+    if (status_str == "BLINKING")
+    {
+        assert(rep.parts() == 4);
+        led_state.st = State::BLINKING;
+
+        // duration
+        rep >> status_str;
+        led_state.duration = std::stoi(status_str);
+
+        //speed
+        rep >> status_str;
+        led_state.speed = std::stoi(status_str);
+
+        // value
+        rep >> status_str;
+        assert(status_str == "ON" || status_str == "OFF");
+        led_state.value = status_str == "ON";
+    }
+    else
+    {
+        assert(rep.parts() == 1);
+        if (status_str == "ON")
+            led_state.st = State::ON;
+        else if (status_str == "OFF")
+            led_state.st = State::OFF;
+        else
+            assert (0);
+    }
+    return led_state;
 }

@@ -73,8 +73,13 @@ TEST_F(LedTest, turnOff)
 FLED my_led(ctx_, "my_led");
 ASSERT_TRUE(my_led.isOff());
 
+ASSERT_TRUE(my_led.turnOn());
+ASSERT_TRUE(my_led.isOn());
+ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "ON"));
+
 ASSERT_TRUE(my_led.turnOff());
 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
+ASSERT_TRUE(my_led.isOff());
 }
 
 TEST_F(LedTest, toggle)
@@ -85,25 +90,43 @@ ASSERT_TRUE(my_led.isOff());
 // fake gpio start off
 ASSERT_TRUE(my_led.toggle());
 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "ON"));
+ASSERT_TRUE(my_led.isOn());
 
 ASSERT_TRUE(my_led.toggle());
 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
+ASSERT_TRUE(my_led.isOff());
 }
 
 TEST_F(LedTest, blink)
 {
 FLED my_led(ctx_, "my_led");
+ASSERT_TRUE(my_led.isOff());
+ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
+ASSERT_FALSE(my_led.isBlinking());
 
-my_led.blink(100, 10);
+my_led.blink(500, 50);
+ASSERT_TRUE(my_led.isBlinking());
+ASSERT_TRUE(my_led.state().st == FLED::State::BLINKING);
 
-// we should see 10 value change
+// we should see 10 changes
 for (int i = 0; i < 5; ++i)
 {
-ASSERT_TRUE(my_led.toggle());
 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "ON"));
+ASSERT_TRUE(my_led.isOn());
 
-ASSERT_TRUE(my_led.toggle());
+ASSERT_TRUE(my_led.isBlinking());
+
 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
+ASSERT_TRUE(my_led.isOff());
 }
+
+// the "final" off: sent when blinking is over (even if gpio is off already)
+ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
+ASSERT_TRUE(my_led.isOff());
+
+//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+ASSERT_FALSE(my_led.isBlinking());
+ASSERT_TRUE(my_led.isOff());
+ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
 
 }

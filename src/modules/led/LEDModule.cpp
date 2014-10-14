@@ -33,7 +33,7 @@ void LEDModule::run()
         reactor_.poll(compute_timeout());
         for (auto &led : leds_)
         {
-            if (led->next_update() < std::chrono::system_clock::now())
+            if (led->next_update() <= std::chrono::system_clock::now())
                 led->update();
         }
     }
