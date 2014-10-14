@@ -39,6 +39,7 @@ WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,
     for (auto &reader : readers_)
     {
         reactor_.add(reader.bus_sub_, std::bind(&WiegandReaderImpl::handle_bus_msg, &reader));
+        reactor_.add(reader.sock_, std::bind(&WiegandReaderImpl::handle_request, &reader));
     }
     reactor_.add(pipe_, std::bind(&WiegandReaderModule::handle_pipe, this));
 }

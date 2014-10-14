@@ -39,6 +39,10 @@ public:
     */
     zmqpp::socket bus_sub_;
 
+    /**
+    * REP socket to receive command on.
+    */
+    zmqpp::socket sock_;
 
     /**
     * Something happened on the bus.
@@ -46,29 +50,40 @@ public:
     void handle_bus_msg();
 
     /**
+    * Someone sent a request.
+    */
+    void handle_request();
+
+    /**
     * Timeout (no more data burst to handle). The WiegandModule call this when polling on any wiegand reader times out.
     * The reader shall publish an event if it received any meaningful message since the last timeout.
     */
     void timeout();
-private:
 
+private:
     /**
     * Socket to write to the message bus.
     */
     zmqpp::socket bus_push_;
 
     /**
-    * ZMQ topic-string to interrupt on HIGH gpio
+    * ZMQ topic-string for interrupt on HIGH gpio (high gpio's name)
     */
     std::string topic_high_;
 
     /**
-    * ZMQ topic-string to interrupt on LOW gpio
+    * ZMQ topic-string to interrupt on LOW gpio (low gpio's name)
     */
     std::string topic_low_;
 
+    /**
+    * Buffer to store incoming bits from high and low gpios.
+    */
     std::array<uint8_t, 16> buffer_;
 
+    /**
+    * Count the number of bits received from GPIOs.
+    */
     int counter_;
 
     /**

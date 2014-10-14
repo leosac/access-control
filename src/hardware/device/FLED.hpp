@@ -82,8 +82,8 @@ public:
     struct State
     {
         /**
-    * Internal state of the LED.
-    */
+        * Internal state of the LED.
+        */
         enum {
             ON,
             OFF,
@@ -106,7 +106,7 @@ public:
         bool value;
     };
 
-    FLED(zmqpp::context &ctx, const std::string &gpio_name);
+    FLED(zmqpp::context &ctx, const std::string &led_name);
 
     /**
     * Disabled copy-constructor.
@@ -179,7 +179,7 @@ public:
 
 private:
     /**
-    * A socket to talk to the backend GPIO.
+    * A socket to talk to the backend LED.
     */
     zmqpp::socket backend_;
 };

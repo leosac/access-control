@@ -24,6 +24,7 @@ set(LEOSAC_LIB_SRCS
     modules/BaseModule.cpp
     hardware/device/FGPIO.cpp
     hardware/device/FLED.cpp
+    hardware/device/FWiegandReader.cpp
     hardware/device/button.cpp
     hardware/device/buzzer.cpp
     hardware/device/dipswitch.cpp
