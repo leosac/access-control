@@ -52,6 +52,9 @@ name_(std::move(o.name_))
 
     buffer_ = o.buffer_;
     counter_ = o.counter_;
+    green_led_ = o.green_led_;
+
+    o.green_led_ = nullptr;
 }
 
 void WiegandReaderImpl::handle_bus_msg()
@@ -99,8 +102,29 @@ void WiegandReaderImpl::timeout()
 void WiegandReaderImpl::handle_request()
 {
     zmqpp::message msg;
+    std::string str;
     sock_.receive(msg);
 
-
-
+    msg >> str;
+    assert(str == "GREEN_LED" || str == "BEEP");
+    if (str == "GREEN_LED")
+    {
+        msg.pop_front();
+        if (!green_led_)
+        {
+            sock_.send("KO");
+            return;
+        }
+        // forward the request to the led.
+        green_led_->backend().send(msg);
+        green_led_->backend().receive(str);
+        assert(str == "OK" || str == "KO");
+        sock_.send(str == "OK" ? "OK" : "KO");
+    }
+    else if (str == "BEEP")
+    {
+        assert (msg.parts() == 2);
+        LOG() << "BEEP BEEP";
+        // buzzer stuff
+    }
 }

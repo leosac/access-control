@@ -177,6 +177,12 @@ public:
     */
     State state();
 
+    /**
+    * Access the backend socket (which is connect to the LED device) to send command directly.
+    * Use carefully !
+    */
+    zmqpp::socket &backend();
+
 private:
     /**
     * A socket to talk to the backend LED.
