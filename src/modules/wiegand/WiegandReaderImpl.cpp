@@ -13,7 +13,8 @@ sock_(ctx, zmqpp::socket_type::rep),
 bus_push_(ctx, zmqpp::socket_type::push),
 counter_(0),
 name_(name),
-green_led_(nullptr)
+green_led_(nullptr),
+buzzer_(nullptr)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
@@ -30,15 +31,15 @@ green_led_(nullptr)
 
     if (!green_led_name.empty())
         green_led_ = new FLED(ctx, green_led_name);
-    /*
+
     if (!buzzer_name.empty())
-        buzzer_ = new FBuzer(ctx, buzzer_name);*/
+        buzzer_ = new FLED(ctx, buzzer_name);
 }
 
 WiegandReaderImpl::~WiegandReaderImpl()
 {
     delete green_led_;
-    /*delete buzzer_;*/
+    delete buzzer_;
 }
 
 WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
@@ -53,8 +54,10 @@ name_(std::move(o.name_))
     buffer_ = o.buffer_;
     counter_ = o.counter_;
     green_led_ = o.green_led_;
+    buzzer_ = o.buzzer_;
 
     o.green_led_ = nullptr;
+    o.buzzer_ = nullptr;
 }
 
 void WiegandReaderImpl::handle_bus_msg()
@@ -125,6 +128,17 @@ void WiegandReaderImpl::handle_request()
     {
         assert (msg.parts() == 2);
         LOG() << "BEEP BEEP";
-        // buzzer stuff
+        std::string duration;
+        msg >> duration;
+        // our buzzer is a LED (this will change later tho)
+        // BEEP:DURATION translates well to ON:DURATION for led.
+        if (!buzzer_)
+        {
+            sock_.send("KO");
+            return;
+        }
+        bool ret = buzzer_->turnOn(std::chrono::milliseconds(std::stoi(duration)));
+        assert(ret);
+        sock_.send("OK");
     }
 }

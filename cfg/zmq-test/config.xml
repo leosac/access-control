@@ -68,10 +68,8 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                                 <on>GRANTED</on>
                                 <target>MY_WIEGAND_1</target>
                                 <cmd>
-                                    <f1>GREEN_LED</f1>
-                                    <f2>BLINK</f2>
-                                    <f3>3000</f3>
-                                    <f4>200</f4>
+                                    <f1>BEEP</f1>
+                                    <f2>1500</f2>
                                 </cmd>
                             </action>
                             <action>
@@ -219,6 +217,13 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <default_blink_duration>2000</default_blink_duration>
                         <default_blink_speed>100</default_blink_speed>
                     </led>
+
+                    <led>
+                        <name>WIEGAND1_BUZZER</name>
+                        <gpio>wiegand_buzzer</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
                 </leds>
             </module_config>
         </module>
@@ -235,6 +240,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <high>wiegand_data_high</high>
                         <low>wiegand_data_low</low>
                         <green_led>WIEGAND1_GREEN_LED</green_led>
+                        <buzzer>WIEGAND1_BUZZER</buzzer>
                     </reader>
 
                     <reader>

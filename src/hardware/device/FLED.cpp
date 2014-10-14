@@ -12,7 +12,7 @@ bool FLED::turnOn(std::chrono::milliseconds duration)
     std::string rep;
     zmqpp::message msg;
 
-    msg << "ON" << duration.count();
+    msg << "ON" << std::to_string(duration.count());
 
     backend_.send(msg);
     backend_.receive(rep);
