@@ -148,3 +148,8 @@ FLED::State FLED::state()
     }
     return led_state;
 }
+
+zmqpp::socket &FLED::backend()
+{
+    return backend_;
+}
