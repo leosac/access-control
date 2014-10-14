@@ -54,9 +54,11 @@ void WiegandReaderModule::process_config()
         std::string reader_name = reader_cfg.get_child("name").data();
         std::string gpio_high = reader_cfg.get_child("high").data();
         std::string gpio_low = reader_cfg.get_child("low").data();
+        std::string buzzer_name = reader_cfg.get<std::string>("buzzer", "");
+        std::string greenled_name = reader_cfg.get<std::string>("green_led", "");
 
         LOG() << "Creating READER " << reader_name;
-        WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low);
+        WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name);
         readers_.push_back(std::move(reader));
     }
 }

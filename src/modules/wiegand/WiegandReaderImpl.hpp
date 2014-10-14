@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include "zmqpp/zmqpp.hpp"
+#include "hardware/device/FLED.hpp"
 
 /**
 * An implementation class that represents a Wiegand Reader.
@@ -13,16 +14,23 @@ class WiegandReaderImpl
 public:
     /**
     * Create a new implementation of a Wiegand Reader.
-    * @oaram ctx ZMQ context.
+    * @param ctx ZMQ context.
     * @param data_high_pin name of the GPIO connected to data high.
     * @param data_low_pin name of the GPIO connected to data low.
+    * @param green_led_name name of the "green led" LED device.
+    * @param buzzer_name name of the buzzer device. -- no buzzer module yet.
     */
     WiegandReaderImpl(zmqpp::context &ctx,
             const std::string &name,
             const std::string &data_high_pin,
-            const std::string &data_low_pin);
+            const std::string &data_low_pin,
+            const std::string &green_led_name,
+            const std::string &buzzer_name);
+
+    ~WiegandReaderImpl();
 
     WiegandReaderImpl(const WiegandReaderImpl &) = delete;
+    WiegandReaderImpl &operator=(const WiegandReaderImpl &) = delete;
 
     WiegandReaderImpl(WiegandReaderImpl &&o);
 
@@ -67,4 +75,9 @@ private:
     * Name of the device (defined in configuration)
     */
     std::string name_;
+
+    /**
+    * Facade to control the reader green led.
+    */
+    FLED *green_led_;
 };

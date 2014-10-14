@@ -5,11 +5,14 @@
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &name,
         const std::string &data_high_pin,
-        const std::string &data_low_pin) :
+        const std::string &data_low_pin,
+        const std::string &green_led_name,
+        const std::string &buzzer_name) :
 bus_sub_(ctx, zmqpp::socket_type::sub),
 bus_push_(ctx, zmqpp::socket_type::push),
 counter_(0),
-name_(name)
+name_(name),
+green_led_(nullptr)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
@@ -21,6 +24,18 @@ name_(name)
     bus_sub_.subscribe(topic_low_);
 
     std::fill(buffer_.begin(), buffer_.end(), 0);
+
+    if (!green_led_name.empty())
+        green_led_ = new FLED(ctx, green_led_name);
+    /*
+    if (!buzzer_name.empty())
+        buzzer_ = new FBuzer(ctx, buzzer_name);*/
+}
+
+WiegandReaderImpl::~WiegandReaderImpl()
+{
+    delete green_led_;
+    /*delete buzzer_;*/
 }
 
 WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
