@@ -95,4 +95,9 @@ private:
     * Facade to control the reader green led.
     */
     FLED *green_led_;
+
+    /**
+    * Facade to the buzzer object, we use a LED device for now, because they are similar enough.
+    */
+    FLED *buzzer_;
 };

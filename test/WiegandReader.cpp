@@ -36,6 +36,9 @@ public:
 
   FakeGPIO high_;
   FakeGPIO low_;
+
+    //FakeGPIO greenled_gpio_;
+  //  FakeLed greenled_;
 };
 
 TEST_F(WiegandReaderTest, readCard)
@@ -61,3 +64,9 @@ TEST_F(WiegandReaderTest, readCard)
 
   ASSERT_TRUE(bus_read(bus_sub_, "S_WIEGAND_1", "ff:00:00:00"));
 }
+/*
+
+TEST_F(WiegandReaderTest, controlGreenLed)
+{
+
+}*/
