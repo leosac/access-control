@@ -32,6 +32,10 @@ void LedImpl::handle_message()
     frontend_.receive(msg);
     msg >> frame1;
     bool ok = false;
+    if (frame1 == "STATE")
+    {
+        return send_state();
+    }
     if (frame1 == "ON" || frame1 == "OFF" || frame1 == "TOGGLE")
     {
         // simply forward message to GPIO
@@ -42,7 +46,7 @@ void LedImpl::handle_message()
     else if (frame1 == "BLINK")
         ok = start_blink(&msg);
     else // invalid cmd
-        ok = false;
+        assert(0);
     frontend_.send(ok ? "OK" : "KO");
 }
 
@@ -80,16 +84,15 @@ zmqpp::message LedImpl::send_to_backend(zmqpp::message &msg)
 bool LedImpl::start_blink(zmqpp::message *msg)
 {
     std::string tmp;
-    int duration;
 
     if (msg->parts() > 1)
     {
         *msg >> tmp;
-        duration = std::stoi(tmp);
+        blink_duration_ = std::stoi(tmp);
     }
     else
     {
-        duration = default_blink_duration_;
+        blink_duration_ = default_blink_duration_;
     }
 
     if (msg->parts() > 2)
@@ -102,11 +105,24 @@ bool LedImpl::start_blink(zmqpp::message *msg)
         blink_speed_ = default_blink_speed_;
     }
 
-    assert(blink_speed_ < duration);
+    assert(blink_speed_ < blink_duration_);
 
-    blink_end_ = std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
+    blink_end_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_duration_);
     next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
     want_update_ = true;
     gpio_.toggle();
     return true;
+}
+
+void LedImpl::send_state()
+{
+    zmqpp::message st;
+    if (want_update_)
+    {
+        // means we are blinking
+        st << "BLINKING";
+        st << std::to_string(blink_duration_) << std::to_string(blink_speed_);
+    }
+    st << (gpio_.isOn() ? "ON" : "OFF");
+    frontend_.send(st);
 }

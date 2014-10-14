@@ -70,11 +70,45 @@ bool FLED::blink(std::chrono::milliseconds duration, std::chrono::milliseconds s
     std::string rep;
     zmqpp::message msg;
 
-    msg << "BLINK" << duration.count() << speed.count();
+    msg << "BLINK" << std::to_string(duration.count()) << std::to_string(speed.count());
 
     backend_.send(msg);
     backend_.receive(rep);
     if (rep == "OK")
         return true;
     return false;
+}
+
+bool FLED::blink(int duration, int speed)
+{
+    return blink(std::chrono::milliseconds(duration), std::chrono::milliseconds(speed));
+}
+
+bool FLED::isOn()
+{
+    zmqpp::message rep;
+    std::string st;
+
+    backend_.send("STATE");
+    backend_.receive(rep);
+
+    rep >> st;
+    if (st == "BLINKING")
+    {
+        assert(rep.parts() == 4);
+        // duration / speed / "real state"
+        rep >> st >> st >> st;
+    }
+    else
+        assert(rep.parts() == 1);
+    if (st == "ON")
+        return true;
+    if (st == "OFF")
+        return false;
+    assert(0);
+}
+
+bool FLED::isOff()
+{
+    return !isOn();
 }

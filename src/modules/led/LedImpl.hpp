@@ -51,6 +51,12 @@ private:
     zmqpp::message send_to_backend(zmqpp::message &msg);
 
     /**
+    * Write the current state of the LED device (according to specs)
+    * to the `frontend_` socket.
+    */
+    void send_state();
+
+    /**
     * Start blinking, this stores the blink_end timepoint and send commands for blinking
     * to happen. Register `update()`.
     */
@@ -72,6 +78,7 @@ private:
     int default_blink_speed_;
 
     int blink_speed_;
+    int blink_duration_;
 
     /**
     * Does this LED want its `update()` method be called by the LEDModule.

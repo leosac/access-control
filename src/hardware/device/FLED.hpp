@@ -31,11 +31,27 @@
 * See command description for more info about parameter.
 * - - - - -
 *
-* We define 4 commands that can be send to a LED device:
+* We define 5 commands that can be send to a LED device:
+*    + `STATE` to query the current state of the device.
 *    + `ON` to turn the LED on.
 *    + `TOGGLE` the LED: if on if goes off; if off it goes on.
 *    + `OFF` to turn the LED off.
 *    + `BLINK` so that the LED will blink.
+*
+* #### `STATE`
+* Shall return the state of the LED device. It is a bit more verbose
+* than the `STATE` command directed to GPIO device.
+* It can return "ON" or "OFF" (in a single frame) if the device is
+* simply on or off.
+*
+* However, if the device is blinking this shall returns a multi
+* frames message:
+*
+*    1. "BLINKING"
+*    2. BLINK_DURATION (string)
+*    3. BLINK_SPEED (string)
+*    4. "ON" | "OFF" (the real current state of the underlying gpio)
+*
 *
 * #### `ON`
 * This turns the LED on. It accepts an optional `duration` parameter.
@@ -52,10 +68,12 @@
 * doesn't expect any parameter either.
 *
 * #### `BLINK`
-* This makes the link blink, useful for controlling your christmas tree.
+* This makes the LED blink, useful for controlling your christmas tree.
 * The `BLINK` command accepts 2 optionals parameter: a `duration` and a `speed`. Both are expressed in milliseconds.
 *
 * The second frame shall contain the duration (use -1 for infinite blink) and the third frame the speed.
+*
+* @note This may sound stupid, but all value (even numeric one) shall be send as string. This will likely change later.
 */
 class FLED
 {
@@ -102,6 +120,19 @@ public:
     * Blink with a duration and a speed.
     */
     bool blink(std::chrono::milliseconds duration, std::chrono::milliseconds speed);
+
+    bool blink(int duration, int speed);
+
+    /**
+    * Query the value of the GPIO and returns true if the LED is ON.
+    * It returns false otherwise.
+    */
+    bool isOn();
+
+    /**
+    * Similar to `isOn()`.
+    */
+    bool isOff();
 
 private:
     /**
