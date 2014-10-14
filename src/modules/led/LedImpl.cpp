@@ -54,7 +54,7 @@ void LedImpl::update()
 {
     LOG() << "UPDATING LED";
 
-    if (std::chrono::system_clock::now() >= blink_end_)
+    if (blink_count_ == 0)
     {
         want_update_ = false;
         gpio_.turnOff();
@@ -62,6 +62,7 @@ void LedImpl::update()
     }
 
     gpio_.toggle();
+    --blink_count_;
     next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
 }
 
@@ -105,12 +106,13 @@ bool LedImpl::start_blink(zmqpp::message *msg)
         blink_speed_ = default_blink_speed_;
     }
 
-    assert(blink_speed_ < blink_duration_);
+    assert(blink_speed_ <= blink_duration_);
+    blink_count_ = blink_duration_ / blink_speed_;
 
-    blink_end_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_duration_);
     next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
     want_update_ = true;
     gpio_.toggle();
+    --blink_count_;
     return true;
 }
 
