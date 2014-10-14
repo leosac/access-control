@@ -32,8 +32,6 @@ TEST(Led, turnOn)
 FakeGPIO gpio(ctx, "a_cool_gpio");
 zmqpp::actor my_gpio_actor(std::bind(&FakeGPIO::run, &gpio, std::placeholders::_1));
 
-    std::vector<std::shared_ptr<FakeGPIO>> gpios;
-
     bus_sub.connect("inproc://zmq-bus-pub");
     bus_sub.subscribe("S_a_cool_gpio");
     zmqpp::actor a(std::bind(&run_module, &ctx, std::placeholders::_1));
@@ -42,11 +40,47 @@ FLED my_led(ctx, "a_nice_led");
 ASSERT_TRUE(my_led.turnOn());
 ASSERT_TRUE(bus_read(bus_sub, std::string("S_a_cool_gpio"), std::string("ON")));
 
+ASSERT_TRUE(my_gpio_actor.stop(true));
+}
+
+TEST(Led, turnOff)
+{
+zmqpp::context ctx;
+MessageBus bus(ctx);
+zmqpp::socket bus_sub(ctx, zmqpp::socket_type::sub);
+
+FakeGPIO gpio(ctx, "a_cool_gpio");
+zmqpp::actor my_gpio_actor(std::bind(&FakeGPIO::run, &gpio, std::placeholders::_1));
+
+bus_sub.connect("inproc://zmq-bus-pub");
+bus_sub.subscribe("S_a_cool_gpio");
+zmqpp::actor a(std::bind(&run_module, &ctx, std::placeholders::_1));
+
+FLED my_led(ctx, "a_nice_led");
 ASSERT_TRUE(my_led.turnOff());
 ASSERT_TRUE(bus_read(bus_sub, "S_a_cool_gpio", "OFF"));
 
+ASSERT_TRUE(my_gpio_actor.stop(true));
+}
+
+TEST(Led, toggle)
+{
+  zmqpp::context ctx;
+    MessageBus bus(ctx);
+    zmqpp::socket bus_sub(ctx, zmqpp::socket_type::sub);
+
+FakeGPIO gpio(ctx, "a_cool_gpio");
+zmqpp::actor my_gpio_actor(std::bind(&FakeGPIO::run, &gpio, std::placeholders::_1));
+
+    bus_sub.connect("inproc://zmq-bus-pub");
+    bus_sub.subscribe("S_a_cool_gpio");
+    zmqpp::actor a(std::bind(&run_module, &ctx, std::placeholders::_1));
+
+FLED my_led(ctx, "a_nice_led");
 ASSERT_TRUE(my_led.toggle());
 ASSERT_TRUE(bus_read(bus_sub, "S_a_cool_gpio", "ON"));
 ASSERT_TRUE(my_led.toggle());
 ASSERT_TRUE(bus_read(bus_sub, "S_a_cool_gpio", "OFF"));
+
+ASSERT_TRUE(my_gpio_actor.stop(true));
 }
