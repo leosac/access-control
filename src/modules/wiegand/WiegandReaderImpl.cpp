@@ -9,6 +9,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &green_led_name,
         const std::string &buzzer_name) :
 bus_sub_(ctx, zmqpp::socket_type::sub),
+sock_(ctx, zmqpp::socket_type::rep),
 bus_push_(ctx, zmqpp::socket_type::push),
 counter_(0),
 name_(name),
@@ -16,6 +17,8 @@ green_led_(nullptr)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
+
+    sock_.bind("inproc://" + name);
 
     topic_high_ = "S_INT:" + data_high_pin;
     topic_low_ = "S_INT:" + data_low_pin;
@@ -40,6 +43,7 @@ WiegandReaderImpl::~WiegandReaderImpl()
 
 WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
 bus_sub_(std::move(o.bus_sub_)),
+sock_(std::move(o.sock_)),
 bus_push_(std::move(o.bus_push_)),
 name_(std::move(o.name_))
 {
@@ -49,7 +53,6 @@ name_(std::move(o.name_))
     buffer_ = o.buffer_;
     counter_ = o.counter_;
 }
-
 
 void WiegandReaderImpl::handle_bus_msg()
 {
@@ -91,4 +94,13 @@ void WiegandReaderImpl::timeout()
 
     std::fill(buffer_.begin(), buffer_.end(), 0);
     counter_ = 0;
+}
+
+void WiegandReaderImpl::handle_request()
+{
+    zmqpp::message msg;
+    sock_.receive(msg);
+
+
+
 }

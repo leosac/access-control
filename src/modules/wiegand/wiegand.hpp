@@ -48,7 +48,7 @@ public:
 private:
 
     /**
-    * Create wiegand reader instance based on configuration.
+    * Create wiegand reader instances based on configuration.
     */
     void process_config();
 
