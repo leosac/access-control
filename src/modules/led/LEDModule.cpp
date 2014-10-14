@@ -23,7 +23,9 @@ int LEDModule::compute_timeout()
         if (led->next_update() < tp)
             tp = led->next_update();
     }
-    return std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
+    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
+    assert(timeout >= 0);
+    return timeout;
 }
 
 void LEDModule::run()

@@ -81,16 +81,17 @@ private:
     int blink_duration_;
 
     /**
+    * Number of toggle left to do. This starts at N and decrements over time. When it reaches 0 it means
+    * we can stop toggling the gpio.
+    */
+    int blink_count_;
+
+    /**
     * Does this LED want its `update()` method be called by the LEDModule.
     */
     bool want_update_;
 
     std::chrono::system_clock::time_point next_update_time_;
-
-    /**
-    * When should blinking end ?
-    */
-    std::chrono::system_clock::time_point blink_end_;
 
     /**
     * Facade to the GPIO we use with this LED.
