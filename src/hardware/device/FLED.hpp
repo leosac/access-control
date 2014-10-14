@@ -78,6 +78,34 @@
 class FLED
 {
 public:
+
+    struct State
+    {
+        /**
+    * Internal state of the LED.
+    */
+        enum {
+            ON,
+            OFF,
+            BLINKING
+        } st;
+
+        /**
+        * Set only if `st` is `BLINKING`, it represents the total duration of blinking.
+        */
+        int duration;
+
+        /**
+        * Set only if `st` is `BLINKING`, it represents the speed of blinking.
+        */
+        int speed;
+
+        /**
+        * Set only if `st` is `BLINKING` : value of the LED (true if ON, false otherwise).
+        */
+        bool value;
+    };
+
     FLED(zmqpp::context &ctx, const std::string &gpio_name);
 
     /**
@@ -126,13 +154,28 @@ public:
     /**
     * Query the value of the GPIO and returns true if the LED is ON.
     * It returns false otherwise.
+    *
+    * If the GPIO is blinking, but currently ON, this returns true.
     */
     bool isOn();
 
     /**
     * Similar to `isOn()`.
+    *
+    * If the GPIO is blinking, but currently OFF, this returns true.
     */
     bool isOff();
+
+    /**
+    * Returns true is the LED is currently blinking.
+    */
+    bool isBlinking();
+
+    /**
+    * Return the state of the device.
+    * See FLED::State for more infos.
+    */
+    State state();
 
 private:
     /**

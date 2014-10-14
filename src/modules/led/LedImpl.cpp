@@ -54,7 +54,7 @@ void LedImpl::update()
 {
     LOG() << "UPDATING LED";
 
-    if (std::chrono::system_clock::now() > blink_end_)
+    if (std::chrono::system_clock::now() >= blink_end_)
     {
         want_update_ = false;
         gpio_.turnOff();
