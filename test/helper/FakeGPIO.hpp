@@ -24,6 +24,9 @@ public:
 
 private:
 
+    // send current state to socket
+    void send_state();
+
     void handle_cmd();
 
     zmqpp::context &ctx_;

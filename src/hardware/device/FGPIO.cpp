@@ -53,3 +53,21 @@ bool FGPIO::toggle()
         return true;
     return false;
 }
+
+bool FGPIO::isOn()
+{
+    std::string rep;
+
+    backend_.send("STATE");
+    backend_.receive(rep);
+
+    if (rep == "ON")
+        return true;
+    assert(rep == "OFF");
+    return false;
+}
+
+bool FGPIO::isOff()
+{
+    return !isOn();
+}

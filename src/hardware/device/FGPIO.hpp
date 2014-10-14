@@ -24,10 +24,15 @@
 * See command description for more info about parameter.
 * - - - - -
 *
-* We define 3 commands that can be send to a GPIO device:
+* We define 4 commands that can be send to a GPIO device:
+*    + `STATE` to query the state (high / low)
 *    + The `ON` command.
 *    + `TOGGLE` to inverse the value of a pin
 *    + `OFF` to turn the GPIO to low.
+*
+* #### `STATE`
+* This asks for the state of the GPIO pin. It sends its value back, in textual format.
+* Therefore it shall always send either "ON" or "OFF".
 *
 * #### `ON`
 * This turns the pin high. It accepts an optional `duration` parameter.
@@ -79,6 +84,17 @@ public:
     * Toggle the GPIO value by sending a message to the backend GPIO impl.
     */
     bool toggle();
+
+    /**
+    * Query the value of the GPIO and returns true if the LED is ON.
+    * It returns false otherwise.
+    */
+    bool isOn();
+
+    /**
+    * Similar to `isOn()`.
+    */
+    bool isOff();
 
 private:
     /**

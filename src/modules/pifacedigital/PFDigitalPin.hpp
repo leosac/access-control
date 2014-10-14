@@ -76,6 +76,11 @@ struct PFDigitalPin
     */
     void handle_message();
 
+    /**
+    * Send the current GPIO state on the socket.
+    */
+    void send_state();
+
     int gpio_no_;
 
     /**

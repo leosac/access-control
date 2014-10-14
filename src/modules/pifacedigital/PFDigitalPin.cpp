@@ -57,8 +57,10 @@ void PFDigitalPin::handle_message()
         ok = turn_off();
     else if (frame1 == "TOGGLE")
         ok = toggle();
+    else if (frame1 == "STATE")
+        return send_state();
     else // invalid cmd
-        ok = false;
+        assert(0);
     sock_.send(ok ? "OK" : "KO");
 }
 
@@ -132,4 +134,9 @@ void PFDigitalPin::publish_state()
 {
     if (bus_push_)
         bus_push_->send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
+}
+
+void PFDigitalPin::send_state()
+{
+    sock_.send((read_value() ? "ON" : "OFF"));
 }
