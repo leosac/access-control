@@ -54,9 +54,16 @@ void FakeGPIO::handle_cmd()
         value_ = false;
     else if (frame1 == "TOGGLE")
         value_ = !value_;
+    else if (frame1 == "STATE")
+        return send_state();
     else
         assert(0);
 
     push_.send(zmqpp::message() << ("S_" + name_) << (value_ ? "ON" : "OFF"));
     rep_.send("OK");
+}
+
+void FakeGPIO::send_state()
+{
+    rep_.send((value_ ? "ON" : "OFF"));
 }
