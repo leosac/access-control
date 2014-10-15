@@ -13,13 +13,17 @@
 * devices.
 *
 * ### Command specifications:
-* A wiegand device shall accept 2 commands:
-*    + `BEEP` to activate the device for a given amount of time.
+* A wiegand device shall accept 4 commands:
+*    + `BEEP` to activate the buzzer device for a given amount of time.
+*    + `BEEP_ON` to activate the buzzer.
+*    + `BEEP_OFF` to deactivate the buzzer.
 *    + `GREEN_LED` to execute a command on the associated led device.
 *
 * Command (Frame 1)        | Frame 2             | Frame 3          | Description
 * -------------------------|---------------------|------------------|--------------
 * BEEP                     | Duration (msec)     |                  | Make the buzzer beep for the given duration
+* BEEP_ON                  |                     |                  | Turn the buzzer on (for an undefined time span)
+* BEEP_OFF                 |                     |                  | Turn the buzzer off
 * GREEN_LED                | A valid LED command | Parameters for command | Forward a LED command (and its parameters) to the green led
 *
 * @note A GREEN_LED command shall return a response as-if we sent a message to a LED device.
@@ -54,6 +58,21 @@ public:
     * Make the reader's green led blink.
     */
     bool greenLedBlink(int duration = 1000, int speed = 300);
+
+    /**
+    * Beep for a given duration
+    */
+    bool beep(int duration = 1000);
+
+    /**
+    * Turn the buzzer on.
+    */
+    bool buzzerOn();
+
+    /**
+    * Turn the buzzer off.
+    */
+    bool buzzerOff();
 
 private:
 

@@ -109,7 +109,7 @@ void WiegandReaderImpl::handle_request()
     sock_.receive(msg);
 
     msg >> str;
-    assert(str == "GREEN_LED" || str == "BEEP");
+    assert(str == "GREEN_LED" || str == "BEEP" || str == "BEEP_ON" || str == "BEEP_OFF");
     if (str == "GREEN_LED")
     {
         msg.pop_front();
@@ -138,6 +138,28 @@ void WiegandReaderImpl::handle_request()
             return;
         }
         bool ret = buzzer_->turnOn(std::chrono::milliseconds(std::stoi(duration)));
+        assert(ret);
+        sock_.send("OK");
+    }
+    else if (str == "BEEP_ON")
+    {
+        if (!buzzer_)
+        {
+            sock_.send("KO");
+            return;
+        }
+        bool ret = buzzer_->turnOn();
+        assert(ret);
+        sock_.send("OK");
+    }
+    else if (str == "BEEP_OFF")
+    {
+        if (!buzzer_)
+        {
+            sock_.send("KO");
+            return;
+        }
+        bool ret = buzzer_->turnOff();
         assert(ret);
         sock_.send("OK");
     }
