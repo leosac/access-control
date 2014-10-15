@@ -112,9 +112,41 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
         else
             LOG() << "Invalid packet";
     }
+    else if (response.type ==RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::SendCards)
+    {
+        handle_send_cards(packet);
+    }
     else
     {
         response.status = RplethProtocol::Success; // Default response
     }
     return (response);
+}
+
+void RplethModule::handle_send_cards(RplethPacket packet)
+{
+    auto itr_start = packet.data.begin();
+    std::vector<Byte>::iterator my_start = itr_start;
+    std::vector<Byte>::iterator it;
+
+    cards_pushed_.clear();
+    cards_read_.clear();
+
+    while (my_start != packet.data.end())
+    {
+        it = std::find(itr_start, packet.data.end(), '|');
+        std::string card;
+        while (my_start != packet.data.end() && my_start != it)
+        {
+            card += *my_start;
+            my_start++;
+        }
+        LOG() << "FOUND CARD {" << card << "}";
+        cards_pushed_.push_back(card);
+        if (my_start == packet.data.end())
+            break;
+        else
+            my_start++;
+        itr_start = ++it;
+    }
 }

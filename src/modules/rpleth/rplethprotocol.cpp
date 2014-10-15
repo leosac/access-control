@@ -66,7 +66,7 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buff
 
 RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const RplethPacket &packet)
 {
-    RplethPacket response = packet;
+   /* RplethPacket response = packet;
 
     response.sender = RplethPacket::Sender::Server;
     if (response.type == Rpleth && response.command == Ping)
@@ -109,5 +109,5 @@ RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const Rplet
     {
         response.status = Success; // Default response
     }
-    return (response);
+    return (response);*/
 }

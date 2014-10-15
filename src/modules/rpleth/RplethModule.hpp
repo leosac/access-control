@@ -53,6 +53,22 @@ private:
     */
     void handle_socket();
 
+    /**
+    * Handle the send cards command: we will store the list of received card somewhere safe.
+    * Cards are text data, separated by a pipe.
+    */
+    void handle_send_cards(RplethPacket packet);
+
+    /**
+    * List of cards pushed by SendCards Rpleth command.
+    */
+    std::list<std::string> cards_pushed_;
+
+    /**
+    * Cards our Wiegand reader read.
+    */
+    std::list<std::string> cards_read_;
+
     std::map<std::string, CircularBuffer> clients_;
 
     zmqpp::context &ctx_;
