@@ -5,11 +5,8 @@
 */
 
 #include "rplethprotocol.hpp"
-#include "rplethauth.hpp"
-
 #include <vector>
 #include <tools/log.hpp>
-#include <hardware/device/led.hpp>
 
 RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer)
 {
@@ -62,52 +59,4 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buff
         return (packet.dataLen + 4 + 1);
     else
         return (packet.dataLen + 4);
-}
-
-RplethPacket RplethProtocol::processClientPacket(RplethAuth *module, const RplethPacket &packet)
-{
-   /* RplethPacket response = packet;
-
-    response.sender = RplethPacket::Sender::Server;
-    if (response.type == Rpleth && response.command == Ping)
-    {
-        response.status = Success;
-    }
-    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Greenled)
-    {
-        Led *led;
-        if ((led = dynamic_cast<Led *>(module->getGreenLed())))
-        {
-            assert(packet.data.size() > 0);
-            if (packet.data[0] == 0x01)
-                led->turnOn();
-            else if (packet.data[0] == 0x00)
-                led->turnOff();
-        }
-        else
-        {
-            LOG() << "Cannot turn green led on/off -- no such device";
-        }
-    }
-    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Beep)
-    {
-        Led *buzzer;
-        if ((buzzer = dynamic_cast<Led *>(module->getBuzzer())))
-        {
-            assert(packet.data.size() > 0);
-            if (packet.data[0] == 0x01)
-                buzzer->turnOn();
-            else if (packet.data[0] == 0x00)
-                buzzer->turnOff();
-        }
-        else
-        {
-            LOG() << "Cannot BEEP -- no beep device.";
-        }
-    }
-    else
-    {
-        response.status = Success; // Default response
-    }
-    return (response);*/
 }
