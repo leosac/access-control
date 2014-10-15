@@ -87,7 +87,7 @@ public:
                 value(false)
         {
         }
-        
+
         /**
         * Internal state of the LED.
         */
