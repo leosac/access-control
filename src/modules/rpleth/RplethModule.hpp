@@ -18,6 +18,7 @@
 * -----------|----------|------------|--------------------------------------------------------|-----------
 * port       |          |            | Which port should we bind to ?                         | YES
 * reader     |          |            | Name of the wiegand reader the module handles          | YES
+* stream_mode|          |            | If enabled, should forward to client all card read     | NO (default to off)
 */
 class RplethModule : public BaseModule
 {
@@ -35,7 +36,7 @@ public:
 private:
     void process_config();
 
-    static constexpr int buffer_size = 2048;
+    static constexpr int buffer_size = 8192;
 
     /**
     * Try to handle a client message. This is called when we received any amount of data, for any client.
@@ -78,9 +79,14 @@ private:
     std::list<std::string> cards_pushed_;
 
     /**
-    * Cards our Wiegand reader read.
+    * Valid cards our Wiegand reader read: cards that were not pushed are not stored here.
     */
     std::list<std::string> cards_read_;
+
+    /**
+    * If stream mode is on, all cards read are stored here.
+    */
+    std::list<std::string> cards_read_stream_;
 
     std::map<std::string, CircularBuffer> clients_;
 
@@ -100,4 +106,6 @@ private:
     * Interface to the reader.
     */
     FWiegandReader *reader_;
+
+    bool stream_mode_;
 };

@@ -4,7 +4,6 @@
  * \brief init function for returning a module class to the core
  */
 
-#include "rplethauth.hpp"
 #include <zmqpp/zmqpp.hpp>
 #include "RplethModule.hpp"
 #include <boost/property_tree/ptree.hpp>

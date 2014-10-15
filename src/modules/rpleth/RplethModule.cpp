@@ -10,7 +10,8 @@ RplethModule::RplethModule(zmqpp::context &ctx,
         ctx_(ctx),
         server_(ctx, zmqpp::socket_type::stream),
         bus_sub_(ctx, zmqpp::socket_type::sub),
-        reader_(nullptr)
+        reader_(nullptr),
+        stream_mode_(false)
 {
     process_config();
     bus_sub_.connect("inproc://zmq-bus-pub");
@@ -30,6 +31,7 @@ void RplethModule::process_config()
 
     uint16_t port = module_config.get<uint16_t>("port", 4242);
     std::string reader_name = module_config.get_child("reader").data();
+    stream_mode_ = module_config.get<bool>("stream_mode", false);
 
     LOG() << "Rpleth module will bind to " << port << " and will control the device nammed " << reader_name;
     reader_ = new FWiegandReader(ctx_, reader_name);
@@ -174,13 +176,18 @@ void RplethModule::handle_wiegand_event()
 
     LOG() << "Rpleth module register card {" << card_id << "}";
     card_id.erase(std::remove(card_id.begin(), card_id.end(), ':'), card_id.end());
-    if (std::find(cards_pushed_.begin(), cards_pushed_.end(), card_id) == cards_pushed_.end())
+    if (std::find(cards_pushed_.begin(), cards_pushed_.end(), card_id) != cards_pushed_.end())
     {
+        cards_read_.push_back(card_id);
+    }
+    else
+    {
+        // card not found
         LOG() << "This card shouldnt register {" << card_id << "}";
         reader_->beep(3000);
-        return;
     }
-    cards_read_.push_back(card_id);
+    if (stream_mode_)
+        cards_read_stream_.push_back(card_id);
 }
 
 RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)

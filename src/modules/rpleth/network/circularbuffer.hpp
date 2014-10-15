@@ -14,7 +14,7 @@
 
 class CircularBuffer
 {
-    static const std::size_t    DefaultSize = 100;
+    static const std::size_t    DefaultSize = 8192;
 
 public:
     CircularBuffer(std::size_t size = DefaultSize);

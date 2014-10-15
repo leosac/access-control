@@ -9,7 +9,6 @@
 
 #include "rplethpacket.hpp"
 #include "network/circularbuffer.hpp"
-#include "rplethauth.hpp"
 
 #include <queue>
 
@@ -73,7 +72,6 @@ public:
 public:
     static RplethPacket decodeCommand(CircularBuffer& buffer);
     static std::size_t  encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size);
-    static RplethPacket processClientPacket(RplethAuth *module, const RplethPacket &packet);
 };
 
 #endif // RPLETHPROTOCOL_HPP
