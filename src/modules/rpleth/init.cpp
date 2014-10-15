@@ -18,12 +18,12 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-   // RplethModule module(zmq_ctx, pipe, cfg);
+    RplethModule module(zmq_ctx, pipe, cfg);
 
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
 
-  //  module.run();
+    module.run();
 
     std::cout << "module Rpleth shutying down" << std::endl;
     return true;

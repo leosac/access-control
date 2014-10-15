@@ -251,13 +251,13 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <green_led>WIEGAND1_GREEN_LED</green_led>
                         <buzzer>WIEGAND1_BUZZER</buzzer>
                     </reader>
-
+                    <!--
                     <reader>
                         <name>MY_WIEGAND_2</name>
                         <high>wiegand2_data_high</high>
                         <low>wiegand2_data_low</low>
                     </reader>
-
+-->
                 </readers>
             </module_config>
         </module>

@@ -57,7 +57,7 @@ public:
         GetCSN          = 0x0b,
         SetCardType     = 0x0c,
         SendCards      = 0x0d, // text, separated by a pipe
-        ReceiveUnpresentedCards = 0x0e
+        ReceiveCardsWaited = 0x0e
     };
 
     enum StatusCode {
