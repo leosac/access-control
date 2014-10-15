@@ -5,9 +5,7 @@
 #include <vector>
 #include <set>
 #include <dynlib/dynamiclibrary.hpp>
-#include <modules/moduleconfig.h>
 #include <boost/property_tree/ptree.hpp>
-
 #include "zmqpp/actor.hpp"
 
 /**

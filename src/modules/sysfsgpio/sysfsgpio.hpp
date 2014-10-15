@@ -1,7 +1,6 @@
 #pragma once
 
 #include <zmqpp/socket.hpp>
-#include "modules/moduleconfig.h"
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/reactor.hpp>
 

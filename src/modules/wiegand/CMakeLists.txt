@@ -1,4 +1,4 @@
-set(WIEGAND_BIN WIEGAND)
+set(WIEGAND_BIN wiegand)
 
 set(WIEGAND_SRCS
     wiegand.cpp

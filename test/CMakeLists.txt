@@ -5,7 +5,7 @@ list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES} )
 
 function(leosacCreateSingleSourceTest NAME)
 ## module we link against
-set(MODULES_LIB WIEGAND led)
+set(MODULES_LIB wiegand led)
 
     set(TEST_NAME test-${NAME})
     add_executable(${TEST_NAME} ${NAME}.cpp helper/FakeGPIO.cpp)
