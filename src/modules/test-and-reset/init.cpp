@@ -1,5 +1,6 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include "TestAndResetModule.hpp"
 
 /**
 * This function is the entry point of the Test And Reset module.
@@ -11,27 +12,11 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         zmqpp::context &zmq_ctx)
 {
     std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
-    zmqpp::socket sock(zmq_ctx, zmqpp::socket_type::req);
-    zmqpp::socket sub(zmq_ctx, zmqpp::socket_type::sub);
+    TestAndResetModule module(zmq_ctx, pipe, cfg);
 
-    sub.connect("inproc::/zmq-bus-pub");
-    sub.subscribe("");
-
-    sock.connect("inproc://leosac-kernel");
     pipe->send(zmqpp::signal::ok);
 
-    zmqpp::poller p;
-    p.add(sock, zmqpp::poller::poll_in);
-    p.add(*pipe, zmqpp::poller::poll_in);
-
-    while (true)
-    {
-        p.poll(-1);
-        if (p.has_input(*pipe))
-        {
-            break;
-        }
-    }
+    module.run();
 
     std::cout << "module test-and-reset shutting down" << std::endl;
     return true;
