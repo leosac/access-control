@@ -82,7 +82,10 @@ void RplethModule::handle_client_msg(const std::string &client_identity, Circula
         if (!packet.isGood)
             break;
         RplethPacket response = handle_client_packet(packet);
+        LOG() << "packet size = " << response.data.size();
         std::size_t size = RplethProtocol::encodeCommand(response, &buffer[0], buffer_size);
+
+        LOG() << "Sending data to client (size = " << size << ")";
 
         zmqpp::message msg;
         msg << client_identity;
@@ -164,6 +167,7 @@ void RplethModule::handle_send_cards(RplethPacket packet)
             my_start++;
         itr_start = ++it;
     }
+    cards_pushed_.unique();
 }
 
 void RplethModule::handle_wiegand_event()
@@ -188,6 +192,8 @@ void RplethModule::handle_wiegand_event()
     }
     if (stream_mode_)
         cards_read_stream_.push_back(card_id);
+
+    cards_read_.unique();
 }
 
 RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
@@ -195,6 +201,7 @@ RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
     std::list<std::string> to_send;
     RplethPacket response = packet;
 
+    LOG() << "Packet size = " << packet.data.size();
     if (packet.data.size() != 1)
     {
         LOG() << "Invalid Packet";
@@ -202,19 +209,29 @@ RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
     }
     if (packet.data[0] == 0x01)
     {
+        LOG() << "Present list";
         // send present list
         to_send = cards_read_;
     }
     else
     {
+        LOG() << "Absent list";
         // send absent list
         to_send = cards_pushed_;
-        to_send.erase(cards_read_.begin(), cards_read_.end());
+        auto lambda = [this] (const std::string &str) -> bool
+        {
+            // if entry is not in cards_read_ means user was absent, do not remove him
+            bool found = std::find(cards_read_.begin(), cards_read_.end(), str) != cards_read_.end();
+            return found;
+        };
+        to_send.erase(std::remove_if(to_send.begin(), to_send.end(), lambda), to_send.end());
     }
     // we reserve approximately what we need, just to avoid useless memory allocations.
-    std::vector<Byte> data(to_send.size() * 8);
+    std::vector<Byte> data;
+    data.reserve(to_send.size() * 8);
     for (auto &card : to_send)
     {
+        LOG() << "Current size of data vector = " << data.size();
         LOG() << "Will store the card {" << card << "} into the rplet packet to send.";
         // we need to convert the card (ff:ae:32:00) to something like "ffae3200"
         card.erase(std::remove(card.begin(), card.end(), ':'), card.end());
@@ -224,5 +241,6 @@ RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
     }
     LOG() << "Built data vector (size = " << data.size() << ")";
     response.data = data;
+    response.dataLen = data.size();
     return response;
 }
