@@ -86,7 +86,8 @@ public:
     TestHelper() :
             ctx_(),
             bus_(ctx_),
-            bus_sub_(ctx_, zmqpp::socket_type::sub)
+            bus_sub_(ctx_, zmqpp::socket_type::sub),
+            module_actor_(nullptr)
     {
         bus_sub_.connect("inproc://zmq-bus-pub");
     }

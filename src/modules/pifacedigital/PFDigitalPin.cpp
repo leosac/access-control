@@ -39,6 +39,7 @@ PFDigitalPin::PFDigitalPin(PFDigitalPin &&o) :
     this->gpio_no_ = o.gpio_no_;
     this->name_ = o.name_;
     this->bus_push_ = o.bus_push_;
+    this->want_update_ = o.want_update_;
 
     o.bus_push_ = nullptr;
 }

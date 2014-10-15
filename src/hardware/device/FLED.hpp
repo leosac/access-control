@@ -81,13 +81,20 @@ public:
 
     struct State
     {
+        State() :
+                duration(0),
+                speed(0),
+                value(false)
+        {
+        }
+        
         /**
         * Internal state of the LED.
         */
         enum {
             ON,
             OFF,
-            BLINKING
+            BLINKING,
         } st;
 
         /**
