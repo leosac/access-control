@@ -7,17 +7,15 @@ set(LEOSAC_SRCS
 
 set(LEOSAC_LIB_SRCS
     config/xmlconfig.cpp
-    core/core.cpp
-    core/modulemanager.cpp
+    core/kernel.cpp
+    core/zmodule_manager.cpp
+    core/MessageBus.cpp
     core/netconfig/networkconfig.cpp
-    core/moduleprotocol/authcommands/aauthcommand.cpp
-    core/moduleprotocol/authcommands/authcmdcreaterequest.cpp
-    core/moduleprotocol/authcommands/authcmddenyaccess.cpp
-    core/moduleprotocol/authcommands/authcmdgrantaccess.cpp
-    core/moduleprotocol/authrequest.cpp
-    core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
-    hardware/hwmanager.cpp
+    modules/BaseModule.cpp
+    hardware/device/FGPIO.cpp
+    hardware/device/FLED.cpp
+    hardware/device/FWiegandReader.cpp
     hardware/device/button.cpp
     hardware/device/buzzer.cpp
     hardware/device/dipswitch.cpp
@@ -70,8 +68,6 @@ endif()
 
 message(STATUS "Found 'mcp23s17' at: ${LIB_MCP23S17}")
 
-
-
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
 
@@ -98,8 +94,10 @@ endif()
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-${CMAKE_CURRENT_SOURCE_DIR}/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/libpifacedigital/src/
+${CMAKE_SOURCE_DIR}/libmcp23s17/src/
+${CMAKE_SOURCE_DIR}/zmqpp/src/
+${CMAKE_SOURCE_DIR}/libzmq/include
 )
 
 #Set compilation flags for current target
@@ -110,7 +108,7 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
     COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
-target_link_libraries(${LEOSAC_LIB} dl pthread ${Boost_LIBRARIES} ${LIB_PIFACE_DIGITAL} ${LIB_MCP23S17})
+target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES} ${LIB_PIFACE_DIGITAL} ${LIB_MCP23S17})
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

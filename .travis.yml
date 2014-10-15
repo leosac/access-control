@@ -11,12 +11,13 @@ notifications:
     - reports@islog.com
     - ryp.sqrt@gmail.com
 before_install:
-    - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
+    - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main universe" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
     - sudo apt-get update -qq
 install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
     - sudo apt-get install -qq libgtest-dev
+    #- sudo apt-get install -qq libzmq3-dev
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
     - sudo cmake .
@@ -25,11 +26,19 @@ install:
     - popd
     # -- workaround end
 before_script:
+## for now use own fork of libzmq
+    - git clone git://github.com/xaqq/libzmq.git
+    - pushd libzmq && git checkout pollpri
+    - ./autogen.sh
+    - ./configure && make -j4
+    - sudo make install
+    - sudo ldconfig
+    - popd;
     - pushd libpifacedigital; make; popd;
     - pushd libmcp23s17; make; popd;
     - mkdir build && pushd build
 script:
-    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi
     - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then make ; fi
 after_success:
     - sudo make install
@@ -67,6 +76,6 @@ addons:
       name: "islog/leosac"
       description: "Build submitted via Travis CI"
     notification_email: kapp.arno@gmail.com
-    build_command_prepend: "cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis"
+    build_command_prepend: "cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis"
     build_command:   "make"
     branch_pattern: develop

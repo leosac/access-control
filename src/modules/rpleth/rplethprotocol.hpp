@@ -9,7 +9,6 @@
 
 #include "rplethpacket.hpp"
 #include "network/circularbuffer.hpp"
-#include "rplethauth.hpp"
 
 #include <queue>
 
@@ -29,7 +28,6 @@ public:
         LCD     = 0x02,
         MaxType
     };
-
     enum RplethCommands {
         DHCPState   = 0x01,
         SetDHCP     = 0x02,
@@ -56,7 +54,9 @@ public:
         Disconnect      = 0x09,
         GetReaderType   = 0x0a,
         GetCSN          = 0x0b,
-        SetCardType     = 0x0c
+        SetCardType     = 0x0c,
+        SendCards      = 0x0d, // text, separated by a pipe
+        ReceiveCardsWaited = 0x0e
     };
 
     enum StatusCode {
@@ -72,7 +72,6 @@ public:
 public:
     static RplethPacket decodeCommand(CircularBuffer& buffer);
     static std::size_t  encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size);
-    static RplethPacket processClientPacket(RplethAuth *module, const RplethPacket &packet);
 };
 
 #endif // RPLETHPROTOCOL_HPP
