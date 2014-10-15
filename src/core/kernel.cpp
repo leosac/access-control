@@ -3,6 +3,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <tools/log.hpp>
 #include <tools/signalhandler.hpp>
+#include <tools/unixshellscript.hpp>
 #include "exception/configexception.hpp"
 
 using boost::property_tree::xml_parser::read_xml;
@@ -17,11 +18,13 @@ using boost::property_tree::ptree;
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
         bus_(ctx_),
+        control_(ctx_, zmqpp::socket_type::rep),
         config_(config),
         is_running_(true),
+        want_restart_(false),
         module_manager_(ctx_)
 {
-
+    control_.bind("inproc://leosac-kernel");
 }
 
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
@@ -35,6 +38,8 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
     try
     {
         read_xml(cfg_stream, cfg, trim_whitespace | no_comments);
+        // store the path the config file.
+        cfg.get_child("kernel").add("kernel-cfg", filename);
         return cfg.get_child("kernel"); // kernel is the root node.
     }
     catch (ptree_error &e)
@@ -53,13 +58,14 @@ bool Kernel::run()
         this->is_running_ = false;
     });
 
+    reactor_.add(control_, std::bind(&Kernel::handle_control_request, this));
     while (is_running_)
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        reactor_.poll(-1);
     }
 
     module_manager_.stopModules();
-    return false; // we dont want to restart;
+    return want_restart_;
 }
 
 bool Kernel::module_manager_init()
@@ -106,4 +112,37 @@ bool Kernel::module_manager_init()
 Kernel::~Kernel()
 {
 
+}
+
+void Kernel::handle_control_request()
+{
+    std::string req;
+
+    control_.receive(req);
+    LOG() << "Receive request: " << req;
+
+    if (req == "RESTART")
+    {
+        is_running_ = false;
+        want_restart_ = true;
+    }
+    if (req == "RESET")
+    {
+        is_running_ = false;
+        want_restart_ = true;
+        factory_reset();
+    }
+}
+
+void Kernel::factory_reset()
+{
+    // we need to restore factory config file.
+    UnixShellScript script("cp -f");
+
+    std::string kernel_config_file = config_.get_child("kernel-cfg").data();
+    LOG() << "Kernel config file path = " << kernel_config_file;
+    LOG() << "RESTORING FACTORY CONFIG";
+
+//    script.run(UnixShellScript::toCmdLine(rel_path_to_factory_conf + "/core.xml", _options.getParam("corecfg")));
+//    script.run(UnixShellScript::toCmdLine(rel_path_to_factory_conf + "/hw.xml", _options.getParam("hwcfg")));
 }

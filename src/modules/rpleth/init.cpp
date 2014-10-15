@@ -8,8 +8,6 @@
 #include "RplethModule.hpp"
 #include <boost/property_tree/ptree.hpp>
 
-
-
 /**
 * This function is the entry point of the Rpleth module.
 */
@@ -24,6 +22,6 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
 
     module.run();
 
-    std::cout << "module Rpleth shutying down" << std::endl;
+    std::cout << "module Rpleth shutting down" << std::endl;
     return true;
 }

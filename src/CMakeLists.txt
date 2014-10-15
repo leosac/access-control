@@ -10,17 +10,8 @@ set(LEOSAC_LIB_SRCS
     core/kernel.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
-#    core/core.cpp
-#    core/modulemanager.cpp
     core/netconfig/networkconfig.cpp
-#    core/moduleprotocol/authcommands/aauthcommand.cpp
-#    core/moduleprotocol/authcommands/authcmdcreaterequest.cpp
-#    core/moduleprotocol/authcommands/authcmddenyaccess.cpp
-#    core/moduleprotocol/authcommands/authcmdgrantaccess.cpp
-#    core/moduleprotocol/authrequest.cpp
-#    core/moduleprotocol/moduleprotocol.cpp
     dynlib/dynamiclibrary.cpp
-#    hardware/hwmanager.cpp
     modules/BaseModule.cpp
     hardware/device/FGPIO.cpp
     hardware/device/FLED.cpp
