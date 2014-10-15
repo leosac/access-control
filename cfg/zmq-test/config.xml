@@ -199,6 +199,16 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
         </module>
 
         <module>
+            <name>rpleth</name>
+            <file>librpleth.so</file>
+            <level>100</level>
+            <module_config>
+                <port>4242</port>
+                <reader>MY_WIEGAND_1</reader>
+            </module_config>
+        </module>
+
+        <module>
             <name>led</name>
             <file>libled.so</file>
             <level>3</level>
