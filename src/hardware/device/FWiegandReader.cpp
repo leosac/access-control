@@ -2,7 +2,8 @@
 
 FWiegandReader::FWiegandReader(zmqpp::context &ctx,
         std::string const &reader_name) :
-        backend_(ctx, zmqpp::socket_type::req)
+        backend_(ctx, zmqpp::socket_type::req),
+        name_(reader_name)
 {
     backend_.connect("inproc://" + reader_name);
 }
@@ -65,4 +66,9 @@ bool FWiegandReader::buzzerOff()
     msg << "BEEP_OFF";
 
     return send_to_backend(msg);
+}
+
+const std::string &FWiegandReader::name() const
+{
+    return name_;
 }

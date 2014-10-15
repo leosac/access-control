@@ -54,10 +54,23 @@ private:
     void handle_socket();
 
     /**
-    * Handle the send cards command: we will store the list of received card somewhere safe.
+    * Handle the SendCards command: we will store the list of received card somewhere safe.
     * Cards are text data, separated by a pipe.
     */
     void handle_send_cards(RplethPacket packet);
+
+    /**
+    * Handle the ReceiveUnpresentedCards command.
+    * This sends cards that were read to the Rpleth client.
+    * @return a response packet with the cards, ascci format, separated by a pipe.
+    */
+    RplethPacket handle_receive_cards(RplethPacket packet);
+
+    /**
+    * We received a message (on the BUS, from the wiegand reader we watch), that means a card was inserted.
+    * We store all cards until we receive a RECEIVE_CARDS command.
+    */
+    void handle_wiegand_event();
 
     /**
     * List of cards pushed by SendCards Rpleth command.
@@ -77,6 +90,11 @@ private:
     * Stream socket to receive Rpleth connection
     */
     zmqpp::socket server_;
+
+    /**
+    * Subscribe to the message bus and listen for event sent by the wiegand reader we watch
+    */
+    zmqpp::socket bus_sub_;
 
     /**
     * Interface to the reader.

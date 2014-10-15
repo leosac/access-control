@@ -74,6 +74,11 @@ public:
     */
     bool buzzerOff();
 
+    /**
+    * Returns the device's name.
+    */
+    const std::string &name() const;
+
 private:
 
     /**
@@ -86,4 +91,6 @@ private:
     * A socket to talk to the backend wiegand reader.
     */
     zmqpp::socket backend_;
+
+    std::string name_;
 };
