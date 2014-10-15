@@ -68,8 +68,9 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                                 <on>GRANTED</on>
                                 <target>MY_WIEGAND_1</target>
                                 <cmd>
-                                    <f1>BEEP</f1>
-                                    <f2>1500</f2>
+                                    <f1>GREEN_LED</f1>
+                                    <f2>ON</f2>
+                                    <f3>1500</f3>
                                 </cmd>
                             </action>
                             <action>
@@ -93,7 +94,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <actions>
                             <action>
                                 <on>GRANTED</on>
-                                <target>YELLOW</target>
+                                <target>YELLOW_LED</target>
                                 <cmd>
                                     <f1>TOGGLE</f1>
                                 </cmd>
@@ -150,7 +151,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                     </gpio>
 
                     <gpio>
-                        <name>YELLOW</name>
+                        <name>YELLOW_LED_GPIO</name>
                         <no>7</no>
                         <direction>out</direction>
                         <value>false</value>
@@ -214,6 +215,12 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
             <module_config>
                 <leds>
                     <led>
+                        <name>YELLOW_LED</name>
+                        <gpio>YELLOW_LED_GPIO</gpio>
+                        <default_blink_duration>5000</default_blink_duration>
+                        <default_blink_speed>1000</default_blink_speed>
+                    </led>
+                    <led>
                         <name>MY_LED</name>
                         <gpio>RED</gpio>
                         <default_blink_duration>5000</default_blink_duration>
@@ -239,7 +246,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
 
         <module>
             <name>WIEGAND</name>
-            <file>libWIEGAND.so</file>
+            <file>libwiegand.so</file>
             <level>5</level>
 
             <module_config>
