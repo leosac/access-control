@@ -135,7 +135,6 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
             </module_config>
         </module>
 
-
         <module>
             <name>PIFACE-GPIO</name>
             <file>libpifacedigital.so</file>

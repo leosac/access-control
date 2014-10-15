@@ -3,7 +3,7 @@ set(RPLETH_BIN rpleth)
 set(RPLETH_SRCS
     init.cpp
     RplethModule.cpp
-    rplethauth.cpp
+    #rplethauth.cpp
     rplethpacket.cpp
     rplethprotocol.cpp
     network/unixsocket.cpp
