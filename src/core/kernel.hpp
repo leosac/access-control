@@ -7,18 +7,41 @@
 #include "MessageBus.hpp"
 
 /**
-* Global ZMQPP context. This is initialized in Kernel constructor.
-*/
-zmqpp::context *gl_leosac_ctx;
-
-/**
 * Core of Leosac. Handles module management and loading.
+* The kernel binds a REP socket at "inproc://leosac-kernel".
+*
+* ### Supported commands
+* Leosac kernel support very few commands. Those commands can be send by modules.
+*
+* Command (Frame 1)        | Frame 2             | Frame 3          | Description
+* -------------------------|---------------------|------------------|--------------
+* RESTART                  |                     |                  | Restart Leosac. This will destroy the kernel object, unload all module, and restart.
+* RESET                    |                     |                  | Reset Leosac configuration to factory default. This will also restart.
 */
 class Kernel
-    {
+{
 public:
-    Kernel(const boost::property_tree::ptree &config);
+    /**
+    * Construct a Kernel object. Only one should live, it doesn't make sense to have more than one, and could
+    * cause problem.
+    *
+    * @param config initial configuration tree
+    * @note You can use Kernel::make_config() to build a configuration tree.
+    */
+    explicit Kernel(const boost::property_tree::ptree &config);
+
     ~Kernel();
+
+    /**
+    * Disable copy constructor as it makes no sense to copy this.
+    */
+    Kernel(const Kernel &) = delete;
+
+    /**
+    * Disable assignment operator.
+    */
+    Kernel &operator=(const Kernel &) = delete;
+
     /**
     * Build a property tree from a runtime object object.
     * It assume the kernel-config (-k) switch points to an XML config file.
@@ -44,6 +67,16 @@ private:
     bool module_manager_init();
 
     /**
+    * A request has arrived on the `control_` socket.
+    */
+    void handle_control_request();
+
+    /**
+    * Reset Leosac configuration.
+    */
+    void factory_reset();
+
+    /**
     * The application ZMQ context.
     */
     zmqpp::context ctx_;
@@ -52,6 +85,16 @@ private:
     * Application wide (inproc) message bus.
     */
     MessageBus bus_;
+
+    /**
+    * A REP socket to send request to the kernel.
+    */
+    zmqpp::socket control_;
+
+    /**
+    * Watch for message on the `control_` socket.
+    */
+    zmqpp::reactor reactor_;
 
     /**
     * Global configuration.
@@ -64,7 +107,12 @@ private:
     bool is_running_;
 
     /**
-    * Manages the different libraries (.so) we load, path to those libraries, modules instanciation.
+    * Should leosac restart ?
+    */
+    bool want_restart_;
+
+    /**
+    * Manages the different libraries (.so) we load, path to those libraries, modules instantiation.
     */
     zModuleManager module_manager_;
-    };
+};
