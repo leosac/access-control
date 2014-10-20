@@ -87,9 +87,11 @@ public:
             ctx_(),
             bus_(ctx_),
             bus_sub_(ctx_, zmqpp::socket_type::sub),
+            bus_push_(ctx_, zmqpp::socket_type::push),
             module_actor_(nullptr)
     {
         bus_sub_.connect("inproc://zmq-bus-pub");
+        bust_push_.connect("inproc://zmq-bus-pull");
     }
 
     virtual ~TestHelper()
@@ -119,6 +121,12 @@ public:
     * A SUB socket connected to the previous bus.
     */
     zmqpp::socket bus_sub_;
+
+
+    /**
+    * A PUSH socket to write on the bus.
+    */
+    zmqpp::socket bus_push_;
 
     /**
     * An actor, to run the module code the same way it would be run by the core.
