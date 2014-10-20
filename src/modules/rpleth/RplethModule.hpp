@@ -33,6 +33,11 @@ public:
 
     RplethModule &operator=(const RplethModule &) = delete;
 
+    /**
+    * Convert a card number from text to binary.
+    */
+    std::vector<uint8_t> card_convert_from_text(const std::string &s);
+
 private:
     void process_config();
 
@@ -94,6 +99,12 @@ private:
     * Handle rpleth greenled command.
     */
     void rpleth_greenled(const RplethPacket &p);
+
+    /**
+    * Flush the cards_read_stream_ list to clients.
+    * This will notify client of all card that we read.
+    */
+    void rpleth_publish_card();
 
     /**
     * We received a message (on the BUS, from the wiegand reader we watch), that means a card was inserted.

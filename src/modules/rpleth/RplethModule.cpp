@@ -114,9 +114,9 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
         rpleth_greenled(packet);
     else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Beep)
         rpleth_beep(packet);
-    else if (response.type ==RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::SendCards)
+    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::SendCards)
         rpleth_send_cards(packet);
-    else if (response.type ==RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::ReceiveCardsWaited)
+    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::ReceiveCardsWaited)
         response = rpleth_receive_cards(response);
     else
     {
@@ -204,7 +204,7 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
         LOG() << "Absent list";
         // send absent list
         to_send = cards_pushed_;
-        auto lambda = [this] (const std::string &str) -> bool
+        auto lambda = [this](const std::string &str) -> bool
         {
             // if entry is not in cards_read_ means user was absent, do not remove him
             bool found = std::find(cards_read_.begin(), cards_read_.end(), str) != cards_read_.end();
@@ -261,4 +261,36 @@ bool RplethModule::client_connected(const std::string &identity) const
 bool RplethModule::client_failed(const std::string &identity) const
 {
     return (std::find(failed_clients_.begin(), failed_clients_.end(), identity) != failed_clients_.end());
+}
+
+void RplethModule::rpleth_publish_card()
+{
+    for (auto const &card : cards_read_stream_)
+    {
+        for (auto &client : clients_)
+        {
+            zmqpp::message msg;
+            msg << client.first;
+
+        }
+    }
+}
+
+std::vector<uint8_t> RplethModule::card_convert_from_text(const std::string &card)
+{
+    std::vector<uint8_t> data;
+    std::istringstream iss(card);
+
+    while (!iss.eof())
+    {
+        unsigned int byte;
+        iss >> std::hex >> byte;
+        assert(byte <= 255);
+        data.push_back(byte);
+        // drop the colon delimeter
+        char trash;
+        iss >> trash;
+        assert(trash == ':');
+    }
+    return data;
 }
