@@ -91,7 +91,7 @@ public:
             module_actor_(nullptr)
     {
         bus_sub_.connect("inproc://zmq-bus-pub");
-        bust_push_.connect("inproc://zmq-bus-pull");
+        bus_push_.connect("inproc://zmq-bus-pull");
     }
 
     virtual ~TestHelper()
