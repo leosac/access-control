@@ -70,7 +70,11 @@ public:
     };
 
 public:
-    static RplethPacket decodeCommand(CircularBuffer& buffer);
+    /**
+    * Decode a packet from a circular buffer object.
+    * If `from_server` is true that means the packet comes from a Rpleth server: this is used by unit testing code.
+    */
+    static RplethPacket decodeCommand(CircularBuffer& buffer, bool from_server = false);
     static std::size_t  encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size);
 };
 

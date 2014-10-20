@@ -8,9 +8,15 @@
 #include <vector>
 #include <tools/log.hpp>
 
-RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer)
+RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer, bool from_server /* = false */)
 {
     RplethPacket packet(RplethPacket::Sender::Client);
+    if (from_server)
+    {
+        // this is used for unit testing
+        buffer.fastForward(1);
+        packet.sender = RplethPacket::Sender::Server;
+    }
     std::size_t toRead = buffer.toRead();
 
     packet.status = Success;

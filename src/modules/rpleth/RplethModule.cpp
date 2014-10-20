@@ -33,7 +33,8 @@ void RplethModule::process_config()
     std::string reader_name = module_config.get_child("reader").data();
     stream_mode_ = module_config.get<bool>("stream_mode", false);
 
-    LOG() << "Rpleth module will bind to " << port << " and will control the device nammed " << reader_name;
+    LOG() << "Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
+            << "Stream mode = " << stream_mode_;
     reader_ = new FWiegandReader(ctx_, reader_name);
     assert(reader_);
     server_.bind("tcp://*:" + std::to_string(port));
@@ -135,6 +136,10 @@ void RplethModule::handle_wiegand_event()
     msg >> card_id >> card_id;
 
     LOG() << "Rpleth module register card {" << card_id << "}";
+
+    if (stream_mode_)
+        cards_read_stream_.push_back(card_id);
+
     card_id.erase(std::remove(card_id.begin(), card_id.end(), ':'), card_id.end());
     if (std::find(cards_pushed_.begin(), cards_pushed_.end(), card_id) != cards_pushed_.end())
     {
@@ -146,10 +151,9 @@ void RplethModule::handle_wiegand_event()
         LOG() << "This card shouldnt register {" << card_id << "}";
         reader_->beep(3000);
     }
-    if (stream_mode_)
-        cards_read_stream_.push_back(card_id);
 
     cards_read_.unique();
+    rpleth_publish_card();
 }
 
 void RplethModule::rpleth_send_cards(const RplethPacket &packet)
@@ -270,10 +274,28 @@ void RplethModule::rpleth_publish_card()
         for (auto &client : clients_)
         {
             zmqpp::message msg;
-            msg << client.first;
+            RplethPacket packet(RplethPacket::Sender::Server);
 
+            msg << client.first;
+            packet.data = card_convert_from_text(card);
+            //for (auto v : packet.data)
+//                std::cout << std::hex << "{" << (int)v << "}" << std::endl;
+            packet.status = RplethProtocol::Success;
+            packet.type = RplethProtocol::HID;
+            packet.command = RplethProtocol::Badge;
+            packet.dataLen = packet.data.size();
+            std::cout << "LEN = " << (int)packet.dataLen << std::endl;
+
+            std::array<uint8_t, 64> buf;
+            std::size_t  size;
+            size = RplethProtocol::encodeCommand(packet, &buf[0], buf.size());
+            std::cout << "packet size = " << size << std::endl;
+            msg.add_raw(&buf, size);
+            if (!server_.send(msg, true))
+                failed_clients_.push_back(client.first);
         }
     }
+    cards_read_stream_.clear();
 }
 
 std::vector<uint8_t> RplethModule::card_convert_from_text(const std::string &card)
