@@ -82,6 +82,7 @@ public:
     struct State
     {
         State() :
+                st(UNKNOWN),
                 duration(0),
                 speed(0),
                 value(false)
@@ -95,6 +96,7 @@ public:
             ON,
             OFF,
             BLINKING,
+            UNKNOWN,
         } st;
 
         /**

@@ -111,68 +111,19 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
         response.status = RplethProtocol::Success;
     }
     else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Greenled)
-    {
-        assert(packet.data.size() > 0);
-        if (packet.data[0] == 0x01)
-            reader_->greenLedOn();
-        else if (packet.data[0] == 0x00)
-            reader_->greenLedOff();
-        else
-            LOG() << "Invalid packet";
-    }
+        rpleth_greenled(packet);
     else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Beep)
-    {
-        assert(packet.data.size() > 0);
-        if (packet.data[0] == 0x01)
-            reader_->buzzerOn();
-        else if (packet.data[0] == 0x00)
-            reader_->buzzerOff();
-        else
-            LOG() << "Invalid packet";
-    }
+        rpleth_beep(packet);
     else if (response.type ==RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::SendCards)
-    {
-        handle_send_cards(packet);
-    }
+        rpleth_send_cards(packet);
     else if (response.type ==RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::ReceiveCardsWaited)
-    {
-        response = handle_receive_cards(response);
-    }
+        response = rpleth_receive_cards(response);
     else
     {
+        LOG() << "Unhandled packet.";
         response.status = RplethProtocol::Success; // Default response
     }
     return (response);
-}
-
-void RplethModule::handle_send_cards(RplethPacket packet)
-{
-    auto itr_start = packet.data.begin();
-    std::vector<Byte>::iterator my_start = itr_start;
-    std::vector<Byte>::iterator it;
-
-    LOG() << "Handle_send_cards";
-    cards_pushed_.clear();
-    cards_read_.clear();
-
-    while (my_start != packet.data.end())
-    {
-        it = std::find(itr_start, packet.data.end(), '|');
-        std::string card;
-        while (my_start != packet.data.end() && my_start != it)
-        {
-            card += *my_start;
-            my_start++;
-        }
-        LOG() << "FOUND CARD {" << card << "}";
-        cards_pushed_.push_back(card);
-        if (my_start == packet.data.end())
-            break;
-        else
-            my_start++;
-        itr_start = ++it;
-    }
-    cards_pushed_.unique();
 }
 
 void RplethModule::handle_wiegand_event()
@@ -201,7 +152,37 @@ void RplethModule::handle_wiegand_event()
     cards_read_.unique();
 }
 
-RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
+void RplethModule::rpleth_send_cards(const RplethPacket &packet)
+{
+    auto itr_start = packet.data.begin();
+    std::vector<Byte>::const_iterator my_start = itr_start;
+    std::vector<Byte>::const_iterator it;
+
+    LOG() << "Handle_send_cards";
+    cards_pushed_.clear();
+    cards_read_.clear();
+
+    while (my_start != packet.data.end())
+    {
+        it = std::find(itr_start, packet.data.end(), '|');
+        std::string card;
+        while (my_start != packet.data.end() && my_start != it)
+        {
+            card += *my_start;
+            my_start++;
+        }
+        LOG() << "FOUND CARD {" << card << "}";
+        cards_pushed_.push_back(card);
+        if (my_start == packet.data.end())
+            break;
+        else
+            my_start++;
+        itr_start = ++it;
+    }
+    cards_pushed_.unique();
+}
+
+RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
 {
     std::list<std::string> to_send;
     RplethPacket response = packet;
@@ -248,6 +229,28 @@ RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
     response.data = data;
     response.dataLen = data.size();
     return response;
+}
+
+void RplethModule::rpleth_beep(const RplethPacket &packet)
+{
+    assert(packet.data.size() > 0);
+    if (packet.data[0] == 0x01)
+        reader_->buzzerOn();
+    else if (packet.data[0] == 0x00)
+        reader_->buzzerOff();
+    else
+        LOG() << "Invalid packet";
+}
+
+void RplethModule::rpleth_greenled(const RplethPacket &packet)
+{
+    assert(packet.data.size() > 0);
+    if (packet.data[0] == 0x01)
+        reader_->greenLedOn();
+    else if (packet.data[0] == 0x00)
+        reader_->greenLedOff();
+    else
+        LOG() << "Invalid packet";
 }
 
 bool RplethModule::client_connected(const std::string &identity) const

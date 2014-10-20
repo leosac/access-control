@@ -73,17 +73,27 @@ private:
     void handle_socket();
 
     /**
-    * Handle the SendCards command: we will store the list of received card somewhere safe.
+    * Handle Rpleth SendCards command: we will store the list of received card somewhere safe.
     * Cards are text data, separated by a pipe.
     */
-    void handle_send_cards(RplethPacket packet);
+    void rpleth_send_cards(const RplethPacket &packet);
 
     /**
-    * Handle the ReceiveUnpresentedCards command.
+    * Handle Rpleth ReceiveUnpresentedCards command.
     * This sends cards that were read to the Rpleth client.
-    * @return a response packet with the cards, ascci format, separated by a pipe.
+    * @return a response packet with the cards, ascii format, separated by a pipe.
     */
-    RplethPacket handle_receive_cards(RplethPacket packet);
+    RplethPacket rpleth_receive_cards(const RplethPacket &packet);
+
+    /**
+    * Handle Rpleth Beep command.
+    */
+    void rpleth_beep(const RplethPacket &p);
+
+    /**
+    * Handle rpleth greenled command.
+    */
+    void rpleth_greenled(const RplethPacket &p);
 
     /**
     * We received a message (on the BUS, from the wiegand reader we watch), that means a card was inserted.
