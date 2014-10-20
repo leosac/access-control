@@ -6,4 +6,4 @@
 	url = https://github.com/xaqq/libpifacedigital.git
 [submodule "zmqpp"]
 	path = zmqpp
-	url = https://github.com/xaqq/zmqpp.git
+	url = https://github.com/zeromq/zmqpp.git
