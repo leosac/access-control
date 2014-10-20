@@ -51,11 +51,13 @@ void RplethModule::handle_socket()
 
     if (content.size() == 0)
     {
-        // connect or disconnect
-        if (clients_.count(identity))
+        // handle special 0 length message that indicates connection / disconnection.
+        if (client_connected(identity)) // client exists so this is a disconnection message.
         {
             LOG() << "client disconnected";
             clients_.erase(identity);
+            if (client_failed(identity))
+                failed_clients_.erase(std::remove(failed_clients_.begin(), failed_clients_.end(), identity), failed_clients_.end());
         }
         else
         {
@@ -64,17 +66,18 @@ void RplethModule::handle_socket()
         }
         return;
     }
-    assert(clients_.count(identity));
-    // fixme proper cast
+    if (client_failed(identity))
+        return;
+    assert(clients_.count(identity) && !client_failed(identity));
     clients_[identity].write(reinterpret_cast<const uint8_t *> (content.c_str()), content.size());
-    handle_client_msg(identity, clients_[identity]);
+    if (handle_client_msg(identity, clients_[identity]) == false)
+        failed_clients_.push_back(identity);
 }
 
-void RplethModule::handle_client_msg(const std::string &client_identity, CircularBuffer &buf)
+bool RplethModule::handle_client_msg(const std::string &client_identity, CircularBuffer &buf)
 {
     RplethPacket packet(RplethPacket::Sender::Client);
 
-    LOG() << "receive raw data from client";
     do
     {
         std::array<uint8_t, buffer_size> buffer;
@@ -82,17 +85,19 @@ void RplethModule::handle_client_msg(const std::string &client_identity, Circula
         if (!packet.isGood)
             break;
         RplethPacket response = handle_client_packet(packet);
-        LOG() << "packet size = " << response.data.size();
         std::size_t size = RplethProtocol::encodeCommand(response, &buffer[0], buffer_size);
-
-        LOG() << "Sending data to client (size = " << size << ")";
 
         zmqpp::message msg;
         msg << client_identity;
         msg.add_raw(&buffer[0], size);
-        server_.send(msg);
+        if (!server_.send(msg, true))
+        {
+            // would block: peer is probably disconnected already.
+            return false;
+        }
     }
     while (packet.isGood && buf.toRead());
+    return true;
 }
 
 RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
@@ -243,4 +248,14 @@ RplethPacket RplethModule::handle_receive_cards(RplethPacket packet)
     response.data = data;
     response.dataLen = data.size();
     return response;
+}
+
+bool RplethModule::client_connected(const std::string &identity) const
+{
+    return clients_.count(identity);
+}
+
+bool RplethModule::client_failed(const std::string &identity) const
+{
+    return (std::find(failed_clients_.begin(), failed_clients_.end(), identity) != failed_clients_.end());
 }

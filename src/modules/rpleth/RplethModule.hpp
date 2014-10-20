@@ -36,13 +36,31 @@ public:
 private:
     void process_config();
 
+    /**
+    * Do we already know this client ?
+    */
+    bool client_connected(const std::string &identity) const;
+
+    /**
+    * Is the client in an invalid state ?
+    * @return true if the client is in the `clients_failed_` list.
+    */
+    bool client_failed(const std::string &identity) const;
+
     static constexpr int buffer_size = 8192;
 
     /**
     * Try to handle a client message. This is called when we received any amount of data, for any client.
     * If there isn't enough data to handle a rpleth message, this does nothing.
+    *
+    * It returns true unless sending a packing would have blocked.
+    *
+    * @note There is a possible race between client disconnection and notification, so it sometime happens that
+    * we attempt to send data to an already disconnected client. This would block forever so we use `dont_wait` flag
+    * and report a failed client by returning false. Message from failed client are ignored until reception of
+    * disconnection notification.
     */
-    void handle_client_msg(const std::string &client_identity, CircularBuffer &buf);
+    bool handle_client_msg(const std::string &client_identity, CircularBuffer &buf);
 
     /**
     * If we successfully built a packet, lets handle it.
@@ -106,6 +124,13 @@ private:
     * Interface to the reader.
     */
     FWiegandReader *reader_;
+
+    /**
+    * Client that are "failed".
+    * A client is considered fail if a `send()` to them would have block.
+    * It's likely they are disconnected but we dont know it yet. Message from those client are ignored.
+    */
+    std::vector<std::string> failed_clients_;
 
     bool stream_mode_;
 };
