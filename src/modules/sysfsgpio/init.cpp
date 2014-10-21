@@ -3,7 +3,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <tools/log.hpp>
 #include <zmqpp/context.hpp>
-#include "sysfsgpio.hpp"
+#include "SysFsGpioModule.hpp"
 
 /**
 * Entry point of the SysFSGPIO module.
