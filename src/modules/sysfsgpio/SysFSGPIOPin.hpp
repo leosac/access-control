@@ -17,10 +17,19 @@ public:
         Out
     };
 
+    enum class InterruptMode
+    {
+        None,
+        Rising,
+        Falling,
+        Both,
+    };
+
     SysFsGpioPin(zmqpp::context &ctx,
             const std::string &name,
             int gpio_no,
             Direction direction,
+            InterruptMode interrupt_mode,
             SysFsGpioModule &module);
 
     ~SysFsGpioPin();
@@ -39,11 +48,6 @@ public:
     void register_sockets(zmqpp::reactor *reactor);
 
 private:
-    /**
-    * Retrieve the underlying file descriptor of the GPIO.
-    */
-    int file_fd() const;
-
     /**
     * Interrupt happened for this GPIO ping.
     */
@@ -78,12 +82,12 @@ private:
     /**
     * Write direction to the `direction` file.
     */
-    void set_direction(const std::string &direction);
+    void set_direction(Direction dir);
 
     /**
     * Write interrupt mode to the `edge` file.
     */
-    void set_interrupt(const std::string &mode);
+    void set_interrupt(InterruptMode mode);
 
     /**
     * File descriptor of the GPIO in sysfs.

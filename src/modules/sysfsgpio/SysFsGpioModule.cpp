@@ -52,13 +52,25 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         std::string gpio_name = gpio_cfg.get_child("name").data();
         int gpio_no = std::stoi(gpio_cfg.get_child("no").data());
         std::string gpio_direction = gpio_cfg.get_child("direction").data();
+        std::string gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
 
         LOG() << "Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction;
 
         export_gpio(gpio_no);
         SysFsGpioPin::Direction direction;
+        SysFsGpioPin::InterruptMode interrupt_mode;
+
+        if (gpio_interrupt == "none")
+            interrupt_mode = SysFsGpioPin::InterruptMode::None;
+        else if (gpio_interrupt == "both")
+        interrupt_mode = SysFsGpioPin::InterruptMode::Both;
+        else if (gpio_interrupt == "falling")
+            interrupt_mode = SysFsGpioPin::InterruptMode::Falling;
+        else if (gpio_interrupt == "rising")
+            interrupt_mode = SysFsGpioPin::InterruptMode::Rising;
+
         direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In : SysFsGpioPin::Direction::Out);
-        gpios_.push_back(new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, *this));
+        gpios_.push_back(new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, interrupt_mode, *this));
     }
 }
 

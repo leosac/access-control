@@ -6,8 +6,18 @@
 #include "SysFSGPIOPin.hpp"
 
 class SysFsGpioPin;
+
 /**
 * Handle GPIO management over sysfs.
+* See below for configuration informations.
+*
+* ### Configuration Options
+*
+* Options    | Options  | Options    | Description                                            | Mandatory
+* -----------|----------|------------|--------------------------------------------------------|-----------
+* port       |          |            | Which port should we bind to ?                         | YES
+* reader     |          |            | Name of the wiegand reader the module handles          | YES
+* stream_mode|          |            | If enabled, should forward to client all card read     | NO (default to off)
 */
 class SysFsGpioModule
 {

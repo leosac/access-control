@@ -5,6 +5,7 @@
 
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
         Direction direction,
+        InterruptMode interrupt_mode,
         SysFsGpioModule &module) :
         gpio_no_(gpio_no),
         sock_(ctx, zmqpp::socket_type::rep),
@@ -15,8 +16,8 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
 
-    set_direction(direction_ == Direction::In ? "in" : "out");
-    set_interrupt("rising");
+    set_direction(direction);
+    set_interrupt(interrupt_mode);
     std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
     LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
@@ -39,14 +40,26 @@ SysFsGpioPin::~SysFsGpioPin()
     }
 }
 
-void SysFsGpioPin::set_direction(const std::string &direction)
+void SysFsGpioPin::set_direction(Direction dir)
 {
+    std::string direction = dir == Direction::In ? "in" : "out";
     UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/direction", direction);
 }
 
-void SysFsGpioPin::set_interrupt(const std::string &mode)
+void SysFsGpioPin::set_interrupt(InterruptMode mode)
 {
-    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/edge", mode);
+    std::string value;
+    if (mode == SysFsGpioPin::InterruptMode::None)
+        value = "none";
+    else if (mode == SysFsGpioPin::InterruptMode::Both)
+        value = "both";
+    else if (mode == SysFsGpioPin::InterruptMode::Falling)
+        value = "falling";
+    else if (mode == SysFsGpioPin::InterruptMode::Rising)
+        value = "rising";
+    else
+        assert (0);
+    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/edge", value);
 }
 
 void SysFsGpioPin::handle_message()
@@ -93,16 +106,10 @@ bool SysFsGpioPin::read_value()
     return UnixFs::readSysFsValue<bool>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
 }
 
-int SysFsGpioPin::file_fd() const
-{
-    return file_fd_;
-}
-
 void SysFsGpioPin::handle_interrupt()
 {
     std::array<char, 64> buffer;
     ssize_t ret;
-    LOG() << "boap !";
 
     // flush interrupt by reading.
     // if we fail we cant recover, this means hardware failure.

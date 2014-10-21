@@ -49,11 +49,13 @@
                         <name>wiegand_data_high</name>
                         <no>15</no>
                         <direction>in</direction>
+                        <interrupt_mode>falling</interrupt_mode>
                     </gpio>
                     <gpio>
                         <name>wiegand_data_low</name>
                         <no>14</no>
                         <direction>in</direction>
+                        <interrupt_mode>falling</interrupt_mode>
                     </gpio>
                     <gpio>
                         <name>wiegand_green</name>
