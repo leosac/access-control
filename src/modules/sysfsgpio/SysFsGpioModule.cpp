@@ -5,6 +5,8 @@
 #include <zmqpp/context.hpp>
 #include "SysFsGpioModule.hpp"
 
+using namespace Leosac::Module;
+
 SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         zmqpp::socket *module_manager_pipe,
         zmqpp::context &ctx) :

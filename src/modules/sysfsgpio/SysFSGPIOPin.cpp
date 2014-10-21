@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include "SysFSGPIOPin.hpp"
 
+using namespace Leosac::Module;
+
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
         Direction direction,
         InterruptMode interrupt_mode,
@@ -12,8 +14,8 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
         sock_(ctx, zmqpp::socket_type::rep),
         name_(name),
         direction_(direction),
-        module_(module),
-        initial_value_(initial_value)
+        initial_value_(initial_value),
+        module_(module)
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);

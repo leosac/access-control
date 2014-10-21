@@ -5,6 +5,8 @@
 #include <zmqpp/context.hpp>
 #include "SysFsGpioModule.hpp"
 
+using namespace Leosac::Module;
+
 /**
 * Entry point of the SysFSGPIO module.
 * It provides a way to control GPIO through the sysfs kernel interface.
