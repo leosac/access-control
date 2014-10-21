@@ -19,18 +19,22 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
         _dhcpEnabled(false)
 {
     _enabled = cfg.get<bool>("enabled", false);
-    _interface = cfg.get<std::string>("interface");
-    _dhcpEnabled = cfg.get<bool>("dhcp");
-    _netmask = cfg.get<std::string>("netmask");
-    _defaultIp = cfg.get<std::string>("default_ip");
-    _ip = cfg.get<std::string>("ip", _defaultIp);
 
-    LOG() << "NetworkSettings:";
-    LOG() << "enabled=" << _enabled;
-    LOG() << "dhcp=" << _dhcpEnabled;
-    LOG() << "ip=" << _ip;
-    LOG() << "netmask=" << _netmask;
-    LOG() << "default=" << _defaultIp;
+    if (_enabled)
+    {
+        _interface = cfg.get<std::string>("interface");
+        _dhcpEnabled = cfg.get<bool>("dhcp");
+        _netmask = cfg.get<std::string>("netmask");
+        _defaultIp = cfg.get<std::string>("default_ip");
+        _ip = cfg.get<std::string>("ip", _defaultIp);
+
+        LOG() << "NetworkSettings:";
+        LOG() << "enabled=" << _enabled;
+        LOG() << "dhcp=" << _dhcpEnabled;
+        LOG() << "ip=" << _ip;
+        LOG() << "netmask=" << _netmask;
+        LOG() << "default=" << _defaultIp;
+    }
 }
 
 void NetworkConfig::reload()
