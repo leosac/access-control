@@ -143,6 +143,9 @@ void Kernel::factory_reset()
     LOG() << "Kernel config file path = " << kernel_config_file;
     LOG() << "RESTORING FACTORY CONFIG";
 
-//    script.run(UnixShellScript::toCmdLine(rel_path_to_factory_conf + "/core.xml", _options.getParam("corecfg")));
-//    script.run(UnixShellScript::toCmdLine(rel_path_to_factory_conf + "/hw.xml", _options.getParam("hwcfg")));
+    if (script.run(UnixShellScript::toCmdLine(std::string(rel_path_to_factory_conf_) + "/kernel.xml",
+            kernel_config_file)) != 0)
+    {
+        LOG() << "Error restoring factory configuration...";
+    }
 }

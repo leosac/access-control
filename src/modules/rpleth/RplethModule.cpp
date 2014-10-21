@@ -149,7 +149,7 @@ void RplethModule::handle_wiegand_event()
     {
         // card not found
         LOG() << "This card shouldnt register {" << card_id << "}";
-        reader_->beep(3000);
+        reader_->beep(1000);
     }
 
     cards_read_.unique();

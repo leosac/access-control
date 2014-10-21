@@ -115,4 +115,6 @@ private:
     * Manages the different libraries (.so) we load, path to those libraries, modules instantiation.
     */
     zModuleManager module_manager_;
+
+    static constexpr const char *rel_path_to_factory_conf_ = "./cfg/factory";
 };

@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<kernel>
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <modules>
+        <module>
+            <name>MONITOR</name>
+            <file>libpersistent-monitor.so</file>
+            <level>1</level>
+
+            <module_config>
+                <file>MY_LOGS.txt</file>
+                <verbose>false</verbose>
+            </module_config>
+        </module>
+
+        <module>
+            <name>PIFACE-GPIO</name>
+            <file>libpifacedigital.so</file>
+            <level>2</level>
+
+            <module_config>
+                <gpios>
+                    <gpio>
+                        <name>wiegand_green</name>
+                        <no>3</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>wiegand_buzzer</name>
+                        <no>2</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <!-- Prepare GPIO for our Wiegand reader -->
+                    <gpio>
+                        <name>wiegand_data_high</name>
+                        <no>1</no>
+                        <direction>in</direction>
+                    </gpio>
+                    <gpio>
+                        <name>wiegand_data_low</name>
+                        <no>0</no>
+                        <direction>in</direction>
+                    </gpio>
+                </gpios>
+            </module_config>
+        </module>
+
+        <module>
+            <name>rpleth</name>
+            <file>librpleth.so</file>
+            <level>100</level>
+            <module_config>
+                <port>4242</port>
+                <reader>MY_WIEGAND_1</reader>
+                <stream_mode>true</stream_mode>
+            </module_config>
+        </module>
+
+        <module>
+            <name>led</name>
+            <file>libled.so</file>
+            <level>3</level>
+            <module_config>
+                <leds>
+                    <led>
+                        <name>WIEGAND1_GREEN_LED</name>
+                        <gpio>wiegand_green</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
+                    <led>
+                        <name>WIEGAND1_BUZZER</name>
+                        <gpio>wiegand_buzzer</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+                </leds>
+            </module_config>
+        </module>
+
+        <module>
+            <name>WIEGAND</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led>WIEGAND1_GREEN_LED</green_led>
+                        <buzzer>WIEGAND1_BUZZER</buzzer>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>ResetWatcher</name>
+            <file>libtest-and-reset.so</file>
+            <level>101</level>
+            <module_config>
+                <devices>
+                    <device>
+                        <name>MY_WIEGAND_1</name>
+                        <reset_card>40:a0:83:80</reset_card>
+                    </device>
+                </devices>
+            </module_config>
+        </module>
+    </modules>
+
+</kernel>
