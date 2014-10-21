@@ -3,11 +3,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <tools/log.hpp>
 #include <zmqpp/context.hpp>
-#include <fcntl.h>
 #include "sysfsgpio.hpp"
-#include "zmqpp/actor.hpp"
-#include "SysFSGPIOPin.hpp"
-
 
 SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         zmqpp::socket *module_manager_pipe,
