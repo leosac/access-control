@@ -278,18 +278,14 @@ void RplethModule::rpleth_publish_card()
 
             msg << client.first;
             packet.data = card_convert_from_text(card);
-            //for (auto v : packet.data)
-//                std::cout << std::hex << "{" << (int)v << "}" << std::endl;
             packet.status = RplethProtocol::Success;
             packet.type = RplethProtocol::HID;
             packet.command = RplethProtocol::Badge;
             packet.dataLen = packet.data.size();
-            std::cout << "LEN = " << (int)packet.dataLen << std::endl;
 
             std::array<uint8_t, 64> buf;
             std::size_t  size;
             size = RplethProtocol::encodeCommand(packet, &buf[0], buf.size());
-            std::cout << "packet size = " << size << std::endl;
             msg.add_raw(&buf, size);
             if (!server_.send(msg, true))
                 failed_clients_.push_back(client.first);

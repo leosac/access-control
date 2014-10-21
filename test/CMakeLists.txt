@@ -6,11 +6,12 @@ list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES} )
 function(leosacCreateSingleSourceTest NAME)
 ## module we link against
 set(MODULES_LIB wiegand led rpleth)
+set(HELPER_SRC  helper/FakeGPIO.cpp helper/FakeWiegandReader.cpp)
 
     set(TEST_NAME test-${NAME})
-    add_executable(${TEST_NAME} ${NAME}.cpp helper/FakeGPIO.cpp)
+    add_executable(${TEST_NAME} ${NAME}.cpp ${HELPER_SRC})
     set_target_properties(${TEST_NAME} PROPERTIES
-        COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}"
+        COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -W -Wall"
         INCLUDE_DIRECTORIES "${LEOSAC_TEST_INCLUDE_DIRECTORIES}")
     target_link_libraries(${TEST_NAME} ${MODULES_LIB} ${LEOSAC_TEST_LIBRARIES})
     add_test(NAME ${TEST_NAME}
