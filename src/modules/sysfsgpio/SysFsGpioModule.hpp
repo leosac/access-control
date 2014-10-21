@@ -13,11 +13,27 @@ class SysFsGpioPin;
 *
 * ### Configuration Options
 *
-* Options    | Options  | Options    | Description                                            | Mandatory
-* -----------|----------|------------|--------------------------------------------------------|-----------
-* port       |          |            | Which port should we bind to ?                         | YES
-* reader     |          |            | Name of the wiegand reader the module handles          | YES
-* stream_mode|          |            | If enabled, should forward to client all card read     | NO (default to off)
+* Options | Options | Options        | Description                                            | Mandatory
+* --------|---------|----------------|--------------------------------------------------------|-----------
+* gpios   |         |                | List of GPIOs pins we configure                        | YES
+* ----->  | gpio    |                | Configuration informations for one GPIO pin.           | YES
+* ----->  | ----->  | name           | Name of the GPIO pin                                   | YES
+* ----->  | ----->  | no             | Number of the GPIO pin.                                | YES
+* ----->  | ----->  | direction      | Direction of the pin. This in either `in` or `out`     | YES
+* ----->  | ----->  | interrupt_mode | What interrupt do we care about? See below for details | NO
+* ----->  | ----->  | value          | Value of the PIN. Either `1` or `0`                    | NO
+*
+* #### Interrupt Mode
+* `interrupt_mode` configuration option can take 4 values:
+*     + `Falling`
+*     + `Rising`
+*     + `Both`
+*     + `None`. This is the default.
+*
+* **This parameter is ignored for output GPIO.**
+*
+* #### Value
+* `value` can be either `1` or `0` and is only meaningful for output GPIO. It default to `0`.
 */
 class SysFsGpioModule
 {
@@ -52,8 +68,6 @@ private:
     * This is basically handle the stop signal from the module manager.
     */
     void handle_pipe();
-
-    //void handle_
 
     /**
     * Process the configuration, preparing configured GPIO pin.

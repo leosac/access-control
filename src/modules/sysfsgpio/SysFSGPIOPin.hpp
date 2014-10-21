@@ -1,8 +1,10 @@
 #pragma once
+
 #include <zmqpp/zmqpp.hpp>
 #include "SysFsGpioModule.hpp"
 
 class SysFsGpioModule;
+
 /**
 * This is a implementation class. It's not exposed to the user and is for this
 * module internal code only.
@@ -12,7 +14,8 @@ class SysFsGpioModule;
 class SysFsGpioPin
 {
 public:
-    enum class Direction {
+    enum class Direction
+    {
         In = 0,
         Out
     };
@@ -30,6 +33,7 @@ public:
             int gpio_no,
             Direction direction,
             InterruptMode interrupt_mode,
+            bool initial_value,
             SysFsGpioModule &module);
 
     ~SysFsGpioPin();
@@ -37,6 +41,7 @@ public:
     SysFsGpioPin(const SysFsGpioPin &) = delete;
 
     SysFsGpioPin &operator=(const SysFsGpioPin &) = delete;
+
     SysFsGpioPin &operator=(SysFsGpioPin &&) = delete;
 
     SysFsGpioPin(SysFsGpioPin &&o) = delete;
@@ -110,6 +115,11 @@ private:
     * Direction of the PIN.
     */
     const Direction direction_;
+
+    /**
+    * Initial value of the PIN. We set the pin's value to this on module shutdown.
+    */
+    const bool initial_value_;
 
     /**
     * Reference to the module. We use this to publish on the bus.

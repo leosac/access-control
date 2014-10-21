@@ -61,7 +61,7 @@
                         <name>wiegand_green</name>
                         <no>3</no>
                         <direction>out</direction>
-                        <value>low</value>
+                        <value>1</value>
                     </gpio>
                 </gpios>
             </module_config>

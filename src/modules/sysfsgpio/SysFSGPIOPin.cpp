@@ -6,12 +6,14 @@
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
         Direction direction,
         InterruptMode interrupt_mode,
+        bool initial_value,
         SysFsGpioModule &module) :
         gpio_no_(gpio_no),
         sock_(ctx, zmqpp::socket_type::rep),
         name_(name),
         direction_(direction),
-        module_(module)
+        module_(module),
+        initial_value_(initial_value)
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
@@ -19,6 +21,15 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
     set_direction(direction);
     set_interrupt(interrupt_mode);
     std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
+
+    if (direction == Direction::Out)
+    {
+        if (initial_value_)
+            turn_on();
+        else
+            turn_off();
+    }
+
     LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
     assert(file_fd_ != -1);
@@ -26,6 +37,14 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
 
 SysFsGpioPin::~SysFsGpioPin()
 {
+    if (direction_ == Direction::Out)
+    {
+        if (initial_value_)
+            turn_on();
+        else
+            turn_off();
+    }
+
     if (file_fd_ != -1 && ::close(file_fd_) != 0)
     {
         LOG() << "fail to close fd " << file_fd_;
