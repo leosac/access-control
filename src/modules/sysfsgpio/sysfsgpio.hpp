@@ -11,11 +11,13 @@
 * It abstract a GPIO pin.
 */
 struct SysFsGpioPin
-    {
+{
     SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no);
+
     ~SysFsGpioPin();
 
     SysFsGpioPin(const SysFsGpioPin &) = delete;
+
     SysFsGpioPin &operator=(const SysFsGpioPin &) = delete;
 
     SysFsGpioPin(SysFsGpioPin &&o);
@@ -67,18 +69,17 @@ struct SysFsGpioPin
     zmqpp::socket bus_push_;
 
     std::string name_;
-    };
+};
 
 /**
 * Handle GPIO management over sysfs.
 */
 class SysFsGpioModule
-    {
+{
 public:
     SysFsGpioModule(const boost::property_tree::ptree &config,
             zmqpp::socket *module_manager_pipe,
-            zmqpp::context &ctx
-    );
+            zmqpp::context &ctx);
 
     /**
     * Module's main loop.
@@ -115,4 +116,4 @@ private:
     zmqpp::context &ctx_;
 
     std::vector<SysFsGpioPin> gpios_;
-    };
+};
