@@ -4,13 +4,14 @@
         <plugindir>.</plugindir>
     </plugin_directories>
 
+    <!--
     <network>
         <enabled>true</enabled>
         <interface>eth0</interface>
         <dhcp>false</dhcp>
         <netmask>255.255.0.0</netmask>
         <default_ip>10.2.3.170</default_ip>
-    </network>
+    </network> -->
 
     <modules>
         <module>

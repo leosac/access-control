@@ -11,13 +11,15 @@ SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         pipe_(*module_manager_pipe),
         config_(config),
         is_running_(true),
-        ctx_(ctx)
+        ctx_(ctx),
+        bus_push_(ctx_, zmqpp::socket_type::push)
 {
+    bus_push_.connect("inproc://zmq-bus-pull");
     process_config(config);
 
     for (auto &gpio : gpios_)
     {
-        reactor_.add(gpio.sock_, std::bind(&SysFsGpioPin::handle_message, &gpio));
+        gpio->register_sockets(&reactor_);
     }
     reactor_.add(pipe_, std::bind(&SysFsGpioModule::handle_pipe, this));
 }
@@ -54,14 +56,24 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         LOG() << "Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction;
 
         export_gpio(gpio_no);
-        SysFsGpioPin pin(ctx_, gpio_name, gpio_no);
-
-        pin.set_direction(gpio_direction);
-        gpios_.push_back(std::move(pin));
+        SysFsGpioPin::Direction direction;
+        direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In : SysFsGpioPin::Direction::Out);
+        gpios_.push_back(new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, *this));
     }
 }
 
 void SysFsGpioModule::export_gpio(int gpio_no)
 {
     UnixFs::writeSysFsValue("/sys/class/gpio/export", gpio_no);
+}
+
+SysFsGpioModule::~SysFsGpioModule()
+{
+    for (auto gpio : gpios_)
+        delete gpio;
+}
+
+void SysFsGpioModule::publish_on_bus(zmqpp::message &msg)
+{
+    bus_push_.send(msg);
 }

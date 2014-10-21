@@ -71,11 +71,12 @@ void PFDigitalModule::handle_interrupt()
 {
     // get interrupt state.
     std::array<char, 64> buffer;
+    ssize_t ret;
 
-    if (::read(interrupt_fd_, &buffer[0], buffer.size()) < 0)
-        throw (GpioException(UnixSyscall::getErrorString("read", errno)));
-    if (::lseek(interrupt_fd_, 0, SEEK_SET) < 0)
-        throw (GpioException(UnixSyscall::getErrorString("lseek", errno)));
+    ret = ::read(interrupt_fd_, &buffer[0], buffer.size());
+    assert(ret >= 0);
+    ret = ::lseek(interrupt_fd_, 0, SEEK_SET);
+    assert(ret >= 0);
 
     uint8_t states = pifacedigital_read_reg(0x11, 0);
     for (int i = 0; i < 8; ++i)

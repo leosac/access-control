@@ -3,15 +3,20 @@
 #include <unistd.h>
 #include "SysFSGPIOPin.hpp"
 
-SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no) :
+SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
+        Direction direction,
+        SysFsGpioModule &module) :
         gpio_no_(gpio_no),
         sock_(ctx, zmqpp::socket_type::rep),
-        bus_push_(ctx, zmqpp::socket_type::push),
-        name_(name)
+        name_(name),
+        direction_(direction),
+        module_(module)
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
-    bus_push_.connect("inproc://zmq-bus-pull");
+
+    set_direction(direction_ == Direction::In ? "in" : "out");
+    set_interrupt("rising");
     std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
     LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
@@ -34,19 +39,14 @@ SysFsGpioPin::~SysFsGpioPin()
     }
 }
 
-SysFsGpioPin::SysFsGpioPin(SysFsGpioPin &&o) :
-        sock_(std::move(o.sock_)),
-        bus_push_(std::move(o.bus_push_))
-{
-    this->file_fd_ = o.file_fd_;
-    this->gpio_no_ = o.gpio_no_;
-    this->name_ = o.name_;
-    o.file_fd_ = -1;
-}
-
 void SysFsGpioPin::set_direction(const std::string &direction)
 {
     UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/direction", direction);
+}
+
+void SysFsGpioPin::set_interrupt(const std::string &mode)
+{
+    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/edge", mode);
 }
 
 void SysFsGpioPin::handle_message()
@@ -66,7 +66,7 @@ void SysFsGpioPin::handle_message()
     sock_.send(ok ? "OK" : "KO");
     // publish new state.
     LOG() << "gpio nammed {" << name_ << " will publish ";
-    bus_push_.send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
+    module_.publish_on_bus(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
 bool SysFsGpioPin::turn_on()
@@ -91,4 +91,34 @@ bool SysFsGpioPin::toggle()
 bool SysFsGpioPin::read_value()
 {
     return UnixFs::readSysFsValue<bool>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
+}
+
+int SysFsGpioPin::file_fd() const
+{
+    return file_fd_;
+}
+
+void SysFsGpioPin::handle_interrupt()
+{
+    std::array<char, 64> buffer;
+    ssize_t ret;
+    LOG() << "boap !";
+
+    // flush interrupt by reading.
+    // if we fail we cant recover, this means hardware failure.
+    ret = ::read(file_fd_, &buffer[0], buffer.size());
+    assert(ret >= 0);
+    ret = ::lseek(file_fd_, 0, SEEK_SET);
+    assert(ret >= 0);
+
+    module_.publish_on_bus(zmqpp::message() << "S_INT:" + name_);
+}
+
+void SysFsGpioPin::register_sockets(zmqpp::reactor *reactor)
+{
+    reactor->add(sock_, std::bind(&SysFsGpioPin::handle_message, this));
+    if (direction_ == Direction::In)
+        reactor->add(file_fd_, std::bind(&SysFsGpioPin::handle_interrupt, this),
+                zmqpp::poller::poll_pri);
+
 }
