@@ -14,6 +14,12 @@
 
     <modules>
         <module>
+            <name>STDIN</name>
+            <file>libstdin-controller.so</file>
+            <level>40</level>
+        </module>
+
+        <module>
             <name>MONITOR</name>
             <file>libpersistent-monitor.so</file>
             <level>1</level>
