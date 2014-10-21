@@ -4,6 +4,7 @@
  * \brief NetworkConfig class implementation
  */
 
+#include <boost/property_tree/ptree_fwd.hpp>
 #include "networkconfig.hpp"
 
 #include "tools/log.hpp"
@@ -12,30 +13,17 @@
 
 const std::string NetworkConfig::NetCfgFile = "interfaces";
 
-NetworkConfig::NetworkConfig()
-:   _enabled(false),
-    _dhcpEnabled(false)
-{}
-
-void NetworkConfig::serialize(ptree& node)
+NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
+        config_(cfg),
+        _enabled(false),
+        _dhcpEnabled(false)
 {
-    node.put<bool>("<xmlattr>.enabled", _enabled);
-    node.put<std::string>("interface", _interface);
-    node.put<bool>("dhcp", _dhcpEnabled);
-    node.put<std::string>("ip", _ip);
-    node.put<std::string>("netmask", _netmask);
-    node.put<std::string>("default_ip", _defaultIp);
-    _enabled = false;
-}
-
-void NetworkConfig::deserialize(const ptree& node)
-{
-    _enabled = node.get<bool>("<xmlattr>.enabled");
-    _interface = node.get<std::string>("interface");
-    _dhcpEnabled = node.get<bool>("dhcp");
-    _netmask = node.get<std::string>("netmask");
-    _defaultIp = node.get<std::string>("default_ip");
-    _ip = node.get<std::string>("ip", _defaultIp);
+    _enabled = cfg.get<bool>("enabled", false);
+    _interface = cfg.get<std::string>("interface");
+    _dhcpEnabled = cfg.get<bool>("dhcp");
+    _netmask = cfg.get<std::string>("netmask");
+    _defaultIp = cfg.get<std::string>("default_ip");
+    _ip = cfg.get<std::string>("ip", _defaultIp);
 
     LOG() << "NetworkSettings:";
     LOG() << "enabled=" << _enabled;

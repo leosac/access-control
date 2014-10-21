@@ -22,9 +22,11 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         config_(config),
         is_running_(true),
         want_restart_(false),
-        module_manager_(ctx_)
+        module_manager_(ctx_),
+        network_config_(config.get_child("network"))
 {
     control_.bind("inproc://leosac-kernel");
+    network_config_.reload();
 }
 
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)

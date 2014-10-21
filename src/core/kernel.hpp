@@ -3,6 +3,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <tools/runtimeoptions.hpp>
 #include <zmqpp/context.hpp>
+#include <core/netconfig/networkconfig.hpp>
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
 
@@ -116,5 +117,13 @@ private:
     */
     zModuleManager module_manager_;
 
+    /**
+    * Object that handle networking configuration.
+    */
+    NetworkConfig network_config_;
+
+    /**
+    * Hardcoded path to factory default settings.
+    */
     static constexpr const char *rel_path_to_factory_conf_ = "./cfg/factory";
 };

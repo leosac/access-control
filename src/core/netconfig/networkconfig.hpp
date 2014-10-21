@@ -4,25 +4,22 @@
  * \brief NetworkConfig class declaration
  */
 
+#include <boost/property_tree/ptree.hpp>
+
 #ifndef NETWORKCONFIG_HPP
 #define NETWORKCONFIG_HPP
 
-#include "config/ixmlserializable.hpp"
-
-class NetworkConfig : public IXmlSerializable
+class NetworkConfig
 {
     static const std::string    NetCfgFile;
 
 public:
-    explicit NetworkConfig();
+    explicit NetworkConfig(const boost::property_tree::ptree &cfg);
     ~NetworkConfig() = default;
 
     NetworkConfig(const NetworkConfig& other) = delete;
     NetworkConfig& operator=(const NetworkConfig& other) = delete;
 
-public:
-    virtual void    serialize(ptree& node) override;
-    virtual void    deserialize(const ptree& node) override;
 
 public:
     void    reload();
@@ -31,6 +28,11 @@ public:
     void    setCustomIP(bool enabled);
 
 private:
+    /**
+    * Network configuration
+    */
+    boost::property_tree::ptree config_;
+
     bool        _enabled;
     std::string _interface;
     bool        _dhcpEnabled;
