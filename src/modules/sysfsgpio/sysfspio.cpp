@@ -107,6 +107,14 @@ SysFsGpioPin::~SysFsGpioPin()
     {
     if (::close(file_fd_) != 0)
         LOG() << "fail to close fd " << file_fd_;
+        try
+        {
+            UnixFs::writeSysFsValue("/sys/class/gpio/unexport", gpio_no_);
+        }
+        catch (FsException &e)
+        {
+            LOG() << "Error while unexporting GPIO: " << e.what();
+        }
     }
 
 void SysFsGpioModule::export_gpio(int gpio_no)
