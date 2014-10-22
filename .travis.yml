@@ -17,7 +17,6 @@ install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
     - sudo apt-get install -qq libgtest-dev
-    #- sudo apt-get install -qq libzmq3-dev
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
     - sudo cmake .
@@ -26,9 +25,10 @@ install:
     - popd
     # -- workaround end
 before_script:
-## for now use own fork of libzmq
-    - git clone git://github.com/xaqq/libzmq.git
-    - pushd libzmq && git checkout pollpri
+# Need POLLPRI support, this is not into a stable release yet,
+# so we use a known commit from mainline developement master.
+    - git clone git://github.com/zeromq/libzmq.git
+    - pushd libzmq && git checkout e9b9860752ffac1a561fdb64f5f72bbfc5515b34
     - ./autogen.sh
     - ./configure && make -j4
     - sudo make install
@@ -78,4 +78,4 @@ addons:
     notification_email: kapp.arno@gmail.com
     build_command_prepend: "cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis"
     build_command:   "make"
-    branch_pattern: develop
+    branch_pattern: coverity_scan
