@@ -4,6 +4,8 @@
 #include "helper/TestHelper.hpp"
 #include "helper/FakeWiegandReader.hpp"
 
+using namespace Leosac::Module::Rpleth;
+
 class RplethTest : public TestHelper
 {
 public:

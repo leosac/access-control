@@ -1,8 +1,8 @@
 /**
- * \file rplethpacket.hpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief Rpleth packet class
- */
+* \file rplethpacket.hpp
+* \author Thibault Schueller <ryp.sqrt@gmail.com>
+* \brief Rpleth packet class
+*/
 
 #ifndef RPLETHPACKET_HPP
 #define RPLETHPACKET_HPP
@@ -11,32 +11,45 @@
 
 #include <vector>
 
-class RplethPacket
+namespace Leosac
 {
-public:
-    enum class Sender {
-        Client = 0,
-        Server
-    };
+    namespace Module
+    {
+        namespace Rpleth
+        {
+            class RplethPacket
+            {
+            public:
+                enum class Sender
+                {
+                    Client = 0,
+                    Server
+                };
 
-public:
-    RplethPacket(Sender packetSender);
-    RplethPacket(const RplethPacket& other);
-    ~RplethPacket() = default;
-    RplethPacket& operator=(const RplethPacket& other);
+            public:
+                RplethPacket(Sender packetSender);
 
-public:
-    Byte    checksum() const;
+                RplethPacket(const RplethPacket &other);
 
-public:
-    Byte                status;
-    Byte                type;
-    Byte                command;
-    Byte                dataLen;
-    std::vector<Byte>   data;
-    Byte                sum;
-    bool                isGood;
-    Sender              sender;
-};
+                ~RplethPacket() = default;
+
+                RplethPacket &operator=(const RplethPacket &other);
+
+            public:
+                Byte checksum() const;
+
+            public:
+                Byte status;
+                Byte type;
+                Byte command;
+                Byte dataLen;
+                std::vector<Byte> data;
+                Byte sum;
+                bool isGood;
+                Sender sender;
+            };
+        }
+    }
+}
 
 #endif // RPLETHPACKET_HPP

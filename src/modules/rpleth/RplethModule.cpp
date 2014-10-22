@@ -3,6 +3,8 @@
 #include "RplethModule.hpp"
 #include "rplethprotocol.hpp"
 
+using namespace Leosac::Module::Rpleth;
+
 RplethModule::RplethModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         const boost::property_tree::ptree &cfg) :
@@ -105,7 +107,7 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
 {
     RplethPacket response = packet;
 
-    LOG() << "received client packet: " << (int)packet.command;
+    LOG() << "received client packet: " << (int) packet.command;
     response.sender = RplethPacket::Sender::Server;
     if (response.type == RplethProtocol::Rpleth && response.command == RplethProtocol::Ping)
     {
@@ -284,7 +286,7 @@ void RplethModule::rpleth_publish_card()
             packet.dataLen = packet.data.size();
 
             std::array<uint8_t, 64> buf;
-            std::size_t  size;
+            std::size_t size;
             size = RplethProtocol::encodeCommand(packet, &buf[0], buf.size());
             msg.add_raw(&buf, size);
             if (!server_.send(msg, true))

@@ -8,6 +8,8 @@
 #include <vector>
 #include <tools/log.hpp>
 
+using namespace Leosac::Module::Rpleth;
+
 RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer, bool from_server /* = false */)
 {
     RplethPacket packet(RplethPacket::Sender::Client);

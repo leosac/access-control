@@ -1,12 +1,15 @@
 /**
- * \file init.cpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief init function for returning a module class to the core
- */
+* \file init.cpp
+* \author Thibault Schueller <ryp.sqrt@gmail.com>
+* \brief init function for returning a module class to the core
+*/
 
 #include <zmqpp/zmqpp.hpp>
 #include "RplethModule.hpp"
 #include <boost/property_tree/ptree.hpp>
+
+using namespace Leosac::Module::Rpleth;
+
 
 /**
 * This function is the entry point of the Rpleth module.
