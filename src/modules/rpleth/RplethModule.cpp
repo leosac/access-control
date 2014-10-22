@@ -88,6 +88,9 @@ bool RplethModule::handle_client_msg(const std::string &client_identity, Circula
         if (!packet.isGood)
             break;
         RplethPacket response = handle_client_packet(packet);
+        if (response.command == RplethProtocol::HIDCommands::Greenled ||
+                response.command == RplethProtocol::HIDCommands::Beep)
+            continue;
         std::size_t size = RplethProtocol::encodeCommand(response, &buffer[0], buffer_size);
 
         zmqpp::message msg;
