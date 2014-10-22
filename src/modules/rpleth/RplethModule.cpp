@@ -33,7 +33,7 @@ void RplethModule::process_config()
 
     uint16_t port = module_config.get<uint16_t>("port", 4242);
     std::string reader_name = module_config.get_child("reader").data();
-    stream_mode_ = module_config.get<bool>("stream_mode", false);
+    stream_mode_ = module_config.get<bool>("stream_mode", true);
 
     LOG() << "Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
             << "Stream mode = " << stream_mode_;

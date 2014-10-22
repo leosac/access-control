@@ -11,22 +11,15 @@ namespace Leosac
 {
     namespace Module
     {
+        /**
+        * Namespace where implementation for Rpleth support takes place.
+        * @see @ref mod_rpleth_main for end-user documentaion.
+        */
         namespace Rpleth
         {
             /**
-            * This module adds support for Rpleth protocol.
-            *
-            * It allows remote control of Wiegand Reader devices.
-
-            * ### Configuration Options
-
-            * Options    | Options  | Options    | Description                                            | Mandatory
-            * -----------|----------|------------|--------------------------------------------------------|-----------
-            * port       |          |            | Which port should we bind to ?                         | YES
-            * reader     |          |            | Name of the wiegand reader the module handles          | YES
-            * stream_mode|          |            | If enabled, should forward to client all card read     | NO (default to off)
-            *
-            * @ref lamasticot
+            * Main class for the Rpleth module.
+            * For configuration information, see @ref mod_rpleth_user_config.
             */
             class RplethModule : public BaseModule
             {
