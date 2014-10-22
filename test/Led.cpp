@@ -4,6 +4,7 @@
 #include "helper/TestHelper.hpp"
 #include "hardware/device/FLED.hpp"
 
+using namespace Leosac::Module;
 
 class LedTest : public TestHelper
 {

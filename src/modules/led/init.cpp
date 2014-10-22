@@ -3,6 +3,8 @@
 #include <zmqpp/zmqpp.hpp>
 #include "LEDModule.hpp"
 
+using namespace Leosac::Module;
+
 /**
 * Entry point of the LED management module.
 */

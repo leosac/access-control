@@ -2,6 +2,8 @@
 #include "LedImpl.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Module;
+
 LEDModule::LEDModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         boost::property_tree::ptree const &cfg) :

@@ -4,98 +4,106 @@
 #include <chrono>
 #include "hardware/device/FGPIO.hpp"
 
-/**
-* Implementation class, for use by the LED module only.
-*/
-class LedImpl
+namespace Leosac
 {
-public:
-    /**
-    * @param ctx ZMQ context
-    * @param led_name name of the led object
-    * @param gpio_name name of the gpio we use to drive this led.
-    */
-    LedImpl(zmqpp::context &ctx,
-            const std::string &led_name,
-            const std::string &gpio_name,
-            int blink_duration,
-            int blink_speed);
+    namespace Module
+    {
 
-    /**
-    * Return the `frontend_` socket.
-    */
-    zmqpp::socket &frontend();
+        /**
+        * Implementation class, for use by the LED module only.
+        */
+        class LedImpl
+        {
+        public:
+            /**
+            * @param ctx ZMQ context
+            * @param led_name name of the led object
+            * @param gpio_name name of the gpio we use to drive this led.
+            */
+            LedImpl(zmqpp::context &ctx,
+                    const std::string &led_name,
+                    const std::string &gpio_name,
+                    int blink_duration,
+                    int blink_speed);
 
-    /**
-    * Message received on the `rep_` socket.
-    */
-    void handle_message();
+            /**
+            * Return the `frontend_` socket.
+            */
+            zmqpp::socket &frontend();
 
-    /**
-    * Time point of the next wanted update.
-    * Set to time_point::max() if not wanted.
-    */
-    std::chrono::system_clock::time_point next_update();
+            /**
+            * Message received on the `rep_` socket.
+            */
+            void handle_message();
 
-    /**
-    * Update the object.
-    * Only use case is blinking which simplifies code (`ON` with delay is fully handled by GPIO).
-    */
-    void update();
+            /**
+            * Time point of the next wanted update.
+            * Set to time_point::max() if not wanted.
+            */
+            std::chrono::system_clock::time_point next_update();
 
-private:
-    /**
-    * Send a message to the backend object (used for ON, OFF, TOGGLE).
-    * Return the response message.
-    */
-    zmqpp::message send_to_backend(zmqpp::message &msg);
+            /**
+            * Update the object.
+            * Only use case is blinking which simplifies code (`ON` with delay is fully handled by GPIO).
+            */
+            void update();
 
-    /**
-    * Write the current state of the LED device (according to specs)
-    * to the `frontend_` socket.
-    */
-    void send_state();
+        private:
+            /**
+            * Send a message to the backend object (used for ON, OFF, TOGGLE).
+            * Return the response message.
+            */
+            zmqpp::message send_to_backend(zmqpp::message &msg);
 
-    /**
-    * Start blinking, this stores the blink_end timepoint and send commands for blinking
-    * to happen. Register `update()`.
-    */
-    bool start_blink(zmqpp::message *msg);
+            /**
+            * Write the current state of the LED device (according to specs)
+            * to the `frontend_` socket.
+            */
+            void send_state();
 
-    zmqpp::context &ctx_;
+            /**
+            * Start blinking, this stores the blink_end timepoint and send commands for blinking
+            * to happen. Register `update()`.
+            */
+            bool start_blink(zmqpp::message *msg);
 
-    /**
-    * REP socket to receive LED command.
-    */
-    zmqpp::socket frontend_;
+            zmqpp::context &ctx_;
 
-    /**
-    * REQ socket to the backend GPIO.
-    */
-    zmqpp::socket backend_;
+            /**
+            * REP socket to receive LED command.
+            */
+            zmqpp::socket frontend_;
 
-    int default_blink_duration_;
-    int default_blink_speed_;
+            /**
+            * REQ socket to the backend GPIO.
+            */
+            zmqpp::socket backend_;
 
-    int blink_speed_;
-    int blink_duration_;
+            int default_blink_duration_;
+            int default_blink_speed_;
 
-    /**
-    * Number of toggle left to do. This starts at N and decrements over time. When it reaches 0 it means
-    * we can stop toggling the gpio.
-    */
-    int blink_count_;
+            int blink_speed_;
+            int blink_duration_;
 
-    /**
-    * Does this LED want its `update()` method be called by the LEDModule.
-    */
-    bool want_update_;
+            /**
+            * Number of toggle left to do. This starts at N and decrements over time. When it reaches 0 it means
+            * we can stop toggling the gpio.
+            */
+            int blink_count_;
 
-    std::chrono::system_clock::time_point next_update_time_;
+            /**
+            * Does this LED want its `update()` method be called by the LEDModule.
+            */
+            bool want_update_;
 
-    /**
-    * Facade to the GPIO we use with this LED.
-    * While we send command directly most of the time (through the backend socket), this can be used too.
-    */
-    FGPIO gpio_;
-};
+            std::chrono::system_clock::time_point next_update_time_;
+
+            /**
+            * Facade to the GPIO we use with this LED.
+            * While we send command directly most of the time (through the backend socket), this can be used too.
+            */
+            FGPIO gpio_;
+        };
+
+    }
+}
