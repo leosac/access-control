@@ -140,7 +140,7 @@ bool zModuleManager::start_module_helper(zmqpp::socket *socket,
         std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function)
 {
     tl_log_socket = new zmqpp::socket(context, zmqpp::socket_type::pub);
-    //tl_log_socket->connect("inproc://log-sink");
+    tl_log_socket->connect("inproc://log-sink");
 
     bool ret;
     ret = module_function(socket, ptree, context);

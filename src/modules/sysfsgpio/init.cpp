@@ -24,6 +24,8 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     p.sched_priority = 90;
     assert(pthread_setschedparam(pthread_self(), SCHED_FIFO, &p) == 0);
 
+    tl_log_socket->send(zmqpp::message() << "INFO" << "BOAP CEST LINFO DU JOUR");
+
     pipe->send(zmqpp::signal::ok);
     module.run();
     std::cout << "module sysfsgpio shutying down" << std::endl;

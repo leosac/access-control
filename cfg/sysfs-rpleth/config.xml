@@ -10,6 +10,12 @@
 
     <modules>
         <module>
+            <name>Logger</name>
+            <file>liblogger.so</file>
+            <level>0</level>
+        </module>
+
+        <module>
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
