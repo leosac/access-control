@@ -2,6 +2,8 @@
 #include <modules/wiegand/wiegand.hpp>
 #include "helper/TestHelper.hpp"
 
+using namespace Leosac::Module;
+
 class WiegandReaderTest : public TestHelper
 {
 private:

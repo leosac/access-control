@@ -7,6 +7,8 @@
 #include "wiegand.hpp"
 #include "zmqpp/actor.hpp"
 
+using namespace Leosac::Module;
+
 /**
 * Entry point of wiegand module.
 * This module provide support for controlling WiegandReader.

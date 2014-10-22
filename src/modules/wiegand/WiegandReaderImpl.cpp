@@ -2,6 +2,8 @@
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Module;
+
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &name,
         const std::string &data_high_pin,

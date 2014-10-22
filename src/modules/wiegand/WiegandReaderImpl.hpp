@@ -5,99 +5,108 @@
 #include "zmqpp/zmqpp.hpp"
 #include "hardware/device/FLED.hpp"
 
-/**
-* An implementation class that represents a Wiegand Reader.
-* It's solely for internal use by the Wiegand module.
-*/
-class WiegandReaderImpl
+namespace Leosac
 {
-public:
-    /**
-    * Create a new implementation of a Wiegand Reader.
-    * @param ctx ZMQ context.
-    * @param data_high_pin name of the GPIO connected to data high.
-    * @param data_low_pin name of the GPIO connected to data low.
-    * @param green_led_name name of the "green led" LED device.
-    * @param buzzer_name name of the buzzer device. -- no buzzer module yet.
-    */
-    WiegandReaderImpl(zmqpp::context &ctx,
-            const std::string &name,
-            const std::string &data_high_pin,
-            const std::string &data_low_pin,
-            const std::string &green_led_name,
-            const std::string &buzzer_name);
+    namespace Module
+    {
 
-    ~WiegandReaderImpl();
+        /**
+        * An implementation class that represents a Wiegand Reader.
+        * It's solely for internal use by the Wiegand module.
+        */
+        class WiegandReaderImpl
+        {
+        public:
+            /**
+            * Create a new implementation of a Wiegand Reader.
+            * @param ctx ZMQ context.
+            * @param data_high_pin name of the GPIO connected to data high.
+            * @param data_low_pin name of the GPIO connected to data low.
+            * @param green_led_name name of the "green led" LED device.
+            * @param buzzer_name name of the buzzer device. -- no buzzer module yet.
+            */
+            WiegandReaderImpl(zmqpp::context &ctx,
+                    const std::string &name,
+                    const std::string &data_high_pin,
+                    const std::string &data_low_pin,
+                    const std::string &green_led_name,
+                    const std::string &buzzer_name);
 
-    WiegandReaderImpl(const WiegandReaderImpl &) = delete;
-    WiegandReaderImpl &operator=(const WiegandReaderImpl &) = delete;
+            ~WiegandReaderImpl();
 
-    WiegandReaderImpl(WiegandReaderImpl &&o);
+            WiegandReaderImpl(const WiegandReaderImpl &) = delete;
 
-    /**
-    * Socket that allows the reader to listen to the application BUS.
-    */
-    zmqpp::socket bus_sub_;
+            WiegandReaderImpl &operator=(const WiegandReaderImpl &) = delete;
 
-    /**
-    * REP socket to receive command on.
-    */
-    zmqpp::socket sock_;
+            WiegandReaderImpl(WiegandReaderImpl &&o);
 
-    /**
-    * Something happened on the bus.
-    */
-    void handle_bus_msg();
+            /**
+            * Socket that allows the reader to listen to the application BUS.
+            */
+            zmqpp::socket bus_sub_;
 
-    /**
-    * Someone sent a request.
-    */
-    void handle_request();
+            /**
+            * REP socket to receive command on.
+            */
+            zmqpp::socket sock_;
 
-    /**
-    * Timeout (no more data burst to handle). The WiegandModule call this when polling on any wiegand reader times out.
-    * The reader shall publish an event if it received any meaningful message since the last timeout.
-    */
-    void timeout();
+            /**
+            * Something happened on the bus.
+            */
+            void handle_bus_msg();
 
-private:
-    /**
-    * Socket to write to the message bus.
-    */
-    zmqpp::socket bus_push_;
+            /**
+            * Someone sent a request.
+            */
+            void handle_request();
 
-    /**
-    * ZMQ topic-string for interrupt on HIGH gpio (high gpio's name)
-    */
-    std::string topic_high_;
+            /**
+            * Timeout (no more data burst to handle). The WiegandModule call this when polling on any wiegand reader times out.
+            * The reader shall publish an event if it received any meaningful message since the last timeout.
+            */
+            void timeout();
 
-    /**
-    * ZMQ topic-string to interrupt on LOW gpio (low gpio's name)
-    */
-    std::string topic_low_;
+        private:
+            /**
+            * Socket to write to the message bus.
+            */
+            zmqpp::socket bus_push_;
 
-    /**
-    * Buffer to store incoming bits from high and low gpios.
-    */
-    std::array<uint8_t, 16> buffer_;
+            /**
+            * ZMQ topic-string for interrupt on HIGH gpio (high gpio's name)
+            */
+            std::string topic_high_;
 
-    /**
-    * Count the number of bits received from GPIOs.
-    */
-    int counter_;
+            /**
+            * ZMQ topic-string to interrupt on LOW gpio (low gpio's name)
+            */
+            std::string topic_low_;
 
-    /**
-    * Name of the device (defined in configuration)
-    */
-    std::string name_;
+            /**
+            * Buffer to store incoming bits from high and low gpios.
+            */
+            std::array<uint8_t, 16> buffer_;
 
-    /**
-    * Facade to control the reader green led.
-    */
-    FLED *green_led_;
+            /**
+            * Count the number of bits received from GPIOs.
+            */
+            int counter_;
 
-    /**
-    * Facade to the buzzer object, we use a LED device for now, because they are similar enough.
-    */
-    FLED *buzzer_;
-};
+            /**
+            * Name of the device (defined in configuration)
+            */
+            std::string name_;
+
+            /**
+            * Facade to control the reader green led.
+            */
+            FLED *green_led_;
+
+            /**
+            * Facade to the buzzer object, we use a LED device for now, because they are similar enough.
+            */
+            FLED *buzzer_;
+        };
+
+    }
+}
