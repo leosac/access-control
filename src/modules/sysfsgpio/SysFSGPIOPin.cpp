@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "SysFSGPIOPin.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::SysFsGpio;
 
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
         Direction direction,

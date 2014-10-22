@@ -5,7 +5,7 @@
 #include <zmqpp/context.hpp>
 #include "SysFsGpioModule.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::SysFsGpio;
 
 SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         zmqpp::socket *module_manager_pipe,
@@ -50,18 +50,23 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
     for (auto &node : module_config.get_child("gpios"))
     {
         boost::property_tree::ptree gpio_cfg = node.second;
+        SysFsGpioPin::Direction direction;
+        SysFsGpioPin::InterruptMode interrupt_mode;
+        std::string gpio_name;
+        std::string gpio_direction;
+        std::string gpio_interrupt;
+        int gpio_no;
+        bool gpio_initial_value;
 
-        std::string gpio_name = gpio_cfg.get_child("name").data();
-        int gpio_no = std::stoi(gpio_cfg.get_child("no").data());
-        std::string gpio_direction = gpio_cfg.get_child("direction").data();
-        std::string gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
-        bool gpio_initial_value = gpio_cfg.get<bool>("value", false);
+        gpio_name = gpio_cfg.get_child("name").data();
+        gpio_no = std::stoi(gpio_cfg.get_child("no").data());
+        gpio_direction = gpio_cfg.get_child("direction").data();
+        gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
+        gpio_initial_value = gpio_cfg.get<bool>("value", false);
 
         LOG() << "Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction;
 
         export_gpio(gpio_no);
-        SysFsGpioPin::Direction direction;
-        SysFsGpioPin::InterruptMode interrupt_mode;
 
         if (gpio_interrupt == "none")
             interrupt_mode = SysFsGpioPin::InterruptMode::None;

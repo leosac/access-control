@@ -19,11 +19,8 @@ set(LEOSAC_LIB_SRCS
     hardware/device/button.cpp
     hardware/device/buzzer.cpp
     hardware/device/dipswitch.cpp
-    hardware/device/gpiodevice.cpp
-    hardware/device/led.cpp
     hardware/device/relay.cpp
-    hardware/device/sysfsled.cpp
-    hardware/device/wiegandreader.cpp
+    hardware/device/gpiodevice.cpp
     hardware/device/gpio/gpiomanager.cpp
     hardware/device/gpio/gpio.cpp
     hardware/device/gpio/AGPIO.cpp

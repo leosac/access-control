@@ -5,7 +5,7 @@
 #include <zmqpp/context.hpp>
 #include "SysFsGpioModule.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::SysFsGpio;
 
 /**
 * Entry point of the SysFSGPIO module.
