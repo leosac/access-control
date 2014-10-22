@@ -2,7 +2,7 @@
 #include "LedImpl.hpp"
 #include "tools/log.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::Led;
 
 LEDModule::LEDModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,

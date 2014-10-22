@@ -13,7 +13,7 @@ namespace Leosac
     {
         /**
         * Namespace where implementation for Rpleth support takes place.
-        * @see @ref mod_rpleth_main for end-user documentaion.
+        * @see @ref mod_rpleth_main for end-user documentation.
         */
         namespace Rpleth
         {

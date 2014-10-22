@@ -37,10 +37,6 @@ set(LEOSAC_LIB_SRCS
     tools/version.cpp
 )
 
-if (LEOSAC_PLATFORM)
-    add_subdirectory(hardware/device/platforms)
-endif()
-
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
 

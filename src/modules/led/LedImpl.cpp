@@ -1,7 +1,7 @@
 #include "LedImpl.hpp"
 #include "tools/log.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::Led;
 
 LedImpl::LedImpl(zmqpp::context &ctx,
         std::string const &led_name,
