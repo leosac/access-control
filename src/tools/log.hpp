@@ -12,6 +12,9 @@
 #include <sstream>
 
 #include "unixfs.hpp"
+#include <zmqpp/zmqpp.hpp>
+
+extern thread_local zmqpp::socket *tl_log_socket;
 
 class LogLine
 {

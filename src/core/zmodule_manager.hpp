@@ -67,6 +67,13 @@ private:
     DynamicLibrary    *load_library_file(const std::string &full_path);
 
     /**
+    * Runs in a the new module thread. This function will call the module init method. This
+    * bridge is needed to perform per-thread initializtion and destruction code (logging sockets).
+    */
+    static bool start_module_helper(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &,
+    std::function<bool (zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function);
+
+    /**
     * Internal helper struct that store informations related to module
     * that are useful to the module manager.
     */

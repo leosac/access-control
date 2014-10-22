@@ -18,7 +18,6 @@
 #include "tools/unixshellscript.hpp"
 #include "exception/leosacexception.hpp"
 
-
 int main(int argc, char** argv)
 {
     RuntimeOptions  options;

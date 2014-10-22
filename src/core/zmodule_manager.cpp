@@ -5,7 +5,7 @@
 #include <exception/moduleexception.hpp>
 #include "zmodule_manager.hpp"
 #include <boost/property_tree/ptree.hpp>
-#include <zmqpp/context.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 void zModuleManager::unloadLibraries()
 {
@@ -34,12 +34,19 @@ bool zModuleManager::initModules()
         {
             void *symptr = module_info.lib_->getSymbol("start_module");
             assert(symptr);
-            std::function<bool(zmqpp::socket * )> actor_fun = std::bind(
-                    ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr),
-                    std::placeholders::_1, // placeholder for pipe
+            // take the module init function and make a std::function out of it.
+            std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> actor_fun =
+                    ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr);
+
+            // std::function that is valid for zmqpp::actor. It store ctx, config and the real module init function.
+            std::function<bool(zmqpp::socket *)> helper_function = std::bind(
+                    &zModuleManager::start_module_helper,
+                    std::placeholders::_1, // actor pipe,
                     module_info.config_,
-                    std::ref(ctx_));
-            zmqpp::actor new_module(actor_fun);
+                    std::ref(ctx_),
+                    actor_fun);
+
+            zmqpp::actor new_module(helper_function);
             modules_.push_back(std::move(new_module));
 
             LOG() << "Module {" << module_info.name_ << "} initialized. (level = " <<
@@ -125,4 +132,18 @@ zModuleManager::zModuleManager(zmqpp::context &ctx) :
         ctx_(ctx)
 {
 
+}
+
+bool zModuleManager::start_module_helper(zmqpp::socket *socket,
+        boost::property_tree::ptree ptree,
+        zmqpp::context &context,
+        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function)
+{
+    tl_log_socket = new zmqpp::socket(context, zmqpp::socket_type::pub);
+    //tl_log_socket->connect("inproc://log-sink");
+
+    bool ret;
+    ret = module_function(socket, ptree, context);
+    delete tl_log_socket;
+    return ret;
 }

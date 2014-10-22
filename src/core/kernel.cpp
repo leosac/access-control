@@ -15,6 +15,9 @@ using boost::property_tree::xml_parser::no_comments;
 using boost::property_tree::xml_parser::trim_whitespace;
 using boost::property_tree::ptree;
 
+// move somewhere else??
+thread_local zmqpp::socket *tl_log_socket = nullptr;
+
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
         bus_(ctx_),
