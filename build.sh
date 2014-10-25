@@ -6,6 +6,18 @@ export RPI_TOOLS=$HOME/Documents/rpi/TOOLS
 export C_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc
 export CXX_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-g++
 
+function install_apt_dep()
+{
+    echo "doing nothing..."
+#    apt-get update
+#    apt-get install git cmake libtool-dev libtool-bin autoconf;
+#    if [ ! 0 -eq $? ] ; then
+#	echo "APT Install error."
+#	exit -1
+#    fi
+
+}
+
 function get_rpi_tools()
 {
     if [ ! -d $RPI_TOOLS ] ; then
@@ -24,15 +36,16 @@ function get_rpi_tools()
 
 function readme()
 {
-    echo "Usage: ./build f|s setup | update"
+    echo "Usage: ./build f|s|l setup | update"
     echo "f -> force: will delete build directory. Will not pause."
     echo "s -> safe:"
+    echo "l -> just fix links in RPI_ROOTFS"
 }
 
-# fix some symlinks
+# fix some symlinks in RPI_ROOTFS
 function fix_links()
 {
-    pushd $RPI_ROOT || { echo "Failure"; exit -1; }
+    pushd $RPI_ROOTFS || { echo "Failure"; exit -1; }
 
     LDL_LINK=`find usr/ -name libdl.so`
     if [ ! readlink -e $LDL_LINK ] ; then
@@ -169,6 +182,12 @@ fi
 
 ## clone or pull cross compile tool
 get_rpi_tools
+install_apt_dep
+
+if [ $1 = "l" ] ; then
+    fix_links;
+    exit 0
+fi
 
 if [ $2 = "setup" ] ; then
     if [ -d "build" ]
