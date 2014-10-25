@@ -24,13 +24,15 @@ function get_rpi_tools()
 
 function readme()
 {
-    echo "Usage: ./build setup | update"
+    echo "Usage: ./build f|s setup | update"
+    echo "f -> force: will delete build directory. Will not pause."
+    echo "s -> safe:"
 }
 
 # fix some symlinks
 function fix_links()
 {
-    pushd $RPI_ROOTS || { echo "Failure"; exit -1; }
+    pushd $RPI_ROOT || { echo "Failure"; exit -1; }
 
     LDL_LINK=`find usr/ -name libdl.so`
     if [ ! readlink -e $LDL_LINK ] ; then
@@ -44,7 +46,7 @@ function fix_links()
 function update()
 {
     echo "Updating RPI libraries and usr directories"
-    rsync -rl --delete-after --safe-links --exclude /usr/bin pi@$RPI_IP:/{lib,usr} $RPI_ROOTFS
+    rsync -vrl --delete-after --safe-links --exclude /usr/bin pi@$RPI_IP:/{lib,usr} $RPI_ROOTFS
     if [ $? -ne 0 ] ; then
 	echo "Error while syncing..."
 	exit 1;
@@ -52,13 +54,54 @@ function update()
     fix_links
 }
 
-function setup()
+## Build libzmq and install to RPI_ROOT
+function build_libzmq()
 {
-    { mkdir build && cd build;} || { echo "Failed to create file";  exit -1 ;}
+    git clone git://github.com/zeromq/libzmq.git
+    pushd libzmq;
+    git checkout e9b9860752ffac1a561fdb64f5f72bbfc5515b34
+    ./autogen.sh || { echo "libzmq autogen failed"; exit -1 ;}
+    ./configure --with-sysroot=$RPI_ROOTFS \
+	--host=arm-linux-gnueabihf \
+	--prefix=$RPI_ROOTFS/usr \
+	CXX=$CXX_CROSS_COMPILER CC=$C_CROSS_COMPILER \
+	|| { echo "libzmq configure failed"; exit -1 ;}
+    make -j10 	|| { echo "libzmq build failed"; exit -1 ;}
+    make install || { echo "libzmq install failed"; exit -1 ;}
+    popd
+}
 
-    if [ $1 = "cross" ] ; then
-	echo "Setting up project for cross compilation."
-	cat > cross.cmake <<EOF
+
+## Build libgest from RPIROOT gtest source and install
+## binary in rpi root.
+## $1 = f | s
+function build_gtest()
+{
+    GTEST_SRC=$RPI_ROOTFS/usr/src/gtest
+    if [ ! -d $GTEST_SRC ]; then
+	echo "Cannot find gtest sources"
+    fi
+    
+    pushd $GTEST_SRC || { echo "$GTEST_SRC doesn't seem to exist"; exit -1 ; }
+    if [ -d $GTEST_SRC/build ] ; then
+	echo "A google test build directory exist already."
+	if [ $1 = "f" ] ; then
+	    echo "Force mode... removing it";
+	    rm -rf $GTEST_SRC/build;
+	else
+	    exit -1;
+	fi
+    fi
+
+    { mkdir -p build && pushd build ; } || { echo "gtest error"; exit -1 ; }
+    { cmake ../ -DCMAKE_TOOLCHAIN_FILE=$CROSS_CMAKE && make ;} || { echo "gtest build error"; exit -1 ; }
+    cp libgtest_main.a libgtest.a $RPI_ROOTFS/usr/lib || { echo "failed to install gtest to rpi rootfs"; exit -1 ;}
+    popd; popd;
+}
+
+function toolchain_file_create()
+{
+    cat > cross.cmake <<EOF
 #toolchain for cross compilation                                                                                   c#make_minimum_required(VERSION 2.8.8 FATAL_ERROR)
  
 SET(CMAKE_SYSTEM_NAME Linux)
@@ -68,8 +111,8 @@ SET(CMAKE_C_COMPILER \$ENV{C_CROSS_COMPILER})
 SET(CMAKE_CXX_COMPILER \$ENV{CXX_CROSS_COMPILER})
 SET(CMAKE_SYSROOT \$ENV{RPI_ROOTFS})
 
-INCLUDE_DIRECTORIES(SYSTEM "${CMAKE_SYSROOT}/usr/local/include" "${CMAKE_SYSROOT}/usr/include")
-LINK_DIRECTORIES(${CMAKE_SYSROOT}/lib ${CMAKE_SYSROOT}/usr/lib ${CMAKE_SYSROOT}/usr/local/lib)
+INCLUDE_DIRECTORIES(SYSTEM ${CMAKE_BINARY_DIR}/libzmq/include "${CMAKE_SYSROOT}/usr/local/include" "${CMAKE_SYSROOT}/usr/include")
+LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/libzmq/.libs ${CMAKE_SYSROOT}/lib ${CMAKE_SYSROOT}/usr/lib ${CMAKE_SYSROOT}/usr/local/lib)
 
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
@@ -77,16 +120,33 @@ SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 EOF
-	CROSS_CMAKE=`pwd`/cross.cmake
-	if [ ! -e $CROSS_CMAKE ]; then
-	    echo "Error"
-	    exit 1
-	fi
+    export CROSS_CMAKE=`pwd`/cross.cmake
+    if [ ! -e $CROSS_CMAKE ]; then
+	echo "Error creating CMake toolchain file"
+	exit 1
+    fi
+}
+
+## $1 -> f | s (force or safe)
+## $2 -> compile mode (normal | cross)
+function setup()
+{
+    { mkdir build && cd build;} || { echo "Failed to create file";  exit -1 ;}
+
+    toolchain_file_create    
+    build_libzmq $1
+    build_gtest $1
+
+    if [ $2 = "cross" ] ; then
+	echo "Setting up project for cross compilation."
+	# wait for user input
+	if [ $1 = "s" ] ; then read; fi
+	    
 	cmake -DCMAKE_TOOLCHAIN_FILE=$CROSS_CMAKE \
 	    -DLEOSAC_BUILD_TESTS=1 \
 	    -DZMQPP_BUILD_STATIC=0 \
-	    -DZEROMQ_LIB_DIR=$RPI_ROOTFS/usr/local/lib \
-	    -DZEROMQ_INCLUDE_DIR=$RPI_ROOTFS/usr/local/include \
+	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
+	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
 	    -DCMAKE_BUILD_TYPE=Debug \
 	    ..
     else
@@ -95,11 +155,12 @@ EOF
 	    -DCMAKE_BUILD_TYPE=Debug \
 	    ..
     fi
+    if [ $1 = "s" ]; then read; fi
     
-    { make VERBOSE=1 -j8  && ctest && echo "Build and test succesfull"; } || { echo "Failure"; exit -1; }
+    { make -j8  && ctest && echo "Build and test succesfull"; } || { echo "Failure"; exit -1; }
 }
 
-if [ $# -lt 1 ]
+if [ $# -lt 2 ]
 then
     echo "Not enough arguments"
     readme;
@@ -109,18 +170,24 @@ fi
 ## clone or pull cross compile tool
 get_rpi_tools
 
-if [ $1 = "setup" ] ; then
+if [ $2 = "setup" ] ; then
     if [ -d "build" ]
     then
-	echo "Build dir already exists... delete first"
-	exit 1
+	if [ $1 = "f" ]; then
+	    rm -rf build;
+	else
+	    echo "Build dir already exists... delete first"
+	    exit 1
+	fi
     fi
     echo "Setting up build directory"
-    setup $2
+    COMPILE_MODE="normal"
+    if [ $# -eq 3 ]; then COMPILE_MODE=$3; fi;
+    setup $1 $COMPILE_MODE
     exit 0
 fi
 
-if [ $1 = "update" ] ; then
+if [ $2 = "update" ] ; then
     update
     exit 0
 fi
