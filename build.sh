@@ -49,7 +49,7 @@ function fix_links()
 
     LDL_LINK=`find usr/ -name libdl.so`
     if [ ! readlink -e $LDL_LINK ] ; then
-	"libdl.so link is broken... attempting to fix"
+	echo "libdl.so link is broken... attempting to fix"
 	unlink $LDL_LINK
 	ln -s $RPI_ROOTFS/lib/arm-linux-gnueabihf/libdl.so.2 $LDL_LINK
     fi
