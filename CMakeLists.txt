@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 project(LEOSAC CXX)
 
+#SET(CMAKE_SKIP_RPATH TRUE)
+
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(WARNING "In-source builds are not encouraged. Make a separate folder for building:\nmkdir build; cd build; cmake ..;cd ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")

@@ -53,13 +53,16 @@ return "UNKNOWN";
     static void log(const std::string &log_msg, int line, const char *funcName,
             const char *fileName, LogLevel level)
     {
+      (void)fileName;
+      (void)line;
+      (void)funcName;
         zmqpp::message msg;
         //msg << fileName;
         //msg << funcName;
         //msg << line;
         msg << log_level_to_string(level);
         msg << log_msg;
-
+        assert(tl_log_socket);
         tl_log_socket->send(msg);
     }
 

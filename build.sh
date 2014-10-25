@@ -42,17 +42,14 @@ function readme()
     echo "l -> just fix links in RPI_ROOTFS"
 }
 
-# fix some symlinks in RPI_ROOTFS
+# should attemp to  fix some symlinks in RPI_ROOTFS
 function fix_links()
 {
     pushd $RPI_ROOTFS || { echo "Failure"; exit -1; }
 
-    LDL_LINK=`find usr/ -name libdl.so`
-    if ! readlink -e $LDL_LINK ; then
-	echo "libdl.so link is broken... attempting to fix"
-	unlink $LDL_LINK
-	ln -s $RPI_ROOTFS/lib/arm-linux-gnueabihf/libdl.so.2 $LDL_LINK
-    fi
+    ## delete usr/local
+    echo "Deleting RPI_ROOTFS/usr/local. We only keep system lib"
+    rm -rf $RPI_ROOTFS/usr/local
     popd
 }
 
