@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export RPI_ROOTFS="$HOME/Documents/rpi/rootfs2"
+export RPI_ROOTFS="$HOME/Documents/rpi/rootfs"
+export RPI_USER=root
 export RPI_IP=192.168.0.15
 export RPI_TOOLS=$HOME/Documents/rpi/TOOLS
 export C_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc
@@ -47,6 +48,18 @@ function fix_links()
 {
     pushd $RPI_ROOTFS || { echo "Failure"; exit -1; }
 
+    LDL_LINK=`find $RPI_ROOTFS/usr -name libdl.so`
+    if test -z $LDL_LINK || ! test -e $LDL_LINK; then
+	echo "Cannot find libdl.so. Will attempt fix"
+	if [ ! -e ./lib/arm-linux-gnueabihf/libdl.so.2 ]; then
+	    echo "Cannot auto fix..."
+	else
+	    ln -s $RPI_ROOTFS/lib/arm-linux-gnueabihf/libdl.so.2 $RPI_ROOTFS/usr/lib/libdl.so
+	fi
+    else
+	echo "Found libdl.so: " $LDL_LINK
+    fi
+
     ## delete usr/local
     echo "Deleting RPI_ROOTFS/usr/local. We only keep system lib"
     rm -rf $RPI_ROOTFS/usr/local
@@ -56,7 +69,7 @@ function fix_links()
 function update()
 {
     echo "Updating RPI libraries and usr directories"
-    rsync -vrl --delete-after --safe-links --exclude /usr/bin pi@$RPI_IP:/{lib,usr} $RPI_ROOTFS
+    rsync -vrl --delete-after --safe-links --exclude /usr/bin $RPI_USER@$RPI_IP:/{lib,usr} $RPI_ROOTFS
     if [ $? -ne 0 ] ; then
 	echo "Error while syncing..."
 	exit 1;
