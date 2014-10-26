@@ -7,17 +7,6 @@ export RPI_TOOLS=$HOME/Documents/rpi/TOOLS
 export C_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc
 export CXX_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-g++
 
-function install_apt_dep()
-{
-    echo "doing nothing..."
-#    apt-get update
-#    apt-get install git cmake libtool-dev libtool-bin autoconf;
-#    if [ ! 0 -eq $? ] ; then
-#	echo "APT Install error."
-#	exit -1
-#    fi
-
-}
 
 function get_rpi_tools()
 {
@@ -54,7 +43,7 @@ function fix_links()
 	if [ ! -e ./lib/arm-linux-gnueabihf/libdl.so.2 ]; then
 	    echo "Cannot auto fix..."
 	else
-	    ln -s $RPI_ROOTFS/lib/arm-linux-gnueabihf/libdl.so.2 $RPI_ROOTFS/usr/lib/libdl.so
+	    ln -s $RPI_ROOTFS/lib/arm-linux-gnueabihf/libdl.so.2 $RPI_ROOTFS/usr/lib/arm-linux-gnueabihf/libdl.so
 	fi
     else
 	echo "Found libdl.so: " $LDL_LINK
@@ -179,8 +168,13 @@ function setup()
 	    ..
     fi
     if [ $1 = "s" ]; then read; fi
-    
-    { make -j8  && ctest && echo "Build and test succesfull"; } || { echo "Failure"; exit -1; }
+
+    make -j8 || { echo "Failed to build Leosac"; exit -1;}
+    if [ $2 != "cross" ]; then
+	echo "Running test since this is not a cross compiled build"
+	ctest || { echo "Test failed :("; exit -1; }
+	fi
+    echo "Success!"
 }
 
 if [ $# -lt 2 ]
@@ -192,7 +186,6 @@ fi
 
 ## clone or pull cross compile tool
 get_rpi_tools
-install_apt_dep
 
 if [ $1 = "l" ] ; then
     fix_links;
