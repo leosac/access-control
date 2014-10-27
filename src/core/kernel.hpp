@@ -90,15 +90,15 @@ private:
     zmqpp::context ctx_;
 
     /**
-    * Application wide (inproc) message bus.
-    */
-    MessageBus bus_;
-
-    /**
     * Logger actor. This is spawn before any module
     * are loaded.
     */
     zmqpp::actor logger_;
+
+    /**
+    * Application wide (inproc) message bus.
+    */
+    MessageBus bus_;
 
     /**
     * A REP socket to send request to the kernel.

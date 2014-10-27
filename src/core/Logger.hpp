@@ -1,6 +1,7 @@
 #pragma once
 
 #include "modules/BaseModule.hpp"
+#include "tools/log.hpp"
 #include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
@@ -30,7 +31,38 @@ namespace Leosac
                     const boost::property_tree::ptree &cfg);
 
         private:
+            enum Color
+            {
+                Black = 30,
+                Red = 31,
+                Green = 32,
+                Yellow = 33,
+                Blue = 34,
+                Magenta = 35,
+                Default
+            };
+
             void handle_log_msg();
+
+            void set_color(std::ostream &s, Color c);
+
+            /**
+            * Log message to stdout.
+            */
+            void log_stdout(const std::string &filename,
+                    const std::string &funcname,
+                    int line,
+                    LogLevel level,
+                    const std::string &message);
+
+            /**
+            * Log message to syslog
+            */
+            void log_syslog(const std::string &filename,
+                    const std::string &funcname,
+                    int line,
+                    LogLevel level,
+                    const std::string &message);
 
             /**
             * Receive log message on this socket.

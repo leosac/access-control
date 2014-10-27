@@ -24,44 +24,56 @@ extern thread_local zmqpp::socket *tl_log_socket;
 
 #include <string>
 #include <sstream>
+#include <syslog.h>
 
 enum class LogLevel
 {
-DEBUG,
-INFO,
-WARN,
-ERROR,
+    EMERG = LOG_EMERG,
+    ALERT = LOG_ALERT,
+    CRIT = LOG_CRIT,
+    ERROR = LOG_ERR,
+    WARN = LOG_WARNING,
+    NOTICE = LOG_NOTICE,
+    INFO = LOG_INFO,
+    DEBUG = LOG_DEBUG,
 };
 
 struct LogHelper
 {
-static std::string log_level_to_string(LogLevel level)
-{
-     switch (level)
-{
-case LogLevel::DEBUG:
-return "DEBUG";
-case LogLevel::INFO:
-return "INFO";
-case LogLevel::WARN:
-return "WARNING";
-case LogLevel::ERROR:
-return "ERROR";
-}
-return "UNKNOWN";
-}
+    static std::string log_level_to_string(LogLevel level)
+    {
+        switch (level)
+        {
+            case LogLevel::DEBUG:
+                return "DEBUG";
+            case LogLevel::INFO:
+                return "INFO";
+            case LogLevel::NOTICE:
+                return "NOTICE";
+            case LogLevel::WARN:
+                return "WARNING";
+            case LogLevel::ERROR:
+                return "ERROR";
+            case LogLevel::CRIT:
+                return "CRITICAL";
+            case LogLevel::ALERT:
+                return "ALERT";
+            case LogLevel::EMERG:
+                return "EMERGENCY";
+        }
+        return "UNKNOWN";
+    }
+
     static void log(const std::string &log_msg, int line, const char *funcName,
             const char *fileName, LogLevel level)
     {
-      (void)fileName;
-      (void)line;
-      (void)funcName;
         zmqpp::message msg;
-        //msg << fileName;
-        //msg << funcName;
-        //msg << line;
-        msg << log_level_to_string(level);
+        msg << fileName;
+        msg << funcName;
+        msg << line;
+        msg << static_cast<int>(level);
         msg << log_msg;
+
         assert(tl_log_socket);
         tl_log_socket->send(msg);
     }
