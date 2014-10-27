@@ -90,7 +90,7 @@ private:
     zmqpp::context ctx_;
 
     /**
-    * Logger actor. This is spawn before any module
+    * Logger actor. This is spawned before any module
     * are loaded.
     */
     zmqpp::actor logger_;

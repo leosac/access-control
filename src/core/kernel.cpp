@@ -30,6 +30,9 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         module_manager_(ctx_),
         network_config_(config.get_child("network"))
 {
+    //init log socket for main thread
+    tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
+    tl_log_socket->connect("inproc://log-sink");
     control_.bind("inproc://leosac-kernel");
     network_config_.reload();
 }
@@ -87,7 +90,7 @@ bool Kernel::module_manager_init()
             std::string pvalue = plugin_dir.second.data();
 
             assert(pname == "plugindir");
-            LOG() << "Adding {" << pvalue << "} in library path";
+            DEBUG("Adding {" << pvalue << "} in library path");
             module_manager_.addToPath(pvalue);
         }
 
@@ -105,7 +108,7 @@ bool Kernel::module_manager_init()
     }
     catch (ptree_error &e)
     {
-        LOG() << "Invalid configuration file: " << e.what();
+        ERROR("Invalid configuration file: " << e.what());
         return false;
     }
     if (!module_manager_.initModules())
@@ -118,7 +121,8 @@ bool Kernel::module_manager_init()
 
 Kernel::~Kernel()
 {
-
+    delete tl_log_socket;
+    tl_log_socket = nullptr;
 }
 
 void Kernel::handle_control_request()
@@ -126,7 +130,7 @@ void Kernel::handle_control_request()
     std::string req;
 
     control_.receive(req);
-    LOG() << "Receive request: " << req;
+    INFO("Receive request: " << req);
 
     if (req == "RESTART")
     {
@@ -147,13 +151,13 @@ void Kernel::factory_reset()
     UnixShellScript script("cp -f");
 
     std::string kernel_config_file = config_.get_child("kernel-cfg").data();
-    LOG() << "Kernel config file path = " << kernel_config_file;
-    LOG() << "RESTORING FACTORY CONFIG";
+    INFO("Kernel config file path = " << kernel_config_file);
+    INFO("RESTORING FACTORY CONFIG");
 
     if (script.run(UnixShellScript::toCmdLine(std::string(rel_path_to_factory_conf_) + "/kernel.xml",
             kernel_config_file)) != 0)
     {
-        LOG() << "Error restoring factory configuration...";
+        ERROR("Error restoring factory configuration...");
     }
 }
 
@@ -163,8 +167,7 @@ bool Kernel::run_logger(zmqpp::socket *pipe)
 
     Leosac::Logger::LoggerSink module(ctx_, pipe, cfg);
     pipe->send(zmqpp::signal::ok);
-    std::cout << "Logger is running." << std::endl;
-    module.run();
 
+    module.run();
     return true;
 }

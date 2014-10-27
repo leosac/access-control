@@ -49,12 +49,12 @@ bool zModuleManager::initModules()
             zmqpp::actor new_module(helper_function);
             modules_.push_back(std::move(new_module));
 
-            LOG() << "Module {" << module_info.name_ << "} initialized. (level = " <<
-                    module_info.config_.get<int>("level", 100);
+            INFO("Module {" << module_info.name_ << "} initialized. (level = " <<
+                    module_info.config_.get<int>("level", 100));
         }
         catch (std::exception &e)
         {
-            LOG() << "Unable to init module {" << module_info.name_ << "}: " << e.what();
+            ERROR("Unable to init module {" << module_info.name_ << "}: " << e.what());
             return false;
         }
     }
@@ -72,7 +72,7 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
     std::string filename = cfg.get_child("file").data();
     std::string module_name = cfg.get_child("name").data();
 
-    LOG() << "Attempting to load module nammed " << module_name << " (shared lib file = " << filename << ")";
+    INFO("Attempting to load module nammed " << module_name << " (shared lib file = " << filename << ")");
     for (const std::string &path_entry : path_)
     {
         // fixme not clean enough.
@@ -85,12 +85,12 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
             if (!(module_info.lib_ = load_library_file(path_entry + "/" + filename)))
                 return false;
             BLABLA_.insert(module_info);
-            LOG() << "library file loaded (not init yet)";
+            DEBUG("library file loaded (not init yet)");
             return true;
         }
 
     }
-    LOG() << "Could'nt load this module";
+    ERROR("Could'nt load this module");
     return false;
 }
 
@@ -98,7 +98,7 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
 {
     DynamicLibrary *lib = nullptr;
 
-    LOG() << "Loading library at: " << full_path;
+    INFO("Loading library at: " << full_path);
     lib = new DynamicLibrary(full_path);
     try
     {
@@ -107,7 +107,7 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
     catch (const DynLibException &e)
     {
         delete lib;
-        LOG() << "FAILURE, full path was:{" << full_path << "}: " << e.what();
+        ERROR("FAILURE, full path was:{" << full_path << "}: " << e.what());
         return nullptr;
     }
     return lib;

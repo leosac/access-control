@@ -66,7 +66,7 @@ void LoggerSink::log_stdout(const std::string &filename,
     std::cout << line;
     set_color(std::cout, Default);
 
-    std::cout << ") --> ";
+    std::cout << ") --> " << std::endl << '\t';
 
     std::cout << message;
     set_color(std::cout, Default);
@@ -79,5 +79,6 @@ void LoggerSink::log_syslog(const std::string &filename,
         LogLevel level,
         const std::string &message)
 {
+    (void)filename;
     syslog(static_cast<int>(level), "%s:%d -> %s", funcname.c_str(), line, message.c_str());
 }

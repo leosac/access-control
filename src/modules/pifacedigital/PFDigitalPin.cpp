@@ -16,7 +16,7 @@ PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
         default_value_(value),
         want_update_(false)
 {
-    LOG() << "trying to bind to " << ("inproc://" + name);
+    DEBUG("trying to bind to " << ("inproc://" + name));
     sock_.bind("inproc://" + name);
     bus_push_->connect("inproc://zmq-bus-pull");
 
@@ -119,7 +119,7 @@ bool PFDigitalPin::read_value()
 
 void PFDigitalPin::update()
 {
-    LOG() << "UPDATING";
+    DEBUG("UPDATING");
     turn_off();
     want_update_ = false;
 }

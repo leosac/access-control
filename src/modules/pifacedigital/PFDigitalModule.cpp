@@ -123,7 +123,7 @@ void PFDigitalModule::process_config(const boost::property_tree::ptree &cfg)
         std::string gpio_direction = gpio_cfg.get_child("direction").data();
         bool gpio_value = gpio_cfg.get<bool>("value", false);
 
-        LOG() << "Creating GPIO " << gpio_name << ", with no " << gpio_no;//<< ". direction = " << gpio_direction;
+        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction);
 
         PFDigitalPin pin(ctx_,
                 gpio_name,

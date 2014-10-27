@@ -15,20 +15,18 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    // assume custom module startup code.
-    // when reeady, signal parent
-
-    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     // file we write event to.
     std::string file_name = cfg.get_child("module_config").get<std::string>("file");
     bool verbose = cfg.get_child("module_config").get<bool>("verbose", false);
+
     pipe->send(zmqpp::signal::ok);
+    INFO("Module Persistent-Monitor initiliazed.");
 
     std::ofstream of(file_name);
 
     if (!of.good())
     {
-        LOG() << "Invalid file";
+        ERROR("Invalid file");
         return false;
     }
 
@@ -63,13 +61,12 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
             }
             if (verbose)
             {
-                LOG() << full_msg.str();
+                INFO(full_msg.str());
             }
             full_msg << std::endl;
             of << full_msg.str();
         }
     }
-
-    std::cout << "module Persistent-Monitor shutting down" << std::endl;
+    INFO("Module Persistent-Monitor shutting down.");
     return true;
 }
