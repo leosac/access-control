@@ -15,7 +15,11 @@ PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
         ctx_(ctx),
         bus_push_(ctx_, zmqpp::socket_type::push)
 {
-    pifacedigital_open(0);
+    if (pifacedigital_open(0) == -1)
+    {
+        ERROR("Cannot open PifaceDigital device");
+        throw LEOSACException("Cannot open PifaceDigital device");
+    }
     assert(pifacedigital_enable_interrupts() == 0);
 
     process_config(config);

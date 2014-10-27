@@ -1,6 +1,0 @@
-echo "Running PostInstall custom script. Press something to continue"
-read
-mount
-echo "gpu_mem=16" >> /boot/config.txt
-
-echo "done..."

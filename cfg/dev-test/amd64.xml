@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<kernel>
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <modules>
+        <module>
+            <name>STDIN</name>
+            <file>libstdin-controller.so</file>
+            <level>40</level>
+        </module>
+
+        <module>
+            <name>MONITOR</name>
+            <file>libpersistent-monitor.so</file>
+            <level>1</level>
+
+            <module_config>
+                <file>MY_LOGS.txt</file>
+                <verbose>false</verbose>
+            </module_config>
+        </module>
+
+        <module>
+            <name>ResetWatcher</name>
+            <file>libtest-and-reset.so</file>
+            <level>101</level>
+            <module_config>
+                <devices>
+                    <device>
+                        <name>MY_WIEGAND_1</name>
+                        <reset_card>40:a0:83:80</reset_card>
+                    </device>
+                </devices>
+            </module_config>
+        </module>
+    </modules>
+</kernel>

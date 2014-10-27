@@ -7,7 +7,6 @@ export RPI_TOOLS=$HOME/Documents/rpi/TOOLS
 export C_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc
 export CXX_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-g++
 
-
 function get_rpi_tools()
 {
     if [ ! -d $RPI_TOOLS ] ; then
@@ -87,8 +86,13 @@ function build_libzmq()
 ## Build libgest from RPIROOT gtest source and install
 ## binary in rpi root.
 ## $1 = f | s
+## $2 = normal | cross
 function build_gtest()
 {
+    if [ $2 = "normal" ]; then 
+	echo "Building in normal mode, so we ignore build_gtest and assume its here"
+	return 0
+    fi;
     GTEST_SRC=$RPI_ROOTFS/usr/src/gtest
     if [ ! -d $GTEST_SRC ]; then
 	echo "Cannot find gtest sources"
@@ -146,8 +150,8 @@ function setup()
     { mkdir build && cd build;} || { echo "Failed to create file";  exit -1 ;}
 
     toolchain_file_create    
-    build_libzmq $1
-    build_gtest $1
+    build_libzmq $1 $2
+    build_gtest $1 $2
 
     if [ $2 = "cross" ] ; then
 	echo "Setting up project for cross compilation."
@@ -169,7 +173,7 @@ function setup()
     fi
     if [ $1 = "s" ]; then read; fi
 
-    make -j8 || { echo "Failed to build Leosac"; exit -1;}
+    make -j4 || { echo "Failed to build Leosac"; exit -1;}
     if [ $2 != "cross" ]; then
 	echo "Running test since this is not a cross compiled build"
 	ctest || { echo "Test failed :("; exit -1; }

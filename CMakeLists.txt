@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
-project(LEOSAC CXX)
+project(LEOSAC)
 
 #SET(CMAKE_SKIP_RPATH TRUE)
 
