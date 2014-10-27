@@ -313,10 +313,13 @@ bool RplethModule::card_convert_from_text(const std::string &card, std::vector<u
         assert(byte <= 255);
         data.push_back(byte);
         // drop the colon delimeter
-        char trash;
-        iss >> trash;
-        if (trash != ':')
-            return false;
+        if (!iss.eof())
+        {
+            char trash;
+            iss >> trash;
+            if (trash != ':')
+                return false;
+        }
     }
     *dest = std::move(data);
     return true;
