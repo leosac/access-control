@@ -6,23 +6,31 @@
 #include "gtest/gtest.h"
 #include "core/MessageBus.hpp"
 
+extern thread_local zmqpp::socket *tl_log_socket;
+
 /**
 * Helper function that create an object of type ModuleType (using conventional parameter) and run it.
+* This runs in "module"'s thread.
 */
 template<typename ModuleType>
 bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg)
 {
+    //create log socket for module thread
+    tl_log_socket = new zmqpp::socket(*ctx, zmqpp::socket_type::push);
+    tl_log_socket->connect("inproc://log-sink");
     ModuleType module(*ctx, pipe, cfg);
 
     pipe->send(zmqpp::signal::ok);
     module.run();
+
+    delete tl_log_socket;
     return true;
 }
 
 /**
 * Part of the `bus_read()` stuff.
 */
-bool bus_read_extract(zmqpp::message * m)
+bool bus_read_extract(zmqpp::message *)
 {
     return true;
 }
@@ -90,12 +98,17 @@ public:
             bus_push_(ctx_, zmqpp::socket_type::push),
             module_actor_(nullptr)
     {
+        // create the log socket for main thread.
+        tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
+        tl_log_socket->connect("inproc://log-sink");
+
         bus_sub_.connect("inproc://zmq-bus-pub");
         bus_push_.connect("inproc://zmq-bus-pull");
     }
 
     virtual ~TestHelper()
     {
+        delete tl_log_socket;
         delete module_actor_;
     }
 
