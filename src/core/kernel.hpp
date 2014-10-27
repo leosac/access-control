@@ -70,6 +70,11 @@ private:
     bool module_manager_init();
 
     /**
+    * Run the Logger thread.
+    */
+    bool run_logger(zmqpp::socket *pipe);
+
+    /**
     * A request has arrived on the `control_` socket.
     */
     void handle_control_request();
@@ -88,6 +93,12 @@ private:
     * Application wide (inproc) message bus.
     */
     MessageBus bus_;
+
+    /**
+    * Logger actor. This is spawn before any module
+    * are loaded.
+    */
+    zmqpp::actor logger_;
 
     /**
     * A REP socket to send request to the kernel.

@@ -42,7 +42,9 @@ zmqpp::context &zmq_ctx)
     {
     // assume custom module startup code.
     // when reeady, signal parent
-    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
+        //
+        INFO("Module stdin-controller is ready. Signaling parent.");
+    //std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
     pipe->send(zmqpp::signal::ok);
 
     // map a device name or anything that can be a target for a command to socket that are connected to it.

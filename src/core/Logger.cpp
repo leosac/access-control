@@ -1,13 +1,12 @@
 #include "Logger.hpp"
 
-using namespace Leosac::Module::Logger;
+using namespace Leosac::Logger;
 
 LoggerSink::LoggerSink(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg) :
         BaseModule(ctx, pipe, cfg),
-        sub_(ctx, zmqpp::socket_type::sub)
+        sub_(ctx, zmqpp::socket_type::pull)
 {
     sub_.bind("inproc://log-sink");
-    sub_.subscribe("");
     reactor_.add(sub_, std::bind(&LoggerSink::handle_log_msg, this));
 }
 

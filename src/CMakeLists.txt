@@ -8,6 +8,7 @@ set(LEOSAC_SRCS
 set(LEOSAC_LIB_SRCS
     config/xmlconfig.cpp
     core/kernel.cpp
+    core/Logger.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp
