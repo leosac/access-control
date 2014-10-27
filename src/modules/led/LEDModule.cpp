@@ -56,8 +56,7 @@ void LEDModule::process_config()
         int default_blink_duration = led_cfg.get<int>("default_blink_duration", 1000);
         int default_blink_speed = led_cfg.get<int>("default_blink_speed", 200);
 
-        LOG() << "Creating LED " << led_name << ", linked to GPIO" << gpio_name;
-
+        INFO("Creating LED " << led_name << ", linked to GPIO" << gpio_name);
         leds_.push_back(std::shared_ptr<LedImpl>(new LedImpl(ctx_, led_name, gpio_name, default_blink_duration, default_blink_speed)));
     }
 }

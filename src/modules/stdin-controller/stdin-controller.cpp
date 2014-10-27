@@ -18,7 +18,7 @@ bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1
     p.add(*target.get(), zmqpp::poller::poll_in);
     if (!p.poll(1000))
     {
-        LOG() << "No response from target (" << target << ")";
+        WARN("No response from target (" << target << ")");
         return false;
     }
 // handle response
@@ -27,7 +27,7 @@ bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1
 
     std::string rep;
     m >> rep;
-    LOG() << "response = " << rep;
+    INFO("response = " << rep);
     return true;
 }
 /**
@@ -86,7 +86,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
                     endpoints_[target]->connect("inproc://" + target);
                 }
 
-                LOG() << "Read {" << std::string(&txt[0]) << "}, target = " << target;
+                DEBUG("Read {" << std::string(&txt[0]) << "}, target = " << target);
 
                 if (!send_request(endpoints_[target], cmd1))
                 {

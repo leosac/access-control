@@ -80,6 +80,17 @@ namespace Leosac
                 */
                 zmqpp::socket backend_;
 
+                /**
+                * Facade to the GPIO we use with this LED.
+                * While we send command directly most of the time (through the backend socket), this can be used too.
+                */
+                FGPIO gpio_;
+
+                /**
+                * Does this LED want its `update()` method be called by the LEDModule.
+                */
+                bool want_update_;
+
                 int default_blink_duration_;
                 int default_blink_speed_;
 
@@ -92,18 +103,7 @@ namespace Leosac
                 */
                 int blink_count_;
 
-                /**
-                * Does this LED want its `update()` method be called by the LEDModule.
-                */
-                bool want_update_;
-
                 std::chrono::system_clock::time_point next_update_time_;
-
-                /**
-                * Facade to the GPIO we use with this LED.
-                * While we send command directly most of the time (through the backend socket), this can be used too.
-                */
-                FGPIO gpio_;
             };
 
         }

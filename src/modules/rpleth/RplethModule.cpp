@@ -110,7 +110,7 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
 {
     RplethPacket response = packet;
 
-    LOG() << "received client packet: " << (int) packet.command;
+    DEBUG("received client packet: " << (int) packet.command);
     response.sender = RplethPacket::Sender::Server;
     if (response.type == RplethProtocol::Rpleth && response.command == RplethProtocol::Ping)
     {
@@ -126,7 +126,7 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
         response = rpleth_receive_cards(response);
     else
     {
-        LOG() << "Unhandled packet.";
+        DEBUG("Unhandled packet.");
         response.status = RplethProtocol::Success; // Default response
     }
     return (response);

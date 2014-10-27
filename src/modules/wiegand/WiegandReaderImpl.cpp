@@ -84,7 +84,7 @@ void WiegandReaderImpl::timeout()
     if (!counter_)
         return;
 
-    LOG() << "timeout, buffer size = " << counter_;
+    DEBUG("timeout, buffer size = " << counter_);
     std::size_t                 size = ((counter_ - 1) / 8) + 1;
 
     std::stringstream card_hex;
@@ -129,7 +129,7 @@ void WiegandReaderImpl::handle_request()
     else if (str == "BEEP")
     {
         assert (msg.parts() == 2);
-        LOG() << "BEEP BEEP";
+        DEBUG("BEEP BEEP");
         std::string duration;
         msg >> duration;
         // our buzzer is a LED (this will change later tho)

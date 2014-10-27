@@ -84,7 +84,7 @@ void DoormanModule::process_config()
             actions.push_back(a);
         }
 
-        LOG() << "Creating Doorman instance " << doorman_name;
+        INFO("Creating Doorman instance " << doorman_name);
         doormen_.push_back(new DoormanInstance(ctx_,
                 doorman_name, auth_ctx_names, actions, timeout));
     }

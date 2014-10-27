@@ -11,10 +11,10 @@ LedImpl::LedImpl(zmqpp::context &ctx,
 ctx_(ctx),
 frontend_(ctx, zmqpp::socket_type::rep),
 backend_(ctx, zmqpp::socket_type::req),
+gpio_(ctx, gpio_name),
+want_update_(false),
 default_blink_duration_(blink_duration),
 default_blink_speed_(blink_speed),
-want_update_(false),
-gpio_(ctx, gpio_name),
 blink_speed_(0),
 blink_duration_(0),
 blink_count_(0)
@@ -57,7 +57,7 @@ void LedImpl::handle_message()
 
 void LedImpl::update()
 {
-    LOG() << "UPDATING LED";
+    DEBUG("UPDATING LED");
 
     if (blink_count_ == 0)
     {

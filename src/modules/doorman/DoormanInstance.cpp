@@ -41,18 +41,18 @@ void DoormanInstance::handle_bus_msg()
     bus_sub_.receive(bus_msg);
     assert(bus_msg.parts() >= 2);
     bus_msg >> auth_name >> auth_status;
-    LOG() << "DOORMAN HERE";
+    DEBUG("DOORMAN HERE");
 
     for (auto &action : actions_)
     {
         if (action.on_ != auth_status)
             continue; // status doesn't match what we expected.
-        LOG() << "ACTION (target = " << action.target_ << ")";
+        DEBUG("ACTION (target = " << action.target_ << ")");
         zmqpp::message msg;
         for (auto &frame : action.cmd_)
         {
             msg << frame;
-            LOG() << "would do : " << frame << " to target: " << action.target_;
+            DEBUG("would do : " << frame << " to target: " << action.target_);
         }
         command_send_recv(action.target_, std::move(msg));
     }
@@ -71,6 +71,6 @@ void DoormanInstance::command_send_recv(std::string const &target_name, zmqpp::m
 
     if (req_status != "OK")
     {
-        LOG() << "Command failed :(";
+        WARN("Command failed :(");
     }
 }

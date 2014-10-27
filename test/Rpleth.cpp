@@ -85,6 +85,7 @@ public:
 
 TEST(Rpleth, TestConvertCard)
 {
+    std::cout << "test 1 _ start" << std::endl;
     // we just need some conf so the module load.
     boost::property_tree::ptree cfg, module_cfg;
 
@@ -97,7 +98,7 @@ TEST(Rpleth, TestConvertCard)
     RplethModule module(ctx, &pipe, cfg);
 
     std::vector<uint8_t> out;
-
+    std::cout << "test 1" << std::endl;
     std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
     ASSERT_TRUE(module.card_convert_from_text("ff:ff:ff:ff", &out));
     ASSERT_EQ(card_binary, out);
@@ -118,6 +119,7 @@ TEST(Rpleth, TestConvertCard)
 */
 TEST_F(RplethTest, TestReceiveStreamCardsSimple)
 {
+    std::cout << "test 2 _ start" << std::endl;
     zmqpp::socket client = connect_to_rpleth();
 
     // fake wiegand reader activity.
@@ -127,6 +129,7 @@ TEST_F(RplethTest, TestReceiveStreamCardsSimple)
 
 TEST_F(RplethTest, TestReceiveStreamCards2)
 {
+    std::cout << "test 3 _ start" << std::endl;
     zmqpp::message msg;
     std::string connection_identity, data;
     zmqpp::socket client = connect_to_rpleth();
@@ -138,7 +141,7 @@ TEST_F(RplethTest, TestReceiveStreamCards2)
     bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "11:22:33:44");
     check_rpleth_card_msg(client, {0x11, 0x22, 0x33, 0x44});
 
-    std::cout << "toto" << std::endl;
+    std::cout << "test 3 " << std::endl;
 
     bus_push_.send(zmqpp::message() << "S_INGNORED_READER" << "11:22:33:44");
     std::this_thread::sleep_for(std::chrono::milliseconds(15));

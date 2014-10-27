@@ -60,7 +60,7 @@ void WiegandReaderModule::process_config()
         std::string buzzer_name = reader_cfg.get<std::string>("buzzer", "");
         std::string greenled_name = reader_cfg.get<std::string>("green_led", "");
 
-        LOG() << "Creating READER " << reader_name << " (green led = " << greenled_name << "), buzzer {" << buzzer_name << "}";
+        INFO("Creating READER " << reader_name << " (green led = " << greenled_name << "), buzzer {" << buzzer_name << "}");
         WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name);
         readers_.push_back(std::move(reader));
     }

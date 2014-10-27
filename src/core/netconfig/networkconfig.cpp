@@ -28,12 +28,12 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
         _defaultIp = cfg.get<std::string>("default_ip");
         _ip = cfg.get<std::string>("ip", _defaultIp);
 
-        LOG() << "NetworkSettings:";
-        LOG() << "enabled=" << _enabled;
-        LOG() << "dhcp=" << _dhcpEnabled;
-        LOG() << "ip=" << _ip;
-        LOG() << "netmask=" << _netmask;
-        LOG() << "default=" << _defaultIp;
+        INFO("Network settings:" <<
+                std::endl << '\t' << "enabled=" << _enabled <<
+                std::endl << '\t' << "dhcp=" << _dhcpEnabled <<
+                std::endl << '\t' << "ip=" << _ip <<
+                std::endl << '\t' << "netmask=" << _netmask <<
+                std::endl << '\t' << "default=" << _defaultIp);
     }
 }
 
@@ -51,8 +51,8 @@ void NetworkConfig::reload()
 
     apply.run(UnixShellScript::toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
     if (!apply.getOutput().empty())
-        LOG() << "ScriptOutput:\n" << apply.getOutput() << "\n";
-    LOG() << "JUST LOAD IFCONFIG CONFIGURATION";
+        INFO("ScriptOutput:\n" << apply.getOutput() << "\n");
+    INFO("JUST LOAD IFCONFIG CONFIGURATION");
 }
 
 void NetworkConfig::setEnabled(bool state)
@@ -62,10 +62,10 @@ void NetworkConfig::setEnabled(bool state)
 
 void NetworkConfig::setDHCP(bool enabled)
 {
-    LOG() << "DHCP";
+    INFO("DHCP");
     if (_dhcpEnabled != enabled)
     {
-        LOG() << "DHCP set to" << enabled;
+        INFO("DHCP set to" << enabled);
         _dhcpEnabled = enabled;
         reload();
     }
@@ -73,6 +73,6 @@ void NetworkConfig::setDHCP(bool enabled)
 
 void NetworkConfig::setCustomIP(bool enabled)
 {
-    LOG() << "CustomIP set to" << enabled;
+    INFO("CustomIP set to" << enabled);
     _ip = _defaultIp;
 }
