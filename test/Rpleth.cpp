@@ -96,14 +96,21 @@ TEST(Rpleth, TestConvertCard)
     zmqpp::socket pipe(ctx, zmqpp::socket_type::pair);
     RplethModule module(ctx, &pipe, cfg);
 
+    std::vector<uint8_t> out;
+
     std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
-    ASSERT_EQ(card_binary, module.card_convert_from_text("ff:ff:ff:ff"));
+    ASSERT_TRUE(module.card_convert_from_text("ff:ff:ff:ff", &out));
+    ASSERT_EQ(card_binary, out);
 
     card_binary = {0x32, 0x12, 0x14, 0xae, 0xbc};
-    ASSERT_EQ(card_binary, module.card_convert_from_text("32:12:14:ae:bc"));
+    ASSERT_TRUE(module.card_convert_from_text("32:12:14:ae:bc", &out));
+    ASSERT_EQ(card_binary, out);
 
     card_binary = {0x00, 0x00, 0x00, 0x00,};
-    ASSERT_EQ(card_binary, module.card_convert_from_text("00:00:00:00"));
+    ASSERT_TRUE(module.card_convert_from_text("00:00:00:00", &out));
+    ASSERT_EQ(card_binary, out);
+
+    ASSERT_FALSE(module.card_convert_from_text("0x:adfw:23", &out));
 }
 
 /**

@@ -282,7 +282,8 @@ void RplethModule::rpleth_publish_card()
             RplethPacket packet(RplethPacket::Sender::Server);
 
             msg << client.first;
-            packet.data = card_convert_from_text(card);
+            if (!card_convert_from_text(card, &packet.data))
+                continue;
             packet.status = RplethProtocol::Success;
             packet.type = RplethProtocol::HID;
             packet.command = RplethProtocol::Badge;
@@ -299,8 +300,9 @@ void RplethModule::rpleth_publish_card()
     cards_read_stream_.clear();
 }
 
-std::vector<uint8_t> RplethModule::card_convert_from_text(const std::string &card)
+bool RplethModule::card_convert_from_text(const std::string &card, std::vector<uint8_t> *dest)
 {
+    assert(dest);
     std::vector<uint8_t> data;
     std::istringstream iss(card);
 
@@ -313,7 +315,9 @@ std::vector<uint8_t> RplethModule::card_convert_from_text(const std::string &car
         // drop the colon delimeter
         char trash;
         iss >> trash;
-        assert(trash == ':');
+        if (trash != ':')
+            return false;
     }
-    return data;
+    *dest = std::move(data);
+    return true;
 }

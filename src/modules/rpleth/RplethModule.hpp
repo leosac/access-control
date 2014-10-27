@@ -35,9 +35,13 @@ namespace Leosac
                 RplethModule &operator=(const RplethModule &) = delete;
 
                 /**
-                * Convert a card number from text to binary.
+                * Convert a card number from text to binary and store the result
+                * into dest.
+                * @param s string source
+                * @param dest destination vector for binary version (cannot be null)
+                * @returns true if conversion went well. false otherwise
                 */
-                std::vector<uint8_t> card_convert_from_text(const std::string &s);
+                bool card_convert_from_text(const std::string &s, std::vector<uint8_t> *dest);
 
             private:
                 void process_config();
