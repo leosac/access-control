@@ -4,6 +4,7 @@ set(SYSFSGPIO_SRCS
     init.cpp
     SysFsGpioModule.cpp
     SysFSGPIOPin.cpp
+    SysFsGpioConfig.cpp
 )
 
 add_library(${SYSFSGPIO_BIN} SHARED ${SYSFSGPIO_SRCS})

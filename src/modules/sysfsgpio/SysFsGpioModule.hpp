@@ -4,6 +4,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/reactor.hpp>
 #include "SysFSGPIOPin.hpp"
+#include "SysFsGpioConfig.hpp"
 
 namespace Leosac
 {
@@ -18,6 +19,7 @@ namespace Leosac
         namespace SysFsGpio
         {
             class SysFsGpioPin;
+            class SysFsGpioConfig;
 
             /**
             * Handle GPIO management over sysfs.
@@ -32,6 +34,9 @@ namespace Leosac
 
                 ~SysFsGpioModule();
 
+                SysFsGpioModule(const SysFsGpioModule &) = delete;
+                SysFsGpioModule &operator=(SysFsGpioModule &&) = delete;
+
                 /**
                 * Module's main loop.
                 */
@@ -42,6 +47,11 @@ namespace Leosac
                 * This is intended for use by the SysFsGpioPin
                 */
                 void publish_on_bus(zmqpp::message &msg);
+
+                /**
+                * Retrieve a reference to the config object.
+                */
+                const SysFsGpioConfig &general_config() const;
 
             private:
                 zmqpp::socket &pipe_;
@@ -63,6 +73,11 @@ namespace Leosac
                 void process_config(const boost::property_tree::ptree &cfg);
 
                 /**
+                * General configuration (file paths, etc).
+                */
+                bool process_general_config();
+
+                /**
                 * Write to "gpio_export_path" so the kernel export the socket to sysfs.
                 */
                 void export_gpio(int gpio_no);
@@ -74,7 +89,15 @@ namespace Leosac
                 */
                 zmqpp::socket bus_push_;
 
+                /**
+                * Vector of underlying pin object
+                */
                 std::vector<SysFsGpioPin *> gpios_;
+
+                /**
+                * General configuration for module
+                */
+                SysFsGpioConfig *general_cfg_;
             };
         }
     }

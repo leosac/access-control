@@ -53,7 +53,7 @@ SysFsGpioPin::~SysFsGpioPin()
     }
     try
     {
-        UnixFs::writeSysFsValue("/sys/class/gpio/unexport", gpio_no_);
+        UnixFs::writeSysFsValue(module_.general_config().unexport_path(), gpio_no_);
     }
     catch (FsException &e)
     {

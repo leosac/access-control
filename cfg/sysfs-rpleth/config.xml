@@ -49,6 +49,15 @@
             <level>2</level>
 
             <module_config>
+
+                <aliases>
+                    <default>gpio%__NO__%</default>
+                </aliases>
+
+                <value_path>/sys/class/gpio/%__REPLACE_ME__%/value</value_path>
+                <export_path>/sys/class/gpio/export</export_path>
+                <unexport_path>/sys/class/gpio/unexport</unexport_path>
+
                 <gpios>
                     <!-- Prepare GPIO for our Wiegand reader -->
                     <gpio>

@@ -5,7 +5,7 @@ list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES} )
 
 function(leosacCreateSingleSourceTest NAME)
 ## module we link against
-set(MODULES_LIB wiegand led rpleth)
+set(MODULES_LIB wiegand led rpleth sysfsgpio)
 set(HELPER_SRC  helper/FakeGPIO.cpp helper/FakeWiegandReader.cpp)
 
     set(TEST_NAME test-${NAME})
@@ -24,3 +24,4 @@ leosacCreateSingleSourceTest(automaton)
 leosacCreateSingleSourceTest(WiegandReader)
 leosacCreateSingleSourceTest(Led)
 leosacCreateSingleSourceTest(Rpleth)
+leosacCreateSingleSourceTest(SysFsGpioConfig)

@@ -4,6 +4,7 @@
 #include <tools/log.hpp>
 #include <zmqpp/context.hpp>
 #include "SysFsGpioModule.hpp"
+#include "SysFsGpioConfig.hpp"
 
 using namespace Leosac::Module::SysFsGpio;
 
@@ -14,7 +15,8 @@ SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         config_(config),
         is_running_(true),
         ctx_(ctx),
-        bus_push_(ctx_, zmqpp::socket_type::push)
+        bus_push_(ctx_, zmqpp::socket_type::push),
+        general_cfg_(nullptr)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     process_config(config);
@@ -46,6 +48,8 @@ void SysFsGpioModule::handle_pipe()
 void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
 {
     boost::property_tree::ptree module_config = cfg.get_child("module_config");
+
+    process_general_config();
 
     for (auto &node : module_config.get_child("gpios"))
     {
@@ -85,16 +89,28 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
 
 void SysFsGpioModule::export_gpio(int gpio_no)
 {
-    UnixFs::writeSysFsValue("/sys/class/gpio/export", gpio_no);
+    UnixFs::writeSysFsValue(general_cfg_->export_path(), gpio_no);
 }
 
 SysFsGpioModule::~SysFsGpioModule()
 {
     for (auto gpio : gpios_)
         delete gpio;
+    delete general_cfg_;
 }
 
 void SysFsGpioModule::publish_on_bus(zmqpp::message &msg)
 {
     bus_push_.send(msg);
+}
+
+bool SysFsGpioModule::process_general_config()
+{
+    assert(general_cfg_ == nullptr);
+    general_cfg_ = new SysFsGpioConfig(config_.get_child("module_config"));
+}
+
+const SysFsGpioConfig &SysFsGpioModule::general_config() const
+{
+    return *general_cfg_;
 }
