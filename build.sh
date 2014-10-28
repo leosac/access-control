@@ -6,6 +6,7 @@ export RPI_IP=10.2.3.137
 export RPI_TOOLS=$HOME/Documents/rpi/TOOLS
 export C_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc
 export CXX_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-g++
+export INSTALL_DIR=/tmp/leosac
 
 function get_rpi_tools()
 {
@@ -155,7 +156,9 @@ function setup()
     build_libzmq $1 $2
     build_gtest $1 $2
 
+    FULL_INSTALL_DIR="lama"
     if [ $2 = "cross" ] ; then
+	FULL_INSTALL_DIR=$INSTALL_DIR/build-arm
 	echo "Setting up project for cross compilation."
 	# wait for user input
 	if [ $1 = "s" ] ; then read; fi
@@ -166,15 +169,16 @@ function setup()
 	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
 	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
 	    -DCMAKE_BUILD_TYPE=Debug \
-	    -DCMAKE_INSTALL_PREFIX=/tmp/build-arm \
+	    -DCMAKE_INSTALL_PREFIX=$FULL_INSTALL_DIR \
 	    ..
     else
+	FULL_INSTALL_DIR=$INSTALL_DIR/build-x64
 	cmake -DLEOSAC_BUILD_TESTS=1 \
 	    -DZMQPP_BUILD_STATIC=0 \
 	    -DCMAKE_BUILD_TYPE=Debug \
 	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
 	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
-	    -DCMAKE_INSTALL_PREFIX=/tmp/build-x64 \
+	    -DCMAKE_INSTALL_PREFIX=$FULL_INSTALL_DIR \
 	    ..
     fi
     if [ $1 = "s" ]; then read; fi
@@ -183,11 +187,15 @@ function setup()
     if [ $2 != "cross" ]; then
 	echo "Running test since this is not a cross compiled build"
 	ctest || { echo "Test failed :("; exit -1; }
+    fi
 
-	echo "Installing leosac..."
-	make install
-
-	fi
+    echo "Install dir = " $FULL_INSTALL_DIR
+    if [ ! -d $FULL_INSTALL_DIR ]; then
+	echo "Install dir not found"
+	exit -1;
+    fi
+    echo "Installing leosac..."
+    make install
     echo "Success!"
 }
 

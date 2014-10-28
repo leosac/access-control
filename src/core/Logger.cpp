@@ -80,5 +80,5 @@ void LoggerSink::log_syslog(const std::string &filename,
         const std::string &message)
 {
     (void)filename;
-    syslog(static_cast<int>(level), "%s:%d -> %s", funcname.c_str(), line, message.c_str());
+    syslog(static_cast<int>(level), "(pid=%d) %s:%d -> %s", getpid(), funcname.c_str(), line, message.c_str());
 }

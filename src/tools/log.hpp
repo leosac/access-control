@@ -97,7 +97,8 @@ struct LogHelper
 * It is used to create an anonymous lambda to allow the logging macros parameter
 * to behave like a stringstream.
 */
-#define BUILD(param) [&] (void) {std::stringstream ss; ss << param; return ss.str();}()
+#define BUILD(param) [&] (void) {std::stringstream logger_macro_ss__; logger_macro_ss__ << param; \
+ return logger_macro_ss__.str();}()
 /**
 * See "Internal macros documentation"
 */
