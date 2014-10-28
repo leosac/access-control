@@ -68,7 +68,7 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
         gpio_initial_value = gpio_cfg.get<bool>("value", false);
 
-        LOG() << "Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction;
+        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction);
 
         export_gpio(gpio_no);
 
@@ -106,8 +106,17 @@ void SysFsGpioModule::publish_on_bus(zmqpp::message &msg)
 
 bool SysFsGpioModule::process_general_config()
 {
-    assert(general_cfg_ == nullptr);
-    general_cfg_ = new SysFsGpioConfig(config_.get_child("module_config"));
+    try
+    {
+        assert(general_cfg_ == nullptr);
+        general_cfg_ = new SysFsGpioConfig(config_.get_child("module_config"));
+        return true;
+    }
+    catch (std::exception &e)
+    {
+        ERROR("SysFsGpio Invalid Configuration:" << e.what());
+        throw e;
+    }
 }
 
 const SysFsGpioConfig &SysFsGpioModule::general_config() const

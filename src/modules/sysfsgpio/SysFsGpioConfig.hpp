@@ -44,6 +44,11 @@ namespace Leosac
                 * Compute the absolute path the "edge" file for pin_no.
                 */
                 std::string edge_path(int pin_no) const;
+
+                /**
+                * Compute the absolute path the "direction" file for pin_no.
+                */
+                std::string direction_path(int pin_no) const;
             private:
 
                 /**
@@ -76,6 +81,11 @@ namespace Leosac
                 * Absolute path to the "edge" file.
                 */
                 std::string cfg_edge_path_;
+
+                /**
+                * Absolute path to the "direction" file.
+                */
+                std::string cfg_direction_path_;
             };
         }
     }

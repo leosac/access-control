@@ -10,12 +10,6 @@
 
     <modules>
         <module>
-            <name>Logger</name>
-            <file>liblogger.so</file>
-            <level>0</level>
-        </module>
-
-        <module>
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
@@ -51,12 +45,15 @@
             <module_config>
 
                 <aliases>
-                    <default>gpio%__NO__%</default>
+                    <default>gpio__NO__</default>
                 </aliases>
 
-                <value_path>/sys/class/gpio/%__REPLACE_ME__%/value</value_path>
                 <export_path>/sys/class/gpio/export</export_path>
                 <unexport_path>/sys/class/gpio/unexport</unexport_path>
+
+                <edge_path>/sys/class/gpio/__REPLACE_ME__/edge</edge_path>
+                <value_path>/sys/class/gpio/__REPLACE_ME__/value</value_path>
+                <direction_path>/sys/class/gpio/__REPLACE_ME__/direction</direction_path>
 
                 <gpios>
                     <!-- Prepare GPIO for our Wiegand reader -->

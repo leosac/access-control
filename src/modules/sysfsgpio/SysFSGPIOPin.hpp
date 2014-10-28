@@ -10,6 +10,7 @@ namespace Leosac
         namespace SysFsGpio
         {
             class SysFsGpioModule;
+            class SysFsGpioConfig;
 
             /**
             * This is a implementation class. It's not exposed to the user and is for this
@@ -132,6 +133,7 @@ namespace Leosac
                 */
                 SysFsGpioModule &module_;
 
+                const SysFsGpioConfig &path_cfg_;
             };
         }
     }

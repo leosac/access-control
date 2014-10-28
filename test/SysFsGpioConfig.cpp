@@ -40,6 +40,7 @@ public:
         module_cfg.add("unexport_path", "/path/to/unexport");
         module_cfg.add("value_path", "/path/to/gpios/__REPLACE_ME__/value");
         module_cfg.add("edge_path", "/path/to/gpios/__REPLACE_ME__/edge");
+        module_cfg.add("direction_path", "/path/to/gpios/__REPLACE_ME__/direction");
 
         module_cfg.add_child("aliases", aliases_cfg);
         cfg_case_1_ = module_cfg;
@@ -51,8 +52,9 @@ public:
 
         module_cfg.add("export_path", "/path/to/export");
         module_cfg.add("unexport_path", "/path/to/unexport");
-        module_cfg.add("value_path", "/path/to/gpios/__REPLACE_ME__/value");
-        module_cfg.add("edge_path", "/path/to/gpios/__REPLACE_ME__/edge");
+        module_cfg.add("value_path", "/random/path/to/__REPLACE_ME__/value");
+        module_cfg.add("edge_path", "/random/path/to/__REPLACE_ME__/edge");
+        module_cfg.add("direction_path", "/random/path/to/__REPLACE_ME__/direction");
 
         // we define default aliases rules.
         aliases_cfg.add("default", "gpio__NO__");
@@ -68,6 +70,7 @@ public:
         module_cfg.add("unexport_path", "/path/to/unexport");
         module_cfg.add("value_path", "/path/to/gpios/__REPLACE_ME__/value");
         module_cfg.add("edge_path", "/path/to/gpios/__REPLACE_ME__/edge");
+        module_cfg.add("direction_path", "/path/to/gpios/__REPLACE_ME__/direction");
 
         // we define default aliases rules.
         aliases_cfg.add("default", "gpio__NO__");
@@ -75,12 +78,13 @@ public:
         aliases_cfg.add("21", "gpio_magic_number");
         module_cfg.add_child("aliases", aliases_cfg);
 
-        cfg_case_2_ = module_cfg;
+        cfg_case_3_ = module_cfg;
     }
 
     zmqpp::context *ctx_;
     boost::property_tree::ptree cfg_case_1_;
     boost::property_tree::ptree cfg_case_2_;
+    boost::property_tree::ptree cfg_case_3_;
 };
 
 TEST_F(SysFsGpioConfigTest, ExportUnexportPath)
@@ -95,14 +99,14 @@ TEST_F(SysFsGpioConfigTest, PathAndDefaultAliases)
 {
     SysFsGpioConfig my_config(cfg_case_2_);
 
-    ASSERT_EQ("/path/to/gpios/gpio14/value", my_config.value_path(14));
-    ASSERT_EQ("/path/to/gpios/gpio3/value", my_config.value_path(3));
-    ASSERT_EQ("/path/to/gpios/gpio17/value", my_config.value_path(17));
+    ASSERT_EQ("/random/path/to/gpio14/value", my_config.value_path(14));
+    ASSERT_EQ("/random/path/to/gpio3/value", my_config.value_path(3));
+    ASSERT_EQ("/random/path/to/gpio17/value", my_config.value_path(17));
 }
 
 TEST_F(SysFsGpioConfigTest, MoreComplexeAliases)
 {
-    SysFsGpioConfig my_config(cfg_case_2_);
+    SysFsGpioConfig my_config(cfg_case_3_);
 
     ASSERT_EQ("/path/to/gpios/gpio14/value", my_config.value_path(14));
     ASSERT_EQ("/path/to/gpios/gpio3/value", my_config.value_path(3));
@@ -110,4 +114,7 @@ TEST_F(SysFsGpioConfigTest, MoreComplexeAliases)
 
     ASSERT_EQ("/path/to/gpios/gpio3/edge", my_config.edge_path(3));
     ASSERT_EQ("/path/to/gpios/gpio_magic_number/edge", my_config.edge_path(21));
+
+    ASSERT_EQ("/path/to/gpios/gpio3/direction", my_config.direction_path(3));
+    ASSERT_EQ("/path/to/gpios/gpio_magic_number/direction", my_config.direction_path(21));
 }

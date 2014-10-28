@@ -28,6 +28,7 @@ export_path |     |                | Absolute path to "export" sysfs file       
 unexport_path |   |                | Absolute path to "unexport" sysfs file                                                  | YES
 value_path |      |                | Absolute path to "value" file. `__REPLACE_ME__` shall act as a placeholder for pin id   | YES
 edge_path  |      |                | Absolute path to "edge" file. `__REPLACE_ME__` shall act as a placeholder for pin id    | YES
+direction_path |  |                | Absolute path to "direction" file. `__REPLACE_ME__` shall act as a placeholder          | YES
 gpios   |         |                | List of GPIOs pins we configure                                                         | YES
 ----->  | gpio    |                | Configuration informations for one GPIO pin.                                            | YES
 ----->  | ----->  | name           | Name of the GPIO pin                                                                    | YES
@@ -75,7 +76,15 @@ This is a example of SysFsGpio possible configuration for SysFsGpio module into 
             <name>SYSFS-GPIO</name>
             <file>libsysfsgpio.so</file>
             <level>2</level>
-            <module_config>
+            <module_config>            
+                <aliases>
+                    <default>gpio__NO__</default>
+                </aliases>
+                <export_path>/sys/class/gpio/export</export_path>
+                <unexport_path>/sys/class/gpio/unexport</unexport_path>
+                <edge_path>/sys/class/gpio/__REPLACE_ME__/edge</edge_path>
+                <value_path>/sys/class/gpio/__REPLACE_ME__/value</value_path>
+                <direction_path>/sys/class/gpio/__REPLACE_ME__/value</direction_path>                
                 <gpios>
                     <gpio>
                         <name>wiegand_data_high</name>

@@ -15,14 +15,15 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
         name_(name),
         direction_(direction),
         initial_value_(initial_value),
-        module_(module)
+        module_(module),
+        path_cfg_(module.general_config())
 {
     LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
 
     set_direction(direction);
     set_interrupt(interrupt_mode);
-    std::string full_path = "/sys/class/gpio/gpio" + std::to_string(gpio_no) + "/value";
+    std::string full_path = path_cfg_.value_path(gpio_no);
 
     if (direction == Direction::Out)
     {
@@ -64,7 +65,7 @@ SysFsGpioPin::~SysFsGpioPin()
 void SysFsGpioPin::set_direction(Direction dir)
 {
     std::string direction = dir == Direction::In ? "in" : "out";
-    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/direction", direction);
+    UnixFs::writeSysFsValue(path_cfg_.direction_path(gpio_no_), direction);
 }
 
 void SysFsGpioPin::set_interrupt(InterruptMode mode)
@@ -80,7 +81,7 @@ void SysFsGpioPin::set_interrupt(InterruptMode mode)
         value = "rising";
     else
         assert (0);
-    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/edge", value);
+    UnixFs::writeSysFsValue(path_cfg_.edge_path(gpio_no_), value);
 }
 
 void SysFsGpioPin::handle_message()
@@ -98,33 +99,33 @@ void SysFsGpioPin::handle_message()
     else if (frame1 == "TOGGLE")
         ok = toggle();
     sock_.send(ok ? "OK" : "KO");
+
     // publish new state.
-    LOG() << "gpio nammed {" << name_ << " will publish ";
     module_.publish_on_bus(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
 bool SysFsGpioPin::turn_on()
 {
-    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", 1);
+    UnixFs::writeSysFsValue(path_cfg_.value_path(gpio_no_), 1);
     return true;
 }
 
 bool SysFsGpioPin::turn_off()
 {
-    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", 0);
+    UnixFs::writeSysFsValue(path_cfg_.value_path(gpio_no_), 0);
     return true;
 }
 
 bool SysFsGpioPin::toggle()
 {
-    int v = UnixFs::readSysFsValue<int>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
-    UnixFs::writeSysFsValue("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value", v == 1 ? 0 : 1);
+    int v = UnixFs::readSysFsValue<int>(path_cfg_.value_path(gpio_no_));
+    UnixFs::writeSysFsValue(path_cfg_.value_path(gpio_no_), v == 1 ? 0 : 1);
     return true;
 }
 
 bool SysFsGpioPin::read_value()
 {
-    return UnixFs::readSysFsValue<bool>("/sys/class/gpio/gpio" + std::to_string(gpio_no_) + "/value");
+    return UnixFs::readSysFsValue<bool>(path_cfg_.value_path(gpio_no_));
 }
 
 void SysFsGpioPin::handle_interrupt()
@@ -148,5 +149,4 @@ void SysFsGpioPin::register_sockets(zmqpp::reactor *reactor)
     if (direction_ == Direction::In)
         reactor->add(file_fd_, std::bind(&SysFsGpioPin::handle_interrupt, this),
                 zmqpp::poller::poll_pri);
-
 }
