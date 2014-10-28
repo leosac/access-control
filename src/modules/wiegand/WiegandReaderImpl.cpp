@@ -67,16 +67,23 @@ void WiegandReaderImpl::handle_bus_msg()
     std::string msg;
     bus_sub_.receive(msg);
 
-    assert(counter_ < 128); // hardcoded max limit
-    if (msg == topic_high_)
+    if (counter_ < 128)
     {
-        buffer_[counter_ / 8] |= (1 << (7 - counter_ % 8));
+        if (msg == topic_high_)
+        {
+            buffer_[counter_ / 8] |= (1 << (7 - counter_ % 8));
+        }
+        else if (msg == topic_low_)
+        {
+            // well, nothing to do here.
+        }
+        counter_++;
     }
-    else if (msg == topic_low_)
+    else
     {
-        // well, nothing to do here.
+        WARN("Received too many interrupt. Resetting current counter.");
+        counter_ = 0;
     }
-    counter_++;
 }
 
 void WiegandReaderImpl::timeout()
