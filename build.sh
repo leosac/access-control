@@ -2,7 +2,7 @@
 
 export RPI_ROOTFS="$HOME/Documents/rpi/rootfs"
 export RPI_USER=root
-export RPI_IP=192.168.0.15
+export RPI_IP=10.2.3.137
 export RPI_TOOLS=$HOME/Documents/rpi/TOOLS
 export C_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-gcc
 export CXX_CROSS_COMPILER=$RPI_TOOLS/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-g++
@@ -77,7 +77,7 @@ function build_libzmq()
 	--prefix=$RPI_ROOTFS/usr \
 	CXX=$CXX_CROSS_COMPILER CC=$C_CROSS_COMPILER \
 	|| { echo "libzmq configure failed"; exit -1 ;}
-    make -j10 	|| { echo "libzmq build failed"; exit -1 ;}
+    make -j4 	|| { echo "libzmq build failed"; exit -1 ;}
     make install || { echo "libzmq install failed"; exit -1 ;}
     popd
 }
@@ -110,6 +110,7 @@ function build_gtest()
     fi
 
     { mkdir -p build && pushd build ; } || { echo "gtest error"; exit -1 ; }
+    echo "Running cmake ../ -DCMAKE_TOOLCHAIN_FILE=$CROSS_CMAKE && make"
     { cmake ../ -DCMAKE_TOOLCHAIN_FILE=$CROSS_CMAKE && make ;} || { echo "gtest build error"; exit -1 ; }
     cp libgtest_main.a libgtest.a $RPI_ROOTFS/usr/lib || { echo "failed to install gtest to rpi rootfs"; exit -1 ;}
     popd; popd;
@@ -126,9 +127,10 @@ SET(CMAKE_SYSTEM_VERSION 1)
 SET(CMAKE_C_COMPILER \$ENV{C_CROSS_COMPILER})
 SET(CMAKE_CXX_COMPILER \$ENV{CXX_CROSS_COMPILER})
 SET(CMAKE_SYSROOT \$ENV{RPI_ROOTFS})
+LIST(APPEND CMAKE_FIND_ROOT_PATH \$ENV{RPI_ROOTFS})
 
-INCLUDE_DIRECTORIES(SYSTEM ${CMAKE_BINARY_DIR}/libzmq/include "${CMAKE_SYSROOT}/usr/local/include" "${CMAKE_SYSROOT}/usr/include")
-LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/libzmq/.libs ${CMAKE_SYSROOT}/lib ${CMAKE_SYSROOT}/usr/lib ${CMAKE_SYSROOT}/usr/local/lib)
+INCLUDE_DIRECTORIES(SYSTEM \${CMAKE_BINARY_DIR}/libzmq/include "\${CMAKE_SYSROOT}/usr/local/include" "\${CMAKE_SYSROOT}/usr/include")
+LINK_DIRECTORIES(\${CMAKE_BINARY_DIR}/libzmq/.libs \${CMAKE_SYSROOT}/lib \${CMAKE_SYSROOT}/usr/lib \${CMAKE_SYSROOT}/usr/local/lib)
 
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
@@ -164,11 +166,15 @@ function setup()
 	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
 	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
 	    -DCMAKE_BUILD_TYPE=Debug \
+	    -DCMAKE_INSTALL_PREFIX=/tmp/build-arm \
 	    ..
     else
 	cmake -DLEOSAC_BUILD_TESTS=1 \
 	    -DZMQPP_BUILD_STATIC=0 \
 	    -DCMAKE_BUILD_TYPE=Debug \
+	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
+	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
+	    -DCMAKE_INSTALL_PREFIX=/tmp/build-x64 \
 	    ..
     fi
     if [ $1 = "s" ]; then read; fi
@@ -177,6 +183,10 @@ function setup()
     if [ $2 != "cross" ]; then
 	echo "Running test since this is not a cross compiled build"
 	ctest || { echo "Test failed :("; exit -1; }
+
+	echo "Installing leosac..."
+	make install
+
 	fi
     echo "Success!"
 }

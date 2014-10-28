@@ -59,7 +59,6 @@ if (CMAKE_BUILD_TYPE MATCHES "Opti")
     endif()
 endif()
 
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 ${CMAKE_SOURCE_DIR}/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/libmcp23s17/src/

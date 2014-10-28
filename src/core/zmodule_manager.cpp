@@ -90,7 +90,7 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
         }
 
     }
-    ERROR("Could'nt load this module");
+    ERROR("Could'nt load this module (file not found)");
     return false;
 }
 
