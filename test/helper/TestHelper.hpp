@@ -18,10 +18,13 @@ bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::prop
     //create log socket for module thread
     tl_log_socket = new zmqpp::socket(*ctx, zmqpp::socket_type::push);
     tl_log_socket->connect("inproc://log-sink");
-    ModuleType module(*ctx, pipe, cfg);
 
-    pipe->send(zmqpp::signal::ok);
-    module.run();
+    {
+        ModuleType module(*ctx, pipe, cfg);
+
+        pipe->send(zmqpp::signal::ok);
+        module.run();
+    }
 
     delete tl_log_socket;
     return true;
@@ -108,8 +111,8 @@ public:
 
     virtual ~TestHelper()
     {
-        delete tl_log_socket;
         delete module_actor_;
+        delete tl_log_socket;
     }
 
     /**

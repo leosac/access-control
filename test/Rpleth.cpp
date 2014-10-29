@@ -95,23 +95,29 @@ TEST(Rpleth, TestConvertCard)
     cfg.add_child("module_config", module_cfg);
     zmqpp::context_t ctx;
     zmqpp::socket pipe(ctx, zmqpp::socket_type::pair);
-    RplethModule module(ctx, &pipe, cfg);
+    zmqpp::socket log_socket(ctx, zmqpp::socket_type::push);
 
-    std::vector<uint8_t> out;
-    std::cout << "test 1" << std::endl;
-    std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
-    ASSERT_TRUE(module.card_convert_from_text("ff:ff:ff:ff", &out));
-    ASSERT_EQ(card_binary, out);
+    tl_log_socket = &log_socket;
+    tl_log_socket->connect("inproc://log-sink");
+    {
+        RplethModule module(ctx, &pipe, cfg);
 
-    card_binary = {0x32, 0x12, 0x14, 0xae, 0xbc};
-    ASSERT_TRUE(module.card_convert_from_text("32:12:14:ae:bc", &out));
-    ASSERT_EQ(card_binary, out);
+        std::vector<uint8_t> out;
+        std::cout << "test 1" << std::endl;
+        std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
+        ASSERT_TRUE(module.card_convert_from_text("ff:ff:ff:ff", &out));
+        ASSERT_EQ(card_binary, out);
 
-    card_binary = {0x00, 0x00, 0x00, 0x00,};
-    ASSERT_TRUE(module.card_convert_from_text("00:00:00:00", &out));
-    ASSERT_EQ(card_binary, out);
+        card_binary = {0x32, 0x12, 0x14, 0xae, 0xbc};
+        ASSERT_TRUE(module.card_convert_from_text("32:12:14:ae:bc", &out));
+        ASSERT_EQ(card_binary, out);
 
-    ASSERT_FALSE(module.card_convert_from_text("0x:adfw:23", &out));
+        card_binary = {0x00, 0x00, 0x00, 0x00,};
+        ASSERT_TRUE(module.card_convert_from_text("00:00:00:00", &out));
+        ASSERT_EQ(card_binary, out);
+
+        ASSERT_FALSE(module.card_convert_from_text("0x:adfw:23", &out));
+    }
 }
 
 /**
