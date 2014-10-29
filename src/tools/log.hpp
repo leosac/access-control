@@ -145,6 +145,31 @@ INFO_1(__VA_ARGS__), \
 INFO_0(__VA_ARGS__), \
 INFO_NO_PARAM(__VA_ARGS__), \
 )
+
+/**
+* See "Internal macros documentation"
+*/
+#define NOTICE_0(msg) LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, \
+__FILE__, LogLevel::NOTICE)
+/**
+* See "Internal macros documentation"
+*/
+#define NOTICE_1(msg, loggers) LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, \
+__FILE__, LogLevel::NOTICE, loggers)
+/**
+* See "Internal macros documentation"
+*/
+#define NOTICE_X(trash, msg, loggers, targetMacro, ...) targetMacro
+/**
+* Notice macro.
+* Issue a log message with NOTICE level.
+*/
+#define NOTICE(...) NOTICE_X(, ##__VA_ARGS__, \
+NOTICE_1(__VA_ARGS__), \
+NOTICE_0(__VA_ARGS__), \
+NOTICE_NO_PARAM(__VA_ARGS__), \
+)
+
 /**
 * See "Internal macros documentation"
 */

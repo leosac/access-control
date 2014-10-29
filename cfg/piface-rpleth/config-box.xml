@@ -2,6 +2,7 @@
 <kernel>
     <plugin_directories>
         <plugindir>.</plugindir>
+        <plugindir>/root/leosac/lib/leosac</plugindir>
     </plugin_directories>
 
     <network>

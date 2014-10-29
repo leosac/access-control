@@ -35,12 +35,11 @@ void RplethModule::process_config()
     std::string reader_name = module_config.get_child("reader").data();
     stream_mode_ = module_config.get<bool>("stream_mode", true);
 
-    LOG() << "Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
-            << "Stream mode = " << stream_mode_;
+    INFO("Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
+            << "Stream mode = " << stream_mode_);
     reader_ = new FWiegandReader(ctx_, reader_name);
     assert(reader_);
     server_.bind("tcp://*:" + std::to_string(port));
-    LOG() << "bind ok";
 }
 
 void RplethModule::handle_socket()
@@ -57,14 +56,14 @@ void RplethModule::handle_socket()
         // handle special 0 length message that indicates connection / disconnection.
         if (client_connected(identity)) // client exists so this is a disconnection message.
         {
-            LOG() << "client disconnected";
+            INFO("client disconnected");
             clients_.erase(identity);
             if (client_failed(identity))
                 failed_clients_.erase(std::remove(failed_clients_.begin(), failed_clients_.end(), identity), failed_clients_.end());
         }
         else
         {
-            LOG() << "Client connected";
+            INFO("Client connected");
             clients_[identity];
         }
         return;
@@ -140,7 +139,7 @@ void RplethModule::handle_wiegand_event()
     bus_sub_.receive(msg);
     msg >> card_id >> card_id;
 
-    LOG() << "Rpleth module register card {" << card_id << "}";
+    DEBUG("Rpleth module register card {" << card_id << "}");
 
     if (stream_mode_)
         cards_read_stream_.push_back(card_id);
@@ -153,8 +152,8 @@ void RplethModule::handle_wiegand_event()
     else
     {
         // card not found
-        LOG() << "This card shouldnt register {" << card_id << "}";
-        reader_->beep(1000);
+        //LOG() << "This card shouldnt register {" << card_id << "}";
+        //reader_->beep(1000);
     }
 
     cards_read_.unique();
@@ -167,6 +166,7 @@ void RplethModule::rpleth_send_cards(const RplethPacket &packet)
     std::vector<Byte>::const_iterator my_start = itr_start;
     std::vector<Byte>::const_iterator it;
 
+    WARN("Should not be here");
     LOG() << "Handle_send_cards";
     cards_pushed_.clear();
     cards_read_.clear();
@@ -195,7 +195,7 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
 {
     std::list<std::string> to_send;
     RplethPacket response = packet;
-
+    WARN("Should not be here");
     LOG() << "Packet size = " << packet.data.size();
     if (packet.data.size() != 1)
     {
@@ -248,7 +248,7 @@ void RplethModule::rpleth_beep(const RplethPacket &packet)
     else if (packet.data[0] == 0x00)
         reader_->buzzerOff();
     else
-        LOG() << "Invalid packet";
+        NOTICE("Invalid Rpleth packet");
 }
 
 void RplethModule::rpleth_greenled(const RplethPacket &packet)
@@ -259,7 +259,7 @@ void RplethModule::rpleth_greenled(const RplethPacket &packet)
     else if (packet.data[0] == 0x00)
         reader_->greenLedOff();
     else
-        LOG() << "Invalid packet";
+        NOTICE("Invalid Rpleth packet");
 }
 
 bool RplethModule::client_connected(const std::string &identity) const
