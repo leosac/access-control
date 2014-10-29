@@ -3,63 +3,56 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
+#include <modules/BaseModule.hpp>
 
-class DoormanInstance;
-
-/**
-* The doorman module allows Leosac's users to configure the behavior to follow
-* when authentication event happens.
-* The doorman module can spawn multiple doorman instance, each taking
-* care of their own stuff.
-*
-* Message passing protocol:
-*    1. Not defined yet.
-*/
-class DoormanModule
+namespace Leosac
 {
-public:
-    DoormanModule(zmqpp::context &ctx,
-            zmqpp::socket *pipe,
-            const boost::property_tree::ptree &cfg);
+    namespace Module
+    {
+        /**
+        * Module that allows user to configure action to be taken
+        * to react to messages from other modules.
+        *
+        * @see @ref mod_doorman_main for end-user documentation.
+        */
+        namespace Doorman
+        {
 
-    DoormanModule(const DoormanModule &) = delete;
-    DoormanModule &operator=(const DoormanModule &) = delete;
+            class DoormanInstance;
 
-    ~DoormanModule();
+            /**
+            * Main class for the module, it create handlers and run them
+            * to, well, handle events and send command.
+            *
+            * @see @ref mod_doorman_user_config for configuration information.
+            */
+            class DoormanModule : public BaseModule
+            {
+            public:
+                DoormanModule(zmqpp::context &ctx,
+                        zmqpp::socket *pipe,
+                        const boost::property_tree::ptree &cfg);
 
-    /**
-    * Module's main loop. Will exit upon reception of signal::stop from module manager
-    */
-    void run();
+                DoormanModule(const DoormanModule &) = delete;
 
-    /**
-    * Watch from stop signal from module manager
-    */
-    void handle_pipe();
+                DoormanModule &operator=(const DoormanModule &) = delete;
 
-private:
+                ~DoormanModule();
 
-    /**
-    * Processing the configuration tree, spawning AuthFileInstance object as described in the
-    * configuration file.
-    */
-    void process_config();
+            private:
 
-    zmqpp::context &ctx_;
+                /**
+                * Processing the configuration tree, spawning AuthFileInstance object as described in the
+                * configuration file.
+                */
+                void process_config();
 
-    /**
-    * Pipe back to module manager
-    */
-    zmqpp::socket &pipe_;
+                /**
+                * Authenticator instance.
+                */
+                std::vector<DoormanInstance *> doormen_;
+            };
 
-    zmqpp::reactor reactor_;
-
-    boost::property_tree::ptree config_;
-
-    bool is_running_;
-
-    /**
-    * Authenticator instance.
-    */
-    std::vector<DoormanInstance *> doormen_;
-};
+        }
+    }
+}

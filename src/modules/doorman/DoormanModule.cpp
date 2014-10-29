@@ -2,13 +2,12 @@
 #include "DoormanInstance.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Module::Doorman;
+
 DoormanModule::DoormanModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         const boost::property_tree::ptree &cfg) :
-        ctx_(ctx),
-        pipe_(*pipe),
-        config_(cfg),
-        is_running_(true)
+        BaseModule(ctx, pipe, cfg)
 {
     process_config();
 
@@ -25,23 +24,6 @@ DoormanModule::~DoormanModule()
     for (auto doorman : doormen_)
     {
         delete doorman;
-    }
-}
-
-void DoormanModule::handle_pipe()
-{
-    zmqpp::signal s;
-
-    pipe_.receive(s, true);
-    if (s == zmqpp::signal::stop)
-        is_running_ = false;
-}
-
-void DoormanModule::run()
-{
-    while (is_running_)
-    {
-        reactor_.poll(-1);
     }
 }
 
@@ -73,7 +55,6 @@ void DoormanModule::process_config()
 
             a.on_ = cfg_action.get<std::string>("on");
             a.target_ = cfg_action.get<std::string>("target");
-            int frame_count = 1;
             for (auto &cmd_node : cfg_action.get_child("cmd"))
             {
                 // each frame in command
