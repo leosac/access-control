@@ -22,7 +22,6 @@ SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
     {
         gpio->register_sockets(&reactor_);
     }
-    reactor_.add(pipe_, std::bind(&SysFsGpioModule::handle_pipe, this));
 }
 
 void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)

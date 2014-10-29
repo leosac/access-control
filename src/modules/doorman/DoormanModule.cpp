@@ -16,7 +16,6 @@ DoormanModule::DoormanModule(zmqpp::context &ctx,
         reactor_.add(doorman->bus_sub(),
                 std::bind(&DoormanInstance::handle_bus_msg, doorman));
     }
-    reactor_.add(pipe_, std::bind(&DoormanModule::handle_pipe, this));
 }
 
 DoormanModule::~DoormanModule()

@@ -74,7 +74,6 @@ bool Kernel::run()
         reactor_.poll(-1);
     }
 
-    module_manager_.stopModules();
     return want_restart_;
 }
 
@@ -113,7 +112,6 @@ bool Kernel::module_manager_init()
     }
     if (!module_manager_.initModules())
     {
-        module_manager_.stopModules();
         return false;
     }
     return true;
@@ -163,6 +161,7 @@ bool Kernel::run_logger(zmqpp::socket *pipe)
     pipe->send(zmqpp::signal::ok);
 
     module.run();
+    std::cout << "logger down" << std::endl;
     return true;
 }
 

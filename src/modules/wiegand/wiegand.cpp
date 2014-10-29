@@ -17,14 +17,17 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    WiegandReaderModule module(zmq_ctx, pipe, cfg);
+    {
+        WiegandReaderModule module(zmq_ctx, pipe, cfg);
 
-    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
-    pipe->send(zmqpp::signal::ok);
+        INFO("Module WiegandReader initialized.");
+        std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
+        pipe->send(zmqpp::signal::ok);
 
-    module.run();
-
-    std::cout << "module WiegandReader shutting down." << std::endl;
+        module.run();
+        INFO("Module WiegandReader shutting down");
+    }
+    INFO("Module WiegandReader terminated.");
     return true;
 }
 

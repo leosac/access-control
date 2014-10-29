@@ -6,10 +6,9 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include "RplethModule.hpp"
-#include <boost/property_tree/ptree.hpp>
+#include <tools/log.hpp>
 
 using namespace Leosac::Module::Rpleth;
-
 
 /**
 * This function is the entry point of the Rpleth module.
@@ -18,13 +17,15 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    RplethModule module(zmq_ctx, pipe, cfg);
+    {
+        RplethModule module(zmq_ctx, pipe, cfg);
 
-    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
-    pipe->send(zmqpp::signal::ok);
+        INFO("Rpleth module initiliazed.");
+        pipe->send(zmqpp::signal::ok);
 
-    module.run();
-
-    std::cout << "module Rpleth shutting down" << std::endl;
+        module.run();
+        INFO("Rpleth module shutting down.");
+    }
+    INFO("Rpleth module terminated.");
     return true;
 }

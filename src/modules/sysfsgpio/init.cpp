@@ -35,5 +35,6 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         ERROR("Something bad happened: " << e.what());
         return false;
     }
+    INFO("Module SysFsGpio terminated.");
     return true;
 }

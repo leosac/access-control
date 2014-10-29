@@ -62,24 +62,6 @@ public:
 
 private:
     /**
-    * This struct wraps the destruction of the tl_log_socket.
-    * We need this, otherwise Kernel destructor will delete the socket
-    * before deleting its attributes.
-    * By wrapping this destruction in a object, we can make sure this is the
-    * last thing that will be done by the kernel destructor.
-    */
-    struct LogSocketGuard
-    {
-        LogSocketGuard() = default;
-        ~LogSocketGuard();
-    };
-
-    /**
-    * Need to be first, so its deleted last.
-    */
-    LogSocketGuard log_socket_guard_;
-
-    /**
     * Init the module manager by feeding it paths to library file, loading module, etc.
     */
     bool module_manager_init();
@@ -103,6 +85,24 @@ private:
     * The application ZMQ context.
     */
     zmqpp::context ctx_;
+
+    /**
+    * This struct wraps the destruction of the tl_log_socket.
+    * We need this, otherwise Kernel destructor will delete the socket
+    * before deleting its attributes.
+    * By wrapping this destruction in a object, we can make sure this is the
+    * last thing that will be done by the kernel destructor.
+    */
+    struct LogSocketGuard
+    {
+        LogSocketGuard() = default;
+        ~LogSocketGuard();
+    };
+
+    /**
+    * Need to be second, so its deleted just before the context.
+    */
+    LogSocketGuard log_socket_guard_;
 
     /**
     * Logger actor. This is spawned before any module

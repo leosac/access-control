@@ -25,7 +25,6 @@ void zModuleManager::unloadLibraries()
     BLABLA_.clear();
 }
 
-
 bool zModuleManager::initModules()
 {
     for (const ModuleInfo &module_info : BLABLA_)
@@ -88,7 +87,6 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
             DEBUG("library file loaded (not init yet)");
             return true;
         }
-
     }
     ERROR("Could'nt load this module (file not found)");
     return false;
@@ -115,11 +113,13 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
 
 void zModuleManager::stopModules()
 {
+    std::cout << "STOPPING MODULE"<< std::endl;
     for (std::set<ModuleInfo>::const_reverse_iterator itr = BLABLA_.rbegin();
          itr != BLABLA_.rend();
          ++itr)
     {
         INFO("Will now stop module " << itr->name_);
+        assert(itr->actor_);
         itr->actor_->stop(true);
     }
 }
