@@ -68,6 +68,11 @@ bool Kernel::run()
         this->is_running_ = false;
     });
 
+    SignalHandler::registerCallback(Signal::SigTerm, [this](Signal)
+    {
+        this->is_running_ = false;
+    });
+
     reactor_.add(control_, std::bind(&Kernel::handle_control_request, this));
     while (is_running_)
     {
