@@ -1,4 +1,5 @@
 #pragma once
+
 #include <list>
 #include <map>
 #include <string>
@@ -21,29 +22,30 @@
 * This initialization order is mandatory, and the lower the value is, the sooner the module is loaded.
 */
 class zModuleManager
-    {
+{
 public:
     /**
-    * Contruct the module manager.
+    * Construct the module manager.
     * @param ctx the zeroMQ context to pass around to module.
     */
     zModuleManager(zmqpp::context &ctx);
+
     ~zModuleManager();
 
-    void        unloadLibraries();
+    void unloadLibraries();
 
     /**
     * Actually call the init_module() function of each library we loaded.
     * The module initialization order in honored (see the "level" property).
     * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
     */
-    bool        initModules();
+    bool initModules();
 
     /**
     * Opposite of init module. this stop all modules thread and perform cleanup.
     * To dynamic library handlers are NOT released.
     */
-    void        stopModules();
+    void stopModules();
 
     /**
     * Add a directory to a path. If the path already exist, it is ignored.
@@ -64,21 +66,37 @@ private:
     * It returns a DynamicLibrary pointer that can be used to retrieve symbol from the shared object.
     * It it failed, returns nullptr.
     */
-    DynamicLibrary    *load_library_file(const std::string &full_path);
+    DynamicLibrary *load_library_file(const std::string &full_path);
 
     /**
     * Runs in a the new module thread. This function will call the module init method. This
     * bridge is needed to perform per-thread initializtion and destruction code (logging sockets).
     */
     static bool start_module_helper(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &,
-    std::function<bool (zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function);
+            std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function);
 
     /**
     * Internal helper struct that store informations related to module
     * that are useful to the module manager.
+    *
+    * @note This goes into a Set, but we need non-const access to the
+    * actor_ pointer.
     */
     struct ModuleInfo
     {
+        ~ModuleInfo();
+        ModuleInfo();
+
+        ModuleInfo(const ModuleInfo &) = delete;
+        ModuleInfo &operator=(const ModuleInfo &) = delete;
+
+        /**
+        * Enable move constructor for std::set
+        */
+        ModuleInfo(ModuleInfo &&o);
+
+        ModuleInfo &operator=(ModuleInfo &&) = delete;
+
         /**
         * Name of the module, as specified in the configuration file.
         */
@@ -95,7 +113,12 @@ private:
         boost::property_tree::ptree config_;
 
         /**
-        * Comparaison operator: used by the module manager set.
+        * Actor object that runs the module code.
+        */
+        mutable zmqpp::actor *actor_;
+
+        /**
+        * Comparison operator: used by the module manager set.
         * We do not really care about uniqueness, we use this
         * to sort module by their loading priority.
         */
@@ -110,11 +133,6 @@ private:
 
     std::vector<std::string> path_;
     std::set<ModuleInfo> BLABLA_;
-
-    /**
-    * Since module live is their own thread, we use the actor pattern.
-    */
-    std::vector<zmqpp::actor> modules_;
 
     zmqpp::context &ctx_;
 };

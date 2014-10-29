@@ -28,7 +28,7 @@ void zModuleManager::unloadLibraries()
 
 bool zModuleManager::initModules()
 {
-    for (auto &module_info : BLABLA_)
+    for (const ModuleInfo &module_info : BLABLA_)
     {
         try
         {
@@ -46,8 +46,8 @@ bool zModuleManager::initModules()
                     std::ref(ctx_),
                     actor_fun);
 
-            zmqpp::actor new_module(helper_function);
-            modules_.push_back(std::move(new_module));
+            zmqpp::actor *new_module = new zmqpp::actor(helper_function);
+            module_info.actor_ = new_module;
 
             INFO("Module {" << module_info.name_ << "} initialized. (level = " <<
                     module_info.config_.get<int>("level", 100));
@@ -84,7 +84,7 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
             module_info.config_ = cfg;
             if (!(module_info.lib_ = load_library_file(path_entry + "/" + filename)))
                 return false;
-            BLABLA_.insert(module_info);
+            BLABLA_.insert(std::move(module_info));
             DEBUG("library file loaded (not init yet)");
             return true;
         }
@@ -115,10 +115,12 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
 
 void zModuleManager::stopModules()
 {
-    std::reverse(modules_.begin(), modules_.end());
-    for (zmqpp::actor &a : modules_)
+    for (std::set<ModuleInfo>::const_reverse_iterator itr = BLABLA_.rbegin();
+         itr != BLABLA_.rend();
+         ++itr)
     {
-        a.stop(true);
+        INFO("Will now stop module " << itr->name_);
+        itr->actor_->stop(true);
     }
 }
 
@@ -146,4 +148,27 @@ bool zModuleManager::start_module_helper(zmqpp::socket *socket,
     ret = module_function(socket, ptree, context);
     delete tl_log_socket;
     return ret;
+}
+
+zModuleManager::ModuleInfo::~ModuleInfo()
+{
+    delete actor_;
+}
+
+zModuleManager::ModuleInfo::ModuleInfo() :
+        lib_(nullptr),
+        actor_(nullptr)
+{
+
+}
+
+zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o)
+{
+    actor_ = o.actor_;
+    lib_ = o.lib_;
+    config_ = o.config_;
+    name_ = o.name_;
+
+    o.actor_ = nullptr;
+    o.lib_ = nullptr;
 }
