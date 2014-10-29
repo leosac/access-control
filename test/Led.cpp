@@ -92,10 +92,9 @@ TEST_F(LedTest, blink)
   ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
   ASSERT_FALSE(my_led.isBlinking());
 
-  my_led.blink(10, 1);
+  my_led.blink(1000, 100);
   ASSERT_TRUE(my_led.isBlinking());
   ASSERT_TRUE(my_led.state().st == FLED::State::BLINKING);
-
   // we should see 10 changes
   for (int i = 0; i < 5; ++i)
     {
@@ -108,7 +107,6 @@ TEST_F(LedTest, blink)
   ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
   ASSERT_TRUE(my_led.isOff());
 
-  //std::this_thread::sleep_for(std::chrono::milliseconds(100));
   ASSERT_FALSE(my_led.isBlinking());
   ASSERT_TRUE(my_led.isOff());
   ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
