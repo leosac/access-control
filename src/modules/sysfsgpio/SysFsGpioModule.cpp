@@ -11,10 +11,7 @@ using namespace Leosac::Module::SysFsGpio;
 SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         zmqpp::socket *module_manager_pipe,
         zmqpp::context &ctx) :
-        pipe_(*module_manager_pipe),
-        config_(config),
-        is_running_(true),
-        ctx_(ctx),
+        BaseModule(ctx, module_manager_pipe, config),
         bus_push_(ctx_, zmqpp::socket_type::push),
         general_cfg_(nullptr)
 {
@@ -26,23 +23,6 @@ SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         gpio->register_sockets(&reactor_);
     }
     reactor_.add(pipe_, std::bind(&SysFsGpioModule::handle_pipe, this));
-}
-
-void SysFsGpioModule::run()
-{
-    while (is_running_)
-    {
-        reactor_.poll(-1);
-    }
-}
-
-void SysFsGpioModule::handle_pipe()
-{
-    zmqpp::signal s;
-
-    pipe_.receive(s, true);
-    if (s == zmqpp::signal::stop)
-        is_running_ = false;
 }
 
 void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)

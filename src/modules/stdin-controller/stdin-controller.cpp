@@ -37,7 +37,7 @@ bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1
 * do signaling when ready
 */
 extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
+        boost::property_tree::ptree /* cfg */,
         zmqpp::context &zmq_ctx)
 {
     INFO("Module stdin-controller is ready. Signaling parent.");
@@ -50,8 +50,6 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
 
     p.add(*pipe, zmqpp::poller::poll_in);
     p.add(0, zmqpp::poller::poll_in);
-
-
     while (true)
     {
         p.poll(-1);
