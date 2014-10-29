@@ -119,12 +119,6 @@ bool Kernel::module_manager_init()
     return true;
 }
 
-Kernel::~Kernel()
-{
-    delete tl_log_socket;
-    tl_log_socket = nullptr;
-}
-
 void Kernel::handle_control_request()
 {
     std::string req;
@@ -170,4 +164,10 @@ bool Kernel::run_logger(zmqpp::socket *pipe)
 
     module.run();
     return true;
+}
+
+Kernel::LogSocketGuard::~LogSocketGuard()
+{
+    delete tl_log_socket;
+    tl_log_socket = nullptr;
 }
