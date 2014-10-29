@@ -106,6 +106,11 @@ namespace Leosac
             * Facade to the buzzer object, we use a LED device for now, because they are similar enough.
             */
             FLED *buzzer_;
+
+            /**
+            * Read mode. Default to false.
+            */
+            bool reverse_mode_;
         };
 
     }

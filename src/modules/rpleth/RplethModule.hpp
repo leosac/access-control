@@ -37,11 +37,11 @@ namespace Leosac
                 /**
                 * Convert a card number from text to binary and store the result
                 * into dest.
-                * @param s string source
+                * @param card_info pair (string, int) with hex reprensentation and number of bit.
                 * @param dest destination vector for binary version (cannot be null)
                 * @returns true if conversion went well. false otherwise
                 */
-                bool card_convert_from_text(const std::string &s, std::vector<uint8_t> *dest);
+                bool card_convert_from_text(std::pair<std::string, int> card_info, std::vector<uint8_t> *dest);
 
             private:
                 void process_config();
@@ -129,8 +129,9 @@ namespace Leosac
 
                 /**
                 * If stream mode is on, all cards read are stored here.
+                * String data of card and number of bit read.
                 */
-                std::list<std::string> cards_read_stream_;
+                std::list<std::pair<std::string, int>> cards_read_stream_;
 
                 std::map<std::string, CircularBuffer> clients_;
 

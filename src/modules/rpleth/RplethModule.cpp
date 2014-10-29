@@ -135,14 +135,15 @@ void RplethModule::handle_wiegand_event()
 {
     zmqpp::message msg;
     std::string card_id;
+    int nb_bit_read;
 
     bus_sub_.receive(msg);
-    msg >> card_id >> card_id;
+    msg >> card_id >> card_id >> nb_bit_read;
 
     DEBUG("Rpleth module register card {" << card_id << "}");
 
     if (stream_mode_)
-        cards_read_stream_.push_back(card_id);
+        cards_read_stream_.push_back(std::make_pair(card_id, nb_bit_read));
 
     card_id.erase(std::remove(card_id.begin(), card_id.end(), ':'), card_id.end());
     if (std::find(cards_pushed_.begin(), cards_pushed_.end(), card_id) != cards_pushed_.end())
@@ -274,7 +275,7 @@ bool RplethModule::client_failed(const std::string &identity) const
 
 void RplethModule::rpleth_publish_card()
 {
-    for (auto const &card : cards_read_stream_)
+    for (auto const &card_pair : cards_read_stream_)
     {
         for (auto &client : clients_)
         {
@@ -282,7 +283,7 @@ void RplethModule::rpleth_publish_card()
             RplethPacket packet(RplethPacket::Sender::Server);
 
             msg << client.first;
-            if (!card_convert_from_text(card, &packet.data))
+            if (!card_convert_from_text(card_pair, &packet.data))
                 continue;
             packet.status = RplethProtocol::Success;
             packet.type = RplethProtocol::HID;
@@ -300,18 +301,26 @@ void RplethModule::rpleth_publish_card()
     cards_read_stream_.clear();
 }
 
-bool RplethModule::card_convert_from_text(const std::string &card, std::vector<uint8_t> *dest)
+bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info, std::vector<uint8_t> *dest)
 {
     assert(dest);
     std::vector<uint8_t> data;
-    std::istringstream iss(card);
+    std::istringstream iss(card_info.first);
+
+    int nb_zero = card_info.second % 32;
+    if (nb_zero != 0)
+        nb_zero = 32 - nb_zero;
+    unsigned int card_value = 0;
 
     while (!iss.eof())
     {
-        unsigned int byte;
+        unsigned int byte = 0;
         iss >> std::hex >> byte;
         assert(byte <= 255);
-        data.push_back(byte);
+
+        card_value <<= 8;
+        card_value |= (byte & 0xFF);
+
         // drop the colon delimeter
         if (!iss.eof())
         {
@@ -320,6 +329,11 @@ bool RplethModule::card_convert_from_text(const std::string &card, std::vector<u
             if (trash != ':')
                 return false;
         }
+    }
+    card_value >>= nb_zero;
+    for (int i = 0; i < 4; ++i)
+    {
+        data.push_back((card_value >> ((3 - i) * 8)) & 0xFF);
     }
     *dest = std::move(data);
     return true;

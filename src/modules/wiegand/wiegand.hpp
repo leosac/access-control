@@ -17,6 +17,7 @@ namespace Leosac
         *     1. Upon reception of what looks like a full wiegand frame, a message MUST be published to the application bus.
         *     2. The message must be published on the "S_{READER_NAME}" topic.
         *     3. This message SHALL contain the card-id that was read, in hexadecimal format, for example: "40:a0:83:80"
+        *     4. The second frame SHALL contain the number of bit read.
         *
         * ### Configuration Options:
         *

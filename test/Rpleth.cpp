@@ -105,18 +105,23 @@ TEST(Rpleth, TestConvertCard)
         std::vector<uint8_t> out;
         std::cout << "test 1" << std::endl;
         std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
-        ASSERT_TRUE(module.card_convert_from_text("ff:ff:ff:ff", &out));
+        ASSERT_TRUE(module.card_convert_from_text(std::make_pair("ff:ff:ff:ff", 32), &out));
         ASSERT_EQ(card_binary, out);
 
-        card_binary = {0x32, 0x12, 0x14, 0xae, 0xbc};
-        ASSERT_TRUE(module.card_convert_from_text("32:12:14:ae:bc", &out));
+        /*card_binary = {0x32, 0x12, 0x14, 0xae, 0xbc};
+        ASSERT_TRUE(module.card_convert_from_text(std::make_pair("32:12:14:ae:bc", 40), &out));
         ASSERT_EQ(card_binary, out);
+        */
 
         card_binary = {0x00, 0x00, 0x00, 0x00,};
-        ASSERT_TRUE(module.card_convert_from_text("00:00:00:00", &out));
+        ASSERT_TRUE(module.card_convert_from_text(std::make_pair("00:00:00:00", 32), &out));
         ASSERT_EQ(card_binary, out);
 
-        ASSERT_FALSE(module.card_convert_from_text("0x:adfw:23", &out));
+        card_binary = {0x02, 0x02, 0x05, 0x85};
+        ASSERT_TRUE(module.card_convert_from_text(std::make_pair("80:81:61:40", 26), &out));
+        ASSERT_EQ(card_binary, out);
+
+        ASSERT_FALSE(module.card_convert_from_text(std::make_pair("0x:adfw:23", 32), &out));
     }
 }
 
@@ -129,8 +134,8 @@ TEST_F(RplethTest, TestReceiveStreamCardsSimple)
     zmqpp::socket client = connect_to_rpleth();
 
     // fake wiegand reader activity.
-    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "ff:ab:cd:ef:12");
-    check_rpleth_card_msg(client, {0xff, 0xab, 0xcd, 0xef, 0x12});
+    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "ff:ab:cd:ef" << 32);
+    check_rpleth_card_msg(client, {0xff, 0xab, 0xcd, 0xef});
 }
 
 TEST_F(RplethTest, TestReceiveStreamCards2)
@@ -141,15 +146,16 @@ TEST_F(RplethTest, TestReceiveStreamCards2)
     zmqpp::socket client = connect_to_rpleth();
 
     // fake wiegand reader activity.
-    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "ff:ab:cd:ef:12");
-    check_rpleth_card_msg(client, {0xff, 0xab, 0xcd, 0xef, 0x12});
+    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "ff:ab:cd:ef" << 32);
+    check_rpleth_card_msg(client, {0xff, 0xab, 0xcd, 0xef});
 
-    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "11:22:33:44");
+    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "11:22:33:44" << 32);
     check_rpleth_card_msg(client, {0x11, 0x22, 0x33, 0x44});
 
-    std::cout << "test 3 " << std::endl;
+    bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "80:81:61:40" << 26);
+    check_rpleth_card_msg(client, {0x02, 0x02, 0x05, 0x85});
 
-    bus_push_.send(zmqpp::message() << "S_INGNORED_READER" << "11:22:33:44");
+    bus_push_.send(zmqpp::message() << "S_INGNORED_READER" << "11:22:33:44" << 32);
     std::this_thread::sleep_for(std::chrono::milliseconds(15));
     // nothing to read anymore
     ASSERT_FALSE(client.receive(msg, true));
