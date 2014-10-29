@@ -18,15 +18,19 @@ LEDModule::LEDModule(zmqpp::context &ctx,
 
 int LEDModule::compute_timeout()
 {
-   std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
+    std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
     for (auto &led : leds_)
     {
         if (led->next_update() < tp)
             tp = led->next_update();
     }
-    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
-    assert(timeout >= 0);
+    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - now).count();
+    DEBUG("TIMEOUT = " << timeout);
+    if (timeout < 0)
+        timeout = 0;
+    //assert(timeout >= 0);
     return timeout;
 }
 

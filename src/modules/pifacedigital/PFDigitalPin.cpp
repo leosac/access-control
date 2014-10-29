@@ -61,7 +61,7 @@ void PFDigitalPin::handle_message()
     else if (frame1 == "STATE")
         return send_state();
     else // invalid cmd
-        assert(0);
+        ERROR("Invalid command received (" << frame1 << "). Potential missconfiguration !");
     sock_.send(ok ? "OK" : "KO");
 }
 
