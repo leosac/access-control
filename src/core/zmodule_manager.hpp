@@ -105,7 +105,7 @@ private:
         /**
         * Pointer to the library object.
         */
-        DynamicLibrary *lib_;
+        mutable DynamicLibrary *lib_;
 
         /**
         * Config tree for the module.

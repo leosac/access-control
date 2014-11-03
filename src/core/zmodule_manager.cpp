@@ -19,8 +19,8 @@ void zModuleManager::unloadLibraries()
         {
             throw (ModuleException(e.what()));
         }
-        //delete module_info.lib_;
-        // module_info.lib_ = nullptr;
+        delete module_info.lib_;
+        module_info.lib_ = nullptr;
     }
     BLABLA_.clear();
 }
