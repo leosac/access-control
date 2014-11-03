@@ -26,7 +26,7 @@ namespace Leosac
             *
             * @note: The AuthFileModule can create multiple AuthFileInstance object.
             */
-            class AuthFileModule
+            class AuthFileModule : public BaseModule
             {
             public:
                 AuthFileModule(zmqpp::context &ctx,
@@ -37,16 +37,6 @@ namespace Leosac
 
                 ~AuthFileModule();
 
-                /**
-                * Module's main loop. Will exit upon reception of signal::stop from module manager
-                */
-                void run();
-
-                /**
-                * Watch from stop signal from module manager
-                */
-                void handle_pipe();
-
             private:
 
                 /**
@@ -54,19 +44,6 @@ namespace Leosac
                 * configuration file.
                 */
                 void process_config();
-
-                zmqpp::context &ctx_;
-
-                /**
-                * Pipe back to module manager
-                */
-                zmqpp::socket &pipe_;
-
-                zmqpp::reactor reactor_;
-
-                boost::property_tree::ptree config_;
-
-                bool is_running_;
 
                 /**
                 * Authenticator instance.

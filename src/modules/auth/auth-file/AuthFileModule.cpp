@@ -7,10 +7,7 @@ using namespace Leosac::Module::Auth;
 AuthFileModule::AuthFileModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         const boost::property_tree::ptree &cfg) :
-        ctx_(ctx),
-        pipe_(*pipe),
-        config_(cfg),
-        is_running_(true)
+        BaseModule(ctx, pipe, cfg)
 {
     process_config();
 
@@ -27,23 +24,6 @@ AuthFileModule::~AuthFileModule()
     for (auto authenticator : authenticators_)
     {
         delete authenticator;
-    }
-}
-
-void AuthFileModule::handle_pipe()
-{
-    zmqpp::signal s;
-
-    pipe_.receive(s, true);
-    if (s == zmqpp::signal::stop)
-        is_running_ = false;
-}
-
-void AuthFileModule::run()
-{
-    while (is_running_)
-    {
-        reactor_.poll(-1);
     }
 }
 
