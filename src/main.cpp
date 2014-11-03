@@ -54,6 +54,7 @@ int main(int argc, char** argv)
             catch (const std::exception &e)
             {
                 relaunch = false;
+                std::cerr << "Exception propagated to main(). Will now exit." << std::endl;
                 Leosac::print_exception(e);
             }
             catch (...)

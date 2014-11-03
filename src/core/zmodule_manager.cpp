@@ -113,7 +113,6 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
 
 void zModuleManager::stopModules()
 {
-    std::cout << "STOPPING MODULE"<< std::endl;
     for (std::set<ModuleInfo>::const_reverse_iterator itr = BLABLA_.rbegin();
          itr != BLABLA_.rend();
          ++itr)

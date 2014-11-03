@@ -9,6 +9,11 @@
 #ifndef NETWORKCONFIG_HPP
 #define NETWORKCONFIG_HPP
 
+/**
+* Class that helps configuring the network.
+*
+* @see @ref network_main for end-user documentation.
+*/
 class NetworkConfig
 {
     static const std::string    NetCfgFile;
@@ -19,7 +24,6 @@ public:
 
     NetworkConfig(const NetworkConfig& other) = delete;
     NetworkConfig& operator=(const NetworkConfig& other) = delete;
-
 
 public:
     void    reload();

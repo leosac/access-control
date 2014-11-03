@@ -13,7 +13,7 @@ AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
 
-    LOG() << "Auth instance (" << auth_ctx_name << ") subscribe to " << auth_target_name;
+    INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << auth_target_name);
     bus_sub_.subscribe("S_" + auth_target_name);
 
     if (!file_stream_.good() || !file_stream_.is_open())

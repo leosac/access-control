@@ -18,7 +18,7 @@ LoggerSink::LoggerSink(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::pr
     }
     catch (...)
     {
-        std::throw_with_nested(ModuleException("Logger init failed"));
+        std::throw_with_nested(ModuleException("Logger initialization failed"));
     }
 }
 
@@ -100,6 +100,12 @@ void LoggerSink::log_syslog(const std::string &filename,
 
 void LoggerSink::process_config()
 {
+    if (!config_.get_child_optional("log"))
+    {
+        // we run with default configuration
+        std::cout << "Module log running with default configuration." << std::endl;
+        return;
+    }
     std::string min_level;
     boost::property_tree::ptree log_cfg = config_.get_child("log");
 

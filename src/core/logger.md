@@ -12,10 +12,8 @@ This page explain how to configure the logging facility Leosac provides.
 Configuration Options {#logger_user_config}
 ===========================================
 
-Below are the configuration options available. Note that this module require
-that some FGPIO device be available and configured as it needs them to 
-control the logger device.
-
+Default configuration will log everything to `stdout`. Entry with 
+a level >= `WARNING` will be written to syslog.
 
 Options       | Options  | Options | Description                                      | Mandatory
 --------------|----------|---------|--------------------------------------------------|-----------
