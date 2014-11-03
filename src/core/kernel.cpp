@@ -29,13 +29,18 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         is_running_(true),
         want_restart_(false),
         module_manager_(ctx_),
-        network_config_(config.get_child("network"))
+        network_config_(nullptr)
 {
     //init log socket for main thread
     tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
     tl_log_socket->connect("inproc://log-sink");
+
+    if (config.get_child_optional("network"))
+        network_config_ = std::move(std::unique_ptr<NetworkConfig>(new NetworkConfig(config.get_child("network"))));
+    else
+        network_config_ = std::move(std::unique_ptr<NetworkConfig>(new NetworkConfig(boost::property_tree::ptree())));
     control_.bind("inproc://leosac-kernel");
-    network_config_.reload();
+    network_config_->reload();
 }
 
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)

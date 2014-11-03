@@ -35,6 +35,8 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
                 std::endl << '\t' << "netmask=" << _netmask <<
                 std::endl << '\t' << "default=" << _defaultIp);
     }
+    else
+        INFO("Network configuration disabled. Will not touch system setting.");
 }
 
 void NetworkConfig::reload()

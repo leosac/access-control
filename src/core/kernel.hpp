@@ -150,7 +150,7 @@ private:
     /**
     * Object that handle networking configuration.
     */
-    NetworkConfig network_config_;
+    std::unique_ptr<NetworkConfig> network_config_;
 
     /**
     * Hardcoded path to factory default settings.
