@@ -1,6 +1,8 @@
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Module::Auth;
+
 AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         std::string const &auth_ctx_name,
         std::string const &auth_target_name,

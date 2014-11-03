@@ -2,6 +2,8 @@
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Module::Auth;
+
 AuthFileModule::AuthFileModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         const boost::property_tree::ptree &cfg) :
