@@ -14,6 +14,7 @@ set(LEOSAC_LIB_SRCS
     core/netconfig/networkconfig.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
+    exception/ExceptionsTools.cpp
     hardware/device/FGPIO.cpp
     hardware/device/FLED.cpp
     hardware/device/FWiegandReader.cpp

@@ -1,3 +1,5 @@
+#include <exception>
+#include <exception/moduleexception.hpp>
 #include "Logger.hpp"
 
 using namespace Leosac::Logger;
@@ -8,9 +10,16 @@ LoggerSink::LoggerSink(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::pr
         enable_syslog_(true),
         min_syslog_(LogLevel::WARN)
 {
-    process_config();
-    pull_.bind("inproc://log-sink");
-    reactor_.add(pull_, std::bind(&LoggerSink::handle_log_msg, this));
+    try
+    {
+        process_config();
+        pull_.bind("inproc://log-sink");
+        reactor_.add(pull_, std::bind(&LoggerSink::handle_log_msg, this));
+    }
+    catch (...)
+    {
+        std::throw_with_nested(ModuleException("Logger init failed"));
+    }
 }
 
 void LoggerSink::handle_log_msg()

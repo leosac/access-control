@@ -6,6 +6,7 @@
 #include <tools/unixshellscript.hpp>
 #include "exception/configexception.hpp"
 #include "Logger.hpp"
+#include "exception/ExceptionsTools.hpp"
 
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;

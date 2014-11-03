@@ -10,6 +10,7 @@
 #include <tclap/CmdLine.h>
 #include <core/kernel.hpp>
 #include <exception/configexception.hpp>
+#include <exception/ExceptionsTools.hpp>
 
 #include "tools/log.hpp"
 #include "tools/leosac.hpp"
@@ -45,9 +46,21 @@ int main(int argc, char** argv)
             //backup.run(UnixShellScript::toCmdLine(options.getParam("corecfg"), "core.cfg"));
             //backup.run(UnixShellScript::toCmdLine(options.getParam("hwcfg"), "hw.cfg"));
 
-            Kernel kernel(Kernel::make_config(options));
-            relaunch = kernel.run();
-
+            try
+            {
+                Kernel kernel(Kernel::make_config(options));
+                relaunch = kernel.run();
+            }
+            catch (const std::exception &e)
+            {
+                relaunch = false;
+                Leosac::print_exception(e);
+            }
+            catch (...)
+            {
+                relaunch = false;
+                std::cerr << "Unkown exception in main" << std::endl;
+            }
             // Yet an other hack. dhclient "steals" the bound port of Rpleth and prevent the program
             // to restart.
             //UnixShellScript kill("killall dhclient");

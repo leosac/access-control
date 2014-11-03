@@ -80,7 +80,7 @@ struct LogHelper
             return LogLevel::ALERT;
         else if (level == "EMERGENCY")
             return LogLevel::EMERG;
-        throw std::runtime_error("Invalid log level");
+        throw std::runtime_error("Invalid log level: " + level);
     }
 
     static void log(const std::string &log_msg, int line, const char *funcName,
