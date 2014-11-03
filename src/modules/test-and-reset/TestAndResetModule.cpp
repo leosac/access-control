@@ -1,6 +1,8 @@
 #include <tools/log.hpp>
 #include "TestAndResetModule.hpp"
 
+using namespace Leosac::Module::TestAndReset;
+
 TestAndResetModule::~TestAndResetModule()
 {
     delete test_led_;

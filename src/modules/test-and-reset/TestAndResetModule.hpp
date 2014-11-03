@@ -3,62 +3,67 @@
 #include <modules/BaseModule.hpp>
 #include <hardware/device/FLED.hpp>
 
-/**
-* This is a module that watch input device and check for preconfigured reset/restart card.
-*
-* Options    | Options   | Options    | Description                                            | Mandatory
-* -----------|-----------|------------|--------------------------------------------------------|-----------
-* test_buzzer  |          |            | Device (beeper )to control when test card is read      | NO
-* test_led  |             |            | Device (led) to control when test card is read        | NO
-* devices    |           |            | List of devices to watch for                           | YES
-* ---->      | device    |            | Watch for event sent by this device                    | YES
-* ---->      | ---->     | name       | Name of the device                                     | YES
-* ---->      | --->      | reset_card | Content / number of the card                           | NO
-* ---->      | --->      | test_card  | Id of the card that trigger test led/beep stuff        | NO
-*/
-class TestAndResetModule : public BaseModule
+namespace Leosac
 {
-public:
-    TestAndResetModule(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg);
-    virtual ~TestAndResetModule();
+    namespace Module
+    {
+        /**
+        * This module provide a way to have feedback when presenting a test card.
+        * It also allow to reset Leosac to its stock configuration.
+        *
+        * @see @ref mod_testandreset_main
+        */
+        namespace TestAndReset
+        {
 
-private:
-    void process_config();
+            class TestAndResetModule : public BaseModule
+            {
+            public:
+                TestAndResetModule(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg);
 
-    void handle_bus_msg();
+                virtual ~TestAndResetModule();
 
-    /**
-    * Do some stuff to let the user known the test card was read.
-    */
-    void test_sequence();
+            private:
+                void process_config();
 
-    /**
-    * REQ socket to kernel
-    */
-    zmqpp::socket kernel_sock_;
+                void handle_bus_msg();
 
-    /**
-    * Sub socket on the BUS
-    */
-    zmqpp::socket sub_;
+                /**
+                * Do some stuff to let the user known the test card was read.
+                */
+                void test_sequence();
 
-    /**
-    * Map a device name to the reset card, since one device can support one reset card currently.
-    */
-    std::map<std::string, std::string> device_reset_card_;
+                /**
+                * REQ socket to kernel
+                */
+                zmqpp::socket kernel_sock_;
 
-    /**
-    *  Map a device name to the test card.
-    */
-    std::map<std::string, std::string> device_test_card_;
+                /**
+                * Sub socket on the BUS
+                */
+                zmqpp::socket sub_;
 
-    /**
-    * Led device for test card
-    */
-    FLED *test_led_;
+                /**
+                * Map a device name to the reset card, since one device can support one reset card currently.
+                */
+                std::map<std::string, std::string> device_reset_card_;
 
-    /**
-    * Buzzer device for test card
-    */
-    FLED *test_buzzer_;
-};
+                /**
+                *  Map a device name to the test card.
+                */
+                std::map<std::string, std::string> device_test_card_;
+
+                /**
+                * Led device for test card
+                */
+                FLED *test_led_;
+
+                /**
+                * Buzzer device for test card
+                */
+                FLED *test_buzzer_;
+            };
+
+        }
+    }
+}
