@@ -21,7 +21,7 @@ thread_local zmqpp::socket *tl_log_socket = nullptr;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
-        logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1)),
+        logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1, config)),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
         config_(config),
@@ -158,10 +158,8 @@ void Kernel::factory_reset()
     }
 }
 
-bool Kernel::run_logger(zmqpp::socket *pipe)
+bool Kernel::run_logger(zmqpp::socket *pipe, boost::property_tree::ptree cfg)
 {
-    boost::property_tree::ptree cfg;
-
     Leosac::Logger::LoggerSink module(ctx_, pipe, cfg);
     pipe->send(zmqpp::signal::ok);
 

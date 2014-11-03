@@ -4,6 +4,11 @@
         <plugindir>.</plugindir>
     </plugin_directories>
 
+    <log>
+        <enable_syslog>true</enable_syslog>
+        <min_syslog>WARNING</min_syslog>
+    </log>
+
     <network>
         <enabled>false</enabled>
     </network>

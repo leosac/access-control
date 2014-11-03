@@ -4,10 +4,13 @@ using namespace Leosac::Logger;
 
 LoggerSink::LoggerSink(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg) :
         BaseModule(ctx, pipe, cfg),
-        sub_(ctx, zmqpp::socket_type::pull)
+        pull_(ctx, zmqpp::socket_type::pull),
+        enable_syslog_(true),
+        min_syslog_(LogLevel::WARN)
 {
-    sub_.bind("inproc://log-sink");
-    reactor_.add(sub_, std::bind(&LoggerSink::handle_log_msg, this));
+    process_config();
+    pull_.bind("inproc://log-sink");
+    reactor_.add(pull_, std::bind(&LoggerSink::handle_log_msg, this));
 }
 
 void LoggerSink::handle_log_msg()
@@ -20,12 +23,15 @@ void LoggerSink::handle_log_msg()
     LogLevel level;
     std::string content;
 
-    sub_.receive(msg);
+    pull_.receive(msg);
     msg >> filename >> funcname >> line >> lvl >> content;
 
     level = static_cast<LogLevel>(lvl);
     log_stdout(filename, funcname, line, level, content);
-    log_syslog(filename, funcname, line, level, content);
+
+    // 0 is highest priority level
+    if (enable_syslog_ && level <= min_syslog_)
+        log_syslog(filename, funcname, line, level, content);
 
 }
 
@@ -81,4 +87,19 @@ void LoggerSink::log_syslog(const std::string &filename,
 {
     (void)filename;
     syslog(static_cast<int>(level), "(pid=%d) %s:%d -> %s", getpid(), funcname.c_str(), line, message.c_str());
+}
+
+void LoggerSink::process_config()
+{
+    std::string min_level;
+    boost::property_tree::ptree log_cfg = config_.get_child("log");
+
+    // Make sure LogLevel value are continous
+    static_assert((LogLevel::DEBUG > LogLevel::INFO) && (LogLevel::INFO > LogLevel::NOTICE) &&
+            (LogLevel::NOTICE > LogLevel::WARN) && (LogLevel::WARN > LogLevel::ERROR) &&
+            (LogLevel::ERROR > LogLevel::ALERT) && (LogLevel::ALERT > LogLevel::EMERG), "Defined LogLevel value are not continous");
+
+    enable_syslog_ = log_cfg.get<bool>("enable_syslog", true);
+    min_level =  log_cfg.get<std::string>("min_syslog", "WARNING");
+    min_syslog_ = LogHelper::log_level_from_string(min_level);
 }

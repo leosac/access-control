@@ -10,12 +10,13 @@ namespace Leosac
     * This module implements Logging capability into Leosac.
     * This works by creating a SUB socket and bind it to a known endpoint.
     *
-    * The logging macro (see log.hpp) will use thread_local variable to access publisher
+    * The logging macro (see tools/log.hpp) will use `thread_local` variable to access publisher
     * that will write to this subscriber.
     *
     * This gives us a nice, thread-safe and flexible logging framework.
     *
     * @note This module is automatically started by the core.
+    * @see @ref logger_main for end-user configuration
     */
     namespace Logger
     {
@@ -42,8 +43,14 @@ namespace Leosac
                 Default
             };
 
+            void process_config();
+
+
             void handle_log_msg();
 
+            /**
+            * Write magic string to enable some color on the terminal
+            */
             void set_color(std::ostream &s, Color c);
 
             /**
@@ -67,7 +74,15 @@ namespace Leosac
             /**
             * Receive log message on this socket.
             */
-            zmqpp::socket sub_;
+            zmqpp::socket pull_;
+
+            bool enable_syslog_;
+
+            /**
+            * Mininal log level for an entry to be written to syslog
+            */
+            LogLevel min_syslog_;
+
         };
     }
 }

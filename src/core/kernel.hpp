@@ -68,8 +68,10 @@ private:
 
     /**
     * Run the Logger thread.
+    * @param pipe PAIR socket back to main thread.
+    * @param config copy of the whole configuration tree.
     */
-    bool run_logger(zmqpp::socket *pipe);
+    bool run_logger(zmqpp::socket *pipe, boost::property_tree::ptree config);
 
     /**
     * A request has arrived on the `control_` socket.

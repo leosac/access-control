@@ -64,6 +64,25 @@ struct LogHelper
         return "UNKNOWN";
     }
 
+    static LogLevel log_level_from_string(const std::string &level)
+    {
+        if (level == "DEBUG")
+            return LogLevel::DEBUG;
+        else if (level == "INFO")
+            return LogLevel::INFO;
+        else if (level == "NOTICE")
+            return LogLevel::NOTICE;
+        else if (level == "WARNING")
+            return LogLevel::WARN;
+        else if (level == "ERROR")
+            return LogLevel::ERROR;
+        else if (level == "ALERT")
+            return LogLevel::ALERT;
+        else if (level == "EMERGENCY")
+            return LogLevel::EMERG;
+        throw std::runtime_error("Invalid log level");
+    }
+
     static void log(const std::string &log_msg, int line, const char *funcName,
             const char *fileName, LogLevel level)
     {
