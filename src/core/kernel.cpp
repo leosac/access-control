@@ -16,6 +16,7 @@ using boost::property_tree::xml_parser::no_concat_text;
 using boost::property_tree::xml_parser::no_comments;
 using boost::property_tree::xml_parser::trim_whitespace;
 using boost::property_tree::ptree;
+using namespace Leosac::Tools;
 
 // move somewhere else??
 thread_local zmqpp::socket *tl_log_socket = nullptr;

@@ -10,6 +10,8 @@
 #include <string>
 #include <algorithm>
 
+using namespace Leosac::Tools;
+
 const std::string Version::validChars = "0123456789.-";
 
 static std::string vstring = std::string();

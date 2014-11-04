@@ -16,6 +16,8 @@ extern "C" {
 
 #include "unixsyscall.hpp"
 
+using namespace Leosac::Tools;
+
 std::string UnixFs::getCWD()
 {
     char*       str = getcwd(nullptr, 0);

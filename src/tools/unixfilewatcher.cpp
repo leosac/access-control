@@ -15,6 +15,8 @@ extern "C" {
 #include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Tools;
+
 UnixFileWatcher::UnixFileWatcher()
 :   _isRunning(false)
 {

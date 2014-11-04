@@ -6,6 +6,7 @@
 
 #include "runtimeoptions.hpp"
 
+using namespace Leosac::Tools;
 const std::string RuntimeOptions::DefaultEmptyParam("undef");
 
 void RuntimeOptions::setFlag(Flag flag, bool value)

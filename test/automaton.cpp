@@ -2,6 +2,8 @@
 #include <string>
 #include "tools/dfautomaton.hpp"
 
+using namespace Leosac::Tools;
+
 namespace Leosac
 {
     namespace Test

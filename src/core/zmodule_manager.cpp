@@ -7,6 +7,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/zmqpp.hpp>
 
+using Leosac::Tools::UnixFs;
+
 void zModuleManager::unloadLibraries()
 {
     for (auto &module_info : BLABLA_)

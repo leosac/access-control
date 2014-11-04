@@ -7,6 +7,7 @@
 #include "SysFsGpioConfig.hpp"
 
 using namespace Leosac::Module::SysFsGpio;
+using Leosac::Tools::UnixFs;
 
 SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
         zmqpp::socket *module_manager_pipe,

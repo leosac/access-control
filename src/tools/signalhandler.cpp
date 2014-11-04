@@ -13,6 +13,8 @@ extern "C" {
 #include "exception/signalexception.hpp"
 #include "tools/unixsyscall.hpp"
 
+using namespace Leosac::Tools;
+
 static std::function<void (Signal)> sigCallback;
 
 static void fesser_e(int signal)

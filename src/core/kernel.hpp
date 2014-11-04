@@ -48,7 +48,7 @@ public:
     * It assume the kernel-config (-k) switch points to an XML config file.
     * If we support more config source type (json) we should move this code.
     */
-    static boost::property_tree::ptree make_config(const RuntimeOptions &opt);
+    static boost::property_tree::ptree make_config(const Leosac::Tools::RuntimeOptions &opt);
 
     /**
     * Main loop of the main thread.

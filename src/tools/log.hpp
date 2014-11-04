@@ -20,6 +20,7 @@
 * It is defined in kernel.cpp
 */
 extern thread_local zmqpp::socket *tl_log_socket;
+//
 
 
 #include <string>
@@ -242,7 +243,7 @@ public:
     LogLine(const char *file, const char *func, int line, std::ostream &out = std::cout)
             : _out(out)
     {
-        _stream << UnixFs::stripPath(file) << ':' << line << ": in '" << func << "': ";
+        _stream << Leosac::Tools::UnixFs::stripPath(file) << ':' << line << ": in '" << func << "': ";
     }
 
     ~LogLine()

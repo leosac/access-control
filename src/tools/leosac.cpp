@@ -7,6 +7,7 @@
 #include "leosac.hpp"
 #include "tools/version.hpp"
 
+using namespace Leosac::Tools;
 static std::string vstring = std::string();
 
 std::string& Leosac::getVersionString()

@@ -4,6 +4,7 @@
 #include "SysFSGPIOPin.hpp"
 
 using namespace Leosac::Module::SysFsGpio;
+using Leosac::Tools::UnixFs;
 
 SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
         Direction direction,

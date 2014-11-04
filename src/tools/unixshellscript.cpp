@@ -17,6 +17,8 @@ extern "C" {
 #include "tools/log.hpp"
 #include "exception/scriptexception.hpp"
 
+using namespace Leosac::Tools;
+
 UnixShellScript::UnixShellScript(const std::string& script)
 :   _script(script)
 {}

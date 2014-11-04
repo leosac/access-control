@@ -11,6 +11,8 @@
 #include "tools/unixshellscript.hpp"
 #include "exception/scriptexception.hpp"
 
+using namespace Leosac::Tools;
+
 const std::string NetworkConfig::NetCfgFile = "interfaces";
 
 NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :

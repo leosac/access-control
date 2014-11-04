@@ -2,6 +2,8 @@
 
 #include "tools/version.hpp"
 
+using namespace Leosac::Tools;
+
 namespace Leosac
 {
     namespace Test
