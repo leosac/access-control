@@ -1,13 +1,10 @@
 #pragma once
 
 #include <memory>
+#include "IAccessProfile.hpp"
 
 namespace Leosac
 {
-    class IAccessProfile;
-
-    class IUser;
-
     namespace Auth
     {
         /**
@@ -23,7 +20,7 @@ namespace Leosac
         public:
 
         protected:
-            std::unique_ptr<IAccessProfile> profile_;
+            IAccessProfilePtr profile_;
         };
     }
 }

@@ -18,11 +18,22 @@ namespace Leosac
         public:
             virtual ~ICard() = default;
 
+            virtual IUserPtr owner() const noexcept
+            {
+                return owner_;
+            }
+
+            virtual void owner(IUserPtr user)
+            {
+                owner_ = user;
+            }
+
+
         protected:
             /**
             * User that owns this card
             */
-            std::unique_ptr<IUser> owner_;
+            IUserPtr owner_;
         };
     }
 }

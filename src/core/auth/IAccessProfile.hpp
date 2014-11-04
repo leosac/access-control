@@ -1,11 +1,15 @@
-#include <chrono>
-
 #pragma once
+
+#include <chrono>
+#include <memory>
 
 namespace Leosac
 {
     namespace Auth
     {
+        class IAccessProfile;
+        using IAccessProfilePtr = std::shared_ptr<IAccessProfile>;
+
         /**
         * Holds information about access permission
         */

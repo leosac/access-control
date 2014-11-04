@@ -30,7 +30,7 @@ namespace Leosac
             std::string id_;
 
             /**
-            * Number of meaningfull bit
+            * Number of meaningful bit
             */
             int nb_bits_;
         };

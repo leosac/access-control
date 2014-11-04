@@ -12,6 +12,8 @@ set(LEOSAC_LIB_SRCS
     core/zmodule_manager.cpp
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp
+    core/auth/WiegandCard.cpp
+    core/auth/IUser.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp

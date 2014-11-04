@@ -8,22 +8,24 @@ using namespace Leosac::Auth;
 class AccessControlTest : public ::testing::Test
 {
 public:
-    AccessControlTest()
+    AccessControlTest() :
+            user(new IUser("my_uuid"))
     {
         card = new WiegandCard("01:f2:fe:23", 32);
+        card->owner(user);
     }
 
     ~AccessControlTest()
     {
         delete card;
-        //delete profile;
     }
 
+    IUserPtr user;
     IAccessProfile *profile;
     ICard *card;
 };
 
 TEST_F(AccessControlTest, Bla)
 {
-
+    ASSERT_EQ("my_uuid", card->owner()->id());
 }
