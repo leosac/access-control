@@ -2,6 +2,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <fstream>
+#include <core/auth/Interfaces/ICard.hpp>
 
 namespace Leosac
 {
@@ -48,6 +49,12 @@ namespace Leosac
                 zmqpp::socket &bus_sub();
 
             private:
+
+                /**
+                * This is for testing purpose for now.
+                */
+                bool authorize(::Leosac::Auth::ICardPtr card);
+
                 /**
                 * Socket to write to the bus.
                 */

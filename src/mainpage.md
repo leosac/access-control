@@ -11,3 +11,5 @@ Interesting stuff:
    + See FLED detailed description for LED command.
    + Configure the [logger](@ref logger_main)
    + Configure the [network](@ref network_main)
+   + Understand the [authentication system](@ref auth_main)
+   

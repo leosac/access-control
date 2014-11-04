@@ -1,3 +1,4 @@
+#include <core/auth/WiegandCard.hpp>
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 
@@ -33,11 +34,16 @@ void AuthFileInstance::handle_bus_msg()
     zmqpp::message auth_result_msg;
     std::string topic;
     std::string auth_data;
+    int nb_bits;
 
     bus_sub_.receive(auth_msg);
     assert(auth_msg.parts() == 2);
     auth_msg >> topic;
     auth_msg >> auth_data;
+    auth_msg >> nb_bits;
+
+    using namespace ::Leosac::Auth;
+    ICardPtr card(new WiegandCard(auth_data, nb_bits));
 
     bool success = false;
     while (!file_stream_.eof())
@@ -69,4 +75,10 @@ void AuthFileInstance::handle_bus_msg()
 zmqpp::socket &AuthFileInstance::bus_sub()
 {
     return bus_sub_;
+}
+
+bool AuthFileInstance::authorize(::Leosac::Auth::ICardPtr card)
+{
+    return false;
+    //return card->
 }

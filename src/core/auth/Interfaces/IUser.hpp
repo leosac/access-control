@@ -29,6 +29,10 @@ namespace Leosac
             */
             void id(const std::string &id_new);
 
+            IAccessProfilePtr profile() const noexcept;
+
+            void profile(IAccessProfilePtr user_profile);
+
         protected:
             /**
             * This is an (unique) identifier for the user.

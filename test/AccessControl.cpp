@@ -14,6 +14,7 @@ public:
     {
         card = new WiegandCard("01:f2:fe:23", 32);
         card->owner(user);
+        user->profile(profile);
     }
 
     ~AccessControlTest()
@@ -22,11 +23,12 @@ public:
     }
 
     IUserPtr user;
-    IAccessProfile *profile;
+    IAccessProfilePtr profile;
     ICard *card;
 };
 
 TEST_F(AccessControlTest, Bla)
 {
     ASSERT_EQ("my_uuid", card->owner()->id());
+    ASSERT_FALSE(profile->isAccessGranted(std::chrono::system_clock::now(), "door_1"));
 }

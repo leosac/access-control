@@ -28,6 +28,13 @@ namespace Leosac
                 owner_ = user;
             }
 
+            /**
+            * Returns the Access Profile associated with this card.
+            */
+            virtual IAccessProfilePtr profile() const
+            {
+
+            }
 
         protected:
             /**
