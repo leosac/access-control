@@ -37,6 +37,15 @@ namespace Leosac
             * Retrieve the user that map to this source.
             */
             virtual IUserPtr owner() const = 0;
+
+            /**
+            * Return (or generate) an Access Profile that make sense
+            * based on the data available in this AuthenticationSource object.
+            *
+            * This profile will later be used to chose between granting and denying
+            * access to an end user.
+            */
+            virtual IAccessProfilePtr profile() const = 0;
         };
     }
 }

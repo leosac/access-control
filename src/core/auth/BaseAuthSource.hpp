@@ -18,6 +18,12 @@ namespace Leosac
 
             virtual IUserPtr owner() const override;
 
+            /**
+            * This implementation simply return the owner_ profile, or null
+            * if not available.
+            */
+            virtual IAccessProfilePtr profile() const;
+
         protected:
             /**
             * Which user this auth source maps to. May be null

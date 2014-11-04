@@ -16,3 +16,10 @@ IUserPtr BaseAuthSource::owner() const
 {
     return owner_;
 }
+
+IAccessProfilePtr BaseAuthSource::profile() const
+{
+    if (owner_)
+        return owner_->profile();
+    return nullptr;
+}

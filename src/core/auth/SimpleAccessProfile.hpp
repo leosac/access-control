@@ -3,11 +3,27 @@
 #include <chrono>
 #include <memory>
 #include <core/auth/Interfaces/IAccessProfile.hpp>
+#include <map>
 
 namespace Leosac
 {
     namespace Auth
     {
+        struct TimeSlot
+        {
+            TimeSlot() : authorized(false),
+                         start_hour(0),
+                         start_min(0),
+                         end_hour(0),
+                         end_min(0)
+            {}
+            bool  authorized;
+            int start_hour;
+            int start_min;
+            int end_hour;
+            int end_min;
+        };
+
         /**
         * Concrete implementation of a simple access control class.
         */
@@ -16,6 +32,11 @@ namespace Leosac
         public:
             virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
                     const std::string &target) override;
+
+            virtual void addAccessHour(int day, int start_hour, int start_min, int end_hour, int end_min);
+
+        protected:
+            std::map<int, TimeSlot> access_range_;
         };
     }
 }
