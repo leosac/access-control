@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/auth/ICard.hpp"
+#include "core/auth/Interfaces/ICard.hpp"
 #include <string>
 
 namespace Leosac

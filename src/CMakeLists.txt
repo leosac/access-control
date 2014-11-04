@@ -13,7 +13,8 @@ set(LEOSAC_LIB_SRCS
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp
     core/auth/WiegandCard.cpp
-    core/auth/IUser.cpp
+    core/auth/SimpleAccessProfile.cpp
+    core/auth/Interfaces/IUser.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp

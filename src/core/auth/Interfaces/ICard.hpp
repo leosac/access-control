@@ -7,8 +7,8 @@ namespace Leosac
 {
     namespace Auth
     {
-        class IAccessProfile;
-        class IUser;
+        class ICard;
+        using ICardPtr = std::shared_ptr<ICard>;
 
         /**
         * Represent a input card
