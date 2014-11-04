@@ -6,7 +6,6 @@ set(LEOSAC_SRCS
 )
 
 set(LEOSAC_LIB_SRCS
-    config/xmlconfig.cpp
     core/kernel.cpp
     core/Logger.cpp
     core/zmodule_manager.cpp
@@ -23,14 +22,6 @@ set(LEOSAC_LIB_SRCS
     hardware/device/FGPIO.cpp
     hardware/device/FLED.cpp
     hardware/device/FWiegandReader.cpp
-    hardware/device/button.cpp
-    hardware/device/buzzer.cpp
-    hardware/device/dipswitch.cpp
-    hardware/device/relay.cpp
-    hardware/device/gpiodevice.cpp
-    hardware/device/gpio/gpiomanager.cpp
-    hardware/device/gpio/gpio.cpp
-    hardware/device/gpio/AGPIO.cpp
     tools/leosac.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
