@@ -1,18 +1,19 @@
 #pragma once
 
 #include "core/auth/Interfaces/ICard.hpp"
+#include "core/auth/BaseAuthSource.hpp"
 #include <string>
 
 namespace Leosac
 {
     namespace Auth
     {
-        class IAccessProfile;
-        class IUser;
+        class WiegandCard;
+        using WiegandCardPtr = std::shared_ptr<WiegandCard>;
         /**
         * A wiegand card.
         */
-        class WiegandCard : public ICard
+        class WiegandCard : public BaseAuthSource
         {
         public:
             /**

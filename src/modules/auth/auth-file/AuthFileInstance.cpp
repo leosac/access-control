@@ -43,7 +43,7 @@ void AuthFileInstance::handle_bus_msg()
     auth_msg >> nb_bits;
 
     using namespace ::Leosac::Auth;
-    ICardPtr card(new WiegandCard(auth_data, nb_bits));
+   // ICardPtr card(new WiegandCard(auth_data, nb_bits));
 
     bool success = false;
     while (!file_stream_.eof())
