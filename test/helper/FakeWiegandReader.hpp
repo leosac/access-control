@@ -1,24 +1,34 @@
 #pragma once
+
 #include "zmqpp/zmqpp.hpp"
 
-/**
-* A test helper that fake a WiegandReader (it read command on a socket and send OK)
-*/
-class FakeWiegandReader
+namespace Leosac
 {
-public:
-    FakeWiegandReader(zmqpp::context &ctx, const std::string &name);
-    FakeWiegandReader(const FakeWiegandReader &) = delete;
+    namespace Test
+    {
+        namespace Helper
+        {
+            /**
+            * A test helper that fake a WiegandReader (it read command on a socket and send OK)
+            */
+            class FakeWiegandReader
+            {
+            public:
+                FakeWiegandReader(zmqpp::context &ctx, const std::string &name);
 
-    /**
-    * Runs the dummy ready in a thread.
-    */
+                FakeWiegandReader(const FakeWiegandReader &) = delete;
 
-    bool run(zmqpp::socket *pipe);
+                /**
+                * Runs the dummy ready in a thread.
+                */
+                bool run(zmqpp::socket *pipe);
 
-private:
-    /**
-    * Receive command here.
-    */
-    zmqpp::socket rep_;
-};
+            private:
+                /**
+                * Receive command here.
+                */
+                zmqpp::socket rep_;
+            };
+        }
+    }
+}

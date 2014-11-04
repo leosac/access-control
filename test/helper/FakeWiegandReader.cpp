@@ -1,5 +1,6 @@
 #include "FakeWiegandReader.hpp"
 
+using namespace Leosac::Test::Helper;
 
 FakeWiegandReader::FakeWiegandReader(zmqpp::context &ctx, const std::string &name) :
 rep_(ctx, zmqpp::socket_type::rep)

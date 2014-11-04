@@ -1,5 +1,7 @@
 #include "FakeGPIO.hpp"
 
+using namespace Leosac::Test::Helper;
+
 FakeGPIO::FakeGPIO(zmqpp::context &ctx,
         const std::string &name) :
 ctx_(ctx),
