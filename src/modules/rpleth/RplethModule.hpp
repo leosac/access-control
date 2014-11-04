@@ -1,11 +1,11 @@
 #pragma once
 
-#include "modules/BaseModule.hpp"
-#include "hardware/device/FWiegandReader.hpp"
-#include "rplethpacket.hpp"
 #include <memory>
 #include <vector>
-#include <modules/rpleth/network/circularbuffer.hpp>
+#include "modules/BaseModule.hpp"
+#include "hardware/FWiegandReader.hpp"
+#include "rplethpacket.hpp"
+#include "modules/rpleth/network/circularbuffer.hpp"
 
 namespace Leosac
 {
@@ -150,7 +150,7 @@ namespace Leosac
                 /**
                 * Interface to the reader.
                 */
-                FWiegandReader *reader_;
+                Hardware::FWiegandReader *reader_;
 
                 /**
                 * Client that are "failed".

@@ -1,11 +1,12 @@
-#include <tools/runtimeoptions.hpp>
 #include <string>
 #include "modules/led/LEDModule.hpp"
 #include "helper/TestHelper.hpp"
-#include "hardware/device/FLED.hpp"
+#include "hardware/FLED.hpp"
+#include "tools/runtimeoptions.hpp"
 
 using namespace Leosac::Module::Led;
 using namespace Leosac::Test::Helper;
+using namespace Leosac::Hardware;
 
 namespace Leosac
 {

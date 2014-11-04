@@ -3,6 +3,7 @@
 #include "tools/log.hpp"
 
 using namespace Leosac::Module;
+using namespace Leosac::Hardware;
 
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &name,

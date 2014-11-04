@@ -8,16 +8,16 @@ LedImpl::LedImpl(zmqpp::context &ctx,
         std::string const &gpio_name,
         int blink_duration,
         int blink_speed) :
-ctx_(ctx),
-frontend_(ctx, zmqpp::socket_type::rep),
-backend_(ctx, zmqpp::socket_type::req),
-gpio_(ctx, gpio_name),
-want_update_(false),
-default_blink_duration_(blink_duration),
-default_blink_speed_(blink_speed),
-blink_speed_(0),
-blink_duration_(0),
-blink_count_(0)
+        ctx_(ctx),
+        frontend_(ctx, zmqpp::socket_type::rep),
+        backend_(ctx, zmqpp::socket_type::req),
+        gpio_(ctx, gpio_name),
+        want_update_(false),
+        default_blink_duration_(blink_duration),
+        default_blink_speed_(blink_speed),
+        blink_speed_(0),
+        blink_duration_(0),
+        blink_count_(0)
 {
     frontend_.bind("inproc://" + led_name);
     backend_.connect("inproc://" + gpio_name);

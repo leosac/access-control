@@ -3,7 +3,7 @@
 #include <string>
 #include <chrono>
 #include "zmqpp/zmqpp.hpp"
-#include "hardware/device/FLED.hpp"
+#include "hardware/FLED.hpp"
 
 namespace Leosac
 {
@@ -100,12 +100,12 @@ namespace Leosac
             /**
             * Facade to control the reader green led.
             */
-            FLED *green_led_;
+            Hardware::FLED *green_led_;
 
             /**
             * Facade to the buzzer object, we use a LED device for now, because they are similar enough.
             */
-            FLED *buzzer_;
+            Hardware::FLED *buzzer_;
 
             /**
             * Read mode. Default to false.

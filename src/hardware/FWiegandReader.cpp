@@ -1,5 +1,7 @@
 #include "FWiegandReader.hpp"
 
+using namespace Leosac::Hardware;
+
 FWiegandReader::FWiegandReader(zmqpp::context &ctx,
         std::string const &reader_name) :
         backend_(ctx, zmqpp::socket_type::req),

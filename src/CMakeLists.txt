@@ -19,9 +19,9 @@ set(LEOSAC_LIB_SRCS
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
-    hardware/device/FGPIO.cpp
-    hardware/device/FLED.cpp
-    hardware/device/FWiegandReader.cpp
+    hardware/FGPIO.cpp
+    hardware/FLED.cpp
+    hardware/FWiegandReader.cpp
     tools/leosac.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp

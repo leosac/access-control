@@ -1,6 +1,8 @@
 #include "FLED.hpp"
 #include <zmqpp/message.hpp>
 
+using namespace Leosac::Hardware;
+
 FLED::FLED(zmqpp::context &ctx, const std::string &led_name) :
         backend_(ctx, zmqpp::socket_type::req)
 {

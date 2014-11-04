@@ -2,7 +2,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <chrono>
-#include "hardware/device/FGPIO.hpp"
+#include "hardware/FGPIO.hpp"
 
 namespace Leosac
 {
@@ -84,7 +84,7 @@ namespace Leosac
                 * Facade to the GPIO we use with this LED.
                 * While we send command directly most of the time (through the backend socket), this can be used too.
                 */
-                FGPIO gpio_;
+                Hardware::FGPIO gpio_;
 
                 /**
                 * Does this LED want its `update()` method be called by the LEDModule.

@@ -1,5 +1,5 @@
-#include <tools/log.hpp>
-#include <hardware/device/FWiegandReader.hpp>
+#include "tools/log.hpp"
+#include "hardware/FWiegandReader.hpp"
 #include "RplethModule.hpp"
 #include "rplethprotocol.hpp"
 
@@ -37,7 +37,7 @@ void RplethModule::process_config()
 
     INFO("Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
             << "Stream mode = " << stream_mode_);
-    reader_ = new FWiegandReader(ctx_, reader_name);
+    reader_ = new Hardware::FWiegandReader(ctx_, reader_name);
     assert(reader_);
     server_.bind("tcp://*:" + std::to_string(port));
 }

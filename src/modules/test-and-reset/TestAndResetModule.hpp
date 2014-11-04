@@ -1,7 +1,7 @@
 #pragma once
 
-#include <modules/BaseModule.hpp>
-#include <hardware/device/FLED.hpp>
+#include "modules/BaseModule.hpp"
+#include "hardware/FLED.hpp"
 
 namespace Leosac
 {
@@ -56,12 +56,12 @@ namespace Leosac
                 /**
                 * Led device for test card
                 */
-                FLED *test_led_;
+                Hardware::FLED *test_led_;
 
                 /**
                 * Buzzer device for test card
                 */
-                FLED *test_buzzer_;
+                Hardware::FLED *test_buzzer_;
             };
 
         }

@@ -2,6 +2,7 @@
 #include "TestAndResetModule.hpp"
 
 using namespace Leosac::Module::TestAndReset;
+using namespace Leosac::Hardware;
 
 TestAndResetModule::~TestAndResetModule()
 {
