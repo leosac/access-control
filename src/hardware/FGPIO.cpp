@@ -1,6 +1,8 @@
 #include "FGPIO.hpp"
 #include <zmqpp/message.hpp>
 
+using namespace Leosac::Hardware;
+
 FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name) :
         backend_(ctx, zmqpp::socket_type::req)
 {
