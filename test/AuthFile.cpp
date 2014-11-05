@@ -1,20 +1,32 @@
+/**
+* @file
+* This file contains unit test suite related to the AuthFile module.
+*
+* @author xaqq
+*/
+
 #include <gtest/gtest.h>
 #include <chrono>
-#include <tools/unixshellscript.hpp>
-#include <core/auth/Interfaces/IAuthSourceMapper.hpp>
+#include "tools/unixshellscript.hpp"
+#include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 
-// path to test-data file.
-// this come from command line (see CmakeLists.txt)
-std::string gl_data_path;
+/**
+* Path to test-data file.
+* this come from command line (see CMakeLists.txt)
+*/
+static std::string gl_data_path;
 
 using namespace Leosac::Auth;
 using namespace Leosac::Module::Auth;
+
 namespace Leosac
 {
     namespace Test
     {
         /**
+        * Test the mapping of wiegand-card to user from a file.
+        *
         * @note This test suite use the AuthFile-1.xml file.
         */
         class AuthFileMapperTest : public ::testing::Test
@@ -22,7 +34,8 @@ namespace Leosac
         public:
             AuthFileMapperTest() :
                     my_card_(new WiegandCard("aa:bb:cc:dd", 32)),
-                    my_card2_(new WiegandCard("cc:dd:ee:ff", 32))
+                    my_card2_(new WiegandCard("cc:dd:ee:ff", 32)),
+                    unknown_card_(new WiegandCard("00:00:00:00", 32))
             {
                 mapper_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-1.xml");
             }
@@ -35,6 +48,7 @@ namespace Leosac
             IAuthSourceMapper *mapper_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
+            IAuthenticationSourcePtr unknown_card_;
         };
 
 
@@ -49,6 +63,13 @@ namespace Leosac
             mapper_->mapToUser(my_card2_);
             ASSERT_TRUE(my_card2_->owner().get());
             ASSERT_EQ("Toto", my_card2_->owner()->id());
+        }
+
+        TEST_F(AuthFileMapperTest, NotFoundMapping)
+        {
+            ASSERT_FALSE(unknown_card_->owner().get());
+            mapper_->mapToUser(unknown_card_);
+            ASSERT_FALSE(unknown_card_->owner().get());
         }
     }
 }

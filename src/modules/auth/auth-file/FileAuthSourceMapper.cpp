@@ -44,7 +44,6 @@ void FileAuthSourceMapper::visit(WiegandCard *src)
             {
                 // we found the card id
                 std::string user_id = node.get<std::string>("user");
-                //std::string user_id = node.get_child("user").data();
                 src->owner(IUserPtr(new IUser(user_id)));
             }
         }

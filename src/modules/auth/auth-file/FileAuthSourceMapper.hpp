@@ -30,7 +30,7 @@ namespace Leosac
             private:
 
                 /**
-                * Store the name of the config.
+                * Store the name of the configuration file.
                 * This is only used in case we need to report an error.
                 */
                 std::string config_file_;
