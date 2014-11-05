@@ -36,9 +36,9 @@ namespace Leosac
             {
             }
 
-            IAuthenticationSourcePtr auth_source_;
             IUserPtr user;
             IAccessProfilePtr profile;
+            IAuthenticationSourcePtr auth_source_;
             WiegandCardPtr card;
             AuthTargetPtr target;
         };

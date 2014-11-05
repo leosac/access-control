@@ -24,7 +24,7 @@ namespace Leosac
         public:
             virtual ~IAuthenticationSource() = default;
 
-            virtual void accept(Tools::IVisitor *visitor) = 0;
+            virtual void accept(Tools::IVisitor *visitor) override = 0;
 
             /**
             * Adds a new authentication sources as a subsource of this one.
