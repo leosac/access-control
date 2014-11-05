@@ -32,8 +32,6 @@ public:
 
     ~zModuleManager();
 
-    void unloadLibraries();
-
     /**
     * Actually call the init_module() function of each library we loaded.
     * The module initialization order in honored (see the "level" property).
@@ -43,7 +41,7 @@ public:
 
     /**
     * Opposite of init module. this stop all modules thread and perform cleanup.
-    * To dynamic library handlers are NOT released.
+    * @note Dynamic libraries handlers are NOT released.
     */
     void stopModules();
 
@@ -62,11 +60,18 @@ public:
 
 private:
     /**
+    * Close library handler.
+    *
+    * Cleanup code, call from destructor only.
+    */
+    void unloadLibraries();
+
+    /**
     * This will load (actually calling dlopen()) the library file located at full_path.
     * It returns a DynamicLibrary pointer that can be used to retrieve symbol from the shared object.
     * It it failed, returns nullptr.
     */
-    DynamicLibrary *load_library_file(const std::string &full_path);
+    std::shared_ptr<DynamicLibrary> load_library_file(const std::string &full_path);
 
     /**
     * Runs in a the new module thread. This function will call the module init method. This
@@ -105,7 +110,7 @@ private:
         /**
         * Pointer to the library object.
         */
-        mutable DynamicLibrary *lib_;
+        mutable std::shared_ptr<DynamicLibrary> lib_;
 
         /**
         * Config tree for the module.
@@ -132,7 +137,7 @@ private:
     };
 
     std::vector<std::string> path_;
-    std::set<ModuleInfo> BLABLA_;
+    std::set<ModuleInfo> modules_;
 
     zmqpp::context &ctx_;
 };

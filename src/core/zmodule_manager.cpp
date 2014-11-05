@@ -6,12 +6,13 @@
 #include "zmodule_manager.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/zmqpp.hpp>
+#include <exception/ExceptionsTools.hpp>
 
 using Leosac::Tools::UnixFs;
 
 void zModuleManager::unloadLibraries()
 {
-    for (auto &module_info : BLABLA_)
+    for (auto &module_info : modules_)
     {
         try
         {
@@ -19,17 +20,15 @@ void zModuleManager::unloadLibraries()
         }
         catch (const DynLibException &e)
         {
-            throw (ModuleException(e.what()));
+            std::throw_with_nested(ModuleException("Unloading library failed."));
         }
-        delete module_info.lib_;
-        module_info.lib_ = nullptr;
     }
-    BLABLA_.clear();
+    modules_.clear();
 }
 
 bool zModuleManager::initModules()
 {
-    for (const ModuleInfo &module_info : BLABLA_)
+    for (const ModuleInfo &module_info : modules_)
     {
         try
         {
@@ -85,7 +84,7 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
             module_info.config_ = cfg;
             if (!(module_info.lib_ = load_library_file(path_entry + "/" + filename)))
                 return false;
-            BLABLA_.insert(std::move(module_info));
+            modules_.insert(std::move(module_info));
             DEBUG("library file loaded (not init yet)");
             return true;
         }
@@ -94,19 +93,16 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
     return false;
 }
 
-DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
+std::shared_ptr<DynamicLibrary> zModuleManager::load_library_file(const std::string &full_path)
 {
-    DynamicLibrary *lib = nullptr;
-
     INFO("Loading library at: " << full_path);
-    lib = new DynamicLibrary(full_path);
+    std::shared_ptr<DynamicLibrary> lib(new DynamicLibrary(full_path));
     try
     {
         lib->open(DynamicLibrary::RelocationMode::Now);
     }
     catch (const DynLibException &e)
     {
-        delete lib;
         ERROR("FAILURE, full path was:{" << full_path << "}: " << e.what());
         return nullptr;
     }
@@ -115,8 +111,8 @@ DynamicLibrary *zModuleManager::load_library_file(const std::string &full_path)
 
 void zModuleManager::stopModules()
 {
-    for (std::set<ModuleInfo>::const_reverse_iterator itr = BLABLA_.rbegin();
-         itr != BLABLA_.rend();
+    for (std::set<ModuleInfo>::const_reverse_iterator itr = modules_.rbegin();
+         itr != modules_.rend();
          ++itr)
     {
         INFO("Will now stop module " << itr->name_);
@@ -127,8 +123,19 @@ void zModuleManager::stopModules()
 
 zModuleManager::~zModuleManager()
 {
-    stopModules();
-    unloadLibraries();
+    try
+    {
+        stopModules();
+        unloadLibraries();
+    }
+    catch (const std::exception &e)
+    {
+        Leosac::print_exception(e);
+    }
+    catch (...)
+    {
+        std::cerr << "Unkown exception in zModuleManager destructor";
+    }
 }
 
 zModuleManager::zModuleManager(zmqpp::context &ctx) :

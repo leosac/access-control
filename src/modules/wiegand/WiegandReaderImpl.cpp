@@ -50,7 +50,8 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
         bus_sub_(std::move(o.bus_sub_)),
         sock_(std::move(o.sock_)),
         bus_push_(std::move(o.bus_push_)),
-        name_(std::move(o.name_))
+        name_(std::move(o.name_)),
+        reverse_mode_(o.reverse_mode_)
 {
     topic_high_ = o.topic_high_;
     topic_low_ = o.topic_low_;
