@@ -17,13 +17,15 @@
         </map>
     </user_mapping>
 
-    <date>
-        <map>
+    <permissions>
+        <permission>
             <user>MY_USER</user>
-            <monday>
-                <start>00:00</start>
-                <end>23:59</end>
-            </monday>
-        </map>
-    </date>
+            <content>
+                <monday>
+                    <start>10:00</start>
+                    <end>14:00</end>
+                </monday>
+            </content>
+        </permission>
+    </permissions>
 </root>

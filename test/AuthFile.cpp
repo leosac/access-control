@@ -68,6 +68,15 @@ namespace Leosac
             ASSERT_EQ("Toto", my_card2_->owner()->id());
         }
 
+ /*       TEST_F(AuthFileMapperTest, TimeFrameMapping)
+        {
+            mapper_->mapToUser(my_card_);
+            ASSERT_TRUE(my_card_->owner().get());
+            IAccessProfilePtr profile = mapper_->buildProfile(my_card_);
+
+            ASSERT_TRUE(profile.get());
+        }*/
+
         /**
         * Card ID doesn't exist in the file.
         */

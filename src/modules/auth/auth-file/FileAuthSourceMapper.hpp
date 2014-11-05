@@ -27,6 +27,8 @@ namespace Leosac
 
                 virtual void mapToUser(Leosac::Auth::IAuthenticationSourcePtr auth_source);
 
+                virtual Leosac::Auth::IAccessProfilePtr buildProfile(Leosac::Auth::IAuthenticationSourcePtr auth_source) override;
+
             private:
 
                 /**

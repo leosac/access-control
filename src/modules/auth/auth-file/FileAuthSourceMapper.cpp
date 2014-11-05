@@ -61,3 +61,8 @@ void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
         std::throw_with_nested(ModuleException("AuthFile failed to map auth_source to user"));
     }
 }
+
+IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr auth_source)
+{
+    return std::shared_ptr<IAccessProfile>();
+}
