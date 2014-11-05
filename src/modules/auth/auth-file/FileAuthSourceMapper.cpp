@@ -52,5 +52,12 @@ void FileAuthSourceMapper::visit(WiegandCard *src)
 
 void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
 {
-    auth_source->accept(this);
+    try
+    {
+        auth_source->accept(this);
+    }
+    catch (...)
+    {
+        std::throw_with_nested(ModuleException("AuthFile failed to map auth_source to user"));
+    }
 }

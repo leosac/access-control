@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
+#include <exception/moduleexception.hpp>
 #include "tools/unixshellscript.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
@@ -27,7 +28,7 @@ namespace Leosac
         /**
         * Test the mapping of wiegand-card to user from a file.
         *
-        * @note This test suite use the AuthFile-1.xml file.
+        * @note This test suite use the AuthFile-1.xml and AuthFile-2.xml files.
         */
         class AuthFileMapperTest : public ::testing::Test
         {
@@ -51,7 +52,9 @@ namespace Leosac
             IAuthenticationSourcePtr unknown_card_;
         };
 
-
+        /**
+        * Successful mapping
+        */
         TEST_F(AuthFileMapperTest, SimpleMapping)
         {
             ASSERT_FALSE(my_card_->owner().get());
@@ -65,11 +68,32 @@ namespace Leosac
             ASSERT_EQ("Toto", my_card2_->owner()->id());
         }
 
+        /**
+        * Card ID doesn't exist in the file.
+        */
         TEST_F(AuthFileMapperTest, NotFoundMapping)
         {
             ASSERT_FALSE(unknown_card_->owner().get());
             mapper_->mapToUser(unknown_card_);
             ASSERT_FALSE(unknown_card_->owner().get());
+        }
+
+        /**
+        * File is not accessible
+        */
+        TEST_F(AuthFileMapperTest, InvalidFile)
+        {
+            ASSERT_THROW(std::unique_ptr<IAuthSourceMapper> faulty_mapper(new FileAuthSourceMapper(gl_data_path + "no_file")),
+                    ModuleException);
+        }
+
+        /**
+        * AuthFile-2.xml has invalid content.
+        */
+        TEST_F(AuthFileMapperTest, InvalidFileContent)
+        {
+            std::unique_ptr<IAuthSourceMapper> faulty_mapper(new FileAuthSourceMapper(gl_data_path + "AuthFile-2.xml"));
+            ASSERT_THROW(faulty_mapper->mapToUser(my_card_), ModuleException);
         }
     }
 }
