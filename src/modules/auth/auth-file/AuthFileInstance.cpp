@@ -76,9 +76,3 @@ zmqpp::socket &AuthFileInstance::bus_sub()
 {
     return bus_sub_;
 }
-
-bool AuthFileInstance::authorize(::Leosac::Auth::ICardPtr card)
-{
-    return false;
-    //return card->
-}

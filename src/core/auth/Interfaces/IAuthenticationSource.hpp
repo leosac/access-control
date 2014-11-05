@@ -24,6 +24,15 @@ namespace Leosac
             virtual ~IAuthenticationSource() = default;
 
             /**
+            * Method to provide support for implementing Visitors.
+            */
+            template<typename VisitorType>
+            void accept(VisitorType visitor) final
+            {
+                visitor.visit(this);
+            }
+
+            /**
             * Adds a new authentication sources as a subsource of this one.
             */
             virtual void addAuthSource(IAuthenticationSourcePtr source) = 0;

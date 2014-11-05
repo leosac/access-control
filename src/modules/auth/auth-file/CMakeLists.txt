@@ -4,6 +4,7 @@ set(AUTH-FILE_SRCS
     init.cpp
     AuthFileModule.cpp
     AuthFileInstance.cpp
+    FileAuthSourceMapper.cpp
 )
 
 add_library(${AUTH-FILE_BIN} SHARED ${AUTH-FILE_SRCS})

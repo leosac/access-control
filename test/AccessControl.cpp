@@ -61,8 +61,12 @@ namespace Leosac
 
             ASSERT_TRUE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp), "target"));
 
-//    ASSERT_EQ("my_uuid", card->owner()->id());
-//    ASSERT_FALSE(profile->isAccessGranted(std::chrono::system_clock::now(), "door_1"));
+            std::tm cpy = *time_out;
+            cpy.tm_hour = 14;
+            cpy.tm_min = 20;
+            std::time_t time_temp2 = std::mktime(&cpy);
+            ASSERT_FALSE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp2), "target"));
+
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Leosac
         {
         public:
             IUser(const std::string &user_id);
-            virtual ~IUser()= default;
+            virtual ~IUser() = default;
 
             /**
             * Get the current id.
