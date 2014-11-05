@@ -3,6 +3,7 @@
 #include <memory>
 #include "IUser.hpp"
 #include "core/auth/AuthTarget.hpp"
+#include "tools/IVisitable.hpp"
 
 namespace Leosac
 {
@@ -18,19 +19,12 @@ namespace Leosac
         * Those sources can be combined to provide strong authentication mechanism.
         * This class handle this.
         */
-        class IAuthenticationSource
+        class IAuthenticationSource : public Tools::IVisitable
         {
         public:
             virtual ~IAuthenticationSource() = default;
 
-            /**
-            * Method to provide support for implementing Visitors.
-            */
-            template<typename VisitorType>
-            void accept(VisitorType visitor) final
-            {
-                visitor.visit(this);
-            }
+            virtual void accept(Tools::IVisitor *visitor) = 0;
 
             /**
             * Adds a new authentication sources as a subsource of this one.

@@ -14,6 +14,8 @@ namespace Leosac
             virtual ~BaseAuthSource() = default;
             virtual void addAuthSource(IAuthenticationSourcePtr source) override;
 
+            virtual void accept(Tools::IVisitor *visitor) override;
+
             virtual void owner(IUserPtr user) override;
 
             virtual IUserPtr owner() const override;

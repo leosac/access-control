@@ -1,3 +1,4 @@
+#include <tools/IVisitor.hpp>
 #include "BaseAuthSource.hpp"
 
 using namespace Leosac::Auth;
@@ -22,4 +23,9 @@ IAccessProfilePtr BaseAuthSource::profile() const
     if (owner_)
         return owner_->profile();
     return nullptr;
+}
+
+void BaseAuthSource::accept(Leosac::Tools::IVisitor *visitor)
+{
+    visitor->visit(this);
 }

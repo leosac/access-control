@@ -23,6 +23,8 @@ namespace Leosac
             */
             WiegandCard(const std::string &card_id, int bits);
 
+            virtual void accept(Tools::IVisitor *visitor) override;
+
         protected:
             /**
             * Card id

@@ -18,8 +18,7 @@ namespace Leosac
               public:
                 FileAuthSourceMapper(const std::string &auth_file);
 
-                virtual void visit(::Leosac::Auth::IAuthenticationSource *src);
-                virtual void visit(::Leosac::Auth::WiegandCard *src);
+                virtual void visit(::Leosac::Auth::WiegandCard *src) override;
             };
         }
     }
