@@ -25,6 +25,11 @@ namespace Leosac
 
             virtual void accept(Tools::IVisitor *visitor) override;
 
+            /**
+            * Returns the id of the card, as a hexadecimal string.
+            */
+            const std::string &id() const;
+
         protected:
             /**
             * Card id

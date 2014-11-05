@@ -15,3 +15,8 @@ void WiegandCard::accept(Leosac::Tools::IVisitor *visitor)
 {
     visitor->visit(this);
 }
+
+const std::string &WiegandCard::id() const
+{
+    return id_;
+}
