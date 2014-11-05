@@ -1,21 +1,15 @@
 #include <fstream>
 #include "kernel.hpp"
-#include <boost/property_tree/xml_parser.hpp>
-#include <tools/log.hpp>
-#include <tools/signalhandler.hpp>
-#include <tools/unixshellscript.hpp>
+#include "tools/log.hpp"
+#include "tools/signalhandler.hpp"
+#include "tools/unixshellscript.hpp"
+#include "tools/XmlTreeBuilder.hpp"
 #include "exception/configexception.hpp"
 #include "Logger.hpp"
 #include "exception/ExceptionsTools.hpp"
 
-using boost::property_tree::xml_parser::read_xml;
-using boost::property_tree::xml_parser::write_xml;
-using boost::property_tree::xml_writer_settings;
-using boost::property_tree::ptree_error;
-using boost::property_tree::xml_parser::no_concat_text;
-using boost::property_tree::xml_parser::no_comments;
-using boost::property_tree::xml_parser::trim_whitespace;
 using boost::property_tree::ptree;
+using boost::property_tree::ptree_error;
 using namespace Leosac::Tools;
 
 // move somewhere else??
@@ -47,14 +41,11 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
 {
     boost::property_tree::ptree cfg;
-    std::string filename(opt.getParam("kernel-cfg"));
-    std::ifstream cfg_stream(filename);
+    std::string filename = opt.getParam("kernel-cfg");
 
-    if (!cfg_stream.good())
-        throw (ConfigException(filename, "Could not open file"));
     try
     {
-        read_xml(cfg_stream, cfg, trim_whitespace | no_comments);
+        cfg = propertyTreeFromXmlFile(filename);
         // store the path the config file.
         cfg.get_child("kernel").add("kernel-cfg", filename);
         return cfg.get_child("kernel"); // kernel is the root node.
