@@ -12,4 +12,5 @@ Interesting stuff:
    + Configure the [logger](@ref logger_main)
    + Configure the [network](@ref network_main)
    + Understand the [authentication system](@ref auth_main)
+   + [Firmware](@ref firmware_main) info
    
