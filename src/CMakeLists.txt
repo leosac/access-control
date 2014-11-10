@@ -62,6 +62,7 @@ ${CMAKE_SOURCE_DIR}/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/libmcp23s17/src/
 ${CMAKE_SOURCE_DIR}/zmqpp/src/
 ${CMAKE_SOURCE_DIR}/libzmq/include
+${CMAKE_SOURCE_DIR}/spdlog/include
 )
 
 #Set compilation flags for current target

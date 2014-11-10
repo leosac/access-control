@@ -26,6 +26,7 @@ extern thread_local zmqpp::socket *tl_log_socket;
 #include <string>
 #include <sstream>
 #include <syslog.h>
+#include "spdlog/spdlog.h"
 
 enum class LogLevel
 {
@@ -94,8 +95,43 @@ struct LogHelper
         msg << static_cast<int>(level);
         msg << log_msg;
 
-        assert(tl_log_socket);
-        tl_log_socket->send(msg);
+        //assert(tl_log_socket);
+       // tl_log_socket->send(msg);
+
+
+        if (!spdlog::get("console"))
+        {
+            auto console = spdlog::stdout_logger_mt("console");
+        }
+        auto console = spdlog::get("console");
+
+        switch (level)
+        {
+            case LogLevel::DEBUG:
+                console->debug(log_msg);
+                break;
+            case LogLevel::INFO:
+                console->info(log_msg);
+                break;
+            case LogLevel::NOTICE:
+                console->notice(log_msg);
+                break;
+            case LogLevel::WARN:
+                console->warn(log_msg);
+                break;
+            case LogLevel::ERROR:
+                console->error(log_msg);
+                break;
+            case LogLevel::CRIT:
+                console->critical(log_msg);
+                break;
+            case LogLevel::ALERT:
+                console->alert(log_msg);
+                break;
+            case LogLevel::EMERG:
+                console->emerg(log_msg);
+                break;
+        }
     }
 
 };
