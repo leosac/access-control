@@ -21,20 +21,19 @@ int LEDModule::compute_timeout()
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
-    bool want_update = false;
     for (auto &led : leds_)
     {
         if (led->next_update() < tp)
         {
             tp = led->next_update();
-            want_update = true;
         }
     }
+    if (tp == std::chrono::system_clock::time_point::max())
+        return -1; // no update asked.
+
     int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - now).count();
     DEBUG("TIMEOUT = " << timeout);
-    if (timeout < 0)
-        timeout = 0;
-    return want_update ? timeout : -1;
+    return timeout < 0 ? 0 : timeout;
 }
 
 void LEDModule::run()
