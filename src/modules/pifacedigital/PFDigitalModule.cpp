@@ -46,7 +46,12 @@ int PFDigitalModule::compute_timeout()
         if (gpio_pin.next_update() < tp)
             tp = gpio_pin.next_update();
     }
-    return std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
+    if (tp == std::chrono::system_clock::time_point::max())
+        return -1; // no update asked.
+
+    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
+    DEBUG("GPIO TIMEOUT =" << timeout);
+    return timeout < 0 ? 0 : timeout;
 }
 
 void PFDigitalModule::run()
