@@ -105,9 +105,11 @@ namespace Leosac
                         bus_(ctx_),
                         bus_sub_(ctx_, zmqpp::socket_type::sub),
                         bus_push_(ctx_, zmqpp::socket_type::push),
+                        log_sink_(ctx_, zmqpp::socket_type::pull),
                         module_actor_(nullptr)
                 {
                     // create the log socket for main thread.
+                    log_sink_.bind("inproc://log-sink");
                     tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
                     tl_log_socket->connect("inproc://log-sink");
 
@@ -124,9 +126,7 @@ namespace Leosac
                 /**
                 * We need this 2-step initialization to prevent calling virtual method (run_module) in constructor.
                 */
-                virtual void SetUp() override
-
-                final
+                virtual void SetUp() override final
                 {
                     module_actor_ = new zmqpp::actor(std::bind(&TestHelper::run_module, this, std::placeholders::_1));
                 }
@@ -151,6 +151,8 @@ namespace Leosac
                 * A PUSH socket to write on the bus.
                 */
                 zmqpp::socket bus_push_;
+
+                zmqpp::socket log_sink_;
 
                 /**
                 * An actor, to run the module code the same way it would be run by the core.

@@ -58,17 +58,14 @@ void LedImpl::handle_message()
 void LedImpl::update()
 {
     DEBUG("UPDATING LED");
+    gpio_.toggle();
+    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
 
-    if (blink_count_ == 0)
+    if (--blink_count_ == 0)
     {
         want_update_ = false;
-        gpio_.turnOff();
         return;
     }
-
-    gpio_.toggle();
-    --blink_count_;
-    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
 }
 
 std::chrono::system_clock::time_point LedImpl::next_update()

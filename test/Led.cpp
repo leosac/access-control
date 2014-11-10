@@ -92,29 +92,52 @@ namespace Leosac
             ASSERT_TRUE(my_led.isOff());
         }
 
-        TEST_F(LedTest, blink)
+        /**
+        * Test blinking, starting with a led that is OFF
+        */
+        TEST_F(LedTest, blink1)
         {
             FLED my_led(ctx_, "my_led");
             ASSERT_TRUE(my_led.isOff());
             ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
             ASSERT_FALSE(my_led.isBlinking());
 
-            my_led.blink(1000, 100);
+            my_led.blink(10, 1);
             ASSERT_TRUE(my_led.isBlinking());
             ASSERT_TRUE(my_led.state().st == FLED::State::BLINKING);
             // we should see 10 changes
             for (int i = 0; i < 5; ++i)
             {
                 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "ON"));
-                ASSERT_TRUE(my_led.isBlinking());
                 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             }
-
-            // the "final" off: sent when blinking is over (even if gpio is off already)
-            ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             ASSERT_TRUE(my_led.isOff());
+            ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
+        }
 
+        /**
+        * Test blinking, starting with a led that is ON.
+        * We blink 9 times, so the led will end up OFF.
+        */
+        TEST_F(LedTest, blink2)
+        {
+            FLED my_led(ctx_, "my_led");
+            my_led.turnOn();
+            ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "ON"));
+            ASSERT_TRUE(my_led.isOn());
+            ASSERT_TRUE(my_led.state().st == FLED::State::ON);
             ASSERT_FALSE(my_led.isBlinking());
+
+            my_led.blink(18, 2);
+            ASSERT_TRUE(my_led.isBlinking());
+            ASSERT_TRUE(my_led.state().st == FLED::State::BLINKING);
+            // we should see 9 changes
+            for (int i = 0; i < 4; ++i)
+            {
+                ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
+                ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "ON"));
+            }
+            ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             ASSERT_TRUE(my_led.isOff());
             ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
         }
