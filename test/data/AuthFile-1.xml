@@ -19,7 +19,26 @@
 
     <permissions>
         <map>
+            <!-- Time frame mapping for MY_USER -->
             <user>MY_USER</user>
+
+            <default_schedule>
+                <!-- The scheduling information here *only* apply for door
+                that have no other scheduling information.
+                 In the test suite that use this file, its DoorC.
+                 It is the default schedule FOR THIS USER.
+                 -->
+
+                <monday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </monday>
+
+                <sunday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </sunday>
+            </default_schedule>
 
             <schedule>
                 <door>doorA</door>
@@ -27,10 +46,7 @@
                     <start>10:00</start>
                     <end>14:59</end>
                 </monday>
-            </schedule>
 
-            <schedule>
-                <door>doorA</door>
                 <monday>
                     <start>16:35</start>
                     <end>23:59</end>
@@ -44,11 +60,17 @@
                     <end>23:59</end>
                 </monday>
             </schedule>
+        </map>
+        <map>
+            <!-- Time frame mapping for Toto -->
+            <user>Toto</user>
 
             <default_schedule>
-
+                <sunday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </sunday>
             </default_schedule>
         </map>
     </permissions>
-
 </root>

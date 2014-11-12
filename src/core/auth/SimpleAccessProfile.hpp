@@ -45,15 +45,28 @@ namespace Leosac
 
             /**
             * Add range in which access is allowed.
+            * @param target door we target. if this is null, it means this is a default access rule.
             */
             virtual void addAccessHour(AuthTargetPtr target,
                     int day, int start_hour, int start_min, int end_hour, int end_min);
 
         protected:
             /**
+            * Check whether this time frame permits access or not.
+            *
+            * @return true if the time frame grant access; false otherwise
+            */
+            bool check_timeframe(const SingleTimeFrame &tf, const std::chrono::system_clock::time_point &date);
+
+            /**
             * Map target name to target's time frame.
             */
             std::map<std::string, std::vector<SingleTimeFrame>> time_frames_;
+
+            /**
+            * Time frames to use when we have nothing for a specific target.
+            */
+            std::vector<SingleTimeFrame> default_time_frames_;
         };
     }
 }

@@ -36,6 +36,7 @@ namespace Leosac
             AuthFileMapperTest() :
                     doorA_(new AuthTarget("doorA")),
                     doorB_(new AuthTarget("doorB")),
+                    doorC_(new AuthTarget("doorC")),
                     my_card_(new WiegandCard("aa:bb:cc:dd", 32)),
                     my_card2_(new WiegandCard("cc:dd:ee:ff", 32)),
                     unknown_card_(new WiegandCard("00:00:00:00", 32))
@@ -66,8 +67,8 @@ namespace Leosac
 
                 // sunday 18h50
                 date3.tm_mday = 2;
-                date2.tm_hour = 18;
-                date2.tm_min = 50;
+                date3.tm_hour = 18;
+                date3.tm_min = 50;
                 time_temp = std::mktime(&date3);
                 date_sunday_18_50 = std::chrono::system_clock::from_time_t(time_temp);
             }
@@ -82,6 +83,7 @@ namespace Leosac
             std::chrono::system_clock::time_point date_sunday_18_50;
             AuthTargetPtr doorA_;
             AuthTargetPtr doorB_;
+            AuthTargetPtr doorC_;
             IAuthSourceMapper *mapper_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
@@ -127,9 +129,28 @@ namespace Leosac
             ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, doorB_));
         }
 
+        /**
+        * Test time frame with default_schedule param
+        */
         TEST_F(AuthFileMapperTest, TimeFrameMapping2)
         {
+            mapper_->mapToUser(my_card_);
+            mapper_->mapToUser(my_card2_);
+            ASSERT_TRUE(my_card_->owner().get());
+            ASSERT_TRUE(my_card2_->owner().get());
+            IAccessProfilePtr profile_myuser = mapper_->buildProfile(my_card_);
+            IAccessProfilePtr profile_toto = mapper_->buildProfile(my_card2_);
+            ASSERT_TRUE(profile_myuser.get());
+            ASSERT_TRUE(profile_toto.get());
 
+
+            ASSERT_TRUE(profile_myuser->isAccessGranted(date_sunday_18_50, doorC_));
+            ASSERT_TRUE(profile_myuser->isAccessGranted(date_monday_16_31, doorC_));
+
+            ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorA_));
+            ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorB_));
+            ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorC_));
+            ASSERT_FALSE(profile_toto->isAccessGranted(date_monday_16_31, doorC_));
         }
 
         /**

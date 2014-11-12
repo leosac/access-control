@@ -44,9 +44,10 @@ namespace Leosac
                 * It adds some schedule to an existing profile.
                 * @param profile cannot be null
                 * @param schedule_cfg property_tree that contains data from a `<schedule>` block.
+                * @param is_default is this a `default_schedule` block ?
                 */
                 void build_schedule(Leosac::Auth::SimpleAccessProfilePtr profile,
-                        const boost::property_tree::ptree &schedule_cfg);
+                        const boost::property_tree::ptree &schedule_cfg, bool is_default);
 
                 /**
                 * Maps string day to int day (starting with sunday = 0)

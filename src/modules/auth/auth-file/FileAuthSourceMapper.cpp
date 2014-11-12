@@ -110,23 +110,32 @@ void FileAuthSourceMapper::build_permission()
 
             for (const auto &schedule : node)
             {
-                if (schedule.first != "schedule")
-                    continue;
-                build_schedule(profile, schedule.second);
+                if (schedule.first == "default_schedule")
+                    build_schedule(profile, schedule.second, true);
+                if (schedule.first == "schedule")
+                    build_schedule(profile, schedule.second, false);
             }
         }
     }
 }
 
 void FileAuthSourceMapper::build_schedule(Leosac::Auth::SimpleAccessProfilePtr profile,
-        const boost::property_tree::ptree &schedule_cfg)
+        const boost::property_tree::ptree &schedule_cfg,
+        bool is_default)
 {
     assert(profile);
-    std::string target_name = schedule_cfg.get<std::string>("door");
-    AuthTargetPtr target = targets_[target_name];
+    std::string target_name;
+    AuthTargetPtr target;
 
-    if (!target)
-        target = targets_[target_name] = AuthTargetPtr(new AuthTarget(target_name));
+    if (!is_default)
+    {
+        // if target is "default" it doesn't apply for a specific one so we dont care about door name.
+        target_name = schedule_cfg.get<std::string>("door");
+        target = targets_[target_name];
+
+        if (!target)
+            target = targets_[target_name] = AuthTargetPtr(new AuthTarget(target_name));
+    }
 
     // loop over every subnodes
     // we have to ignore the <door> name as it doesn't directly hold scheduling data
