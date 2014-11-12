@@ -84,18 +84,30 @@ namespace Leosac
 
             ASSERT_TRUE(profile.get());
 
-            // Monday
+            // Monday 12h
             std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
             date.tm_hour = 12;
             date.tm_mday = 3;
             date.tm_mon = 10;
             date.tm_year = 114;
             std::time_t time_temp = std::mktime(&date);
-            std::tm const *time_out = std::localtime(&time_temp);
             auto my_date = std::chrono::system_clock::from_time_t(time_temp);
 
+            // monday 16h31
+            std::tm date2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            date2.tm_mday = 3;
+            date2.tm_mon = 10;
+            date2.tm_year = 114;
+            date2.tm_hour = 16;
+            date2.tm_min = 31;
+            std::time_t time_temp2 = std::mktime(&date2);
+            auto my_date2 = std::chrono::system_clock::from_time_t(time_temp2);
+
             ASSERT_TRUE(profile->isAccessGranted(my_date, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(my_date2, doorA_));
+
             ASSERT_FALSE(profile->isAccessGranted(my_date, doorB_));
+            ASSERT_TRUE(profile->isAccessGranted(my_date2, doorB_));
         }
 
         /**
@@ -139,6 +151,5 @@ int main(int argc, char **argv)
     // argv[1] shall be the path to test data file
     assert(argc == 2);
     gl_data_path = std::string(argv[1]) + '/';
-    std::cout << "GLDATA = " << gl_data_path << std::endl;
     return RUN_ALL_TESTS();
 }

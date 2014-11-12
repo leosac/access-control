@@ -25,6 +25,14 @@
                 <door>doorA</door>
                 <monday>
                     <start>10:00</start>
+                    <end>14:59</end>
+                </monday>
+            </schedule>
+
+            <schedule>
+                <door>doorA</door>
+                <monday>
+                    <start>16:35</start>
                     <end>23:59</end>
                 </monday>
             </schedule>
