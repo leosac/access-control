@@ -28,10 +28,7 @@ namespace Leosac
 
                 // add access monday from 10 to 14.
                 auto profile_r = std::dynamic_pointer_cast<SimpleAccessProfile>(profile);
-                // todo target
-                profile_r->addAccessHour(nullptr, 1, 10, 0, 14, 0);
-
-                target->name("MY_DOOR");
+                profile_r->addAccessHour(target, 1, 10, 0, 14, 0);
             }
 
             ~AccessControlTest()
@@ -61,15 +58,14 @@ namespace Leosac
             std::tm const *time_out = std::localtime(&time_temp);
             ASSERT_EQ(1, time_out->tm_wday);
 
-            // todo target
-            ASSERT_TRUE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp), nullptr));
+            ASSERT_TRUE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp), target));
 
             std::tm cpy = *time_out;
             cpy.tm_hour = 14;
             cpy.tm_min = 20;
             std::time_t time_temp2 = std::mktime(&cpy);
             // todo target
-            ASSERT_FALSE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp2), nullptr));
+            ASSERT_FALSE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp2), target));
 
         }
     }
