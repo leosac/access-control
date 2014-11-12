@@ -41,6 +41,35 @@ namespace Leosac
                     unknown_card_(new WiegandCard("00:00:00:00", 32))
             {
                 mapper_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-1.xml");
+
+                // initialize date object.
+                std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+                std::tm date2;
+                std::tm date3;
+                std::time_t time_temp;
+
+                // Monday 12h
+                date.tm_year = 114;
+                date.tm_mon = 10;
+                date.tm_mday = 3;
+                date.tm_hour = 12;
+                date3 = date2 = date;
+
+                time_temp = std::mktime(&date);
+                date_monday_12_00 = std::chrono::system_clock::from_time_t(time_temp);
+
+                // monday 16h31
+                date2.tm_hour = 16;
+                date2.tm_min = 31;
+                time_temp = std::mktime(&date2);
+                date_monday_16_31 = std::chrono::system_clock::from_time_t(time_temp);
+
+                // sunday 18h50
+                date3.tm_mday = 2;
+                date2.tm_hour = 18;
+                date2.tm_min = 50;
+                time_temp = std::mktime(&date3);
+                date_sunday_18_50 = std::chrono::system_clock::from_time_t(time_temp);
             }
 
             ~AuthFileMapperTest()
@@ -48,6 +77,9 @@ namespace Leosac
                 delete mapper_;
             }
 
+            std::chrono::system_clock::time_point date_monday_12_00;
+            std::chrono::system_clock::time_point date_monday_16_31;
+            std::chrono::system_clock::time_point date_sunday_18_50;
             AuthTargetPtr doorA_;
             AuthTargetPtr doorB_;
             IAuthSourceMapper *mapper_;
@@ -84,30 +116,15 @@ namespace Leosac
 
             ASSERT_TRUE(profile.get());
 
-            // Monday 12h
-            std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            date.tm_hour = 12;
-            date.tm_mday = 3;
-            date.tm_mon = 10;
-            date.tm_year = 114;
-            std::time_t time_temp = std::mktime(&date);
-            auto my_date = std::chrono::system_clock::from_time_t(time_temp);
 
-            // monday 16h31
-            std::tm date2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-            date2.tm_mday = 3;
-            date2.tm_mon = 10;
-            date2.tm_year = 114;
-            date2.tm_hour = 16;
-            date2.tm_min = 31;
-            std::time_t time_temp2 = std::mktime(&date2);
-            auto my_date2 = std::chrono::system_clock::from_time_t(time_temp2);
+            ASSERT_TRUE(profile->isAccessGranted(date_monday_12_00, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(date_monday_16_31, doorA_));
 
-            ASSERT_TRUE(profile->isAccessGranted(my_date, doorA_));
-            ASSERT_FALSE(profile->isAccessGranted(my_date2, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(date_monday_12_00, doorB_));
+            ASSERT_TRUE(profile->isAccessGranted(date_monday_16_31, doorB_));
 
-            ASSERT_FALSE(profile->isAccessGranted(my_date, doorB_));
-            ASSERT_TRUE(profile->isAccessGranted(my_date2, doorB_));
+            ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, doorB_));
         }
 
         /**

@@ -64,7 +64,6 @@ namespace Leosac
             cpy.tm_hour = 14;
             cpy.tm_min = 20;
             std::time_t time_temp2 = std::mktime(&cpy);
-            // todo target
             ASSERT_FALSE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp2), target));
 
         }
