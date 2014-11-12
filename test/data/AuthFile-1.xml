@@ -18,14 +18,30 @@
     </user_mapping>
 
     <permissions>
-        <permission>
+        <map>
             <user>MY_USER</user>
-            <content>
+
+            <schedule>
+                <door>doorA</door>
                 <monday>
                     <start>10:00</start>
-                    <end>14:00</end>
+                    <end>23:59</end>
                 </monday>
-            </content>
-        </permission>
+            </schedule>
+
+            <schedule>
+                <door>doorB</door>
+                <monday>
+                    <start>15:00</start>
+                    <end>23:59</end>
+                </monday>
+            </schedule>
+
+            <default_schedule>
+
+            </default_schedule>
+        </map>
+
     </permissions>
+
 </root>

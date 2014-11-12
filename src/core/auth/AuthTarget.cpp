@@ -11,3 +11,9 @@ void AuthTarget::name(std::string const &param)
 {
     name_ = param;
 }
+
+AuthTarget::AuthTarget(const std::string target_name) :
+        name_(target_name)
+{
+
+}

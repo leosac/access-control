@@ -34,6 +34,8 @@ namespace Leosac
         {
         public:
             AuthFileMapperTest() :
+                    doorA_(new AuthTarget("doorA")),
+                    doorB_(new AuthTarget("doorB")),
                     my_card_(new WiegandCard("aa:bb:cc:dd", 32)),
                     my_card2_(new WiegandCard("cc:dd:ee:ff", 32)),
                     unknown_card_(new WiegandCard("00:00:00:00", 32))
@@ -46,6 +48,8 @@ namespace Leosac
                 delete mapper_;
             }
 
+            AuthTargetPtr doorA_;
+            AuthTargetPtr doorB_;
             IAuthSourceMapper *mapper_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
@@ -68,6 +72,10 @@ namespace Leosac
             ASSERT_EQ("Toto", my_card2_->owner()->id());
         }
 
+        /**
+        * Test that time frame for access a properly loaded and that
+        * the AccessProfile is coherent with the configuration file.
+        */
         TEST_F(AuthFileMapperTest, TimeFrameMapping)
         {
             mapper_->mapToUser(my_card_);
@@ -86,8 +94,8 @@ namespace Leosac
             std::tm const *time_out = std::localtime(&time_temp);
             auto my_date = std::chrono::system_clock::from_time_t(time_temp);
 
-            ASSERT_TRUE(profile->isAccessGranted(my_date, "doorA"));
-            ASSERT_FALSE(profile->isAccessGranted(my_date, "doorB"));
+            ASSERT_TRUE(profile->isAccessGranted(my_date, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(my_date, doorB_));
         }
 
         /**

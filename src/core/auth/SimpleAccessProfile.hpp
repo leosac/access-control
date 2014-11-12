@@ -2,22 +2,28 @@
 
 #include <chrono>
 #include <memory>
-#include <core/auth/Interfaces/IAccessProfile.hpp>
 #include <map>
+#include <vector>
+#include "core/auth/Interfaces/IAccessProfile.hpp"
+#include "core/auth/AuthTarget.hpp"
 
 namespace Leosac
 {
     namespace Auth
     {
-        struct TimeSlot
+        /**
+        * A single time frame, in a day.
+        */
+        struct SingleTimeFrame
         {
-            TimeSlot() : authorized(false),
-                         start_hour(0),
-                         start_min(0),
-                         end_hour(0),
-                         end_min(0)
+            SingleTimeFrame() : authorized(false),
+                                start_hour(0),
+                                start_min(0),
+                                end_hour(0),
+                                end_min(0)
             {}
-            bool  authorized;
+            bool authorized;
+            int day;
             int start_hour;
             int start_min;
             int end_hour;
@@ -34,17 +40,19 @@ namespace Leosac
         {
         public:
             virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
-                    const std::string &target) override;
-
+                     AuthTargetPtr target) override;
 
             /**
             * Add range in which access is allowed.
-            * @warning Only one range per day is currently supported.
             */
-            virtual void addAccessHour(int day, int start_hour, int start_min, int end_hour, int end_min);
+            virtual void addAccessHour(AuthTargetPtr target,
+                    int day, int start_hour, int start_min, int end_hour, int end_min);
 
         protected:
-            std::map<int, TimeSlot> access_range_;
+            /**
+            * Map target name to target's time frame.
+            */
+            std::map<std::string, std::vector<SingleTimeFrame>> time_frames_;
         };
     }
 }

@@ -68,6 +68,11 @@ namespace Leosac
                 * Maps user id (or name) to object.
                 */
                 std::map<std::string, Leosac::Auth::IUserPtr> users_;
+
+                /**
+                * Maps target (eg door) name to object.
+                */
+                std::map<std::string, Leosac::Auth::AuthTargetPtr> targets_;
             };
         }
     }

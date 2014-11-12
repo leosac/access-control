@@ -81,7 +81,6 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
 
 void FileAuthSourceMapper::build_permission()
 {
-    INFO("BUILD_PERMISSION");
     const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("permissions");
 
     for (const auto &permission_mapping : mapping_tree)
@@ -122,9 +121,12 @@ void FileAuthSourceMapper::build_permission()
 void FileAuthSourceMapper::build_schedule(Leosac::Auth::SimpleAccessProfilePtr profile,
         const boost::property_tree::ptree &schedule_cfg)
 {
-    INFO("BUILD_SCHEDULE");
     assert(profile);
     std::string target_name = schedule_cfg.get<std::string>("door");
+    AuthTargetPtr target = targets_[target_name];
+
+    if (!target)
+        target = targets_[target_name] = AuthTargetPtr(new AuthTarget(target_name));
 
     // loop over every subnodes
     // we have to ignore the <door> name as it doesn't directly hold scheduling data
@@ -151,7 +153,8 @@ void FileAuthSourceMapper::build_schedule(Leosac::Auth::SimpleAccessProfilePtr p
         int end_hour = std::stoi(temp[0]);
         int end_min = std::stoi(temp[1]);
 
-        profile->addAccessHour(week_day_to_int(day), start_hour, start_min, end_hour, end_min);
+        profile->addAccessHour(target,
+                week_day_to_int(day), start_hour, start_min, end_hour, end_min);
     }
 }
 

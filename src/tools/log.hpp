@@ -102,6 +102,7 @@ struct LogHelper
         if (!spdlog::get("console"))
         {
             auto console = spdlog::stdout_logger_mt("console");
+            spdlog::set_level(spdlog::level::DEBUG);
         }
         auto console = spdlog::get("console");
 

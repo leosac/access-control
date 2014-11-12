@@ -17,6 +17,7 @@ namespace Leosac
         {
         public:
             virtual ~AuthTarget() = default;
+            explicit AuthTarget(const std::string target_name);
 
             const std::string &name() const;
             void name(const std::string &new_name);

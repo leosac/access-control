@@ -18,7 +18,7 @@ namespace Leosac
                     profile(new SimpleAccessProfile()),
                     auth_source_(new BaseAuthSource()),
                     card(new WiegandCard("01:f2:fe:23", 32)),
-                    target(new AuthTarget())
+                    target(new AuthTarget("random_target"))
             {
                 // this is authentication module work
                 card->owner(user);
@@ -28,7 +28,8 @@ namespace Leosac
 
                 // add access monday from 10 to 14.
                 auto profile_r = std::dynamic_pointer_cast<SimpleAccessProfile>(profile);
-                profile_r->addAccessHour(1, 10, 0, 14, 0);
+                // todo target
+                profile_r->addAccessHour(nullptr, 1, 10, 0, 14, 0);
 
                 target->name("MY_DOOR");
             }
@@ -60,13 +61,15 @@ namespace Leosac
             std::tm const *time_out = std::localtime(&time_temp);
             ASSERT_EQ(1, time_out->tm_wday);
 
-            ASSERT_TRUE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp), "target"));
+            // todo target
+            ASSERT_TRUE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp), nullptr));
 
             std::tm cpy = *time_out;
             cpy.tm_hour = 14;
             cpy.tm_min = 20;
             std::time_t time_temp2 = std::mktime(&cpy);
-            ASSERT_FALSE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp2), "target"));
+            // todo target
+            ASSERT_FALSE(p->isAccessGranted(std::chrono::system_clock::from_time_t(time_temp2), nullptr));
 
         }
     }

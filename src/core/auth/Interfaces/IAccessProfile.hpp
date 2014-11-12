@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <memory>
+#include "core/auth/AuthTarget.hpp"
 
 namespace Leosac
 {
@@ -23,7 +24,7 @@ namespace Leosac
             * @param target the door we want to open
             */
             virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
-                    const std::string &target) = 0;
+            AuthTargetPtr target) = 0;
         };
     }
 }
