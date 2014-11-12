@@ -17,6 +17,7 @@ namespace Leosac
         struct SingleTimeFrame
         {
             SingleTimeFrame() : authorized(false),
+                                day(0),
                                 start_hour(0),
                                 start_min(0),
                                 end_hour(0),

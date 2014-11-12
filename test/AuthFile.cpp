@@ -127,6 +127,11 @@ namespace Leosac
             ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, doorB_));
         }
 
+        TEST_F(AuthFileMapperTest, TimeFrameMapping2)
+        {
+
+        }
+
         /**
         * Card ID doesn't exist in the file.
         */

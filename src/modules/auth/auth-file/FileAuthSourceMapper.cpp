@@ -141,14 +141,14 @@ void FileAuthSourceMapper::build_schedule(Leosac::Auth::SimpleAccessProfilePtr p
         std::string end = schedule_info.second.get<std::string>("end");
 
         boost::split(temp, start, boost::is_any_of(":"));
-        if (!temp.size() == 2)
+        if (temp.size() != 2)
             throw ModuleException("AuthFail schedule building error.");
         int start_hour = std::stoi(temp[0]);
         int start_min = std::stoi(temp[1]);
 
         temp.clear();
         boost::split(temp, end, boost::is_any_of(":"));
-        if (!temp.size() == 2)
+        if (temp.size() != 2)
             throw ModuleException("AuthFail schedule building error.");
         int end_hour = std::stoi(temp[0]);
         int end_min = std::stoi(temp[1]);
