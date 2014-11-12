@@ -68,14 +68,27 @@ namespace Leosac
             ASSERT_EQ("Toto", my_card2_->owner()->id());
         }
 
- /*       TEST_F(AuthFileMapperTest, TimeFrameMapping)
+        TEST_F(AuthFileMapperTest, TimeFrameMapping)
         {
             mapper_->mapToUser(my_card_);
             ASSERT_TRUE(my_card_->owner().get());
             IAccessProfilePtr profile = mapper_->buildProfile(my_card_);
 
             ASSERT_TRUE(profile.get());
-        }*/
+
+            // Monday
+            std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            date.tm_hour = 12;
+            date.tm_mday = 3;
+            date.tm_mon = 10;
+            date.tm_year = 114;
+            std::time_t time_temp = std::mktime(&date);
+            std::tm const *time_out = std::localtime(&time_temp);
+            auto my_date = std::chrono::system_clock::from_time_t(time_temp);
+
+            ASSERT_TRUE(profile->isAccessGranted(my_date, "doorA"));
+            ASSERT_FALSE(profile->isAccessGranted(my_date, "doorB"));
+        }
 
         /**
         * Card ID doesn't exist in the file.
@@ -101,8 +114,11 @@ namespace Leosac
         */
         TEST_F(AuthFileMapperTest, InvalidFileContent)
         {
-            std::unique_ptr<IAuthSourceMapper> faulty_mapper(new FileAuthSourceMapper(gl_data_path + "AuthFile-2.xml"));
-            ASSERT_THROW(faulty_mapper->mapToUser(my_card_), ModuleException);
+            ASSERT_THROW(
+                    {
+                        std::unique_ptr<IAuthSourceMapper> faulty_mapper(new FileAuthSourceMapper(gl_data_path + "AuthFile-2.xml"));
+                        faulty_mapper->mapToUser(my_card_);
+                    }, ModuleException);
         }
     }
 }

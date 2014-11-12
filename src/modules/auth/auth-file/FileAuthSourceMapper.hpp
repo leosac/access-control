@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
+#include <map>
 #include <boost/property_tree/ptree.hpp>
+#include <core/auth/SimpleAccessProfile.hpp>
 #include "core/auth/WiegandCard.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
@@ -32,6 +34,26 @@ namespace Leosac
             private:
 
                 /**
+                * Build user/group permissions from configuration.
+                */
+                void build_permission();
+
+                /**
+                * Build the schedule for an access profile.
+                *
+                * It adds some schedule to an existing profile.
+                * @param profile cannot be null
+                * @param schedule_cfg property_tree that contains data from a `<schedule>` block.
+                */
+                void build_schedule(Leosac::Auth::SimpleAccessProfilePtr profile,
+                        const boost::property_tree::ptree &schedule_cfg);
+
+                /**
+                * Maps string day to int day (starting with sunday = 0)
+                */
+                static int week_day_to_int(const std::string &day);
+
+                /**
                 * Store the name of the configuration file.
                 * This is only used in case we need to report an error.
                 */
@@ -41,6 +63,11 @@ namespace Leosac
                 * Property tree that holds the whole authentication tree.
                 */
                 boost::property_tree::ptree authentication_data_;
+
+                /**
+                * Maps user id (or name) to object.
+                */
+                std::map<std::string, Leosac::Auth::IUserPtr> users_;
             };
         }
     }

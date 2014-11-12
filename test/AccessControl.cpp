@@ -27,7 +27,8 @@ namespace Leosac
                 user->profile(profile);
 
                 // add access monday from 10 to 14.
-                profile->addAccessHour(1, 10, 0, 14, 0);
+                auto profile_r = std::dynamic_pointer_cast<SimpleAccessProfile>(profile);
+                profile_r->addAccessHour(1, 10, 0, 14, 0);
 
                 target->name("MY_DOOR");
             }
