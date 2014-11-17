@@ -33,6 +33,7 @@ set(LEOSAC_LIB_SRCS
     tools/unixfilewatcher.cpp
     tools/unixfs.cpp
     tools/version.cpp
+    tools/XmlTreeWriter.cpp
 )
 
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})

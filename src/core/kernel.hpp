@@ -20,6 +20,8 @@
 * -------------------------|---------------------|------------------|--------------
 * RESTART                  |                     |                  | Restart Leosac. This will destroy the kernel object, unload all module, and restart.
 * RESET                    |                     |                  | Reset Leosac configuration to factory default. This will also restart.
+* GET_NETCONFIG            |                     |                  | Send the network config.
+* SET_NETCONFIG            | Serialized ptree    |                  | Write the new network config to file
 */
 class Kernel
 {
@@ -82,12 +84,24 @@ private:
     void factory_reset();
 
     /**
+    * Handle GET_NETCONFIG command.
+    */
+    void get_netconfig();
+
+    /**
+    * Handle SET_NETCONFIG command and update the configuration file directly.
+    * The configuration update will take effect on the next restart.
+    * @param msg ZMQ message that holds config
+    */
+    void set_netconfig(zmqpp::message *msg);
+
+    /**
     * The application ZMQ context.
     */
     zmqpp::context ctx_;
 
     /**
-    * This struct wraps the destruction of the tl_log_socket.
+    * This struct wraps the construction and destruction of the tl_log_socket.
     * We need this, otherwise Kernel destructor will delete the socket
     * before deleting its attributes.
     * By wrapping this destruction in a object, we can make sure this is the
@@ -95,7 +109,7 @@ private:
     */
     struct LogSocketGuard
     {
-        LogSocketGuard() = default;
+        LogSocketGuard(zmqpp::context &ctx);
         ~LogSocketGuard();
     };
 

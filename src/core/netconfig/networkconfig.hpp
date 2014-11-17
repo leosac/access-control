@@ -39,6 +39,7 @@ private:
     std::string _netmask;
     std::string _ip;
     std::string _defaultIp;
+    std::string _gateway;
 };
 
 #endif // NETWORKCONFIG_HPP

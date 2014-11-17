@@ -46,7 +46,7 @@ namespace Leosac
                     SetGateway = 0x06,
                     SetPort = 0x07,
                     Message = 0x08, // NOTE not documented
-                    Reset = 0x09,
+                    Reset = 0x09, // This will actually trigger a restart, not a reset.
                     Ping = 0x0a
                 };
 

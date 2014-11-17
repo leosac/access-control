@@ -6,6 +6,11 @@
 #include <tools/unixshellscript.hpp>
 #include "exception/configexception.hpp"
 #include "Logger.hpp"
+#include "tools/XmlTreeWriter.hpp"
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
 
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;
@@ -21,6 +26,7 @@ thread_local zmqpp::socket *tl_log_socket = nullptr;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
+        log_socket_guard_(ctx_),
         logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1)),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
@@ -30,9 +36,6 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         module_manager_(ctx_),
         network_config_(config.get_child("network"))
 {
-    //init log socket for main thread
-    tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
-    tl_log_socket->connect("inproc://log-sink");
     control_.bind("inproc://leosac-kernel");
     network_config_.reload();
 }
@@ -124,21 +127,32 @@ bool Kernel::module_manager_init()
 
 void Kernel::handle_control_request()
 {
+    zmqpp::message msg;
     std::string req;
 
-    control_.receive(req);
+    control_.receive(msg);
+    msg >> req;
     INFO("Receive request: " << req);
 
     if (req == "RESTART")
     {
         is_running_ = false;
         want_restart_ = true;
+        control_.send("OK");
     }
     if (req == "RESET")
     {
         is_running_ = false;
         want_restart_ = true;
         factory_reset();
+    }
+    if (req == "GET_NETCONFIG")
+    {
+        get_netconfig();
+    }
+    if (req == "SET_NETCONFIG")
+    {
+        set_netconfig(&msg);
     }
 }
 
@@ -174,4 +188,55 @@ Kernel::LogSocketGuard::~LogSocketGuard()
 {
     delete tl_log_socket;
     tl_log_socket = nullptr;
+}
+
+void Kernel::get_netconfig()
+{
+    std::ostringstream oss;
+    boost::archive::binary_oarchive archive(oss);
+    auto network_config = config_.get_child("network");
+
+    zmqpp::message response;
+    boost::property_tree::save(archive, network_config, 1);
+    response << oss.str();
+    control_.send(response);
+}
+
+void Kernel::set_netconfig(zmqpp::message *msg)
+{
+    std::string serialized_config;
+    *msg >> serialized_config;
+    std::istringstream iss(serialized_config);
+    boost::archive::binary_iarchive archive(iss);
+
+    boost::property_tree::ptree network_config;
+    boost::property_tree::load(archive, network_config, 1);
+
+    config_.erase("network");
+    config_.add_child("network", network_config);
+
+    // we need to add the root node to write config;
+    boost::property_tree::ptree to_save;
+
+    to_save.add_child("kernel", config_);
+    // remove path to config file.
+    to_save.get_child("kernel").erase("kernel-cfg");
+    try
+    {
+        Leosac::Tools::propertyTreeToXmlFile(to_save, config_.get_child("kernel-cfg").data());
+    }
+    catch (std::exception &e)
+    {
+        ERROR("Exception: " << e.what());
+        control_.send("KO");
+        return;
+    }
+    control_.send("OK");
+}
+
+Kernel::LogSocketGuard::LogSocketGuard(zmqpp::context &ctx)
+{
+    //init log socket for main thread
+    tl_log_socket = new zmqpp::socket(ctx, zmqpp::socket_type::push);
+    tl_log_socket->connect("inproc://log-sink");
 }
