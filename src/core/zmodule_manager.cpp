@@ -46,8 +46,10 @@ bool zModuleManager::initModules()
                     std::ref(ctx_),
                     actor_fun);
 
+            //std::unique_ptr<zmqpp::actor> new_module(new zmqpp::actor(helper_function));
             zmqpp::actor *new_module = new zmqpp::actor(helper_function);
             module_info.actor_ = new_module;
+            //new_module.release();
 
             INFO("Module {" << module_info.name_ << "} initialized. (level = " <<
                     module_info.config_.get<int>("level", 100));
@@ -115,9 +117,16 @@ void zModuleManager::stopModules()
          itr != modules_.rend();
          ++itr)
     {
-        INFO("Will now stop module " << itr->name_);
-        assert(itr->actor_);
-        itr->actor_->stop(true);
+        // if a module failed to initialize, its actor will be null.
+        if (itr->actor_)
+        {
+            INFO("Will now stop module " << itr->name_);
+            itr->actor_->stop(true);
+        }
+        else
+        {
+            NOTICE("Not stopping module " << itr->name_ << " as it failed to load (or didnt load).");
+        }
     }
 }
 
@@ -149,12 +158,12 @@ bool zModuleManager::start_module_helper(zmqpp::socket *socket,
         zmqpp::context &context,
         std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function)
 {
-    tl_log_socket = new zmqpp::socket(context, zmqpp::socket_type::push);
-    tl_log_socket->connect("inproc://log-sink");
+ //   tl_log_socket = new zmqpp::socket(context, zmqpp::socket_type::push);
+//    tl_log_socket->connect("inproc://log-sink");
 
     bool ret;
     ret = module_function(socket, ptree, context);
-    delete tl_log_socket;
+  //  delete tl_log_socket;
     return ret;
 }
 

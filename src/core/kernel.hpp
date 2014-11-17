@@ -118,13 +118,13 @@ private:
     /**
     * Need to be second, so its deleted just before the context.
     */
-    LogSocketGuard log_socket_guard_;
+    //LogSocketGuard log_socket_guard_;
 
     /**
     * Logger actor. This is spawned before any module
     * are loaded.
     */
-    zmqpp::actor logger_;
+    //zmqpp::actor logger_;
 
     /**
     * Application wide (inproc) message bus.

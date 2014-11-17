@@ -22,8 +22,8 @@ thread_local zmqpp::socket *tl_log_socket = nullptr;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
-        log_socket_guard_(ctx_),
-        logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1, config)),
+//        log_socket_guard_(ctx_),
+//        logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1, config)),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
         config_(config),
@@ -57,7 +57,7 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
     }
     catch (ptree_error &e)
     {
-        std::throw_with_nested(ConfigException("haha", "Invalid main configuration"));
+        std::throw_with_nested(ConfigException(filename, "Invalid main configuration"));
     }
 }
 
