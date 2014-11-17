@@ -6,8 +6,6 @@
 #include "gtest/gtest.h"
 #include "core/MessageBus.hpp"
 
-extern thread_local zmqpp::socket *tl_log_socket;
-
 namespace Leosac
 {
     namespace Test
@@ -21,18 +19,12 @@ namespace Leosac
             template<typename ModuleType>
             bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg)
             {
-                //create log socket for module thread
-                //tl_log_socket = new zmqpp::socket(*ctx, zmqpp::socket_type::push);
-                //tl_log_socket->connect("inproc://log-sink");
-
                 {
                     ModuleType module(*ctx, pipe, cfg);
 
                     pipe->send(zmqpp::signal::ok);
                     module.run();
                 }
-
-                //delete tl_log_socket;
                 return true;
             }
 
@@ -105,22 +97,14 @@ namespace Leosac
                         bus_(ctx_),
                         bus_sub_(ctx_, zmqpp::socket_type::sub),
                         bus_push_(ctx_, zmqpp::socket_type::push),
-                        log_sink_(ctx_, zmqpp::socket_type::pull),
                         module_actor_(nullptr)
                 {
-                    // create the log socket for main thread.
-                 //   log_sink_.bind("inproc://log-sink");
-                    //tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
-                    //tl_log_socket->connect("inproc://log-sink");
-
                     bus_sub_.connect("inproc://zmq-bus-pub");
                     bus_push_.connect("inproc://zmq-bus-pull");
                 }
 
                 virtual ~TestHelper()
                 {
-                    //delete module_actor_;
-                    //delete tl_log_socket;
                 }
 
                 /**
@@ -146,13 +130,10 @@ namespace Leosac
                 */
                 zmqpp::socket bus_sub_;
 
-
                 /**
                 * A PUSH socket to write on the bus.
                 */
                 zmqpp::socket bus_push_;
-
-                zmqpp::socket log_sink_;
 
                 /**
                 * An actor, to run the module code the same way it would be run by the core.
@@ -160,7 +141,6 @@ namespace Leosac
                 */
                 std::unique_ptr<zmqpp::actor> module_actor_;
             };
-
         }
     }
 }

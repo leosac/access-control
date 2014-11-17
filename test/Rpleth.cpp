@@ -57,19 +57,8 @@ namespace Leosac
 
                 zmqpp::socket client(ctx_, zmqpp::socket_type::stream);
                 client.connect("tcp://127.0.0.1:4242");
-                zmqpp::poller poller;
-
-                std::cerr << "hihihihi" << std::endl;
-                poller.add(client);
-
-                if (!poller.poll(1000))
-                {
-                    ERROR("Test client cannot connect");
-                    throw std::runtime_error("abort test, cannot connect to local server");
-                }
                 client.receive(msg);
-                DEBUG("HELLO");
-                std::cerr << "hihihihi" << std::endl;
+
                 assert(msg.parts() == 2);
                 msg >> connection_identity;
                 assert(msg.size(1) == 0);
@@ -113,10 +102,7 @@ namespace Leosac
             cfg.add_child("module_config", module_cfg);
             zmqpp::context_t ctx;
             zmqpp::socket pipe(ctx, zmqpp::socket_type::pair);
-            zmqpp::socket log_socket(ctx, zmqpp::socket_type::push);
 
-//            tl_log_socket = &log_socket;
-//            tl_log_socket->connect("inproc://log-sink");
             {
                 RplethModule module(ctx, &pipe, cfg);
 

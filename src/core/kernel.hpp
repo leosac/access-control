@@ -7,8 +7,6 @@
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
 
-
-
 /**
 * Core of Leosac. Handles module management and loading.
 * The kernel binds a REP socket at "inproc://leosac-kernel".
@@ -69,13 +67,6 @@ private:
     bool module_manager_init();
 
     /**
-    * Run the Logger thread.
-    * @param pipe PAIR socket back to main thread.
-    * @param config copy of the whole configuration tree.
-    */
-    bool run_logger(zmqpp::socket *pipe, boost::property_tree::ptree config);
-
-    /**
     * A request has arrived on the `control_` socket.
     */
     void handle_control_request();
@@ -101,30 +92,6 @@ private:
     * The application ZMQ context.
     */
     zmqpp::context ctx_;
-
-    /**
-    * This struct wraps the construction and destruction of the tl_log_socket.
-    * We need this, otherwise Kernel destructor will delete the socket
-    * before deleting its attributes.
-    * By wrapping this destruction in a object, we can make sure this is the
-    * last thing that will be done by the kernel destructor.
-    */
-    struct LogSocketGuard
-    {
-        LogSocketGuard(zmqpp::context &ctx);
-        ~LogSocketGuard();
-    };
-
-    /**
-    * Need to be second, so its deleted just before the context.
-    */
-    //LogSocketGuard log_socket_guard_;
-
-    /**
-    * Logger actor. This is spawned before any module
-    * are loaded.
-    */
-    //zmqpp::actor logger_;
 
     /**
     * Application wide (inproc) message bus.

@@ -5,7 +5,6 @@
 #include "tools/unixshellscript.hpp"
 #include "exception/configexception.hpp"
 #include "exception/coreexception.hpp"
-#include "Logger.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include <boost/property_tree/ptree_serialization.hpp>
@@ -17,13 +16,8 @@ using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
 using namespace Leosac::Tools;
 
-// move somewhere else??
-thread_local zmqpp::socket *tl_log_socket = nullptr;
-
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
-//        log_socket_guard_(ctx_),
-//        logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1, config)),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
         config_(config),
@@ -172,22 +166,6 @@ void Kernel::factory_reset()
     }
 }
 
-bool Kernel::run_logger(zmqpp::socket *pipe, boost::property_tree::ptree cfg)
-{
-    Leosac::Logger::LoggerSink module(ctx_, pipe, cfg);
-    pipe->send(zmqpp::signal::ok);
-
-    module.run();
-    std::cout << "logger down" << std::endl;
-    return true;
-}
-
-Kernel::LogSocketGuard::~LogSocketGuard()
-{
-    delete tl_log_socket;
-    tl_log_socket = nullptr;
-}
-
 void Kernel::get_netconfig()
 {
     std::ostringstream oss;
@@ -230,11 +208,4 @@ void Kernel::set_netconfig(zmqpp::message *msg)
         return;
     }
     control_.send("OK");
-}
-
-Kernel::LogSocketGuard::LogSocketGuard(zmqpp::context &ctx)
-{
-    //init log socket for main thread
-    tl_log_socket = new zmqpp::socket(ctx, zmqpp::socket_type::push);
-    tl_log_socket->connect("inproc://log-sink");
 }

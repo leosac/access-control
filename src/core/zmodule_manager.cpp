@@ -38,18 +38,10 @@ bool zModuleManager::initModules()
             std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> actor_fun =
                     ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr);
 
-            // std::function that is valid for zmqpp::actor. It store ctx, config and the real module init function.
-            std::function<bool(zmqpp::socket *)> helper_function = std::bind(
-                    &zModuleManager::start_module_helper,
-                    std::placeholders::_1, // actor pipe,
+            zmqpp::actor *new_module = new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
                     module_info.config_,
-                    std::ref(ctx_),
-                    actor_fun);
-
-            //std::unique_ptr<zmqpp::actor> new_module(new zmqpp::actor(helper_function));
-            zmqpp::actor *new_module = new zmqpp::actor(helper_function);
+                    std::ref(ctx_)));
             module_info.actor_ = new_module;
-            //new_module.release();
 
             INFO("Module {" << module_info.name_ << "} initialized. (level = " <<
                     module_info.config_.get<int>("level", 100));
@@ -152,20 +144,6 @@ zModuleManager::zModuleManager(zmqpp::context &ctx) :
         ctx_(ctx)
 {
 
-}
-
-bool zModuleManager::start_module_helper(zmqpp::socket *socket,
-        boost::property_tree::ptree ptree,
-        zmqpp::context &context,
-        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> module_function)
-{
- //   tl_log_socket = new zmqpp::socket(context, zmqpp::socket_type::push);
-//    tl_log_socket->connect("inproc://log-sink");
-
-    bool ret;
-    ret = module_function(socket, ptree, context);
-  //  delete tl_log_socket;
-    return ret;
 }
 
 zModuleManager::ModuleInfo::~ModuleInfo()

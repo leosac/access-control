@@ -5,8 +5,6 @@
 
 using namespace Leosac::Module::SysFsGpio;
 
-extern thread_local zmqpp::socket *tl_log_socket;
-
 namespace Leosac
 {
     namespace Test
@@ -23,8 +21,6 @@ namespace Leosac
             SysFsGpioConfigTest()
             {
                 ctx_ = new zmqpp::context_t();
-//                tl_log_socket = new zmqpp::socket(*ctx_, zmqpp::socket_type::push);
-//                tl_log_socket->connect("inproc://trash");
 
                 build_config_case1();
                 build_config_case2();
@@ -33,7 +29,6 @@ namespace Leosac
 
             ~SysFsGpioConfigTest()
             {
-  //              delete tl_log_socket;
                 delete ctx_;
             }
 

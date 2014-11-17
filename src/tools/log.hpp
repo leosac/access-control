@@ -10,22 +10,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-
 #include "unixfs.hpp"
-#include <zmqpp/zmqpp.hpp>
-
-/**
-* This is declared here so source file including
-* log.gpp will have access to the socket.
-* It is defined in kernel.cpp
-*/
-extern thread_local zmqpp::socket *tl_log_socket;
-//
-
-
-#include <string>
-#include <sstream>
-#include <syslog.h>
 #include "spdlog/spdlog.h"
 
 enum class LogLevel
@@ -85,20 +70,12 @@ struct LogHelper
         throw std::runtime_error("Invalid log level: " + level);
     }
 
-    static void log(const std::string &log_msg, int line, const char *funcName,
-            const char *fileName, LogLevel level)
+    static void log(const std::string &log_msg,
+            int /*line*/,
+            const char */*funcName*/,
+            const char */*fileName*/,
+            LogLevel level)
     {
-        zmqpp::message msg;
-        msg << fileName;
-        msg << funcName;
-        msg << line;
-        msg << static_cast<int>(level);
-        msg << log_msg;
-
-        //assert(tl_log_socket);
-       // tl_log_socket->send(msg);
-
-
         if (!spdlog::get("console"))
         {
             auto console = spdlog::stdout_logger_mt("console");
