@@ -106,6 +106,43 @@ namespace Leosac
                 void rpleth_greenled(const RplethPacket &p);
 
                 /**
+                * Handle Rpleth GetDHCP command
+                */
+                RplethPacket get_dhcp_state();
+
+                /**
+                * Enable or disable DHCP. Rpleth command
+                */
+                RplethPacket set_dhcp_state(const RplethPacket &p);
+
+                /**
+                * Update the IP of this Leosac unit.
+                */
+                RplethPacket set_reader_ip(const RplethPacket &p);
+
+                /**
+                * Update netmask of this Leosac unit.
+                */
+                RplethPacket set_reader_netmask(const RplethPacket &p);
+
+                /**
+                * Update the reader gateway
+                */
+                RplethPacket set_reader_gw(const RplethPacket &p);
+
+                void restart_reader();
+
+                /**
+                * Retrieve the network configuration from the core.
+                */
+                boost::property_tree::ptree get_network_config();
+
+                /**
+                * Push a configuration to the core as the new network config.
+                */
+                bool push_network_config(const boost::property_tree::ptree &tree);
+
+                /**
                 * Flush the cards_read_stream_ list to clients.
                 * This will notify client of all card that we read.
                 */
@@ -146,6 +183,11 @@ namespace Leosac
                 * Subscribe to the message bus and listen for event sent by the wiegand reader we watch
                 */
                 zmqpp::socket bus_sub_;
+
+                /**
+                * REQ socket to core
+                */
+                zmqpp::socket core_;
 
                 /**
                 * Interface to the reader.

@@ -27,7 +27,7 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.41.0 REQUIRED)
+find_package(Boost 1.41.0 REQUIRED serialization)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
 
@@ -63,3 +63,13 @@ add_subdirectory(test)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh
+  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+  DESTINATION scripts
+      )
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh
+  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+  DESTINATION scripts
+      )

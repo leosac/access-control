@@ -1,7 +1,10 @@
 #include "tools/log.hpp"
 #include "hardware/FWiegandReader.hpp"
+#include <boost/property_tree/ptree_serialization.hpp>
 #include "RplethModule.hpp"
 #include "rplethprotocol.hpp"
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 
 using namespace Leosac::Module::Rpleth;
 
@@ -12,9 +15,11 @@ RplethModule::RplethModule(zmqpp::context &ctx,
         ctx_(ctx),
         server_(ctx, zmqpp::socket_type::stream),
         bus_sub_(ctx, zmqpp::socket_type::sub),
+        core_(ctx, zmqpp::socket_type::req),
         reader_(nullptr),
         stream_mode_(false)
 {
+    core_.connect("inproc://leosac-kernel");
     process_config();
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_sub_.subscribe("S_" + reader_->name());
@@ -107,28 +112,47 @@ bool RplethModule::handle_client_msg(const std::string &client_identity, Circula
 
 RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
 {
-    RplethPacket response = packet;
+    try
+    {
+        RplethPacket response = packet;
 
-    DEBUG("received client packet: " << (int) packet.command);
-    response.sender = RplethPacket::Sender::Server;
-    if (response.type == RplethProtocol::Rpleth && response.command == RplethProtocol::Ping)
-    {
-        response.status = RplethProtocol::Success;
+        DEBUG("received client packet: " << (int) packet.command);
+        response.sender = RplethPacket::Sender::Server;
+        if (response.type == RplethProtocol::Rpleth && response.command == RplethProtocol::Ping)
+        {
+            response.status = RplethProtocol::Success;
+        }
+        else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Greenled)
+            rpleth_greenled(packet);
+        else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Beep)
+            rpleth_beep(packet);
+        else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::SendCards)
+            rpleth_send_cards(packet);
+        else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::ReceiveCardsWaited)
+            response = rpleth_receive_cards(response);
+        else if (response.type == RplethProtocol::TypeCode::Rpleth && response.command == RplethProtocol::RplethCommands::DHCPState)
+            response = get_dhcp_state();
+        else if (response.type == RplethProtocol::TypeCode::Rpleth && response.command == RplethProtocol::RplethCommands::SetDHCP)
+            response = set_dhcp_state(response);
+        else if (response.type == RplethProtocol::TypeCode::Rpleth && response.command == RplethProtocol::RplethCommands::SetIP)
+            response = set_reader_ip(response);
+        else if (response.type == RplethProtocol::TypeCode::Rpleth && response.command == RplethProtocol::RplethCommands::SetSubnet)
+            response = set_reader_netmask(response);
+        else if (response.type == RplethProtocol::TypeCode::Rpleth && response.command == RplethProtocol::RplethCommands::SetGateway)
+            response = set_reader_gw(response);
+        else if (response.type == RplethProtocol::TypeCode::Rpleth && response.command == RplethProtocol::RplethCommands::Reset)
+            restart_reader();
+        else
+        {
+            DEBUG("Unhandled packet.");
+            response.status = RplethProtocol::Success; // Default response
+        }
+        return response;
     }
-    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Greenled)
-        rpleth_greenled(packet);
-    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::Beep)
-        rpleth_beep(packet);
-    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::SendCards)
-        rpleth_send_cards(packet);
-    else if (response.type == RplethProtocol::TypeCode::HID && response.command == RplethProtocol::HIDCommands::ReceiveCardsWaited)
-        response = rpleth_receive_cards(response);
-    else
+    catch (std::exception &e)
     {
-        DEBUG("Unhandled packet.");
-        response.status = RplethProtocol::Success; // Default response
+        ERROR("Exception while handling rpleth packet: " << e.what());
     }
-    return (response);
 }
 
 void RplethModule::handle_wiegand_event()
@@ -337,4 +361,194 @@ bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info,
     }
     *dest = std::move(data);
     return true;
+}
+
+RplethPacket RplethModule::get_dhcp_state()
+{
+    auto network_cfg = get_network_config();
+    RplethPacket response(RplethPacket::Sender::Server);
+
+    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.command = RplethProtocol::RplethCommands::DHCPState;
+    try
+    {
+        if (network_cfg.get<bool>("enabled"))
+        {
+            response.status = RplethProtocol::Success;
+            response.data = network_cfg.get<bool>("dhcp") ? std::vector<uint8_t>({1}) : std::vector<uint8_t>({0});
+            response.dataLen = 1;
+        }
+        else // network not handled by leosac. return failure.
+        {
+            response.status = RplethProtocol::Failed;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        ERROR("Exception while getting DHCP state: " << e.what());
+    }
+    return response;
+}
+
+RplethPacket RplethModule::set_dhcp_state(const RplethPacket &p)
+{
+    auto network_cfg = get_network_config();
+    RplethPacket response(RplethPacket::Sender::Server);
+
+    response.status = RplethProtocol::Failed;
+    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.command = RplethProtocol::RplethCommands::SetDHCP;
+
+    INFO("COOL");
+    if (p.dataLen < 1)
+        ERROR("Invalid Rpleth Packet");
+
+    else if (network_cfg.get<bool>("enabled"))
+        {
+            INFO("SUPER__COOL");
+            network_cfg.erase("dhcp");
+            network_cfg.put("dhcp", p.data[0] ? true : false);
+            if (push_network_config(network_cfg))
+                response.status = RplethProtocol::Success;
+            else
+                WARN("Failed to update network config.");
+        }
+    else
+        NOTICE("Network not managed by Leosac, doing nothing.");
+    return response;
+}
+
+RplethPacket RplethModule::set_reader_ip(const RplethPacket &p)
+{
+    auto network_cfg = get_network_config();
+    RplethPacket response(RplethPacket::Sender::Server);
+
+    response.status = RplethProtocol::Failed;
+    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.command = RplethProtocol::RplethCommands::SetIP;
+
+    if (p.dataLen < 4)
+        ERROR("Invalid Rpleth Packet");
+    else if (network_cfg.get<bool>("enabled"))
+        {
+            std::ostringstream oss;
+            for (unsigned char i = 0; i < 4; ++i)
+            {
+                oss << std::to_string(p.data[i]);
+                if (i != 3)
+                    oss << ".";
+            }
+            INFO("new ip  = {" << oss.str() << "}");
+            network_cfg.erase("default_ip");
+            network_cfg.put("default_ip", oss.str());
+            if (push_network_config(network_cfg))
+                response.status = RplethProtocol::Success;
+            else
+                WARN("Failed to update network config.");
+        }
+    else
+        NOTICE("Network not managed by Leosac, doing nothing.");
+    return response;
+}
+
+RplethPacket RplethModule::set_reader_netmask(const RplethPacket &p)
+{
+    auto network_cfg = get_network_config();
+    RplethPacket response(RplethPacket::Sender::Server);
+
+    response.status = RplethProtocol::Failed;
+    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.command = RplethProtocol::RplethCommands::SetSubnet;
+
+    if (p.dataLen < 4)
+        ERROR("Invalid Rpleth Packet");
+    else if (network_cfg.get<bool>("enabled"))
+        {
+            std::ostringstream oss;
+            for (unsigned char i = 0; i < 4; ++i)
+            {
+                oss << std::to_string(p.data[i]);
+                if (i != 3)
+                    oss << ".";
+            }
+            network_cfg.erase("netmask");
+            network_cfg.put("netmask", oss.str());
+            if (push_network_config(network_cfg))
+                response.status = RplethProtocol::Success;
+            else
+                WARN("Failed to update network config.");
+        }
+    else
+        NOTICE("Network not managed by Leosac, doing nothing.");
+    return response;
+}
+
+RplethPacket RplethModule::set_reader_gw(const RplethPacket &p)
+{
+    auto network_cfg = get_network_config();
+    RplethPacket response(RplethPacket::Sender::Server);
+
+    response.status = RplethProtocol::Failed;
+    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.command = RplethProtocol::RplethCommands::SetGateway;
+
+    if (p.dataLen < 4)
+        ERROR("Invalid Rpleth Packet");
+    else if (network_cfg.get<bool>("enabled"))
+        {
+            std::ostringstream oss;
+            for (unsigned char i = 0; i < 4; ++i)
+            {
+                oss << std::to_string(p.data[i]);
+                if (i != 3)
+                    oss << ".";
+            }
+            network_cfg.erase("gateway");
+            network_cfg.put("gateway", oss.str());
+            if (push_network_config(network_cfg))
+                response.status = RplethProtocol::Success;
+            else
+                WARN("Failed to update network config.");
+        }
+    else
+        NOTICE("Network not managed by Leosac, doing nothing.");
+    return response;
+}
+
+bool RplethModule::push_network_config(boost::property_tree::ptree const &tree)
+{
+    std::ostringstream oss;
+    boost::archive::binary_oarchive archive(oss);
+    boost::property_tree::save(archive, tree, 1);
+    core_.send(zmqpp::message() << "SET_NETCONFIG" << oss.str());
+
+    std::string ret;
+    core_.receive(ret);
+    return ret == "OK" ? true : false;
+}
+
+boost::property_tree::ptree RplethModule::get_network_config()
+{
+    boost::property_tree::ptree network_config;
+    std::string data;
+
+    core_.send("GET_NETCONFIG");
+
+    zmqpp::message response;
+    core_.receive(response);
+    assert(response.parts() == 1);
+
+    response >> data;
+    std::istringstream iss(data);
+    boost::archive::binary_iarchive archive(iss);
+    boost::property_tree::load(archive, network_config, 1);
+
+    return network_config;
+}
+
+void RplethModule::restart_reader()
+{
+    std::string ret;
+    core_.send("RESTART");
+    core_.receive(ret);
 }

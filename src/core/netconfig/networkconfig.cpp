@@ -29,12 +29,14 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
         _netmask = cfg.get<std::string>("netmask");
         _defaultIp = cfg.get<std::string>("default_ip");
         _ip = cfg.get<std::string>("ip", _defaultIp);
+        _gateway = cfg.get<std::string>("gateway");
 
         INFO("Network settings:" <<
                 std::endl << '\t' << "enabled=" << _enabled <<
                 std::endl << '\t' << "dhcp=" << _dhcpEnabled <<
                 std::endl << '\t' << "ip=" << _ip <<
                 std::endl << '\t' << "netmask=" << _netmask <<
+                std::endl << '\t' << "gateway=" << _gateway <<
                 std::endl << '\t' << "default=" << _defaultIp);
     }
     else
@@ -49,7 +51,7 @@ void NetworkConfig::reload()
     if (!_enabled)
         return;
 
-    builder.run(UnixShellScript::toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, "1&>/dev/null"));
+    builder.run(UnixShellScript::toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, _gateway, "1&>/dev/null"));
     if (!builder.getOutput().empty())
         throw (ScriptException(builder.getOutput()));
 
