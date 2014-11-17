@@ -22,6 +22,7 @@ thread_local zmqpp::socket *tl_log_socket = nullptr;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
+        log_socket_guard_(ctx_),
         logger_(std::bind(&Kernel::run_logger, this, std::placeholders::_1, config)),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
@@ -31,10 +32,6 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         module_manager_(ctx_),
         network_config_(nullptr)
 {
-    //init log socket for main thread
-    tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
-    tl_log_socket->connect("inproc://log-sink");
-
     if (config.get_child_optional("network"))
         network_config_ = std::move(std::unique_ptr<NetworkConfig>(new NetworkConfig(config.get_child("network"))));
     else
