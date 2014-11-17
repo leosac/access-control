@@ -18,7 +18,7 @@ boost::property_tree::ptree Leosac::Tools::propertyTreeFromXmlFile(const std::st
     std::ifstream cfg_stream(filename);
 
     if (!cfg_stream.good())
-        throw (ConfigException(filename, "Could not open file"));
+        throw (ConfigException(filename, "Could not open file {" + path + "}"));
     try
     {
         read_xml(cfg_stream, cfg, trim_whitespace | no_comments);
@@ -26,7 +26,7 @@ boost::property_tree::ptree Leosac::Tools::propertyTreeFromXmlFile(const std::st
     }
     catch (ptree_error &e)
     {
-        throw (ConfigException(filename, std::string("Boost exception: ") + e.what()));
+        std::throw_with_nested(ConfigException(filename, ""));
     }
 }
 
@@ -37,7 +37,7 @@ void Leosac::Tools::propertyTreeToXmlFile(const boost::property_tree::ptree &tre
     std::ofstream cfg_stream(filename);
 
     if (!cfg_stream.good())
-        throw (ConfigException(filename, "Could not open file"));
+        throw (ConfigException(filename, "Could not open file {" + path + "}"));
     try
     {
         boost::property_tree::xml_writer_settings<char> settings('\t', 1);
@@ -45,6 +45,6 @@ void Leosac::Tools::propertyTreeToXmlFile(const boost::property_tree::ptree &tre
     }
     catch (ptree_error &e)
     {
-        throw (ConfigException(filename, std::string("Boost exception: ") + e.what()));
+        std::throw_with_nested(ConfigException(filename, ""));
     }
 }

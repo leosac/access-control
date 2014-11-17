@@ -11,6 +11,7 @@
 #include <core/kernel.hpp>
 #include <exception/configexception.hpp>
 #include <exception/ExceptionsTools.hpp>
+#include <exception/coreexception.hpp>
 
 #include "tools/log.hpp"
 #include "tools/leosac.hpp"
@@ -18,6 +19,8 @@
 #include "tools/unixfs.hpp"
 #include "tools/unixshellscript.hpp"
 #include "exception/leosacexception.hpp"
+
+void print_usage();
 
 using namespace Leosac::Tools;
 
@@ -53,6 +56,12 @@ int main(int argc, char** argv)
                 Kernel kernel(Kernel::make_config(options));
                 relaunch = kernel.run();
             }
+            catch (const CoreException &e)
+            {
+                Leosac::print_exception(e);
+                print_usage();
+                return 1;
+            }
             catch (const std::exception &e)
             {
                 relaunch = false;
@@ -70,4 +79,9 @@ int main(int argc, char** argv)
         std::cerr << e.what() << std::endl;
     }
     return (0);
+}
+
+void print_usage()
+{
+    std::cout << "./Leosac -k path/to/config [-v]" << std::endl;
 }

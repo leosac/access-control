@@ -4,6 +4,7 @@
 #include "tools/signalhandler.hpp"
 #include "tools/unixshellscript.hpp"
 #include "exception/configexception.hpp"
+#include "exception/coreexception.hpp"
 #include "Logger.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/XmlPropertyTree.hpp"
@@ -44,6 +45,9 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
     boost::property_tree::ptree cfg;
     std::string filename = opt.getParam("kernel-cfg");
 
+    if (filename.empty())
+        throw CoreException("Invalid command line parameter. No kernel configuration file specified.");
+
     try
     {
         cfg = propertyTreeFromXmlFile(filename);
@@ -53,7 +57,7 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
     }
     catch (ptree_error &e)
     {
-        throw (ConfigException(filename, std::string("Boost exception: ") + e.what()));
+        std::throw_with_nested(ConfigException("haha", "Invalid main configuration"));
     }
 }
 

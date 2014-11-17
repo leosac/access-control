@@ -14,7 +14,8 @@
 class ConfigException : public LEOSACException
 {
 public:
-    ConfigException(const std::string& file, const std::string& message) : LEOSACException("Config::" + file + ": "  + message) {}
+    ConfigException(const std::string& file, const std::string& message) :
+            LEOSACException("Configuration error in file {" + file + "}: "  + message) {}
     virtual ~ConfigException() {}
 };
 
