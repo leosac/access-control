@@ -20,10 +20,32 @@
     <date>
         <map>
             <user>MY_USER</user>
-            <monday>
-                <start>00:00</start>
-                <end>23:59</end>
-            </monday>
+
+            <schedule>
+                <door>porteA</door>
+                <monday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </monday>
+            </schedule>
+
+            <schedule>
+                <door>porteB</door>
+                <monday>
+                    <start>2:00</start>
+                    <end>23:59</end>
+                </monday>
+            </schedule>
+
+            <default_schedule>
+
+            </default_schedule>
+        </map>
+
+        <map>
+            <user>MY_USER</user>
+            <door>porteB</door>
+            <schedule />
         </map>
     </date>
 </root>
