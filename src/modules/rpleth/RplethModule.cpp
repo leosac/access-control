@@ -29,7 +29,6 @@ RplethModule::RplethModule(zmqpp::context &ctx,
 
 RplethModule::~RplethModule()
 {
-    delete reader_;
 }
 
 void RplethModule::process_config()
@@ -42,7 +41,7 @@ void RplethModule::process_config()
 
     INFO("Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
             << "Stream mode = " << stream_mode_);
-    reader_ = new Hardware::FWiegandReader(ctx_, reader_name);
+    reader_ = std::unique_ptr<Hardware::FWiegandReader>(new Hardware::FWiegandReader(ctx_, reader_name));
     assert(reader_);
     server_.bind("tcp://*:" + std::to_string(port));
 }
@@ -112,10 +111,9 @@ bool RplethModule::handle_client_msg(const std::string &client_identity, Circula
 
 RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
 {
+    RplethPacket response = packet;
     try
     {
-        RplethPacket response = packet;
-
         DEBUG("received client packet: " << (int) packet.command);
         response.sender = RplethPacket::Sender::Server;
         if (response.type == RplethProtocol::Rpleth && response.command == RplethProtocol::Ping)
@@ -153,6 +151,8 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
     {
         ERROR("Exception while handling rpleth packet: " << e.what());
     }
+    response.status = RplethProtocol::Failed;
+    return response;
 }
 
 void RplethModule::handle_wiegand_event()

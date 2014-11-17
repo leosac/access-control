@@ -128,6 +128,7 @@ void zModuleManager::stopModules()
             NOTICE("Not stopping module " << itr->name_ << " as it failed to load (or didnt load).");
         }
     }
+    INFO("DONE");
 }
 
 zModuleManager::~zModuleManager()

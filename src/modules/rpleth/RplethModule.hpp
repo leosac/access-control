@@ -192,7 +192,7 @@ namespace Leosac
                 /**
                 * Interface to the reader.
                 */
-                Hardware::FWiegandReader *reader_;
+                std::unique_ptr<Hardware::FWiegandReader> reader_;
 
                 /**
                 * Client that are "failed".
