@@ -22,8 +22,8 @@ namespace Leosac
             bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg)
             {
                 //create log socket for module thread
-                tl_log_socket = new zmqpp::socket(*ctx, zmqpp::socket_type::push);
-                tl_log_socket->connect("inproc://log-sink");
+                //tl_log_socket = new zmqpp::socket(*ctx, zmqpp::socket_type::push);
+                //tl_log_socket->connect("inproc://log-sink");
 
                 {
                     ModuleType module(*ctx, pipe, cfg);
@@ -32,7 +32,7 @@ namespace Leosac
                     module.run();
                 }
 
-                delete tl_log_socket;
+                //delete tl_log_socket;
                 return true;
             }
 
@@ -109,9 +109,9 @@ namespace Leosac
                         module_actor_(nullptr)
                 {
                     // create the log socket for main thread.
-                    log_sink_.bind("inproc://log-sink");
-                    tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
-                    tl_log_socket->connect("inproc://log-sink");
+                 //   log_sink_.bind("inproc://log-sink");
+                    //tl_log_socket = new zmqpp::socket(ctx_, zmqpp::socket_type::push);
+                    //tl_log_socket->connect("inproc://log-sink");
 
                     bus_sub_.connect("inproc://zmq-bus-pub");
                     bus_push_.connect("inproc://zmq-bus-pull");
@@ -119,8 +119,8 @@ namespace Leosac
 
                 virtual ~TestHelper()
                 {
-                    delete module_actor_;
-                    delete tl_log_socket;
+                    //delete module_actor_;
+                    //delete tl_log_socket;
                 }
 
                 /**
@@ -128,7 +128,7 @@ namespace Leosac
                 */
                 virtual void SetUp() override final
                 {
-                    module_actor_ = new zmqpp::actor(std::bind(&TestHelper::run_module, this, std::placeholders::_1));
+                    module_actor_ = std::unique_ptr<zmqpp::actor>(new zmqpp::actor(std::bind(&TestHelper::run_module, this, std::placeholders::_1)));
                 }
 
                 /**
@@ -158,7 +158,7 @@ namespace Leosac
                 * An actor, to run the module code the same way it would be run by the core.
                 * Does NOT subscribe to anything.
                 */
-                zmqpp::actor *module_actor_;
+                std::unique_ptr<zmqpp::actor> module_actor_;
             };
 
         }
