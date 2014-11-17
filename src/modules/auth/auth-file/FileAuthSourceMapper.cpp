@@ -1,7 +1,7 @@
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "FileAuthSourceMapper.hpp"
 #include "core/auth/WiegandCard.hpp"
-#include "tools/XmlTreeBuilder.hpp"
+#include "tools/XmlPropertyTree.hpp"
 #include "tools/log.hpp"
 #include <iostream>
 #include <exception/moduleexception.hpp>

@@ -3,11 +3,10 @@
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixshellscript.hpp"
-#include "tools/XmlTreeBuilder.hpp"
 #include "exception/configexception.hpp"
 #include "Logger.hpp"
 #include "exception/ExceptionsTools.hpp"
-#include "tools/XmlTreeWriter.hpp"
+#include "tools/XmlPropertyTree.hpp"
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
