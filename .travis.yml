@@ -15,7 +15,7 @@ before_install:
     - sudo apt-get update -qq
 install:
     - sudo apt-get install -qq g++ clang cmake
-    - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
+    - sudo apt-get install -qq libtclap-dev libboost-all-dev valgrind
     - sudo apt-get install -qq libgtest-dev
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
