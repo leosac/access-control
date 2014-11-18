@@ -167,5 +167,5 @@ private:
     /**
     * Hardcoded path to factory default settings.
     */
-    static constexpr const char *rel_path_to_factory_conf_ = "./cfg/factory";
+    static constexpr const char *rel_path_to_factory_conf_ = "/root/leosac/share/leosac/cfg/factory/";
 };
