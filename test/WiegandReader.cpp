@@ -2,7 +2,7 @@
 #include <modules/wiegand/wiegand.hpp>
 #include "helper/TestHelper.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Test::Helper;
 
 namespace Leosac

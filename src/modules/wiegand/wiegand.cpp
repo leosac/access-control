@@ -7,7 +7,7 @@
 #include "wiegand.hpp"
 #include "zmqpp/actor.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::Wiegand;
 
 /**
 * Entry point of wiegand module.

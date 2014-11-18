@@ -4,7 +4,7 @@ Leosac Documentation Mainpage {#mainpage}
 Introduction {#main_intro}
 =========================
 
-See Leosac::Module.
+See [modules](@ref Leosac::Module) for an overview of available modules.
 
 Interesting stuff:
    + See FGPIO detailed description for GPIO command.

@@ -6,7 +6,7 @@ TestAndReset Module Documentation {#mod_testandreset_main}
 Introduction {#mod_testandreset_intro}
 ======================================
 
-The TestAndReset allows end user to have visual and/or audio feedback when
+The TestAndReset module allows end user to have visual and/or audio feedback when
 presenting a test card.
 It also allow the user to reset Leosac configuration to its factory default.
 

@@ -2,7 +2,7 @@
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
 
-using namespace Leosac::Module;
+using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Hardware;
 
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
