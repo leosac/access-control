@@ -28,9 +28,11 @@ private:
     void handle_bus_msg();
 
     /**
-    * Do some stuff to let the user known the test card was read.
+    * Do some stuff to let the user known something happened.
+    * This may be trigger on module initialization, and will be called when
+    * test card is read.
     */
-    void test_sequence();
+    void run_test_sequence();
 
     /**
     * REQ socket to kernel

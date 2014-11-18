@@ -22,6 +22,7 @@ TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
 
     process_config();
     reactor_.add(sub_, std::bind(&TestAndResetModule::handle_bus_msg, this));
+    run_test_sequence();
 }
 
 void TestAndResetModule::process_config()
@@ -70,13 +71,13 @@ void TestAndResetModule::handle_bus_msg()
     }
     if (device_test_card_.count(src) && device_test_card_[src] == card)
     {
-        test_sequence();
+        INFO("Test card read.");
+        run_test_sequence();
     }
 }
 
-void TestAndResetModule::test_sequence()
+void TestAndResetModule::run_test_sequence()
 {
-    INFO("Test card read.");
     if (test_buzzer_)
     {
         test_buzzer_->blink(4000, 500);
@@ -87,7 +88,6 @@ void TestAndResetModule::test_sequence()
     }
     if (!test_led_ && !test_buzzer_)
     {
-        INFO("Test card read, but doing nothing");
+        NOTICE("Test sequence doing nothing...");
     }
-
 }
