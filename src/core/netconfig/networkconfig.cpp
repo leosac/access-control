@@ -41,17 +41,19 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
 
 void NetworkConfig::reload()
 {
-    UnixShellScript builder(UnixFs::getCWD() + '/' + "build_ipconfig.sh");
-    UnixShellScript apply(UnixFs::getCWD() + '/' + "load_ipconfig.sh");
+    //UnixShellScript builder(UnixFs::getCWD() + '/' + "build_ipconfig.sh");
+    //UnixShellScript apply(UnixFs::getCWD() + '/' + "load_ipconfig.sh");
+    UnixShellScript builder("/root/build_ipconfig.sh");
+    UnixShellScript apply("/root/load_ipconfig.sh");
 
     if (!_enabled)
         return;
 
-    builder.run(UnixShellScript::toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, _gateway, "1&>/dev/null"));
+    builder.run(UnixShellScript::toCmdLine(_dhcpEnabled, NetCfgFile, _interface, _ip, _netmask, _gateway, "1&>/dev/null", "2>/dev/null"));
     if (!builder.getOutput().empty())
         throw (ScriptException(builder.getOutput()));
 
-    apply.run(UnixShellScript::toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
+    apply.run(UnixShellScript::toCmdLine(NetCfgFile, _interface, "1&>/dev/null", "2>/dev/null"));
     if (!apply.getOutput().empty())
         INFO("ScriptOutput:\n" << apply.getOutput() << "\n");
     INFO("JUST LOAD IFCONFIG CONFIGURATION");
