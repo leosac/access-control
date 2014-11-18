@@ -346,10 +346,10 @@ bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info,
         card_value <<= 8;
         card_value |= (byte & 0xFF);
 
-        // drop the colon delimeter
+        // drop the colon delimiter or fail.
         if (!iss.eof())
         {
-            char trash;
+            char trash = 0;
             iss >> trash;
             if (trash != ':')
                 return false;
