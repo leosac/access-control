@@ -7,3 +7,6 @@
 #CMake related
 build
 install
+
+#IDE workspace stuff
+.idea/workspace.xml

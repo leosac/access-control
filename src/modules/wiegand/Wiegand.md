@@ -10,7 +10,7 @@ This module provides support for Wiegand devices. Simply put, it listens to GPIO
 gather them, and generate Wiegand events. It supports multiple readers.
 
 As this is an module that provide an authentication source (by reading card ids), it shall
-conforms to Auth Source Message Passing specc.
+conforms to Auth Source Message Passing specc (todo, see #47).
 
 Message passing protocol:
  1. Upon reception of what looks like a full wiegand frame, a message MUST be published to the application bus.
