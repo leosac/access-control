@@ -3,8 +3,9 @@
 
 /**
 * Implements a message bus (running in its own thread) that use 2 sockets.
-* PULL socket to receive message from client.
-* PUB socket to publish everything it received.
+*
+* PULL socket to receive message from client (available at `inproc://zmq-bus-pull`)
+* PUB socket to publish everything it received (available at `inproc://zmq-bus-pub`)
 */
 class MessageBus
     {

@@ -1,25 +1,19 @@
 Wiegand Module Documentation {#mod_wiegand_main}
-==========================================================
+================================================
 
 [TOC]
 
 Introduction {#mod_wiegand_intro}
-======================================
+=================================
 
 This module provides support for Wiegand devices. Simply put, it listens to GPIO event,
 gather them, and generate Wiegand events. It supports multiple readers.
 
 As this is an module that provide an authentication source (by reading card ids), it shall
-conforms to Auth Source Message Passing specc (todo, see #47).
-
-Message passing protocol:
- 1. Upon reception of what looks like a full wiegand frame, a message MUST be published to the application bus.
- 2. The message must be published on the "S_{READER_NAME}" topic.
- 3. This message SHALL contain the card-id that was read, in hexadecimal format, for example: "40:a0:83:80"
- 4. The second frame SHALL contain the number of bit read.
+conforms to [those specifications](@ref auth_specc) regarding message passing.
 
 Configuration Options {#mod_wiegand_user_config}
-=====================================================
+================================================
 
 Options    | Options  | Options    | Description                                            | Mandatory
 -----------|----------|------------|--------------------------------------------------------|-----------
@@ -32,7 +26,7 @@ readers    |          |            | Lists of all configured readers            
 ---->      | ---->    | buzzer     | name of the buzzer device attached to the reader       | NO
 
 Example {#mod_wiegand_example}
------------------------------------
+------------------------------
 
 This is a example of Rpleth possible configuration for Rpleth module into Leosac:
 
