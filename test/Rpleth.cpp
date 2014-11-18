@@ -117,7 +117,7 @@ namespace Leosac
                 ASSERT_EQ(card_binary, out);
                 */
 
-                card_binary = {0x00, 0x00, 0x00, 0x00,};
+                card_binary = {0x00, 0x00, 0x00, 0x00};
                 ASSERT_TRUE(module.card_convert_from_text(std::make_pair("00:00:00:00", 32), &out));
                 ASSERT_EQ(card_binary, out);
 
