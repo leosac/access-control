@@ -25,6 +25,13 @@ namespace Leosac
 
             private:
                 void process_config();
+                
+                /**
+                * Do some stuff to let the user known something happened.
+                * This may be trigger on module initialization, and will be called when
+                * test card is read.
+                */
+                void run_test_sequence();
 
                 void handle_bus_msg();
 
