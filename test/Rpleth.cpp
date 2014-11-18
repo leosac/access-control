@@ -92,41 +92,23 @@ namespace Leosac
 
         TEST(Rpleth, TestConvertCard)
         {
-            std::cout << "test 1 _ start" << std::endl;
-            // we just need some conf so the module load.
-            boost::property_tree::ptree cfg, module_cfg;
+            std::vector<uint8_t> out;
+            std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
 
-            module_cfg.add("port", "4242");
-            module_cfg.add("reader", "WIEGAND1");
-            module_cfg.add("stream_mode", "true");
-            cfg.add_child("module_config", module_cfg);
-            zmqpp::context_t ctx;
-            zmqpp::socket pipe(ctx, zmqpp::socket_type::pair);
+            ASSERT_TRUE(RplethModule::card_convert_from_text(std::make_pair("ff:ff:ff:ff", 32), &out));
+            ASSERT_EQ(card_binary, out);
 
-            {
-                RplethModule module(ctx, &pipe, cfg);
+            card_binary = {0x00, 0x00, 0x00, 0x00};
+            ASSERT_TRUE(RplethModule::card_convert_from_text(std::make_pair("00:00:00:00", 32), &out));
+            ASSERT_EQ(card_binary, out);
 
-                std::vector<uint8_t> out;
-                std::cout << "test 1" << std::endl;
-                std::vector<uint8_t> card_binary = {0xff, 0xff, 0xff, 0xff};
-                ASSERT_TRUE(module.card_convert_from_text(std::make_pair("ff:ff:ff:ff", 32), &out));
-                ASSERT_EQ(card_binary, out);
+            card_binary = {0x02, 0x02, 0x05, 0x85};
+            ASSERT_TRUE(RplethModule::card_convert_from_text(std::make_pair("80:81:61:40", 26), &out));
+            ASSERT_EQ(card_binary, out);
 
-                /*card_binary = {0x32, 0x12, 0x14, 0xae, 0xbc};
-                ASSERT_TRUE(module.card_convert_from_text(std::make_pair("32:12:14:ae:bc", 40), &out));
-                ASSERT_EQ(card_binary, out);
-                */
-
-                card_binary = {0x00, 0x00, 0x00, 0x00};
-                ASSERT_TRUE(module.card_convert_from_text(std::make_pair("00:00:00:00", 32), &out));
-                ASSERT_EQ(card_binary, out);
-
-                card_binary = {0x02, 0x02, 0x05, 0x85};
-                ASSERT_TRUE(module.card_convert_from_text(std::make_pair("80:81:61:40", 26), &out));
-                ASSERT_EQ(card_binary, out);
-
-                ASSERT_FALSE(module.card_convert_from_text(std::make_pair("0x:adfw:23", 32), &out));
-            }
+            ASSERT_FALSE(RplethModule::card_convert_from_text(std::make_pair("0x:adfw:23", 32), &out));
+            ASSERT_FALSE(RplethModule::card_convert_from_text(std::make_pair("fff:aa:bb:d", 32), &out));
+            ASSERT_FALSE(RplethModule::card_convert_from_text(std::make_pair("d:bb:aa:fff", 32), &out));
         }
 
         /**

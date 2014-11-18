@@ -41,7 +41,7 @@ namespace Leosac
                 * @param dest destination vector for binary version (cannot be null)
                 * @returns true if conversion went well. false otherwise
                 */
-                bool card_convert_from_text(std::pair<std::string, int> card_info, std::vector<uint8_t> *dest);
+                static bool card_convert_from_text(std::pair<std::string, int> card_info, std::vector<uint8_t> *dest);
 
             private:
                 void process_config();

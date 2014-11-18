@@ -340,7 +340,8 @@ bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info,
     {
         unsigned int byte = 0;
         iss >> std::hex >> byte;
-        assert(byte <= 255);
+        if (byte > 255)
+            return false;
 
         card_value <<= 8;
         card_value |= (byte & 0xFF);
