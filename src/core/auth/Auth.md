@@ -106,10 +106,10 @@ Workflow for an **authentication source** module:
  2. The message shall be multiparts.
     1. Its first frame must be the auth source's name prefixed by "S_".
     2. The second frame shall be the type of data. See [this](@ref auth_data_type).    
-    3. Optional (but likely presents) frames that contains differents data based on the [auth data type](@ref auth_data_type)
+    3. Optional (but likely presents) frames that contains different data based on the [auth data type](@ref auth_data_type)
 
 
-As an example, consider a message from a wiegand device, named `MY_WIEGAND_1`:
+As an example, consider a message from the [wiegand module](@ref mod_wiegand_main), named `MY_WIEGAND_1`:
  1. "S_MY_WIEGAND_1"
  2. "SIMPLE_WIEGAND"
  3. "12:af:cd:21"

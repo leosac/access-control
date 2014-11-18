@@ -142,7 +142,7 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
             restart_reader();
         else
         {
-            DEBUG("Unhandled packet.");
+            WARN("Unhandled packet.");
             response.status = RplethProtocol::Success; // Default response
         }
         return response;

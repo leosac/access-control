@@ -48,3 +48,8 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
             </module_config>
         </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+Notes {#mod_wiegand_notes}
+==========================
+
+Technical implementations details can be found [here](@ref Leosac::Module::Wiegand).

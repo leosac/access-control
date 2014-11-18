@@ -44,4 +44,4 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
 Notes {#mod_rpleth_notes}
 =========================
 
-Response to packet controlling the buzzer and the greenled for a Wiegand reader is disabled.
+Technical details of implementations is [here](@ref Leosac::Module::Rpleth).
