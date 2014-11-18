@@ -60,6 +60,7 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
     counter_ = o.counter_;
     green_led_ = o.green_led_;
     buzzer_ = o.buzzer_;
+    reverse_mode_ = o.reverse_mode_;
 
     o.green_led_ = nullptr;
     o.buzzer_ = nullptr;
