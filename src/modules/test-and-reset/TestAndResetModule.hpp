@@ -19,7 +19,12 @@ namespace Leosac
             class TestAndResetModule : public BaseModule
             {
             public:
-                TestAndResetModule(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg);
+                explicit TestAndResetModule(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg);
+
+                TestAndResetModule(const TestAndResetModule &) = delete;
+                TestAndResetModule(TestAndResetModule &&) = delete;
+                TestAndResetModule &operator=(const TestAndResetModule &) = delete;
+                TestAndResetModule &operator=(TestAndResetModule &&) = delete;
 
                 virtual ~TestAndResetModule();
 
@@ -63,12 +68,17 @@ namespace Leosac
                 /**
                 * Led device for test card
                 */
-                Hardware::FLED *test_led_;
+                std::unique_ptr<Hardware::FLED> test_led_;
 
                 /**
                 * Buzzer device for test card
                 */
-                Hardware::FLED *test_buzzer_;
+                std::unique_ptr<Hardware::FLED> test_buzzer_;
+
+                /**
+                * Play the sequence on module startup.
+                */
+                bool run_on_start_;
             };
 
         }

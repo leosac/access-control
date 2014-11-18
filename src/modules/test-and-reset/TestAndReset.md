@@ -14,15 +14,16 @@ Configuration Options {#mod_testandreset_user_config}
 =====================================================
 
 This is a module that watch input device and check for preconfigured reset/restart card.
-Options      | Options   | Options    | Description                                            | Mandatory
--------------|-----------|------------|--------------------------------------------------------|-----------
-test_buzzer  |           |            | Device (beeper )to control when test card is read      | NO
-test_led     |           |            | Device (led) to control when test card is read         | NO
-devices      |           |            | List of devices to watch for                           | YES
----->        | device    |            | Watch for event sent by this device                    | YES
----->        | ---->     | name       | Name of the device                                     | YES
----->        | --->      | reset_card | Content / number of the card                           | NO
----->        | --->      | test_card  | Id of the card that trigger test led/beep stuff        | NO
+Options       | Options   | Options    | Description                                            | Mandatory
+--------------|-----------|------------|--------------------------------------------------------|-----------
+test_buzzer   |           |            | Device (beeper) to control when test card is read      | NO
+test_led      |           |            | Device (led) to control when test card is read         | NO
+run_on_start  |           |            | Should we beep/blink when the module starts ?          | NO (defaults to true)
+devices       |           |            | List of devices to watch for                           | YES
+---->         | device    |            | Watch for event sent by this device                    | YES
+---->         | ---->     | name       | Name of the device                                     | YES
+---->         | --->      | reset_card | Content / number of the card                           | NO
+---->         | --->      | test_card  | Id of the card that trigger test led/beep stuff        | NO
 
 Example {#mod_testandreset_example}
 -----------------------------------
@@ -34,6 +35,9 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
             <name>ResetWatcher</name>
             <file>libtest-and-reset.so</file>
             <level>101</level>
+            <beep_on_start>false</beep_on_start>
+            <test_buzzer>my_buzzer</test_buzzer>
+            <test_led>my_blinking_led</test_led>
             <module_config>
                 <devices>
                     <device>

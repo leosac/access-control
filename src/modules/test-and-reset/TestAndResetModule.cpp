@@ -6,8 +6,6 @@ using namespace Leosac::Hardware;
 
 TestAndResetModule::~TestAndResetModule()
 {
-    delete test_led_;
-    delete test_buzzer_;
 }
 
 TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
@@ -17,15 +15,16 @@ TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
         kernel_sock_(ctx, zmqpp::socket_type::req),
         sub_(ctx, zmqpp::socket_type::sub),
         test_led_(nullptr),
-        test_buzzer_(nullptr)
-
+        test_buzzer_(nullptr),
+        run_on_start_(true)
 {
     sub_.connect("inproc://zmq-bus-pub");
     kernel_sock_.connect("inproc://leosac-kernel");
 
     process_config();
     reactor_.add(sub_, std::bind(&TestAndResetModule::handle_bus_msg, this));
-    run_test_sequence();
+    if (run_on_start_)
+        run_test_sequence();
 }
 
 void TestAndResetModule::process_config()
@@ -34,11 +33,12 @@ void TestAndResetModule::process_config()
 
     std::string test_device_led = module_config.get<std::string>("test_led", "");
     std::string test_device_buzzer = module_config.get<std::string>("test_buzzer", "");
+    run_on_start_ = module_config.get<bool>("run_on_start", true);
 
     if (!test_device_led.empty())
-        test_led_ = new FLED(ctx_, test_device_led);
+        test_led_ = std::unique_ptr<FLED>(new FLED(ctx_, test_device_led));
     if (!test_device_buzzer.empty())
-        test_buzzer_ = new FLED(ctx_, test_device_buzzer);
+        test_buzzer_ = std::unique_ptr<FLED>(new FLED(ctx_, test_device_buzzer));
 
     for (auto &node : module_config.get_child("devices"))
     {
