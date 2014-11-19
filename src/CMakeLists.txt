@@ -15,6 +15,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp
     core/auth/Interfaces/IUser.cpp
+    core/auth/AuthSourceBuilder.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp

@@ -39,6 +39,7 @@ void AuthFileInstance::handle_bus_msg()
     bus_sub_.receive(auth_msg);
     assert(auth_msg.parts() == 2);
     auth_msg >> topic;
+    ///todo auth data type.
     auth_msg >> auth_data;
     auth_msg >> nb_bits;
 

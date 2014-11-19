@@ -29,3 +29,13 @@ void BaseAuthSource::accept(Leosac::Tools::IVisitor *visitor)
 {
     visitor->visit(this);
 }
+
+const std::string &BaseAuthSource::name() const
+{
+    return source_name_;
+}
+
+void BaseAuthSource::name(std::string const &n)
+{
+    source_name_ = n;
+}

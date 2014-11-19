@@ -49,6 +49,12 @@ namespace Leosac
             * access to an end user.
             */
             virtual IAccessProfilePtr profile() const = 0;
+
+            /**
+            * Return the name of the source. This could be the name of the name of the module
+            * or device that sent the message that lead to this object's creation.
+            */
+            virtual const std::string &name() const = 0;
         };
     }
 }

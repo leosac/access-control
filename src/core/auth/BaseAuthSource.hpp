@@ -8,6 +8,9 @@ namespace Leosac
 {
     namespace Auth
     {
+        class BaseAuthSource;
+        using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
+
         class BaseAuthSource : public IAuthenticationSource
         {
         public:
@@ -24,7 +27,14 @@ namespace Leosac
             * This implementation simply return the owner_ profile, or null
             * if not available.
             */
-            virtual IAccessProfilePtr profile() const;
+            virtual IAccessProfilePtr profile() const override;
+
+            virtual const std::string &name() const override;
+
+            /**
+            * Set a name for this auth source
+            */
+            void name(const std::string &n);
 
         protected:
             /**
@@ -36,6 +46,11 @@ namespace Leosac
             * Underlying auth source.
             */
             std::vector<IAuthenticationSourcePtr> subsources_;
+
+            /**
+            * Name of the source (generally the module / device that sent it)
+            */
+            std::string source_name_;
         };
     }
 }

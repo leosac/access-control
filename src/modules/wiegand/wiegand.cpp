@@ -86,8 +86,6 @@ void WiegandReaderModule::run()
         {
             for (auto &reader : readers_)
                 reader.timeout();
-            //LOG() << "timeout";
         }
-
     }
 }
