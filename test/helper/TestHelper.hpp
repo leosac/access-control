@@ -36,23 +36,19 @@ namespace Leosac
                 return true;
             }
 
+            template<typename ...Content>
+            bool bus_read_extract(zmqpp::message *m, const char *first_arg, Content... content);
+
             /**
             * Default frame extraction function.
+            *
+            * Disabled for `const char *`.
             */
             template<typename T, typename ...Content>
-            bool bus_read_extract(zmqpp::message *m,
+            typename std::enable_if<!std::is_same<const char *, T>::value, bool>::type bus_read_extract(zmqpp::message *m,
                     T first_arg,
                     Content... content)
             {
-                if (std::is_same<const char *, T>::value)
-                {
-                    std::string value;
-                    *m >> value;
-                    if (strcmp(value.c_str(), reinterpret_cast<const char *>(first_arg)) != 0)
-                        return false;
-                     return bus_read_extract(m, content...);
-                }
-
                 T value;
                 *m >> value;
                 if (value != first_arg)
@@ -64,17 +60,16 @@ namespace Leosac
             /**
             * Frame extraction method specialized (thanks to overloading) for `const char *`
             */
-/*            template<typename ...Content>
+            template<typename ...Content>
             bool bus_read_extract(zmqpp::message *m, const char *first_arg, Content... content)
             {
                 std::string value;
                 *m >> value;
 
-                std::cerr << "I AM HERE" << std::endl;
                 if (strcmp(value.c_str(), first_arg) != 0)
                     return false;
                 return bus_read_extract(m, content...);
-            }*/
+            }
 
             /**
             * Make a blocking read on the bus, return true if content match the message.
