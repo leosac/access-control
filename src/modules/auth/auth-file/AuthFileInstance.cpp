@@ -10,41 +10,51 @@ using namespace Leosac::Auth;
 AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         std::string const &auth_ctx_name,
         std::string const &auth_target_name,
-        std::string const &valid_input_file) :
+        std::string const &input_file) :
         bus_push_(ctx, zmqpp::socket_type::push),
         bus_sub_(ctx, zmqpp::socket_type::sub),
         name_(auth_ctx_name),
-        file_stream_(valid_input_file)
+        file_path_(input_file)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
 
     INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << auth_target_name);
     bus_sub_.subscribe("S_" + auth_target_name);
-
-    if (!file_stream_.good() || !file_stream_.is_open())
-        throw std::runtime_error("Cannot access file containing credentials");
 }
 
 AuthFileInstance::~AuthFileInstance()
 {
-    LOG() << "auth contenxt instance down";
+    INFO("AuthFileInstance down");
 }
 
 void AuthFileInstance::handle_bus_msg()
 {
     zmqpp::message auth_msg;
+    zmqpp::message auth_msg_cpy;
     zmqpp::message auth_result_msg;
     std::string topic;
     std::string auth_data;
     int nb_bits;
 
     bus_sub_.receive(auth_msg);
+    auth_msg_cpy = auth_msg.copy();
 
-    ///
-    handle_auth(&auth_msg);
-    return;
-
+    if (handle_auth(&auth_msg))
+    {
+        auth_result_msg << ("S_" + name_);
+        auth_result_msg << "GRANTED";
+        //auth_result_msg << auth_msg_cpy;
+        bus_push_.send(auth_result_msg);
+    }
+    else
+    {
+        auth_result_msg << ("S_" + name_);
+        auth_result_msg << "GRANTED";
+        //auth_result_msg << auth_data;
+        bus_push_.send(auth_result_msg);
+    }
+/*
     assert(auth_msg.parts() == 2);
     auth_msg >> topic;
     ///todo auth data type.
@@ -78,7 +88,7 @@ void AuthFileInstance::handle_bus_msg()
     else
         auth_result_msg << "DENIED";
     auth_result_msg << auth_data;
-    bus_push_.send(auth_result_msg);
+    bus_push_.send(auth_result_msg);*/
 }
 
 zmqpp::socket &AuthFileInstance::bus_sub()
@@ -86,7 +96,7 @@ zmqpp::socket &AuthFileInstance::bus_sub()
     return bus_sub_;
 }
 
-void AuthFileInstance::handle_auth(zmqpp::message *msg)
+bool AuthFileInstance::handle_auth(zmqpp::message *msg)
 {
     AuthSourceBuilder build;
     auto ptr = build.create(msg);
@@ -94,4 +104,6 @@ void AuthFileInstance::handle_auth(zmqpp::message *msg)
 
     mapper.mapToUser(ptr);
    // ptr->profile()->isAccessGranted(..., ...);
+
+    return false;
 }

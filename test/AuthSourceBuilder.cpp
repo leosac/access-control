@@ -59,6 +59,8 @@ namespace Leosac
             ASSERT_TRUE(auth_source.get());
 
             ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
+            WiegandCardPtr spec = std::dynamic_pointer_cast<WiegandCard>(auth_source);
+            ASSERT_TRUE(spec.get());
         }
     }
 }

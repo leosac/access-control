@@ -22,14 +22,12 @@ namespace Leosac
                 * @param ctx the ZeroMQ context
                 * @param auth_ctx_name name of this authentication context.
                 * @param auth_target_name name of the target device we watch
-                * @param valid_input_file Path to the file that contains valid input data.
-                *
-                * @note If the valid_input_file cannot be opened the constructor will throw.
+                * @param input_file path to file contain auth configuration
                 */
                 AuthFileInstance(zmqpp::context &ctx,
                         const std::string &auth_ctx_name,
                         const std::string &auth_target_name,
-                        const std::string &valid_input_file);
+                        const std::string &input_file);
 
                 ~AuthFileInstance();
 
@@ -42,7 +40,12 @@ namespace Leosac
                 */
                 void handle_bus_msg();
 
-                void handle_auth(zmqpp::message *msg);
+                /**
+                * Prepare auth source object, map them to profile and check if access is granted.
+                *
+                * @return true is access shall be granted, false otherwise.
+                */
+                bool handle_auth(zmqpp::message *msg);
 
                 /**
                 * Returns the socket subscribed to the message bus.
@@ -67,11 +70,10 @@ namespace Leosac
                 std::string name_;
 
                 /**
-                * File stream to the valid-credentials file.
+                * Path to the auth data file.
                 */
-                std::ifstream file_stream_;
+                std::string file_path_;
             };
-
         }
     }
 }
