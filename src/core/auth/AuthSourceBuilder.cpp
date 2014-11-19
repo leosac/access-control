@@ -41,7 +41,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
         zmqpp::message *msg)
 {
     // card id and number of bit shall be left.
-    assert(msg && msg->unread_parts() == 2);
+   // assert(msg && msg->unread_parts() == 2);
 
     std::string card_id;
     int bits;
