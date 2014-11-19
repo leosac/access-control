@@ -42,6 +42,8 @@ namespace Leosac
                 */
                 void handle_bus_msg();
 
+                void handle_auth(zmqpp::message *msg);
+
                 /**
                 * Returns the socket subscribed to the message bus.
                 */

@@ -37,7 +37,15 @@ namespace Leosac
             * @return true if it succeed, false otherwise.
             * @see @ref auth_specc
             */
-            bool extract_source_name(const std::string &input, std::string *output);
+            bool extract_source_name(const std::string &input, std::string *output) const;
+
+        protected:
+            /**
+            * Create an auth source from SIMPLE_WIEGAND data type.
+            * @param msg the message first frame shall be wiegand data (ie previous should be pop'd).
+            */
+            IAuthenticationSourcePtr create_simple_wiegand(const std::string &name,
+                    zmqpp::message *msg);
         };
     }
 }

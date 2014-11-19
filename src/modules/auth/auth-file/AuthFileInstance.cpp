@@ -1,8 +1,11 @@
 #include <core/auth/WiegandCard.hpp>
+#include <core/auth/AuthSourceBuilder.hpp>
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
+#include "FileAuthSourceMapper.hpp"
 
 using namespace Leosac::Module::Auth;
+using namespace Leosac::Auth;
 
 AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         std::string const &auth_ctx_name,
@@ -37,6 +40,11 @@ void AuthFileInstance::handle_bus_msg()
     int nb_bits;
 
     bus_sub_.receive(auth_msg);
+
+    ///
+    handle_auth(&auth_msg);
+    return;
+
     assert(auth_msg.parts() == 2);
     auth_msg >> topic;
     ///todo auth data type.
@@ -76,4 +84,14 @@ void AuthFileInstance::handle_bus_msg()
 zmqpp::socket &AuthFileInstance::bus_sub()
 {
     return bus_sub_;
+}
+
+void AuthFileInstance::handle_auth(zmqpp::message *msg)
+{
+    AuthSourceBuilder build;
+    auto ptr = build.create(msg);
+    FileAuthSourceMapper mapper("FILE");
+
+    mapper.mapToUser(ptr);
+   // ptr->profile()->isAccessGranted(..., ...);
 }
