@@ -1,7 +1,5 @@
 #include <tools/log.hpp>
-#include "AuthSourceBuilder.hpp"
-#include "BaseAuthSource.hpp"
-#include "WiegandCard.hpp"
+#include "Auth.hpp"
 
 using namespace Leosac::Auth;
 
@@ -10,7 +8,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     // Auth spec say at least 2 frames: source and type.
     assert(msg && msg->parts() >= 2);
     std::string source_name;
-    std::string type_name;
+    SourceType type_name;
     *msg >> source_name >> type_name;
 
     if (!extract_source_name(source_name, &source_name))
@@ -20,7 +18,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
                 "Source name was {" << source_name << "}");
         assert(0);
     }
-    if (type_name == "SIMPLE_WIEGAND")
+    if (type_name == SourceType::SIMPLE_WIEGAND)
     {
         return create_simple_wiegand(source_name, msg);
     }

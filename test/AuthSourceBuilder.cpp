@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <core/auth/AuthSourceBuilder.hpp>
+#include <core/auth/Auth.hpp>
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 
@@ -20,7 +21,7 @@ namespace Leosac
             AuthSourceBuilderTest()
             {
                 msg1_ << "S_MY_WIEGAND_1";
-                msg1_ << "SIMPLE_WIEGAND";
+                msg1_ << SourceType::SIMPLE_WIEGAND;
                 msg1_ << "af:bc:12:42";
                 msg1_ << 32;
             }

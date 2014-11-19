@@ -1,5 +1,6 @@
 #include <tools/runtimeoptions.hpp>
 #include <modules/wiegand/wiegand.hpp>
+#include <core/auth/Auth.hpp>
 #include "helper/TestHelper.hpp"
 
 using namespace Leosac::Module::Wiegand;
@@ -53,7 +54,8 @@ namespace Leosac
                 high_.interrupt(); // building card id ff:ff:ff:ff
             }
 
-            ASSERT_TRUE(bus_read(bus_sub_, "S_WIEGAND_1", "SIMPLE_WIEGAND", "ff:ff:ff:ff", 32));
+            ASSERT_TRUE(bus_read(bus_sub_, "S_WIEGAND_1",
+                    Leosac::Auth::SourceType::SIMPLE_WIEGAND, "ff:ff:ff:ff", 32));
 
             for (int i = 0; i < 32; i++)
             {
@@ -67,7 +69,8 @@ namespace Leosac
                 std::this_thread::sleep_for(std::chrono::milliseconds(2));
             }
 
-            ASSERT_TRUE(bus_read(bus_sub_, "S_WIEGAND_1", "SIMPLE_WIEGAND", "00:00:00:ff", 32));
+            ASSERT_TRUE(bus_read(bus_sub_, "S_WIEGAND_1",
+                    Leosac::Auth::SourceType::SIMPLE_WIEGAND, "00:00:00:ff", 32));
         }
 
     }

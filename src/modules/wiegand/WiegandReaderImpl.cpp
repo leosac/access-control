@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <core/auth/Auth.hpp>
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
 
@@ -120,7 +121,7 @@ void WiegandReaderImpl::timeout()
     }
 
     zmqpp::message msg;
-    msg << ("S_" + name_) << "SIMPLE_WIEGAND" << card_hex.str() << counter_;
+    msg << ("S_" + name_) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_hex.str() << counter_;
     bus_push_.send(msg);
 
     std::fill(buffer_.begin(), buffer_.end(), 0);

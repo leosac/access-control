@@ -76,7 +76,7 @@ Authentication data type {#auth_data_type}
 ------------------------------------------
 
 Data types information helps authentication backend understand message from authentication sources.
-It is a simple string (and a couple of specifications).
+It is an enumeration value, see [AuthSourceType](@ref Leosac::Auth::SourceType).
 
 Currently we are lucky, we only define one.
 
@@ -111,11 +111,11 @@ Workflow for an **authentication source** module:
 
 As an example, consider a message from the [wiegand module](@ref mod_wiegand_main), named `MY_WIEGAND_1`:
  1. "S_MY_WIEGAND_1"
- 2. "SIMPLE_WIEGAND"
+ 2. `Leosac::Auth::SourceType::SIMPLE_WIEGAND`
  3. "12:af:cd:21"
  4. `26`
  
- Frames 1 through 3 are string. Frame 4 is integer.
+ Frames 1 and 3 are string. Frame 2 is an enum: [AuthSourceType](@ref Leosac::Auth::SourceType). Frame 4 is integer.
 
 
 @namespace Leosac::Auth
