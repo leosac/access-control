@@ -21,7 +21,6 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         WiegandReaderModule module(zmq_ctx, pipe, cfg);
 
         INFO("Module WiegandReader initialized.");
-        std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
         pipe->send(zmqpp::signal::ok);
 
         module.run();

@@ -15,11 +15,10 @@ bool start_module(zmqpp::socket *pipe,
 {
     LEDModule module(zmq_ctx, pipe, cfg);
 
-    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
+    INFO("Module Led initialized.");
     pipe->send(zmqpp::signal::ok);
 
     module.run();
-
-    std::cout << "module LED shutting down." << std::endl;
+    INFO("Module Led shutting down");
     return true;
 }
