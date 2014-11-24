@@ -1,3 +1,4 @@
+#include <core/auth/Auth.hpp>
 #include "DoormanInstance.hpp"
 #include "tools/log.hpp"
 
@@ -38,16 +39,16 @@ void DoormanInstance::handle_bus_msg()
 {
     zmqpp::message bus_msg;
     std::string auth_name; // name of the auth context that sent the message.
-    std::string auth_status;
+    Leosac::Auth::AccessStatus access_status;
 
     bus_sub_.receive(bus_msg);
     assert(bus_msg.parts() >= 2);
-    bus_msg >> auth_name >> auth_status;
+    bus_msg >> auth_name >> access_status;
     DEBUG("DOORMAN HERE");
 
     for (auto &action : actions_)
     {
-        if (action.on_ != auth_status)
+        if (action.on_ != access_status)
             continue; // status doesn't match what we expected.
         DEBUG("ACTION (target = " << action.target_ << ")");
         zmqpp::message msg;

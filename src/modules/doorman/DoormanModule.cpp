@@ -1,8 +1,10 @@
+#include <core/auth/Auth.hpp>
 #include "DoormanModule.hpp"
 #include "DoormanInstance.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac::Module::Doorman;
+using namespace Leosac::Auth;
 
 DoormanModule::DoormanModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
@@ -51,8 +53,11 @@ void DoormanModule::process_config()
             // every action we take
             boost::property_tree::ptree cfg_action = action_node.second;
             DoormanAction a;
+            std::string on_status;
 
-            a.on_ = cfg_action.get<std::string>("on");
+            on_status = cfg_action.get<std::string>("on") == "GRANTED";
+            a.on_ = (on_status == "GRANTED" ? AccessStatus::GRANTED : AccessStatus::DENIED);
+
             a.target_ = cfg_action.get<std::string>("target");
             for (auto &cmd_node : cfg_action.get_child("cmd"))
             {

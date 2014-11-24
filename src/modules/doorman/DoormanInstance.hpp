@@ -24,7 +24,7 @@ namespace Leosac
                 /**
                 * When should this action be done? on GRANTED or DENIED ?
                 */
-                std::string on_;
+                Leosac::Auth::AccessStatus on_;
 
                 /**
                 * The command to be send. Each element of the vector will be a frame in the zmqpp::message.
