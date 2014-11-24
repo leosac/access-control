@@ -215,6 +215,9 @@ namespace Leosac
             ASSERT_TRUE(is_in_group("Useless", "random_group", mapper2_));
         }
 
+        /**
+        * Test that group permission applies to user.
+        */
         TEST_F(AuthFileMapperTest, TestGroupPermission)
         {
             mapper2_->mapToUser(my_card_);
