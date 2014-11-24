@@ -13,28 +13,24 @@ namespace Leosac
             * This define message formatting for data source SIMPLE_WIEGAND.
             * You can find out more [here](@ref auth_data_type).
             */
-            SIMPLE_WIEGAND = 1
+            SIMPLE_WIEGAND = 1,
+        };
+
+        enum class AccessStatus : uint32_t
+        {
+            GRANTED = 1,
+            DENIED = 2,
         };
     }
 }
 
-zmqpp::message &operator>>(zmqpp::message &msg, Leosac::Auth::SourceType &t)
-{
-    static_assert(std::is_same<std::underlying_type<Leosac::Auth::SourceType>::type, uint32_t>::value,
-            "Bad underlying type for enum");
-    uint32_t tmp;
-    msg >> tmp;
-    t = static_cast<Leosac::Auth::SourceType>(tmp);
-    return msg;
-}
+zmqpp::message &operator>>(zmqpp::message &msg, Leosac::Auth::SourceType &t);
 
-zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::Auth::SourceType &t)
-{
-    static_assert(std::is_same<std::underlying_type<Leosac::Auth::SourceType>::type, uint32_t>::value,
-            "Bad underlying type for enum");
-    msg << static_cast<uint32_t>(t);
-    return msg;
-}
+zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::Auth::SourceType &t);
+
+zmqpp::message &operator>>(zmqpp::message &msg, Leosac::Auth::AccessStatus &st);
+
+zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::Auth::AccessStatus &st);
 
 #include "AuthSourceBuilder.hpp"
 #include "BaseAuthSource.hpp"

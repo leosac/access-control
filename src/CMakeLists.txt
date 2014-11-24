@@ -10,6 +10,7 @@ set(LEOSAC_LIB_SRCS
     core/zmodule_manager.cpp
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp
+    core/auth/Auth.cpp
     core/auth/WiegandCard.cpp
     core/auth/SimpleAccessProfile.cpp
     core/auth/BaseAuthSource.cpp
