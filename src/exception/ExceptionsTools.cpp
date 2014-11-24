@@ -29,7 +29,7 @@ void Leosac::log_exception(const std::exception &e, int level /* = 0 */)
     }
     catch (const std::exception &e2)
     {
-        print_exception(e2, level + 1);
+        log_exception(e2, level + 1);
     }
     catch (...)
     {
