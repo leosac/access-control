@@ -214,6 +214,26 @@ namespace Leosac
             ASSERT_FALSE(is_in_group("Useless", "Admins", mapper2_));
             ASSERT_TRUE(is_in_group("Useless", "random_group", mapper2_));
         }
+
+        TEST_F(AuthFileMapperTest, TestGroupPermission)
+        {
+            mapper2_->mapToUser(my_card_);
+
+            auto profile = mapper2_->buildProfile(my_card_);
+            ASSERT_TRUE(profile.get());
+
+            ASSERT_TRUE(profile->isAccessGranted(date_monday_12_00, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(date_monday_16_31, doorA_));
+
+            ASSERT_FALSE(profile->isAccessGranted(date_monday_12_00, doorB_));
+            ASSERT_TRUE(profile->isAccessGranted(date_monday_16_31, doorB_));
+
+            ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, doorB_));
+
+            ASSERT_TRUE(profile->isAccessGranted(date_sunday_18_50, doorC_));
+            ASSERT_FALSE(profile->isAccessGranted(date_monday_16_31, doorC_));
+        }
     }
 }
 

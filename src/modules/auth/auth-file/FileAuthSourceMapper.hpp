@@ -58,6 +58,12 @@ namespace Leosac
                 void membership_group(const boost::property_tree::ptree &group_mapping);
 
                 /**
+                * Naive method that bruteforce groups to try to find
+                * membership for an user.
+                */
+                Leosac::Auth::GroupPtr get_user_group(Leosac::Auth::IUserPtr u);
+
+                /**
                 * Build the schedule for an access profile.
                 *
                 * It adds some schedule to an existing profile.

@@ -33,6 +33,14 @@
         <map>
             <group>Admins</group>
             <default_schedule>
+                <sunday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </sunday>
+            </default_schedule>
+
+            <schedule>
+                <door>doorA</door>
                 <monday>
                     <start>10:00</start>
                     <end>14:59</end>
@@ -42,12 +50,15 @@
                     <start>16:35</start>
                     <end>23:59</end>
                 </monday>
+            </schedule>
 
-                <sunday>
-                    <start>00:00</start>
+            <schedule>
+                <door>doorB</door>
+                <monday>
+                    <start>15:00</start>
                     <end>23:59</end>
-                </sunday>
-            </default_schedule>
+                </monday>
+            </schedule>
         </map>
     </permissions>
 </root>

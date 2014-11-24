@@ -73,10 +73,26 @@ void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
 IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr auth_source)
 {
     assert(auth_source);
-    if (auth_source->owner())
+    IAccessProfilePtr profile;
+
+    if (!auth_source->owner())
     {
-        return auth_source->owner()->profile();
+        NOTICE("No owner for this auth source.");
+        return nullptr;
     }
+    profile = auth_source->owner()->profile();
+    if (profile)
+    {
+        INFO("Profile is user-specific: {" << auth_source->owner()->id() << "}");
+        return profile;
+    }
+    GroupPtr grp = get_user_group(auth_source->owner());
+    if (grp)
+    {
+        INFO("Using profile from group {" << grp->name() << "}");
+        return grp->profile();
+    }
+
     return nullptr;
 }
 
@@ -261,4 +277,22 @@ std::vector<GroupPtr> FileAuthSourceMapper::groups() const
         ret.push_back(map_entry.second);
     }
     return ret;
+}
+
+Leosac::Auth::GroupPtr FileAuthSourceMapper::get_user_group(Leosac::Auth::IUserPtr u)
+{
+    for (const auto &grp_map : groups_)
+    {
+        GroupPtr grp;
+        std::tie(std::ignore, grp) = grp_map;
+
+        if (std::find_if(grp->members().begin(),
+                grp->members().end(),
+                [&](IUserPtr user) -> bool
+                {
+                    return user->id() == u->id();
+                }) != grp->members().end())
+            return grp;
+    }
+    return nullptr;
 }
