@@ -154,7 +154,7 @@ void WiegandReaderImpl::handle_request()
     {
         assert (msg.parts() == 2);
         DEBUG("BEEP BEEP");
-        std::string duration;
+        int64_t duration;
         msg >> duration;
         // our buzzer is a LED (this will change later tho)
         // BEEP:DURATION translates well to ON:DURATION for led.
@@ -163,7 +163,7 @@ void WiegandReaderImpl::handle_request()
             sock_.send("KO");
             return;
         }
-        bool ret = buzzer_->turnOn(std::chrono::milliseconds(std::stoi(duration)));
+        bool ret = buzzer_->turnOn(std::chrono::milliseconds(duration));
         assert(ret);
         sock_.send("OK");
     }

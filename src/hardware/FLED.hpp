@@ -53,8 +53,8 @@ namespace Leosac
         * frames message:
         *
         *    1. "BLINKING"
-        *    2. BLINK_DURATION (string)
-        *    3. BLINK_SPEED (string)
+        *    2. BLINK_DURATION (int64_t)
+        *    3. BLINK_SPEED (int64_t)
         *    4. "ON" | "OFF" (the real current state of the underlying gpio)
         *
         *
@@ -78,7 +78,6 @@ namespace Leosac
         *
         * The second frame shall contain the duration (use -1 for infinite blink) and the third frame the speed.
         *
-        * @note This may sound stupid, but all value (even numeric one) shall be send as string. This will likely change later.
         */
         class FLED
         {
@@ -108,12 +107,12 @@ namespace Leosac
                 /**
                 * Set only if `st` is `BLINKING`, it represents the total duration of blinking.
                 */
-                int duration;
+                int64_t duration;
 
                 /**
                 * Set only if `st` is `BLINKING`, it represents the speed of blinking.
                 */
-                int speed;
+                int64_t speed;
 
                 /**
                 * Set only if `st` is `BLINKING` : value of the LED (true if ON, false otherwise).

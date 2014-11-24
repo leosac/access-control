@@ -54,7 +54,21 @@ void DoormanInstance::handle_bus_msg()
         zmqpp::message msg;
         for (auto &frame : action.cmd_)
         {
-            msg << frame;
+            // we try to convert argument to int. if it works we send as int64_t, otherwise as string
+            bool err = false;
+            int v = 0;
+            try
+            {
+                v = std::stoi(frame);
+            }
+            catch (...)
+            {
+                err = true;
+            }
+            if (err)
+                msg << frame;
+            else
+                msg << static_cast<int64_t>(v);
             DEBUG("would do : " << frame << " to target: " << action.target_);
         }
         command_send_recv(action.target_, std::move(msg));

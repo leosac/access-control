@@ -66,7 +66,8 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         std::this_thread::sleep_for(std::chrono::milliseconds(wait_for));
     }
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clock);
-    LOG() << "TOOK " << std::to_string(elapsed.count()) << "ms";
-    std::cout << "module bench toggle shutting down" << std::endl;
+    DEBUG("TOOK " << elapsed.count() << "ms");
+
+    INFO("Module Bench-Toggle shutting down");
     return true;
 }

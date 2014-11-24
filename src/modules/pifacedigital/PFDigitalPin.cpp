@@ -73,9 +73,9 @@ bool PFDigitalPin::turn_on(zmqpp::message *msg /* = nullptr */)
     if (msg && msg->parts() > 1)
     {
         // optional parameter is present
-        std::string duration;
+        int64_t duration;
         *msg >> duration;
-        next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(std::stoi(duration));
+        next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
         want_update_ = true;
     }
     pifacedigital_digital_write(gpio_no_, 1);

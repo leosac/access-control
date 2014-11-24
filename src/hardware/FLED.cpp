@@ -14,7 +14,7 @@ bool FLED::turnOn(std::chrono::milliseconds duration)
     std::string rep;
     zmqpp::message msg;
 
-    msg << "ON" << std::to_string(duration.count());
+    msg << "ON" << duration.count();
 
     backend_.send(msg);
     backend_.receive(rep);
@@ -72,7 +72,7 @@ bool FLED::blink(std::chrono::milliseconds duration, std::chrono::milliseconds s
     std::string rep;
     zmqpp::message msg;
 
-    msg << "BLINK" << std::to_string(duration.count()) << std::to_string(speed.count());
+    msg << "BLINK" << duration.count() << speed.count();
 
     backend_.send(msg);
     backend_.receive(rep);
@@ -126,12 +126,10 @@ FLED::State FLED::state()
         led_state.st = State::BLINKING;
 
         // duration
-        rep >> status_str;
-        led_state.duration = std::stoi(status_str);
+        rep >> led_state.duration;
 
         //speed
-        rep >> status_str;
-        led_state.speed = std::stoi(status_str);
+        rep >> led_state.speed;
 
         // value
         rep >> status_str;

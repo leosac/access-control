@@ -90,8 +90,7 @@ bool LedImpl::start_blink(zmqpp::message *msg)
 
     if (msg->parts() > 1)
     {
-        *msg >> tmp;
-        blink_duration_ = std::stoi(tmp);
+        *msg >> blink_duration_;
     }
     else
     {
@@ -100,8 +99,7 @@ bool LedImpl::start_blink(zmqpp::message *msg)
 
     if (msg->parts() > 2)
     {
-        *msg >> tmp;
-        blink_speed_ = std::stoi(tmp);
+        *msg >> blink_speed_;
     }
     else
     {
@@ -125,7 +123,7 @@ void LedImpl::send_state()
     {
         // means we are blinking
         st << "BLINKING";
-        st << std::to_string(blink_duration_) << std::to_string(blink_speed_);
+        st << blink_duration_ << blink_speed_;
     }
     st << (gpio_.isOn() ? "ON" : "OFF");
     frontend_.send(st);

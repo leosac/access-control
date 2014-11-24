@@ -91,11 +91,11 @@ namespace Leosac
                 */
                 bool want_update_;
 
-                int default_blink_duration_;
-                int default_blink_speed_;
+                int64_t default_blink_duration_;
+                int64_t default_blink_speed_;
 
-                int blink_speed_;
-                int blink_duration_;
+                int64_t blink_speed_;
+                int64_t blink_duration_;
 
                 /**
                 * Number of toggle left to do. This starts at N and decrements over time. When it reaches 0 it means

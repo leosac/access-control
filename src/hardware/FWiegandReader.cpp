@@ -26,10 +26,10 @@ bool FWiegandReader::greenLedOff()
     return send_to_backend(msg);
 }
 
-bool FWiegandReader::greenLedBlink(int duration, int speed)
+bool FWiegandReader::greenLedBlink(int64_t duration, int64_t speed)
 {
     zmqpp::message msg;
-    msg << "GREEN_LED" << "BLINK" << std::to_string(duration) << std::to_string(speed);
+    msg << "GREEN_LED" << "BLINK" << duration << speed;
 
     return send_to_backend(msg);
 }
@@ -46,10 +46,10 @@ bool FWiegandReader::send_to_backend(zmqpp::message &msg)
     return false;
 }
 
-bool FWiegandReader::beep(int duration)
+bool FWiegandReader::beep(int64_t duration)
 {
     zmqpp::message msg;
-    msg << "BEEP" << std::to_string(duration);
+    msg << "BEEP" << duration;
 
     return send_to_backend(msg);
 }

@@ -63,12 +63,12 @@ namespace Leosac
             /**
             * Make the reader's green led blink.
             */
-            bool greenLedBlink(int duration = 1000, int speed = 300);
+            bool greenLedBlink(int64_t duration = 1000, int64_t speed = 300);
 
             /**
             * Beep for a given duration
             */
-            bool beep(int duration = 1000);
+            bool beep(int64_t duration = 1000);
 
             /**
             * Turn the buzzer on.
