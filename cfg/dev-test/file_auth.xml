@@ -7,9 +7,18 @@
             <user>MY_USER</user>
             <WiegandCard>80:83:a0:40</WiegandCard>
         </map>
+        <map>
+            <user>Toto</user>
+            <WiegandCard>80:81:61:40</WiegandCard>
+        </map>
     </user_mapping>
 
     <permissions>
+        <map>
+            <user>Toto</user>
+            <default_schedule>
+            </default_schedule>
+        </map>
         <map>
             <!-- Time frame mapping for MY_USER -->
             <user>MY_USER</user>

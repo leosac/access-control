@@ -28,7 +28,7 @@ namespace Leosac
         /**
         * Test the mapping of wiegand-card to user from a file.
         *
-        * @note This test suite use the AuthFile-1.xml and AuthFile-2.xml files.
+        * @note This test suite use the AuthFile-*.xml files.
         */
         class AuthFileMapperTest : public ::testing::Test
         {
@@ -42,6 +42,7 @@ namespace Leosac
                     unknown_card_(new WiegandCard("00:00:00:00", 32))
             {
                 mapper_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-1.xml");
+                mapper2_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-3.xml");
 
                 // initialize date object.
                 std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -78,6 +79,25 @@ namespace Leosac
                 delete mapper_;
             }
 
+            bool is_in_group(const std::string &user_name, const std::string &group_name,
+                    IAuthSourceMapper *mapper)
+            {
+                auto search_lambda = [&](IUserPtr u) -> bool
+                {
+                    return u->id() == user_name;
+                };
+
+                for (const auto &group : mapper->groups())
+                {
+                    if (group->name() == group_name)
+                    {
+                        return std::find_if(group->members().begin(),
+                                group->members().end(), search_lambda) != group->members().end();
+                    }
+                }
+                return false;
+            }
+
             std::chrono::system_clock::time_point date_monday_12_00;
             std::chrono::system_clock::time_point date_monday_16_31;
             std::chrono::system_clock::time_point date_sunday_18_50;
@@ -85,6 +105,8 @@ namespace Leosac
             AuthTargetPtr doorB_;
             AuthTargetPtr doorC_;
             IAuthSourceMapper *mapper_;
+            // for group related tests.
+            IAuthSourceMapper *mapper2_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
             IAuthenticationSourcePtr unknown_card_;
@@ -182,6 +204,15 @@ namespace Leosac
                         std::unique_ptr<IAuthSourceMapper> faulty_mapper(new FileAuthSourceMapper(gl_data_path + "AuthFile-2.xml"));
                         faulty_mapper->mapToUser(my_card_);
                     }, ModuleException);
+        }
+
+        TEST_F(AuthFileMapperTest, TestGroupMapping)
+        {
+            ASSERT_TRUE(is_in_group("MY_USER", "Admins", mapper2_));
+            ASSERT_TRUE(is_in_group("Toto", "Admins", mapper2_));
+
+            ASSERT_FALSE(is_in_group("Useless", "Admins", mapper2_));
+            ASSERT_TRUE(is_in_group("Useless", "random_group", mapper2_));
         }
     }
 }

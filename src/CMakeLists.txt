@@ -11,6 +11,7 @@ set(LEOSAC_LIB_SRCS
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp
     core/auth/Auth.cpp
+    core/auth/Group.cpp
     core/auth/WiegandCard.cpp
     core/auth/SimpleAccessProfile.cpp
     core/auth/BaseAuthSource.cpp

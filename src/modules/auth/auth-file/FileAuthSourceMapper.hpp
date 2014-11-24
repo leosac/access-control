@@ -3,7 +3,8 @@
 #include <string>
 #include <map>
 #include <boost/property_tree/ptree.hpp>
-#include <core/auth/SimpleAccessProfile.hpp>
+#include "core/auth/SimpleAccessProfile.hpp"
+#include "core/auth/Group.hpp"
 #include "core/auth/WiegandCard.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
@@ -31,12 +32,30 @@ namespace Leosac
 
                 virtual Leosac::Auth::IAccessProfilePtr buildProfile(Leosac::Auth::IAuthenticationSourcePtr auth_source) override;
 
+                std::vector<Leosac::Auth::GroupPtr> groups() const override;
             private:
 
                 /**
                 * Build user/group permissions from configuration.
                 */
                 void build_permission();
+
+                /**
+                * We are building permissions for an user.
+                */
+                void permission_user(const std::string &user_name,
+                        const boost::property_tree::ptree &);
+
+                /**
+                * We are building permissions for a group.
+                */
+                void permission_group(const std::string &group_name,
+                        const boost::property_tree::ptree &);
+
+                /**
+                * Extract group membership.
+                */
+                void membership_group(const boost::property_tree::ptree &group_mapping);
 
                 /**
                 * Build the schedule for an access profile.
@@ -56,7 +75,6 @@ namespace Leosac
 
                 /**
                 * Store the name of the configuration file.
-                * This is only used in case we need to report an error.
                 */
                 std::string config_file_;
 
@@ -69,6 +87,11 @@ namespace Leosac
                 * Maps user id (or name) to object.
                 */
                 std::map<std::string, Leosac::Auth::IUserPtr> users_;
+
+                /**
+                * Maps group name to object.
+                */
+                std::map<std::string, Leosac::Auth::GroupPtr> groups_;
 
                 /**
                 * Maps target (eg door) name to object.

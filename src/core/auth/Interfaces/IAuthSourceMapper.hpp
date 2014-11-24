@@ -2,6 +2,7 @@
 
 #include "tools/IVisitor.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
+#include "core/auth/Group.hpp"
 
 namespace Leosac
 {
@@ -40,6 +41,11 @@ namespace Leosac
             * The caller expect a valid profile object that will behave correctly.
             */
             virtual IAccessProfilePtr buildProfile(IAuthenticationSourcePtr auth_source) = 0;
+
+            /**
+            * Return the groups this mapper is aware of.
+            */
+            virtual std::vector<Leosac::Auth::GroupPtr> groups() const = 0;
         };
 
     }

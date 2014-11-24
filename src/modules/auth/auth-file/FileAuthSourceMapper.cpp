@@ -84,6 +84,10 @@ void FileAuthSourceMapper::build_permission()
 {
     const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("permissions");
 
+    auto opt_group_mapping = authentication_data_.get_child_optional("group_mapping");
+    if (opt_group_mapping)
+        membership_group(*opt_group_mapping);
+
     for (const auto &permission_mapping : mapping_tree)
     {
         const std::string &node_name = permission_mapping.first;
@@ -93,29 +97,14 @@ void FileAuthSourceMapper::build_permission()
             throw ConfigException(config_file_, "Invalid config file content");
 
         auto opt_child_user = node.get_child_optional("user");
+        auto opt_child_group = node.get_child_optional("group");
         if (opt_child_user)
         {
-            // we a are mapping a user
-            std::string user_name = opt_child_user->data();
-            IUserPtr user = users_[user_name];
-            if (!user)
-            {
-                user = IUserPtr(new IUser(user_name));
-                users_[user_name] = user;
-            }
-            else
-                WARN("We already had data for this user");
-
-            SimpleAccessProfilePtr profile(new SimpleAccessProfile());
-            user->profile(profile);
-
-            for (const auto &schedule : node)
-            {
-                if (schedule.first == "default_schedule")
-                    build_schedule(profile, schedule.second, true);
-                if (schedule.first == "schedule")
-                    build_schedule(profile, schedule.second, false);
-            }
+            permission_user(opt_child_user->data(), node);
+        }
+        else if (opt_child_group)
+        {
+            permission_group(opt_child_group->data(), node);
         }
     }
 }
@@ -185,4 +174,91 @@ int FileAuthSourceMapper::week_day_to_int(const std::string &day)
     if (day == "saturday")
         return 6;
     assert(0);
+}
+
+void FileAuthSourceMapper::permission_user(const std::string &user_name,
+        const boost::property_tree::ptree &node)
+{
+    // we a are building permission for a user
+
+    IUserPtr user = users_[user_name];
+    if (user && user->profile())
+        WARN("We already had data for this user. Will override");
+    else if (!user)
+    {
+        user = IUserPtr(new IUser(user_name));
+        users_[user_name] = user;
+    }
+
+    SimpleAccessProfilePtr profile(new SimpleAccessProfile());
+    user->profile(profile);
+
+    for (const auto &schedule : node)
+    {
+        if (schedule.first == "default_schedule")
+            build_schedule(profile, schedule.second, true);
+        if (schedule.first == "schedule")
+            build_schedule(profile, schedule.second, false);
+    }
+}
+
+void FileAuthSourceMapper::permission_group(const std::string &group_name,
+        const boost::property_tree::ptree &node)
+{
+    GroupPtr group = groups_[group_name];
+
+    if (group && group->profile())
+        WARN("Already had some data for this group. Will override.");
+    else if (!group)
+    {
+        group = groups_[group_name] = GroupPtr(new Group(group_name));
+    }
+
+    SimpleAccessProfilePtr profile(new SimpleAccessProfile());
+    group->profile(profile);
+
+    for (const auto &schedule : node)
+    {
+        if (schedule.first == "default_schedule")
+            build_schedule(profile, schedule.second, true);
+        if (schedule.first == "schedule")
+            build_schedule(profile, schedule.second, false);
+    }
+}
+
+void FileAuthSourceMapper::membership_group(const boost::property_tree::ptree &group_mapping)
+{
+    for (const auto &group_info : group_mapping)
+    {
+        const boost::property_tree::ptree &node = group_info.second;
+        const std::string &group_name = node.get<std::string>("group");
+
+        if (group_info.first != "map")
+            throw ConfigException(config_file_, "Invalid config file content");
+
+        GroupPtr grp = groups_[group_name] = GroupPtr(new Group(group_name));
+
+        for (const auto &membership : node)
+        {
+            if (membership.first != "user")
+                continue;
+            std::string user_name = membership.second.data();
+            IUserPtr user = users_[user_name];
+            if (!user)
+                user = users_[user_name] = IUserPtr(new IUser(user_name));
+            grp->member_add(user);
+        }
+    }
+}
+
+std::vector<GroupPtr> FileAuthSourceMapper::groups() const
+{
+    std::vector<GroupPtr> ret;
+
+    ret.reserve(groups_.size());
+    for (const auto &map_entry : groups_)
+    {
+        ret.push_back(map_entry.second);
+    }
+    return ret;
 }
