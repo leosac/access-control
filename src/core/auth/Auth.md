@@ -118,6 +118,18 @@ As an example, consider a message from the [wiegand module](@ref mod_wiegand_mai
  Frames 1 and 3 are string. Frame 2 is an enum: [AuthSourceType](@ref Leosac::Auth::SourceType). Frame 4 is integer.
 
 
+Workflow for an **authentication backend** module:
+ 1. Receive a message from an **auth source**.
+ 2. Process the message, and decide whether access shall be granted or not.
+ 3. Send a multiparts response message.
+   1. The first frame MUST be "S_{AUTH_INSTANCE_NAME}".
+   2. The second frame shall be an [AccessStatus](@ref Leosac::Auth::AccessStatus).
+
+Example:
+ 1. "S_MY_AUTH_SOURCE_1"
+ 2. `Leosac::Auth::SourceType::Granted`
+ 
+
 @namespace Leosac::Auth
 @brief Holds classes relevant to the Authentication and Authorization subsystem.
 

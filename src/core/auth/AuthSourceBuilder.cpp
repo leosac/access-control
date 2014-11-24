@@ -48,6 +48,8 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
 
     *msg >> card_id >> bits;
 
+    INFO("Building an AuthSource object (WiegandCard): " << card_id << " with " <<
+            bits << " significants bits.");
     BaseAuthSourcePtr auth_source(new WiegandCard(card_id, bits));
     auth_source->name(name);
 

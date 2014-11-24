@@ -55,9 +55,8 @@ void DoormanModule::process_config()
             DoormanAction a;
             std::string on_status;
 
-            on_status = cfg_action.get<std::string>("on") == "GRANTED";
+            on_status = cfg_action.get<std::string>("on");
             a.on_ = (on_status == "GRANTED" ? AccessStatus::GRANTED : AccessStatus::DENIED);
-
             a.target_ = cfg_action.get<std::string>("target");
             for (auto &cmd_node : cfg_action.get_child("cmd"))
             {

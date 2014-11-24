@@ -11,7 +11,7 @@ namespace Leosac
         * This class is some kind of factory to create IAuthenticationSource object
         * from a zmqpp::message sent by a AuthSource module (eg Wiegand).
         *
-        * The AuthenticationSource will not contain all data. It still needs to be map
+        * The AuthenticationSource will not contain all data. It still needs to be mapped
         * to a user/access profile.
         */
         class AuthSourceBuilder

@@ -59,6 +59,7 @@ void FileAuthSourceMapper::visit(WiegandCard *src)
 
 void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
 {
+    assert(auth_source.get());
     try
     {
         auth_source->accept(this);

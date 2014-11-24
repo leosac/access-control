@@ -4,6 +4,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
 #include <modules/BaseModule.hpp>
+#include "AuthFileInstance.hpp"
 
 namespace Leosac
 {
@@ -17,14 +18,8 @@ namespace Leosac
             /**
             * This implements a authentication module that use files to store access permissions.
             *
-            * Message passing protocol:
-            *     1. The module SHALL listen to the device it wants to (using the application message bus).
-            *     2. Upon reception of a input from this device the module MUST publish a message on the BUS.
-            *     3. This message MUST have "S_{AUTH_INSTANCE_NAME}" as topic.
-            *     4. The first data frame MUST be either "GRANTED" or "DENIED".
-            *     5. Input from the device that lead to this authentication handling SHALL be appended to the message.
-            *
-            * @note: The AuthFileModule can create multiple AuthFileInstance object.
+            * This module conforms to @ref auth_specc.
+            * @see @ref mod_auth_file_user_config for end user doc
             */
             class AuthFileModule : public BaseModule
             {
@@ -48,7 +43,7 @@ namespace Leosac
                 /**
                 * Authenticator instance.
                 */
-                std::vector<AuthFileInstance *> authenticators_;
+                std::vector<AuthFileInstancePtr> authenticators_;
             };
 
         }

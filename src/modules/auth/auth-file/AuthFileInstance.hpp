@@ -10,6 +10,9 @@ namespace Leosac
         namespace Auth
         {
 
+            class AuthFileInstance;
+            using AuthFileInstancePtr = std::shared_ptr<AuthFileInstance>;
+
             /**
             * An instance of an authentication handler that use files to check whether or not access is granted or denied.
             * This class is for INTERNAL use only (by AuthFileModule).
@@ -43,9 +46,10 @@ namespace Leosac
                 /**
                 * Prepare auth source object, map them to profile and check if access is granted.
                 *
+                * @note This is a `noexcept` method. Will return false in case something went wrong.
                 * @return true is access shall be granted, false otherwise.
                 */
-                bool handle_auth(zmqpp::message *msg);
+                bool handle_auth(zmqpp::message *msg) noexcept;
 
                 /**
                 * Returns the socket subscribed to the message bus.

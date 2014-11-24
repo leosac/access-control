@@ -5,47 +5,33 @@
     <user_mapping>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>00:11:22:33</WiegandCard>
-        </map>
-        <map>
-            <user>MY_USER</user>
-            <WiegandCard>aa:bb:cc:dd</WiegandCard>
-        </map>
-        <map>
-            <user>Toto</user>
-            <WiegandCard>cc:dd:ee:ff</WiegandCard>
+            <WiegandCard>80:83:a0:40</WiegandCard>
         </map>
     </user_mapping>
 
-    <date>
+    <permissions>
         <map>
+            <!-- Time frame mapping for MY_USER -->
             <user>MY_USER</user>
 
-            <schedule>
-                <door>porteA</door>
+            <default_schedule>
+                <!-- The scheduling information here *only* apply for door
+                that have no other scheduling information.
+                 In the test suite that use this file, its DoorC.
+                 It is the default schedule FOR THIS USER.
+                 -->
+
                 <monday>
                     <start>00:00</start>
                     <end>23:59</end>
                 </monday>
-            </schedule>
 
-            <schedule>
-                <door>porteB</door>
-                <monday>
-                    <start>2:00</start>
+                <sunday>
+                    <start>00:00</start>
                     <end>23:59</end>
-                </monday>
-            </schedule>
-
-            <default_schedule>
-
+                </sunday>
             </default_schedule>
         </map>
-
-        <map>
-            <user>MY_USER</user>
-            <door>porteB</door>
-            <schedule />
-        </map>
-    </date>
+    </permissions>
 </root>
+

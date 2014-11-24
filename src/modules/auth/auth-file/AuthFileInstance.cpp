@@ -1,5 +1,7 @@
 #include <core/auth/WiegandCard.hpp>
 #include <core/auth/AuthSourceBuilder.hpp>
+#include <core/auth/Auth.hpp>
+#include <exception/ExceptionsTools.hpp>
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 #include "FileAuthSourceMapper.hpp"
@@ -31,64 +33,20 @@ AuthFileInstance::~AuthFileInstance()
 void AuthFileInstance::handle_bus_msg()
 {
     zmqpp::message auth_msg;
-    zmqpp::message auth_msg_cpy;
     zmqpp::message auth_result_msg;
-    std::string topic;
-    std::string auth_data;
-    int nb_bits;
 
     bus_sub_.receive(auth_msg);
-    auth_msg_cpy = auth_msg.copy();
-
-    if (handle_auth(&auth_msg))
-    {
-        auth_result_msg << ("S_" + name_);
-        auth_result_msg << "GRANTED";
-        //auth_result_msg << auth_msg_cpy;
-        bus_push_.send(auth_result_msg);
-    }
-    else
-    {
-        auth_result_msg << ("S_" + name_);
-        auth_result_msg << "GRANTED";
-        //auth_result_msg << auth_data;
-        bus_push_.send(auth_result_msg);
-    }
-/*
-    assert(auth_msg.parts() == 2);
-    auth_msg >> topic;
-    ///todo auth data type.
-    auth_msg >> auth_data;
-    auth_msg >> nb_bits;
-
-    using namespace ::Leosac::Auth;
-   // ICardPtr card(new WiegandCard(auth_data, nb_bits));
-
-    bool success = false;
-    while (!file_stream_.eof())
-    {
-        std::string line;
-        std::getline(file_stream_, line);
-
-        if (line == auth_data)
-        {
-            LOG() << "Auth context (" << name_ << ") receive valid auth data: " << auth_data;
-            success = true;
-            break;
-        }
-    }
-
-    file_stream_.clear();
-    file_stream_.seekg(std::ios_base::beg);
 
     auth_result_msg << ("S_" + name_);
-
-    if (success)
-        auth_result_msg << "GRANTED";
+    if (handle_auth(&auth_msg))
+    {
+        auth_result_msg << Leosac::Auth::AccessStatus::GRANTED;
+    }
     else
-        auth_result_msg << "DENIED";
-    auth_result_msg << auth_data;
-    bus_push_.send(auth_result_msg);*/
+    {
+        auth_result_msg << Leosac::Auth::AccessStatus::DENIED;
+    }
+    bus_push_.send(auth_result_msg);
 }
 
 zmqpp::socket &AuthFileInstance::bus_sub()
@@ -96,14 +54,26 @@ zmqpp::socket &AuthFileInstance::bus_sub()
     return bus_sub_;
 }
 
-bool AuthFileInstance::handle_auth(zmqpp::message *msg)
+bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
 {
-    AuthSourceBuilder build;
-    auto ptr = build.create(msg);
-    FileAuthSourceMapper mapper("FILE");
+    try
+    {
+        AuthSourceBuilder build;
+        IAuthenticationSourcePtr ptr = build.create(msg);
+        FileAuthSourceMapper mapper(file_path_);
 
-    mapper.mapToUser(ptr);
-   // ptr->profile()->isAccessGranted(..., ...);
-
+        mapper.mapToUser(ptr);
+        if (!ptr->profile())
+        {
+            NOTICE("No profile were create from this auth source message.");
+            return false;
+        }
+        // check against default target
+        return ptr->profile()->isAccessGranted(std::chrono::system_clock::now(), nullptr);
+    }
+    catch (std::exception &e)
+    {
+        log_exception(e);
+    }
     return false;
 }

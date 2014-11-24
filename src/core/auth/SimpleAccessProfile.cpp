@@ -7,9 +7,7 @@ using namespace Leosac::Auth;
 
 bool SimpleAccessProfile::isAccessGranted(const std::chrono::system_clock::time_point &date, AuthTargetPtr target)
 {
-    assert(target);
-
-    if (!time_frames_[target->name()].size())
+    if (!target || !time_frames_[target->name()].size())
     {
         // use default target information, as we have nothing specific
         for (const auto &time_frame : default_time_frames_)

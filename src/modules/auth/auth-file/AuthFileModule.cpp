@@ -1,5 +1,4 @@
 #include "AuthFileModule.hpp"
-#include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac::Module::Auth;
@@ -16,15 +15,10 @@ AuthFileModule::AuthFileModule(zmqpp::context &ctx,
         reactor_.add(authenticator->bus_sub(),
                 std::bind(&AuthFileInstance::handle_bus_msg, authenticator));
     }
-    reactor_.add(pipe_, std::bind(&AuthFileModule::handle_pipe, this));
 }
 
 AuthFileModule::~AuthFileModule()
 {
-    for (auto authenticator : authenticators_)
-    {
-        delete authenticator;
-    }
 }
 
 void AuthFileModule::process_config()
@@ -37,12 +31,12 @@ void AuthFileModule::process_config()
 
         std::string auth_ctx_name = auth_instance_cfg.get_child("name").data();
         std::string auth_target_name = auth_instance_cfg.get_child("auth_source").data();
-        std::string auth_input_file = auth_instance_cfg.get_child("valid_input_file").data();
+        std::string config_file = auth_instance_cfg.get_child("config_file").data();
 
-        LOG() << "Creating Auth instance " << auth_ctx_name;
-        authenticators_.push_back(new AuthFileInstance(ctx_,
+        INFO("Creating Auth instance " << auth_ctx_name);
+        authenticators_.push_back(AuthFileInstancePtr(new AuthFileInstance(ctx_,
                 auth_ctx_name,
                 auth_target_name,
-                auth_input_file));
+                config_file)));
     }
 }

@@ -3,6 +3,7 @@
     <plugin_directories>
         <plugindir>.</plugindir>
         <plugindir>/root/leosac/lib/leosac</plugindir>
+        <plugindir>/root/leosac/lib/leosac/auth</plugindir>
     </plugin_directories>
 
     <network>
@@ -87,7 +88,7 @@
             </module_config>
         </module>
 
- <module>
+        <module>
             <name>AUTH-MANAGER-FILE</name>
             <file>libauth-file.so</file>
             <level>41</level>
@@ -100,14 +101,13 @@
 
                         <!-- Device we watch as input source -->
                         <auth_source>MY_WIEGAND_1</auth_source>
-                        <valid_input_file>valid-cards.txt</valid_input_file>
-                        <user-map>file_auth.xml</user-map>
+                        <config_file>file_auth.xml</config_file>
                     </instance>
                 </instances>
             </module_config>
         </module>
 
-     <module>
+        <module>
             <!-- Doorman module: react to authentication broadcast -->
             <name>DOORMAN</name>
             <file>libdoorman.so</file>
@@ -141,10 +141,12 @@
                                     <f2>ON</f2>
                                     <f3>1500</f3>
                                 </cmd>
+                            </action>
                         </actions>
                     </instance>
                 </instances>
             </module_config>
         </module>
+    </modules>
 
 </kernel>
