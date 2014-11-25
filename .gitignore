@@ -10,3 +10,7 @@ install
 
 #IDE workspace stuff
 .idea/workspace.xml
+
+## This is generated Doxygen doc.
+## Or files attached to release
+doc/
