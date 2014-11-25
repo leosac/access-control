@@ -1,8 +1,8 @@
 #include "tools/log.hpp"
 #include "hardware/FWiegandReader.hpp"
-#include <boost/property_tree/ptree_serialization.hpp>
 #include "RplethModule.hpp"
 #include "rplethprotocol.hpp"
+#include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 
@@ -42,7 +42,6 @@ void RplethModule::process_config()
     INFO("Rpleth module will bind to " << port << " and will control the device nammed " << reader_name
             << "Stream mode = " << stream_mode_);
     reader_ = std::unique_ptr<Hardware::FWiegandReader>(new Hardware::FWiegandReader(ctx_, reader_name));
-    assert(reader_);
     server_.bind("tcp://*:" + std::to_string(port));
 }
 
@@ -114,7 +113,6 @@ RplethPacket RplethModule::handle_client_packet(RplethPacket packet)
     RplethPacket response = packet;
     try
     {
-        DEBUG("received client packet: " << (int) packet.command);
         response.sender = RplethPacket::Sender::Server;
         if (response.type == RplethProtocol::Rpleth && response.command == RplethProtocol::Ping)
         {
@@ -164,7 +162,8 @@ void RplethModule::handle_wiegand_event()
     bus_sub_.receive(msg);
     msg >> card_id >> card_id >> nb_bit_read;
 
-    DEBUG("Rpleth module register card {" << card_id << "}");
+    DEBUG("Rpleth module registered card with id " << card_id << " and "
+            << nb_bit_read << " significants bits");
 
     if (stream_mode_)
         cards_read_stream_.push_back(std::make_pair(card_id, nb_bit_read));
@@ -174,13 +173,6 @@ void RplethModule::handle_wiegand_event()
     {
         cards_read_.push_back(card_id);
     }
-    else
-    {
-        // card not found
-        //LOG() << "This card shouldnt register {" << card_id << "}";
-        //reader_->beep(1000);
-    }
-
     cards_read_.unique();
     rpleth_publish_card();
 }
@@ -267,24 +259,32 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
 
 void RplethModule::rpleth_beep(const RplethPacket &packet)
 {
-    assert(packet.data.size() > 0);
-    if (packet.data[0] == 0x01)
-        reader_->buzzerOn();
-    else if (packet.data[0] == 0x00)
-        reader_->buzzerOff();
+    if (packet.data.size() > 0)
+    {
+        if (packet.data[0] == 0x01)
+            reader_->buzzerOn();
+        else if (packet.data[0] == 0x00)
+            reader_->buzzerOff();
+        else
+            WARN("Malformed (Rpleth Beep) packet. Data byte is invalid");
+    }
     else
-        NOTICE("Invalid Rpleth packet");
+        WARN("Malformed (Rpleth Beep) packet. Not enough data");
 }
 
 void RplethModule::rpleth_greenled(const RplethPacket &packet)
 {
-    assert(packet.data.size() > 0);
-    if (packet.data[0] == 0x01)
-        reader_->greenLedOn();
-    else if (packet.data[0] == 0x00)
-        reader_->greenLedOff();
+    if (packet.data.size() > 0)
+    {
+        if (packet.data[0] == 0x01)
+            reader_->greenLedOn();
+        else if (packet.data[0] == 0x00)
+            reader_->greenLedOff();
+        else
+            WARN("Malformed (Rpleth GreenLed) packet. Data byte is invalid");
+    }
     else
-        NOTICE("Invalid Rpleth packet");
+        WARN("Malformed (Rpleth GreenLed) packet. Not enough data");
 }
 
 bool RplethModule::client_connected(const std::string &identity) const
@@ -400,13 +400,10 @@ RplethPacket RplethModule::set_dhcp_state(const RplethPacket &p)
     response.type = RplethProtocol::TypeCode::Rpleth;
     response.command = RplethProtocol::RplethCommands::SetDHCP;
 
-    INFO("COOL");
     if (p.dataLen < 1)
         ERROR("Invalid Rpleth Packet");
-
     else if (network_cfg.get<bool>("enabled"))
         {
-            INFO("SUPER__COOL");
             network_cfg.erase("dhcp");
             network_cfg.put("dhcp", p.data[0] ? true : false);
             if (push_network_config(network_cfg))
