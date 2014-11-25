@@ -77,6 +77,7 @@ namespace Leosac
             ~AuthFileMapperTest()
             {
                 delete mapper_;
+                delete mapper2_;
             }
 
             bool is_in_group(const std::string &user_name, const std::string &group_name,
