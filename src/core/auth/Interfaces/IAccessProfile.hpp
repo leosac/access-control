@@ -23,8 +23,7 @@ namespace Leosac
             * @param date the time point at which we try to get access.
             * @param target the door we want to open.
             *
-            * @note If target is null or if it has no special permissions we check
-            * for defaults access permissions.
+            * @note Check for defaults permissions then door-specific permissions.
             */
             virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
             AuthTargetPtr target) = 0;

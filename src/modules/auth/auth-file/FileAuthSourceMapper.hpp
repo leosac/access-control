@@ -60,8 +60,16 @@ namespace Leosac
                 /**
                 * Naive method that bruteforce groups to try to find
                 * membership for an user.
+                *
+                * @param u a non-null pointer to user.
+                * @return all group the user is a member of.
                 */
-                Leosac::Auth::GroupPtr get_user_group(Leosac::Auth::IUserPtr u);
+                std::vector<Leosac::Auth::GroupPtr> get_user_groups(Leosac::Auth::IUserPtr u);
+
+                /**
+                * Merge a bunch of profiles together and returns a new profile.
+                */
+                Leosac::Auth::IAccessProfilePtr merge_profiles(const std::vector<Leosac::Auth::IAccessProfilePtr> profiles);
 
                 /**
                 * Build the schedule for an access profile.

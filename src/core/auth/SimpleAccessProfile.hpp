@@ -50,6 +50,21 @@ namespace Leosac
             virtual void addAccessHour(AuthTargetPtr target,
                     int day, int start_hour, int start_min, int end_hour, int end_min);
 
+            /**
+            * Adds a time frame for a target.
+            */
+            virtual void addAccessTimeFrame(AuthTargetPtr target, const SingleTimeFrame& tf);
+
+            /**
+            * Provide informations about time frames that apply to non-specific door (ie when target is nullptr).
+            */
+            virtual const std::vector<SingleTimeFrame>& defaultTimeFrames() const;
+
+            /**
+            * Provide informations about the doors specific timeframe.
+            */
+            virtual const std::map<std::string, std::vector<SingleTimeFrame>>& timeFrames() const;
+
         protected:
             /**
             * Check whether this time frame permits access or not.

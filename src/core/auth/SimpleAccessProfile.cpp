@@ -7,14 +7,13 @@ using namespace Leosac::Auth;
 
 bool SimpleAccessProfile::isAccessGranted(const std::chrono::system_clock::time_point &date, AuthTargetPtr target)
 {
-    if (!target || !time_frames_[target->name()].size())
-    {
-        // use default target information, as we have nothing specific
-        for (const auto &time_frame : default_time_frames_)
-            if (check_timeframe(time_frame, date))
-                return true;
-    }
-    else
+    // check "general" permissions that apply to all target
+    for (const auto &time_frame : default_time_frames_)
+        if (check_timeframe(time_frame, date))
+            return true;
+
+    // check door specific permissions.
+    if (target && time_frames_[target->name()].size())
     {
         for (const auto &time_frame : time_frames_[target->name()])
             if (check_timeframe(time_frame, date))
@@ -41,10 +40,7 @@ void SimpleAccessProfile::addAccessHour(AuthTargetPtr target,
     tf.end_hour = end_hour;
     tf.end_min = end_min;
 
-    if (!target)
-        default_time_frames_.push_back(tf);
-    else
-        time_frames_[target->name()].push_back(tf);
+    addAccessTimeFrame(target, tf);
 }
 
 bool SimpleAccessProfile::check_timeframe(const SingleTimeFrame &tf, const std::chrono::system_clock::time_point &date)
@@ -61,4 +57,22 @@ bool SimpleAccessProfile::check_timeframe(const SingleTimeFrame &tf, const std::
             (tf.end_hour == time_out->tm_hour && tf.end_min >= time_out->tm_min)))
         return false;
     return true;
+}
+
+const std::map<std::string, std::vector<SingleTimeFrame>> &SimpleAccessProfile::timeFrames() const
+{
+    return time_frames_;
+}
+
+const std::vector<SingleTimeFrame> &SimpleAccessProfile::defaultTimeFrames() const
+{
+    return default_time_frames_;
+}
+
+void SimpleAccessProfile::addAccessTimeFrame(AuthTargetPtr target, const SingleTimeFrame &tf)
+{
+    if (target)
+        time_frames_[target->name()].push_back(tf);
+    else
+        default_time_frames_.push_back(tf);
 }

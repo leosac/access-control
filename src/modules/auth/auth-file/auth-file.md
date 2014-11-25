@@ -7,6 +7,8 @@ Introduction {#mod_auth_file_intro}
 ================================
 
 The module Auth-File is an **authentication backend** module.
+This module is suitable only for a low number of users / cards / groups.
+The whole configuration lives in memory so is where this limitation comes from.
 
 
 Configuration Options {#mod_auth_file_user_config}

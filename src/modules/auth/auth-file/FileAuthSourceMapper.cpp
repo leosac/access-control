@@ -7,6 +7,7 @@
 #include <exception/moduleexception.hpp>
 #include <exception/configexception.hpp>
 #include <boost/algorithm/string.hpp>
+#include <core/auth/ProfileMerger.hpp>
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
@@ -73,27 +74,21 @@ void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
 IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr auth_source)
 {
     assert(auth_source);
-    IAccessProfilePtr profile;
+    std::vector<GroupPtr> grps;
+    std::vector<IAccessProfilePtr> profiles; // profiles that apply to the user.
 
     if (!auth_source->owner())
     {
         NOTICE("No owner for this auth source.");
         return nullptr;
     }
-    profile = auth_source->owner()->profile();
-    if (profile)
-    {
-        INFO("Profile is user-specific: {" << auth_source->owner()->id() << "}");
-        return profile;
-    }
-    GroupPtr grp = get_user_group(auth_source->owner());
-    if (grp)
-    {
-        INFO("Using profile from group {" << grp->name() << "}");
-        return grp->profile();
-    }
 
-    return nullptr;
+    grps = get_user_groups(auth_source->owner());
+    for (auto & grp : grps)
+            profiles.push_back(grp->profile());
+
+    profiles.push_back(auth_source->owner()->profile());
+    return merge_profiles(profiles);
 }
 
 void FileAuthSourceMapper::build_permission()
@@ -279,20 +274,38 @@ std::vector<GroupPtr> FileAuthSourceMapper::groups() const
     return ret;
 }
 
-Leosac::Auth::GroupPtr FileAuthSourceMapper::get_user_group(Leosac::Auth::IUserPtr u)
+std::vector<GroupPtr> FileAuthSourceMapper::get_user_groups(Leosac::Auth::IUserPtr u)
 {
+    assert(u);
+    std::vector<GroupPtr> grps;
+    auto lambda_cmp = [&](IUserPtr user) -> bool
+            {
+                return user->id() == u->id();
+            };
+
     for (const auto &grp_map : groups_)
     {
         GroupPtr grp;
         std::tie(std::ignore, grp) = grp_map;
 
         if (std::find_if(grp->members().begin(),
-                grp->members().end(),
-                [&](IUserPtr user) -> bool
-                {
-                    return user->id() == u->id();
-                }) != grp->members().end())
-            return grp;
+                grp->members().end(), lambda_cmp) != grp->members().end())
+        {
+            grps.push_back(grp);
+        }
     }
-    return nullptr;
+    return grps;
+}
+
+IAccessProfilePtr FileAuthSourceMapper::merge_profiles(const std::vector<IAccessProfilePtr> profiles)
+{
+    ProfileMerger merger;
+    IAccessProfilePtr result(new SimpleAccessProfile());
+
+    for (auto &profile : profiles)
+    {
+        if (profile)
+            result = merger.merge(result, profile);
+    }
+    return result;
 }
