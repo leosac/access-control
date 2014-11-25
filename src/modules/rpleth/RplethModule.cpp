@@ -5,6 +5,7 @@
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <core/auth/Auth.hpp>
 
 using namespace Leosac::Module::Rpleth;
 
@@ -157,10 +158,14 @@ void RplethModule::handle_wiegand_event()
 {
     zmqpp::message msg;
     std::string card_id;
+    std::string src; // object that sent event
+    Leosac::Auth::SourceType type;
     int nb_bit_read;
 
     bus_sub_.receive(msg);
-    msg >> card_id >> card_id >> nb_bit_read;
+    msg >> src >> type;
+    assert(type == Leosac::Auth::SourceType::SIMPLE_WIEGAND);
+    msg >> card_id >> nb_bit_read;
 
     DEBUG("Rpleth module registered card with id " << card_id << " and "
             << nb_bit_read << " significants bits");
