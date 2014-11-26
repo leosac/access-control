@@ -16,15 +16,42 @@ Configuration Options {#mod_auth_file_user_config}
 
 
 
-Options    | Options     | Options    | Description                                            | Mandatory
------------|-------------|------------|--------------------------------------------------------|-----------
-instances  |             |            | List of configured auth file instance                  | YES
----->      | name        |            | Configure of one particular led device                 | YES
----->      | auth_source |            | Which device (auth source) we listen to                | YES
----->      | config_file |            | Path to the config file that holds permissions data    | YES
+Options    | Options     | Options    | Description                                                  | Mandatory
+-----------|-------------|------------|--------------------------------------------------------------|-----------
+instances  |             |            | List of configured auth file instance                        | YES
+---->      | name        |            | Configure of one particular led device                       | YES
+---->      | auth_source |            | Which device (auth source) we listen to                      | YES
+---->      | config_file |            | Path to the config file that holds permissions data          | YES
+---->      | target      |            | Name of the target (door) that we are authenticating against | NO
 
-Example {#mod_led_example}
+If the `target` is not present, the module assumes the default target, and will ignore target-specific
+permissions.
+
+Example {#mod_auth_file_example}
 -----------------------------
+
+This is the module configuration in the main config file.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+        <module>
+            <name>AUTH-MANAGER-FILE</name>
+            <file>libauth-file.so</file>
+            <level>41</level>
+            <module_config>
+                <instances>
+                    <instance>
+                        <name>AUTH_CONTEXT_1</name>
+                        <auth_source>MY_WIEGAND_1</auth_source>
+                        <config_file>file_auth.xml</config_file>
+                    </instance>
+                </instances>
+            </module_config>
+        </module>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+This is a possible content of the file designed by the `config_field` config entry for
+the module ("file_auth.xml" based on the previous example).
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <root>
