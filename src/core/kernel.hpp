@@ -64,7 +64,7 @@ private:
     /**
     * Init the module manager by feeding it paths to library file, loading module, etc.
     */
-    bool module_manager_init();
+    void module_manager_init();
 
     /**
     * A request has arrived on the `control_` socket.

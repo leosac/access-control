@@ -22,8 +22,10 @@ instances  |             |            | List of configured auth file instance   
 ---->      | config_file |            | Path to the config file that holds permissions data          | YES
 ---->      | target      |            | Name of the target (door) that we are authenticating against | NO
 
-If the `target` is not present, the module assumes the default target, and will ignore target-specific
+Notes:
+  + If the `target` is not present, the module assumes the default target, and will ignore target-specific
 permissions.
+  + the `config_file` path is relative to the working directory of Leosac.
 
 Example {#mod_auth_file_example}
 -----------------------------

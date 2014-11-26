@@ -11,6 +11,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <exception/moduleexception.hpp>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -57,8 +58,7 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
 
 bool Kernel::run()
 {
-    if (!module_manager_init())
-        return false;
+    module_manager_init();
 
     SignalHandler::registerCallback(Signal::SigInt, [this](Signal)
     {
@@ -79,7 +79,7 @@ bool Kernel::run()
     return want_restart_;
 }
 
-bool Kernel::module_manager_init()
+void Kernel::module_manager_init()
 {
     try
     {
@@ -104,19 +104,18 @@ bool Kernel::module_manager_init()
             std::string module_file = module_conf.get_child("file").data();
 
             if (!module_manager_.loadModule(module_conf))
-                return false;
+                throw LEOSACException("Cannot load modules.");
         }
     }
     catch (ptree_error &e)
     {
         ERROR("Invalid configuration file: " << e.what());
-        return false;
+        std::throw_with_nested(LEOSACException("Cannot load modules."));
     }
     if (!module_manager_.initModules())
     {
-        return false;
+        throw LEOSACException("Cannot initiliaze modules.");
     }
-    return true;
 }
 
 void Kernel::handle_control_request()
