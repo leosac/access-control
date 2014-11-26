@@ -42,7 +42,7 @@ script:
     # unit test
     - ctest --verbose
     # other tests
-    - pushd test_helper;
+    - pushd ../test_helper;
     - ./run_tests.sh;
     - popd;
 after_success:
