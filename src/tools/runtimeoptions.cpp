@@ -31,3 +31,8 @@ const std::string& RuntimeOptions::getParam(const std::string& key) const
     else
         throw std::runtime_error("RuntimeOptions::getParam [key = " + key + "] [value = " + DefaultEmptyParam + "]");
 }
+
+bool RuntimeOptions::hasParam(const std::string &key) const
+{
+    return _params.count(key);
+}

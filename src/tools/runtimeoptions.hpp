@@ -45,6 +45,8 @@ namespace Leosac
 
             bool isSet(Flag flag) const;
 
+            bool hasParam(const std::string &key) const;
+
             void setParam(const std::string &key, const std::string &value);
 
             const std::string &getParam(const std::string &key) const;

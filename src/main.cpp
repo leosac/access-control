@@ -12,7 +12,7 @@
 #include <exception/configexception.hpp>
 #include <exception/ExceptionsTools.hpp>
 #include <exception/coreexception.hpp>
-
+#include <unistd.h>
 #include "tools/log.hpp"
 #include "tools/leosac.hpp"
 #include "tools/runtimeoptions.hpp"
@@ -20,9 +20,19 @@
 #include "tools/unixshellscript.hpp"
 #include "exception/leosacexception.hpp"
 
-void print_usage();
-
 using namespace Leosac::Tools;
+
+static int set_working_directory(RuntimeOptions &opts)
+{
+    int ret = 0;
+    if (opts.hasParam("working_directory") && !opts.getParam("working_directory").empty())
+    {
+        ret = chdir(opts.getParam("working_directory").c_str());
+        if (ret != 0)
+            perror("Cannot change working directory");
+    }
+    return ret;
+}
 
 int main(int argc, char **argv)
 {
@@ -33,18 +43,25 @@ int main(int argc, char **argv)
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ', Leosac::getVersionString());
         TCLAP::SwitchArg verboseSwitch("v", "verbose", "Increase verbosity", false);
-        TCLAP::ValueArg<std::string> kernelFile("k", "kernel-cfg", "Kernel Configuration file", false, "", "string");
+        TCLAP::ValueArg<std::string> kernelFile("k", "kernel-cfg", "Kernel Configuration file", true, "", "string");
+        TCLAP::ValueArg<std::string> working_directory("d", "working_directory", "Leosac's working directory", false, "", "string");
 
         cmd.add(verboseSwitch);
         cmd.add(kernelFile);
+        cmd.add(working_directory);
         cmd.parse(argc, argv);
         options.setFlag(RuntimeOptions::Verbose, verboseSwitch.getValue());
         options.setParam("kernel-cfg", kernelFile.getValue());
+        options.setParam("working_directory", working_directory.getValue());
     }
     catch (const TCLAP::ArgException &e)
     {
         throw (LEOSACException(e.error()));
     }
+
+    if (set_working_directory(options) != 0)
+        return 1;
+
     while (relaunch)
     {
         UnixShellScript backup("cp -f");
@@ -53,12 +70,6 @@ int main(int argc, char **argv)
         {
             Kernel kernel(Kernel::make_config(options));
             relaunch = kernel.run();
-        }
-        catch (const CoreException &e)
-        {
-            Leosac::print_exception(e);
-            print_usage();
-            return 1;
         }
         catch (const std::exception &e)
         {
@@ -73,9 +84,4 @@ int main(int argc, char **argv)
         }
     }
     return (0);
-}
-
-void print_usage()
-{
-    std::cout << "./Leosac -k path/to/config [-v]" << std::endl;
 }

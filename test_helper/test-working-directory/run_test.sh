@@ -28,4 +28,11 @@ if ./build/leosac -k $TMP_DIR/amd64.xml; then
     die 1
 fi
 
+## should work because we use the plugin dir as workding dir
+(sleep 3s; kill `pidof leosac`) &
+if ! ./build/leosac -k $TMP_DIR/amd64.xml -d $TMP_DIR/build ; then
+    echo "Leosac failed, but should have succeded"
+    die 1
+fi
+
 die 0
