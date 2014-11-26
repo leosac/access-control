@@ -39,7 +39,12 @@ before_script:
 script:
     - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi
     - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then make ; fi
+    # unit test
     - ctest --verbose
+    # other tests
+    - pushd test_helper;
+    - ./run_tests.sh;
+    - popd;
 after_success:
     - sudo make install
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
