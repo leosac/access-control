@@ -11,18 +11,20 @@ using namespace Leosac::Auth;
 
 AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         std::string const &auth_ctx_name,
+        std::string const &auth_source_name,
         std::string const &auth_target_name,
         std::string const &input_file) :
         bus_push_(ctx, zmqpp::socket_type::push),
         bus_sub_(ctx, zmqpp::socket_type::sub),
         name_(auth_ctx_name),
+        target_name_(auth_target_name),
         file_path_(input_file)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
 
-    INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << auth_target_name);
-    bus_sub_.subscribe("S_" + auth_target_name);
+    INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << auth_source_name);
+    bus_sub_.subscribe("S_" + auth_source_name);
 }
 
 AuthFileInstance::~AuthFileInstance()
@@ -68,8 +70,16 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
             NOTICE("No profile were create from this auth source message.");
             return false;
         }
-        // check against default target
-        return ptr->profile()->isAccessGranted(std::chrono::system_clock::now(), nullptr);
+        if (target_name_.empty())
+        {
+            // check against default target
+            return ptr->profile()->isAccessGranted(std::chrono::system_clock::now(), nullptr);
+        }
+        else
+        {
+            AuthTargetPtr t(new AuthTarget(target_name_));
+            return ptr->profile()->isAccessGranted(std::chrono::system_clock::now(), t);
+        }
     }
     catch (std::exception &e)
     {

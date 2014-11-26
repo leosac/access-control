@@ -102,6 +102,7 @@
                         <!-- Device we watch as input source -->
                         <auth_source>MY_WIEGAND_1</auth_source>
                         <config_file>file_auth.xml</config_file>
+                        <target>doorA</target>
                     </instance>
                 </instances>
             </module_config>
