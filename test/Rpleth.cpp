@@ -2,6 +2,7 @@
 #include <modules/rpleth/RplethModule.hpp>
 #include <modules/rpleth/rplethprotocol.hpp>
 #include <tools/log.hpp>
+#include <core/auth/Auth.hpp>
 #include "helper/TestHelper.hpp"
 #include "helper/FakeWiegandReader.hpp"
 
@@ -116,32 +117,30 @@ namespace Leosac
         */
         TEST_F(RplethTest, TestReceiveStreamCardsSimple)
         {
-            std::cout << "test 2 _ start" << std::endl;
             zmqpp::socket client = connect_to_rpleth();
 
             // fake wiegand reader activity.
-            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "ff:ab:cd:ef" << 32);
+            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << Leosac::Auth::SourceType::SIMPLE_WIEGAND << "ff:ab:cd:ef" << 32);
             check_rpleth_card_msg(client, {0xff, 0xab, 0xcd, 0xef});
         }
 
         TEST_F(RplethTest, TestReceiveStreamCards2)
         {
-            std::cout << "test 3 _ start" << std::endl;
             zmqpp::message msg;
             std::string connection_identity, data;
             zmqpp::socket client = connect_to_rpleth();
 
             // fake wiegand reader activity.
-            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "ff:ab:cd:ef" << 32);
+            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << Leosac::Auth::SourceType::SIMPLE_WIEGAND << "ff:ab:cd:ef" << 32);
             check_rpleth_card_msg(client, {0xff, 0xab, 0xcd, 0xef});
 
-            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "11:22:33:44" << 32);
+            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << Leosac::Auth::SourceType::SIMPLE_WIEGAND  << "11:22:33:44" << 32);
             check_rpleth_card_msg(client, {0x11, 0x22, 0x33, 0x44});
 
-            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << "80:81:61:40" << 26);
+            bus_push_.send(zmqpp::message() << "S_WIEGAND1" << Leosac::Auth::SourceType::SIMPLE_WIEGAND  << "80:81:61:40" << 26);
             check_rpleth_card_msg(client, {0x02, 0x02, 0x05, 0x85});
 
-            bus_push_.send(zmqpp::message() << "S_INGNORED_READER" << "11:22:33:44" << 32);
+            bus_push_.send(zmqpp::message() << "S_INGNORED_READER" << Leosac::Auth::SourceType::SIMPLE_WIEGAND  << "11:22:33:44" << 32);
             std::this_thread::sleep_for(std::chrono::milliseconds(15));
             // nothing to read anymore
             ASSERT_FALSE(client.receive(msg, true));
