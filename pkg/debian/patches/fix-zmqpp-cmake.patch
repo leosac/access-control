@@ -1,0 +1,31 @@
+Title: Disable zmqpp static build
+DEP: 3
+State: ACCEPTED
+Date: 2014-11-26
+Drivers: Arnaud Kapp <kapp.arno@gmail.com>
+Abstract:
+ Disable building static zmqpp because this requires
+ static libzmq and cause a bug.
+--- a/zmqpp/CMakeLists.txt
++++ b/zmqpp/CMakeLists.txt
+@@ -88,13 +88,13 @@
+ 
+ # Staticlib
+ 
+-if (ZMQPP_BUILD_STATIC)
+-  add_library( zmqpp-static STATIC ${LIBZMQPP_SOURCES})
+-  find_library(ZEROMQ_LIBRARY_STATIC ${ZMQPP_LIBZMQ_NAME_STATIC} PATHS ${ZEROMQ_LIB_DIR})
+-  target_link_libraries( zmqpp-static ${ZEROMQ_LIBRARY_STATIC} )
+-  list( APPEND INSTALL_TARGET_LIST zmqpp-static)
+-  set( LIB_TO_LINK_TO_EXAMPLES zmqpp-static )
+-endif() # ZMQPP_BUILD_STATIC
++#if (ZMQPP_BUILD_STATIC)
++#  add_library( zmqpp-static STATIC ${LIBZMQPP_SOURCES})
++#  find_library(ZEROMQ_LIBRARY_STATIC ${ZMQPP_LIBZMQ_NAME_STATIC} PATHS ${ZEROMQ_LIB_DIR})
++#  target_link_libraries( zmqpp-static ${ZEROMQ_LIBRARY_STATIC} )
++#  list( APPEND INSTALL_TARGET_LIST zmqpp-static)
++#  set( LIB_TO_LINK_TO_EXAMPLES zmqpp-static )
++#endif() # ZMQPP_BUILD_STATIC
+ 
+ # Shared lib
+ 
