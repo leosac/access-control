@@ -16,7 +16,7 @@ void DynamicLibrary::open(RelocationMode mode)
 {
     char*   err;
 
-    if (!(_handle = dlopen(_file.c_str(), static_cast<int>(mode))))
+    if (!(_handle = dlopen(_file.c_str(), static_cast<int>(mode) | RTLD_NODELETE)))
     {
         if ((err = dlerror()))
             throw (DynLibException(std::string("dlopen(): ") + err));
