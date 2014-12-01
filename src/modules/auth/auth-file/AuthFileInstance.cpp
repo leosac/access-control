@@ -67,7 +67,7 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         mapper.mapToUser(ptr);
         if (!ptr->profile())
         {
-            NOTICE("No profile were create from this auth source message.");
+            NOTICE("No profile were created from this auth source message.");
             return false;
         }
         if (target_name_.empty())

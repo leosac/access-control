@@ -1,9 +1,9 @@
 #pragma once
 
 #include <boost/property_tree/ptree.hpp>
-#include <tools/runtimeoptions.hpp>
 #include <zmqpp/context.hpp>
-#include <core/netconfig/networkconfig.hpp>
+#include "tools/runtimeoptions.hpp"
+#include "core/netconfig/networkconfig.hpp"
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
 

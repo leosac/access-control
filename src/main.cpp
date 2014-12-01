@@ -5,20 +5,14 @@
 */
 
 #include <iostream>
-
 // NOTE TCLAP is easily replacable by boost::program_options
 #include <tclap/CmdLine.h>
-#include <core/kernel.hpp>
-#include <exception/configexception.hpp>
-#include <exception/ExceptionsTools.hpp>
-#include <exception/coreexception.hpp>
 #include <unistd.h>
+#include "core/kernel.hpp"
+#include "exception/ExceptionsTools.hpp"
 #include "tools/log.hpp"
 #include "tools/leosac.hpp"
-#include "tools/runtimeoptions.hpp"
-#include "tools/unixfs.hpp"
 #include "tools/unixshellscript.hpp"
-#include "exception/leosacexception.hpp"
 
 using namespace Leosac::Tools;
 
@@ -34,7 +28,7 @@ static int set_working_directory(RuntimeOptions &opts)
     return ret;
 }
 
-int main(int argc, char **argv)
+int main(int argc, const char **argv)
 {
     RuntimeOptions options;
     int relaunch = 1;
