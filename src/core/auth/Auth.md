@@ -138,3 +138,7 @@ This namespace defines interface and concrete implementation of some class
 useful in the authentication and authorization system. Authentication module
 will likely make direct use of this part of Leosac.
 @see @ref auth_main
+
+
+@namespace Leosac::Module::Auth
+@brief Authentication backend modules live here.

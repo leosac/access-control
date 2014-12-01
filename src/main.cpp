@@ -15,6 +15,7 @@
 #include "tools/unixshellscript.hpp"
 
 using namespace Leosac::Tools;
+using namespace Leosac;
 
 static int set_working_directory(RuntimeOptions &opts)
 {

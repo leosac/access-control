@@ -16,6 +16,7 @@
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
 using namespace Leosac::Tools;
+using namespace Leosac;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
@@ -28,9 +29,13 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         network_config_(nullptr)
 {
     if (config.get_child_optional("network"))
-        network_config_ = std::move(std::unique_ptr<NetworkConfig>(new NetworkConfig(config.get_child("network"))));
+    {
+        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(config.get_child("network")));
+    }
     else
-        network_config_ = std::move(std::unique_ptr<NetworkConfig>(new NetworkConfig(boost::property_tree::ptree())));
+    {
+        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(boost::property_tree::ptree()));
+    }
     control_.bind("inproc://leosac-kernel");
     network_config_->reload();
 }
