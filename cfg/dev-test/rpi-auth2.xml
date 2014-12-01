@@ -12,6 +12,16 @@
 
     <modules>
         <module>
+            <name>MONITOR</name>
+            <file>libmonitor.so</file>
+            <level>1</level>
+            <module_config>
+                <file-bus>MY_LOGS.txt</file-bus>
+                <verbose>true</verbose>
+            </module_config>
+        </module>
+
+        <module>
             <name>PIFACE-GPIO</name>
             <file>libpifacedigital.so</file>
             <level>2</level>
