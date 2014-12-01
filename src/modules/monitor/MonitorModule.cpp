@@ -39,7 +39,7 @@ void MonitorModule::run()
 {
     while (is_running_)
     {
-        reactor_.poll(3);
+        reactor_.poll(1000);
         if (last_ping_ == TimePoint::max() ||
                 std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_ping_).count() > 3)
         {

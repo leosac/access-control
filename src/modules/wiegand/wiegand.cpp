@@ -81,7 +81,7 @@ void WiegandReaderModule::run()
 {
     while (is_running_)
     {
-        if (!reactor_.poll(10))
+        if (!reactor_.poll(50))
         {
             for (auto &reader : readers_)
                 reader.timeout();
