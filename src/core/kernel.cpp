@@ -112,10 +112,7 @@ void Kernel::module_manager_init()
         ERROR("Invalid configuration file: " << e.what());
         std::throw_with_nested(LEOSACException("Cannot load modules."));
     }
-    if (!module_manager_.initModules())
-    {
-        throw LEOSACException("Cannot initiliaze modules.");
-    }
+    module_manager_.initModules();
 }
 
 void Kernel::handle_control_request()

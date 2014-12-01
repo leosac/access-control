@@ -37,7 +37,7 @@ public:
     * The module initialization order in honored (see the "level" property).
     * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
     */
-    bool initModules();
+    void initModules();
 
     /**
     * Opposite of init module. this stop all modules thread and perform cleanup.

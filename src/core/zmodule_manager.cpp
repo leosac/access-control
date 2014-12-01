@@ -26,7 +26,7 @@ void zModuleManager::unloadLibraries()
     modules_.clear();
 }
 
-bool zModuleManager::initModules()
+void zModuleManager::initModules()
 {
     for (const ModuleInfo &module_info : modules_)
     {
@@ -49,10 +49,9 @@ bool zModuleManager::initModules()
         catch (std::exception &e)
         {
             ERROR("Unable to init module {" << module_info.name_ << "}: " << e.what());
-            return false;
+            std::throw_with_nested(ModuleException("Unable to init module {" + module_info.name_ + "}"));
         }
     }
-    return true;
 }
 
 void zModuleManager::addToPath(const std::string &dir)
