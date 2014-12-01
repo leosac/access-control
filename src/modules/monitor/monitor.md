@@ -20,6 +20,9 @@ Options    | Options  | Options                | Description                    
 -----------|----------|------------------------|--------------------------------------------------------|-----------
 file-bus   |          |                        | Where we write event from the application bus          | NO
 verbose    |          |                        | Be verbose and write to stdout everything we log       | NO
+ping       |          |                        | Configure network testing                              | NO
+---->      | ip       |                        | An ip address to ping to check network connectivity    | YES
+---->      | led      |                        | Name of led that represents status of network          | YES
 
 Notes:
 + `file-bus`: If not set (or empty) we ignore the system bus.

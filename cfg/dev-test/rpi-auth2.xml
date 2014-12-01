@@ -18,6 +18,10 @@
             <module_config>
                 <file-bus>MY_LOGS.txt</file-bus>
                 <verbose>true</verbose>
+                <ping>
+                    <ip>8.8.8.8</ip>
+                    <led>NETWORK_LED</led>
+                </ping>
             </module_config>
         </module>
 
@@ -28,6 +32,14 @@
 
             <module_config>
                 <gpios>
+
+                    <gpio>
+                        <name>network_watch_gpio</name>
+                        <no>6</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
                     <gpio>
                         <name>wiegand_green</name>
                         <no>3</no>
@@ -63,6 +75,13 @@
             <level>3</level>
             <module_config>
                 <leds>
+                    <led>
+                        <name>NETWORK_LED</name>
+                        <gpio>network_watch_gpio</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
                     <led>
                         <name>WIEGAND1_GREEN_LED</name>
                         <gpio>wiegand_green</gpio>

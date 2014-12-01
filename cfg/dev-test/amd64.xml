@@ -28,6 +28,10 @@
             <module_config>
                 <file-bus>MY_LOGS.txt</file-bus>
                 <verbose>false</verbose>
+<!--                <ping>
+                    <ip>8.8.8.8</ip>
+                    <led>dummy</led>
+                </ping>-->
             </module_config>
         </module>
 

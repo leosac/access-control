@@ -1,6 +1,7 @@
 #pragma once
 
 #include <modules/BaseModule.hpp>
+#include <hardware/FLED.hpp>
 
 namespace Leosac
 {
@@ -28,16 +29,28 @@ namespace Leosac
                 MonitorModule &operator=(const MonitorModule &) = delete;
                 MonitorModule &operator=(MonitorModule &&) = delete;
 
+
+                virtual void run() override;
+
             private:
+                using TimePoint = std::chrono::system_clock::time_point;
                 /**
                 * Called when a message arrives on the system bus and we
                 * are configured to log that.
                 */
                 void log_system_bus();
 
+                void test_ping();
+
                 zmqpp::socket bus_;
 
                 bool verbose_;
+
+                std::string addr_to_ping_;
+
+                std::unique_ptr<Leosac::Hardware::FLED> network_led_;
+
+                TimePoint last_ping_;
             };
         }
     }

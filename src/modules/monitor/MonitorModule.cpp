@@ -1,4 +1,5 @@
 #include <tools/log.hpp>
+#include <tools/unixshellscript.hpp>
 #include "MonitorModule.hpp"
 
 using namespace Leosac::Module::Monitor;
@@ -8,7 +9,8 @@ MonitorModule::MonitorModule(zmqpp::context &ctx,
         const boost::property_tree::ptree &cfg) :
         BaseModule(ctx, pipe, cfg),
         bus_(ctx, zmqpp::socket_type::sub),
-        verbose_(false)
+        verbose_(false),
+        last_ping_(TimePoint::max())
 {
     std::string system_bus_log_file = config_.get_child("module_config").get<std::string>("file-bus", "");
     if (!system_bus_log_file.empty())
@@ -22,6 +24,28 @@ MonitorModule::MonitorModule(zmqpp::context &ctx,
     if (verbose_)
     {
         spdlog::stdout_logger_mt("monitor_stdout");
+    }
+
+    auto ping_node = config_.get_child("module_config").get_child_optional("ping");
+    if (ping_node)
+    {
+        addr_to_ping_ = ping_node->get<std::string>("ip");
+        std::string network_led_name = ping_node->get<std::string>("led");
+        network_led_ = decltype (network_led_) (new Leosac::Hardware::FLED(ctx, network_led_name));
+    }
+}
+
+void MonitorModule::run()
+{
+    while (is_running_)
+    {
+        reactor_.poll(3);
+        if (last_ping_ == TimePoint::max() ||
+                std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_ping_).count() > 3)
+        {
+            test_ping();
+            last_ping_ = std::chrono::system_clock::now();
+        }
     }
 }
 
@@ -46,5 +70,25 @@ void MonitorModule::log_system_bus()
         auto monitor_stdout = spdlog::get("monitor_stdout");
         assert(monitor_stdout);
         monitor_stdout->info(full_msg.str());
+    }
+}
+
+void MonitorModule::test_ping()
+{
+    if (addr_to_ping_.empty())
+        return;
+    INFO("TESTING PING");
+    Tools::UnixShellScript script("./scripts/ping.sh");
+
+    int ret = script.run(addr_to_ping_);
+    if (ret == 0)
+    {
+        INFO("PING OK");
+        network_led_->turnOn();
+    }
+    else
+    {
+        WARN("Network looks down");
+        network_led_->turnOff();
     }
 }
