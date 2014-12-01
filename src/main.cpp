@@ -77,5 +77,6 @@ int main(int argc, const char **argv)
             return 1;
         }
     }
+    INFO("Bye.");
     return (0);
 }

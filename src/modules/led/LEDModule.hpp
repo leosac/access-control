@@ -34,6 +34,12 @@ namespace Leosac
                         zmqpp::socket *pipe,
                         const boost::property_tree::ptree &cfg);
 
+                virtual ~LEDModule() = default;
+
+                LEDModule(const LEDModule &) = delete;
+                LEDModule(LEDModule &&) = delete;
+                LEDModule &operator=(const LEDModule &) = delete;
+                LEDModule &operator=(LEDModule &&) = delete;
 
                 void run() override;
 
