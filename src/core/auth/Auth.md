@@ -88,8 +88,6 @@ Currently we are lucky, we only define one.
 Message Passing Specifications {#auth_specc}
 ============================================
 
-**This is not implemented yet**.
-
 Understand the [application message bus](@ref MessageBus) first.
 
 First, a few assumptions. Authentication data from auth source may vary widely.
@@ -98,7 +96,8 @@ number of meaningful bits.
 A wiegand reader can also handle PIN code + card id, augmenting complexity of the auth data.
 
 Auth backend must be able to distinguish between those to handles them properly.
- 
+
+### Authentication Source
 
 Workflow for an **authentication source** module:
  1. Having enough meaningful data that represents an authentication source (card id, pin code, fingerprint, ...)
@@ -110,13 +109,15 @@ Workflow for an **authentication source** module:
 
 
 As an example, consider a message from the [wiegand module](@ref mod_wiegand_main), named `MY_WIEGAND_1`:
- 1. "S_MY_WIEGAND_1"
- 2. `Leosac::Auth::SourceType::SIMPLE_WIEGAND`
- 3. "12:af:cd:21"
- 4. `26`
- 
- Frames 1 and 3 are string. Frame 2 is an enum: [AuthSourceType](@ref Leosac::Auth::SourceType). Frame 4 is integer.
 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------------------------
+1        | "MY_WIEGAND_1"                                | `string`
+2        | `Leosac::Auth::SourceType::SIMPLE_WIEGAND`    | [AuthSourceType](@ref Leosac::Auth::SourceType) (`uint8_t`)
+3        | "12:af:cd:21"                                 | `string`
+4        | 26                                            | `int` 
+
+### Authentication Backend
 
 Workflow for an **authentication backend** module:
  1. Receive a message from an **auth source**.
@@ -125,10 +126,10 @@ Workflow for an **authentication backend** module:
    1. The first frame MUST be "S_{AUTH_INSTANCE_NAME}".
    2. The second frame shall be an [AccessStatus](@ref Leosac::Auth::AccessStatus).
 
-Example:
- 1. "S_MY_AUTH_SOURCE_1"
- 2. `Leosac::Auth::SourceType::Granted`
- 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------------------------
+1        | "S_MY_AUTH_SOURCE_1"                          | `string`
+2        | `Leosac::Auth::AccessStatus::Granted`         | [AccessStatus](@ref Leosac::Auth::AccessStatus) (`uint8_t`)
 
 @namespace Leosac::Auth
 @brief Holds classes relevant to the Authentication and Authorization subsystem.

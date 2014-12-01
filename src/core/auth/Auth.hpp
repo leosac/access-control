@@ -7,7 +7,7 @@ namespace Leosac
     namespace Auth
     {
 
-        enum class SourceType : uint32_t
+        enum class SourceType : uint8_t
         {
             /**
             * This define message formatting for data source SIMPLE_WIEGAND.
@@ -16,7 +16,7 @@ namespace Leosac
             SIMPLE_WIEGAND = 1,
         };
 
-        enum class AccessStatus : uint32_t
+        enum class AccessStatus : uint8_t
         {
             GRANTED = 1,
             DENIED = 2,
