@@ -12,4 +12,6 @@ for d in `find . -type d`; do
     popd
 done
 
+echo "All tests passed !"
+
 exit 0
