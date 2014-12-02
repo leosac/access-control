@@ -45,7 +45,7 @@ script:
     # unit test
     - ctest --verbose
     # other tests
-    - sudo make install
+    - make install
     - pushd ../test_helper;
     - ./run_tests.sh /tmp/leosac;
     - popd;
