@@ -16,6 +16,8 @@ install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-all-dev valgrind
     - sudo apt-get install -qq libgtest-dev
+    - sudo apt-get install -qq pip
+    - sudo pip install pyzmq
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
     - sudo cmake .
