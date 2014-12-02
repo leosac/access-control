@@ -13,7 +13,7 @@ InstrumentationModule::InstrumentationModule(zmqpp::context &ctx,
     std::string bind_str = "ipc://" + config_.get_child("module_config").get<std::string>("ipc_endpoint");
     controller_.bind(bind_str);
     INFO("Binding to: " << bind_str);
-    bus_push_.connect("inproc://zmq-bus-push");
+    bus_push_.connect("inproc://zmq-bus-pull");
     reactor_.add(controller_, std::bind(&InstrumentationModule::handle_command, this));
 }
 

@@ -18,6 +18,23 @@
             <name>STDIN</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
+
+        </module>
+           <module>
+            <name>WIEGAND</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                    </reader>
+                </readers>
+            </module_config>
         </module>
 
         <module>

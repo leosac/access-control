@@ -21,9 +21,9 @@ def main():
 
     connect_str = "ipc://" + str(ipc_endpoint)
     dealer.connect(connect_str)
-    print "Connected too " + connect_str
+    print "Connected to " + connect_str
 
-    trigger_interrupt(dealer, "my_lama");
+    trigger_interrupt(dealer, "wiegand_data_low");
 
     context.destroy(linger=5000)
     return 0

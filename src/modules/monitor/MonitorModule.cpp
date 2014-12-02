@@ -18,7 +18,7 @@ MonitorModule::MonitorModule(zmqpp::context &ctx,
         reactor_.add(bus_, std::bind(&MonitorModule::log_system_bus, this));
         bus_.connect("inproc://zmq-bus-pub");
         bus_.subscribe("");
-        spdlog::rotating_logger_mt("system_bus_event", "system_bus.log", 1024 * 1024 * 3, 2);
+        spdlog::rotating_logger_mt("system_bus_event", system_bus_log_file, 1024 * 1024 * 3, 2);
     }
     verbose_ = config_.get_child("module_config").get<bool>("verbose", false);
     if (verbose_)
