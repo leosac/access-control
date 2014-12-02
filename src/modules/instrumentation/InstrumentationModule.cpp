@@ -33,7 +33,8 @@ void InstrumentationModule::handle_command()
     }
     else
     {
-        NOTICE("Received unhandled command: " << str);
+        // since this is a test/debug module, lets die if we receive bad input.
+        assert(0);
     }
 }
 

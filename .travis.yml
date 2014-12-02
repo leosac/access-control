@@ -16,8 +16,7 @@ install:
     - sudo apt-get install -qq g++ clang cmake
     - sudo apt-get install -qq libtclap-dev libboost-all-dev valgrind
     - sudo apt-get install -qq libgtest-dev
-    - sudo apt-get install -qq pip
-    - sudo pip install pyzmq
+    - sudo apt-get install -qq python-pip
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
     - sudo cmake .
@@ -39,7 +38,6 @@ before_script:
     - pushd libmcp23s17; make; popd;
     - mkdir build && pushd build
     ## install pyzmq once we have libzmq installed
-    - sudo apt-get install -qq python-pip
     - sudo pip install pyzmq
 script:
     - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis ; fi

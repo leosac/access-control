@@ -8,13 +8,6 @@
       <enabled>false</enabled>
     </network>
     <modules>
-
-        <module>
-            <name>STDIN</name>
-            <file>libstdin-controller.so</file>
-            <level>40</level>
-        </module>
-
         <module>
             <name>rpleth</name>
             <file>librpleth.so</file>
