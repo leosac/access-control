@@ -10,6 +10,9 @@ The TestAndReset module allows end user to have visual and/or audio feedback whe
 presenting a test card.
 It also allow the user to reset Leosac configuration to its factory default.
 
+@note This module is only able to watch module that sends SIMPLE_WIEGAND as auth-source
+ data format.
+
 Configuration Options {#mod_testandreset_user_config}
 =====================================================
 

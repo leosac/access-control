@@ -1,4 +1,5 @@
 #include <tools/log.hpp>
+#include <core/auth/Auth.hpp>
 #include "TestAndResetModule.hpp"
 
 using namespace Leosac::Module::TestAndReset;
@@ -60,12 +61,20 @@ void TestAndResetModule::handle_bus_msg()
 {
     zmqpp::message msg;
     std::string src;
+    Leosac::Auth::SourceType type;
     std::string card;
 
     sub_.receive(msg);
 
     assert(msg.parts() >= 2);
-    msg >> src >> card;
+    msg >> src >> type >> card;
+
+    if (type != Leosac::Auth::SourceType::SIMPLE_WIEGAND)
+    {
+        ERROR("Invalid auth source type ! Doing nothing.");
+        return;
+    }
+
     // remove "S_" from topic string
     src = src.substr(2, src.size());
     if (device_reset_card_.count(src) && device_reset_card_[src] == card)
@@ -81,6 +90,7 @@ void TestAndResetModule::handle_bus_msg()
 
 void TestAndResetModule::run_test_sequence()
 {
+    DEBUG("Running test sequence...");
     if (test_buzzer_)
     {
         test_buzzer_->blink(4000, 500);
