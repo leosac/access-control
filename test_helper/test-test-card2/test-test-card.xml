@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<kernel>
+    <plugin_directories>
+        <plugindir>./install/lib/leosac/</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <modules>
+        <module>
+            <name>MONITOR</name>
+            <file>libmonitor.so</file>
+            <level>1</level>
+
+            <module_config>
+                <file-bus>./system_bus_log</file-bus>
+                <verbose>false</verbose>
+            </module_config>
+        </module>
+
+        <module>
+            <name>Instrumentation</name>
+            <file>libintrumentation.so</file>
+            <level>105</level>
+            <module_config>
+                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+            </module_config>
+        </module>
+
+        <module>
+            <name>WIEGAND</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>ResetWatcher</name>
+            <file>libtest-and-reset.so</file>
+            <level>101</level>
+            <module_config>
+                <test_led></test_led>
+                <run_on_start>false</run_on_start>
+                <devices>
+                    <device>
+                        <name>MY_WIEGAND_1</name>
+                        <test_card>40:a0:83:80</test_card>
+                    </device>
+                </devices>
+            </module_config>
+        </module>
+    </modules>
+
+</kernel>
