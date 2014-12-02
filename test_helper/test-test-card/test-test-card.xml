@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <kernel>
     <plugin_directories>
-        <plugindir>.</plugindir>
+        <plugindir>./install/lib/leosac/</plugindir>
     </plugin_directories>
 
     <network>
