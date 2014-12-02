@@ -45,8 +45,8 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
 
 void NetworkConfig::reload()
 {
-    UnixShellScript builder(UnixFs::getCWD() + '/' + "build_ipconfig.sh");
-    UnixShellScript apply(UnixFs::getCWD() + '/' + "load_ipconfig.sh");
+    UnixShellScript builder(UnixFs::getCWD() + "/scripts/" + "build_ipconfig.sh");
+    UnixShellScript apply(UnixFs::getCWD() + "/scripts/" + "load_ipconfig.sh");
 
     if (!_enabled)
         return;

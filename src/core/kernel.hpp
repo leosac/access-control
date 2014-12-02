@@ -147,7 +147,8 @@ namespace Leosac
 
         /**
         * Hardcoded path to factory default settings.
+        * Matches folder architecture once installed.
         */
-        static constexpr const char *rel_path_to_factory_conf_ = "./cfg/factory";
+        static constexpr const char *rel_path_to_factory_conf_ = "./share/leosac/cfg/factory";
     };
 }
