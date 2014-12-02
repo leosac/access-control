@@ -24,7 +24,7 @@ function errcho()
 ## $1 is status code. If not set returns 1
 function die()
 {
-    rm -rf ${TMP_DIR}
+    [ -z $DEBUG_MODE ] && rm -rf ${TMP_DIR}
     [ ! -z $1 ] && exit $1
     exit 1
 }
@@ -39,6 +39,7 @@ function fail()
 
 ## This test working directory
 TMP_DIR=$(mktemp -d)
+echo -e ${Yel}"Working directory for this test:"${RCol} $TMP_DIR
 
 ## This test source directory
 SCRIPT_DIR=`pwd`
