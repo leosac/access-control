@@ -46,7 +46,7 @@ script:
     - ctest --verbose
     # other tests
     - pushd ../test_helper;
-    - ./run_tests.sh;
+    - ./run_tests.sh /usr;
     - popd;
 after_success:
     - sudo make install
