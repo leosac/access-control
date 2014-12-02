@@ -28,6 +28,10 @@ namespace Leosac
 
                 void handle_command();
 
+                void handle_gpio_command(zmqpp::message *str);
+
+                zmqpp::socket bus_push_;
+
                 /**
                 * IPC ROUTER socket.
                 */

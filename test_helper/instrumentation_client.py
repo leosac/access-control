@@ -6,6 +6,10 @@ import zmq
 def print_usage():
     print "Usage: ./intrumentation_client ipc_endpoint"
 
+def trigger_interrupt(sock, gpio_name):
+    msg = [zmq.Frame("GPIO"), zmq.Frame(gpio_name), zmq.Frame("INT")]
+    sock.send_multipart(msg)
+    
 def main():
     if len(sys.argv) < 2:
         print_usage()
@@ -18,8 +22,8 @@ def main():
     connect_str = "ipc://" + str(ipc_endpoint)
     dealer.connect(connect_str)
     print "Connected too " + connect_str
-    for i in range(1, 1000):
-        dealer.send_string("hello");
+
+    trigger_interrupt(dealer, "my_lama");
 
     context.destroy(linger=5000)
     return 0
