@@ -9,7 +9,7 @@ InstrumentationModule::InstrumentationModule(zmqpp::context &ctx,
         BaseModule(ctx, pipe, cfg),
         controller_(ctx, zmqpp::socket_type::router)
 {
-    std::string bind_str = "ipc:///tmp/leosac-ipc/" + std::to_string(getpid());
+    std::string bind_str = "ipc://" + config_.get_child("module_config").get<std::string>("ipc_endpoint");
     controller_.bind(bind_str);
     INFO("Binding to: " << bind_str);
     reactor_.add(controller_, std::bind(&InstrumentationModule::handle_command, this));

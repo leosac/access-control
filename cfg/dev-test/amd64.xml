@@ -21,9 +21,12 @@
         </module>
 
         <module>
-            <name>INSTRUEMNETAITON</name>
+            <name>Instrumentation</name>
             <file>libintrumentation.so</file>
             <level>105</level>
+            <module_config>
+                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+            </module_config>
         </module>
 
         <module>

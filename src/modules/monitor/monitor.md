@@ -1,4 +1,4 @@
-Led Module Documentation {#mod_monitor_main}
+Monitor Module Documentation {#mod_monitor_main}
 ============================================
 
 [TOC]
