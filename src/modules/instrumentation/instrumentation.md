@@ -29,7 +29,7 @@ Example {#mod_instrumentation_example}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
         <module>
             <name>Instrumentation</name>
-            <file>libintrumentation.so</file>
+            <file>libinstrumentation.so</file>
             <level>105</level>
             <module_config>
                 <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>

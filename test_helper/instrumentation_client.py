@@ -22,7 +22,7 @@ class CommandHandler(object):
         send_card_id(self.socket_, card_id)
 
 def print_usage():
-    print "Usage: ./intrumentation_client ipc_endpoint command [params]"
+    print "Usage: ./instrumentation_client ipc_endpoint command [params]"
 
 def send_card_id(sock, card_str):
     binary_string = bin(int(card_str, 16))[2:].zfill(len(card_str) * 4)

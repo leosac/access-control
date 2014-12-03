@@ -1,4 +1,4 @@
-set(INSTRUMENTATION_BIN intrumentation)
+set(INSTRUMENTATION_BIN instrumentation)
 
 set(INSTRUMENTATION_SRCS
     init.cpp
