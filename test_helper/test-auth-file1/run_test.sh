@@ -13,17 +13,17 @@ cp $TMP_DIR/this_test/auth-file.xml $TMP_DIR
 
 ## Send 3 unkown cards, 1 unauthorized and 2 that have access
 ($INSTR send_card 11:22:33:44
-    sleep 3s
+    sleep 7s
     $INSTR send_card 80:83:a0:40
-    sleep 3s
+    sleep 7s
     $INSTR send_card 15:22:33:44
-    sleep 3s
+    sleep 7s
     $INSTR send_card 0a:22:33:44
-    sleep 3s
+    sleep 7s
     $INSTR send_card 80:81:61:40
-    sleep 3s
+    sleep 7s
     $INSTR send_card 80:83:a0:40
-    sleep 3s
+    sleep 7s
     kill $(cat pid-file)
 )&
 
