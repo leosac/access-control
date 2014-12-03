@@ -1,8 +1,18 @@
 #include <tools/log.hpp>
 #include <tools/unixshellscript.hpp>
+#include <zmqpp/z85.hpp>
 #include "MonitorModule.hpp"
 
 using namespace Leosac::Module::Monitor;
+
+static std::string z85_pad(const std::string &in, char pad_char)
+{
+    std::string out(in);
+
+    while (out.size() % 4)
+        out += pad_char;
+    return out;
+}
 
 MonitorModule::MonitorModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
@@ -62,7 +72,17 @@ void MonitorModule::log_system_bus()
     {
         std::string buf;
         msg >> buf;
-        full_msg << "F" << i << ": {" << buf << "} ; ";
+        if (std::find_if(buf.begin(), buf.end(), [](char c) { return !isprint(c);})
+            != buf.end())
+        {
+            // encode frame in z85 since it contains non printable char
+            buf = zmqpp::z85::encode(z85_pad(buf, 0));
+            full_msg << "F" << i << ": {" << buf << "} ; ";
+        }
+        else
+        {
+            full_msg << "F" << i << ": {" << buf << "} ; ";
+        }
     }
     system_bus_logger->info(full_msg.str());
     if (verbose_)
