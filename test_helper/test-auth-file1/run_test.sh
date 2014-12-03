@@ -13,23 +13,23 @@ cp $TMP_DIR/this_test/auth-file.xml $TMP_DIR
 
 ## Send 3 unkown cards, 1 unauthorized and 2 that have access
 ($INSTR send_card 11:22:33:44
-    sleep 0.2s
+    sleep 3s
     $INSTR send_card 80:83:a0:40
-    sleep 0.2s
+    sleep 3s
     $INSTR send_card 15:22:33:44
-    sleep 0.2s
+    sleep 3s
     $INSTR send_card 0a:22:33:44
-    sleep 0.2s
+    sleep 3s
     $INSTR send_card 80:81:61:40
-    sleep 0.2s
+    sleep 3s
     $INSTR send_card 80:83:a0:40
-    sleep 3
-    kill `pidof leosac`
+    sleep 3s
+    kill $(cat pid-file)
 )&
 
 ## start leosac and wait for return value
 ## Use custom work directory to access the factory config file
-(./install/bin/leosac -k $config_file > leosac-log &
+(valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file > leosac-log &
     echo $! > pid-file;  wait $! && echo $? > exit-status)
 
 log_file="leosac-log"

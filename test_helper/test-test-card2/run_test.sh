@@ -5,12 +5,12 @@ source ../shell_helper.sh
 
 ## send card ID not recognize
 ($INSTR send_card 40:a0:83:81
-    sleep 3
-    kill `pidof leosac`
+    sleep 5
+    kill $(cat pid-file)
 )&
 
 #start leosac and wait for return value
-(./install/bin/leosac -k $TMP_DIR/this_test/test-test-card.xml > leosac-log &
+(valgrind --error-exitcode=42 ./install/bin/leosac -k $TMP_DIR/this_test/test-test-card.xml > leosac-log &
     echo $! > pid-file;  wait $! && echo $? > exit-status)
 
 ## check test sequence was NOT run.
