@@ -7,7 +7,7 @@
 source ../shell_helper.sh
 
 ($INSTR send_card 40:a0:83:80
-    sleep 5
+    sleep $SLEEP_TIME
     kill $(cat pid-file)
 )&
 

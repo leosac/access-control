@@ -7,7 +7,7 @@ config_file="$TMP_DIR/this_test/test-reset-card.xml"
 
 ## Send reset card
 ($INSTR send_card 40:a0:83:80
-    sleep 5s
+    sleep $SLEEP_TIME
     kill $(cat pid-file)
 )&
 

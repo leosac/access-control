@@ -59,3 +59,9 @@ cp -R $SCRIPT_DIR $TMP_DIR/this_test
 
 ## Go to working directory
 cd $TMP_DIR
+
+## Set the recommend sleeping time (if not set already)
+## This allows us to use a way longer sleep time when running on Travis.
+if [ -z $SLEEP_TIME ]; then
+    SLEEP_TIME=10
+fi

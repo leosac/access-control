@@ -9,7 +9,7 @@ if ./install/bin/leosac/ -k $TMP_DIR/this_test/amd64.xml > leosac-log; then
 fi
 
 ## should work because we use the plugin dir as workding dir
-(sleep 3s; kill `pidof leosac`) &
+(sleep $SLEEP_TIME; kill `pidof leosac`) &
 if ! ./install/bin/leosac -k $TMP_DIR/this_test/amd64.xml \
     -d $TMP_DIR/install/lib/leosac > leosac-log; then
     fail "Leosac failed, but should have succeded"
