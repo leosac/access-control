@@ -72,6 +72,18 @@ namespace Leosac
         */
         bool run();
 
+        /**
+        * Return the path to the scripts directory.
+        * Uses environment variable if available, otherwise defaults to hardcoded path relative to cwd.
+        */
+        std::string script_directory() const;
+
+        /**
+        * Return the path to factory config directory
+        * Uses environment variable if available, otherwise defaults to hardcoded path relative to cwd.
+        */
+        std::string factory_config_directory() const;
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -99,6 +111,8 @@ namespace Leosac
         * @param msg ZMQ message that holds config
         */
         void set_netconfig(zmqpp::message *msg);
+
+        void extract_environ();
 
         /**
         * The application ZMQ context.
@@ -145,10 +159,12 @@ namespace Leosac
         */
         std::unique_ptr<NetworkConfig> network_config_;
 
-        /**
-        * Hardcoded path to factory default settings.
-        * Matches folder architecture once installed.
-        */
-        static constexpr const char *rel_path_to_factory_conf_ = "./share/leosac/cfg/factory";
+        enum class EnvironVar
+        {
+            FACTORY_CONFIG_DIR,
+            SCRIPTS_DIR,
+        };
+
+        std::map<EnvironVar, std::string> environ_;
     };
 }

@@ -6,7 +6,7 @@
 
 #include <boost/property_tree/ptree_fwd.hpp>
 #include "networkconfig.hpp"
-
+#include "core/kernel.hpp"
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
 #include "exception/scriptexception.hpp"
@@ -16,10 +16,12 @@ using namespace Leosac;
 
 const std::string NetworkConfig::NetCfgFile = "interfaces";
 
-NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
+NetworkConfig::NetworkConfig(const Kernel &k,
+        const boost::property_tree::ptree &cfg) :
         config_(cfg),
         _enabled(false),
-        _dhcpEnabled(false)
+        _dhcpEnabled(false),
+        kernel_(k)
 {
     _enabled = cfg.get<bool>("enabled", false);
 
@@ -46,8 +48,8 @@ NetworkConfig::NetworkConfig(const boost::property_tree::ptree &cfg) :
 
 void NetworkConfig::reload()
 {
-    UnixShellScript builder(UnixFs::getCWD() + "/scripts/" + "build_ipconfig.sh");
-    UnixShellScript apply(UnixFs::getCWD() + "/scripts/" + "load_ipconfig.sh");
+    UnixShellScript builder(kernel_.script_directory() + "build_ipconfig.sh");
+    UnixShellScript apply(kernel_.script_directory() + "load_ipconfig.sh");
 
     if (!_enabled)
         return;

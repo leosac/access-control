@@ -11,6 +11,8 @@
 
 namespace Leosac
 {
+    class Kernel;
+
     /**
     * Class that helps configuring the network.
     *
@@ -21,7 +23,8 @@ namespace Leosac
         static const std::string NetCfgFile;
 
     public:
-        explicit NetworkConfig(const boost::property_tree::ptree &cfg);
+        explicit NetworkConfig(const Kernel &k,
+                const boost::property_tree::ptree &cfg);
 
         ~NetworkConfig() = default;
 
@@ -51,6 +54,8 @@ namespace Leosac
         std::string _ip;
         std::string _defaultIp;
         std::string _gateway;
+
+        const Kernel &kernel_;
     };
 }
 

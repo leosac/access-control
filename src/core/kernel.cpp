@@ -28,13 +28,15 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         module_manager_(ctx_),
         network_config_(nullptr)
 {
+    extract_environ();
+
     if (config.get_child_optional("network"))
     {
-        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(config.get_child("network")));
+        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(*this, config.get_child("network")));
     }
     else
     {
-        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(boost::property_tree::ptree()));
+        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(*this, boost::property_tree::ptree()));
     }
     control_.bind("inproc://leosac-kernel");
     network_config_->reload();
@@ -160,7 +162,7 @@ void Kernel::factory_reset()
     INFO("Kernel config file path = " << kernel_config_file);
     INFO("RESTORING FACTORY CONFIG");
 
-    if (script.run(UnixShellScript::toCmdLine(std::string(rel_path_to_factory_conf_) + "/kernel.xml",
+    if (script.run(UnixShellScript::toCmdLine(factory_config_directory() + "/kernel.xml",
             kernel_config_file)) != 0)
     {
         ERROR("Error restoring factory configuration...");
@@ -209,4 +211,32 @@ void Kernel::set_netconfig(zmqpp::message *msg)
         return;
     }
     control_.send("OK");
+}
+
+void Kernel::extract_environ()
+{
+    if (char *str = getenv("LEOSAC_FACTORY_CONFIG_DIR"))
+    {
+        INFO("Using FACTORY_CONFIG_DIR: " << str);
+        environ_[EnvironVar::FACTORY_CONFIG_DIR] = std::string(str);
+    }
+    if (char *str = getenv("LEOSAC_SCRIPTS_DIR"))
+    {
+        INFO("Using SCRIPTS_DIR: " << str);
+        environ_[EnvironVar::SCRIPTS_DIR] = std::string(str);
+    }
+}
+
+std::string Kernel::script_directory() const
+{
+    if (environ_.count(EnvironVar::SCRIPTS_DIR))
+        return environ_.at(EnvironVar::SCRIPTS_DIR);
+    return Leosac::Tools::UnixFs::getCWD() + "/scripts/";
+}
+
+std::string Kernel::factory_config_directory() const
+{
+    if (environ_.count(EnvironVar::FACTORY_CONFIG_DIR))
+        return environ_.at(EnvironVar::FACTORY_CONFIG_DIR);
+   return Leosac::Tools::UnixFs::getCWD() + "/share/leosac/cfg/factory/";
 }

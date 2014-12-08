@@ -17,17 +17,19 @@ export INSTALL_DIR="$1"
 
 echo "Running tests, using $1 as install directory"
 
-for d in `find . -type d`; do
-    if [ $d = "." ] || [ $d = ".." ] ; then continue; fi
+total_test=`find . -maxdepth 1 -mindepth 1 -type d | wc -l`
+count=0
+for d in `find . -maxdepth 1 -mindepth 1 -type d`; do
+    count=$(($count+1))
     echo -e ${Yel}"Will run test:${RCol} $d"
     pushd $d
     [ -x run_test.sh ] || { echo "Not run_test.sh files in subdirectory"; exit 1; }
     ./run_test.sh || { echo -e ${Red}"Test failed"${RCol} ; exit 1; }
-    echo -e ${Gre}"Test $d succeded"${RCol}
+    echo -e ${Gre}"Test $d succeeded ($count / $total_test)"${RCol}
     popd
 done
 pwd
 
-echo -e ${Gre}"All tests passed !"${RCol}
+echo -e ${Gre}"All $count tests passed !"${RCol}
 
 exit 0
