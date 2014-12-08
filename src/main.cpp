@@ -17,7 +17,7 @@
 using namespace Leosac::Tools;
 using namespace Leosac;
 
-static int set_working_directory(RuntimeOptions &opts)
+static int set_working_directory(RuntimeOptions &opts) noexcept
 {
     int ret = 0;
     if (opts.hasParam("working_directory") && !opts.getParam("working_directory").empty())
@@ -51,7 +51,8 @@ int main(int argc, const char **argv)
     }
     catch (const TCLAP::ArgException &e)
     {
-        throw (LEOSACException(e.error()));
+        Leosac::print_exception(e);
+        return 1;
     }
 
     if (set_working_directory(options) != 0)
