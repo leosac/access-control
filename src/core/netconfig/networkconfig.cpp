@@ -12,6 +12,7 @@
 #include "exception/scriptexception.hpp"
 
 using namespace Leosac::Tools;
+using namespace Leosac;
 
 const std::string NetworkConfig::NetCfgFile = "interfaces";
 
@@ -58,7 +59,7 @@ void NetworkConfig::reload()
     apply.run(UnixShellScript::toCmdLine(NetCfgFile, _interface, "1&>/dev/null"));
     if (!apply.getOutput().empty())
         INFO("ScriptOutput:\n" << apply.getOutput() << "\n");
-    INFO("JUST LOAD IFCONFIG CONFIGURATION");
+    INFO("JUST LOADED IFCONFIG CONFIGURATION");
 }
 
 void NetworkConfig::setEnabled(bool state)
@@ -68,7 +69,6 @@ void NetworkConfig::setEnabled(bool state)
 
 void NetworkConfig::setDHCP(bool enabled)
 {
-    INFO("DHCP");
     if (_dhcpEnabled != enabled)
     {
         INFO("DHCP set to" << enabled);
