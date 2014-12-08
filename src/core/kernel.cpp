@@ -28,6 +28,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         module_manager_(ctx_),
         network_config_(nullptr)
 {
+    configure_logger();
     extract_environ();
 
     if (config.get_child_optional("network"))
@@ -252,4 +253,23 @@ std::string Kernel::factory_config_directory() const
     if (environ_.count(EnvironVar::FACTORY_CONFIG_DIR))
         return environ_.at(EnvironVar::FACTORY_CONFIG_DIR);
    return Leosac::Tools::UnixFs::getCWD() + "/share/leosac/cfg/factory/";
+}
+
+void Kernel::configure_logger()
+{
+    bool use_syslog                 = true;
+    std::string syslog_min_level    = "WARNING";
+
+    if (config_.get_child_optional("log"))
+    {
+        use_syslog          = config_.get_child("log").get<bool>("enable_syslog", true);
+        syslog_min_level    = config_.get_child("log").get<std::string>("min_syslog", "WARNING");
+    }
+    if (use_syslog)
+    {
+        auto syslog = spdlog::create("syslog", {std::make_shared<spdlog::sinks::syslog_sink>()});
+        syslog->set_level(static_cast<spdlog::level::level_enum>(LogHelper::log_level_from_string(syslog_min_level)));
+    }
+    auto console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
+    console->set_level(spdlog::level::DEBUG);
 }

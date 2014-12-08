@@ -116,6 +116,8 @@ namespace Leosac
 
         void extract_environ();
 
+        void configure_logger();
+
         /**
         * The application ZMQ context.
         */

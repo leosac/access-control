@@ -189,7 +189,6 @@ void RplethModule::rpleth_send_cards(const RplethPacket &packet)
     std::vector<Byte>::const_iterator it;
 
     WARN("Should not be here");
-    LOG() << "Handle_send_cards";
     cards_pushed_.clear();
     cards_read_.clear();
 
@@ -202,7 +201,6 @@ void RplethModule::rpleth_send_cards(const RplethPacket &packet)
             card += *my_start;
             my_start++;
         }
-        LOG() << "FOUND CARD {" << card << "}";
         cards_pushed_.push_back(card);
         if (my_start == packet.data.end())
             break;
@@ -218,21 +216,21 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
     std::list<std::string> to_send;
     RplethPacket response = packet;
     WARN("Should not be here");
-    LOG() << "Packet size = " << packet.data.size();
+    DEBUG("Packet size = " << packet.data.size());
     if (packet.data.size() != 1)
     {
-        LOG() << "Invalid Packet";
+        WARN("Invalid Packet");
         return response;
     }
     if (packet.data[0] == 0x01)
     {
-        LOG() << "Present list";
+        DEBUG("Present list");
         // send present list
         to_send = cards_read_;
     }
     else
     {
-        LOG() << "Absent list";
+        DEBUG("Absent list");
         // send absent list
         to_send = cards_pushed_;
         auto lambda = [this](const std::string &str) -> bool
@@ -248,15 +246,11 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
     data.reserve(to_send.size() * 8);
     for (auto &card : to_send)
     {
-        LOG() << "Current size of data vector = " << data.size();
-        LOG() << "Will store the card {" << card << "} into the rplet packet to send.";
         // we need to convert the card (ff:ae:32:00) to something like "ffae3200"
         card.erase(std::remove(card.begin(), card.end(), ':'), card.end());
         data.insert(data.end(), card.begin(), card.end());
-        LOG() << "Card {" << card << "} has been stored into the rplet packet";
         data.push_back('|');
     }
-    LOG() << "Built data vector (size = " << data.size() << ")";
     response.data = data;
     response.dataLen = data.size();
     return response;

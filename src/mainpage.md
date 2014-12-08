@@ -14,3 +14,5 @@ Interesting stuff:
    + Understand the [authentication system](@ref auth_main)
    + [Firmware](@ref firmware_main) info
    
+Use environment variable (LEOSAC_SCRIPTS_DIR and LEOSAC_FACTORY_CONFIG_DIR) to specify
+custom location for scripts directory and the location of the factory config directory.

@@ -19,7 +19,6 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
         module_(module),
         path_cfg_(module.general_config())
 {
-    LOG() << "trying to bind to " << ("inproc://" + name);
     sock_.bind("inproc://" + name);
 
     set_direction(direction);
@@ -34,7 +33,6 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
             turn_off();
     }
 
-    LOG() << "PATH {" << full_path << "}";
     file_fd_ = open(full_path.c_str(), O_RDONLY | O_NONBLOCK);
     assert(file_fd_ != -1);
 }
@@ -51,7 +49,7 @@ SysFsGpioPin::~SysFsGpioPin()
 
     if (file_fd_ != -1 && ::close(file_fd_) != 0)
     {
-        LOG() << "fail to close fd " << file_fd_;
+        ERROR("fail to close fd " << file_fd_);
     }
     try
     {
@@ -59,7 +57,7 @@ SysFsGpioPin::~SysFsGpioPin()
     }
     catch (FsException &e)
     {
-        LOG() << "Error while unexporting GPIO: " << e.what();
+        ERROR("Error while unexporting GPIO: " << e.what());
     }
 }
 

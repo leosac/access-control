@@ -19,16 +19,16 @@ bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1
     p.add(*target.get(), zmqpp::poller::poll_in);
     if (!p.poll(1000))
     {
-        LOG() << "No response from target (" << target << ")";
+        INFO("No response from target (" << target << ")");
         return false;
     }
-// handle response
+
     zmqpp::message_t m;
     target->receive(m);
 
     std::string rep;
     m >> rep;
-    LOG() << "response = " << rep;
+    INFO("response = " << rep);
     return true;
 }
 
@@ -42,9 +42,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    // assume custom module startup code.
-    // when reeady, signal parent
-    std::cout << "Init ok (myname = " << cfg.get_child("name").data() << "... sending OK" << std::endl;
+    INFO("Bench-Toggle will start");
     std::string endpoint_to_bench = cfg.get_child("module_config").get_child("target").data();
     int itr = cfg.get_child("module_config").get<int>("iterations");
     int wait_for = cfg.get_child("module_config").get<int>("pause");
@@ -56,7 +54,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     std::shared_ptr<zmqpp::socket> sock(new zmqpp::socket(zmq_ctx, zmqpp::socket_type::req));
 
     sock->connect("inproc://" + endpoint_to_bench);
-    LOG() << "should take about " << itr * wait_for << "ms to run";
+    INFO("should take about " << itr * wait_for << "ms to run");
     std::chrono::system_clock::time_point clock = std::chrono::system_clock::now();
     Leosac::Hardware::FGPIO my_gpio(zmq_ctx, endpoint_to_bench);
     for (int i = 0; i < itr; i++)

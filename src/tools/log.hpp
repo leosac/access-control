@@ -13,16 +13,16 @@
 #include "unixfs.hpp"
 #include "spdlog/spdlog.h"
 
-enum class LogLevel
+enum LogLevel
 {
-    EMERG = LOG_EMERG,
-    ALERT = LOG_ALERT,
-    CRIT = LOG_CRIT,
-    ERROR = LOG_ERR,
-    WARN = LOG_WARNING,
-    NOTICE = LOG_NOTICE,
-    INFO = LOG_INFO,
-    DEBUG = LOG_DEBUG,
+    EMERG = spdlog::level::EMERG,
+    ALERT = spdlog::level::ALERT,
+    CRIT = spdlog::level::CRITICAL,
+    ERROR = spdlog::level::ERR,
+    WARN = spdlog::level::WARN,
+    NOTICE = spdlog::level::NOTICE,
+    INFO = spdlog::level::INFO,
+    DEBUG = spdlog::level::DEBUG,
 };
 
 struct LogHelper
@@ -76,38 +76,64 @@ struct LogHelper
             const char */*fileName*/,
             LogLevel level)
     {
-        if (!spdlog::get("console"))
-        {
-            auto console = spdlog::stdout_logger_mt("console");
-            spdlog::set_level(spdlog::level::DEBUG);
-        }
         auto console = spdlog::get("console");
+        auto syslog = spdlog::get("syslog");
+        if (!console && !syslog)
+        {
+            std::cerr << "Logger not set-up yet ! Will display log message as is." << std::endl;
+            std::cerr << log_msg << std::endl;
+            return;
+        }
 
         switch (level)
         {
             case LogLevel::DEBUG:
-                console->debug(log_msg);
+                if (console)
+                    console->debug(log_msg);
+                if (syslog)
+                    syslog->debug(log_msg);
                 break;
             case LogLevel::INFO:
-                console->info(log_msg);
+                if (console)
+                    console->info(log_msg);
+                if (syslog)
+                    syslog->info(log_msg);
                 break;
             case LogLevel::NOTICE:
-                console->notice(log_msg);
+                if (console)
+                    console->notice(log_msg);
+                if (syslog)
+                    syslog->notice(log_msg);
                 break;
             case LogLevel::WARN:
-                console->warn(log_msg);
+                if (console)
+                    console->warn(log_msg);
+                if (syslog)
+                    syslog->warn(log_msg);
                 break;
             case LogLevel::ERROR:
-                console->error(log_msg);
+                if (console)
+                    console->error(log_msg);
+                if (syslog)
+                    syslog->error(log_msg);
                 break;
             case LogLevel::CRIT:
-                console->critical(log_msg);
+                if (console)
+                    console->critical(log_msg);
+                if (syslog)
+                    syslog->critical(log_msg);
                 break;
             case LogLevel::ALERT:
-                console->alert(log_msg);
+                if (console)
+                    console->alert(log_msg);
+                if (syslog)
+                    syslog->alert(log_msg);
                 break;
             case LogLevel::EMERG:
-                console->emerg(log_msg);
+                if (console)
+                    console->emerg(log_msg);
+                if (syslog)
+                    syslog->emerg(log_msg);
                 break;
         }
     }
@@ -250,35 +276,5 @@ ERROR_1(__VA_ARGS__), \
 ERROR_0(__VA_ARGS__), \
 ERROR_NO_PARAM(__VA_ARGS__), \
 )
-
-class LogLine
-{
-public:
-    LogLine(const char *file, const char *func, int line, std::ostream &out = std::cout)
-            : _out(out)
-    {
-        _stream << Leosac::Tools::UnixFs::stripPath(file) << ':' << line << ": in '" << func << "': ";
-    }
-
-    ~LogLine()
-    {
-        _stream << std::endl;
-        _out << _stream.rdbuf(); // NOTE C++11 garantees thread safety
-        _out.flush();
-    }
-
-    template<class T>
-    LogLine &operator<<(const T &arg)
-    {
-        _stream << arg;
-        return (*this);
-    }
-
-private:
-    std::stringstream _stream;
-    std::ostream &_out;
-};
-
-#define LOG() LogLine(__FILE__, __FUNCTION__, __LINE__)
 
 #endif // LOG_HPP

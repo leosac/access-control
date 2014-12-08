@@ -31,7 +31,7 @@ int UnixShellScript::run(const std::string& args)
     std::string         line = _script + ' ' + args;
     int                 ret;
 
-    LOG() << "CmdLine: " << line;
+    INFO("CmdLine: " << line);
     if (!(stream = popen(line.c_str(), "r")))
         throw (ScriptException(UnixSyscall::getErrorString("popen", errno) + " command: '" + line + '\''));
     while (fgets(buffer, BufferSize, stream))

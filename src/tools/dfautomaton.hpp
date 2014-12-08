@@ -53,7 +53,7 @@ public:
         IdxType targetIdx = _transitionMap[current][transition];
         Node& node = _nodeGraph[targetIdx];
 
-        LOG() << "DFA Update: start=" << current << " transition=" << transition << " dest=" << targetIdx;
+        INFO("DFA Update: start=" << current << " transition=" << transition << " dest=" << targetIdx);
         if (node)
             node(instance);
 
