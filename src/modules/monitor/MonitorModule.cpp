@@ -20,7 +20,8 @@ MonitorModule::MonitorModule(zmqpp::context &ctx,
         BaseModule(ctx, pipe, cfg),
         bus_(ctx, zmqpp::socket_type::sub),
         verbose_(false),
-        last_ping_(TimePoint::max())
+        last_ping_(TimePoint::max()),
+        kernel_(ctx, zmqpp::socket_type::req)
 {
     std::string system_bus_log_file = config_.get_child("module_config").get<std::string>("file-bus", "");
     if (!system_bus_log_file.empty())
@@ -43,6 +44,8 @@ MonitorModule::MonitorModule(zmqpp::context &ctx,
         std::string network_led_name = ping_node->get<std::string>("led");
         network_led_ = decltype (network_led_) (new Leosac::Hardware::FLED(ctx, network_led_name));
     }
+
+    kernel_.connect("inproc://leosac-kernel");
 }
 
 void MonitorModule::run()
@@ -98,7 +101,7 @@ void MonitorModule::test_ping()
     if (addr_to_ping_.empty())
         return;
     INFO("TESTING PING");
-    Tools::UnixShellScript script("./scripts/ping.sh");
+    Tools::UnixShellScript script(req_scripts_dir() + "/ping.sh");
 
     int ret = script.run(addr_to_ping_);
     if (ret == 0)
@@ -111,4 +114,12 @@ void MonitorModule::test_ping()
         WARN("Network looks down");
         network_led_->turnOff();
     }
+}
+
+std::string MonitorModule::req_scripts_dir()
+{
+    std::string ret;
+    kernel_.send("SCRIPTS_DIR");
+    kernel_.receive(ret);
+    return ret;
 }

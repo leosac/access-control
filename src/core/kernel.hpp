@@ -14,7 +14,7 @@ namespace Leosac
     * The kernel binds a REP socket at "inproc://leosac-kernel".
     *
     * ### Supported commands
-    * Leosac kernel support very few commands. Those commands can be send by modules.
+    * Leosac kernel support a few commands. Those commands can be send by modules.
     *
     * Command (Frame 1)        | Frame 2             | Frame 3          | Description
     * -------------------------|---------------------|------------------|--------------
@@ -22,6 +22,8 @@ namespace Leosac
     * RESET                    |                     |                  | Reset Leosac configuration to factory default. This will also restart.
     * GET_NETCONFIG            |                     |                  | Send the network config.
     * SET_NETCONFIG            | Serialized ptree    |                  | Write the new network config to file
+    * SCRIPTS_DIR              |                     |                  | Ask the path to scripts directory
+    * FACTORY_CONFIG_DIR       |                     |                  | Ask the path to factory config directory
     */
     class Kernel
     {

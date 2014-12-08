@@ -34,6 +34,12 @@ namespace Leosac
 
             private:
                 using TimePoint = std::chrono::system_clock::time_point;
+
+                /**
+                * Get scripts directory from kernel.
+                */
+                std::string req_scripts_dir();
+
                 /**
                 * Called when a message arrives on the system bus and we
                 * are configured to log that.
@@ -51,6 +57,8 @@ namespace Leosac
                 std::unique_ptr<Leosac::Hardware::FLED> network_led_;
 
                 TimePoint last_ping_;
+
+                zmqpp::socket kernel_;
             };
         }
     }

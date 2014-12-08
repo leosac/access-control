@@ -137,19 +137,32 @@ void Kernel::handle_control_request()
         want_restart_ = true;
         control_.send("OK");
     }
-    if (req == "RESET")
+    else if (req == "RESET")
     {
         is_running_ = false;
         want_restart_ = true;
         factory_reset();
     }
-    if (req == "GET_NETCONFIG")
+    else if (req == "GET_NETCONFIG")
     {
         get_netconfig();
     }
-    if (req == "SET_NETCONFIG")
+    else if (req == "SET_NETCONFIG")
     {
         set_netconfig(&msg);
+    }
+    else if (req == "SCRIPTS_DIR")
+    {
+        control_.send(script_directory());
+    }
+    else if (req == "FACTORY_CONF_DIR")
+    {
+        control_.send(factory_config_directory());
+    }
+    else
+    {
+        ERROR("Unsupported message: " << req);
+        assert(0);
     }
 }
 
