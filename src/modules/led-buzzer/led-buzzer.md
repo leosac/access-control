@@ -1,17 +1,22 @@
-Led Module Documentation {#mod_led_main}
+Led Module Documentation {#mod_ledbuzzer_main}
 ==============================================
 
 [TOC]
 
-Introduction {#mod_led_intro}
-================================
+Introduction {#mod_ledbuzzer_intro}
+===================================
 
-Welcome to the main documentation page for the Led module.
-This page is about using and configuring the Led module from an end-user point of view. \n
+Welcome to the main documentation page for the LedBuzzer module.
+This page is about using and configuring the Led module from an end-user point of view. It
+also support some buzzer (like the one attached to some reader) because they work in the 
+exact same way.
+
+Currently this module is the backend for [FLED](@ref Leosac::Hardware::FLED) and
+[FBuzzer](@ref Leosac::Hardware::FBuzzer) object.
 
 
-Configuration Options {#mod_led_user_config}
-===============================================
+Configuration Options {#mod_ledbuzzer_user_config}
+==================================================
 
 Below are the configuration options available. Note that this module require
 that some FGPIO device be available and configured as it needs them to 
@@ -27,8 +32,11 @@ leds       |          |                        | List of configured Led devices 
 ---->      | ---->    | default_blink_duration | Time to blink (ms )if no explicit duration is specified| YES
 ---->      | ---->    | default_blink_speed    | Blink speed (in ms) if no speed is specified           | YES
 
-Example {#mod_led_example}
------------------------------
+
+TODO: You can use "buzzers" and "buzzer" instead of "leds" and "led", or you can use all four if you want.
+
+Example {#mod_ledbuzzer_example}
+--------------------------------
 
 This is a example of led possible configuration for Led module into Leosac.\n
 This assume that a `my_gpio_1` and `my_gpio_2` gpios devices are configured.
@@ -57,8 +65,8 @@ This assume that a `my_gpio_1` and `my_gpio_2` gpios devices are configured.
         </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Notes {#mod_led_notes}
-----------------------
+Notes {#mod_ledbuzzer_notes}
+----------------------------
 
-If you want to *implement* a module that supports Led device, see FLED for description
+If you want to *implement* a module that supports Led device, see [FLED](@ref Leosac::Hardware::FLED) for description
 of commands that **shall** be supported by your module.

@@ -8,12 +8,12 @@ namespace Leosac
 {
     namespace Module
     {
-        namespace Led
+        namespace LedBuzzer
         {
             /**
             * Implementation class, for use by the LED module only.
             */
-            class LedImpl
+            class LedBuzzerImpl
             {
             public:
                 /**
@@ -21,7 +21,7 @@ namespace Leosac
                 * @param led_name name of the led object
                 * @param gpio_name name of the gpio we use to drive this led.
                 */
-                LedImpl(zmqpp::context &ctx,
+                LedBuzzerImpl(zmqpp::context &ctx,
                         const std::string &led_name,
                         const std::string &gpio_name,
                         int blink_duration,
@@ -87,7 +87,7 @@ namespace Leosac
                 Hardware::FGPIO gpio_;
 
                 /**
-                * Does this LED want its `update()` method be called by the LEDModule.
+                * Does this LED want its `update()` method be called by the LEDBuzzerModule.
                 */
                 bool want_update_;
 

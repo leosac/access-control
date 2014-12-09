@@ -1,10 +1,10 @@
-#include "LEDModule.hpp"
-#include "LedImpl.hpp"
+#include "LEDBuzzerModule.hpp"
+#include "LedBuzzerImpl.hpp"
 #include "tools/log.hpp"
 
-using namespace Leosac::Module::Led;
+using namespace Leosac::Module::LedBuzzer;
 
-LEDModule::LEDModule(zmqpp::context &ctx,
+LEDBuzzerModule::LEDBuzzerModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         boost::property_tree::ptree const &cfg) :
         BaseModule(ctx, pipe, cfg)
@@ -12,11 +12,11 @@ LEDModule::LEDModule(zmqpp::context &ctx,
     process_config();
     for (auto &led : leds_)
     {
-        reactor_.add(led->frontend(), std::bind(&LedImpl::handle_message, led.get()));
+        reactor_.add(led->frontend(), std::bind(&LedBuzzerImpl::handle_message, led.get()));
     }
 }
 
-int LEDModule::compute_timeout()
+int LEDBuzzerModule::compute_timeout()
 {
     std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
     std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
@@ -35,7 +35,7 @@ int LEDModule::compute_timeout()
     return timeout < 0 ? 0 : timeout;
 }
 
-void LEDModule::run()
+void LEDBuzzerModule::run()
 {
     while (is_running_)
     {
@@ -48,7 +48,7 @@ void LEDModule::run()
     }
 }
 
-void LEDModule::process_config()
+void LEDBuzzerModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
 
@@ -62,6 +62,6 @@ void LEDModule::process_config()
         int default_blink_speed = led_cfg.get<int>("default_blink_speed", 200);
 
         INFO("Creating LED " << led_name << ", linked to GPIO" << gpio_name);
-        leds_.push_back(std::shared_ptr<LedImpl>(new LedImpl(ctx_, led_name, gpio_name, default_blink_duration, default_blink_speed)));
+        leds_.push_back(std::shared_ptr<LedBuzzerImpl>(new LedBuzzerImpl(ctx_, led_name, gpio_name, default_blink_duration, default_blink_speed)));
     }
 }

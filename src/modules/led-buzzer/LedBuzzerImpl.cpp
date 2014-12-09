@@ -1,9 +1,9 @@
-#include "LedImpl.hpp"
+#include "LedBuzzerImpl.hpp"
 #include "tools/log.hpp"
 
-using namespace Leosac::Module::Led;
+using namespace Leosac::Module::LedBuzzer;
 
-LedImpl::LedImpl(zmqpp::context &ctx,
+LedBuzzerImpl::LedBuzzerImpl(zmqpp::context &ctx,
         std::string const &led_name,
         std::string const &gpio_name,
         int blink_duration,
@@ -23,12 +23,12 @@ LedImpl::LedImpl(zmqpp::context &ctx,
     backend_.connect("inproc://" + gpio_name);
 }
 
-zmqpp::socket &LedImpl::frontend()
+zmqpp::socket &LedBuzzerImpl::frontend()
 {
     return frontend_;
 }
 
-void LedImpl::handle_message()
+void LedBuzzerImpl::handle_message()
 {
     zmqpp::message_t msg;
     zmqpp::message_t rep;
@@ -55,7 +55,7 @@ void LedImpl::handle_message()
     frontend_.send(ok ? "OK" : "KO");
 }
 
-void LedImpl::update()
+void LedBuzzerImpl::update()
 {
     DEBUG("UPDATING LED");
     gpio_.toggle();
@@ -68,14 +68,14 @@ void LedImpl::update()
     }
 }
 
-std::chrono::system_clock::time_point LedImpl::next_update()
+std::chrono::system_clock::time_point LedBuzzerImpl::next_update()
 {
     if (want_update_)
         return next_update_time_;
     return std::chrono::system_clock::time_point::max();
 }
 
-zmqpp::message LedImpl::send_to_backend(zmqpp::message &msg)
+zmqpp::message LedBuzzerImpl::send_to_backend(zmqpp::message &msg)
 {
     zmqpp::message rep;
     backend_.send(msg);
@@ -84,7 +84,7 @@ zmqpp::message LedImpl::send_to_backend(zmqpp::message &msg)
     return rep;
 }
 
-bool LedImpl::start_blink(zmqpp::message *msg)
+bool LedBuzzerImpl::start_blink(zmqpp::message *msg)
 {
     std::string tmp;
 
@@ -116,7 +116,7 @@ bool LedImpl::start_blink(zmqpp::message *msg)
     return true;
 }
 
-void LedImpl::send_state()
+void LedBuzzerImpl::send_state()
 {
     zmqpp::message st;
     if (want_update_)

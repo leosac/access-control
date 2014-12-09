@@ -1,10 +1,10 @@
 #include <string>
-#include "modules/led/LEDModule.hpp"
+#include "modules/led-buzzer/LEDBuzzerModule.hpp"
 #include "helper/TestHelper.hpp"
 #include "hardware/FLED.hpp"
 #include "tools/runtimeoptions.hpp"
 
-using namespace Leosac::Module::Led;
+using namespace Leosac::Module::LedBuzzer;
 using namespace Leosac::Test::Helper;
 using namespace Leosac::Hardware;
 
@@ -29,7 +29,7 @@ namespace Leosac
                 module_cfg.add_child("leds", leds_cfg);
                 cfg.add_child("module_config", module_cfg);
 
-                return test_run_module<LEDModule>(&ctx_, pipe, cfg);
+                return test_run_module<LEDBuzzerModule>(&ctx_, pipe, cfg);
             }
 
         public:
