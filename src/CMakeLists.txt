@@ -54,7 +54,7 @@ if (CMAKE_BUILD_TYPE MATCHES "Debug")
 endif()
 
 ## Add optimization flags
-if (CMAKE_BUILD_TYPE MATCHES "Opti")
+if (CMAKE_BUILD_TYPE MATCHES "Release")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
         set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2")
     endif()
