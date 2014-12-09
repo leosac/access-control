@@ -25,15 +25,15 @@ control the Led device.
 
 Options    | Options  | Options                | Description                                            | Mandatory
 -----------|----------|------------------------|--------------------------------------------------------|-----------
-leds       |          |                        | List of configured Led devices                         | YES
----->      | led      |                        | Configure of one particular led device                 | YES
+leds       |          |                        | List of configured Led devices                         | NO
+---->      | led      |                        | Configure of one particular led device                 | NO
 ---->      | ---->    | name                   | Chosen name for this led device                        | YES
 ---->      | ---->    | gpio                   | Name of the underlying GPIO used by the Led            | YES
 ---->      | ---->    | default_blink_duration | Time to blink (ms )if no explicit duration is specified| YES
 ---->      | ---->    | default_blink_speed    | Blink speed (in ms) if no speed is specified           | YES
 
 
-TODO: You can use "buzzers" and "buzzer" instead of "leds" and "led", or you can use all four if you want.
+You can use "buzzers" and "buzzer" instead of "leds" and "led", or you can use all four if you want.
 
 Example {#mod_ledbuzzer_example}
 --------------------------------

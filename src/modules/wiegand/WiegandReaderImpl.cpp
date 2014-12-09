@@ -35,16 +35,14 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
     std::fill(buffer_.begin(), buffer_.end(), 0);
 
     if (!green_led_name.empty())
-        green_led_ = new FLED(ctx, green_led_name);
+        green_led_ = std::unique_ptr<FLED>(new FLED(ctx, green_led_name));
 
     if (!buzzer_name.empty())
-        buzzer_ = new FLED(ctx, buzzer_name);
+        buzzer_ = std::unique_ptr<FBuzzer>(new FBuzzer(ctx, buzzer_name));
 }
 
 WiegandReaderImpl::~WiegandReaderImpl()
 {
-    delete green_led_;
-    delete buzzer_;
 }
 
 WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
@@ -59,12 +57,10 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
 
     buffer_ = o.buffer_;
     counter_ = o.counter_;
-    green_led_ = o.green_led_;
-    buzzer_ = o.buzzer_;
     reverse_mode_ = o.reverse_mode_;
 
-    o.green_led_ = nullptr;
-    o.buzzer_ = nullptr;
+    green_led_ = std::move(o.green_led_);
+    buzzer_ = std::move(o.buzzer_);
 }
 
 void WiegandReaderImpl::handle_bus_msg()
