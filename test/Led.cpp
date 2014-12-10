@@ -112,7 +112,7 @@ namespace Leosac
                 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             }
             ASSERT_TRUE(my_led.isOff());
-            ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
+	    ASSERT_EQ(FLED::State::OFF, my_led.state().st);
         }
 
         /**
@@ -139,7 +139,7 @@ namespace Leosac
             }
             ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             ASSERT_TRUE(my_led.isOff());
-            ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
+	    ASSERT_EQ(FLED::State::OFF, my_led.state().st);
         }
     }
 }
