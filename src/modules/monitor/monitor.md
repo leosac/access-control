@@ -23,6 +23,10 @@ verbose    |          |                        | Be verbose and write to stdout 
 ping       |          |                        | Configure network testing                              | NO
 ---->      | ip       |                        | An ip address to ping to check network connectivity    | YES
 ---->      | led      |                        | Name of led that represents status of network          | YES
+reader     |          |                        | Feedback for reader activity                           | NO
+---->      | name     |                        | Name of the reader object to watch                     | YES
+---->      | led      |                        | Led to turn ON when we detect reader activity          | YES
+
 
 Notes:
 + `file-bus`: If not set (or empty) we ignore the system bus.

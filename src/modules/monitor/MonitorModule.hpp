@@ -35,6 +35,18 @@ namespace Leosac
             private:
                 using TimePoint = std::chrono::system_clock::time_point;
 
+                void process_config();
+
+                /**
+                * Load config related to network monitoring
+                */
+                void process_network_config();
+
+                /**
+                * Load config related to reader activity monitoring.
+                */
+                void process_reader_config();
+
                 /**
                 * Get scripts directory from kernel.
                 */
@@ -54,7 +66,17 @@ namespace Leosac
 
                 std::string addr_to_ping_;
 
+                std::string reader_to_watch_;
+
+                /**
+                * Led for feedback about network availability
+                */
                 std::unique_ptr<Leosac::Hardware::FLED> network_led_;
+
+                /**
+                * Led for feedback about reader activity
+                */
+                std::unique_ptr<Leosac::Hardware::FLED> reader_led_;
 
                 TimePoint last_ping_;
 

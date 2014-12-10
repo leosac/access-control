@@ -12,16 +12,26 @@
 
     <modules>
         <module>
+            <name>STDIN</name>
+            <file>libstdin-controller.so</file>
+            <level>40</level>
+        </module>
+
+        <module>
             <name>MONITOR</name>
             <file>libmonitor.so</file>
             <level>1</level>
             <module_config>
                 <file-bus>MY_LOGS.txt</file-bus>
-                <verbose>true</verbose>
+                <verbose>false</verbose>
                 <ping>
                     <ip>8.8.8.8</ip>
                     <led>NETWORK_LED</led>
                 </ping>
+                <reader>
+                    <name>MY_WIEGAND_1</name>
+                    <led>READER_ACTIVITY_LED</led>
+                </reader>
             </module_config>
         </module>
 
@@ -32,6 +42,13 @@
 
             <module_config>
                 <gpios>
+
+                    <gpio>
+                        <name>reader_activity_gpio</name>
+                        <no>4</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
 
                     <gpio>
                         <name>network_watch_gpio</name>
@@ -71,10 +88,17 @@
 
         <module>
             <name>led</name>
-            <file>libled.so</file>
+            <file>libled-buzzer.so</file>
             <level>3</level>
             <module_config>
                 <leds>
+                    <led>
+                        <name>READER_ACTIVITY_LED</name>
+                        <gpio>reader_activity_gpio</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
                     <led>
                         <name>NETWORK_LED</name>
                         <gpio>network_watch_gpio</gpio>
