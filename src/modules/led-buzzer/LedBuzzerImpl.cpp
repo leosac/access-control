@@ -1,3 +1,4 @@
+#include <tools/dfautomaton.hpp>
 #include "LedBuzzerImpl.hpp"
 #include "tools/log.hpp"
 
@@ -12,15 +13,17 @@ LedBuzzerImpl::LedBuzzerImpl(zmqpp::context &ctx,
         frontend_(ctx, zmqpp::socket_type::rep),
         backend_(ctx, zmqpp::socket_type::req),
         gpio_(ctx, gpio_name),
-        want_update_(false),
         default_blink_duration_(blink_duration),
         default_blink_speed_(blink_speed),
         blink_speed_(0),
         blink_duration_(0),
-        blink_count_(0)
+        blink_count_(0),
+	stmachine_(std::ref(gpio_))
 {
     frontend_.bind("inproc://" + led_name);
     backend_.connect("inproc://" + gpio_name);
+
+    stmachine_.start();
 }
 
 zmqpp::socket &LedBuzzerImpl::frontend()
@@ -50,6 +53,11 @@ void LedBuzzerImpl::handle_message()
     }
     else if (frame1 == "BLINK")
         ok = start_blink(&msg);
+    else if (frame1 == "LAMA")
+      {
+	ok = true;
+	stmachine_.process_event(EventPattern1());
+      }
     else // invalid cmd
         assert(0);
     frontend_.send(ok ? "OK" : "KO");
@@ -57,22 +65,13 @@ void LedBuzzerImpl::handle_message()
 
 void LedBuzzerImpl::update()
 {
-    DEBUG("UPDATING LED");
-    gpio_.toggle();
-    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
-
-    if (--blink_count_ == 0)
-    {
-        want_update_ = false;
-        return;
-    }
+  DEBUG("UPDATING LED");
+  stmachine_.process_event(EventUpdate());
 }
 
 std::chrono::system_clock::time_point LedBuzzerImpl::next_update()
 {
-    if (want_update_)
-        return next_update_time_;
-    return std::chrono::system_clock::time_point::max();
+  return stmachine_.next_update();
 }
 
 zmqpp::message LedBuzzerImpl::send_to_backend(zmqpp::message &msg)
@@ -109,17 +108,18 @@ bool LedBuzzerImpl::start_blink(zmqpp::message *msg)
     assert(blink_speed_ <= blink_duration_);
     blink_count_ = blink_duration_ / blink_speed_;
 
-    next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(blink_speed_);
-    want_update_ = true;
-    gpio_.toggle();
-    --blink_count_;
+    EventBlink b;
+    b.duration = blink_count_;
+    b.speed = blink_speed_;
+    stmachine_.process_event(b);
+
     return true;
 }
 
 void LedBuzzerImpl::send_state()
 {
     zmqpp::message st;
-    if (want_update_)
+    if (stmachine_.is_state_blinking_)
     {
         // means we are blinking
         st << "BLINKING";
