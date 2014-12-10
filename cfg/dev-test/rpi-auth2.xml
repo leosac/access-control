@@ -32,6 +32,7 @@
                     <name>MY_WIEGAND_1</name>
                     <led>READER_ACTIVITY_LED</led>
                 </reader>
+                <system_ok>SYSTEM_STATUS_LED</system_ok>
             </module_config>
         </module>
 
@@ -42,6 +43,13 @@
 
             <module_config>
                 <gpios>
+
+                    <gpio>
+                        <name>system_status_gpio</name>
+                        <no>2</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
 
                     <gpio>
                         <name>reader_activity_gpio</name>
@@ -66,7 +74,7 @@
 
                     <gpio>
                         <name>wiegand_buzzer</name>
-                        <no>2</no>
+                        <no>7</no>
                         <direction>out</direction>
                         <value>false</value>
                     </gpio>
@@ -92,6 +100,13 @@
             <level>3</level>
             <module_config>
                 <leds>
+                    <led>
+                        <name>SYSTEM_STATUS_LED</name>
+                        <gpio>system_status_gpio</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
                     <led>
                         <name>READER_ACTIVITY_LED</name>
                         <gpio>reader_activity_gpio</gpio>

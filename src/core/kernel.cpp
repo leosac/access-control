@@ -22,6 +22,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         ctx_(),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
+        bus_push_(ctx_, zmqpp::socket_type::push),
         config_(config),
         is_running_(true),
         want_restart_(false),
@@ -40,6 +41,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(*this, boost::property_tree::ptree()));
     }
     control_.bind("inproc://leosac-kernel");
+    bus_push_.connect("inproc://zmq-bus-pull");
     network_config_->reload();
 }
 
@@ -77,6 +79,9 @@ bool Kernel::run()
     {
         this->is_running_ = false;
     });
+
+    // At this point all module should have properly initialized.
+    bus_push_.send(zmqpp::message() << "KERNEL" << "SYSTEM_READY");
 
     reactor_.add(control_, std::bind(&Kernel::handle_control_request, this));
     while (is_running_)

@@ -29,7 +29,6 @@ namespace Leosac
                 MonitorModule &operator=(const MonitorModule &) = delete;
                 MonitorModule &operator=(MonitorModule &&) = delete;
 
-
                 virtual void run() override;
 
             private:
@@ -77,6 +76,11 @@ namespace Leosac
                 * Led for feedback about reader activity
                 */
                 std::unique_ptr<Leosac::Hardware::FLED> reader_led_;
+
+                /**
+                * Led for feedback about system readiness
+                */
+                std::unique_ptr<Leosac::Hardware::FLED> system_led_;
 
                 TimePoint last_ping_;
 

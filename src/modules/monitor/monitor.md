@@ -26,11 +26,13 @@ ping       |          |                        | Configure network testing      
 reader     |          |                        | Feedback for reader activity                           | NO
 ---->      | name     |                        | Name of the reader object to watch                     | YES
 ---->      | led      |                        | Led to turn ON when we detect reader activity          | YES
-
+system_ok  |          |                        | A led to turn ON when the system is ready              | NO
 
 Notes:
 + `file-bus`: If not set (or empty) we ignore the system bus.
 + `verbose`: default to false.
++ `system_ok`: this led should have `false` has its default value, otherwise it doesn't make sense as it will
+stay on, always.
 
 
 Example {#mod_monitor_example}

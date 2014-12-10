@@ -82,10 +82,17 @@ void MonitorModule::log_system_bus()
         monitor_stdout->info(full_msg.str());
     }
 
-    DEBUG("SRC = " << src << " to watch  = " << reader_to_watch_);
+    // reader activity check
     if (src == ("S_" + reader_to_watch_) && reader_led_)
     {
         reader_led_->turnOn(500);
+    }
+
+    // system readiness check
+    DEBUG("src = " << src);
+    if (src == "KERNEL" && system_led_)
+    {
+        system_led_->turnOn();
     }
 }
 
@@ -129,6 +136,12 @@ void MonitorModule::process_config()
     if (verbose_)
     {
         spdlog::stdout_logger_mt("monitor_stdout");
+    }
+
+    std::string system_led_name = config_.get_child("module_config").get<std::string>("system_ok", "");
+    if (!system_led_name.empty())
+    {
+        system_led_ = std::unique_ptr<Leosac::Hardware::FLED>(new Leosac::Hardware::FLED(ctx_, system_led_name));
     }
 
     process_network_config();

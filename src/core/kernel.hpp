@@ -24,6 +24,9 @@ namespace Leosac
     * SET_NETCONFIG            | Serialized ptree    |                  | Write the new network config to file
     * SCRIPTS_DIR              |                     |                  | Ask the path to scripts directory
     * FACTORY_CONFIG_DIR       |                     |                  | Ask the path to factory config directory
+    *
+    * @note Leosac kernel will publish on the message bus a `SYSTEM_READY` message when all modules are
+    * initialized. This message's topic is "KERNEL".
     */
     class Kernel
     {
@@ -132,6 +135,11 @@ namespace Leosac
         * A REP socket to send request to the kernel.
         */
         zmqpp::socket control_;
+
+        /**
+        * A PUSH socket to write on the bus.
+        */
+        zmqpp::socket bus_push_;
 
         /**
         * Watch for message on the `control_` socket.
