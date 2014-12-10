@@ -15,10 +15,7 @@ LedBuzzerImpl::LedBuzzerImpl(zmqpp::context &ctx,
         gpio_(ctx, gpio_name),
         default_blink_duration_(blink_duration),
         default_blink_speed_(blink_speed),
-        blink_speed_(0),
-        blink_duration_(0),
-        blink_count_(0),
-	stmachine_(std::ref(gpio_))
+        stmachine_(std::ref(gpio_))
 {
     frontend_.bind("inproc://" + led_name);
     backend_.connect("inproc://" + gpio_name);
@@ -53,11 +50,17 @@ void LedBuzzerImpl::handle_message()
     }
     else if (frame1 == "BLINK")
         ok = start_blink(&msg);
-    else if (frame1 == "LAMA")
-      {
-	ok = true;
-	stmachine_.process_event(EventPattern1());
-      }
+    else if (frame1 == "FAST_TO_SLOW")
+    {
+        ok = true;
+        SM::EventPlayingPattern e;
+        e.pattern = {
+                {5000, 1000},
+                {2100, 700},
+                {1000, 100},
+        };
+        stmachine_.process_event(e);
+    }
     else // invalid cmd
         assert(0);
     frontend_.send(ok ? "OK" : "KO");
@@ -65,13 +68,13 @@ void LedBuzzerImpl::handle_message()
 
 void LedBuzzerImpl::update()
 {
-  DEBUG("UPDATING LED");
-  stmachine_.process_event(EventUpdate());
+    DEBUG("UPDATING LED");
+    stmachine_.process_event(SM::EventUpdate());
 }
 
 std::chrono::system_clock::time_point LedBuzzerImpl::next_update()
 {
-  return stmachine_.next_update();
+    return stmachine_.next_update();
 }
 
 zmqpp::message LedBuzzerImpl::send_to_backend(zmqpp::message &msg)
@@ -86,32 +89,21 @@ zmqpp::message LedBuzzerImpl::send_to_backend(zmqpp::message &msg)
 bool LedBuzzerImpl::start_blink(zmqpp::message *msg)
 {
     std::string tmp;
+    SM::EventBlink event_blink;
+    event_blink.duration = default_blink_duration_;
+    event_blink.speed = default_blink_speed_;
 
     if (msg->parts() > 1)
     {
-        *msg >> blink_duration_;
-    }
-    else
-    {
-        blink_duration_ = default_blink_duration_;
+        *msg >> event_blink.duration;
     }
 
     if (msg->parts() > 2)
     {
-        *msg >> blink_speed_;
+        *msg >> event_blink.speed;
     }
-    else
-    {
-        blink_speed_ = default_blink_speed_;
-    }
-
-    assert(blink_speed_ <= blink_duration_);
-    blink_count_ = blink_duration_ / blink_speed_;
-
-    EventBlink b;
-    b.duration = blink_count_;
-    b.speed = blink_speed_;
-    stmachine_.process_event(b);
+    assert(event_blink.speed <= event_blink.duration);
+    stmachine_.process_event(event_blink);
 
     return true;
 }
@@ -123,7 +115,9 @@ void LedBuzzerImpl::send_state()
     {
         // means we are blinking
         st << "BLINKING";
-        st << blink_duration_ << blink_speed_;
+        // we are lying... but we'll tell the truth soon
+        st << static_cast<int64_t>(1000) << static_cast<int64_t>(100);
+        //	st << blink_duration_ << blink_speed_;
     }
     st << (gpio_.isOn() ? "ON" : "OFF");
     frontend_.send(st);
