@@ -23,6 +23,11 @@ bool FLED::turnOn(std::chrono::milliseconds duration)
     return false;
 }
 
+bool FLED::turnOn(int duration)
+{
+    return turnOn(std::chrono::milliseconds(duration));
+}
+
 bool FLED::turnOn()
 {
     std::string rep;

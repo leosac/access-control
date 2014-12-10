@@ -136,6 +136,11 @@ namespace Leosac
             /**
             * Turn the LED ON and turn it OFF duration milliseconds later.
             */
+            bool turnOn(int duration);
+
+            /**
+            * Turn the LED ON and turn it OFF duration milliseconds later.
+            */
             bool turnOn(std::chrono::milliseconds duration);
 
             /**
