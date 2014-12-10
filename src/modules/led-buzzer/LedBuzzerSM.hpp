@@ -13,9 +13,6 @@ namespace Leosac
                 /********************************************
                 * Define events used in the state machine   *
                 ********************************************/
-                struct Event1
-                {
-                };
 
                 /**
                 * Fired when we update the state machine.
@@ -41,19 +38,22 @@ namespace Leosac
                 };
 
                 /**
-                * Fired when StatePattern1 has stopped.
+                * Fired when playing pattern has terminated.
                 */
                 struct EventPlayingPatternStop
                 {
                 };
+
                 /**
-                * Fired when we want to "play" StatePattern1
+                * Fired when we want to "play" a pettern
                 */
                 struct EventPlayingPattern
                 {
                     /**
                     * A vector of <duration, speed> that represents
                     * our blinking pattern.
+                    *
+                    * @note Pattern are played in reverse order.
                     */
                     std::vector<std::pair<int, int>> pattern;
                 };
@@ -138,7 +138,6 @@ namespace Leosac
 
                         std::vector<std::pair<int, int>> pattern_;
                     };
-
 
                     struct StateBlinking : msmf::state<>
                     {
