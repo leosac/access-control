@@ -3,7 +3,6 @@
 #include "mcp23s17.h"
 #include "pifacedigital.h"
 #include "exception/gpioexception.hpp"
-#include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
 
 PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
@@ -20,7 +19,8 @@ PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
         ERROR("Cannot open PifaceDigital device");
         throw LEOSACException("Cannot open PifaceDigital device");
     }
-    assert(pifacedigital_enable_interrupts() == 0);
+    int ret = pifacedigital_enable_interrupts();
+    assert(ret == 0);
 
     process_config(config);
     bus_push_.connect("inproc://zmq-bus-pull");
