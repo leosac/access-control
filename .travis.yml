@@ -31,7 +31,7 @@ before_script:
     ## install pyzmq once we have libzmq installed
     - sudo pip install pyzmq
 script:
-    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/tmp/leosac -DLEOSAC_PLATFORM=Travis ; fi
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/tmp/leosac -DLEOSAC_PLATFORM=Travis -DZMQPP_LIBZMQ_CMAKE=1 -DZEROMQ_INCLUDE_DIR=`pwd`/../libzmq/include -DZMQ_BUILD_TESTS=0 ; fi
     - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then make ; fi
     # unit test
     - ctest --verbose
@@ -74,6 +74,6 @@ addons:
       name: "islog/leosac"
       description: "Build submitted via Travis CI"
     notification_email: kapp.arno@gmail.com
-    build_command_prepend: "cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis"
+    build_command_prepend: "cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis -DZMQPP_LIBZMQ_CMAKE=1  -DZEROMQ_INCLUDE_DIR=`pwd`/../libzmq/include -DZMQ_BUILD_TESTS=0"
     build_command:   "make"
     branch_pattern: coverity_scan
