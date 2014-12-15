@@ -25,15 +25,6 @@ install:
     - popd
     # -- workaround end
 before_script:
-# Need POLLPRI support, this is not into a stable release yet,
-# so we use a known commit from mainline developement master.
-    - git clone git://github.com/zeromq/libzmq.git
-    - pushd libzmq && git checkout e9b9860752ffac1a561fdb64f5f72bbfc5515b34
-    - ./autogen.sh
-    - ./configure && make -j4
-    - sudo make install
-    - sudo ldconfig
-    - popd;
     - pushd libpifacedigital; make; popd;
     - pushd libmcp23s17; make; popd;
     - mkdir build && pushd build
