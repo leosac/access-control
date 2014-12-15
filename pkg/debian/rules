@@ -12,7 +12,8 @@ override_dh_shlibdeps:
 
 override_dh_auto_configure:
 	dh_auto_configure -- -DLEOSAC_PLATFORM=None -DCMAKE_BUILD_TYPE=Release \
-	 -DZMQ_BUILD_TESTS=0 -DZMQPP_BUILD_STATIC=0 -DZMQ_BUILD_STATIC=0
+	 -DZMQ_BUILD_TESTS=0 -DZMQPP_BUILD_STATIC=0 -DZMQ_BUILD_STATIC=0 \
+	-DZMQPP_LIBZMQ_CMAKE=1
 
 override_dh_auto_install:
 	dh_auto_install
