@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <tools/log.hpp>
 #include "SimpleAccessProfile.hpp"
-#include "AuthTarget.hpp"
 
 using namespace Leosac::Auth;
 

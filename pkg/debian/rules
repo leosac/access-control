@@ -11,7 +11,7 @@ override_dh_shlibdeps:
 	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info
 
 override_dh_auto_configure:
-	dh_auto_configure -- -DLEOSAC_PLATFORM=None -DCMAKE_BUILD_TYPE=Release
+	dh_auto_configure -- -DLEOSAC_PLATFORM=None -DCMAKE_BUILD_TYPE=Release -DZMQ_BUILD_TESTS=0
 
 override_dh_auto_install:
 	dh_auto_install
@@ -23,4 +23,8 @@ override_dh_auto_install:
 
 	install -m 644 -t "$(_INSTALL_PATH)/etc/leosac.d/factory"       \
 		"cfg/factory/kernel.xml" \
-		"cfg/factory/README.md"     \
+		"cfg/factory/README.md"   
+
+#	## binary of libzmq
+#	install -m 644 -t "$(_INSTALL_PATH)/share/" \
+#		"share/libzmq.so.4.0.0"

@@ -49,6 +49,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_INSTALL_RPATH \$ORIGIN/../lib)
 
+add_subdirectory(libzmq)
 add_subdirectory(zmqpp)
 add_subdirectory(src)
 add_subdirectory(cfg)

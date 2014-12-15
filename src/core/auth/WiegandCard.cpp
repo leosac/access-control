@@ -1,6 +1,5 @@
 #include <tools/IVisitor.hpp>
 #include "WiegandCard.hpp"
-#include "BaseAuthSource.hpp"
 
 using namespace Leosac::Auth;
 

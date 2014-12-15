@@ -20,12 +20,17 @@ cd $TMP_DIR
 
 echo $TMP_DIR
 
-git clone https://github.com/islog/leosac.git
-pushd leosac
-git submodule init;
-git submodule update;
-popd
+function clone()
+{
+    git clone https://github.com/islog/leosac.git
+    pushd leosac
+    git submodule init;
+    git submodule update;
+    popd
+}
 
+#clone
+cp -R /home/xaqq/ClionProjects/leosac .
 
 MAJOR=`grep "DLEOSAC_VERSION_MAJOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
 MINOR=`grep "DLEOSAC_VERSION_MINOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`

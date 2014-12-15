@@ -3,9 +3,9 @@ Maintainer: Thibault Schueller <ryp.sqrt@gmail.com>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), cmake, libtclap-dev, libboost-dev, g++ (>= 4.8)
+Build-Depends: debhelper (>= 9), cmake, libtclap-dev, libboost-all-dev, g++ (>= 4.8)
 
 Package: leosac
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-all-dev, libtclap-dev,
 Description: open source access control

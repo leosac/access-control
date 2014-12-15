@@ -1,5 +1,4 @@
 #include "PFDigitalPin.hpp"
-#include "mcp23s17.h"
 #include "pifacedigital.h"
 #include "tools/log.hpp"
 

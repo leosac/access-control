@@ -10,3 +10,6 @@
 [submodule "spdlog"]
 	path = spdlog
 	url = https://github.com/xaqq/spdlog.git
+[submodule "libzmq"]
+	path = libzmq
+	url = https://github.com/zeromq/libzmq.git

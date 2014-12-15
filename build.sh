@@ -166,6 +166,7 @@ function setup()
 	cmake -DCMAKE_TOOLCHAIN_FILE=$CROSS_CMAKE \
 	    -DLEOSAC_BUILD_TESTS=1 \
 	    -DZMQPP_BUILD_STATIC=0 \
+	    -DZMQPP_BUILD_SHARED=1 \
 	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
 	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
 	    -DCMAKE_BUILD_TYPE=Debug \
@@ -175,6 +176,7 @@ function setup()
 	FULL_INSTALL_DIR=$INSTALL_DIR/build-x64
 	cmake -DLEOSAC_BUILD_TESTS=1 \
 	    -DZMQPP_BUILD_STATIC=0 \
+	    -DZMQPP_BUILD_SHARED=1 \
 	    -DCMAKE_BUILD_TYPE=Debug \
 	    -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ \
 	    -DZEROMQ_INCLUDE_DIR=`pwd`/libzmq/include \
