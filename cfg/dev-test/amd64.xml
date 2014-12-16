@@ -13,6 +13,10 @@
         <enabled>false</enabled>
     </network>
 
+    <remote>
+        <port>12345</port>
+    </remote>
+
     <modules>
         <module>
             <name>STDIN</name>

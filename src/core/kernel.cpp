@@ -46,7 +46,8 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         is_running_(true),
         want_restart_(false),
         module_manager_(ctx_),
-        network_config_(nullptr)
+        network_config_(nullptr),
+        remote_controller_(nullptr)
 {
     configure_logger();
     extract_environ();
@@ -59,6 +60,12 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
     {
         network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(*this, boost::property_tree::ptree()));
     }
+
+    if (config.get_child_optional("remote"))
+    {
+        remote_controller_ = std::unique_ptr<RemoteControl>(new RemoteControl(ctx_, *this, config.get_child("remote")));
+    }
+
     control_.bind("inproc://leosac-kernel");
     bus_push_.connect("inproc://zmq-bus-pull");
     network_config_->reload();
@@ -103,6 +110,8 @@ bool Kernel::run()
     bus_push_.send(zmqpp::message() << "KERNEL" << "SYSTEM_READY");
 
     reactor_.add(control_, std::bind(&Kernel::handle_control_request, this));
+    if (remote_controller_)
+        reactor_.add(remote_controller_->socket_, std::bind(&RemoteControl::handle_msg, remote_controller_.get()));
     while (is_running_)
     {
         reactor_.poll(-1);

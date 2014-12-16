@@ -7,6 +7,7 @@ set(LEOSAC_SRCS
 
 set(LEOSAC_LIB_SRCS
     core/kernel.cpp
+    core/RemoteControl.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp

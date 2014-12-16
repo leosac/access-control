@@ -29,7 +29,7 @@ namespace Leosac
         /**
         * Base class for module implementation.
         *
-        * It provide a base for writing module code. The base class
+        * It provide a base class for writing module code. The base class
         * implements `run()` as a main loop and use a reactor to handle socket
         * when they become available for reading. When implementing a module using
         * this class you're supposed to use that reactor and register your socket.
@@ -37,6 +37,12 @@ namespace Leosac
         * or to watch the `pipe_` on way or another.
         *
         * It use a reactor to poll on the `pipe` socket that connect the module back to the module manager.
+        *
+        * For replication and ease of management, command can be written on the module's pipe and must
+        * be implemented in the module (unless it is implemented by the BaseModule class).
+        *
+        * Commands:
+        *   DUMP_CONFIG : serialize the current module config. (as a ptree)
         *
         * @note This class is here to help reduce code duplication. It is NOT mandatory to inherit from this base class
         * to implement a module. However, it may help.
@@ -67,6 +73,11 @@ namespace Leosac
             * This implementation switch `is_running_` to false.
             */
             virtual void handle_pipe();
+
+            /**
+            * Serialize the config_ property tree in portable text format and returns it.
+            */
+            std::string dump_config() const;
 
             /**
             * A reference to the ZeroMQ context in case you need it to create additional socket.

@@ -17,6 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <tools/log.hpp>
 #include "BaseModule.hpp"
 
 using namespace Leosac::Module;
@@ -42,13 +45,36 @@ void BaseModule::run()
 
 void BaseModule::handle_pipe()
 {
+    zmqpp::message msg;
     zmqpp::signal sig;
-    pipe_.receive(sig);
+    std::string frame1;
+    pipe_.receive(msg);
 
-    if (sig == zmqpp::signal::stop)
+    if (msg.is_signal())
     {
-        is_running_ = false;
+        msg >> sig;
+        if (sig == zmqpp::signal::stop)
+            is_running_ = false;
+        else
+            assert(0);
     }
     else
-        assert(0);
+    {
+        msg >> frame1;
+        if (frame1 == "DUMP_CONFIG")
+        {
+            DEBUG("Dumping config");
+            pipe_.send(dump_config());
+        }
+    }
+
+}
+
+std::string BaseModule::dump_config() const
+{
+    std::ostringstream oss;
+    boost::archive::text_oarchive archive(oss);
+    boost::property_tree::save(archive, config_, 1);
+
+    return oss.str();
 }

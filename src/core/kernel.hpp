@@ -25,6 +25,7 @@
 #include "core/netconfig/networkconfig.hpp"
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
+#include "RemoteControl.hpp"
 
 namespace Leosac
 {
@@ -189,6 +190,11 @@ namespace Leosac
         * Object that handle networking configuration.
         */
         std::unique_ptr<NetworkConfig> network_config_;
+
+        /**
+        * Object that expose leosac to the world.
+        */
+        std::unique_ptr<RemoteControl> remote_controller_;
 
         enum class EnvironVar
         {
