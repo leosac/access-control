@@ -25,6 +25,15 @@ for d in `find . -maxdepth 1 -mindepth 1 -type d`; do
     pushd $d
     [ -x run_test.sh ] || { echo "Not run_test.sh files in subdirectory"; exit 1; }
     ./run_test.sh || { echo -e ${Red}"Test failed"${RCol} ; exit 1; }
+    
+    if [ ! -z "`pidof leosac`" ]; then
+	echo ${Red}"For some reason a leosac is still active...${RCol}"
+	for p in `pidof leosac`; do
+	    echo ${Red}"Killing $p"${RCol}
+	    kill -9 $p
+	done
+    fi
+
     echo -e ${Gre}"Test $d succeeded ($count / $total_test)"${RCol}
     popd
 done
