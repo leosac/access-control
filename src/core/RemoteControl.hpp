@@ -13,6 +13,16 @@ namespace Leosac
     *
     * It's responsibility is to expose a secure socket on the network and filter
     * request from the world, passing legit message to the rest of the application.
+    *
+    * Configuration option:
+    *    + port
+    *    + z85 encoded private key
+    *
+    * Commands:
+    * MODULE_LIST
+    *
+    * response: module_name*
+    * module_name: a-Z+
     */
     class RemoteControl
     {
@@ -20,6 +30,8 @@ namespace Leosac
         RemoteControl(zmqpp::context &ctx, Kernel &kernel, const boost::property_tree::ptree &cfg);
 
     private:
+
+        void module_list(zmqpp::message *message_out);
 
         /**
         * Register by core and called when message arrives.

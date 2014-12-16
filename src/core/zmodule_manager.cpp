@@ -186,3 +186,15 @@ zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o)
     o.actor_ = nullptr;
     o.lib_ = nullptr;
 }
+
+std::vector<std::string> zModuleManager::modules_names() const
+{
+    std::vector<std::string> ret;
+
+    ret.reserve(modules_.size());
+    for (auto const &module : modules_)
+    {
+        ret.push_back(module.name_);
+    }
+    return ret;
+}

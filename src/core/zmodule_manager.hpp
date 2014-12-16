@@ -77,6 +77,11 @@ public:
     */
     bool loadModule(const boost::property_tree::ptree &cfg);
 
+    /**
+    * Returns the list of the name of the loaded modules.
+    */
+    std::vector<std::string> modules_names() const;
+
 private:
     /**
     * Close library handler.

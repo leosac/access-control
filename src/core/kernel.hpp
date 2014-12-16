@@ -109,6 +109,8 @@ namespace Leosac
         */
         std::string factory_config_directory() const;
 
+        const zModuleManager &module_manager() const;
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.

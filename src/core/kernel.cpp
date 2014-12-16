@@ -112,6 +112,7 @@ bool Kernel::run()
     reactor_.add(control_, std::bind(&Kernel::handle_control_request, this));
     if (remote_controller_)
         reactor_.add(remote_controller_->socket_, std::bind(&RemoteControl::handle_msg, remote_controller_.get()));
+
     while (is_running_)
     {
         reactor_.poll(-1);
@@ -305,4 +306,9 @@ void Kernel::configure_logger()
     }
     auto console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
     console->set_level(spdlog::level::DEBUG);
+}
+
+const zModuleManager &Kernel::module_manager() const
+{
+    return module_manager_;
 }
