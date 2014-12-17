@@ -10,7 +10,8 @@ RemoteControl::RemoteControl(zmqpp::context &ctx,
         const boost::property_tree::ptree &cfg) :
         kernel_(kernel),
         socket_(ctx, zmqpp::socket_type::router),
-        auth_(ctx)
+        auth_(ctx),
+        context_(ctx)
 {
     auth_.set_verbose(true);
     auth_.configure_curve("CURVE_ALLOW_ANY");
@@ -51,13 +52,26 @@ void RemoteControl::handle_msg()
     rep << source;
     std::stringstream ss;
     for (auto c : source)
-        ss << std::hex << (int)c;
+        ss << std::hex << (int) c;
     INFO("(" << test_.size() << ") New message from {" << ss.str() << "}");
 
     msg >> frame1;
     DEBUG("Cmd = {" << frame1 << "}");
     if (frame1 == "MODULE_LIST")
         module_list(&rep);
+    if (frame1 == "MODULE_CONFIG")
+    {
+        if (msg.remaining() >= 1)
+        {
+            std::string module_name;
+            msg >> module_name;
+            module_config(module_name, &rep);
+        }
+        else
+        {
+            rep << "MALFORMED MESSAGE";
+        }
+    }
 
     DEBUG("Sending response, " << rep.parts() << " frames");
     socket_.send(rep);
@@ -71,5 +85,27 @@ void RemoteControl::module_list(zmqpp::message *message_out)
     {
         DEBUG("Module {" << s << "}");
         *message_out << s;
+    }
+}
+
+void RemoteControl::module_config(const std::string &module, zmqpp::message *message_out)
+{
+    assert(message_out);
+    // we need to make sure the module's name exist.
+    for (const std::string &s : kernel_.module_manager().modules_names())
+    {
+        if (module == s)
+        {
+            zmqpp::socket sock(context_, zmqpp::socket_type::req);
+            std::string serialized_cfg;
+            DEBUG("FOUND " << module);
+            sock.connect("inproc://module-" + module);
+            bool ret = sock.send("DUMP_CONFIG");
+            assert(ret);
+            DEBUG("HERE");
+            sock.receive(serialized_cfg);
+            *message_out << serialized_cfg;
+            break;
+        }
     }
 }

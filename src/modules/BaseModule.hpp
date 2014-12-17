@@ -38,7 +38,10 @@ namespace Leosac
         *
         * It use a reactor to poll on the `pipe` socket that connect the module back to the module manager.
         *
-        * For replication and ease of management, command can be written on the module's pipe and must
+        * A module shall have a control socket and it must be a REP socket and
+        * bound to inproc://module-${MODULE_NAME}
+        *
+        * For replication and ease of management, command can be written on the module's control socket and must
         * be implemented in the module (unless it is implemented by the BaseModule class).
         *
         * Commands:
@@ -75,6 +78,11 @@ namespace Leosac
             virtual void handle_pipe();
 
             /**
+            * Handle called when a message on the module's control socket arrives.
+            */
+            virtual void handle_control();
+
+            /**
             * Serialize the config_ property tree in portable text format and returns it.
             */
             std::string dump_config() const;
@@ -98,6 +106,11 @@ namespace Leosac
             * Boolean indicating whether the main loop should run or not.
             */
             bool is_running_;
+
+            /**
+            * Control REP socket.
+            */
+            zmqpp::socket control_;
 
             /**
             * The reactor object we poll() on in the main loop. Register additional socket/fd here if

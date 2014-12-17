@@ -8,16 +8,26 @@ class CommandHandler(object):
     def __init__(self, sock, argv):
         self.socket_ = sock
         self.argv_ = argv
+        self.argv_offset = 4
 
     def handle_command(self, cmd):
         if (cmd == "module_list"):
             self.handle_module_list();
+        if (cmd == "module_config"):
+            self.handle_module_config(self.argv_[self.argv_offset])
 
     def handle_module_list(self):
         print "Running 'module_list;"
         self.socket_.send("MODULE_LIST")
         ret = self.socket_.recv_multipart()
         print ret
+
+    def handle_module_config(self, mod):
+        print "Running 'module_config' for module", mod
+        self.socket_.send_multipart(["MODULE_CONFIG", mod])
+        ret = self.socket_.recv_multipart()
+        print ret
+
 
 def print_usage():
     print "Usage: ./remote_control tcp_endpoint server_key command [params]"

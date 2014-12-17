@@ -33,6 +33,8 @@ namespace Leosac
 
         void module_list(zmqpp::message *message_out);
 
+        void module_config(const std::string &module, zmqpp::message *message_out);
+
         /**
         * Register by core and called when message arrives.
         */
@@ -59,6 +61,8 @@ namespace Leosac
 
         zmqpp::auth auth_;
         std::vector<std::string> test_;
+
+        zmqpp::context &context_;
 
         // Allow kernel full access to this class.
         friend class Kernel;

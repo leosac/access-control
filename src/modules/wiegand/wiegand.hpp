@@ -52,7 +52,6 @@ namespace Leosac
                 virtual void run() override;
 
             private:
-
                 /**
                 * Create wiegand reader instances based on configuration.
                 */
