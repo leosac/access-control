@@ -29,8 +29,7 @@ function clone()
     popd
 }
 
-#clone
-cp -R /home/xaqq/ClionProjects/leosac .
+clone
 
 MAJOR=`grep "DLEOSAC_VERSION_MAJOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
 MINOR=`grep "DLEOSAC_VERSION_MINOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
@@ -46,5 +45,6 @@ cd $name
 #copy existing pkg/debian directory (maintained in repos, with patches)
 cp -R pkg/debian .
 
+export DEB_BUILD_OPTIONS="parallel=3"
 debuild -us -uc
 
