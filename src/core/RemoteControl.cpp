@@ -27,16 +27,20 @@ void RemoteControl::handle_msg()
     zmqpp::message rep;
     std::string source;
     std::string frame1;
-    std::string trash;
     socket_.receive(msg);
 
     assert(msg.parts() > 1);
     DEBUG("PARTS = " << msg.parts());
     msg >> source;
-    msg >> trash; // since i am testing with REQ socket
+    if (std::find(test_.begin(), test_.end(), source) != test_.end())
+        DEBUG("FOUND !!!");
+    else
+        test_.push_back(source);
     rep << source;
-    rep << ""; // since sending to REQ socket
-    INFO("New message from {" << std::hex << source << std::resetiosflags << "}");
+    std::stringstream ss;
+    for (auto c : source)
+        ss << std::hex << (int)c;
+    INFO("(" << test_.size() << ") New message from {" << ss.str() << "}");
 
     msg >> frame1;
     DEBUG("Cmd = {" << frame1 << "}");

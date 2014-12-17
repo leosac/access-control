@@ -47,6 +47,8 @@ namespace Leosac
         */
         zmqpp::socket socket_;
 
+        std::vector<std::string> test_;
+
         // Allow kernel full access to this class.
         friend class Kernel;
     };
