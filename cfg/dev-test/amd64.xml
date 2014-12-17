@@ -15,6 +15,8 @@
 
     <remote>
         <port>12345</port>
+	<secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+	<public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
     </remote>
 
     <modules>

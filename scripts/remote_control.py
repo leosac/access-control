@@ -14,29 +14,36 @@ class CommandHandler(object):
             self.handle_module_list();
 
     def handle_module_list(self):
+        print "Running 'module_list;"
         self.socket_.send("MODULE_LIST")
-        test = self.socket_.recv()
-        print test
+        ret = self.socket_.recv_multipart()
+        print ret
 
 def print_usage():
-    print "Usage: ./remote_control tcp_endpoint command [params]"
+    print "Usage: ./remote_control tcp_endpoint server_key command [params]"
 
 def main():
-    if len(sys.argv) < 3:
+    if len(sys.argv) < 4:
         print_usage()
         return -1
     tcp_endpoint = sys.argv[1]
+    server_key = sys.argv[2]
 
     context = zmq.Context.instance()
     dealer = context.socket(zmq.DEALER)
 
+    #random key as the server doesn't check those
+    client_public, client_secret = zmq.curve_keypair()
+    dealer.curve_serverkey = server_key
+    dealer.curve_publickey = client_public
+    dealer.curve_secretkey = client_secret
+
     connect_str = "tcp://" + str(tcp_endpoint)
-    dealer.identity = "bla"
     dealer.connect(connect_str)
     print "Connected to " + connect_str
 
     ch = CommandHandler(dealer, sys.argv);
-    ch.handle_command(sys.argv[2])
+    ch.handle_command(sys.argv[3])
 
     
     time.sleep(5)

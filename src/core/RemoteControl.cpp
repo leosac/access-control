@@ -1,4 +1,5 @@
 #include <tools/log.hpp>
+#include <zmqpp/curve.hpp>
 #include "RemoteControl.hpp"
 #include "kernel.hpp"
 
@@ -8,8 +9,11 @@ RemoteControl::RemoteControl(zmqpp::context &ctx,
         Kernel &kernel,
         const boost::property_tree::ptree &cfg) :
         kernel_(kernel),
-        socket_(ctx, zmqpp::socket_type::router)
+        socket_(ctx, zmqpp::socket_type::router),
+        auth_(ctx)
 {
+    auth_.set_verbose(true);
+    auth_.configure_curve("CURVE_ALLOW_ANY");
     process_config(cfg);
 }
 
@@ -17,7 +21,15 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
 {
     int port = cfg.get<int>("port");
 
+    secret_key_ = cfg.get<std::string>("secret_key");
+    public_key_ = cfg.get<std::string>("public_key");
+
     INFO("Binding RemoteControl socket to port " << port);
+    INFO("Use private key {" << secret_key_ << "} and public key {" << public_key_ << "}");
+
+    socket_.set(zmqpp::socket_option::curve_server, true);
+    socket_.set(zmqpp::socket_option::curve_secret_key, secret_key_);
+    socket_.set(zmqpp::socket_option::curve_public_key, public_key_);
     socket_.bind("tcp://*:" + std::to_string(port));
 }
 

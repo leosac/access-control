@@ -47,6 +47,17 @@ namespace Leosac
         */
         zmqpp::socket socket_;
 
+        /**
+        * z85 encoded public curve key
+        */
+        std::string public_key_;
+
+        /**
+        * z85 encoded private curve key
+        */
+        std::string secret_key_;
+
+        zmqpp::auth auth_;
         std::vector<std::string> test_;
 
         // Allow kernel full access to this class.
