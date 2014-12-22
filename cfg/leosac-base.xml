@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<kernel>
+    <plugin_directories>
+        <plugindir>/usr/lib/leosac</plugindir>
+        <plugindir>/usr/lib/leosac/auth</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <modules>
+        <module>
+            <name>MODULE_NAME</name>
+            <file>SHARED_LIBRARY_FILE</file>
+            <level>41</level>
+
+            <module_config>
+                <!-- Specific module configuration -->
+            </module_config>
+        </module>
+    </modules>
+
+</kernel>
