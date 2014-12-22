@@ -33,7 +33,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)
-option(LEOSAC_BUILD_TESTS   "build-tests" ON)
+option(LEOSAC_BUILD_TESTS   "build-tests" OFF)
 option(LEOSAC_GPROF         "gprof" OFF)
 
 if(LEOSAC_GPROF)
@@ -54,13 +54,13 @@ add_subdirectory(zmqpp)
 add_subdirectory(src)
 add_subdirectory(cfg)
 
-#if(LEOSAC_BUILD_TESTS)
-#    enable_testing()
-#    add_subdirectory(test)
-#endif()
+if(LEOSAC_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(test)
+endif()
 # IDE hackfix, will always build test.
-enable_testing()
-add_subdirectory(test)
+#enable_testing()
+#add_subdirectory(test)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
