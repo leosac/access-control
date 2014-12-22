@@ -1,42 +1,62 @@
 /**
- * \file networkconfig.hpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief NetworkConfig class declaration
- */
+* \file networkconfig.hpp
+* \author Thibault Schueller <ryp.sqrt@gmail.com>
+* \brief NetworkConfig class declaration
+*/
+
+#include <boost/property_tree/ptree.hpp>
 
 #ifndef NETWORKCONFIG_HPP
 #define NETWORKCONFIG_HPP
 
-#include "config/ixmlserializable.hpp"
-
-class NetworkConfig : public IXmlSerializable
+namespace Leosac
 {
-    static const std::string    NetCfgFile;
+    class Kernel;
 
-public:
-    explicit NetworkConfig();
-    ~NetworkConfig() = default;
+    /**
+    * Class that helps configuring the network.
+    *
+    * @see @ref network_main for end-user documentation.
+    */
+    class NetworkConfig
+    {
+        static const std::string NetCfgFile;
 
-    NetworkConfig(const NetworkConfig& other) = delete;
-    NetworkConfig& operator=(const NetworkConfig& other) = delete;
+    public:
+        explicit NetworkConfig(const Kernel &k,
+                const boost::property_tree::ptree &cfg);
 
-public:
-    virtual void    serialize(ptree& node) override;
-    virtual void    deserialize(const ptree& node) override;
+        ~NetworkConfig() = default;
 
-public:
-    void    reload();
-    void    setEnabled(bool state);
-    void    setDHCP(bool enabled);
-    void    setCustomIP(bool enabled);
+        NetworkConfig(const NetworkConfig &other) = delete;
 
-private:
-    bool        _enabled;
-    std::string _interface;
-    bool        _dhcpEnabled;
-    std::string _netmask;
-    std::string _ip;
-    std::string _defaultIp;
-};
+        NetworkConfig &operator=(const NetworkConfig &other) = delete;
+
+    public:
+        void reload();
+
+        void setEnabled(bool state);
+
+        void setDHCP(bool enabled);
+
+        void setCustomIP(bool enabled);
+
+    private:
+        /**
+        * Network configuration
+        */
+        boost::property_tree::ptree config_;
+
+        bool _enabled;
+        std::string _interface;
+        bool _dhcpEnabled;
+        std::string _netmask;
+        std::string _ip;
+        std::string _defaultIp;
+        std::string _gateway;
+
+        const Kernel &kernel_;
+    };
+}
 
 #endif // NETWORKCONFIG_HPP

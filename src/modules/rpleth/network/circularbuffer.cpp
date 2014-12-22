@@ -1,22 +1,25 @@
 /**
- * \file circularbuffer.cpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief simple circular buffer class
- */
+* \file circularbuffer.cpp
+* \author Thibault Schueller <ryp.sqrt@gmail.com>
+* \brief simple circular buffer class
+*/
 
 #include "circularbuffer.hpp"
 
 #include <algorithm>
 
-CircularBuffer::CircularBuffer(std::size_t size)
-:   _buffer(size),
-    _size(size),
-    _rIdx(0),
-    _wIdx(0),
-    _toRead(0)
-{}
+using namespace Leosac::Module::Rpleth;
 
-std::size_t CircularBuffer::read(Byte* data, std::size_t size)
+CircularBuffer::CircularBuffer(std::size_t size)
+        : _buffer(size),
+          _size(size),
+          _rIdx(0),
+          _wIdx(0),
+          _toRead(0)
+{
+}
+
+std::size_t CircularBuffer::read(Byte *data, std::size_t size)
 {
     std::size_t readIdx;
 
@@ -36,7 +39,7 @@ std::size_t CircularBuffer::read(Byte* data, std::size_t size)
     return (readIdx);
 }
 
-std::size_t CircularBuffer::write(const Byte* data, std::size_t size)
+std::size_t CircularBuffer::write(const Byte *data, std::size_t size)
 {
     if (!size || size > _size)
         return (0);

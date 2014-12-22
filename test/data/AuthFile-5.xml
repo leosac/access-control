@@ -1,0 +1,61 @@
+<root>
+    <group_mapping>
+        <map>
+            <group>Admins</group>
+            <user>MY_USER</user>
+            <user>Toto</user>
+        </map>
+    </group_mapping>
+    <!--
+    Maps WiegandCard to user
+    -->
+    <user_mapping>
+        <map>
+            <user>MY_USER</user>
+            <WiegandCard>aa:bb:cc:dd</WiegandCard>
+        </map>
+        <map>
+            <user>Toto</user>
+            <WiegandCard>cc:dd:ee:ff</WiegandCard>
+        </map>
+    </user_mapping>
+
+    <permissions>
+        <map>
+            <group>Admins</group>
+            <schedule>
+                <door>doorC</door>
+                <monday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </monday>
+            </schedule>
+            <schedule>
+                <door>doorB</door>
+                <sunday>
+                    <start>14:00</start>
+                    <end>18:50</end>
+                </sunday>
+            </schedule>
+
+            <schedule>
+                <door>doorA</door>
+                <thursday>
+                    <start>13:37</start>
+                    <end>14:25</end>
+                </thursday>
+            </schedule>
+        </map>
+
+        <map>
+            <user>MY_USER</user>
+            <schedule>
+                <door>doorA</door>
+                <sunday>
+                    <start>10:20</start>
+                    <end>19:05</end>
+                </sunday>
+            </schedule>
+        </map>
+    </permissions>
+</root>

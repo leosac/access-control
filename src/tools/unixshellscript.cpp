@@ -17,6 +17,8 @@ extern "C" {
 #include "tools/log.hpp"
 #include "exception/scriptexception.hpp"
 
+using namespace Leosac::Tools;
+
 UnixShellScript::UnixShellScript(const std::string& script)
 :   _script(script)
 {}
@@ -29,7 +31,7 @@ int UnixShellScript::run(const std::string& args)
     std::string         line = _script + ' ' + args;
     int                 ret;
 
-    LOG() << "CmdLine: " << line;
+    INFO("CmdLine: " << line);
     if (!(stream = popen(line.c_str(), "r")))
         throw (ScriptException(UnixSyscall::getErrorString("popen", errno) + " command: '" + line + '\''));
     while (fgets(buffer, BufferSize, stream))

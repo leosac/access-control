@@ -1,4 +1,11 @@
 ================================================================================
+    Leosac 0.3.4: 2014-10-28
+--------------------------------------------------------------------------------
+- Infrastructure change: now use message passing.
+- Logging is more flexible (not all LOG() call have been updated yet).
+- This tag is for testing purpose mostly.
+
+================================================================================
     Leosac 0.3.3: 2014-08-26
 --------------------------------------------------------------------------------
 - Use Travis CI to automate .deb packaging and automatic release attachments #29

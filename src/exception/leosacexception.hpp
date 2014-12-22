@@ -21,4 +21,14 @@ private:
     const std::string   _message;
 };
 
+#include "configexception.hpp"
+#include "coreexception.hpp"
+#include "deviceexception.hpp"
+#include "dynlibexception.hpp"
+#include "fsexception.hpp"
+#include "gpioexception.hpp"
+#include "moduleexception.hpp"
+#include "scriptexception.hpp"
+#include "signalexception.hpp"
+
 #endif // LEOSACEXCEPTION_HPP

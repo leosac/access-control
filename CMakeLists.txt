@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
-project(LEOSAC CXX)
+project(LEOSAC)
 
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
@@ -27,13 +27,13 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.41.0 REQUIRED)
+find_package(Boost 1.41.0 REQUIRED serialization)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)
-option(LEOSAC_BUILD_TESTS   "build-tests" OFF)
+option(LEOSAC_BUILD_TESTS   "build-tests" ON)
 option(LEOSAC_GPROF         "gprof" OFF)
 
 if(LEOSAC_GPROF)
@@ -41,20 +41,36 @@ if(LEOSAC_GPROF)
 endif()
 
 add_definitions(-DLEOSAC_VERSION_MAJOR=0)
-add_definitions(-DLEOSAC_VERSION_MINOR=3)
-add_definitions(-DLEOSAC_VERSION_PATCH=3)
+add_definitions(-DLEOSAC_VERSION_MINOR=4)
+add_definitions(-DLEOSAC_VERSION_PATCH=0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
+set(CMAKE_INSTALL_RPATH \$ORIGIN/../lib)
 
+add_subdirectory(libzmq)
+add_subdirectory(zmqpp)
 add_subdirectory(src)
 add_subdirectory(cfg)
 
-if(LEOSAC_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test)
-endif()
+#if(LEOSAC_BUILD_TESTS)
+#    enable_testing()
+#    add_subdirectory(test)
+#endif()
+# IDE hackfix, will always build test.
+enable_testing()
+add_subdirectory(test)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh
+  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+  DESTINATION scripts
+      )
+
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh
+  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+  DESTINATION scripts
+      )

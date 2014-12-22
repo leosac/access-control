@@ -1,0 +1,26 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="xaqq">
+    <words>
+      <w>concat</w>
+      <w>deserialize</w>
+      <w>dont</w>
+      <w>fgpio</w>
+      <w>gpio</w>
+      <w>gpios</w>
+      <w>informations</w>
+      <w>inproc</w>
+      <w>leds</w>
+      <w>leosac</w>
+      <w>piface</w>
+      <w>ptree</w>
+      <w>realtime</w>
+      <w>rpleth</w>
+      <w>syscall</w>
+      <w>sysfs</w>
+      <w>sysfsgpio</w>
+      <w>unexport</w>
+      <w>wiegand</w>
+      <w>zmqpp</w>
+    </words>
+  </dictionary>
+</component>

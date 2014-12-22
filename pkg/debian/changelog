@@ -1,0 +1,13 @@
+leosac (0.4.0-1) UNRELEASED; urgency=medium
+
+  * More stable.
+  * Full Rpleth support.
+  * Group and user permission support.
+
+ --  <xaqq@atlantis.islog.private>  Wed, 26 Nov 2014 15:11:41 +0100
+
+leosac (0.3.4-1) UNRELEASED; urgency=medium
+
+  * Initial test release.
+
+ --  <xaqq@atlantis.islog.private>  Wed, 26 Nov 2014 15:11:41 +0100

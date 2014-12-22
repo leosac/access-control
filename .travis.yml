@@ -9,14 +9,14 @@ branches:
 notifications:
   email:
     - reports@islog.com
-    - ryp.sqrt@gmail.com
 before_install:
-    - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
+    - sudo add-apt-repository -y "deb http://fr.archive.ubuntu.com/ubuntu/ trusty main universe" # NOTE use ubuntu trusty repo instead of hacking with custom user packages
     - sudo apt-get update -qq
 install:
     - sudo apt-get install -qq g++ clang cmake
-    - sudo apt-get install -qq libtclap-dev libboost-dev valgrind
+    - sudo apt-get install -qq libtclap-dev libboost-all-dev valgrind
     - sudo apt-get install -qq libgtest-dev
+    - sudo apt-get install -qq python-pip
     #  NOTE gtest install workaround
     - pushd /usr/src/gtest
     - sudo cmake .
@@ -25,13 +25,23 @@ install:
     - popd
     # -- workaround end
 before_script:
+    - pushd libpifacedigital; make; popd;
+    - pushd libmcp23s17; make; popd;
     - mkdir build && pushd build
-    - cmake .. -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis
+    ## install pyzmq once we have libzmq installed
+    - sudo pip install pyzmq
 script:
-    - make
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/tmp/leosac -DLEOSAC_PLATFORM=Travis -DZMQPP_LIBZMQ_CMAKE=1 -DZEROMQ_INCLUDE_DIR=`pwd`/../libzmq/include -DZMQ_BUILD_TESTS=0 ; fi
+    - if [ ${COVERITY_SCAN_BRANCH} != 1 ] ; then make ; fi
+    # unit test
+    - ctest --verbose
+    # other tests
+    - make install
+    - pushd ../test_helper;
+# Disabled for now. Travis randomly fails way too often.
+#    - ./run_tests.sh /tmp/leosac;
+    - popd;
 after_success:
-    - sudo make install
-    - ctest --output-on-failure
     - valgrind --leak-check=full --show-reachable=yes --suppressions=../valgrind/leosac-travis.supp ./leosac -t -g cfg/hardwareDebug.xml -f cfg/defaultDebug.xml
 deploy:
   edge: true
@@ -53,3 +63,18 @@ before_deploy:
     - bash scripts/travis_makepkg.sh
     - popd
     - LEOSAC_DEB="`find * -maxdepth 0 -name leosac_*.deb`"
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "EW8MSkUc99OH4F9y/k8qZb1pzLx+UQRNl7JY4X57SXx6TWhYj9ufnddsS8md4yydU2m6vhW2o16lYOh/0EqMFB0+zj/5syc+gDprhQ7ahaECdBCqVQT9zB5PqGWE+Sv1JkZQ2eHBYEJhHnC7NXKcVEqT+N8O320m5mdWqfdA4Hs="
+
+addons:
+  coverity_scan:
+    project:
+      name: "islog/leosac"
+      description: "Build submitted via Travis CI"
+    notification_email: kapp.arno@gmail.com
+    build_command_prepend: "cmake .. -DZMQPP_BUILD_STATIC=0 -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr -DLEOSAC_PLATFORM=Travis -DZMQPP_LIBZMQ_CMAKE=1  -DZEROMQ_INCLUDE_DIR=`pwd`/../libzmq/include -DZMQ_BUILD_TESTS=0"
+    build_command:   "make"
+    branch_pattern: coverity_scan

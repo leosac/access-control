@@ -15,6 +15,8 @@ extern "C" {
 #include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Tools;
+
 UnixFileWatcher::UnixFileWatcher()
 :   _isRunning(false)
 {
@@ -29,14 +31,14 @@ UnixFileWatcher::~UnixFileWatcher()
             throw (FsException(UnixSyscall::getErrorString("close", errno)));
     }
     catch (const FsException& e) {
-        LOG() << "Exception caught: " << e.what();
+        ERROR("Exception caught: " << e.what());
     }
 }
 
 void UnixFileWatcher::start()
 {
     _isRunning = true;
-    LOG() << "inotify start";
+    INFO("inotify start");
     _thread = std::thread([this] () {
         run();
     } );
@@ -45,7 +47,7 @@ void UnixFileWatcher::start()
 void UnixFileWatcher::stop()
 {
     _isRunning = false;
-    LOG() << "inotify stop";
+    INFO("inotify stop");
     _thread.join();
     for (auto watch : _watches)
     {
@@ -118,7 +120,7 @@ void UnixFileWatcher::run()
             if (errno != EINTR)
                 throw (FsException(UnixSyscall::getErrorString("select", errno)));
             else
-                LOG() << UnixSyscall::getErrorString("select", errno);
+                ERROR(UnixSyscall::getErrorString("select", errno));
         }
         else if (ret > 0)
         {

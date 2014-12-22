@@ -8,7 +8,6 @@
 #define GPIOEXCEPTION_HPP
 
 #include <string>
-
 #include "leosacexception.hpp"
 
 class GpioException : public LEOSACException

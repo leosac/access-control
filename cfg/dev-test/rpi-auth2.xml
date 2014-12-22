@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<kernel>
+    <plugin_directories>
+        <plugindir>.</plugindir>
+        <plugindir>/root/leosac/lib/leosac</plugindir>
+        <plugindir>/root/leosac/lib/leosac/auth</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <modules>
+        <module>
+            <name>STDIN</name>
+            <file>libstdin-controller.so</file>
+            <level>40</level>
+        </module>
+
+        <module>
+            <name>MONITOR</name>
+            <file>libmonitor.so</file>
+            <level>1</level>
+            <module_config>
+                <file-bus>MY_LOGS.txt</file-bus>
+                <verbose>false</verbose>
+                <ping>
+                    <ip>8.8.8.8</ip>
+                    <led>NETWORK_LED</led>
+                </ping>
+                <reader>
+                    <name>MY_WIEGAND_1</name>
+                    <led>READER_ACTIVITY_LED</led>
+                </reader>
+                <system_ok>SYSTEM_STATUS_LED</system_ok>
+            </module_config>
+        </module>
+
+        <module>
+            <name>PIFACE-GPIO</name>
+            <file>libpifacedigital.so</file>
+            <level>2</level>
+
+            <module_config>
+                <gpios>
+
+                    <gpio>
+                        <name>system_status_gpio</name>
+                        <no>2</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>reader_activity_gpio</name>
+                        <no>4</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>network_watch_gpio</name>
+                        <no>6</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>wiegand_green</name>
+                        <no>3</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <gpio>
+                        <name>wiegand_buzzer</name>
+                        <no>7</no>
+                        <direction>out</direction>
+                        <value>false</value>
+                    </gpio>
+
+                    <!-- Prepare GPIO for our Wiegand reader -->
+                    <gpio>
+                        <name>wiegand_data_high</name>
+                        <no>1</no>
+                        <direction>in</direction>
+                    </gpio>
+                    <gpio>
+                        <name>wiegand_data_low</name>
+                        <no>0</no>
+                        <direction>in</direction>
+                    </gpio>
+                </gpios>
+            </module_config>
+        </module>
+
+        <module>
+            <name>led</name>
+            <file>libled-buzzer.so</file>
+            <level>3</level>
+            <module_config>
+                <leds>
+                    <led>
+                        <name>SYSTEM_STATUS_LED</name>
+                        <gpio>system_status_gpio</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
+                    <led>
+                        <name>READER_ACTIVITY_LED</name>
+                        <gpio>reader_activity_gpio</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
+                    <led>
+                        <name>NETWORK_LED</name>
+                        <gpio>network_watch_gpio</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
+                    <led>
+                        <name>WIEGAND1_GREEN_LED</name>
+                        <gpio>wiegand_green</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
+                    <led>
+                        <name>WIEGAND1_BUZZER</name>
+                        <gpio>wiegand_buzzer</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+                </leds>
+            </module_config>
+        </module>
+
+        <module>
+            <name>WIEGAND</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led>WIEGAND1_GREEN_LED</green_led>
+                        <buzzer>WIEGAND1_BUZZER</buzzer>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>AUTH-MANAGER-FILE</name>
+            <file>libauth-file.so</file>
+            <level>41</level>
+
+            <module_config>
+                <instances>
+                    <!-- Multiple authentication instance are allowed -->
+                    <instance>
+                        <name>AUTH_CONTEXT_1</name>
+
+                        <!-- Device we watch as input source -->
+                        <auth_source>MY_WIEGAND_1</auth_source>
+                        <config_file>file_auth.xml</config_file>
+                        <target>doorA</target>
+                    </instance>
+                </instances>
+            </module_config>
+        </module>
+
+        <module>
+            <!-- Doorman module: react to authentication broadcast -->
+            <name>DOORMAN</name>
+            <file>libdoorman.so</file>
+            <level>50</level>
+
+            <module_config>
+                <instances>
+                    <instance>
+                        <name>DOORMAN_JARVIS_1</name>
+                        <auth_contexts>
+                            <auth_context>
+                                <name>AUTH_CONTEXT_1</name>
+                            </auth_context>
+                        </auth_contexts>
+                        <!-- If multiple auth context, this is the maximum delay we use to "match together" auth event -->
+                        <timeout>1000</timeout>
+                        <actions>
+                            <action>
+                                <on>DENIED</on>
+                                <target>wiegand_buzzer</target>
+                                <cmd>
+                                    <f1>ON</f1>
+                                    <f2>500</f2>
+                                </cmd>
+                            </action>
+                            <action>
+                                <on>GRANTED</on>
+                                <target>MY_WIEGAND_1</target>
+                                <cmd>
+                                    <f1>GREEN_LED</f1>
+                                    <f2>ON</f2>
+                                    <f3>1500</f3>
+                                </cmd>
+                            </action>
+                        </actions>
+                    </instance>
+                </instances>
+            </module_config>
+        </module>
+    </modules>
+
+</kernel>

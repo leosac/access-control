@@ -6,6 +6,7 @@
 
 #include "runtimeoptions.hpp"
 
+using namespace Leosac::Tools;
 const std::string RuntimeOptions::DefaultEmptyParam("undef");
 
 void RuntimeOptions::setFlag(Flag flag, bool value)
@@ -28,5 +29,10 @@ const std::string& RuntimeOptions::getParam(const std::string& key) const
     if (_params.count(key) > 0)
         return (_params.at(key));
     else
-        throw (DefaultEmptyParam);
+        throw std::runtime_error("RuntimeOptions::getParam [key = " + key + "] [value = " + DefaultEmptyParam + "]");
+}
+
+bool RuntimeOptions::hasParam(const std::string &key) const
+{
+    return _params.count(key);
 }

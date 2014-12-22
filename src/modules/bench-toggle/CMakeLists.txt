@@ -1,0 +1,14 @@
+set(BENCHTOGGLE_BIN bench-toggle)
+
+set(BENCHTOGGLE_SRCS
+    bench-toggle.cpp
+)
+
+add_library(${BENCHTOGGLE_BIN} SHARED ${BENCHTOGGLE_SRCS})
+
+set_target_properties(${BENCHTOGGLE_BIN} PROPERTIES
+    COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
+    )
+#target_include_directories(${BENCHTOGGLE_BIN} PUBLIC ${CMAKE_SOURCE_DIR}/src "${CMAKE_SOURCE_DIR}/zmqpp/src")
+
+install(TARGETS ${BENCHTOGGLE_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})

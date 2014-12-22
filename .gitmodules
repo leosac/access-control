@@ -1,0 +1,15 @@
+[submodule "libmcp23s17"]
+	path = libmcp23s17
+	url = https://github.com/xaqq/libmcp23s17.git
+[submodule "libpifacedigital"]
+	path = libpifacedigital
+	url = https://github.com/xaqq/libpifacedigital.git
+[submodule "zmqpp"]
+	path = zmqpp
+	url = https://github.com/xaqq/zmqpp.git
+[submodule "spdlog"]
+	path = spdlog
+	url = https://github.com/xaqq/spdlog.git
+[submodule "libzmq"]
+	path = libzmq
+	url = https://github.com/zeromq/libzmq.git

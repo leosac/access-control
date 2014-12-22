@@ -1,0 +1,6 @@
+packages=git,libboost-all-dev,libtclap-dev,emacs23-nox,libgtest-dev,rsync,binutils,gdb
+release=wheezy
+root_ssh_pubkey="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC45Qg94+rMmNt60zeED1ZtfruK6E6KlcgweJRwvMsoPfmtpiRsgkVQsIiKA7l5xzhi+xNGPRyWqPbhGMp12wboj9ERDdiKS7fBTQFPGtmA4VFq+7k2GgEbPmNvm1Yk2fBXteFYJnXioGre0rLixWVs0ytrz9B/tVqtqpreunanInZ9Hh7oVO+Igt5Ah6FGPFlCAhRSIC6vvsKAXUxvcmm1pqO6dmrq9yJYU3zSMC4fnryYansLLKaOJMwqKOY+Y1Wiza5lsLtc3C6iw/H5dAib6tQ+mgtvZiNO5DGwZqMqTE6Kj6LS/pzCn9d3oNQlKYLV/CHiv1k7vJb8KuZgaPGV xaqq@atlantis"
+locales=en_US.UTF-8
+system_default_locale=en_US.UTF-8
+timezone=Europe/Paris

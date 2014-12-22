@@ -4,6 +4,9 @@
 #   1:dhcp enabled
 #   2:target config
 #   3:interface
+#   4:address
+#   5:netmask
+#   6:gateway
 
 HEADER="# This file was auto-generated
 auto lo
@@ -20,4 +23,5 @@ else
     echo "iface $3 inet static" >> $2
     echo "    address $4" >> $2
     echo "    netmask $5" >> $2
+    echo "    gateway $6" >> $2
 fi

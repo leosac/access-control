@@ -1,17 +1,25 @@
 /**
- * \file rplethprotocol.cpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief Rpleth protocol implementation
- */
+* \file rplethprotocol.cpp
+* \author Thibault Schueller <ryp.sqrt@gmail.com>
+* \brief Rpleth protocol implementation
+*/
 
 #include "rplethprotocol.hpp"
-
 #include <vector>
+#include <tools/log.hpp>
 
-RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
+using namespace Leosac::Module::Rpleth;
+
+RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer, bool from_server /* = false */)
 {
-    RplethPacket    packet(RplethPacket::Sender::Client);
-    std::size_t     toRead = buffer.toRead();
+    RplethPacket packet(RplethPacket::Sender::Client);
+    if (from_server)
+    {
+        // this is used for unit testing
+        buffer.fastForward(1);
+        packet.sender = RplethPacket::Sender::Server;
+    }
+    std::size_t toRead = buffer.toRead();
 
     packet.status = Success;
     packet.isGood = false;
@@ -39,7 +47,7 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer& buffer)
     return (packet);
 }
 
-std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buffer, std::size_t size)
+std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buffer, std::size_t size)
 {
     if (size < packet.dataLen + 5U) // Buffer is too small
         return (0);
@@ -59,16 +67,4 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket& packet, Byte* buff
         return (packet.dataLen + 4 + 1);
     else
         return (packet.dataLen + 4);
-}
-
-RplethPacket RplethProtocol::processClientPacket(const RplethPacket& packet)
-{
-    RplethPacket response = packet;
-
-    response.sender = RplethPacket::Sender::Server;
-    if (response.type == Rpleth && response.command == Ping)
-        response.status = Success;
-    else
-        response.status = Success; // Default response
-    return (response);
 }
