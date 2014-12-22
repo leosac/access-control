@@ -1,3 +1,9 @@
+leosac (0.4.1-1) UNRELEASED; urgency=medium
+
+  * Fix package dependecies
+
+ --  <xaqq@atlantis.islog.private>  Mon, 22 Dec 2014 15:11:41 +0100
+
 leosac (0.4.0-1) UNRELEASED; urgency=medium
 
   * More stable.

@@ -3,97 +3,77 @@
 #include <zmqpp/socket.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/reactor.hpp>
+#include <modules/BaseModule.hpp>
 #include "PFDigitalPin.hpp"
 
-/**
-* Application-level controller for the PiFaceDigital I/O extender cards: it provides support of
-* GPIO object.
-*
-* It implements the *GPIO command set* described in the specifications of the facade object (FGPIO).
-*
-* Specifications of configuration informations:
-*     1. A `<gpios>` entities defines all the GPIO you wish to export.
-*     2. Each `<gpio>` entities define one GPIO pin.
-*     3. `<name>` defines the application-name of the GPIO. The object shall be available through this name
-*     and it shall use this name to publish message on the message bus.
-*     4. `<no>` defines the number of the GPIO pin. It must be between 0 and 7.
-*     5. `<direction>` defines whether this an INPUT or OUTPUT pin. It must be either `in` or `out`.
-*     6. `<value>` defines the initial value. This is applicable only for OUTPUT pin.
-*
-* @note `<name>`, `<no>` and `<direction>` are mandatory configuration information.
-* `<value>` is optional and default to `0`.
-*
-* @note Pin number if shared by input and outputs pin. Both use 0-7. This is important when writing configuration file.
-* @see FGPIO for the GPIO command set specifications.
-* @see PFDigitalPin for the helper class that is used by this module.
-*/
-class PFDigitalModule
+namespace Leosac
 {
-public:
-    PFDigitalModule(const boost::property_tree::ptree &config,
-            zmqpp::socket *module_manager_pipe,
-            zmqpp::context &ctx);
+    namespace Module
+    {
+        /**
+        * Provide support for the piface digital device.
+        *
+        * @see @ref mod_piface_main for documentation
+        */
+        namespace Piface
+        {
+            /**
+            * Main class for the piface digital module.
+            */
+            class PFDigitalModule : public BaseModule
+            {
+            public:
+                PFDigitalModule(const boost::property_tree::ptree &config,
+                        zmqpp::socket *module_manager_pipe,
+                        zmqpp::context &ctx);
 
-    /**
-    * Module's main loop.
-    */
-    void run();
+                /**
+                * Module's main loop.
+                */
+                virtual void run() override;
 
-private:
-    zmqpp::socket &pipe_;
-    boost::property_tree::ptree config_;
+            private:
 
-    zmqpp::reactor reactor_;
+                /**
+                * An interrupt was triggered. Lets handle it.
+                */
+                void handle_interrupt();
 
-    bool is_running_;
+                /**
+                * Process the configuration, preparing configured GPIO pin.
+                */
+                void process_config(const boost::property_tree::ptree &cfg);
 
-    /**
-    * Handle message coming from the pipe.
-    * This is basically handle the stop signal from the module manager.
-    */
-    void handle_pipe();
+                /**
+                * Compute the poll timeout (in milliseconds) and returns it.
+                * This timeout is calculated by calling `next_update()` on the available GPIO.
+                */
+                int compute_timeout();
 
-    /**
-    * An interrupt was triggered. Lets handle it.
-    */
-    void handle_interrupt();
+                /**
+                * Socket to push event to the bus.
+                */
+                zmqpp::socket bus_push_;
 
-    /**
-    * Process the configuration, preparing configured GPIO pin.
-    */
-    void process_config(const boost::property_tree::ptree &cfg);
+                /**
+                * GPIO vector
+                */
+                std::vector<PFDigitalPin> gpios_;
 
-    /**
-    * Compute the poll timeout (in milliseconds) and returns it.
-    * This timeout is calculated by calling `next_update()` on the available GPIO.
-    */
-    int compute_timeout();
+                /**
+                * Should be removed someday...
+                * store the name of the input pin with id = idx in dest.
+                *
+                * returns true if it was succesful (pin exists), false otherwise.
+                */
+                bool get_input_pin_name(std::string &dest, int idx);
 
-    /**
-    * A reference to our ZeroMQ context.
-    */
-    zmqpp::context &ctx_;
+                /**
+                * File descriptor of the PIN that triggers interrupts. This is card and will not change.
+                */
+                int interrupt_fd_;
+            };
 
-    /**
-    * Socket to push event to the bus.
-    */
-    zmqpp::socket bus_push_;
-
-    /**
-    * GPIO vector
-    */
-    std::vector <PFDigitalPin> gpios_;
-
-    /**
-    * Should be removed someday...
-    * store the name of the input pin with id = idx in dest.
-    *
-    * returns true if it was succesful (pin exists), false otherwise.
-    */
-    bool get_input_pin_name(std::string &dest, int idx);
-
-    /**
-    * File descriptor of the PIN that triggers interrupts. This is card and will not change.
-    */
-    int interrupt_fd_;
-};
+        }
+    }
+}

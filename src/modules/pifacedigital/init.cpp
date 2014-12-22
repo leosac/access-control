@@ -11,7 +11,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    PFDigitalModule module(cfg, pipe, zmq_ctx);
+    Leosac::Module::Piface::PFDigitalModule module(cfg, pipe, zmq_ctx);
 
     INFO("Module PFDigital initiliazed.");
     pipe->send(zmqpp::signal::ok);

@@ -5,13 +5,12 @@
 #include "exception/gpioexception.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Module::Piface;
+
 PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
         zmqpp::socket *module_manager_pipe,
         zmqpp::context &ctx) :
-        pipe_(*module_manager_pipe),
-        config_(config),
-        is_running_(true),
-        ctx_(ctx),
+        BaseModule(ctx, module_manager_pipe, config),
         bus_push_(ctx_, zmqpp::socket_type::push)
 {
     if (pifacedigital_open(0) == -1)
@@ -28,7 +27,6 @@ PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
     {
         reactor_.add(gpio.sock_, std::bind(&PFDigitalPin::handle_message, &gpio));
     }
-    reactor_.add(pipe_, std::bind(&PFDigitalModule::handle_pipe, this));
 
     std::string path_to_gpio = "/sys/class/gpio/gpio" + std::to_string(GPIO_INTERRUPT_PIN) + "/value";
     interrupt_fd_ = open(path_to_gpio.c_str(), O_RDONLY | O_NONBLOCK);
@@ -65,15 +63,6 @@ void PFDigitalModule::run()
                 gpio_pin.update();
         }
     }
-}
-
-void PFDigitalModule::handle_pipe()
-{
-    zmqpp::signal s;
-
-    pipe_.receive(s, true);
-    if (s == zmqpp::signal::stop)
-        is_running_ = false;
 }
 
 void PFDigitalModule::handle_interrupt()
