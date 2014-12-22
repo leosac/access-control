@@ -24,6 +24,7 @@ function clone()
 {
     git clone https://github.com/islog/leosac.git
     pushd leosac
+    git checkout master;
     git submodule init;
     git submodule update;
     popd
@@ -45,6 +46,7 @@ cd $name
 #copy existing pkg/debian directory (maintained in repos, with patches)
 cp -R pkg/debian .
 
-export DEB_BUILD_OPTIONS="parallel=3"
+if [ -z ${DEB_BUILD_OPTIONS} ] ; then
+    export DEB_BUILD_OPTIONS="parallel=3"
+fi
 debuild -us -uc
-
