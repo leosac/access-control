@@ -21,6 +21,7 @@
 
 #include "zmqpp/zmqpp.hpp"
 #include <boost/property_tree/ptree.hpp>
+#include <modules/BaseModule.hpp>
 #include "WiegandReaderImpl.hpp"
 
 namespace Leosac
@@ -38,7 +39,7 @@ namespace Leosac
             /**
             * This simply is the main class for the Wiegand module.
             */
-            class WiegandReaderModule
+            class WiegandReaderModule : public BaseModule
             {
             public:
                 WiegandReaderModule(zmqpp::context &ctx,
@@ -48,12 +49,7 @@ namespace Leosac
                 /**
                 * Module's main loop. Will exit upon reception of signal::stop from module manager
                 */
-                void run();
-
-                /**
-                * Watch from stop signal from module manager
-                */
-                void handle_pipe();
+                virtual void run() override;
 
             private:
 
@@ -62,18 +58,10 @@ namespace Leosac
                 */
                 void process_config();
 
-                zmqpp::reactor reactor_;
-
                 /**
                 * Vector of wiegand reader managed by this module.
                 */
                 std::vector<WiegandReaderImpl> readers_;
-
-                zmqpp::context &ctx_;
-                zmqpp::socket &pipe_;
-                boost::property_tree::ptree config_;
-
-                bool is_running_;
             };
         }
     }

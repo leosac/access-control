@@ -52,10 +52,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
 WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         boost::property_tree::ptree const &cfg) :
-        ctx_(ctx),
-        pipe_(*pipe),
-        config_(cfg),
-        is_running_(true)
+        BaseModule(ctx, pipe, cfg)
 {
     process_config();
 
@@ -64,7 +61,6 @@ WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,
         reactor_.add(reader.bus_sub_, std::bind(&WiegandReaderImpl::handle_bus_msg, &reader));
         reactor_.add(reader.sock_, std::bind(&WiegandReaderImpl::handle_request, &reader));
     }
-    reactor_.add(pipe_, std::bind(&WiegandReaderModule::handle_pipe, this));
 }
 
 void WiegandReaderModule::process_config()
@@ -85,15 +81,6 @@ void WiegandReaderModule::process_config()
         WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name);
         readers_.push_back(std::move(reader));
     }
-}
-
-void WiegandReaderModule::handle_pipe()
-{
-    zmqpp::signal s;
-
-    pipe_.receive(s, true);
-    if (s == zmqpp::signal::stop)
-        is_running_ = false;
 }
 
 void WiegandReaderModule::run()
