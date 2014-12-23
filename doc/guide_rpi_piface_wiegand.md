@@ -161,12 +161,12 @@ We add this to our config file:
                     </gpio>
                     <gpio>
                         <name>wiegand_data_high</name>
-                        <no>1</no>
+                        <no>4</no>
                         <direction>in</direction>
                     </gpio>
                     <gpio>
                         <name>wiegand_data_low</name>
-                        <no>0</no>
+                        <no>2</no>
                         <direction>in</direction>
                     </gpio>
                 </gpios>
@@ -336,6 +336,21 @@ This is easy to do using the doorman module.
 ~~~~~~~~~~~~~~~~~~~
 
 We are defining an action that will target `my_door_gpio` and send the `ON` command for `3000` ms.
+
+Wiring everything {#install_guide_wiring}
+=========================================
+
+This is the board with the PiFace plug onto it.
+![Raspi and board](../piface-front.png)
+The orange port are output ports. Green ports are for inputs.
+
+We have 3 wire to connect:
+    1. Brown wire is our OUTPUT wire, connected to the door.
+    2. Purple wire is wiegand low.
+    3. Yellow wire is wiegand high.
+    
+![Raspi wired](../piface-wire.png)
+
 
 Conclusion {#install_guide_end}
 ===============================
