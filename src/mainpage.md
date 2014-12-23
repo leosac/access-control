@@ -16,3 +16,5 @@ Interesting stuff:
    
 Use environment variable (LEOSAC_SCRIPTS_DIR and LEOSAC_FACTORY_CONFIG_DIR) to specify
 custom location for scripts directory and the location of the factory config directory.
+
+You can find an [install guide](@ref install_guide) for a simple setup: Raspberry Pi + Piface + Wiegand + Door. 

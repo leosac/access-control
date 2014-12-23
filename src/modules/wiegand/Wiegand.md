@@ -25,6 +25,9 @@ readers    |          |            | Lists of all configured readers            
 ---->      | ---->    | green_led  | name of the green led device attached to the reader    | NO
 ---->      | ---->    | buzzer     | name of the buzzer device attached to the reader       | NO
 
+**Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
+the sysfsgpio or pifacedigital module.
+
 Example {#mod_wiegand_example}
 ------------------------------
 

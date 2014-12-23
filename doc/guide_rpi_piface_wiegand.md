@@ -173,3 +173,172 @@ We add this to our config file:
             </module_config>
         </module>
 ~~~~~~~~~~~~~~~~~~~
+
+As you can see, we are defining GPIO using the gpio port `<no>` we wired our reader and door.
+!IMAGE HERE!
+
+Note that we use `<level>2</level>` to make sure this module is one of the first to start.
+We are assigning meaningful name to our GPIO. Keep them in mind because we will reuse them later.
+
+Configure the Wiegand module {#install_guide_add_mod_wiegand}
+-------------------------------------------------------------
+
+Now that our configured GPIO are available to the rest of the application, we can configure the
+module that will understand our Wiegand Card Reader.
+
+We have 1 reader to configure, and we will use both INPUT pin: `wiegand_data_low` and `wiegand_data_high`.
+
+~~~~~~~~~~~~~~~~~~~.xml
+        <module>
+            <name>WIEGAND</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+~~~~~~~~~~~~~~~~~~~
+
+As you can see, we are re-using `wiegand_data_low` and `wiegand_data_high`. We assign them to our
+reader (`MY_WIEGAND_1`). 
+**Note**: Most wiegand card readers also have a green led and a buzzer than you can activate. We are not using
+ them in this tutorial, we are leaving them out in the configuration.
+ 
+Configure the auth-file module {#install_guide_add_mod_auth_file}
+-----------------------------------------------------------------
+
+In every access control system we need a component that is able to determine
+if an access should be granted or denied. This is what the [auth file](@ref mod_auth_file_main) module
+is doing.
+
+For this module we need a new configuration file, dedicated to this module only. This file will holds
+cards informations, group and user mapping and time slice informations.
+
+Lets say this file is named "auth.xml".
+
+~~~~~~~~~~~~~~~~~~~.xml
+<root>
+    <user_mapping>
+        <map>
+            <user>MY_USER</user>
+            <WiegandCard>80:83:a0:40</WiegandCard>
+        </map>
+        <map>
+            <user>Toto</user>
+            <WiegandCard>80:81:61:40</WiegandCard>
+        </map>
+    </user_mapping>
+    <permissions>
+        <map>
+            <user>Toto</user>
+            <default_schedule>
+            </default_schedule>
+        </map>
+        <map>
+            <!-- Time frame mapping for MY_USER -->
+            <user>MY_USER</user>
+            <default_schedule>
+                <monday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </monday>
+                <sunday>
+                    <start>00:00</start>
+                    <end>23:59</end>
+                </sunday>
+            </default_schedule>
+            <schedule>
+                <door>doorA</door>
+                <wednesday>
+                    <start>11:00</start>
+                    <end>13:00</end>
+                </wednesday>
+            </schedule>
+        </map>
+    </permissions>
+</root>
+~~~~~~~~~~~~~~~~~~~
+
+As you can see, the `Toto` user has no access. `MY_USER` has full access on monday and sunday.
+`MY_USER` also has access to `doorA` on wednesday, from 11 to 13.
+
+To enable this module, we also need to add something in the main configuration file. This something
+looks like this:
+
+~~~~~~~~~~~~~~~~~~~.xml
+        <module>
+            <name>AUTH-MANAGER-FILE</name>
+            <file>libauth-file.so</file>
+            <level>41</level>
+            <module_config>
+                <instances>
+                    <instance>
+                        <name>AUTH_CONTEXT_1</name>
+                        <auth_source>MY_WIEGAND_1</auth_source>
+                        <config_file>auth.xml</config_file>
+                        <target>doorA</target>
+                    </instance>
+                </instances>
+            </module_config>
+        </module>
+~~~~~~~~~~~~~~~~~~~
+
+The `<target>` match `<door>` in the `auth.xml` file. `<auth_source>` is the name of the reader
+that will generate access attempt.
+
+When an attempt is detect, this module will analyze it and either grant the access, or deny it. This response
+is then read by the doorman module.
+
+Configuring the doorman module {#install_guide_add_mod_doorman}
+---------------------------------------------------------------
+
+At last, we need to react to those "grant access" or "deny access" from the auth module.
+In our scenario, we want to open the door for a few seconds when an access is successful. In case 
+an access is failed, we do nothing.
+This is easy to do using the doorman module.
+
+~~~~~~~~~~~~~~~~~~~.xml
+        <module>
+            <name>DOORMAN</name>
+            <file>libdoorman.so</file>
+            <level>50</level>
+            <module_config>
+                <instances>
+                    <instance>
+                        <name>A_DOORMAN_INSTANCE</name>
+                        <auth_contexts>
+                            <auth_context>
+                                <name>AUTH_CONTEXT_1</name>
+                            </auth_context>
+                        </auth_contexts>
+                        <actions>
+                            <action>
+                                <on>GRANTED</on>
+                                <target>my_door_gpio</target>
+                                <cmd>
+                                    <f2>ON</f2>
+                                    <f3>3000</f3>
+                                </cmd>
+                            </action>
+                        </actions>
+                    </instance>
+                </instances>
+            </module_config>
+        </module>
+~~~~~~~~~~~~~~~~~~~
+
+We are defining an action that will target `my_door_gpio` and send the `ON` command for `3000` ms.
+
+Conclusion {#install_guide_end}
+===============================
+
+This is theoretically easy and should work.
+The whole configuration file can be found in `cfg/example/guide_rpi_piface_wiegand/`.
