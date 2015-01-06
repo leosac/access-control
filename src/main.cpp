@@ -58,7 +58,7 @@ int main(int argc, const char **argv)
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ', Leosac::getVersionString());
         TCLAP::SwitchArg verboseSwitch("v", "verbose", "Increase verbosity", false);
         TCLAP::ValueArg<std::string> kernelFile("k", "kernel-cfg", "Kernel Configuration file", true, "", "config_file");
-        TCLAP::ValueArg<std::string> working_directory("d", "working_directory", "Leosac's working directory", false, "", "working_directory");
+        TCLAP::ValueArg<std::string> working_directory("d", "working-directory", "Leosac's working directory", false, "", "working_directory");
 
         cmd.add(verboseSwitch);
         cmd.add(kernelFile);

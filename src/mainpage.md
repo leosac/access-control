@@ -24,7 +24,7 @@ Usage {#usage}
 
 Short | Long                   | Description
 ------|------------------------|------------
--d    | --working_directory    | Directory to cd to.
--k    | --kernel-cfg           | Leosac's core configuration file
--h    | --help                 | Print the help
-      | --version              | Display version informations and exit
+-d    | `--working-directory`  | Directory to cd to.
+-k    | `--kernel-cfg`         | Leosac's core configuration file
+-h    | `--help`               | Print the help
+N/A   | `--version`            | Display version informations and exit
