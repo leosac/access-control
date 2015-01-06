@@ -92,20 +92,24 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
 {
     assert(message_out);
     // we need to make sure the module's name exist.
-    for (const std::string &s : kernel_.module_manager().modules_names())
+    std::vector<std::string> modules_names = kernel_.module_manager().modules_names();
+    if (std::find(modules_names.begin(), modules_names.end(), module) != modules_names.end())
     {
-        if (module == s)
-        {
-            zmqpp::socket sock(context_, zmqpp::socket_type::req);
-            std::string serialized_cfg;
-            DEBUG("FOUND " << module);
-            sock.connect("inproc://module-" + module);
-            bool ret = sock.send("DUMP_CONFIG");
-            assert(ret);
-            DEBUG("HERE");
-            sock.receive(serialized_cfg);
-            *message_out << serialized_cfg;
-            break;
-        }
+        zmqpp::socket sock(context_, zmqpp::socket_type::req);
+        std::string serialized_cfg;
+        DEBUG("FOUND " << module);
+        sock.connect("inproc://module-" + module);
+        bool ret = sock.send("DUMP_CONFIG");
+        assert(ret);
+        DEBUG("HERE");
+        sock.receive(serialized_cfg);
+        *message_out << "OK";
+        *message_out << serialized_cfg;
+        return;
+    }
+    else
+    {
+        // if module with this name is not found
+        *message_out << "KO";
     }
 }
