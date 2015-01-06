@@ -13,8 +13,18 @@ Interesting stuff:
    + Configure the [network](@ref network_main)
    + Understand the [authentication system](@ref auth_main)
    + [Firmware](@ref firmware_main) info
+   + [Path management](@ref path_management)
    
-Use environment variable (LEOSAC_SCRIPTS_DIR and LEOSAC_FACTORY_CONFIG_DIR) to specify
-custom location for scripts directory and the location of the factory config directory.
-
 You can find an [install guide](@ref install_guide) for a simple setup: Raspberry Pi + Piface + Wiegand + Door. 
+
+Usage {#usage}
+==============
+
+`./leosac [-d <working_directory>] -k <config_file> [-v] [--] [--version] [-h]`
+
+Short | Long                   | Description
+------|------------------------|------------
+-d    | --working_directory    | Directory to cd to.
+-k    | --kernel-cfg           | Leosac's core configuration file
+-h    | --help                 | Print the help
+      | --version              | Display version informations and exit

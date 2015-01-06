@@ -123,6 +123,8 @@ Explanations:
   
 **MAKE SURE YOU DONT USE THE SAME `LEVEL` TWICE**
 
+<HR>
+
 Adding modules {#install_guide_add_mod}
 =======================================
 
