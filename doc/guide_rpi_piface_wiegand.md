@@ -326,8 +326,8 @@ This is easy to do using the doorman module.
                                 <on>GRANTED</on>
                                 <target>my_door_gpio</target>
                                 <cmd>
-                                    <f2>ON</f2>
-                                    <f3>3000</f3>
+                                    <f1>ON</f2>
+                                    <f2>3000</f3>
                                 </cmd>
                             </action>
                         </actions>

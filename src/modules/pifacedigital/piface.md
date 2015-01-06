@@ -10,7 +10,7 @@ Documentation for the PifaceDigital module.
 This provide support for using the PifaceDigital device with Leosac, as a GPIO controller.
 This can be very handy because it eases wiring.
 
-This module requires that the Linux Kernel Module SPI is enabled.
+This module requires that the Linux Kernel Module SPI be enabled.
 You can do this through `raspi-config` on Raspbian.
 
 Configuration Options {#mod_piface_user_config}

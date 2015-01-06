@@ -67,7 +67,7 @@ namespace Leosac
                 void process_config();
 
                 /**
-                * Authenticator instance.
+                * Authenticator instances.
                 */
                 std::vector<DoormanInstance *> doormen_;
             };
