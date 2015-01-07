@@ -119,18 +119,17 @@ void MonitorModule::test_ping()
 {
     if (addr_to_ping_.empty())
         return;
-    INFO("TESTING PING");
     Tools::UnixShellScript script(req_scripts_dir() + "/ping.sh");
 
     int ret = script.run(addr_to_ping_);
     if (ret == 0)
     {
-        INFO("PING OK");
+        INFO("Ping against " << addr_to_ping_<< " was successful. Looks like network is up.");
         network_led_->turnOn();
     }
     else
     {
-        WARN("Network looks down");
+        INFO("Ping against " << addr_to_ping_<< " failed. Network is probably down.");
         network_led_->turnOff();
     }
 }

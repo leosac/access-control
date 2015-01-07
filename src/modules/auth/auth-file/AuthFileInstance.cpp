@@ -62,10 +62,12 @@ void AuthFileInstance::handle_bus_msg()
     if (handle_auth(&auth_msg))
     {
         auth_result_msg << Leosac::Auth::AccessStatus::GRANTED;
+        INFO(name_ << " GRANTED access to target " << target_name_ << " for someone");
     }
     else
     {
         auth_result_msg << Leosac::Auth::AccessStatus::DENIED;
+        INFO(name_ << " DENIED access to target " << target_name_ << " for someone");
     }
     bus_push_.send(auth_result_msg);
 }
