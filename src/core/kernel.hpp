@@ -110,6 +110,7 @@ namespace Leosac
         std::string factory_config_directory() const;
 
         const zModuleManager &module_manager() const;
+        zModuleManager &module_manager();
 
     private:
         /**

@@ -51,51 +51,6 @@ public:
 
     ~zModuleManager();
 
-    /**
-    * Actually call the init_module() function of each library we loaded.
-    * The module initialization order in honored (see the "level" property).
-    * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
-    */
-    void initModules();
-
-    /**
-    * Opposite of init module. this stop all modules thread and perform cleanup.
-    * @note Dynamic libraries handlers are NOT released.
-    */
-    void stopModules();
-
-    /**
-    * Add a directory to a path. If the path already exist, it is ignored.
-    */
-    void addToPath(const std::string &dir);
-
-    /**
-    * Search the path and load a module based on a property tree for this module.
-    * Mandatory data are the module "name" and the "file" location (the name of the .so to load).
-    *
-    * The first file to match (looping over the path array) will be loaded.
-    */
-    bool loadModule(const boost::property_tree::ptree &cfg);
-
-    /**
-    * Returns the list of the name of the loaded modules.
-    */
-    std::vector<std::string> modules_names() const;
-
-private:
-    /**
-    * Close library handler.
-    *
-    * Cleanup code, call from destructor only.
-    */
-    void unloadLibraries();
-
-    /**
-    * This will load (actually calling dlopen()) the library file located at full_path.
-    * It returns a DynamicLibrary pointer that can be used to retrieve symbol from the shared object.
-    * It it failed, returns nullptr.
-    */
-    std::shared_ptr<DynamicLibrary> load_library_file(const std::string &full_path);
 
     /**
     * Internal helper struct that store informations related to module
@@ -137,7 +92,7 @@ private:
         /**
         * Actor object that runs the module code.
         */
-        mutable zmqpp::actor *actor_;
+        mutable std::unique_ptr<zmqpp::actor> actor_;
 
         /**
         * Comparison operator: used by the module manager set.
@@ -152,6 +107,60 @@ private:
             return level_me < level_o;
         }
     };
+
+    /**
+    * Actually call the init_module() function of each library we loaded.
+    * The module initialization order is honored (see the "level" property).
+    * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
+    */
+    void initModules();
+
+    void initModule(const std::string &name);
+    void initModule(ModuleInfo *modinfo);
+
+    /**
+    * Opposite of init module. this stop all modules thread and perform cleanup.
+    * @note Dynamic libraries handlers are NOT released.
+    */
+    void stopModules();
+
+    /**
+    * Stop a module by name
+    */
+    void stopModule(const std::string &name);
+
+    /**
+    * Add a directory to a path. If the path already exist, it is ignored.
+    */
+    void addToPath(const std::string &dir);
+
+    /**
+    * Search the path and load a module based on a property tree for this module.
+    * Mandatory data are the module "name" and the "file" location (the name of the .so to load).
+    *
+    * The first file to match (looping over the path array) will be loaded.
+    */
+    bool loadModule(const boost::property_tree::ptree &cfg);
+
+    /**
+    * Returns the list of the name of the loaded modules.
+    */
+    std::vector<std::string> modules_names() const;
+
+private:
+    /**
+    * Close library handler.
+    *
+    * Cleanup code, call from destructor only.
+    */
+    void unloadLibraries();
+
+    /**
+    * This will load (actually calling dlopen()) the library file located at full_path.
+    * It returns a DynamicLibrary pointer that can be used to retrieve symbol from the shared object.
+    * It it failed, returns nullptr.
+    */
+    std::shared_ptr<DynamicLibrary> load_library_file(const std::string &full_path);
 
     std::vector<std::string> path_;
     std::set<ModuleInfo> modules_;

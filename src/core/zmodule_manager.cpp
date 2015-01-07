@@ -49,28 +49,55 @@ void zModuleManager::initModules()
 {
     for (const ModuleInfo &module_info : modules_)
     {
-        try
-        {
-            void *symptr = module_info.lib_->getSymbol("start_module");
-            assert(symptr);
-            // take the module init function and make a std::function out of it.
-            std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> actor_fun =
-                    ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr);
-
-            zmqpp::actor *new_module = new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
-                    module_info.config_,
-                    std::ref(ctx_)));
-            module_info.actor_ = new_module;
-
-            INFO("Module {" << module_info.name_ << "} initialized. (level = " <<
-                    module_info.config_.get<int>("level", 100));
-        }
-        catch (std::exception &e)
-        {
-            ERROR("Unable to init module {" << module_info.name_ << "}: " << e.what());
-            std::throw_with_nested(ModuleException("Unable to init module {" + module_info.name_ + "}"));
-        }
+        //fixme ... that cast.
+        initModule(const_cast<ModuleInfo *>(&module_info));
     }
+}
+
+void zModuleManager::initModule(ModuleInfo *modinfo)
+{
+    assert(modinfo);
+    // if not null, may still be running
+    assert(modinfo->actor_ == nullptr);
+    assert(modinfo->lib_);
+
+    try
+    {
+        void *symptr = modinfo->lib_->getSymbol("start_module");
+        assert(symptr);
+        // take the module init function and make a std::function out of it.
+        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> actor_fun =
+                ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr);
+
+        auto new_module = std::unique_ptr<zmqpp::actor>(new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
+                modinfo->config_,
+                std::ref(ctx_))));
+        modinfo->actor_ = std::move(new_module);
+
+        INFO("Module {" << modinfo->name_ << "} initialized. (level = " <<
+                modinfo->config_.get<int>("level", 100));
+    }
+    catch (std::exception &e)
+    {
+        ERROR("Unable to init module {" << modinfo->name_ << "}: " << e.what());
+        std::throw_with_nested(ModuleException("Unable to init module {" + modinfo->name_ + "}"));
+    }
+}
+
+void zModuleManager::initModule(const std::string &name)
+{
+    auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
+    {
+        return m.name_ == name;
+    });
+
+    if (itr != modules_.end())
+    {
+        //fixme cast... again
+        initModule(const_cast<ModuleInfo *>(&(*itr)));
+    }
+    else
+        WARN("Cannot find any module nammed " << name);
 }
 
 void zModuleManager::addToPath(const std::string &dir)
@@ -141,6 +168,23 @@ void zModuleManager::stopModules()
     INFO("DONE");
 }
 
+void zModuleManager::stopModule(const std::string &name)
+{
+    for (std::set<ModuleInfo>::const_iterator itr = modules_.begin();
+         itr != modules_.end();
+         ++itr)
+    {
+        // if a module failed to initialize, its actor will be null.
+        if (itr->actor_ && name == itr->name_)
+        {
+            INFO("Will now stop module (BY NAME)" << itr->name_);
+            itr->actor_->stop(true);
+            itr->actor_ = nullptr;
+            break;
+        }
+    }
+}
+
 zModuleManager::~zModuleManager()
 {
     try
@@ -166,7 +210,7 @@ zModuleManager::zModuleManager(zmqpp::context &ctx) :
 
 zModuleManager::ModuleInfo::~ModuleInfo()
 {
-    delete actor_;
+
 }
 
 zModuleManager::ModuleInfo::ModuleInfo() :
@@ -178,7 +222,7 @@ zModuleManager::ModuleInfo::ModuleInfo() :
 
 zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o)
 {
-    actor_ = o.actor_;
+    actor_ = std::move(o.actor_);
     lib_ = o.lib_;
     config_ = o.config_;
     name_ = o.name_;

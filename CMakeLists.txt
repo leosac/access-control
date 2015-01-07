@@ -13,6 +13,9 @@ endif()
 
 # Set correct hardware platform macro
 set(LEOSAC_PLATFORM CACHE STRING "Hardware platform on which to build Leosac")
+
+set(LEOSAC_BUILD_CMAKE_ZMQ CACHE BOOL true)
+
 if(NOT LEOSAC_PLATFORM)
     message(WARNING "No hardware platform is specified\nExample: -DLEOSAC_PLATFORM=RaspberryPi")
 else()
@@ -27,7 +30,7 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.41.0 REQUIRED serialization)
+find_package(Boost 1.41.0 REQUIRED serialization regex)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
 
@@ -49,7 +52,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_INSTALL_RPATH \$ORIGIN/../lib)
 
+if (LEOSAC_BUILD_CMAKE_ZMQ)
 add_subdirectory(libzmq)
+endif()
 add_subdirectory(zmqpp)
 add_subdirectory(src)
 add_subdirectory(cfg)

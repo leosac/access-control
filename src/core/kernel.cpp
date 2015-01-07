@@ -312,3 +312,8 @@ const zModuleManager &Kernel::module_manager() const
 {
     return module_manager_;
 }
+
+zModuleManager &Kernel::module_manager()
+{
+    return module_manager_;
+}
