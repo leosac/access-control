@@ -24,6 +24,14 @@
 
 using namespace Leosac::Module::LedBuzzer;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "LED_BUZZER";
+}
+}
+
 /**
 * Entry point of the LEDBuzzer management module.
 */

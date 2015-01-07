@@ -22,6 +22,14 @@
 
 using namespace Leosac::Module::Doorman;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "DOORMAN";
+}
+}
+
 /**
 * Entry point for the Doorman module.
 */

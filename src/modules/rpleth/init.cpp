@@ -29,6 +29,14 @@
 
 using namespace Leosac::Module::Rpleth;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "RPLETH";
+}
+}
+
 /**
 * This function is the entry point of the Rpleth module.
 */

@@ -49,6 +49,15 @@ bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1
     INFO("response = " << rep);
     return true;
 }
+
+extern "C"
+{
+const char *get_module_name()
+{
+    return "STDIN_CONTROLLER";
+}
+}
+
 /**
 * pipe is pipe back to module manager.
 * this function is called in its own thread.

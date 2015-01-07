@@ -26,6 +26,15 @@
 
 using namespace Leosac::Module::SysFsGpio;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "SYSFS_GPIO";
+}
+}
+
+
 /**
 * Entry point of the SysFsGpio module.
 * It provides a way to control GPIO through the sysfs kernel interface.

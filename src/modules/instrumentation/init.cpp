@@ -22,6 +22,14 @@
 
 using namespace Leosac::Module::Instrumentation;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "INSTRUMENTATION";
+}
+}
+
 extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)

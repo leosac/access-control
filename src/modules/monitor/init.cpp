@@ -45,6 +45,14 @@ struct logger_guard
     std::vector<std::string> logger_names;
 };
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "MONITOR";
+}
+}
+
 /**
 * This is the entry point of the Monitor module.
 */

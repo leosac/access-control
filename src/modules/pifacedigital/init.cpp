@@ -22,6 +22,14 @@
 #include <tools/log.hpp>
 #include "PFDigitalModule.hpp"
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "PIFACEDIGITAL_GPIO";
+}
+}
+
 /**
 * This function is the entry point of the PifaceDigital module.
 * @see PFDigitalModule description.

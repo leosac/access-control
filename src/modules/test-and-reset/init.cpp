@@ -24,6 +24,14 @@
 
 using namespace Leosac::Module::TestAndReset;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "TEST_AND_RESET";
+}
+}
+
 /**
 * This function is the entry point of the Test And Reset module.
 */

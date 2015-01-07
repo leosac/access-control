@@ -28,6 +28,14 @@
 
 using namespace Leosac::Module::Wiegand;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "WIEGAND_READER";
+}
+}
+
 /**
 * Entry point of wiegand module.
 * This module provide support for controlling WiegandReader.

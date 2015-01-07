@@ -22,6 +22,14 @@
 
 using namespace Leosac::Module::Auth;
 
+extern "C"
+{
+const char *get_module_name()
+{
+    return "AUTH_FILE";
+}
+}
+
 /**
 * Entry point for the auth-file module.
 */
