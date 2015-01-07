@@ -73,7 +73,9 @@ namespace Leosac
         * be implemented in the module (unless it is implemented by the BaseModule class).
         *
         * Commands:
-        *   DUMP_CONFIG : serialize the current module config. (as a ptree)
+        *   DUMP_CONFIG: serialize the current module config.
+        *              : Parameter: "0" -> as a ptree
+        *                           "1" -> as a xml tree
         *
         * @note This class is here to help reduce code duplication. It is NOT mandatory to inherit from this base class
         * to implement a module. However, it may help.
@@ -112,8 +114,11 @@ namespace Leosac
 
             /**
             * Serialize the config_ property tree in portable text format and returns it.
+            * This is called upon receiving the DUMP_CONFIG command.
+            *
+            * @note You can override this if you need to.
             */
-            std::string dump_config() const;
+            virtual std::string dump_config(bool xml_format) const;
 
             /**
             * A reference to the ZeroMQ context in case you need it to create additional socket.

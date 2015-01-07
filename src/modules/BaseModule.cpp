@@ -21,8 +21,10 @@
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <tools/log.hpp>
 #include "BaseModule.hpp"
+#include "tools/XmlPropertyTree.hpp"
 
 using namespace Leosac::Module;
+using namespace Leosac::Tools;
 
 BaseModule::BaseModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
@@ -67,13 +69,20 @@ void BaseModule::handle_pipe()
     }
 }
 
-std::string BaseModule::dump_config() const
+std::string BaseModule::dump_config(bool xml_format) const
 {
-    std::ostringstream oss;
-    boost::archive::text_oarchive archive(oss);
-    boost::property_tree::save(archive, config_, 1);
+    if (!xml_format)
+    {
+        std::ostringstream oss;
+        boost::archive::text_oarchive archive(oss);
+        boost::property_tree::save(archive, config_, 1);
 
-    return oss.str();
+        return oss.str();
+    }
+    else
+    {
+        return propertyTreeToXml(config_);
+    }
 }
 
 void BaseModule::handle_control()
@@ -85,8 +94,14 @@ void BaseModule::handle_control()
     msg >> frame1;
     if (frame1 == "DUMP_CONFIG")
     {
+        assert(msg.remaining() == 1);
+        uint8_t format;
+        msg >> format;
         DEBUG("Dumping config!");
-        control_.send(dump_config());
+        if (format == '1')
+            control_.send(dump_config(true));
+        else
+            control_.send(dump_config(false));
     }
     else
     {

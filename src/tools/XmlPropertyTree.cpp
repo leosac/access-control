@@ -55,15 +55,20 @@ void Leosac::Tools::propertyTreeToXmlFile(const boost::property_tree::ptree &tre
     std::string filename(path);
     std::ofstream cfg_stream(filename);
 
-    if (!cfg_stream.good())
-        throw (ConfigException(filename, "Could not open file {" + path + "}"));
+    cfg_stream << propertyTreeToXml(tree);
+}
+
+std::string Leosac::Tools::propertyTreeToXml(const boost::property_tree::ptree &tree)
+{
+    std::stringstream ss;
     try
     {
         boost::property_tree::xml_writer_settings<char> settings('\t', 1);
-        write_xml(cfg_stream, tree, settings);
+        write_xml(ss, tree, settings);
     }
     catch (ptree_error &e)
     {
-        std::throw_with_nested(ConfigException(filename, ""));
+        std::throw_with_nested(std::runtime_error("Failed to serialize ptree"));
     }
+    return ss.str();
 }

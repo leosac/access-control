@@ -36,5 +36,10 @@ namespace Leosac
         */
         void propertyTreeToXmlFile(const boost::property_tree::ptree &tree,
                 const std::string &path);
+
+        /**
+        * Convert a property tree to an xml formatted string.
+        */
+        std::string propertyTreeToXml(const boost::property_tree::ptree &tree);
     }
 }
