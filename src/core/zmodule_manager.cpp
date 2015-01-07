@@ -99,15 +99,9 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
 
 bool zModuleManager::initModule(const std::string &name)
 {
-    auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
+     if (ModuleInfo *ptr = find_module_by_name(name))
     {
-        return m.name_ == name;
-    });
-
-    if (itr != modules_.end())
-    {
-        //fixme cast... again
-        initModule(const_cast<ModuleInfo *>(&(*itr)));
+        initModule(ptr);
         return true;
     }
     else
@@ -172,34 +166,40 @@ void zModuleManager::stopModules()
          itr != modules_.rend();
          ++itr)
     {
-        // if a module failed to initialize, its actor will be null.
-        if (itr->actor_)
-        {
-            INFO("Will now stop module " << itr->name_);
-            itr->actor_->stop(true);
-        }
-        else
-        {
-            NOTICE("Not stopping module " << itr->name_ << " as it failed to load (or didnt load).");
-        }
+        stopModule(const_cast<ModuleInfo *>(&(*itr)));
     }
 }
 
-void zModuleManager::stopModule(const std::string &name)
+void zModuleManager::stopModule(ModuleInfo *modinfo)
 {
-    for (std::set<ModuleInfo>::const_iterator itr = modules_.begin();
-         itr != modules_.end();
-         ++itr)
+    assert(modinfo);
+
+    // make sure the module is running.
+    if (modinfo->actor_)
     {
-        // if a module failed to initialize, its actor will be null.
-        if (itr->actor_ && name == itr->name_)
-        {
-            INFO("Will now stop module (BY NAME)" << itr->name_);
-            itr->actor_->stop(true);
-            itr->actor_ = nullptr;
-            break;
-        }
+        INFO("Will now stop module " << modinfo->name_);
+        modinfo->actor_->stop(true);
+        modinfo->actor_ = nullptr;
     }
+    else
+    {
+        NOTICE("Not stopping module " << modinfo->name_  << " as it doesn't seem to run.");
+    }
+}
+
+bool zModuleManager::stopModule(const std::string &name)
+{
+    if (ModuleInfo *ptr = find_module_by_name(name))
+    {
+        stopModule(ptr);
+        return true;
+    }
+    else
+    {
+        WARN("Cannot find any module nammed " << name);
+        return false;
+    }
+    return false;
 }
 
 zModuleManager::~zModuleManager()
@@ -258,4 +258,16 @@ std::vector<std::string> zModuleManager::modules_names() const
         ret.push_back(module.name_);
     }
     return ret;
+}
+
+zModuleManager::ModuleInfo *zModuleManager::find_module_by_name(const std::string &name)
+{
+   auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
+    {
+        return m.name_ == name;
+    });
+
+    if (itr != modules_.end())
+        return const_cast<ModuleInfo *>(&(*itr));
+    return nullptr;
 }

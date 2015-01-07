@@ -138,8 +138,18 @@ public:
     * @note This does not unload the underlying shared library.
     * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
     *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
+    * @return false if a module with this name cannot be found. True otherwise.
     */
-    void stopModule(const std::string &name);
+    bool stopModule(const std::string &name);
+
+    /**
+    * Stop a specific module.
+    * @note This does not unload the underlying shared library.
+    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
+    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
+    * @return false if a module with this name cannot be found. True otherwise.
+    */
+    void stopModule(ModuleInfo *modinfo);
 
     /**
     * Add a directory to a path. If the path already exist, it is ignored.
@@ -166,6 +176,8 @@ private:
     * Cleanup code, call from destructor only.
     */
     void unloadLibraries();
+
+    ModuleInfo *find_module_by_name(const std::string &name);
 
     /**
     * This will load (actually calling dlopen()) the library file located at full_path.
