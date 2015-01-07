@@ -15,7 +15,7 @@
 
     <modules>
         <module>
-            <name>STDIN</name>
+            <name>STDIN_CONTROLLER</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
         </module>
@@ -32,7 +32,7 @@
         </module>
 
         <module>
-            <name>PIFACE-GPIO</name>
+            <name>PIFACEDIGITAL_GPIO</name>
             <file>libpifacedigital.so</file>
             <level>2</level>
 
@@ -68,7 +68,7 @@
         </module>
 
         <module>
-            <name>rpleth</name>
+            <name>RPLETH</name>
             <file>librpleth.so</file>
             <level>100</level>
             <module_config>
@@ -79,7 +79,7 @@
         </module>
 
         <module>
-            <name>led</name>
+            <name>LED_BUZZER</name>
             <file>libled.so</file>
             <level>3</level>
             <module_config>
@@ -102,7 +102,7 @@
         </module>
 
         <module>
-            <name>WIEGAND</name>
+            <name>WIEGAND_READER</name>
             <file>libwiegand.so</file>
             <level>5</level>
 
@@ -120,7 +120,7 @@
         </module>
 
         <module>
-            <name>ResetWatcher</name>
+            <name>TEST_AND_RESET</name>
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <module_config>

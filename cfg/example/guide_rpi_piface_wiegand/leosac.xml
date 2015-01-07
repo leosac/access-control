@@ -9,7 +9,7 @@
     </network>
     <modules>
         <module>
-            <name>PIFACE-GPIO</name>
+            <name>PIFACEDIGITAL_GPIO</name>
             <file>libpifacedigital.so</file>
             <level>2</level>
             <module_config>
@@ -35,7 +35,7 @@
         </module>
 
         <module>
-            <name>WIEGAND</name>
+            <name>WIEGAND_READER</name>
             <file>libwiegand.so</file>
             <level>5</level>
             <module_config>
@@ -52,7 +52,7 @@
         </module>
 
         <module>
-            <name>AUTH-MANAGER-FILE</name>
+            <name>AUTH_FILE</name>
             <file>libauth-file.so</file>
             <level>41</level>
             <module_config>

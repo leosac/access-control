@@ -35,7 +35,7 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
         <module>
-            <name>ResetWatcher</name>
+            <name>TEST_AND_RESET</name>
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <beep_on_start>false</beep_on_start>

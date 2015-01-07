@@ -42,6 +42,8 @@ namespace Leosac
 
                 readers_cfg.add_child("reader", reader1_cfg);
                 module_cfg.add_child("readers", readers_cfg);
+
+                cfg.add("name", "WIEGAND_READER");
                 cfg.add_child("module_config", module_cfg);
 
                 return test_run_module<WiegandReaderModule>(&ctx_, pipe, cfg);

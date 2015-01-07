@@ -30,7 +30,7 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
         <module>
-            <name>rpleth</name>
+            <name>RPLETH</name>
             <file>librpleth.so</file>
             <level>100</level>
             <module_config>

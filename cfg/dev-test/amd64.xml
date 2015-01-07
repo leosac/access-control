@@ -15,19 +15,19 @@
 
     <remote>
         <port>12345</port>
-	<secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
-	<public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
     </remote>
 
     <modules>
         <module>
-            <name>STDIN</name>
+            <name>STDIN_CONTROLLER</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
 
         </module>
            <module>
-            <name>WIEGAND</name>
+            <name>WIEGAND_READER</name>
             <file>libwiegand.so</file>
             <level>5</level>
             <module_config>
@@ -44,7 +44,7 @@
         </module>
 
         <module>
-            <name>Instrumentation</name>
+            <name>INSTRUMENTATION</name>
             <file>libinstrumentation.so</file>
             <level>105</level>
             <module_config>
@@ -68,7 +68,7 @@
         </module>
 
         <module>
-            <name>ResetWatcher</name>
+            <name>TEST_AND_RESET</name>
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <module_config>

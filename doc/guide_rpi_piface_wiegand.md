@@ -150,7 +150,7 @@ We add this to our config file:
 
 ~~~~~~~~~~~~~~~~~~~.xml
  <module>
-            <name>PIFACE-GPIO</name>
+            <name>PIFACEDIGITAL_GPIO</name>
             <file>libpifacedigital.so</file>
             <level>2</level>
             <module_config>
@@ -277,7 +277,7 @@ looks like this:
 
 ~~~~~~~~~~~~~~~~~~~.xml
         <module>
-            <name>AUTH-MANAGER-FILE</name>
+            <name>AUTH_FILE</name>
             <file>libauth-file.so</file>
             <level>41</level>
             <module_config>

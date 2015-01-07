@@ -44,6 +44,7 @@ namespace Leosac
                 module_cfg.add("reader", "WIEGAND1");
                 module_cfg.add("stream_mode", "true");
 
+                cfg.add("name", "RPLETH");
                 cfg.add_child("module_config", module_cfg);
                 return test_run_module<RplethModule>(&ctx_, pipe, cfg);
             }

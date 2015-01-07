@@ -28,7 +28,6 @@
                     <start>00:00</start>
                     <end>23:59</end>
                 </monday>
-
                 <sunday>
                     <start>00:00</start>
                     <end>23:59</end>
@@ -40,6 +39,10 @@
                 <wednesday>
                     <start>11:00</start>
                     <end>13:00</end>
+                </wednesday>
+                <wednesday>
+                    <start>00:00</start>
+                    <end>23:59</end>
                 </wednesday>
             </schedule>
         </map>

@@ -21,7 +21,7 @@
         </module>
 
         <module>
-            <name>Instrumentation</name>
+            <name>INSTRUMENTATION</name>
             <file>libinstrumentation.so</file>
             <level>105</level>
             <module_config>
@@ -30,7 +30,7 @@
         </module>
 
         <module>
-            <name>WIEGAND</name>
+            <name>WIEGAND_READER</name>
             <file>libwiegand.so</file>
             <level>5</level>
 
@@ -48,7 +48,7 @@
         </module>
 
         <module>
-            <name>ResetWatcher</name>
+            <name>TEST_AND_RESET</name>
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <module_config>

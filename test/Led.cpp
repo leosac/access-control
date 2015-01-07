@@ -46,6 +46,8 @@ namespace Leosac
 
                 leds_cfg.add_child("led", led1_cfg);
                 module_cfg.add_child("leds", leds_cfg);
+
+                cfg.add("name", "LED_BUZZER");
                 cfg.add_child("module_config", module_cfg);
 
                 return test_run_module<LEDBuzzerModule>(&ctx_, pipe, cfg);

@@ -33,7 +33,7 @@ BaseModule::BaseModule(zmqpp::context &ctx,
         is_running_(true),
         control_(ctx, zmqpp::socket_type::rep)
 {
-    std::string module_name;
+    std::string module_name = cfg.get<std::string>("name");
     control_.bind("inproc://module-" + module_name);
 
     reactor_.add(control_, std::bind(&BaseModule::handle_control, this));

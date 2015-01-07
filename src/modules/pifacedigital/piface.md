@@ -34,10 +34,9 @@ Notes:
 Example {#mod_piface_example}
 ------------------------------
 
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
         <module>
-            <name>PIFACE-GPIO</name>
+            <name>PIFACEDIGITAL_GPIO</name>
             <file>libpifacedigital.so</file>
             <level>2</level>
             <module_config>

@@ -16,7 +16,7 @@
         </module>
 
         <module>
-            <name>AUTH-MANAGER-FILE</name>
+            <name>AUTH_FILE</name>
             <file>libauth-file.so</file>
             <level>41</level>
 
@@ -76,7 +76,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
         </module>
 
         <module>
-            <name>WIEGAND</name>
+            <name>WIEGAND_READER</name>
             <file>libwiegand.so</file>
             <level>5</level>
 
@@ -92,7 +92,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
         </module>
 
         <module>
-            <name>ResetWatcher</name>
+            <name>TEST_AND_RESET</name>
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <module_config>
