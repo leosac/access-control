@@ -11,7 +11,7 @@
 
     <modules>
         <module>
-            <name>STDIN</name>
+            <name>STDIN_CONTROLLER</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
         </module>

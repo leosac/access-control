@@ -88,7 +88,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
         modinfo->actor_ = std::move(new_module);
 
         INFO("Module {" << modinfo->name_ << "} initialized. (level = " <<
-                modinfo->config_.get<int>("level", 100));
+                modinfo->config_.get<int>("level", 100) << ")");
     }
     catch (std::exception &e)
     {
@@ -97,7 +97,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
     }
 }
 
-void zModuleManager::initModule(const std::string &name)
+bool zModuleManager::initModule(const std::string &name)
 {
     auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
     {
@@ -108,9 +108,14 @@ void zModuleManager::initModule(const std::string &name)
     {
         //fixme cast... again
         initModule(const_cast<ModuleInfo *>(&(*itr)));
+        return true;
     }
     else
+    {
         WARN("Cannot find any module nammed " << name);
+        return false;
+    }
+    return false;
 }
 
 void zModuleManager::addToPath(const std::string &dir)
@@ -178,7 +183,6 @@ void zModuleManager::stopModules()
             NOTICE("Not stopping module " << itr->name_ << " as it failed to load (or didnt load).");
         }
     }
-    INFO("DONE");
 }
 
 void zModuleManager::stopModule(const std::string &name)
@@ -211,7 +215,7 @@ zModuleManager::~zModuleManager()
     }
     catch (...)
     {
-        std::cerr << "Unkown exception in zModuleManager destructor";
+        std::cerr << "Unkown exception in zModuleManager destructor" << std::endl;
     }
 }
 

@@ -117,8 +117,10 @@ public:
 
     /**
     * Attempt to find a module using its name, then load it.
+    * @return false if a module with this name cannot be found. True otherwise
+    * @note Even if the module is found, loading it could fail. In that case, an exception would be thrown.
     */
-    void initModule(const std::string &name);
+    bool initModule(const std::string &name);
 
     /**
     * Initialize a module.
