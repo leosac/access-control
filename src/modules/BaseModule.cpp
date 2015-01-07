@@ -60,8 +60,11 @@ void BaseModule::handle_pipe()
     if (sig == zmqpp::signal::stop)
         is_running_ = false;
     else
+    {
+        ERROR("Module receive a message on its pipe that wasn't a signal. Aborting.");
         assert(0);
-
+        throw std::runtime_error("Module receive a message on its pipe that wasn't a signal. Aborting.");
+    }
 }
 
 std::string BaseModule::dump_config() const
@@ -80,12 +83,15 @@ void BaseModule::handle_control()
 
     control_.receive(msg);
     msg >> frame1;
-    DEBUG("HOHO:" << frame1);
     if (frame1 == "DUMP_CONFIG")
     {
         DEBUG("Dumping config!");
         control_.send(dump_config());
     }
     else
+    {
+        ERROR("Module received invalid request (" << frame1 << "). Aborting.");
         assert(0);
+        throw std::runtime_error("Invalid request for module.");
+    }
 }

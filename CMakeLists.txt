@@ -11,17 +11,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "")
     message(WARNING "Please specify a build type\nExample: cmake .. -DCMAKE_BUILD_TYPE=Debug")
 endif()
 
-# Set correct hardware platform macro
-set(LEOSAC_PLATFORM CACHE STRING "Hardware platform on which to build Leosac")
-
-set(LEOSAC_BUILD_CMAKE_ZMQ CACHE BOOL true)
-
-if(NOT LEOSAC_PLATFORM)
-    message(WARNING "No hardware platform is specified\nExample: -DLEOSAC_PLATFORM=RaspberryPi")
-else()
-    string(TOUPPER ${LEOSAC_PLATFORM} LEOSAC_PLATFORM_UPPERCASE)
-    add_definitions(-DLEOSAC_PLATFORM_${LEOSAC_PLATFORM_UPPERCASE})
-endif()
+set(LEOSAC_BUILD_CMAKE_ZMQ true CACHE BOOL "Build Libzmq through its CMakeFile")
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_STATIC_RUNTIME OFF)
@@ -63,9 +53,6 @@ if(LEOSAC_BUILD_TESTS)
     enable_testing()
     add_subdirectory(test)
 endif()
-# IDE hackfix, will always build test.
-#enable_testing()
-#add_subdirectory(test)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/build_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts/load_ipconfig.sh DESTINATION ${LEOSAC_BINARY_DIR})

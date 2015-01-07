@@ -164,6 +164,7 @@ function setup()
 	if [ $1 = "s" ] ; then read; fi
 	    
 	cmake -DCMAKE_TOOLCHAIN_FILE=$CROSS_CMAKE \
+	    -DLEOSAC_BUILD_CMAKE_ZMQ=0 \
 	    -DLEOSAC_BUILD_TESTS=1 \
 	    -DZMQPP_BUILD_STATIC=0 \
 	    -DZMQPP_BUILD_SHARED=1 \

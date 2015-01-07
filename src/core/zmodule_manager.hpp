@@ -117,7 +117,7 @@ public:
 
     /**
     * Attempt to find a module using its name, then load it.
-    * @return false if a module with this name cannot be found. True otherwise
+    * @return false if a module with this name cannot be found. True otherwise.
     * @note Even if the module is found, loading it could fail. In that case, an exception would be thrown.
     */
     bool initModule(const std::string &name);
@@ -136,6 +136,8 @@ public:
     /**
     * Stop a module by name.
     * @note This does not unload the underlying shared library.
+    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
+    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
     */
     void stopModule(const std::string &name);
 
