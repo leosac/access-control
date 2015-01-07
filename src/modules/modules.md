@@ -7,6 +7,9 @@ everything talks to each other.
 
 See the [Leosac::Module](@ref Leosac::Module) namespace for a reference of all modules.
 
+When configuring a module, the name specified in the configuration file must match the name
+provided by the module through its `get_module_name()` function.
+
 Writing a new module {#modules_write}
 =====================================
 

@@ -63,6 +63,19 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
 
     try
     {
+        char *(*module_name_fct)(void) = (char *(*)(void)) modinfo->lib_->getSymbol("get_module_name");
+        assert(module_name_fct);
+        std::string module_exported_name(module_name_fct());
+
+        if (modinfo->name_ != module_exported_name)
+        {
+            std::stringstream error;
+            error << "Missconfiguration: Configured module name doesn't match the name exported by the module. " <<
+                    "(" << modinfo->name_ << " != " << module_exported_name << ")";
+            ERROR(error.str());
+            throw ConfigException("main configuration file", error.str());
+        }
+
         void *symptr = modinfo->lib_->getSymbol("start_module");
         assert(symptr);
         // take the module init function and make a std::function out of it.

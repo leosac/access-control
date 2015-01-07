@@ -34,7 +34,7 @@
 * No reference to an object is returned when loading a module. The module will lives in its own thread and other components
 * can talk to it.
 *
-* @note: Only the zModuleManager object has "direct access" to the module object. It is zmqpp::actor launch the module
+* @note: Only the zModuleManager object has "direct access" to the module object. It is zmqpp::actor that launches the module
 * in its own thread.
 *
 * @note: Use the "level" property to define module initialization order.
@@ -110,12 +110,19 @@ public:
 
     /**
     * Actually call the init_module() function of each library we loaded.
-    * The module initialization order is honored (see the "level" property).
+    * The module initialization order is honored because the modules_ set is ordered.
     * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
     */
     void initModules();
 
+    /**
+    * Attempt to find a module using its name, then load it.
+    */
     void initModule(const std::string &name);
+
+    /**
+    * Initialize a module.
+    */
     void initModule(ModuleInfo *modinfo);
 
     /**
@@ -125,7 +132,8 @@ public:
     void stopModules();
 
     /**
-    * Stop a module by name
+    * Stop a module by name.
+    * @note This does not unload the underlying shared library.
     */
     void stopModule(const std::string &name);
 
