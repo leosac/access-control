@@ -44,17 +44,7 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    {
-        WiegandReaderModule module(zmq_ctx, pipe, cfg);
-
-        INFO("Module WiegandReader initialized.");
-        pipe->send(zmqpp::signal::ok);
-
-        module.run();
-        INFO("Module WiegandReader shutting down");
-    }
-    INFO("Module WiegandReader terminated.");
-    return true;
+    return Leosac::Module::start_module_helper<WiegandReaderModule>(pipe, cfg, zmq_ctx);
 }
 
 WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,

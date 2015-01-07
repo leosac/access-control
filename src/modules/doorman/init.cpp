@@ -37,14 +37,5 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    {
-        DoormanModule module(zmq_ctx, pipe, cfg);
-
-        INFO("Doorman Module initialized.");
-        pipe->send(zmqpp::signal::ok);
-
-        module.run();
-    }
-    INFO("Doorman module shutting down.");
-    return true;
+    return Leosac::Module::start_module_helper<DoormanModule>(pipe, cfg, zmq_ctx);
 }

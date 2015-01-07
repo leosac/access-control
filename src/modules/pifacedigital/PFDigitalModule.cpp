@@ -26,11 +26,11 @@
 
 using namespace Leosac::Module::Piface;
 
-PFDigitalModule::PFDigitalModule(const boost::property_tree::ptree &config,
+PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
         zmqpp::socket *module_manager_pipe,
-        zmqpp::context &ctx) :
-        BaseModule(ctx, module_manager_pipe, config),
-        bus_push_(ctx_, zmqpp::socket_type::push)
+        const boost::property_tree::ptree &config)
+        : BaseModule(ctx, module_manager_pipe, config),
+          bus_push_(ctx_, zmqpp::socket_type::push)
 {
     if (pifacedigital_open(0) == -1)
     {
@@ -104,7 +104,7 @@ void PFDigitalModule::handle_interrupt()
             std::string gpio_name;
             if (get_input_pin_name(gpio_name, i))
             {
-                bus_push_.send(zmqpp::message() << std::string ("S_INT:" + gpio_name));
+                bus_push_.send(zmqpp::message() << std::string("S_INT:" + gpio_name));
             }
         }
     }

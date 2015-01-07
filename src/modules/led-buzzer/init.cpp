@@ -40,12 +40,5 @@ bool start_module(zmqpp::socket *pipe,
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    LEDBuzzerModule module(zmq_ctx, pipe, cfg);
-
-    INFO("Module Led initialized.");
-    pipe->send(zmqpp::signal::ok);
-
-    module.run();
-    INFO("Module Led shutting down");
-    return true;
+    return Leosac::Module::start_module_helper<LEDBuzzerModule>(pipe, cfg, zmq_ctx);
 }

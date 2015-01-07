@@ -44,15 +44,5 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    {
-        RplethModule module(zmq_ctx, pipe, cfg);
-
-        INFO("Rpleth module initiliazed.");
-        pipe->send(zmqpp::signal::ok);
-
-        module.run();
-        INFO("Rpleth module shutting down.");
-    }
-    INFO("Rpleth module terminated.");
-    return true;
+    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx);
 }

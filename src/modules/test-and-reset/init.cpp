@@ -39,12 +39,5 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    TestAndResetModule module(zmq_ctx, pipe, cfg);
-    INFO("Module TestAndReset intialized");
-    pipe->send(zmqpp::signal::ok);
-
-    module.run();
-
-    INFO("Module TestAndReset shutting down...");
-    return true;
+    return Leosac::Module::start_module_helper<TestAndResetModule>(pipe, cfg, zmq_ctx);
 }

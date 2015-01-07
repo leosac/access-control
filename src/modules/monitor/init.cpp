@@ -61,14 +61,5 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         zmqpp::context &zmq_ctx)
 {
     logger_guard g({"system_bus_event", "monitor_stdout"});
-    {
-        MonitorModule module(zmq_ctx, pipe, cfg);
-        pipe->send(zmqpp::signal::ok);
-        INFO("Module Monitor initiliazed.");
-
-        module.run();
-
-        INFO("Module Monitor shutting down.");
-    }
-    return true;
+    return Leosac::Module::start_module_helper<MonitorModule>(pipe, cfg, zmq_ctx);
 }

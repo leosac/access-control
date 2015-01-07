@@ -48,9 +48,9 @@ namespace Leosac
             class SysFsGpioModule : public BaseModule
             {
             public:
-                SysFsGpioModule(const boost::property_tree::ptree &config,
+                SysFsGpioModule(zmqpp::context &ctx,
                         zmqpp::socket *module_manager_pipe,
-                        zmqpp::context &ctx);
+                        const boost::property_tree::ptree &config);
 
                 ~SysFsGpioModule();
 

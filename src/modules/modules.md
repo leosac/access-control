@@ -35,5 +35,8 @@ There are hard requirements what symbols your shared library (aka modules) must 
    Note that the returned module name shall be composed of capital letter, number and underscore only.
 
 
+The `start_module` function can be a one liner if you use the the `BaseModule` class
+and the helper [start_module_helper](@ref Leosac::Module::start_module_helper).
+
 @namespace Leosac::Module
 @brief All modules that provides features to Leosac shall be in this namespace.

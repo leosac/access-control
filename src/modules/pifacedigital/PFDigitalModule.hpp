@@ -42,9 +42,9 @@ namespace Leosac
             class PFDigitalModule : public BaseModule
             {
             public:
-                PFDigitalModule(const boost::property_tree::ptree &config,
+                PFDigitalModule(zmqpp::context &ctx,
                         zmqpp::socket *module_manager_pipe,
-                        zmqpp::context &ctx);
+                        const boost::property_tree::ptree &config);
 
                 /**
                 * Module's main loop.

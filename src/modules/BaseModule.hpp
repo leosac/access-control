@@ -21,11 +21,39 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include "tools/log.hpp"
+
+extern "C"
+{
+const char *get_module_name();
+}
 
 namespace Leosac
 {
     namespace Module
     {
+        /**
+        * This function template is a helper wrt writing the
+        * `start_module` function for every module.
+        *
+        * This helper allows you to create a 1 line `start_module` function.
+        */
+        template<typename UserModule>
+        bool start_module_helper(zmqpp::socket *pipe,
+                boost::property_tree::ptree cfg,
+                zmqpp::context &zmq_ctx)
+        {
+            {
+                UserModule module(zmq_ctx, pipe, cfg);
+                INFO("Module " << get_module_name() << " is now initialized.");
+                pipe->send(zmqpp::signal::ok);
+
+                module.run();
+            }
+            INFO("Module " << get_module_name() << " has now terminated.");
+            return true;
+        }
+
         /**
         * Base class for module implementation.
         *

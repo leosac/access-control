@@ -34,14 +34,5 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx)
 {
-    {
-        InstrumentationModule module(zmq_ctx, pipe, cfg);
-
-        INFO("Instrumentation module initialized.");
-        pipe->send(zmqpp::signal::ok);
-
-        module.run();
-    }
-    INFO("Instrumentation module shutting down.");
-    return true;
+    return Leosac::Module::start_module_helper<InstrumentationModule>(pipe, cfg, zmq_ctx);
 }

@@ -28,12 +28,13 @@
 using namespace Leosac::Module::SysFsGpio;
 using Leosac::Tools::UnixFs;
 
-SysFsGpioModule::SysFsGpioModule(const boost::property_tree::ptree &config,
+
+SysFsGpioModule::SysFsGpioModule(zmqpp::context &ctx,
         zmqpp::socket *module_manager_pipe,
-        zmqpp::context &ctx) :
-        BaseModule(ctx, module_manager_pipe, config),
-        bus_push_(ctx_, zmqpp::socket_type::push),
-        general_cfg_(nullptr)
+        const boost::property_tree::ptree &config)
+        : BaseModule(ctx, module_manager_pipe, config),
+          bus_push_(ctx_, zmqpp::socket_type::push),
+          general_cfg_(nullptr)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     process_config(config);
