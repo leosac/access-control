@@ -31,6 +31,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <exception/moduleexception.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -47,7 +48,8 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         want_restart_(false),
         module_manager_(ctx_),
         network_config_(nullptr),
-        remote_controller_(nullptr)
+        remote_controller_(nullptr),
+        config_manager_(*this)
 {
     configure_logger();
     extract_environ();
@@ -118,6 +120,7 @@ bool Kernel::run()
         reactor_.poll(-1);
     }
 
+   // attempt_dump_config();
     return want_restart_;
 }
 
@@ -316,4 +319,22 @@ const zModuleManager &Kernel::module_manager() const
 zModuleManager &Kernel::module_manager()
 {
     return module_manager_;
+}
+
+void Kernel::attempt_dump_config()
+{
+    std::string full_config;
+    // kernel config_ tree contains the whole initial configuration.
+    DEBUG("Full config: " << Tools::propertyTreeToXml(config_manager_.get_application_config()));
+}
+
+
+const boost::property_tree::ptree &Kernel::get_config() const
+{
+    return config_;
+}
+
+zmqpp::context &Kernel::get_context()
+{
+    return ctx_;
 }

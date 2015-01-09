@@ -21,6 +21,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/context.hpp>
+#include <core/config/ConfigManager.hpp>
 #include "tools/runtimeoptions.hpp"
 #include "core/netconfig/networkconfig.hpp"
 #include "zmodule_manager.hpp"
@@ -112,6 +113,16 @@ namespace Leosac
         const zModuleManager &module_manager() const;
         zModuleManager &module_manager();
 
+        /**
+        * Returns a const-ref to the config tree.
+        */
+        const boost::property_tree::ptree &get_config() const;
+
+        /**
+        * Returns a reference to the zmqpp context create for the application.
+        */
+        zmqpp::context &get_context();
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -143,6 +154,13 @@ namespace Leosac
         void extract_environ();
 
         void configure_logger();
+
+        void attempt_dump_config();
+
+        /**
+        * Query all modules and retrieve the full application configuration.
+        */
+        std::string get_full_config();
 
         /**
         * The application ZMQ context.
@@ -206,5 +224,7 @@ namespace Leosac
         };
 
         std::map<EnvironVar, std::string> environ_;
+
+        ConfigManager config_manager_;
     };
 }
