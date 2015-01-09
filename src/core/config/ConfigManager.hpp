@@ -54,6 +54,19 @@ namespace Leosac
         */
         boost::property_tree::ptree get_application_config();
 
+        /**
+        * Store the configuration tree for a module.
+        * If pushing the configuration overwrote a previously existing one, this will return
+        * true. Otherwise it will return false.
+        */
+        bool store_config(const std::string &module, const boost::property_tree::ptree &cfg);
+
+
+        /**
+        * Return the stored configuration for a given module.
+        */
+        const boost::property_tree::ptree &load_config(const std::string &module) const;
+
     private:
         /**
         * Extract the current "general configuration".
@@ -66,7 +79,12 @@ namespace Leosac
         boost::property_tree::ptree get_general_config();
 
         /**
-        * Retrieve configuration option for a module.
+        * Retrieve configuration ptree for a module.
+        *
+        * This also update the cached config data stored in `modules_configs_`.
+        *
+        * @note This will send a internal message to the module to retrieve up-to-date configuration.
+        * @note This is different from `load_config()` that simply returns stored data.
         */
         boost::property_tree::ptree get_module_config(const std::string &module);
 
@@ -79,8 +97,14 @@ namespace Leosac
         Kernel &kernel_;
 
         /**
-        * Maps a socket to a module (by using the module's name).
+        * Maps a module's name to a socket.
         */
         std::map<std::string, std::shared_ptr<zmqpp::socket>> modules_sockets_;
+
+        /**
+        * Maps a module's name to a property tree object.
+        */
+        std::map<std::string, boost::property_tree::ptree> modules_configs_;
+
     };
 }

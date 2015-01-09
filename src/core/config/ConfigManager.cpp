@@ -99,9 +99,35 @@ boost::property_tree::ptree ConfigManager::get_module_config(std::string const &
     std::string tmp;
     sock_ptr->receive(tmp);
 
-    std::istringstream              iss(tmp);
-    boost::archive::text_iarchive   archive(iss);
-    boost::property_tree::ptree     cfg;
+    std::istringstream iss(tmp);
+    boost::archive::text_iarchive archive(iss);
+    boost::property_tree::ptree cfg;
     boost::property_tree::load(archive, cfg, 1);
+
+    modules_configs_[module] = cfg;
     return cfg;
+}
+
+bool ConfigManager::store_config(std::string const &module,
+        boost::property_tree::ptree const &cfg)
+{
+    bool ret;
+
+    if (modules_configs_.count(module))
+        ret = true;
+    else
+        ret = false;
+
+    modules_configs_[module] = cfg;
+
+    return ret;
+}
+
+const boost::property_tree::ptree &ConfigManager::load_config(const std::string &module) const
+{
+    assert(modules_configs_.count(module));
+    auto itr = modules_configs_.find(module);
+    if (itr != modules_configs_.end())
+        return itr->second;
+    throw std::runtime_error("");
 }
