@@ -1,3 +1,22 @@
+/*
+    Copyright (C) 2014-2015 Islog
+
+    This file is part of Leosac.
+
+    Leosac is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Leosac is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
@@ -77,10 +96,10 @@ boost::property_tree::ptree ConfigManager::get_module_config(std::string const &
     // get config as a serialized ptree.
     sock_ptr->send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('0'));
 
-    std::string         tmp;
-    std::istringstream  iss(tmp);
+    std::string tmp;
     sock_ptr->receive(tmp);
 
+    std::istringstream              iss(tmp);
     boost::archive::text_iarchive   archive(iss);
     boost::property_tree::ptree     cfg;
     boost::property_tree::load(archive, cfg, 1);

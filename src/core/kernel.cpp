@@ -120,7 +120,7 @@ bool Kernel::run()
         reactor_.poll(-1);
     }
 
-   // attempt_dump_config();
+    save_config();
     return want_restart_;
 }
 
@@ -321,13 +321,17 @@ zModuleManager &Kernel::module_manager()
     return module_manager_;
 }
 
-void Kernel::attempt_dump_config()
+void Kernel::save_config()
 {
-    std::string full_config;
-    // kernel config_ tree contains the whole initial configuration.
-    DEBUG("Full config: " << Tools::propertyTreeToXml(config_manager_.get_application_config()));
-}
+    std::string full_config     = Tools::propertyTreeToXml(config_manager_.get_application_config());
+    std::string cfg_file_path   = config_.get<std::string>("kernel-cfg");
 
+    DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
+    std::ofstream cfg_file(cfg_file_path);
+
+    cfg_file << full_config;
+    cfg_file.close();
+}
 
 const boost::property_tree::ptree &Kernel::get_config() const
 {

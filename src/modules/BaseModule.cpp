@@ -35,8 +35,8 @@ BaseModule::BaseModule(zmqpp::context &ctx,
         is_running_(true),
         control_(ctx, zmqpp::socket_type::rep)
 {
-    std::string module_name = cfg.get<std::string>("name");
-    control_.bind("inproc://module-" + module_name);
+    name_ = cfg.get<std::string>("name");
+    control_.bind("inproc://module-" + name_);
 
     reactor_.add(control_, std::bind(&BaseModule::handle_control, this));
     reactor_.add(pipe_, std::bind(&BaseModule::handle_pipe, this));
@@ -97,7 +97,7 @@ void BaseModule::handle_control()
         assert(msg.remaining() == 1);
         uint8_t format;
         msg >> format;
-        DEBUG("Dumping config!");
+        DEBUG("Module " << name_ << " is dumping config!");
         if (format == '1')
             control_.send(dump_config(true));
         else

@@ -150,6 +150,8 @@ namespace Leosac
             * you need to.
             */
             zmqpp::reactor reactor_;
+
+            std::string name_;
         };
     }
 }

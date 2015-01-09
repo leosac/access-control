@@ -155,7 +155,11 @@ namespace Leosac
 
         void configure_logger();
 
-        void attempt_dump_config();
+        /**
+        * Save the current configuration to its original file.
+        * This means that configuration change made when Leosac was running will be persisted.
+        */
+        void save_config();
 
         /**
         * Query all modules and retrieve the full application configuration.
