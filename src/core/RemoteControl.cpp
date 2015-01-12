@@ -4,6 +4,9 @@
 #include "kernel.hpp"
 #include <boost/regex.hpp>
 #include <cassert>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
 
 using namespace Leosac;
 
@@ -87,6 +90,8 @@ void RemoteControl::handle_msg()
             rep << "MALFORMED MESSAGE (SYNC_FROM)";
         }
     }
+    else
+        assert(0);
 
     DEBUG("Sending response, " << rep.parts() << " frames");
     socket_.send(rep);
@@ -106,6 +111,14 @@ void RemoteControl::module_list(zmqpp::message *message_out)
 void RemoteControl::module_config(const std::string &module, zmqpp::message *message_out)
 {
     assert(message_out);
+
+    // fixme just fix module
+    if (module == "STDIN_CONTROLLER")
+    {
+        *message_out << "KO";
+        return;
+    }
+
     // we need to make sure the module's name exist.
     std::vector<std::string> modules_names = kernel_.module_manager().modules_names();
     if (std::find(modules_names.begin(), modules_names.end(), module) != modules_names.end())
@@ -114,7 +127,8 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
         std::string serialized_cfg;
         DEBUG("FOUND " << module);
         sock.connect("inproc://module-" + module);
-        bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('1'));
+        // ask for a binary dump
+        bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('0'));
         assert(ret);
         DEBUG("HERE");
         sock.receive(serialized_cfg);
@@ -141,38 +155,41 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
     assert(message_out);
     zmqpp::socket sock(context_, zmqpp::socket_type::dealer);
 
+    auto kp = zmqpp::curve::generate_keypair();
+    sock.set(zmqpp::socket_option::curve_secret_key, kp.secret_key);
+    sock.set(zmqpp::socket_option::curve_public_key, kp.public_key);
+    sock.set(zmqpp::socket_option::curve_server_key, "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT");
+    sock.set(zmqpp::socket_option::linger, 0);
+
     if (validate_endpoint(endpoint))
     {
+        INFO("Attempting to fetch config from {" << endpoint << "}");
         sock.connect(endpoint);
 
         INFO("Remote Control module entering blocking mode...");
 
-        gather_remote_config(sock);
+        // list of module to stop
+        std::list<std::string> stop_list;
 
+        // list of module to start.
+        std::list<std::string> start_list;
 
-        kernel_.module_manager().stopModule("WIEGAND_READER");
-        kernel_.module_manager().stopModule("DOORMAN");
-        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+        if (gather_remote_config(sock, start_list, stop_list))
+        {
+            for (const std::string &m : stop_list)
+                kernel_.module_manager().stopModule(m);
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
+            for (const std::string &m : start_list)
+                kernel_.module_manager().initModule(m);
 
-                boost::property_tree::ptree cfg, module_cfg, readers_cfg, reader1_cfg;
-
-                reader1_cfg.add("name", "WIEGAND_4242");
-                reader1_cfg.add("high", "GPIO_HIGH");
-                reader1_cfg.add("low", "GPIO_LOW");
-
-                readers_cfg.add_child("reader", reader1_cfg);
-                module_cfg.add_child("readers", readers_cfg);
-
-                cfg.add("name", "WIEGAND_READER");
-                cfg.add_child("module_config", module_cfg);
-
-        kernel_.config_manager().store_config("WIEGAND_READER", cfg);
-
-        kernel_.module_manager().initModule("WIEGAND_READER");
-        kernel_.module_manager().initModule("DOORMAN");
-                INFO("Remote Control resuming normal operation");
-        *message_out << "HO";
+            INFO("Remote Control resuming normal operation");
+            *message_out << "HO";
+        }
+        else
+        {
+            *message_out << "Failed to synchronise configuration.";
+        }
     }
     else
     {
@@ -185,56 +202,113 @@ static bool retrieved_all_config(const std::map<std::string, bool> &cfg)
 {
     for (const auto &p : cfg)
     {
+        //fix me temporary fix to disable this module as we cant get its config
+        if (p.first == "STDIN_CONTROLLER")
+            continue;
         if (!p.second)
+        {
             return false;
+    }
     }
     return true;
 }
 
-bool RemoteControl::gather_remote_config(zmqpp::socket &sock)
+bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::string> &start_list,
+        std::list<std::string> &stop_list)
 {
     std::map<std::string, bool> cfg;
 
     // list of name of remote module.
-    std::vector<std::string> remote_modules;
+    std::list<std::string> remote_modules;
 
-    sock.send("MODULE_LIST");
-
-    while (true)
+    // first get the list of module currently running on the remote
+    // host. This is done in a blocking way, with a 3s timeout.
     {
-        zmqpp::message msg;
-        bool ret = sock.receive(msg);
-        assert(ret);
-        std::string tmp;
-        while (msg.remaining())
+        sock.send("MODULE_LIST");
+
+        zmqpp::poller p;
+        p.add(sock);
+        p.poll(3000);
+        if (p.has(sock))
         {
-        msg >> tmp;
-            remote_modules.push_back(tmp);
-    }
+            zmqpp::message msg;
+            bool ret = sock.receive(msg);
+            assert(ret);
+            std::string tmp;
+            while (msg.remaining())
+            {
+                msg >> tmp;
+                remote_modules.push_back(tmp);
+            }
+        }
+        else
+        {
+            // no response after 3s.
+            WARN("Could'nt get remote module_list in time. Aborting synchronisation");
+            return false;
+        }
     }
 
-    if (remote_modules != kernel_.module_manager().modules_names())
-    {
-        ERROR("MODULE LIST DIFFERS. THIS TYPE OF SYNC IS NOT YET SUPPORTED");
-        return false;
-    }
-
-    for (const std::string &module_name : kernel_.module_manager().modules_names())
+    // we want to retrieve the configure of the remote module.
+    // so we dont really care about our current module.
+    for (const std::string &module_name : remote_modules)
     {
         cfg[module_name] = false;
         zmqpp::message msg;
         msg << "MODULE_CONFIG" << module_name;
+        INFO("Request remote config for " << module_name);
         sock.send(msg);
     }
 
+    // we want to stop all our module that weren't running on the remote host.
+    for (const std::string &my_module : kernel_.module_manager().modules_names())
+    {
+        auto itr = std::find(remote_modules.begin(), remote_modules.end(), my_module);
+        if (itr == remote_modules.end())
+        {
+            // remote doesn't run this module
+            stop_list.push_back(my_module);
+        }
+    }
+    // also remove all remote module.
+    // so basically remove all module
+    stop_list.insert(stop_list.end(), remote_modules.begin(), remote_modules.end());
+
+    // we want to start all remote module.
+    start_list.insert(start_list.end(), remote_modules.begin(), remote_modules.end());
+
+    // fixme would break in some case.
     while (!retrieved_all_config(cfg))
     {
         zmqpp::message msg;
+        std::string ok;
+        std::string module;
+        std::string binary_cfg;
 
-
+        DEBUG("HOHO");
         sock.receive(msg);
-        assert(msg.parts() == 3);
 
+        msg >> ok;
+        if (ok == "OK")
+        {
+            assert(msg.parts() == 3);
+
+            msg >> module >> binary_cfg;
+            cfg[module] = true;
+
+            INFO("Updating ConfigManager configuration for module " << module);
+            std::istringstream iss(binary_cfg);
+            boost::archive::text_iarchive archive(iss);
+            boost::property_tree::ptree cfg_tree;
+            boost::property_tree::load(archive, cfg_tree, 1);
+            cfg[module] = true;
+            kernel_.config_manager().store_config(module, cfg_tree);
+        }
+        else
+        {
+            ERROR("Error while retrieving config for module.");
+        }
     }
-return true;
+    INFO("SUCCESS");
+    return true;
 }

@@ -55,8 +55,10 @@ namespace Leosac
         * Will retrieve the config for a remote leosac unit.
         *
         * The socket shall be already connected to the remote endpoint.
+        *
+        * It will populate the stop_list and start_list with a list of to respectively stop and start.
         */
-        bool gather_remote_config(zmqpp::socket &s);
+        bool gather_remote_config(zmqpp::socket &s, std::list<std::string> &start_list, std::list<std::string> &stop_list);
 
         Kernel &kernel_;
 
