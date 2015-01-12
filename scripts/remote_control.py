@@ -15,6 +15,8 @@ class CommandHandler(object):
             self.handle_module_list();
         if (cmd == "module_config"):
             self.handle_module_config(self.argv_[self.argv_offset])
+        if (cmd == "sync_from"):
+            self.sync_from(self.argv_[self.argv_offset])
 
     def handle_module_list(self):
         print "Running 'module_list;"
@@ -28,6 +30,11 @@ class CommandHandler(object):
         ret = self.socket_.recv_multipart()
         print ret
 
+    def sync_from(self, endpoint):
+        print "Will ask Leosac to sync from {", endpoint, "}"
+        self.socket_.send_multipart(["SYNC_FROM", endpoint])
+        ret = self.socket_.recv_multipart()
+        print ret
 
 def print_usage():
     print "Usage: ./remote_control tcp_endpoint server_key command [params]"
@@ -56,7 +63,7 @@ def main():
     ch.handle_command(sys.argv[3])
 
     
-    time.sleep(5)
+    time.sleep(1)
     context.destroy(linger=5000)
     return 0
 

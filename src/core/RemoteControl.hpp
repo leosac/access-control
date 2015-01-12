@@ -20,9 +20,16 @@ namespace Leosac
     *
     * Commands:
     * MODULE_LIST
-    *
     * response: module_name*
     * module_name: a-Z+
+    *
+    * MODULE_CONFIG module_name
+    * response: boost serialization
+    *
+    * SYNC_FROM ENDPOINT
+    * endpoint: tcp://IP:PORT
+    *
+    * Attempt to Fetch the config from an other Leosac unit and apply it to itself.
     */
     class RemoteControl
     {
@@ -35,12 +42,21 @@ namespace Leosac
 
         void module_config(const std::string &module, zmqpp::message *message_out);
 
+        void sync_from(const std::string &endpoint, zmqpp::message *message_out);
+
         /**
         * Register by core and called when message arrives.
         */
         void handle_msg();
 
         void process_config(const boost::property_tree::ptree &cfg);
+
+        /**
+        * Will retrieve the config for a remote leosac unit.
+        *
+        * The socket shall be already connected to the remote endpoint.
+        */
+        bool gather_remote_config(zmqpp::socket &s);
 
         Kernel &kernel_;
 

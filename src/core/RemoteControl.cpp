@@ -2,6 +2,8 @@
 #include <zmqpp/curve.hpp>
 #include "RemoteControl.hpp"
 #include "kernel.hpp"
+#include <boost/regex.hpp>
+#include <cassert>
 
 using namespace Leosac;
 
@@ -59,7 +61,7 @@ void RemoteControl::handle_msg()
     DEBUG("Cmd = {" << frame1 << "}");
     if (frame1 == "MODULE_LIST")
         module_list(&rep);
-    if (frame1 == "MODULE_CONFIG")
+    else if (frame1 == "MODULE_CONFIG")
     {
         if (msg.remaining() >= 1)
         {
@@ -70,6 +72,19 @@ void RemoteControl::handle_msg()
         else
         {
             rep << "MALFORMED MESSAGE";
+        }
+    }
+    else if (frame1 == "SYNC_FROM")
+    {
+        if (msg.remaining() == 1)
+        {
+            std::string endpoint;
+            msg >> endpoint;
+            sync_from(endpoint, &rep);
+        }
+        else
+        {
+            rep << "MALFORMED MESSAGE (SYNC_FROM)";
         }
     }
 
@@ -99,11 +114,12 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
         std::string serialized_cfg;
         DEBUG("FOUND " << module);
         sock.connect("inproc://module-" + module);
-        bool ret = sock.send("DUMP_CONFIG");
+        bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('1'));
         assert(ret);
         DEBUG("HERE");
         sock.receive(serialized_cfg);
         *message_out << "OK";
+        *message_out << module;
         *message_out << serialized_cfg;
         return;
     }
@@ -112,4 +128,113 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
         // if module with this name is not found
         *message_out << "KO";
     }
+}
+
+static bool validate_endpoint(const std::string &endpoint)
+{
+    static const boost::regex r_endpoint("tcp://((\\d{1,3}\\.){3}\\d{1,3}):\\d+");
+    return regex_match(endpoint, r_endpoint);
+}
+
+void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *message_out)
+{
+    assert(message_out);
+    zmqpp::socket sock(context_, zmqpp::socket_type::dealer);
+
+    if (validate_endpoint(endpoint))
+    {
+        sock.connect(endpoint);
+
+        INFO("Remote Control module entering blocking mode...");
+
+        gather_remote_config(sock);
+
+
+        kernel_.module_manager().stopModule("WIEGAND_READER");
+        kernel_.module_manager().stopModule("DOORMAN");
+        std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+
+                boost::property_tree::ptree cfg, module_cfg, readers_cfg, reader1_cfg;
+
+                reader1_cfg.add("name", "WIEGAND_4242");
+                reader1_cfg.add("high", "GPIO_HIGH");
+                reader1_cfg.add("low", "GPIO_LOW");
+
+                readers_cfg.add_child("reader", reader1_cfg);
+                module_cfg.add_child("readers", readers_cfg);
+
+                cfg.add("name", "WIEGAND_READER");
+                cfg.add_child("module_config", module_cfg);
+
+        kernel_.config_manager().store_config("WIEGAND_READER", cfg);
+
+        kernel_.module_manager().initModule("WIEGAND_READER");
+        kernel_.module_manager().initModule("DOORMAN");
+                INFO("Remote Control resuming normal operation");
+        *message_out << "HO";
+    }
+    else
+    {
+        *message_out << "ENDPOINT SEEMS INVALID";
+    }
+}
+
+
+static bool retrieved_all_config(const std::map<std::string, bool> &cfg)
+{
+    for (const auto &p : cfg)
+    {
+        if (!p.second)
+            return false;
+    }
+    return true;
+}
+
+bool RemoteControl::gather_remote_config(zmqpp::socket &sock)
+{
+    std::map<std::string, bool> cfg;
+
+    // list of name of remote module.
+    std::vector<std::string> remote_modules;
+
+    sock.send("MODULE_LIST");
+
+    while (true)
+    {
+        zmqpp::message msg;
+        bool ret = sock.receive(msg);
+        assert(ret);
+        std::string tmp;
+        while (msg.remaining())
+        {
+        msg >> tmp;
+            remote_modules.push_back(tmp);
+    }
+    }
+
+    if (remote_modules != kernel_.module_manager().modules_names())
+    {
+        ERROR("MODULE LIST DIFFERS. THIS TYPE OF SYNC IS NOT YET SUPPORTED");
+        return false;
+    }
+
+    for (const std::string &module_name : kernel_.module_manager().modules_names())
+    {
+        cfg[module_name] = false;
+        zmqpp::message msg;
+        msg << "MODULE_CONFIG" << module_name;
+        sock.send(msg);
+    }
+
+    while (!retrieved_all_config(cfg))
+    {
+        zmqpp::message msg;
+
+
+        sock.receive(msg);
+        assert(msg.parts() == 3);
+
+    }
+return true;
 }
