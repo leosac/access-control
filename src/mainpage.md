@@ -28,3 +28,11 @@ Short | Long                   | Description
 -k    | `--kernel-cfg`         | Leosac's core configuration file
 -h    | `--help`               | Print the help
 N/A   | `--version`            | Display version informations and exit
+
+
+
+Notes
+=====
+
+`boost::serialization` version shall be the same on all your Leosac unit.
+This will prevent trouble when passing around configuration.

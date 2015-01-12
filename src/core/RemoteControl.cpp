@@ -293,7 +293,8 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
             msg >> module >> binary_cfg;
             cfg[module] = true;
 
-            INFO("Updating ConfigManager configuration for module " << module);
+            INFO("Updating ConfigManager configuration for module " << module << std::endl
+            << "{" << binary_cfg << "}");
             std::istringstream iss(binary_cfg);
             boost::archive::text_iarchive archive(iss);
             boost::property_tree::ptree cfg_tree;

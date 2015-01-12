@@ -54,7 +54,6 @@ void BaseModule::handle_pipe()
 {
     zmqpp::message msg;
     zmqpp::signal sig;
-    std::string frame1;
     pipe_.receive(msg);
 
     assert(msg.is_signal());
@@ -75,6 +74,7 @@ std::string BaseModule::dump_config(bool xml_format) const
     {
         std::ostringstream oss;
         boost::archive::text_oarchive archive(oss);
+        DEBUG(archive.get_library_version());
         boost::property_tree::save(archive, config_, 1);
 
         return oss.str();

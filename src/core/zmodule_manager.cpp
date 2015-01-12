@@ -20,10 +20,7 @@
 #include <algorithm>
 #include <tools/unixfs.hpp>
 #include <tools/log.hpp>
-#include <exception/dynlibexception.hpp>
-#include <exception/moduleexception.hpp>
 #include "zmodule_manager.hpp"
-#include <boost/property_tree/ptree.hpp>
 #include <zmqpp/zmqpp.hpp>
 #include <exception/ExceptionsTools.hpp>
 #include <core/config/ConfigManager.hpp>
