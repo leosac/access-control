@@ -44,6 +44,12 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     struct sched_param p;
     p.sched_priority = 90;
     int ret = pthread_setschedparam(pthread_self(), SCHED_FIFO, &p);
-    assert(ret == 0);
+
+    if (ret != 0)
+    {
+        WARN("Setting realtime priority for " << get_module_name() << " module failed. " <<
+        "The program will keep running but could encounter issues like missing some Wiegand bits.");
+    }
+
     return Leosac::Module::start_module_helper<PFDigitalModule>(pipe, cfg, zmq_ctx);
 }

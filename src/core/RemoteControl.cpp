@@ -181,7 +181,12 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
             for (const std::string &m : start_list)
-                kernel_.module_manager().initModule(m);
+                if (!kernel_.module_manager().initModule(m))
+                {
+                    kernel_.module_manager().loadModule(kernel_.config_manager().load_config(m));
+                    bool r = kernel_.module_manager().initModule(m);
+                    assert(r);
+                }
 
             INFO("Remote Control resuming normal operation");
             *message_out << "HO";
@@ -263,16 +268,8 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
     // we want to stop all our module that weren't running on the remote host.
     for (const std::string &my_module : kernel_.module_manager().modules_names())
     {
-        auto itr = std::find(remote_modules.begin(), remote_modules.end(), my_module);
-        if (itr == remote_modules.end())
-        {
-            // remote doesn't run this module
             stop_list.push_back(my_module);
-        }
     }
-    // also remove all remote module.
-    // so basically remove all module
-    stop_list.insert(stop_list.end(), remote_modules.begin(), remote_modules.end());
 
     // we want to start all remote module.
     start_list.insert(start_list.end(), remote_modules.begin(), remote_modules.end());
