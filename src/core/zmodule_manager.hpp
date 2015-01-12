@@ -28,6 +28,11 @@
 #include <boost/property_tree/ptree.hpp>
 #include "zmqpp/actor.hpp"
 
+namespace Leosac
+{
+    class ConfigManager;
+}
+
 /**
 * A second module manager that loads "ZMQ aware" module -- modules that talks to the application through message passing.
 * A second loader is necessary because the procedure of loading a module differs.
@@ -47,7 +52,7 @@ public:
     * Construct the module manager.
     * @param ctx the zeroMQ context to pass around to module.
     */
-    zModuleManager(zmqpp::context &ctx);
+    zModuleManager(zmqpp::context &ctx, Leosac::ConfigManager &cfg_mgr);
 
     ~zModuleManager();
 
@@ -190,4 +195,5 @@ private:
     std::set<ModuleInfo> modules_;
 
     zmqpp::context &ctx_;
+    Leosac::ConfigManager &config_manager_;
 };

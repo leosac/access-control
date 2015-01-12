@@ -26,6 +26,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/zmqpp.hpp>
 #include <exception/ExceptionsTools.hpp>
+#include <core/config/ConfigManager.hpp>
 
 using Leosac::Tools::UnixFs;
 
@@ -83,7 +84,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
                 ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr);
 
         auto new_module = std::unique_ptr<zmqpp::actor>(new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
-                modinfo->config_,
+                config_manager_.load_config(modinfo->name_),
                 std::ref(ctx_))));
         modinfo->actor_ = std::move(new_module);
 
@@ -99,7 +100,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
 
 bool zModuleManager::initModule(const std::string &name)
 {
-     if (ModuleInfo *ptr = find_module_by_name(name))
+    if (ModuleInfo *ptr = find_module_by_name(name))
     {
         initModule(ptr);
         return true;
@@ -132,7 +133,10 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
             ModuleInfo module_info;
 
             module_info.name_ = module_name;
-            module_info.config_ = cfg;
+
+            // use for level.
+            module_info.config_ = config_manager_.load_config(module_name);
+
             if (!(module_info.lib_ = load_library_file(path_entry + "/" + filename)))
                 return false;
             modules_.insert(std::move(module_info));
@@ -219,8 +223,9 @@ zModuleManager::~zModuleManager()
     }
 }
 
-zModuleManager::zModuleManager(zmqpp::context &ctx) :
-        ctx_(ctx)
+zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::ConfigManager &cfg_mgr) :
+        ctx_(ctx),
+        config_manager_(cfg_mgr)
 {
 
 }

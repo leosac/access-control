@@ -22,16 +22,12 @@
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixshellscript.hpp"
-#include "exception/configexception.hpp"
-#include "exception/coreexception.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
-#include <exception/moduleexception.hpp>
-#include <boost/algorithm/string/replace.hpp>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -46,10 +42,10 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         config_(config),
         is_running_(true),
         want_restart_(false),
-        module_manager_(ctx_),
+        config_manager_(*this),
+        module_manager_(ctx_, config_manager_),
         network_config_(nullptr),
-        remote_controller_(nullptr),
-        config_manager_(*this)
+        remote_controller_(nullptr)
 {
     configure_logger();
     extract_environ();
@@ -147,6 +143,10 @@ void Kernel::module_manager_init()
 
             ptree module_conf = module.second;
             std::string module_file = module_conf.get_child("file").data();
+            std::string module_name = module_conf.get_child("name").data();
+
+            // we store the conf in our ConfigManager object, the ModuleManager will use it later.
+            config_manager_.store_config(module_name, module_conf);
 
             if (!module_manager_.loadModule(module_conf))
                 throw LEOSACException("Cannot load modules.");
@@ -341,4 +341,9 @@ const boost::property_tree::ptree &Kernel::get_config() const
 zmqpp::context &Kernel::get_context()
 {
     return ctx_;
+}
+
+ConfigManager &Kernel::config_manager()
+{
+    return config_manager_;
 }

@@ -123,6 +123,8 @@ namespace Leosac
         */
         zmqpp::context &get_context();
 
+        ConfigManager &config_manager();
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -206,6 +208,8 @@ namespace Leosac
         */
         bool want_restart_;
 
+        ConfigManager config_manager_;
+
         /**
         * Manages the different libraries (.so) we load, path to those libraries, modules instantiation.
         */
@@ -229,6 +233,5 @@ namespace Leosac
 
         std::map<EnvironVar, std::string> environ_;
 
-        ConfigManager config_manager_;
     };
 }
