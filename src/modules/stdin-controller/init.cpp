@@ -17,4 +17,26 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "StdinControllerModule.hpp"
+
+extern "C"
+{
+const char *get_module_name()
+{
+    return "STDIN_CONTROLLER";
+}
+}
+
+/**
+* pipe is pipe back to module manager.
+* this function is called in its own thread.
+*
+* do signaling when ready
+*/
+extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
+        boost::property_tree::ptree cfg,
+        zmqpp::context &zmq_ctx)
+{
+    using namespace Leosac::Module;
+    return start_module_helper<StdinControllerModule>(pipe, cfg, zmq_ctx);
+}

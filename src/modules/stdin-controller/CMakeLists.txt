@@ -1,7 +1,8 @@
 set(STDINCONTROLLER_BIN stdin-controller)
 
 set(STDINCONTROLLER_SRCS
-    stdin-controller.cpp
+    init.cpp
+    StdinControllerModule.cpp
 )
 
 add_library(${STDINCONTROLLER_BIN} SHARED ${STDINCONTROLLER_SRCS})

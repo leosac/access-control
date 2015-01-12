@@ -112,13 +112,6 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
 {
     assert(message_out);
 
-    // fixme just fix module
-    if (module == "STDIN_CONTROLLER")
-    {
-        *message_out << "KO";
-        return;
-    }
-
     // we need to make sure the module's name exist.
     std::vector<std::string> modules_names = kernel_.module_manager().modules_names();
     if (std::find(modules_names.begin(), modules_names.end(), module) != modules_names.end())
@@ -207,9 +200,6 @@ static bool retrieved_all_config(const std::map<std::string, bool> &cfg)
 {
     for (const auto &p : cfg)
     {
-        //fix me temporary fix to disable this module as we cant get its config
-        if (p.first == "STDIN_CONTROLLER")
-            continue;
         if (!p.second)
         {
             return false;

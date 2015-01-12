@@ -45,8 +45,6 @@ boost::property_tree::ptree ConfigManager::get_application_config()
     for (auto &it : modules_sockets_)
     {
         std::tie(module_name, sock) = it;
-        if (module_name == "STDIN_CONTROLLER") //fix me : this doesn't implement control socket.
-            continue;
         modules_config.add_child("module", get_module_config(module_name));
     }
     app_config.get_child("kernel").add_child("modules", modules_config);
