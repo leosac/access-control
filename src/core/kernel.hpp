@@ -158,7 +158,7 @@ namespace Leosac
         void configure_logger();
 
         /**
-        * Save the current configuration to its original file.
+        * Save the current configuration to its original file if `autosave` is enabled.
         * This means that configuration change made when Leosac was running will be persisted.
         */
         void save_config();
@@ -232,6 +232,11 @@ namespace Leosac
         };
 
         std::map<EnvironVar, std::string> environ_;
+
+        /**
+        * Autosave configuration on shutdown.
+        */
+        bool autosave_;
 
     };
 }

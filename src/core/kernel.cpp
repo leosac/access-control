@@ -45,7 +45,8 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
         config_manager_(*this),
         module_manager_(ctx_, config_manager_),
         network_config_(nullptr),
-        remote_controller_(nullptr)
+        remote_controller_(nullptr),
+        autosave_(false)
 {
     configure_logger();
     extract_environ();
@@ -62,6 +63,11 @@ Kernel::Kernel(const boost::property_tree::ptree &config) :
     if (config.get_child_optional("remote"))
     {
         remote_controller_ = std::unique_ptr<RemoteControl>(new RemoteControl(ctx_, *this, config.get_child("remote")));
+    }
+
+    if (auto child = config.get_child_optional("autosave"))
+    {
+        autosave_ = (*child).get<bool>("");
     }
 
     control_.bind("inproc://leosac-kernel");
@@ -323,14 +329,22 @@ zModuleManager &Kernel::module_manager()
 
 void Kernel::save_config()
 {
-    std::string full_config     = Tools::propertyTreeToXml(config_manager_.get_application_config());
-    std::string cfg_file_path   = config_.get<std::string>("kernel-cfg");
+    if (autosave_)
+    {
+        INFO("Saving config at shutdown...");
+        std::string full_config = Tools::propertyTreeToXml(config_manager_.get_application_config());
+        std::string cfg_file_path = config_.get<std::string>("kernel-cfg");
 
-    DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
-    std::ofstream cfg_file(cfg_file_path);
+        DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
+        std::ofstream cfg_file(cfg_file_path);
 
-    cfg_file << full_config;
-    cfg_file.close();
+        cfg_file << full_config;
+        cfg_file.close();
+    }
+    else
+    {
+        INFO("Autosave is disabled. Not saving config.");
+    }
 }
 
 const boost::property_tree::ptree &Kernel::get_config() const
