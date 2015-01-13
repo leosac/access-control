@@ -51,6 +51,22 @@ namespace Leosac
 
         void process_config(const boost::property_tree::ptree &cfg);
 
+
+        /**
+        * Build the list of modules (their name) running on the remote host.
+        * We issue the MODULE_LIST command in order to do that.
+        *
+        * @return false if we can't get this list.
+        */
+        bool gather_remote_module_list(zmqpp::socket &s, std::list<std::string> &remote_modules);
+
+        /**
+        * After sending a bunch of MODULE_CONFIG command, wait for reply.
+        *
+        * If receiving command timeout (>3s) return false;
+        */
+        bool receive_remote_config(zmqpp::socket &s, std::map<std::string, bool> &cfg);
+
         /**
         * Will retrieve the config for a remote leosac unit.
         *

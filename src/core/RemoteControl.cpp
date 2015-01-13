@@ -171,18 +171,20 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
         {
             for (const std::string &m : stop_list)
                 kernel_.module_manager().stopModule(m);
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
             for (const std::string &m : start_list)
                 if (!kernel_.module_manager().initModule(m))
                 {
+                    // maybe it wasn't preloaded in the module manager.
+                    // attempt to load dll and try again.
                     kernel_.module_manager().loadModule(kernel_.config_manager().load_config(m));
                     bool r = kernel_.module_manager().initModule(m);
                     assert(r);
                 }
 
             INFO("Remote Control resuming normal operation");
-            *message_out << "HO";
+            *message_out << "OK";
         }
         else
         {
@@ -203,7 +205,7 @@ static bool retrieved_all_config(const std::map<std::string, bool> &cfg)
         if (!p.second)
         {
             return false;
-    }
+        }
     }
     return true;
 }
@@ -216,35 +218,10 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
     // list of name of remote module.
     std::list<std::string> remote_modules;
 
-    // first get the list of module currently running on the remote
-    // host. This is done in a blocking way, with a 3s timeout.
-    {
-        sock.send("MODULE_LIST");
+    if (!gather_remote_module_list(sock, remote_modules))
+        return false;
 
-        zmqpp::poller p;
-        p.add(sock);
-        p.poll(3000);
-        if (p.has(sock))
-        {
-            zmqpp::message msg;
-            bool ret = sock.receive(msg);
-            assert(ret);
-            std::string tmp;
-            while (msg.remaining())
-            {
-                msg >> tmp;
-                remote_modules.push_back(tmp);
-            }
-        }
-        else
-        {
-            // no response after 3s.
-            WARN("Could'nt get remote module_list in time. Aborting synchronisation");
-            return false;
-        }
-    }
-
-    // we want to retrieve the configure of the remote module.
+    // we want to retrieve the configure of the remote modules.
     // so we dont really care about our current module.
     for (const std::string &module_name : remote_modules)
     {
@@ -258,13 +235,53 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
     // we want to stop all our module that weren't running on the remote host.
     for (const std::string &my_module : kernel_.module_manager().modules_names())
     {
-            stop_list.push_back(my_module);
+        stop_list.push_back(my_module);
     }
 
-    // we want to start all remote module.
+    // we want to start all remote modules.
     start_list.insert(start_list.end(), remote_modules.begin(), remote_modules.end());
 
-    // fixme would break in some case.
+    if (receive_remote_config(sock, cfg))
+    {
+        INFO("SUCCESS");
+        return true;
+    }
+    return false;
+}
+
+bool RemoteControl::gather_remote_module_list(zmqpp::socket &sock, std::list<std::string> &remote_modules)
+{
+    sock.send("MODULE_LIST");
+    zmqpp::poller p;
+
+    p.add(sock);
+    p.poll(3000);
+    if (p.has(sock))
+    {
+        zmqpp::message msg;
+        bool ret = sock.receive(msg);
+        assert(ret);
+        std::string tmp;
+        while (msg.remaining())
+        {
+            msg >> tmp;
+            remote_modules.push_back(tmp);
+        }
+        return true;
+    }
+    else
+    {
+        // no response after 3s.
+        WARN("Could'nt get remote module_list in time. Aborting synchronisation");
+        return false;
+    }
+    return false;
+}
+
+bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::string, bool> &cfg)
+{
+    zmqpp::poller p;
+    p.add(sock);
     while (!retrieved_all_config(cfg))
     {
         zmqpp::message msg;
@@ -272,31 +289,38 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
         std::string module;
         std::string binary_cfg;
 
-        DEBUG("HOHO");
-        sock.receive(msg);
-
-        msg >> ok;
-        if (ok == "OK")
+        p.poll(3000);
+        if (p.has_input(sock))
         {
-            assert(msg.parts() == 3);
+            sock.receive(msg);
 
-            msg >> module >> binary_cfg;
-            cfg[module] = true;
+            msg >> ok;
+            if (ok == "OK")
+            {
+                assert(msg.parts() == 3);
 
-            INFO("Updating ConfigManager configuration for module " << module << std::endl
-            << "{" << binary_cfg << "}");
-            std::istringstream iss(binary_cfg);
-            boost::archive::text_iarchive archive(iss);
-            boost::property_tree::ptree cfg_tree;
-            boost::property_tree::load(archive, cfg_tree, 1);
-            cfg[module] = true;
-            kernel_.config_manager().store_config(module, cfg_tree);
+                msg >> module >> binary_cfg;
+                cfg[module] = true;
+
+                INFO("Updating ConfigManager configuration for module " << module << std::endl
+                        << "{" << binary_cfg << "}");
+                std::istringstream iss(binary_cfg);
+                boost::archive::text_iarchive archive(iss);
+                boost::property_tree::ptree cfg_tree;
+                boost::property_tree::load(archive, cfg_tree, 1);
+                cfg[module] = true;
+                kernel_.config_manager().store_config(module, cfg_tree);
+            }
+            else
+            {
+                ERROR("Error while retrieving config for module.");
+            }
         }
         else
         {
-            ERROR("Error while retrieving config for module.");
+            ERROR("Receiving remote config timed out");
+            return false;
         }
     }
-    INFO("SUCCESS");
     return true;
 }
