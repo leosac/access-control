@@ -266,7 +266,7 @@ bool RemoteControl::gather_remote_module_list(zmqpp::socket &sock, std::list<std
 
     p.add(sock);
     p.poll(3000);
-    if (p.has(sock))
+    if (p.has_input(sock))
     {
         zmqpp::message msg;
         bool ret = sock.receive(msg);
