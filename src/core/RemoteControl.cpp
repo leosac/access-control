@@ -117,22 +117,30 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
     if (std::find(modules_names.begin(), modules_names.end(), module) != modules_names.end())
     {
         zmqpp::socket sock(context_, zmqpp::socket_type::req);
-        std::string serialized_cfg;
-        DEBUG("FOUND " << module);
         sock.connect("inproc://module-" + module);
+
         // ask for a binary dump
         bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('0'));
         assert(ret);
-        DEBUG("HERE");
-        sock.receive(serialized_cfg);
+        zmqpp::message rep;
+
+        sock.receive(rep);
         *message_out << "OK";
         *message_out << module;
-        *message_out << serialized_cfg;
-        return;
+
+        // extract data from received configuration
+        // fixme this is poor code and involve lots of copying.
+        while (rep.remaining())
+        {
+            std::string tmp;
+            rep >> tmp;
+            *message_out << tmp;
+        }
     }
     else
     {
         // if module with this name is not found
+        ERROR("RemoteControl: Cannot retrieve local module configuration for {" << module << "}");
         *message_out << "KO";
     }
 }
@@ -174,6 +182,7 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
             for (const std::string &m : start_list)
+            {
                 if (!kernel_.module_manager().initModule(m))
                 {
                     // maybe it wasn't preloaded in the module manager.
@@ -182,6 +191,7 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
                     bool r = kernel_.module_manager().initModule(m);
                     assert(r);
                 }
+            }
 
             INFO("Remote Control resuming normal operation");
             *message_out << "OK";
@@ -221,7 +231,7 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
     if (!gather_remote_module_list(sock, remote_modules))
         return false;
 
-    // we want to retrieve the configure of the remote modules.
+    // we want to retrieve the configuration of the remote modules.
     // so we dont really care about our current module.
     for (const std::string &module_name : remote_modules)
     {
@@ -297,7 +307,7 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
             msg >> ok;
             if (ok == "OK")
             {
-                assert(msg.parts() == 3);
+                assert(msg.parts() >= 3);
 
                 msg >> module >> binary_cfg;
                 cfg[module] = true;
@@ -310,6 +320,22 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
                 boost::property_tree::load(archive, cfg_tree, 1);
                 cfg[module] = true;
                 kernel_.config_manager().store_config(module, cfg_tree);
+                // todo update config file if specified.
+                //
+                // note this may be dangerous, as it will override ANY file specified here.
+                // this is a IMPORTANT security consideration. The remote Leosac can cause damage
+                // to the receiving one if its maliciously configured.
+                while (msg.remaining())
+                {
+                    // We consider a pair of frame here:  filepath and content.
+                    assert((msg.remaining() % 2) == 0);
+                    std::string filepath;
+                    std::string content;
+
+                    msg >> filepath >> content;
+                    std::ofstream stream(filepath, std::ofstream::trunc);
+                    stream << content;
+                }
             }
             else
             {

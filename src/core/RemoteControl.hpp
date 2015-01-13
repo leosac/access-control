@@ -63,6 +63,9 @@ namespace Leosac
         /**
         * After sending a bunch of MODULE_CONFIG command, wait for reply.
         *
+        * Update the configuration manager object with the newly received configuration.
+        * Also update additional configuration if needed.
+        *
         * If receiving command timeout (>3s) return false;
         */
         bool receive_remote_config(zmqpp::socket &s, std::map<std::string, bool> &cfg);

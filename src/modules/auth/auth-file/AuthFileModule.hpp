@@ -51,6 +51,12 @@ namespace Leosac
 
                 ~AuthFileModule();
 
+            protected:
+                /**
+                * We have one config file per authenticator object.
+                */
+                virtual void dump_additional_config(zmqpp::message *out) const override;
+
             private:
 
                 /**

@@ -77,6 +77,17 @@ namespace Leosac
                 */
                 zmqpp::socket &bus_sub();
 
+                /**
+                * Return the name of the file associated with the authenticator.
+                */
+                const std::string &auth_file_name() const;
+
+                /**
+                * Return the content of the configuration file use for user/group and permission
+                * mapping.
+                */
+                std::string auth_file_content() const;
+
             private:
 
                 /**

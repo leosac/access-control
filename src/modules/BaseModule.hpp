@@ -77,6 +77,16 @@ namespace Leosac
         *              : Parameter: "0" -> as a ptree
         *                           "1" -> as a xml tree
         *
+        * It is possible some module require additional configuration file. If that's the case,
+        * those this shall be copied in the response.
+        * Response may look like this:
+        * + XML (or ptree encoded by boost serialization)
+        * + FileName1
+        * + ContentOfFilename1
+        * + Filename2
+        * + Content of Filename2
+        *
+        *
         * @note This class is here to help reduce code duplication. It is NOT mandatory to inherit from this base class
         * to implement a module. However, it may help.
         */
@@ -99,6 +109,12 @@ namespace Leosac
             */
             virtual void run();
 
+            enum class ConfigFormat
+            {
+                XML,
+                BOOST_ARCHIVE,
+            };
+
         protected:
             /**
             * The base class register the `pipe_` socket to its `reactor_` so that this function
@@ -113,12 +129,26 @@ namespace Leosac
             virtual void handle_control();
 
             /**
-            * Serialize the config_ property tree in portable text format and returns it.
-            * This is called upon receiving the DUMP_CONFIG command.
+            * Dump additional configuration (for example module specific
+            * config file).
             *
-            * @note You can override this if you need to.
+            * If your module has this kind of file, you may override
+            * this method to provide correct dump of the config.
+            *
+            * @note Unless reimplemented this method does nothing.
+            * @note See DUMP_CONFIG specs for additional config file.
+            *
+            * @param out MUST not be null.
             */
-            virtual std::string dump_config(bool xml_format) const;
+            virtual void dump_additional_config(zmqpp::message *out) const;
+
+            /**
+            * Fills a message with the module's configuration information.
+            *
+            * This method calls the `dump_additional_config()` method.
+            * @param out_msg MUST not be null.
+            */
+           void dump_config(BaseModule::ConfigFormat fmt, zmqpp::message *out_msg) const;
 
             /**
             * A reference to the ZeroMQ context in case you need it to create additional socket.

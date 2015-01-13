@@ -68,21 +68,31 @@ void BaseModule::handle_pipe()
     }
 }
 
-std::string BaseModule::dump_config(bool xml_format) const
+void BaseModule::dump_config(BaseModule::ConfigFormat fmt, zmqpp::message *out_msg) const
 {
-    if (!xml_format)
+    assert(out_msg);
+    if (fmt == ConfigFormat::BOOST_ARCHIVE)
     {
         std::ostringstream oss;
         boost::archive::text_oarchive archive(oss);
-        DEBUG(archive.get_library_version());
         boost::property_tree::save(archive, config_, 1);
-
-        return oss.str();
+        out_msg->add(oss.str());
     }
     else
     {
-        return propertyTreeToXml(config_);
+        out_msg->add(propertyTreeToXml(config_));
     }
+    DEBUG("NB_FRAMES = " << out_msg->parts());
+    try
+    {
+        dump_additional_config(out_msg);
+    }
+    catch (std::exception &e)
+    {
+        ERROR("ERROR: " << e.what());
+    }
+
+    DEBUG("NB_FRAMES = " << out_msg->parts());
 }
 
 void BaseModule::handle_control()
@@ -94,14 +104,14 @@ void BaseModule::handle_control()
     msg >> frame1;
     if (frame1 == "DUMP_CONFIG")
     {
+        zmqpp::message response;
+
         assert(msg.remaining() == 1);
         uint8_t format;
         msg >> format;
         DEBUG("Module " << name_ << " is dumping config!");
-        if (format == '1')
-            control_.send(dump_config(true));
-        else
-            control_.send(dump_config(false));
+        dump_config(format == '1' ? ConfigFormat::XML : ConfigFormat::BOOST_ARCHIVE , &response);
+        control_.send(response);
     }
     else
     {
@@ -109,4 +119,9 @@ void BaseModule::handle_control()
         assert(0);
         throw std::runtime_error("Invalid request for module.");
     }
+}
+
+void BaseModule::dump_additional_config(zmqpp::message *) const
+{
+
 }

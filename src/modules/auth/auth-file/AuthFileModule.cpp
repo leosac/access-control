@@ -61,3 +61,14 @@ void AuthFileModule::process_config()
                 config_file)));
     }
 }
+
+void AuthFileModule::dump_additional_config(zmqpp::message *out) const
+{
+    assert(out);
+
+    for (auto &ptr : authenticators_)
+    {
+        *out << ptr->auth_file_name();
+        *out << ptr->auth_file_content();
+    }
+}

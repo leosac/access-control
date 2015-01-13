@@ -108,3 +108,17 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
     }
     return false;
 }
+
+std::string AuthFileInstance::auth_file_content() const
+{
+    std::ifstream t(file_path_);
+    std::stringstream buffer;
+    buffer << t.rdbuf();
+
+    return buffer.str();
+}
+
+const std::string &AuthFileInstance::auth_file_name() const
+{
+    return file_path_;
+}
