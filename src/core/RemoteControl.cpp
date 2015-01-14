@@ -112,6 +112,8 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
 
         // ask for a binary dump
         bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('0'));
+
+
         assert(ret);
         zmqpp::message rep;
 

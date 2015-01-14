@@ -92,7 +92,7 @@ boost::property_tree::ptree ConfigManager::get_module_config(std::string const &
     assert(sock_ptr);
 
     // get config as a serialized ptree.
-    sock_ptr->send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('0'));
+    sock_ptr->send(zmqpp::message() << "DUMP_CONFIG" << ConfigFormat::BOOST_ARCHIVE);
 
     std::string tmp;
     sock_ptr->receive(tmp);
@@ -128,4 +128,22 @@ const boost::property_tree::ptree &ConfigManager::load_config(const std::string 
     if (itr != modules_configs_.end())
         return itr->second;
     throw std::runtime_error("");
+}
+
+zmqpp::message &operator>>(zmqpp::message &msg, Leosac::ConfigManager::ConfigFormat &fmt)
+{
+    static_assert(std::is_same<std::underlying_type<Leosac::ConfigManager::ConfigFormat>::type, uint8_t>::value,
+            "Bad underlying type for enum");
+    uint8_t tmp;
+    msg >> tmp;
+    fmt = static_cast<Leosac::ConfigManager::ConfigFormat>(tmp);
+    return msg;
+}
+
+zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::ConfigManager::ConfigFormat &fmt)
+{
+    static_assert(std::is_same<std::underlying_type<Leosac::ConfigManager::ConfigFormat>::type, uint8_t>::value,
+            "Bad underlying type for enum");
+    msg << static_cast<uint8_t>(fmt);
+    return msg;
 }

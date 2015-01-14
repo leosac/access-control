@@ -20,6 +20,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <tools/log.hpp>
+#include <core/config/ConfigManager.hpp>
 #include "BaseModule.hpp"
 #include "tools/XmlPropertyTree.hpp"
 
@@ -68,10 +69,10 @@ void BaseModule::handle_pipe()
     }
 }
 
-void BaseModule::dump_config(BaseModule::ConfigFormat fmt, zmqpp::message *out_msg) const
+void BaseModule::dump_config(ConfigManager::ConfigFormat fmt, zmqpp::message *out_msg) const
 {
     assert(out_msg);
-    if (fmt == ConfigFormat::BOOST_ARCHIVE)
+    if (fmt == ConfigManager::ConfigFormat::BOOST_ARCHIVE)
     {
         std::ostringstream oss;
         boost::archive::text_oarchive archive(oss);
@@ -107,10 +108,10 @@ void BaseModule::handle_control()
         zmqpp::message response;
 
         assert(msg.remaining() == 1);
-        uint8_t format;
+        ConfigManager::ConfigFormat format;
         msg >> format;
         DEBUG("Module " << name_ << " is dumping config!");
-        dump_config(format == '1' ? ConfigFormat::XML : ConfigFormat::BOOST_ARCHIVE , &response);
+        dump_config(format, &response);
         control_.send(response);
     }
     else

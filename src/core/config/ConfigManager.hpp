@@ -61,11 +61,19 @@ namespace Leosac
         */
         bool store_config(const std::string &module, const boost::property_tree::ptree &cfg);
 
-
         /**
         * Return the stored configuration for a given module.
         */
         const boost::property_tree::ptree &load_config(const std::string &module) const;
+
+        /**
+        * This enum is used internally, when core request module configuration.
+        */
+        enum class ConfigFormat : uint8_t
+        {
+            BOOST_ARCHIVE = 0,
+            XML           = 1,
+        };
 
     private:
         /**
@@ -108,3 +116,7 @@ namespace Leosac
 
     };
 }
+
+zmqpp::message &operator>>(zmqpp::message &msg, Leosac::ConfigManager::ConfigFormat &fmt);
+
+zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::ConfigManager::ConfigFormat &fmt);

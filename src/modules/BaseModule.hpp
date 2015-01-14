@@ -22,6 +22,7 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include "tools/log.hpp"
+#include "core/config/ConfigManager.hpp"
 
 extern "C"
 {
@@ -109,12 +110,6 @@ namespace Leosac
             */
             virtual void run();
 
-            enum class ConfigFormat
-            {
-                XML,
-                BOOST_ARCHIVE,
-            };
-
         protected:
             /**
             * The base class register the `pipe_` socket to its `reactor_` so that this function
@@ -148,7 +143,7 @@ namespace Leosac
             * This method calls the `dump_additional_config()` method.
             * @param out_msg MUST not be null.
             */
-           void dump_config(BaseModule::ConfigFormat fmt, zmqpp::message *out_msg) const;
+           void dump_config(ConfigManager::ConfigFormat fmt, zmqpp::message *out_msg) const;
 
             /**
             * A reference to the ZeroMQ context in case you need it to create additional socket.
