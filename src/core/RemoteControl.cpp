@@ -57,15 +57,16 @@ void RemoteControl::handle_msg()
         module_list(&rep);
     else if (frame1 == "MODULE_CONFIG")
     {
-        if (msg.remaining() >= 1)
+        if (msg.remaining() >= 2)
         {
             std::string module_name;
-            msg >> module_name;
-            module_config(module_name, &rep);
+            ConfigManager::ConfigFormat  format;
+            msg >> module_name >> format;
+            module_config(module_name, format, &rep);
         }
         else
         {
-            rep << "MALFORMED MESSAGE";
+            rep << "KO" << "MALFORMED MESSAGE";
         }
     }
     else if (frame1 == "SYNC_FROM")
@@ -78,7 +79,7 @@ void RemoteControl::handle_msg()
         }
         else
         {
-            rep << "MALFORMED MESSAGE (SYNC_FROM)";
+            rep << "KO" << "MALFORMED MESSAGE (SYNC_FROM)";
         }
     }
     else
@@ -99,7 +100,7 @@ void RemoteControl::module_list(zmqpp::message *message_out)
     }
 }
 
-void RemoteControl::module_config(const std::string &module, zmqpp::message *message_out)
+void RemoteControl::module_config(const std::string &module, ConfigManager::ConfigFormat cfg_format, zmqpp::message *message_out)
 {
     assert(message_out);
 
@@ -111,7 +112,7 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
         sock.connect("inproc://module-" + module);
 
         // ask for a binary dump
-        bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << uint8_t('0'));
+        bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << cfg_format);
 
 
         assert(ret);
@@ -233,7 +234,8 @@ bool RemoteControl::gather_remote_config(zmqpp::socket &sock, std::list<std::str
     {
         cfg[module_name] = false;
         zmqpp::message msg;
-        msg << "MODULE_CONFIG" << module_name;
+        // we use boost-text serialization here, since its lighter
+        msg << "MODULE_CONFIG" << module_name << ConfigManager::ConfigFormat::BOOST_ARCHIVE;
         INFO("Request remote config for " << module_name);
         sock.send(msg);
     }

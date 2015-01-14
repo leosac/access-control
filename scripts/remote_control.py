@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import struct
 import time
 import sys
 import zmq
@@ -28,7 +29,9 @@ class CommandHandler(object):
 
     def handle_module_config(self, mod):
         print "Running 'module_config' for module", mod
-        self.socket_.send_multipart(["MODULE_CONFIG", mod])
+        # we prefer text (xml) config format.
+        cfg_format = struct.pack("!B", 1)
+        self.socket_.send_multipart(["MODULE_CONFIG", mod, cfg_format])
         ret = self.socket_.recv_multipart()
         print ret
 

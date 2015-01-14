@@ -96,10 +96,11 @@ that is not loaded on the Leosac server.
 
 From Client to Server:
 
-Frame    | Content                                       | Type
----------|-----------------------------------------------|-------------------------------------------------------------
-1        | "MODULE_CONFIG"                               | `string`
-2        | "MODULE_NAME"                                 | `string`
+Frame    | Content                                        | Type
+---------|------------------------------------------------|-------------------------------------------------------------
+1        | "MODULE_CONFIG"                                | `string`
+2        | "MODULE_NAME"                                  | `string`
+3        | Configuration Type (boost text archive or xml) | `uint8_t`
 
 From Server to Client, in case everything went well.
 
@@ -116,6 +117,7 @@ In case something went wrong, here is the response the server send to the client
 Frame    | Content                               | Type
 ---------|---------------------------------------|-------------------------------------------------------------
 1        | "KO"                                  | `string`
+2        | Reason                                | `string`
 
 
 SYNC_FROM {#remote_control_cmd_sync_from}
