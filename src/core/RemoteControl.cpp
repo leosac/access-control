@@ -18,7 +18,6 @@ RemoteControl::RemoteControl(zmqpp::context &ctx,
         auth_(ctx),
         context_(ctx)
 {
-    auth_.set_verbose(true);
     auth_.configure_curve("CURVE_ALLOW_ANY");
     process_config(cfg);
 }
@@ -132,7 +131,8 @@ void RemoteControl::module_config(const std::string &module, zmqpp::message *mes
     else
     {
         // if module with this name is not found
-        ERROR("RemoteControl: Cannot retrieve local module configuration for {" << module << "}");
+        ERROR("RemoteControl: Cannot retrieve local module configuration for {" << module << "}" <<
+                "The module appears to not be loaded.");
         *message_out << "KO";
     }
 }
