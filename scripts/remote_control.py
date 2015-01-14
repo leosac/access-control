@@ -13,10 +13,12 @@ class CommandHandler(object):
     def handle_command(self, cmd):
         if (cmd == "module_list"):
             self.handle_module_list();
-        if (cmd == "module_config"):
+        elif (cmd == "module_config"):
             self.handle_module_config(self.argv_[self.argv_offset])
-        if (cmd == "sync_from"):
+        elif (cmd == "sync_from"):
             self.sync_from(self.argv_[self.argv_offset])
+        else:
+            print "Non-handled command: ", cmd
 
     def handle_module_list(self):
         print "Running 'module_list;"
