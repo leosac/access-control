@@ -50,15 +50,7 @@ void RemoteControl::handle_msg()
     assert(msg.parts() > 1);
     DEBUG("PARTS = " << msg.parts());
     msg >> source;
-    if (std::find(test_.begin(), test_.end(), source) != test_.end())
-        DEBUG("FOUND !!!");
-    else
-        test_.push_back(source);
     rep << source;
-    std::stringstream ss;
-    for (auto c : source)
-        ss << std::hex << (int) c;
-    INFO("(" << test_.size() << ") New message from {" << ss.str() << "}");
 
     msg >> frame1;
     DEBUG("Cmd = {" << frame1 << "}");
@@ -331,7 +323,7 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
                     assert((msg.remaining() % 2) == 0);
                     std::string filepath;
                     std::string content;
-
+                    NOTICE("Writing (or overwriting) config file: " << filepath);
                     msg >> filepath >> content;
                     std::ofstream stream(filepath, std::ofstream::trunc);
                     stream << content;

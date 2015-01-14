@@ -138,7 +138,14 @@ std::string MonitorModule::req_scripts_dir()
 {
     std::string ret;
     kernel_.send("SCRIPTS_DIR");
-    kernel_.receive(ret);
+
+    zmqpp::poller poller;
+    poller.add(kernel_);
+    poller.poll(1000);
+    if (poller.has_input(kernel_))
+        kernel_.receive(ret);
+    else
+        throw std::runtime_error("Internal Error, timeout'd");
     return ret;
 }
 
