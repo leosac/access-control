@@ -119,9 +119,31 @@ Frame    | Content                               | Type
 
 
 SYNC_FROM {#remote_control_cmd_sync_from}
-------------------------------------------
+-----------------------------------------
 
 The `SYNC_FROM` command allows Leosac to replicate the configuration of an other Leosac unit.
 
+**SECURITY CONSIDERATION**: A module can have additional configuration file. In order to correctly replicate
+a configuration, we need to copy (and paste) those files too. Leosac will do that. That means that it will
+**blindly write the content of a received file where it is told to**. That means that syncing from a 
+malicious unit can cause to overwrite **any** file in your filesystem (if Leosac runs as root).
+
 From Client to Server:
 
+Frame    | Content                                      | Type
+---------|----------------------------------------------|-------------------------------------------------------------
+1        | "SYNC_FROM"                                  | `string`
+2        | The endpoint to sync from: "tcp://IP:PORT"   | `string`
+
+From Server to Client (if **no error occurred**):
+
+Frame    | Content                                      | Type
+---------|----------------------------------------------|-------------------------------------------------------------
+1        | "OK"                                         | `string`
+
+From Server to Client (in case **something went wrong**):
+
+Frame    | Content                               | Type
+---------|---------------------------------------|-------------------------------------------------------------
+1        | "KO"                                  | `string`
+2        | Reason                                | `string`

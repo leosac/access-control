@@ -14,22 +14,7 @@ namespace Leosac
     * It's responsibility is to expose a secure socket on the network and filter
     * request from the world, passing legit message to the rest of the application.
     *
-    * Configuration option:
-    *    + port
-    *    + z85 encoded private key
-    *
-    * Commands:
-    * MODULE_LIST
-    * response: module_name*
-    * module_name: a-Z+
-    *
-    * MODULE_CONFIG module_name
-    * response: boost serialization
-    *
-    * SYNC_FROM ENDPOINT
-    * endpoint: tcp://IP:PORT
-    *
-    * Attempt to Fetch the config from an other Leosac unit and apply it to itself.
+    * @see @ref remote_control_main For an overview of the Remote Control functionality.
     */
     class RemoteControl
     {
@@ -50,7 +35,6 @@ namespace Leosac
         void handle_msg();
 
         void process_config(const boost::property_tree::ptree &cfg);
-
 
         /**
         * Build the list of modules (their name) running on the remote host.
@@ -97,8 +81,6 @@ namespace Leosac
         std::string secret_key_;
 
         zmqpp::auth auth_;
-        std::vector<std::string> test_;
-
         zmqpp::context &context_;
 
         // Allow kernel full access to this class.

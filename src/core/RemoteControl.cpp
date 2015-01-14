@@ -190,12 +190,14 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
         }
         else
         {
+            *message_out << "KO";
             *message_out << "Failed to synchronise configuration.";
         }
     }
     else
     {
-        *message_out << "ENDPOINT SEEMS INVALID";
+        *message_out << "KO";
+        *message_out << "Endpoint seems invalid";
     }
 }
 
@@ -312,8 +314,7 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
                 boost::property_tree::load(archive, cfg_tree, 1);
                 cfg[module] = true;
                 kernel_.config_manager().store_config(module, cfg_tree);
-                // todo update config file if specified.
-                //
+
                 // note this may be dangerous, as it will override ANY file specified here.
                 // this is a IMPORTANT security consideration. The remote Leosac can cause damage
                 // to the receiving one if its maliciously configured.
