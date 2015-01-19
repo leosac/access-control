@@ -287,7 +287,7 @@ void Kernel::extract_environ()
 std::string Kernel::script_directory() const
 {
     if (environ_.count(EnvironVar::SCRIPTS_DIR))
-        return environ_.at(EnvironVar::SCRIPTS_DIR);
+        return environ_.at(EnvironVar::SCRIPTS_DIR) + "/";
     return Leosac::Tools::UnixFs::getCWD() + "/scripts/";
 }
 

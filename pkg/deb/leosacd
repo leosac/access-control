@@ -11,9 +11,13 @@
 ### END INIT INFO
 
 DAEMON=/usr/bin/leosac
-DAEMON_OPTS="-f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml"
+DAEMON_OPTS="-k /etc/leosac.d/kernel.xml"
 LEOSAC_PID_FILE=/var/run/leosac.pid
 LEOSAC_DIR="/etc/leosac.d"
+
+## some env variable that you may customize
+LEOSAC_SCRIPTS_DIR=""
+LEOSAC_FACTORY_CONFIG_DIR=""
 
 test -x "$DAEMON" || exit 0
 
@@ -27,7 +31,8 @@ start()
         log_end_msg 0
         exit 0
     else
-        start-stop-daemon                                               \
+        LEOSAC_SCRIPTS_DIR=${LEOSAC_SCRIPTS_DIR} LEOSAC_FACTORY_CONFIG_DIR=${LEOSAC_FACTORY_CONFIG_DIR} \
+        /sbin/start-stop-daemon                                         \
             --start --quiet --background --oknodo                       \
             --make-pidfile --pidfile "$LEOSAC_PID_FILE"                 \
             --chdir "$LEOSAC_DIR" --exec "$DAEMON" -- "$DAEMON_OPTS"
@@ -38,7 +43,7 @@ start()
 stop()
 {
     log_daemon_msg "Stopping leosac daemon"
-    start-stop-daemon --stop --quiet --oknodo                           \
+    /sbin/start-stop-daemon --stop --quiet --oknodo                           \
         --pidfile "$LEOSAC_PID_FILE"
     log_end_msg $?
     rm -f "$LEOSAC_PID_FILE"

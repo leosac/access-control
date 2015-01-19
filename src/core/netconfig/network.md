@@ -39,5 +39,6 @@ An other example with enabled network management.
         <dhcp>true</dhcp>
         <netmask>255.255.255.0</netmask>
         <default_ip>192.168.0.18</default_ip>
+        <gateway>192.168.0.1</gateway>
     </network>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
