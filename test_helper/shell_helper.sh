@@ -46,6 +46,7 @@ SCRIPT_DIR=`pwd`
 
 ## Instrumentation Client (python script)
 INSTR="$SCRIPT_DIR/../instrumentation_client.py /tmp/leosac-ipc"
+REMOTE_CONTROL="$SCRIPT_DIR/../../scripts/remote_control.py "
 
 set -x
 set -e
