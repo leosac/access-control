@@ -9,8 +9,7 @@ See [modules](@ref modules) for an overview of available modules.
 Interesting stuff:
    + See FGPIO detailed description for GPIO command.
    + See FLED detailed description for LED command.
-   + Configure the [logger](@ref logger_main)
-   + Configure the [network](@ref network_main)
+   + [General configuration information](@ref general_config_main) (logger / network / remote control).
    + Understand the [authentication system](@ref auth_main)
    + [Firmware](@ref firmware_main) info
    + [Path management](@ref path_management)
@@ -29,8 +28,6 @@ Short | Long                   | Description
 -k    | `--kernel-cfg`         | Leosac's core configuration file
 -h    | `--help`               | Print the help
 N/A   | `--version`            | Display version informations and exit
-
-
 
 Notes
 =====
