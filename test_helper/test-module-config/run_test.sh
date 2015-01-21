@@ -11,4 +11,4 @@ source ../shell_helper.sh
 ## to make use of some of its code.
 
 cp "$SCRIPT_DIR/../../scripts/remote_control.py" .
-python ./test.py
+python "$SCRIPT_DIR/test.py"
