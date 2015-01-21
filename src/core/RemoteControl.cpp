@@ -32,6 +32,15 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
     INFO("Binding RemoteControl socket to port " << port);
     INFO("Use private key {" << secret_key_ << "} and public key {" << public_key_ << "}");
 
+    command_handlers_["MODULE_CONFIG"] = std::bind(&RemoteControl::handle_module_config, this, std::placeholders::_1,
+            std::placeholders::_2);
+
+    command_handlers_["MODULE_LIST"] = std::bind(&RemoteControl::handle_module_list, this, std::placeholders::_1,
+            std::placeholders::_2);
+
+    command_handlers_["SYNC_FROM"] = std::bind(&RemoteControl::handle_sync_from, this, std::placeholders::_1,
+            std::placeholders::_2);
+
     socket_.set(zmqpp::socket_option::curve_server, true);
     socket_.set(zmqpp::socket_option::curve_secret_key, secret_key_);
     socket_.set(zmqpp::socket_option::curve_public_key, public_key_);
@@ -53,37 +62,18 @@ void RemoteControl::handle_msg()
 
     msg >> frame1;
     DEBUG("Cmd = {" << frame1 << "}");
-    if (frame1 == "MODULE_LIST")
-        module_list(&rep);
-    else if (frame1 == "MODULE_CONFIG")
+
+    if (command_handlers_.find(frame1) != command_handlers_.end())
     {
-        if (msg.remaining() >= 2)
-        {
-            std::string module_name;
-            ConfigManager::ConfigFormat  format;
-            msg >> module_name >> format;
-            module_config(module_name, format, &rep);
-        }
-        else
-        {
-            rep << "KO" << "MALFORMED MESSAGE";
-        }
-    }
-    else if (frame1 == "SYNC_FROM")
-    {
-        if (msg.remaining() == 1)
-        {
-            std::string endpoint;
-            msg >> endpoint;
-            sync_from(endpoint, &rep);
-        }
-        else
-        {
-            rep << "KO" << "MALFORMED MESSAGE (SYNC_FROM)";
-        }
+        auto h = command_handlers_[frame1];
+
+        h(&msg, &rep);
     }
     else
-        assert(0);
+    {
+        rep << "KO" << "UNKOWN MESSAGE";
+        WARN("UNKNOWN MESSAGE ON REMOTE CONTROL INTERFACE");
+    }
 
     DEBUG("Sending response, " << rep.parts() << " frames");
     socket_.send(rep);
@@ -344,4 +334,54 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
         }
     }
     return true;
+}
+
+void RemoteControl::handle_module_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
+{
+    assert(msg_in);
+    assert(msg_out);
+
+    if (msg_in->remaining() >= 2)
+    {
+        std::string module_name;
+        ConfigManager::ConfigFormat format;
+        *msg_in >> module_name >> format;
+        module_config(module_name, format, msg_out);
+    }
+    else
+    {
+        *msg_out << "KO" << "MALFORMED MESSAGE";
+    }
+}
+
+void RemoteControl::handle_module_list(zmqpp::message *msg_in, zmqpp::message *msg_out)
+{
+    assert(msg_in);
+    assert(msg_out);
+
+    if (msg_in->remaining() == 0)
+    {
+        module_list(msg_out);
+    }
+    else
+    {
+        *msg_in << "KO" << "MALFORMED MESSAGE";
+    }
+}
+
+void RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg_out)
+{
+    assert(msg_in);
+    assert(msg_out);
+
+    if (msg_in->remaining() == 1)
+    {
+        std::string endpoint;
+        *msg_in >> endpoint;
+        sync_from(endpoint, msg_out);
+    }
+    else
+    {
+        *msg_out << "KO" << "MALFORMED MESSAGE (SYNC_FROM)";
+    }
 }

@@ -12,14 +12,17 @@ set -x
 
 ## we include the remote_control.py script
 ## to make use of some of its code.
-cp "$SCRIPT_DIR/../../scripts/remote_control.py" .
-ls
+cp "$SCRIPT_DIR/../../scripts/remote_control.py" this_test
+
+config_file="$TMP_DIR/this_test/test-module-config.xml"
 
 (valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file > leosac-log &
     echo $! > pid-file;  wait $! && echo $? > exit-status) &
 
-python "$SCRIPT_DIR/test-valid.py"
-python "$SCRIPT_DIR/test-invalid.py"
+pushd "$TMP_DIR/this_test"
+python test-valid.py
+python test-invalid.py
+popd
 
 kill $(cat pid-file)
 
