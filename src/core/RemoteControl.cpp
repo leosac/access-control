@@ -134,7 +134,7 @@ void RemoteControl::module_config(const std::string &module, ConfigManager::Conf
         // if module with this name is not found
         ERROR("RemoteControl: Cannot retrieve local module configuration for {" << module << "}" <<
                 "The module appears to not be loaded.");
-        *message_out << "KO";
+        *message_out << "KO" << "Module not loaded, so config not available";
     }
 }
 

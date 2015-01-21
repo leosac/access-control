@@ -7,8 +7,12 @@
 [ -r ../shell_helper.sh ] || { echo "Cannot source shell_helper.sh"; exit -1; }
 source ../shell_helper.sh
 
+set -e
+set -x
+
 ## we include the remote_control.py script
 ## to make use of some of its code.
-
 cp "$SCRIPT_DIR/../../scripts/remote_control.py" .
-python "$SCRIPT_DIR/test.py"
+
+python "$SCRIPT_DIR/test-valid.py"
+python "$SCRIPT_DIR/test-invalid.py"
