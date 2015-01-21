@@ -13,6 +13,7 @@ set -x
 ## we include the remote_control.py script
 ## to make use of some of its code.
 cp "$SCRIPT_DIR/../../scripts/remote_control.py" .
+ls
 
 (valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file > leosac-log &
     echo $! > pid-file;  wait $! && echo $? > exit-status) &
