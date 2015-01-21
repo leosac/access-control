@@ -24,7 +24,7 @@ config_file="$TMP_DIR/this_test/test-module-list.xml"
     echo $! > pid-file;  wait $! && echo $? > exit-status)
 
 if ! grep "MONITOR" remote_result ; then
-fail "MONITOR module should be reported present."
+   fail "MONITOR module should be reported present."
 fi
 
 [ $(cat exit-status) -eq 0 ] || fail "Non zero return code"
