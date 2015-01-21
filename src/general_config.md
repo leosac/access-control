@@ -14,6 +14,23 @@ Here is an overview of what we call "general configuration":
   + Logger configuration
   + Network configuration
   + Remote control configuration.
+
+
+Path Management {#general_config_path_mng}
+==========================================
+
+Leosac has to know 2 importants paths:
+  1. The path to the factory configuration directory: this can be set with the environment variable
+   `LEOSAC_FACTORY_CONFIG_DIR`.
+  2. Paths to where Leosac's shell scripts are saved. Customizable with `LEOSAC_SCRIPTS_DIR` env variable.
+  
+
+Automatic Configuration Saving {#general_config_save}
+=====================================================
+
+There is a useful configuration option: `autosave`. When set to true,
+the current configuration of Leosac will be saved to disk when Leosac exits.
+It defaults to false.  
   
 Logger Configuration {#general_config_logger}
 =============================================
@@ -46,7 +63,6 @@ as a module.
         <min_syslog>INFO</min_syslog>
     </log>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 Network Configuration {#general_config_network}

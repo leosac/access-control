@@ -92,10 +92,8 @@ void RemoteControl::handle_msg()
 void RemoteControl::module_list(zmqpp::message *message_out)
 {
     assert(message_out);
-    DEBUG("HERE");
     for (const std::string &s : kernel_.module_manager().modules_names())
     {
-        DEBUG("Module {" << s << "}");
         *message_out << s;
     }
 }

@@ -12,7 +12,7 @@ Interesting stuff:
    + [General configuration information](@ref general_config_main) (logger / network / remote control).
    + Understand the [authentication system](@ref auth_main)
    + [Firmware](@ref firmware_main) info
-   + [Path management](@ref path_management)
+   + [Path management](@ref general_config_path_mng)
    + Overview of the [Remote Control](@ref remote_control_main) interface.
    
 You can find an [install guide](@ref install_guide) for a simple setup: Raspberry Pi + Piface + Wiegand + Door. 

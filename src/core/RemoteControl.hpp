@@ -84,6 +84,11 @@ namespace Leosac
         zmqpp::auth auth_;
         zmqpp::context &context_;
 
+        // Function is not really void (), we use placeholder and bind.
+        using CommandHandlerMap = std::map<std::string, std::function<void>()>;
+
+        CommandHandlerMap command_handlers_;
+
         // Allow kernel full access to this class.
         friend class Kernel;
     };

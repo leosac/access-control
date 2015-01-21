@@ -149,3 +149,14 @@ Frame    | Content                               | Type
 ---------|---------------------------------------|-------------------------------------------------------------
 1        | "KO"                                  | `string`
 2        | Reason                                | `string`
+
+SAVE {#remote_control_save}
+---------------------------
+
+TODO:
+
+When `SYNC_FROM` configuration, the new configuration is apply directly. However,
+it is not persisted to disk. Moreover, it will not be persisted to disk, unless
+the `<autosave>BOOLEAN</autosave>` configuration option is set to `true`.
+
+The `SAVE` command will make Leosac save its current configuration to disk.
