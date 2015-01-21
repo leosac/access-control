@@ -11,6 +11,7 @@ set -e
 ## Name of the leosac image.
 DOCKER_CONTAINER=leosac
 
-docker run -t leosac "(pushd /leosac_src/test_helper/$1/ && INSTALL_DIR=/usr/local ./run_test.sh && popd)"
+docker run -t ${DOCKER_CONTAINER} "(pushd /leosac_src/test_helper/$1/ && INSTALL_DIR=/usr/local ./run_test.sh && popd)" \
+ || echo "Test $1 FAILED"
 
 exit 0

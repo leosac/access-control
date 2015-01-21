@@ -85,7 +85,7 @@ namespace Leosac
         zmqpp::context &context_;
 
         // Function is not really void (), we use placeholder and bind.
-        using CommandHandlerMap = std::map<std::string, std::function<void>()>;
+        using CommandHandlerMap = std::map<std::string, std::function<void()>>;
 
         CommandHandlerMap command_handlers_;
 
