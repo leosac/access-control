@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<kernel>
+    <plugin_directories>
+        <plugindir>./install/lib/leosac</plugindir>
+        <plugindir>./install/lib/leosac/auth</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <remote>
+        <port>12346</port>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+    </remote>
+
+    <modules>
+        <module>
+            <name>MONITOR</name>
+            <file>libmonitor.so</file>
+            <level>1</level>
+
+            <module_config>
+                <file-bus>./system_bus_log</file-bus>
+                <verbose>true</verbose>
+            </module_config>
+        </module>
+
+        <module>
+            <name>INSTRUMENTATION</name>
+            <file>libinstrumentation.so</file>
+            <level>105</level>
+            <module_config>
+                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+            </module_config>
+        </module>
+
+        <module>
+            <name>WIEGAND_READER</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+    </modules>
+
+</kernel>

@@ -4,12 +4,13 @@ import remote_control
 import sys
 
 def main():
-    print "Hello"
+    print "Hello, I will query the config of an invalid module."
     
     p = ["", "127.0.0.1:12345", "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT", "module_config", "INVALID_MODULE"]
-    remote_control.run(p)
+    ret = remote_control.run(p)
 
-    if size(p) != 2 || p[0] != "KO":
+    print ret
+    if len(ret) != 2 or ret[0] != "KO":
         print "Didn't fail for invalid module..."
         return 1
     return 0
