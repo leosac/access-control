@@ -13,11 +13,11 @@ class CommandHandler(object):
 
     def handle_command(self, cmd):
         if (cmd == "module_list"):
-            self.handle_module_list();
+            return self.handle_module_list();
         elif (cmd == "module_config"):
-            self.handle_module_config(self.argv_[self.argv_offset])
+            return self.handle_module_config(self.argv_[self.argv_offset])
         elif (cmd == "sync_from"):
-            self.sync_from(self.argv_[self.argv_offset])
+            return self.sync_from(self.argv_[self.argv_offset])
         else:
             print "Non-handled command: ", cmd
 
@@ -25,7 +25,7 @@ class CommandHandler(object):
         print "Running 'module_list;"
         self.socket_.send("MODULE_LIST")
         ret = self.socket_.recv_multipart()
-        print ret
+        return ret
 
     def handle_module_config(self, mod):
         print "Running 'module_config' for module", mod
@@ -33,23 +33,23 @@ class CommandHandler(object):
         cfg_format = struct.pack("!B", 1)
         self.socket_.send_multipart(["MODULE_CONFIG", mod, cfg_format])
         ret = self.socket_.recv_multipart()
-        print ret
+        return ret
 
     def sync_from(self, endpoint):
         print "Will ask Leosac to sync from {", endpoint, "}"
         self.socket_.send_multipart(["SYNC_FROM", endpoint])
         ret = self.socket_.recv_multipart()
-        print ret
+        return ret
 
 def print_usage():
     print "Usage: ./remote_control tcp_endpoint server_key command [params]"
 
-def main():
-    if len(sys.argv) < 4:
+def run(user_params):
+    if len(user_params) < 4:
         print_usage()
         return -1
-    tcp_endpoint = sys.argv[1]
-    server_key = sys.argv[2]
+    tcp_endpoint = user_params[1]
+    server_key = user_params[2]
 
     context = zmq.Context.instance()
     dealer = context.socket(zmq.DEALER)
@@ -64,13 +64,17 @@ def main():
     dealer.connect(connect_str)
     print "Connected to " + connect_str
 
-    ch = CommandHandler(dealer, sys.argv);
-    ch.handle_command(sys.argv[3])
-
+    ch = CommandHandler(dealer, user_params
+);
+    ret = ch.handle_command(user_params[3])
     
     time.sleep(1)
     context.destroy(linger=5000)
-    return 0
+    return ret
+
+def main():
+    ret = run(sys.argv)
+    print "Result = ", ret
 
 if __name__ == "__main__":
     ret = main()

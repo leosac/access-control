@@ -27,6 +27,10 @@ if ! grep "MONITOR" remote_result ; then
    fail "MONITOR module should be reported present."
 fi
 
+if ! grep "WIEGAND_READER" remote_result ; then
+   fail "WIEGAND_READER module should be reported present."
+fi
+
 [ $(cat exit-status) -eq 0 ] || fail "Non zero return code"
 
 die 0

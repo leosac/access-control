@@ -15,7 +15,7 @@ which parallel > /dev/null || { echo "Need GNU parallel." ; exit 1; }
 echo "Running tests, using $1 as install directory"
 
 total_test=`find . -maxdepth 1 -mindepth 1 -type d | wc -l`
-echo -e ${Yel} "We will run ${total_test} tests"
+echo -e ${Yel} "We will run ${total_test} tests" ${RCol}
 
 ## the run_docker script require a test-folder name.
 find . -maxdepth 1 -mindepth 1 -type d | parallel ./run_docker.sh {} ;
@@ -23,9 +23,9 @@ find . -maxdepth 1 -mindepth 1 -type d | parallel ./run_docker.sh {} ;
 RET_VALUE=$?
 ## parallel ret value is our test suite return value.
 if [ ${RET_VALUE} -eq 0 ] ; then
-    echo -e ${Gre}"All tests succeded"
+    echo -e ${Gre}"All tests succeded"${RCol}
 else
-echo -e ${Red} "Some failure... ret value = ${RET_VALUE}"
+    echo -e ${Red} "Some failure... ret value = ${RET_VALUE}"${RCol}
 fi
 
 exit 0
