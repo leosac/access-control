@@ -374,11 +374,19 @@ void RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
     assert(msg_in);
     assert(msg_out);
 
-    if (msg_in->remaining() == 1)
+    uint8_t autocommit;
+
+    if (msg_in->remaining() == 2)
     {
         std::string endpoint;
         *msg_in >> endpoint;
+        *msg_in >> autocommit;
         sync_from(endpoint, msg_out);
+        if (autocommit)
+        {
+            INFO("Saving configuration to disk after synchronization.");
+            kernel_.save_config();
+        }
     }
     else
     {

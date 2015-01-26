@@ -125,6 +125,12 @@ namespace Leosac
 
         ConfigManager &config_manager();
 
+        /**
+        * Save the current configuration to its original file if `autosave` is enabled.
+        * This means that configuration change made when Leosac was running will be persisted.
+        */
+        void save_config();
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -156,12 +162,6 @@ namespace Leosac
         void extract_environ();
 
         void configure_logger();
-
-        /**
-        * Save the current configuration to its original file if `autosave` is enabled.
-        * This means that configuration change made when Leosac was running will be persisted.
-        */
-        void save_config();
 
         /**
         * Query all modules and retrieve the full application configuration.

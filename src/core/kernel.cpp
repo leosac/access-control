@@ -122,7 +122,8 @@ bool Kernel::run()
         reactor_.poll(-1);
     }
 
-    save_config();
+    if (autosave_)
+        save_config();
     return want_restart_;
 }
 
@@ -329,22 +330,15 @@ zModuleManager &Kernel::module_manager()
 
 void Kernel::save_config()
 {
-    if (autosave_)
-    {
-        INFO("Saving config at shutdown...");
-        std::string full_config = Tools::propertyTreeToXml(config_manager_.get_application_config());
-        std::string cfg_file_path = config_.get<std::string>("kernel-cfg");
+    INFO("Saving current configuration to disk.");
+    std::string full_config = Tools::propertyTreeToXml(config_manager_.get_application_config());
+    std::string cfg_file_path = config_.get<std::string>("kernel-cfg");
 
-        DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
-        std::ofstream cfg_file(cfg_file_path);
+    DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
+    std::ofstream cfg_file(cfg_file_path);
 
-        cfg_file << full_config;
-        cfg_file.close();
-    }
-    else
-    {
-        INFO("Autosave is disabled. Not saving config.");
-    }
+    cfg_file << full_config;
+    cfg_file.close();
 }
 
 const boost::property_tree::ptree &Kernel::get_config() const
