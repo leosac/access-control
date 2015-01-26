@@ -133,7 +133,7 @@ malicious unit can cause to overwrite **any** file in your filesystem (if Leosac
 From Client to Server:
 
 Frame    | Content                                      | Type
----------|----------------------------------------------|-------------------------------------------------------------
+---------|----------------------------------------------|---------------------------------
 1        | "SYNC_FROM"                                  | `string`
 2        | The endpoint to sync from: "tcp://IP:PORT"   | `string`
 3        | Autocommit (aka writing conf to disk) 1 | 0  | `uint8_t`
@@ -144,24 +144,35 @@ synchronisation is done.
 
 From Server to Client (if **no error occurred**):
 
-Frame    | Content                                      | Type
----------|----------------------------------------------|-------------------------------------------------------------
-1        | "OK"                                         | `string`
+Frame    | Content                  | Type
+---------|--------------------------|------------
+1        | "OK"                     | `string`
 
 From Server to Client (in case **something went wrong**):
 
 Frame    | Content                               | Type
----------|---------------------------------------|-------------------------------------------------------------
+---------|---------------------------------------|--------------------------
 1        | "KO"                                  | `string`
 2        | Reason                                | `string`
 
 SAVE {#remote_control_save}
 ---------------------------
 
-TODO:
-
 When `SYNC_FROM` configuration, the new configuration is apply directly. However,
 it is not persisted to disk. Moreover, it will not be persisted to disk, unless
 the `<autosave>BOOLEAN</autosave>` configuration option is set to `true`.
 
 The `SAVE` command will make Leosac save its current configuration to disk.
+
+From Client to Server:
+
+Frame    | Content                                 | Type
+---------|-----------------------------------------|-------------------
+1        | "SAVE"                                  | `string`
+
+
+From Server to Client:
+
+Frame    | Content                         | Type
+---------|---------------------------------|------------
+1        | "OK"                            | `string`

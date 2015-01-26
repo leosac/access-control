@@ -129,7 +129,7 @@ namespace Leosac
         * Save the current configuration to its original file if `autosave` is enabled.
         * This means that configuration change made when Leosac was running will be persisted.
         */
-        void save_config();
+        bool save_config();
 
     private:
         /**

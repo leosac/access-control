@@ -41,6 +41,9 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
     command_handlers_["SYNC_FROM"] = std::bind(&RemoteControl::handle_sync_from, this, std::placeholders::_1,
             std::placeholders::_2);
 
+    command_handlers_["SAVE"] = std::bind(&RemoteControl::handle_save, this, std::placeholders::_1,
+            std::placeholders::_2);
+
     socket_.set(zmqpp::socket_option::curve_server, true);
     socket_.set(zmqpp::socket_option::curve_secret_key, secret_key_);
     socket_.set(zmqpp::socket_option::curve_public_key, public_key_);
@@ -392,5 +395,21 @@ void RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
     else
     {
         *msg_out << "KO" << "MALFORMED MESSAGE (SYNC_FROM)";
+    }
+}
+
+void RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
+{
+    assert(msg_in);
+    assert(msg_out);
+
+    if (msg_in->remaining() == 0)
+    {
+        kernel_.save_config();
+        *msg_out << "OK";
+    }
+    else
+    {
+        *msg_out << "KO" << "Malformed message (SAVE)";
     }
 }

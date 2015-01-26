@@ -39,6 +39,11 @@ namespace Leosac
         */
         void handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
+        /**
+        * Save the current configuration to disk.
+        */
+        void handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out);
+
         void module_list(zmqpp::message *message_out);
 
         void module_config(const std::string &module, ConfigManager::ConfigFormat cfg_format, zmqpp::message *message_out);

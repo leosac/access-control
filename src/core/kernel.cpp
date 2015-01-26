@@ -328,7 +328,7 @@ zModuleManager &Kernel::module_manager()
     return module_manager_;
 }
 
-void Kernel::save_config()
+bool Kernel::save_config()
 {
     INFO("Saving current configuration to disk.");
     std::string full_config = Tools::propertyTreeToXml(config_manager_.get_application_config());
@@ -337,8 +337,9 @@ void Kernel::save_config()
     DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
     std::ofstream cfg_file(cfg_file_path);
 
-    cfg_file << full_config;
-    cfg_file.close();
+    if (cfg_file << full_config)
+        return true;
+    return false;
 }
 
 const boost::property_tree::ptree &Kernel::get_config() const

@@ -18,6 +18,8 @@ class CommandHandler(object):
             return self.handle_module_config(self.argv_[self.argv_offset])
         elif (cmd == "sync_from"):
             return self.sync_from(self.argv_[self.argv_offset])
+        elif (cmd == "save"):
+            return self.handle_save()
         else:
             print "Non-handled command: ", cmd
 
@@ -40,6 +42,12 @@ class CommandHandler(object):
         ## not autocommit / autosave of configuration.
         autocommit = struct.pack("!B", 0)
         self.socket_.send_multipart(["SYNC_FROM", endpoint, autocommit])
+        ret = self.socket_.recv_multipart()
+        return ret
+
+    def handle_save(self):
+        print "Will ask Leosac to save its config to disk"
+        self.socket_.send_multipart(["SAVE"])
         ret = self.socket_.recv_multipart()
         return ret
 
