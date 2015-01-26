@@ -17,12 +17,21 @@ config_file="$TMP_DIR/this_test/test-sync-from.xml"
 ## config file for the source unit
 source_cfg_file="$TMP_DIR/this_test/source_cfg.xml"
 
+## We need a dummy run to let autosave_ reformat the config file.
+## Otherwise checksum will differ event if the content is semantically the same
+(valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file > leosac-log &
+    echo $! > pid-file;  wait $! && echo $? > exit-status) &
+
+sleep 10s
+kill $(cat pid-file)
+sleep 5s
+
+SUM=$(md5sum $config_file)
+
 (${REMOTE_CONTROL} "127.0.0.1:12345" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' "sync_from" "tcp://127.0.0.1:12346"
     sleep $SLEEP_TIME
     kill $(cat pid-file)
 )&
-
-SUM=$(md5sum $config_file)
 
 ## start leosac and wait for return value
 ## Use custom work directory to access the factory config file

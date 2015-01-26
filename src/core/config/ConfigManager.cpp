@@ -55,7 +55,7 @@ boost::property_tree::ptree ConfigManager::get_general_config()
 {
     boost::property_tree::ptree general_cfg;
 
-    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network"})
+    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network", "autosave"})
     {
         auto child_opt = kernel_.get_config().get_child_optional(cfg_name);
         if (child_opt)

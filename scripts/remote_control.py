@@ -37,7 +37,9 @@ class CommandHandler(object):
 
     def sync_from(self, endpoint):
         print "Will ask Leosac to sync from {", endpoint, "}"
-        self.socket_.send_multipart(["SYNC_FROM", endpoint])
+        ## not autocommit / autosave of configuration.
+        autocommit = struct.pack("!B", 0)
+        self.socket_.send_multipart(["SYNC_FROM", endpoint, autocommit])
         ret = self.socket_.recv_multipart()
         return ret
 

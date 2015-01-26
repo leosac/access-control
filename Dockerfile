@@ -30,9 +30,30 @@ VOLUME /docker_scripts
 ADD docker_scripts /docker_scripts
 
 
-ADD . /leosac_src
+## This is way too verbose, but we don't have a choice...
+## We want the necessary files to build, not the tests scripts and all.
+## Otherwise, just editing a test-script would cause full rebuild ...
+RUN mkdir -p /leosac_src/{cmake,cfg,docker_scripts,libmcp23s17,libpifacedigital,libzmq,scripts,spdlog,src,test,tools,zmqpp,test_helper}
+
+ADD cfg /leosac_src/cfg/
+ADD docker_scripts /leosac_src/docker_scripts/
+ADD libmcp23s17 /leosac_src/libmcp23s17/
+ADD libpifacedigital /leosac_src/libpifacedigital/
+ADD libzmq /leosac_src/libzmq/
+ADD scripts /leosac_src/scripts/
+ADD spdlog /leosac_src/spdlog/
+ADD test /leosac_src/test/
+ADD tools /leosac_src/tools/
+ADD zmqpp /leosac_src/zmqpp/
+ADD cmake /leosac_src/cmake/
+ADD src /leosac_src/src/
+ADD CMakeLists.txt /leosac_src/
+
 RUN /docker_scripts/build_leosac.sh
+
 
 CMD [""]
 
 ENTRYPOINT ["/docker_scripts/entry.sh"]
+
+ADD test_helper /leosac_src/test_helper

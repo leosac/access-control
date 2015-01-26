@@ -325,6 +325,7 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
             else
             {
                 ERROR("Error while retrieving config for module.");
+                return false;
             }
         }
         else
