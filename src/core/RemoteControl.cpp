@@ -405,8 +405,10 @@ void RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
 
     if (msg_in->remaining() == 0)
     {
-        kernel_.save_config();
-        *msg_out << "OK";
+        if (kernel_.save_config())
+            *msg_out << "OK";
+        else
+            *msg_out << "KO" << "Saving config failed for some unkown reason.";
     }
     else
     {
