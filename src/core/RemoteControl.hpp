@@ -78,7 +78,7 @@ namespace Leosac
         */
         void general_config(ConfigManager::ConfigFormat cfg_format, zmqpp::message *msg_out);
 
-        void sync_from(const std::string &endpoint, zmqpp::message *message_out);
+        void sync_from(const std::string &endpoint, const std::string &remote_server_pk, zmqpp::message *message_out);
 
         /**
         * Register by core and called when message arrives.

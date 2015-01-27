@@ -149,15 +149,18 @@ malicious unit can cause to overwrite **any** file in your filesystem (if Leosac
 
 From Client to Server:
 
-Frame    | Content                                      | Type
----------|----------------------------------------------|---------------------------------
-1        | "SYNC_FROM"                                  | `string`
-2        | The endpoint to sync from: "tcp://IP:PORT"   | `string`
-3        | Autocommit (aka writing conf to disk) 1 | 0  | `uint8_t`
+Frame    | Content                                           | Type
+---------|---------------------------------------------------|---------------------------------
+1        | "SYNC_FROM"                                       | `string`
+2        | The endpoint to sync from: "tcp://IP:PORT"        | `string`
+3        | Autocommit (aka writing conf to disk) `1` or `0`  | `uint8_t`
+4        | Remote Leosac server key                          | `string`
 
 If the 3rd frame has a value of `1`, we will write the new configuration to disk as soon as the
 synchronisation is done.
 
+The 4th frame is the z85 encoded public key of the remote Leosac server. This is an additional
+security to make sure you are connecting to the server expect to connect to.
 
 From Server to Client (if **no error occurred**):
 

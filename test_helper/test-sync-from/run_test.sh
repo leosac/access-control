@@ -28,7 +28,7 @@ sleep 5s
 
 SUM=$(md5sum $config_file)
 
-(${REMOTE_CONTROL} "127.0.0.1:12345" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' "sync_from" "tcp://127.0.0.1:12346"
+(${REMOTE_CONTROL} "127.0.0.1:12345" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' "sync_from" "tcp://127.0.0.1:12346" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT';
     sleep $SLEEP_TIME
     kill $(cat pid-file)
 )&

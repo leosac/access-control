@@ -17,7 +17,7 @@ class CommandHandler(object):
         elif (cmd == "module_config"):
             return self.handle_module_config(self.argv_[self.argv_offset])
         elif (cmd == "sync_from"):
-            return self.sync_from(self.argv_[self.argv_offset])
+            return self.sync_from(self.argv_[self.argv_offset], self.argv_[self.argv_offset + 1])
         elif (cmd == "save"):
             return self.handle_save()
         elif (cmd == "general_config"):
@@ -39,11 +39,11 @@ class CommandHandler(object):
         ret = self.socket_.recv_multipart()
         return ret
 
-    def sync_from(self, endpoint):
+    def sync_from(self, endpoint, target_server_key):
         print "Will ask Leosac to sync from {", endpoint, "}"
         ## not autocommit / autosave of configuration.
         autocommit = struct.pack("!B", 0)
-        self.socket_.send_multipart(["SYNC_FROM", endpoint, autocommit])
+        self.socket_.send_multipart(["SYNC_FROM", endpoint, autocommit, target_server_key])
         ret = self.socket_.recv_multipart()
         return ret
 

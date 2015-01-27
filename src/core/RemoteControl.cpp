@@ -82,6 +82,7 @@ void RemoteControl::handle_msg()
             // therefore, the response shall be empty (except for the zmq id)
             assert(rep.parts() == 1);
             rep << "KO" << "Malformed message: " << frame1;
+            NOTICE("Received malformed message on Remote Control Interface. Message type was " << frame1);
         }
     }
     else
@@ -168,7 +169,9 @@ static bool validate_endpoint(const std::string &endpoint)
     return regex_match(endpoint, r_endpoint);
 }
 
-void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *message_out)
+void RemoteControl::sync_from(const std::string &endpoint,
+        const std::string &remote_server_pk,
+        zmqpp::message *message_out)
 {
     assert(message_out);
     zmqpp::socket sock(context_, zmqpp::socket_type::dealer);
@@ -176,7 +179,7 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
     auto kp = zmqpp::curve::generate_keypair();
     sock.set(zmqpp::socket_option::curve_secret_key, kp.secret_key);
     sock.set(zmqpp::socket_option::curve_public_key, kp.public_key);
-    sock.set(zmqpp::socket_option::curve_server_key, "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT");
+    sock.set(zmqpp::socket_option::curve_server_key, remote_server_pk);
     sock.set(zmqpp::socket_option::linger, 0);
 
     if (validate_endpoint(endpoint))
@@ -409,12 +412,16 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
 
     uint8_t autocommit;
 
-    if (msg_in->remaining() == 2)
+    if (msg_in->remaining() == 3)
     {
         std::string endpoint;
+        std::string remote_server_pubkey;
+
         *msg_in >> endpoint;
         *msg_in >> autocommit;
-        sync_from(endpoint, msg_out);
+        *msg_in >> remote_server_pubkey;
+        sync_from(endpoint, remote_server_pubkey, msg_out);
+
         if (autocommit)
         {
             INFO("Saving configuration to disk after synchronization.");
