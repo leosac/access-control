@@ -114,11 +114,6 @@ namespace Leosac
         zModuleManager &module_manager();
 
         /**
-        * Returns a const-ref to the config tree.
-        */
-        const boost::property_tree::ptree &get_config() const;
-
-        /**
         * Returns a reference to the zmqpp context create for the application.
         */
         zmqpp::context &get_context();
@@ -168,6 +163,8 @@ namespace Leosac
         */
         std::string get_full_config();
 
+        ConfigManager config_manager_;
+
         /**
         * The application ZMQ context.
         */
@@ -194,11 +191,6 @@ namespace Leosac
         zmqpp::reactor reactor_;
 
         /**
-        * Global configuration.
-        */
-        boost::property_tree::ptree config_;
-
-        /**
         * Controls core main loop.
         */
         bool is_running_;
@@ -207,8 +199,6 @@ namespace Leosac
         * Should leosac restart ?
         */
         bool want_restart_;
-
-        ConfigManager config_manager_;
 
         /**
         * Manages the different libraries (.so) we load, path to those libraries, modules instantiation.

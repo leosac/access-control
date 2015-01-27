@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 namespace Leosac
 {
@@ -37,13 +38,31 @@ namespace Leosac
     class ConfigManager
     {
     public:
-        ConfigManager(Kernel &k);
+        ConfigManager(Kernel &k, const boost::property_tree::ptree &cfg);
         virtual ~ConfigManager() = default;
         
         ConfigManager(const ConfigManager &) = delete;
         ConfigManager(ConfigManager &&) = delete;
         ConfigManager &operator=(const ConfigManager &) = delete;
         ConfigManager &operator=(ConfigManager &&) = delete;
+
+        /**
+        * Extract the current "general configuration".
+        *
+        * General configuration means anything that is not module configuration,
+        * i/e "log", "network" and "remote".
+        *
+        * @note This is part of the process to build the whole up-to-date config tree.
+        */
+        boost::property_tree::ptree get_general_config() const;
+
+        /**
+        * Return the property_tree of item inside the `<kernel>` tag (except <modules>`)
+        * that are marked exportable.
+        *
+        * See the `<sync_source>` tag in @ref general_config_main.
+        */
+        boost::property_tree::ptree get_exportable_general_config() const;
 
         /**
         * Retrieve the (current, running) configuration from the application and
@@ -75,17 +94,17 @@ namespace Leosac
             XML           = 1,
         };
 
-    private:
         /**
-        * Extract the current "general configuration".
-        *
-        * General configuration means anything that is not module configuration,
-        * i/e "log", "network" and "remote".
-        *
-        * @note This is part of the process to build the whole up-to-date config tree.
+        * Return const & on the general config tree.
         */
-        boost::property_tree::ptree get_general_config();
+        const boost::property_tree::ptree &kconfig() const;
 
+        /**
+        * Returns non-const ref to general config tree.
+        */
+        boost::property_tree::ptree &kconfig();
+
+    private:
         /**
         * Retrieve configuration ptree for a module.
         *
@@ -113,6 +132,12 @@ namespace Leosac
         * Maps a module's name to a property tree object.
         */
         std::map<std::string, boost::property_tree::ptree> modules_configs_;
+
+        /**
+        * Property tree for general configuration.
+        * This is the base config tree.
+        */
+        boost::property_tree::ptree kernel_config_;
 
     };
 }

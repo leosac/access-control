@@ -35,14 +35,13 @@ using namespace Leosac::Tools;
 using namespace Leosac;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
+        config_manager_(*this, config),
         ctx_(),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
         bus_push_(ctx_, zmqpp::socket_type::push),
-        config_(config),
         is_running_(true),
         want_restart_(false),
-        config_manager_(*this),
         module_manager_(ctx_, config_manager_),
         network_config_(nullptr),
         remote_controller_(nullptr),
@@ -131,7 +130,7 @@ void Kernel::module_manager_init()
 {
     try
     {
-        ptree plugin_dirs = config_.get_child("plugin_directories");
+        ptree plugin_dirs = config_manager_.kconfig().get_child("plugin_directories");
 
         for (const auto &plugin_dir : plugin_dirs)
         {
@@ -143,7 +142,7 @@ void Kernel::module_manager_init()
             module_manager_.addToPath(pvalue);
         }
 
-        for (const auto &module : config_.get_child("modules"))
+        for (const auto &module : config_manager_.kconfig().get_child("modules"))
         {
             std::string pname = module.first;
             assert(pname == "module");
@@ -216,7 +215,7 @@ void Kernel::factory_reset()
     // we need to restore factory config file.
     UnixShellScript script("cp -f");
 
-    std::string kernel_config_file = config_.get_child("kernel-cfg").data();
+    std::string kernel_config_file = config_manager_.kconfig().get_child("kernel-cfg").data();
     INFO("Kernel config file path = " << kernel_config_file);
     INFO("RESTORING FACTORY CONFIG");
 
@@ -231,7 +230,7 @@ void Kernel::get_netconfig()
 {
     std::ostringstream oss;
     boost::archive::binary_oarchive archive(oss);
-    auto network_config = config_.get_child("network");
+    auto network_config = config_manager_.kconfig().get_child("network");
 
     zmqpp::message response;
     boost::property_tree::save(archive, network_config, 1);
@@ -249,18 +248,18 @@ void Kernel::set_netconfig(zmqpp::message *msg)
     boost::property_tree::ptree network_config;
     boost::property_tree::load(archive, network_config, 1);
 
-    config_.erase("network");
-    config_.add_child("network", network_config);
+    config_manager_.kconfig().erase("network");
+    config_manager_.kconfig().add_child("network", network_config);
 
     // we need to add the root node to write config;
     boost::property_tree::ptree to_save;
 
-    to_save.add_child("kernel", config_);
+    to_save.add_child("kernel", config_manager_.kconfig());
     // remove path to config file.
     to_save.get_child("kernel").erase("kernel-cfg");
     try
     {
-        Leosac::Tools::propertyTreeToXmlFile(to_save, config_.get_child("kernel-cfg").data());
+        Leosac::Tools::propertyTreeToXmlFile(to_save, config_manager_.kconfig().get_child("kernel-cfg").data());
     }
     catch (std::exception &e)
     {
@@ -304,10 +303,10 @@ void Kernel::configure_logger()
     bool use_syslog                 = true;
     std::string syslog_min_level    = "WARNING";
 
-    if (config_.get_child_optional("log"))
+    if (config_manager_.kconfig().get_child_optional("log"))
     {
-        use_syslog          = config_.get_child("log").get<bool>("enable_syslog", true);
-        syslog_min_level    = config_.get_child("log").get<std::string>("min_syslog", "WARNING");
+        use_syslog          = config_manager_.kconfig().get_child("log").get<bool>("enable_syslog", true);
+        syslog_min_level    = config_manager_.kconfig().get_child("log").get<std::string>("min_syslog", "WARNING");
     }
     if (use_syslog)
     {
@@ -332,7 +331,7 @@ bool Kernel::save_config()
 {
     INFO("Saving current configuration to disk.");
     std::string full_config = Tools::propertyTreeToXml(config_manager_.get_application_config());
-    std::string cfg_file_path = config_.get<std::string>("kernel-cfg");
+    std::string cfg_file_path = config_manager_.kconfig().get<std::string>("kernel-cfg");
 
     DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
     std::ofstream cfg_file(cfg_file_path);
@@ -340,11 +339,6 @@ bool Kernel::save_config()
     if (cfg_file << full_config)
         return true;
     return false;
-}
-
-const boost::property_tree::ptree &Kernel::get_config() const
-{
-    return config_;
 }
 
 zmqpp::context &Kernel::get_context()

@@ -26,8 +26,9 @@
 
 using namespace Leosac;
 
-ConfigManager::ConfigManager(Kernel &k) :
-        kernel_(k)
+ConfigManager::ConfigManager(Kernel &k, const boost::property_tree::ptree &cfg) :
+        kernel_(k),
+        kernel_config_(cfg)
 {
 
 }
@@ -51,17 +52,43 @@ boost::property_tree::ptree ConfigManager::get_application_config()
     return app_config;
 }
 
-boost::property_tree::ptree ConfigManager::get_general_config()
+boost::property_tree::ptree ConfigManager::get_general_config() const
 {
     boost::property_tree::ptree general_cfg;
 
     for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network", "autosave"})
     {
-        auto child_opt = kernel_.get_config().get_child_optional(cfg_name);
+        auto child_opt = kernel_config_.get_child_optional(cfg_name);
         if (child_opt)
             general_cfg.add_child(cfg_name, *child_opt);
     }
     return general_cfg;
+}
+
+boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
+{
+    auto general_cfg                = get_general_config();
+    auto child_opt                  = kernel_config_.get_child_optional("sync_source");
+    std::vector<std::string> exportable_config;
+    boost::property_tree::ptree ret;
+
+    if (!child_opt)
+        return general_cfg;
+
+    for (const auto &c : *child_opt)
+    {
+        if (c.second.get_value<bool>())
+            exportable_config.push_back(c.first);
+    }
+
+    for (const auto &child : general_cfg)
+    {
+        if (std::find(exportable_config.begin(), exportable_config.end(), child.first) != exportable_config.end())
+        {
+            ret.add_child(child.first, child.second);
+        }
+    }
+   return ret;
 }
 
 void ConfigManager::update_modules_map()
@@ -146,4 +173,14 @@ zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::ConfigManager::Con
             "Bad underlying type for enum");
     msg << static_cast<uint8_t>(fmt);
     return msg;
+}
+
+const boost::property_tree::ptree &ConfigManager::kconfig() const
+{
+    return kernel_config_;
+}
+
+boost::property_tree::ptree &ConfigManager::kconfig()
+{
+    return kernel_config_;
 }
