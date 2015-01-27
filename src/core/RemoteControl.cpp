@@ -75,7 +75,14 @@ void RemoteControl::handle_msg()
     {
         auto h = command_handlers_[frame1];
 
-        h(&msg, &rep);
+        bool ret = h(&msg, &rep);
+        if (!ret)
+        {
+            // if the handler fails, that means the source message was incorrect.
+            // therefore, the response shall be empty (except for the zmq id)
+            assert(rep.parts() == 1);
+            rep << "KO" << "Malformed message: " << frame1;
+        }
     }
     else
     {
@@ -366,7 +373,7 @@ bool RemoteControl::receive_remote_config(zmqpp::socket &sock, std::map<std::str
     return true;
 }
 
-void RemoteControl::handle_module_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_module_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -377,14 +384,12 @@ void RemoteControl::handle_module_config(zmqpp::message *msg_in, zmqpp::message 
         ConfigManager::ConfigFormat format;
         *msg_in >> module_name >> format;
         module_config(module_name, format, msg_out);
+        return true;
     }
-    else
-    {
-        *msg_out << "KO" << "MALFORMED MESSAGE";
-    }
+    return false;
 }
 
-void RemoteControl::handle_module_list(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_module_list(zmqpp::message *msg_in, zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -392,14 +397,12 @@ void RemoteControl::handle_module_list(zmqpp::message *msg_in, zmqpp::message *m
     if (msg_in->remaining() == 0)
     {
         module_list(msg_out);
+        return true;
     }
-    else
-    {
-        *msg_in << "KO" << "MALFORMED MESSAGE";
-    }
+        return false;
 }
 
-void RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -417,14 +420,12 @@ void RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
             INFO("Saving configuration to disk after synchronization.");
             kernel_.save_config();
         }
+        return true;
     }
-    else
-    {
-        *msg_out << "KO" << "MALFORMED MESSAGE (SYNC_FROM)";
-    }
+    return false;
 }
 
-void RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -435,14 +436,13 @@ void RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
             *msg_out << "OK";
         else
             *msg_out << "KO" << "Saving config failed for some unkown reason.";
+
+        return true;
     }
-    else
-    {
-        *msg_out << "KO" << "Malformed message (SAVE)";
-    }
+    return false;
 }
 
-void RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -452,9 +452,7 @@ void RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message
         ConfigManager::ConfigFormat format;
         *msg_in >> format;
         general_config(format, msg_out);
+        return true;
     }
-    else
-    {
-        *msg_out << "KO" << "Malformed message (GENERAL_CONFIG)";
-    }
+    return false;
 }

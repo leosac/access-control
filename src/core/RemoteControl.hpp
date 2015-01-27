@@ -26,28 +26,38 @@ namespace Leosac
 
         /**
         * Extract and verify content from user-message and call implementation.
+        *
+        * Returning false means the source message was malformed.
         */
-        void handle_module_config(zmqpp::message *msg_in, zmqpp::message *msg_out);
+        bool handle_module_config(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
         /**
         * Extract and verify content from message and call implementation.
+        *
+        * Returning false means the source message was malformed.
         */
-        void handle_module_list(zmqpp::message *msg_in, zmqpp::message *msg_out);
+        bool handle_module_list(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
         /**
         * Extract and verify content from message and call `sync_from()`
+        *
+        * Returning false means the source message was malformed.
         */
-        void handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg_out);
+        bool handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
         /**
         * Save the current configuration to disk.
+        *
+        * Returning false means the source message was malformed.
         */
-        void handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out);
+        bool handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
         /**
         * Command handler for GENERAL_CONFIG.
+        *
+        * Returning false means the source message was malformed.
         */
-        void handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out);
+        bool handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
         /**
         * Implements the module list command.
@@ -125,7 +135,7 @@ namespace Leosac
         zmqpp::context &context_;
 
         // Function is not really void (), we use placeholder and bind.
-        using CommandHandlerMap = std::map<std::string, std::function<void(zmqpp::message *msg_in, zmqpp::message *msg_out)>>;
+        using CommandHandlerMap = std::map<std::string, std::function<bool(zmqpp::message *msg_in, zmqpp::message *msg_out)>>;
 
         CommandHandlerMap command_handlers_;
 
