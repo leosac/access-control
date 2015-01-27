@@ -20,6 +20,8 @@ class CommandHandler(object):
             return self.sync_from(self.argv_[self.argv_offset])
         elif (cmd == "save"):
             return self.handle_save()
+        elif (cmd == "general_config"):
+            return self.handle_general_config()
         else:
             print "Non-handled command: ", cmd
 
@@ -48,6 +50,14 @@ class CommandHandler(object):
     def handle_save(self):
         print "Will ask Leosac to save its config to disk"
         self.socket_.send_multipart(["SAVE"])
+        ret = self.socket_.recv_multipart()
+        return ret
+
+    def handle_general_config(self):
+        print "Will ask for the general config information"
+        # we prefer text (xml) config format.
+        cfg_format = struct.pack("!B", 1)
+        self.socket_.send_multipart(["GENERAL_CONFIG", cfg_format])
         ret = self.socket_.recv_multipart()
         return ret
 

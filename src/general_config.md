@@ -106,3 +106,29 @@ Remote Control {#remote_control}
 
 The Remote Control API is more complicated than logger or network configuration,
 and require a more in depth description. You can find it [here](@ref remote_control_main).
+
+Sync Source {#sync_source}
+==========================
+
+From all these configuration options, you may want to limit which one gets
+exported over the network when a remote command to fetch the configuration
+(GENERAL_CONFIG -- todo) are received.
+
+If no `<sync_source>` is present, export everything.
+Here is a list of exportable config tag:
+ + `<autosave>`
+ + `<plugin_directories>`
+ + `<log>`
+ + `<network>`
+ + `<remote>`
+
+Example {#sync_source_ex}
+-------------------------
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+    <sync_source>
+        <log>true</log>
+        <network>false</network>
+        <remote>false</remote>
+    </sync_source>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

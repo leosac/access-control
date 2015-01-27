@@ -88,6 +88,23 @@ Frame    | Content                                       | Type
 One module name per frame. As many frames as needed. Note that module names are standard and hardcoded in the
 module code.
 
+GENERAL_CONFIG {#remote_control_cmd_general_config}
+---------------------------------------------------
+
+The `GENERAL_CONFIG` command retrieve Leosac's general configuration. This mean the configuration
+data except the modules' configuration.
+
+It is wise to not export all the configuration. For example, the `<remote>` tag include the server
+private. You probably don't want to share this.
+To control what information are sent when receving a GENERAL_CONFIG command, see
+[the sync_source configuration option](@ref sync_source).
+
+Frame    | Content                                        | Type
+---------|------------------------------------------------|-------------------------------------------------------------
+1        | "GENERAL_CONFIG"                               | `string`
+2        | Configuration Type (boost text archive or xml) | `uint8_t`
+
+
 MODULE_CONFIG {#remote_control_cmd_module_config}
 --------------------------------------------------
 

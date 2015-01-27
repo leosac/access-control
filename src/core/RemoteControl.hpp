@@ -44,9 +44,29 @@ namespace Leosac
         */
         void handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
+        /**
+        * Command handler for GENERAL_CONFIG.
+        */
+        void handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out);
+
+        /**
+        * Implements the module list command.
+        *
+        * It fetch the list of module from the module manager object.
+        */
         void module_list(zmqpp::message *message_out);
 
+        /**
+        * Implements the MODULE_CONFIG command.
+        */
         void module_config(const std::string &module, ConfigManager::ConfigFormat cfg_format, zmqpp::message *message_out);
+
+        /**
+        * Implements GLOBAL_CONFIG API call.
+        *
+        * This returns configuration information unrelated to modules.
+        */
+        void general_config(ConfigManager::ConfigFormat cfg_format, zmqpp::message *msg_out);
 
         void sync_from(const std::string &endpoint, zmqpp::message *message_out);
 

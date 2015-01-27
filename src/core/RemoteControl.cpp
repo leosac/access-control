@@ -7,6 +7,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <tools/XmlPropertyTree.hpp>
 
 using namespace Leosac;
 
@@ -42,6 +44,9 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
             std::placeholders::_2);
 
     command_handlers_["SAVE"] = std::bind(&RemoteControl::handle_save, this, std::placeholders::_1,
+            std::placeholders::_2);
+
+    command_handlers_["GENERAL_CONFIG"] = std::bind(&RemoteControl::handle_general_config, this, std::placeholders::_1,
             std::placeholders::_2);
 
     socket_.set(zmqpp::socket_option::curve_server, true);
@@ -131,6 +136,25 @@ void RemoteControl::module_config(const std::string &module, ConfigManager::Conf
     }
 }
 
+void RemoteControl::general_config(ConfigManager::ConfigFormat cfg_format, zmqpp::message *msg_out)
+{
+    assert(msg_out);
+
+    auto cfg = kernel_.config_manager().get_exportable_general_config();
+
+    if (cfg_format == ConfigManager::ConfigFormat::BOOST_ARCHIVE)
+    {
+        std::ostringstream oss;
+        boost::archive::text_oarchive archive(oss);
+        boost::property_tree::save(archive, cfg, 1);
+        msg_out->add(oss.str());
+    }
+    else
+    {
+        msg_out->add(Tools::propertyTreeToXml(cfg));
+    }
+}
+
 static bool validate_endpoint(const std::string &endpoint)
 {
     static const boost::regex r_endpoint("tcp://((\\d{1,3}\\.){3}\\d{1,3}):\\d+");
@@ -164,7 +188,9 @@ void RemoteControl::sync_from(const std::string &endpoint, zmqpp::message *messa
         if (gather_remote_config(sock, start_list, stop_list))
         {
             for (const std::string &m : stop_list)
+            {
                 kernel_.module_manager().stopModule(m);
+            }
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
             for (const std::string &m : start_list)
@@ -413,5 +439,22 @@ void RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
     else
     {
         *msg_out << "KO" << "Malformed message (SAVE)";
+    }
+}
+
+void RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
+{
+    assert(msg_in);
+    assert(msg_out);
+
+    if (msg_in->remaining() == 1)
+    {
+        ConfigManager::ConfigFormat format;
+        *msg_in >> format;
+        general_config(format, msg_out);
+    }
+    else
+    {
+        *msg_out << "KO" << "Malformed message (GENERAL_CONFIG)";
     }
 }
