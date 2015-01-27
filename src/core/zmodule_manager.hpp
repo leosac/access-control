@@ -139,7 +139,7 @@ public:
     void stopModules();
 
     /**
-    * Stop a module by name.
+    * Stop a module by name and remove its config info from the config manager.
     * @note This does not unload the underlying shared library.
     * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
     *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
@@ -148,7 +148,7 @@ public:
     bool stopModule(const std::string &name);
 
     /**
-    * Stop a specific module.
+    * Stop a specific module and remove its config info from the config manager.
     * @note This does not unload the underlying shared library.
     * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
     *       It's recommended to also stop modules that depends on the module you initially wanted to stop.

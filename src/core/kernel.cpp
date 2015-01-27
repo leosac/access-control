@@ -35,7 +35,7 @@ using namespace Leosac::Tools;
 using namespace Leosac;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
-        config_manager_(*this, config),
+        config_manager_(config),
         ctx_(),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),

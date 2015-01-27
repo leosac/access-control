@@ -26,8 +26,7 @@
 
 using namespace Leosac;
 
-ConfigManager::ConfigManager(Kernel &k, const boost::property_tree::ptree &cfg) :
-        kernel_(k),
+ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg) :
         kernel_config_(cfg)
 {
 
@@ -35,18 +34,18 @@ ConfigManager::ConfigManager(Kernel &k, const boost::property_tree::ptree &cfg) 
 
 boost::property_tree::ptree ConfigManager::get_application_config()
 {
-    update_modules_map();
     boost::property_tree::ptree app_config;
     boost::property_tree::ptree modules_config;
 
     app_config.add_child("kernel", get_general_config());
 
     std::string module_name;
+    boost::property_tree::ptree tree;
     std::shared_ptr<zmqpp::socket> sock;
-    for (auto &it : modules_sockets_)
+    for (auto &it : modules_configs_)
     {
-        std::tie(module_name, sock) = it;
-        modules_config.add_child("module", get_module_config(module_name));
+        std::tie(module_name, tree) = it;
+        modules_config.add_child("module", load_config(module_name));
     }
     app_config.get_child("kernel").add_child("modules", modules_config);
     return app_config;
@@ -89,48 +88,6 @@ boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
         }
     }
    return ret;
-}
-
-void ConfigManager::update_modules_map()
-{
-    std::vector<std::string> modules = kernel_.module_manager().modules_names();
-
-    // create socket for modules.
-    for (const std::string &module : modules)
-    {
-        if (modules_sockets_.count(module))
-        {
-            // we disconnect-reconnect. This is inproc so its fast. It prevents trouble when a module
-            // has been reloaded.
-            modules_sockets_[module]->disconnect("inproc://module-" + module);
-            modules_sockets_[module]->connect("inproc://module-" + module);
-        }
-        else
-        {
-            modules_sockets_[module] = std::make_shared<zmqpp::socket>(kernel_.get_context(), zmqpp::socket_type::req);
-            modules_sockets_[module]->connect("inproc://module-" + module);
-        }
-    }
-}
-
-boost::property_tree::ptree ConfigManager::get_module_config(std::string const &module)
-{
-    auto sock_ptr = modules_sockets_[module];
-    assert(sock_ptr);
-
-    // get config as a serialized ptree.
-    sock_ptr->send(zmqpp::message() << "DUMP_CONFIG" << ConfigFormat::BOOST_ARCHIVE);
-
-    std::string tmp;
-    sock_ptr->receive(tmp);
-
-    std::istringstream iss(tmp);
-    boost::archive::text_iarchive archive(iss);
-    boost::property_tree::ptree cfg;
-    boost::property_tree::load(archive, cfg, 1);
-
-    modules_configs_[module] = cfg;
-    return cfg;
 }
 
 bool ConfigManager::store_config(std::string const &module,
@@ -183,4 +140,14 @@ const boost::property_tree::ptree &ConfigManager::kconfig() const
 boost::property_tree::ptree &ConfigManager::kconfig()
 {
     return kernel_config_;
+}
+
+bool ConfigManager::remove_config(const std::string &module)
+{
+    if (modules_configs_.find(module) != modules_configs_.end())
+    {
+        modules_configs_.erase(module);
+        return true;
+    }
+    return false;
 }

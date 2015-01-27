@@ -32,13 +32,16 @@ namespace Leosac
 
     /**
     * That class helps manage the configuration for the application and its module.
-    * It's goal is to help saving the configuration and to extract the runtime configuration
-    * from each module.
+    * It's goal is to help saving the configuration to be used to maintain each module configuration.
+    *
+    * The `load_config()` and `store_config()` are used to retrive or update module config.
+    * For example, when remote control is doing a SYNC_FROM, it pushes the new config
+    * to the ConfigManager using `store_config()`.
     */
     class ConfigManager
     {
     public:
-        ConfigManager(Kernel &k, const boost::property_tree::ptree &cfg);
+        ConfigManager(const boost::property_tree::ptree &cfg);
         virtual ~ConfigManager() = default;
         
         ConfigManager(const ConfigManager &) = delete;
@@ -68,7 +71,8 @@ namespace Leosac
         * Retrieve the (current, running) configuration from the application and
         * its modules.
         *
-        * This is done by asking every module to dump their current configuration.
+        * Since the ConfigManager shall have an up-to-date view of the modules' configuration
+        * tree, it can build a global config tree.
         * It returns a proper property tree that can be serialized.
         */
         boost::property_tree::ptree get_application_config();
@@ -84,6 +88,13 @@ namespace Leosac
         * Return the stored configuration for a given module.
         */
         const boost::property_tree::ptree &load_config(const std::string &module) const;
+
+        /**
+        * Remove the config entry for the module named module.
+        *
+        * Return true if successfully removed entry, false otherwise.
+        */
+        bool remove_config(const std::string &module);
 
         /**
         * This enum is used internally, when core request module configuration.
@@ -105,29 +116,6 @@ namespace Leosac
         boost::property_tree::ptree &kconfig();
 
     private:
-        /**
-        * Retrieve configuration ptree for a module.
-        *
-        * This also update the cached config data stored in `modules_configs_`.
-        *
-        * @note This will send a internal message to the module to retrieve up-to-date configuration.
-        * @note This is different from `load_config()` that simply returns stored data.
-        */
-        boost::property_tree::ptree get_module_config(const std::string &module);
-
-        /**
-        * Use the module manager to get an up-to-date list of running modules
-        * and adapts its module_sockets_ map accordingly.
-        */
-        void update_modules_map();
-
-        Kernel &kernel_;
-
-        /**
-        * Maps a module's name to a socket.
-        */
-        std::map<std::string, std::shared_ptr<zmqpp::socket>> modules_sockets_;
-
         /**
         * Maps a module's name to a property tree object.
         */

@@ -181,6 +181,7 @@ void zModuleManager::stopModule(ModuleInfo *modinfo)
         INFO("Will now stop module " << modinfo->name_);
         modinfo->actor_->stop(true);
         modinfo->actor_ = nullptr;
+        config_manager_.remove_config(modinfo->name_);
     }
     else
     {
@@ -193,6 +194,7 @@ bool zModuleManager::stopModule(const std::string &name)
     if (ModuleInfo *ptr = find_module_by_name(name))
     {
         stopModule(ptr);
+        config_manager_.remove_config(name);
         return true;
     }
     else
