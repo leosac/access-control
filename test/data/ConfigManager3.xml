@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<kernel>
+
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <log>
+        <enable_syslog>true</enable_syslog>
+        <min_syslog>INFO</min_syslog>
+    </log>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <!-- Since we have a `sync_source` tag, everything should be false -->
+    <sync_source>
+        <network>false</network>
+    </sync_source>
+</kernel>

@@ -45,12 +45,16 @@ namespace Leosac
 
                 cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager2.xml");
                 cfg2 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
+
+                cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager3.xml");
+                cfg3 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
             }
 
         protected:
             std::shared_ptr<ConfigManager> cfg0;
             std::shared_ptr<ConfigManager> cfg1;
             std::shared_ptr<ConfigManager> cfg2;
+            std::shared_ptr<ConfigManager> cfg3;
         };
 
 
@@ -116,6 +120,19 @@ namespace Leosac
             ASSERT_TRUE(c1);
             ASSERT_TRUE(c2);
             ASSERT_TRUE(c3);
+        }
+
+        TEST_F(ConfigManagerTest, build_safe_cfg3)
+        {
+            auto cfg = cfg3->get_exportable_general_config();
+
+            auto c1 = cfg.get_child_optional("plugin_directories");
+            auto c2 = cfg.get_child_optional("log");
+            auto c3 = cfg.get_child_optional("network");
+
+            ASSERT_FALSE(c1);
+            ASSERT_FALSE(c2);
+            ASSERT_FALSE(c3);
         }
     }
 }
