@@ -104,6 +104,13 @@ Frame    | Content                                        | Type
 1        | "GENERAL_CONFIG"                               | `string`
 2        | Configuration Type (boost text archive or xml) | `uint8_t`
 
+Response
+
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------------------------
+1        | "OK"                                          | `string`
+2        | Configuration Content                         | `string`
+
 
 MODULE_CONFIG {#remote_control_cmd_module_config}
 --------------------------------------------------

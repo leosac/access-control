@@ -155,10 +155,12 @@ void RemoteControl::general_config(ConfigManager::ConfigFormat cfg_format, zmqpp
         std::ostringstream oss;
         boost::archive::text_oarchive archive(oss);
         boost::property_tree::save(archive, cfg, 1);
+        msg_out->add("OK");
         msg_out->add(oss.str());
     }
     else
     {
+        msg_out->add("OK");
         msg_out->add(Tools::propertyTreeToXml(cfg));
     }
 }
