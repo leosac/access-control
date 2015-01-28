@@ -41,5 +41,18 @@ namespace Leosac
         * Convert a property tree to an xml formatted string.
         */
         std::string propertyTreeToXml(const boost::property_tree::ptree &tree);
+
+        /**
+        * Convert a boost text archive, whose content is represented as a string (data) to
+        * a property tree.
+        *
+        * If this failed for any reason, return false.
+        * Otherwise returns true.
+        * This function does not throw.
+        */
+        bool boost_text_archive_to_ptree(const std::string &data, boost::property_tree::ptree &tree) noexcept;
+
+
+        void toto() noexcept;
     }
 }

@@ -17,9 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/serialization/string.hpp>
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include "exception/configexception.hpp"
 #include "XmlPropertyTree.hpp"
+#include "log.hpp"
 
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;
@@ -71,4 +75,23 @@ std::string Leosac::Tools::propertyTreeToXml(const boost::property_tree::ptree &
         std::throw_with_nested(std::runtime_error("Failed to serialize ptree"));
     }
     return ss.str();
+}
+
+bool Leosac::Tools::boost_text_archive_to_ptree(const std::string &data, boost::property_tree::ptree &tree) noexcept
+{
+    boost::property_tree::ptree cfg;
+    std::istringstream iss(data);
+
+    try
+    {
+        boost::archive::text_iarchive archive(iss);
+        boost::property_tree::load(archive, cfg, 1);
+        std::swap(cfg, tree);
+        return true;
+    }
+    catch (std::exception &e)
+    {
+        ERROR("Exception while extracting boost archive (as string) to property tree: " << e.what());
+        return false;
+    }
 }
