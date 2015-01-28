@@ -179,6 +179,7 @@ void zModuleManager::stopModule(ModuleInfo *modinfo)
     if (modinfo->actor_)
     {
         INFO("Will now stop module " << modinfo->name_);
+        // fixme i believe we may have a potential deadlock here.
         modinfo->actor_->stop(true);
         modinfo->actor_ = nullptr;
         config_manager_.remove_config(modinfo->name_);

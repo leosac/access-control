@@ -3,6 +3,7 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <core/config/ConfigManager.hpp>
+#include <stdint-gcc.h>
 
 namespace Leosac
 {
@@ -78,7 +79,8 @@ namespace Leosac
         */
         void general_config(ConfigManager::ConfigFormat cfg_format, zmqpp::message *msg_out);
 
-        void sync_from(const std::string &endpoint, const std::string &remote_server_pk, zmqpp::message *message_out);
+        void sync_from(const std::string &endpoint, const std::string &remote_server_pk,
+                uint8_t sync_general_config, zmqpp::message *message_out);
 
         /**
         * Register by core and called when message arrives.

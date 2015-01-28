@@ -96,7 +96,7 @@ data except the modules' configuration.
 
 It is wise to not export all the configuration. For example, the `<remote>` tag include the server
 private. You probably don't want to share this.
-To control what information are sent when receving a GENERAL_CONFIG command, see
+To control what information are sent when receiving a GENERAL_CONFIG command, see
 [the sync_source configuration option](@ref sync_source).
 
 Frame    | Content                                        | Type
@@ -110,6 +110,8 @@ Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------------------------
 1        | "OK"                                          | `string`
 2        | Configuration Content                         | `string`
+
+The response is either a boost text archive, or xml.
 
 
 MODULE_CONFIG {#remote_control_cmd_module_config}
@@ -162,12 +164,22 @@ Frame    | Content                                           | Type
 2        | The endpoint to sync from: "tcp://IP:PORT"        | `string`
 3        | Autocommit (aka writing conf to disk) `1` or `0`  | `uint8_t`
 4        | Remote Leosac server key                          | `string`
+5        | Also sync general config (`1` or `0`).            | `uint8_t`
 
 If the 3rd frame has a value of `1`, we will write the new configuration to disk as soon as the
 synchronisation is done.
 
 The 4th frame is the z85 encoded public key of the remote Leosac server. This is an additional
 security to make sure you are connecting to the server expect to connect to.
+
+The 5th frame is a flag to tell if the general config should also be sync.
+If not set, only modules list (and their configuration) would be synchronised.
+If set to `1`, the general configuration will also be synchronized (honoring `sync_from` and `sync_dest` TODO).
+
+Notes: If only the modules (and their config) are synchronised, Leosac will reload them on the fly. However,
+if the general configuration data (network, logger cfg, remote control configuration) are to be synchronized to, 
+Leosac will restart in order to apply the changes.
+
 
 From Server to Client (if **no error occurred**):
 
