@@ -115,6 +115,13 @@ namespace Leosac
         */
         boost::property_tree::ptree &kconfig();
 
+        /**
+        * Update Leosac's core config ptree.
+        *
+        * This will have no effect, unless when saving configuration to disk.
+        */
+        void set_kconfig(const boost::property_tree::ptree &new_cfg);
+
     private:
         /**
         * Maps a module's name to a property tree object.

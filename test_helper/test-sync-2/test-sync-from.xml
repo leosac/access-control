@@ -5,6 +5,8 @@
         <plugindir>./install/lib/leosac/auth</plugindir>
     </plugin_directories>
 
+    <autosave>true</autosave>
+
     <network>
         <enabled>false</enabled>
     </network>
@@ -15,12 +17,11 @@
         <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
     </remote>
 
-    <!-- Only enable sharing of the "plugin_directories" global config option -->
-    <sync_source>
-        <plugin_directories>true</plugin_directories>
-        <remote>false</remote>
-        <network>false</network>
-    </sync_source>
+    <sync_dest>
+        <log>true</log>
+    </sync_dest>
 
-    <modules></modules>
+    <modules>
+    </modules>
+
 </kernel>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- Works with ConfigManager5.xml. The tests are here to check that we can properly
+merge those config file, and that the merge honor <sync_dest>
+-->
+<kernel>
+
+    <!-- Normal kernel-cfg is set by leosac core. Since we are unit testing,
+    we fake it and add it ourselves -->
+    <kernel-cfg>a_random_path</kernel-cfg>
+
+    <log>
+        <enable_syslog>true</enable_syslog>
+        <min_syslog>INFO</min_syslog>
+    </log>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <remote>
+        <port>12345</port>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+    </remote>
+
+    <sync_source>
+        <log>true</log>
+        <remote>true</remote>
+    </sync_source>
+</kernel>

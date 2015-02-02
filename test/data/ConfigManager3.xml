@@ -16,6 +16,5 @@
 
     <!-- Since we have a `sync_source` tag, everything should be false -->
     <sync_source>
-        <network>false</network>
     </sync_source>
 </kernel>

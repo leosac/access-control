@@ -20,6 +20,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
+#include <tools/XmlPropertyTree.hpp>
 #include "ConfigManager.hpp"
 #include "core/kernel.hpp"
 #include "tools/log.hpp"
@@ -55,7 +56,7 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
 {
     boost::property_tree::ptree general_cfg;
 
-    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network", "autosave"})
+    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network", "autosave", "sync_dest"})
     {
         auto child_opt = kernel_config_.get_child_optional(cfg_name);
         if (child_opt)
@@ -150,4 +151,41 @@ bool ConfigManager::remove_config(const std::string &module)
         return true;
     }
     return false;
+}
+
+void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
+{
+    INFO("Attempting to set kernel config. We need to somehow merge.");
+    auto kernel_cfg_file = kernel_config_.get<std::string>("kernel-cfg");
+
+    auto child_opt                  = kernel_config_.get_child_optional("sync_dest");
+    std::vector<std::string> exportable_config;
+    boost::property_tree::ptree ret;
+
+    DEBUG("Before: " << std::endl << Leosac::Tools::propertyTreeToXml(kernel_config_));
+
+    if (!child_opt)
+    {
+        // import all
+        kernel_config_ = new_cfg;
+        kernel_config_.add("kernel-cfg", kernel_cfg_file);
+    }
+    else
+    {
+        for (const auto &c : *child_opt)
+        {
+            if (c.second.get_value<bool>())
+                exportable_config.push_back(c.first);
+        }
+
+        for (const auto &child : new_cfg)
+        {
+            if (std::find(exportable_config.begin(), exportable_config.end(), child.first) != exportable_config.end())
+            {
+                DEBUG("omg...." << child.first);
+                kernel_config_.put_child(child.first, child.second);
+            }
+        }
+    }
+    DEBUG("After: " << std::endl << Leosac::Tools::propertyTreeToXml(kernel_config_));
 }

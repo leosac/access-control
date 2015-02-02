@@ -170,3 +170,8 @@ const boost::property_tree::ptree &RemoteConfigCollector::module_config(const st
     assert(0);
     throw std::runtime_error("Code is broken: module " + name + " doesn't exist in this config map.");
 }
+
+const boost::property_tree::ptree &RemoteConfigCollector::general_config() const
+{
+    return general_config_;
+}

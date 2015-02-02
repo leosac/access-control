@@ -126,6 +126,12 @@ namespace Leosac
         */
         bool save_config();
 
+        /**
+        * Set the running_ and want_restart flag so that
+        * leosac will restart in the next main loop iteration.
+        */
+        void restart_later();
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.

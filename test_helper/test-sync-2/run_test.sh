@@ -28,14 +28,14 @@ sleep 5s
 
 SUM=$(md5sum $config_file)
 
-(${REMOTE_CONTROL} "127.0.0.1:12345" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' "sync_from" "tcp://127.0.0.1:12346" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' 0 0;
+(${REMOTE_CONTROL} "127.0.0.1:12345" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' "sync_from" "tcp://127.0.0.1:12346" 'TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT' 1 1;
     sleep $SLEEP_TIME
     kill $(cat pid-file)
 )&
 
 ## start leosac and wait for return value
 ## Use custom work directory to access the factory config file
-(valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file > leosac-log &
+(valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file &
     echo $! > pid-file;  wait $! && echo $? > exit-status) &
 
 (valgrind --error-exitcode=42 ./install/bin/leosac -k $source_cfg_file > leosac-log-2 &
@@ -64,9 +64,19 @@ echo "Process 2 finished with status" $(cat exit-status-2);
 ### Checksum should then change.
 SUM_AFTER_UPDATE=$(md5sum $config_file)
 
+echo "Dumping LOG"
+cat leosac-log
+
 if [ "${SUM_AFTER_UPDATE}" = "${SUM}" ] ; then
     echo "Config file checksum did not change. Something is wrong."
     exit 1
+fi
+
+## Also make sure we can grep "remote_config" info from the config of the
+## instance that received the SYNC_FROM command.
+if ! grep '<enable_syslog>true</enable_syslog>' $config_file ; then
+echo "Cannot grep the correct log config info from the config file. Looks like it wasn't properly synchronised"
+exit 1;
 fi
 
 die 0

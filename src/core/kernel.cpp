@@ -350,3 +350,9 @@ ConfigManager &Kernel::config_manager()
 {
     return config_manager_;
 }
+
+void Kernel::restart_later()
+{
+    want_restart_ = true;
+    is_running_ = false;
+}

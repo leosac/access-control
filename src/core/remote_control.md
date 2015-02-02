@@ -176,6 +176,10 @@ The 5th frame is a flag to tell if the general config should also be sync.
 If not set, only modules list (and their configuration) would be synchronised.
 If set to `1`, the general configuration will also be synchronized (honoring `sync_from` and `sync_dest` TODO).
 
+Syncing general config has no effect unless autocommit is set to `1`. The reason
+is that sync general config will trigger Loesac's restarts. So if the configuration
+wasn't autocommit'd it will be lost.
+
 Notes: If only the modules (and their config) are synchronised, Leosac will reload them on the fly. However,
 if the general configuration data (network, logger cfg, remote control configuration) are to be synchronized to, 
 Leosac will restart in order to apply the changes.

@@ -79,9 +79,20 @@ namespace Leosac
         */
         const std::list<std::string> &modules_list() const noexcept;
 
+        /**
+        * Returns a reference to modules and their configuration.
+        */
         const ModuleConfigMap &modules_config() const noexcept;
 
+        /**
+        * Returns the configuration for one specific module, identified by name.
+        */
         const boost::property_tree::ptree &module_config(const std::string &name) const;
+
+        /**
+        * Returns the tree for the general configuration option.
+        */
+        const boost::property_tree::ptree &general_config() const;
 
     private:
         /**

@@ -48,6 +48,12 @@ namespace Leosac
 
                 cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager3.xml");
                 cfg3 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
+
+                cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager4.xml");
+                cfg4 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
+
+                cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager5.xml");
+                cfg5 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
             }
 
         protected:
@@ -55,6 +61,8 @@ namespace Leosac
             std::shared_ptr<ConfigManager> cfg1;
             std::shared_ptr<ConfigManager> cfg2;
             std::shared_ptr<ConfigManager> cfg3;
+            std::shared_ptr<ConfigManager> cfg4;
+            std::shared_ptr<ConfigManager> cfg5;
         };
 
 
@@ -105,7 +113,7 @@ namespace Leosac
         }
 
         /**
-        * Safe as build_safe_cfg but with a second config file.
+        * Same as build_safe_cfg but with a second config file.
         * We do not declare <sync_source> there, so we should retrieve
         * everything.
         */
@@ -133,6 +141,31 @@ namespace Leosac
             ASSERT_FALSE(c1);
             ASSERT_FALSE(c2);
             ASSERT_FALSE(c3);
+        }
+
+        /**
+        * Config4 export remote and log.
+        * Config5 import remote.
+        *
+        * We must only have remote once merged.
+        */
+        TEST_F(ConfigManagerTest, test_sync_dest)
+        {
+            auto cfg = cfg4->get_exportable_general_config();
+
+            // "merge" config.
+            cfg5->set_kconfig(cfg);
+
+            // make sure sync_dest was honored.
+            auto merged_cfg = cfg5->get_general_config();
+
+            auto c1 = merged_cfg.get_child_optional("log");
+            auto c2 = merged_cfg.get_child_optional("remote");
+            auto c3 = merged_cfg.get_child_optional("plugin_directories");
+
+            ASSERT_TRUE(c1);
+            ASSERT_FALSE(c2);
+            ASSERT_TRUE(c3);
         }
     }
 }

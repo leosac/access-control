@@ -175,6 +175,15 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
     std::string error;
     if (collector.fetch_config(&error))
     {
+
+        if (sync_general_config)
+        {
+            INFO("Also syncing general configuration.");
+            // syncing the global configure requires restart.
+            kernel_.config_manager().set_kconfig(collector.general_config());
+            kernel_.restart_later();
+        }
+
         kernel_.module_manager().stopModules();
 
         // module manager code is half-broken.
@@ -236,18 +245,17 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
 
     uint8_t autocommit;
 
-    //if (msg_in->remaining() == 4)
-    if (msg_in->remaining() == 3)
+    if (msg_in->remaining() == 4)
     {
         std::string endpoint;
         std::string remote_server_pubkey;
-      //  uint8_t sync_general_config;
+        uint8_t sync_general_config;
 
         *msg_in >> endpoint;
         *msg_in >> autocommit;
         *msg_in >> remote_server_pubkey;
-        //*msg_in >> sync_general_config;
-        sync_from(endpoint, remote_server_pubkey, 0, msg_out);
+        *msg_in >> sync_general_config;
+        sync_from(endpoint, remote_server_pubkey, sync_general_config, msg_out);
 
         if (autocommit)
         {
