@@ -162,8 +162,6 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
     std::vector<std::string> exportable_config;
     boost::property_tree::ptree ret;
 
-    DEBUG("Before: " << std::endl << Leosac::Tools::propertyTreeToXml(kernel_config_));
-
     if (!child_opt)
     {
         // import all
@@ -182,10 +180,8 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
         {
             if (std::find(exportable_config.begin(), exportable_config.end(), child.first) != exportable_config.end())
             {
-                DEBUG("omg...." << child.first);
                 kernel_config_.put_child(child.first, child.second);
             }
         }
     }
-    DEBUG("After: " << std::endl << Leosac::Tools::propertyTreeToXml(kernel_config_));
 }

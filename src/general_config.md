@@ -136,6 +136,6 @@ Example {#sync_source_ex}
 Sync Dest {#sync_dest}
 ======================
 
-This is similar to `sync_from` but is on the receiver side.
+This is similar to `sync_source` but is on the receiver side.
 The tag set to true in `sync_dest` are the tag that will be update with the content from the remote server.
-The rules are the same than `sync_from`.
+The rules are the same than `sync_source`.

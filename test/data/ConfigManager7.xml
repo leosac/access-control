@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!-- Works with ConfigManager6.xml. The tests are here to check that we can properly
+merge those config file, and that the merge honor <sync_dest>
+-->
+<kernel>
+
+    <plugin_directories>
+        <plugindir>llama</plugindir>
+    </plugin_directories>
+
+    <kernel-cfg>a_random_path_2</kernel-cfg>
+
+    <!-- The corresponding file in the test suite (ConfigManager4.xml) exports
+    both log and remote. We only want to sync log.
+    -->
+    <sync_dest>
+        <log>true</log>
+    </sync_dest>
+
+    <!-- We do not sync remote, so make sure its not overwritten -->
+    <remote>
+        <port>12347</port>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+    </remote>
+</kernel>

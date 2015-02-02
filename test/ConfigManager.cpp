@@ -54,6 +54,12 @@ namespace Leosac
 
                 cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager5.xml");
                 cfg5 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
+
+                cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager6.xml");
+                cfg6 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
+
+                cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager7.xml");
+                cfg7 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
             }
 
         protected:
@@ -63,6 +69,8 @@ namespace Leosac
             std::shared_ptr<ConfigManager> cfg3;
             std::shared_ptr<ConfigManager> cfg4;
             std::shared_ptr<ConfigManager> cfg5;
+            std::shared_ptr<ConfigManager> cfg6;
+            std::shared_ptr<ConfigManager> cfg7;
         };
 
 
@@ -145,9 +153,9 @@ namespace Leosac
 
         /**
         * Config4 export remote and log.
-        * Config5 import remote.
+        * Config5 import log.
         *
-        * We must only have remote once merged.
+        * We must only have log once merged.
         */
         TEST_F(ConfigManagerTest, test_sync_dest)
         {
@@ -166,6 +174,37 @@ namespace Leosac
             ASSERT_TRUE(c1);
             ASSERT_FALSE(c2);
             ASSERT_TRUE(c3);
+        }
+
+        /**
+        * Config6 export remote and log.
+        * Config7 import log.
+        *
+        * Make sure config7's remote is not overwritten.
+        */
+        TEST_F(ConfigManagerTest, test_sync_dest2)
+        {
+            auto cfg = cfg6->get_exportable_general_config();
+
+            auto port_before = cfg.get<int>("remote.port");
+
+            ASSERT_EQ(12345, port_before);
+            // "merge" config.
+            cfg7->set_kconfig(cfg);
+
+            // make sure sync_dest was honored.
+            auto merged_cfg = cfg7->get_general_config();
+
+            auto c1 = merged_cfg.get_child_optional("log");
+            auto c2 = merged_cfg.get_child_optional("remote");
+            auto c3 = merged_cfg.get_child_optional("plugin_directories");
+
+            ASSERT_TRUE(c1);
+            ASSERT_TRUE(c2);
+            ASSERT_TRUE(c3);
+
+            auto port = (*c2).get<int>("port");
+            ASSERT_EQ(12347, port);
         }
     }
 }
