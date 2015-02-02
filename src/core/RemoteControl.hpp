@@ -3,7 +3,6 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <core/config/ConfigManager.hpp>
-#include <stdint-gcc.h>
 
 namespace Leosac
 {
