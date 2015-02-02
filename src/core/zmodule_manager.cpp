@@ -86,7 +86,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
         modinfo->actor_ = std::move(new_module);
 
         INFO("Module {" << modinfo->name_ << "} initialized. (level = " <<
-                modinfo->config_.get<int>("level", 100) << ")");
+                config_manager_.load_config(modinfo->name_).get<int>("level", 100) << ")");
     }
     catch (std::exception &e)
     {
@@ -127,12 +127,9 @@ bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
         // fixme not clean enough.
         if (UnixFs::fileExists(path_entry + "/" + filename))
         {
-            ModuleInfo module_info;
+            ModuleInfo module_info(config_manager_);
 
             module_info.name_ = module_name;
-
-            // use for level.
-            module_info.config_ = config_manager_.load_config(module_name);
 
             if (!(module_info.lib_ = load_library_file(path_entry + "/" + filename)))
                 return false;
@@ -235,18 +232,19 @@ zModuleManager::ModuleInfo::~ModuleInfo()
 
 }
 
-zModuleManager::ModuleInfo::ModuleInfo() :
+zModuleManager::ModuleInfo::ModuleInfo(const Leosac::ConfigManager &cfg) :
         lib_(nullptr),
-        actor_(nullptr)
+        actor_(nullptr),
+        cfg_(cfg)
 {
 
 }
 
-zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o)
+zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o) :
+        cfg_(o.cfg_)
 {
     actor_ = std::move(o.actor_);
     lib_ = o.lib_;
-    config_ = o.config_;
     name_ = o.name_;
 
     o.actor_ = nullptr;

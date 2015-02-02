@@ -26,6 +26,7 @@
 #include <set>
 #include <dynlib/dynamiclibrary.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <core/config/ConfigManager.hpp>
 #include "zmqpp/actor.hpp"
 
 namespace Leosac
@@ -67,7 +68,7 @@ public:
     struct ModuleInfo
     {
         ~ModuleInfo();
-        ModuleInfo();
+        ModuleInfo(const Leosac::ConfigManager &cfg);
 
         ModuleInfo(const ModuleInfo &) = delete;
         ModuleInfo &operator=(const ModuleInfo &) = delete;
@@ -90,11 +91,6 @@ public:
         mutable std::shared_ptr<DynamicLibrary> lib_;
 
         /**
-        * Config tree for the module.
-        */
-        boost::property_tree::ptree config_;
-
-        /**
         * Actor object that runs the module code.
         */
         mutable std::unique_ptr<zmqpp::actor> actor_;
@@ -106,11 +102,14 @@ public:
         */
         bool operator<(const ModuleInfo &o) const
         {
-            int level_me = config_.get<int>("level", 100);
-            int level_o = o.config_.get<int>("level", 100);
+            int level_me = cfg_.load_config(name_).get<int>("level", 100);
+            int level_o = cfg_.load_config(o.name_).get<int>("level", 100);
 
             return level_me < level_o;
         }
+
+    private:
+        const Leosac::ConfigManager &cfg_;
     };
 
     /**
