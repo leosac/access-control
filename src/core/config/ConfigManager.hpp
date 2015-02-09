@@ -44,7 +44,8 @@ namespace Leosac
         ConfigManager(const boost::property_tree::ptree &cfg);
         virtual ~ConfigManager() = default;
         
-        ConfigManager(const ConfigManager &) = delete;
+        ConfigManager(const ConfigManager &)= default;
+
         ConfigManager(ConfigManager &&) = delete;
         ConfigManager &operator=(const ConfigManager &) = delete;
         ConfigManager &operator=(ConfigManager &&) = delete;
@@ -128,6 +129,11 @@ namespace Leosac
         * Imported means added or updated when a SYNC_FROM is executed.
         */
         std::list<std::string> get_non_importable_modules() const;
+
+        /**
+        * Helper around get_non_importable_modules()
+        */
+        bool is_module_importable(const std::string &) const;
 
     private:
         /**

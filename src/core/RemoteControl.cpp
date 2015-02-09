@@ -175,6 +175,7 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
     std::string error;
     if (collector.fetch_config(&error))
     {
+        ConfigManager backup = kernel_.config_manager();
 
         if (sync_general_config)
         {
@@ -188,7 +189,17 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
 
         for (const auto &name : collector.modules_list())
         {
-            kernel_.config_manager().store_config(name, collector.module_config(name));
+            if (kernel_.config_manager().is_module_importable(name))
+            {
+                DEBUG("Updating config for {" << name << "}");
+                kernel_.config_manager().store_config(name, collector.module_config(name));
+            }
+            else
+            {   // If the module is immutable (aka conf not synchronized)
+                // we simply load its config from backup.
+                kernel_.config_manager().store_config(name, backup.load_config(name));
+            }
+
             if (!kernel_.module_manager().has_module(name))
             {   // load new module.
                 bool ret = kernel_.module_manager().loadModule(name);

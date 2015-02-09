@@ -56,7 +56,7 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
 {
     boost::property_tree::ptree general_cfg;
 
-    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network", "autosave", "sync_dest"})
+    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network", "autosave", "sync_dest", "no_import"})
     {
         auto child_opt = kernel_config_.get_child_optional(cfg_name);
         if (child_opt)
@@ -199,4 +199,10 @@ std::list<std::string> ConfigManager::get_non_importable_modules() const
         }
     }
     return ret;
+}
+
+bool ConfigManager::is_module_importable(std::string const &module_name) const
+{
+    auto lst = get_non_importable_modules();
+    return std::find(lst.begin(), lst.end(), module_name) == lst.end();
 }

@@ -218,6 +218,8 @@ namespace Leosac
         {
             auto cfg = cfg8->get_non_importable_modules();
             ASSERT_EQ(cfg, std::list<std::string>({"WIEGAND_READER", "TEST_AND_RESET"}));
+            ASSERT_FALSE(cfg8->is_module_importable("WIEGAND_READER"));
+            ASSERT_FALSE(cfg8->is_module_importable("TEST_AND_RESET"));
         }
     }
 }

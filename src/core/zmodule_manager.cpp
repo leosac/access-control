@@ -91,7 +91,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
     catch (std::exception &e)
     {
         ERROR("Unable to init module {" << modinfo->name_ << "}: " << e.what());
-        std::throw_with_nested(ModuleException("Unable to init module {" + modinfo->name_ + "}"));
+        std::throw_with_nested(ModuleException("Unable to init module {" + modinfo->name_ + "}: " + e.what()));
     }
 }
 
