@@ -27,8 +27,8 @@ reset_card    |           |            | Wiegand ID of reset card. Only useful i
 devices       |           |            | List of devices to watch for                                   | NO
 ---->         | device    |            | Watch for event sent by this device                            | YES
 ---->         | ---->     | name       | Name of the device                                             | YES
----->         | --->      | reset_card | Content / number of the card                                   | NO
----->         | --->      | test_card  | Id of the card that trigger test led/beep stuff                | NO
+---->         | ---->     | reset_card | Content / number of the card                                   | NO
+---->         | ---->     | test_card  | Id of the card that trigger test led/beep stuff                | NO
 
 About `promisc` mode: It will listen to everything on the message bus to try and detect the reset card.
 This comes at a little performance cost because we watch way more message than needed. However, this

@@ -60,6 +60,9 @@ namespace Leosac
 
                 cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager7.xml");
                 cfg7 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
+
+                cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager8.xml");
+                cfg8 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));
             }
 
         protected:
@@ -71,6 +74,7 @@ namespace Leosac
             std::shared_ptr<ConfigManager> cfg5;
             std::shared_ptr<ConfigManager> cfg6;
             std::shared_ptr<ConfigManager> cfg7;
+            std::shared_ptr<ConfigManager> cfg8;
         };
 
 
@@ -205,6 +209,15 @@ namespace Leosac
 
             auto port = (*c2).get<int>("port");
             ASSERT_EQ(12347, port);
+        }
+
+        /**
+        * Config 8 test. Test the `no_import` feature.
+        */
+        TEST_F(ConfigManagerTest, tes_no_import)
+        {
+            auto cfg = cfg8->get_non_importable_modules();
+            ASSERT_EQ(cfg, std::list<std::string>({"WIEGAND_READER", "TEST_AND_RESET"}));
         }
     }
 }

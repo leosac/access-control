@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!-- Works with ConfigManager6.xml. The tests are here to check that we can properly
+merge those config file, and that the merge honor <sync_dest>
+-->
+<kernel>
+
+    <no_import>
+        <WIEGAND_READER />
+        <TEST_AND_RESET />
+    </no_import>
+
+    <modules>
+        <module>
+            <name>STDIN_CONTROLLER</name>
+            <file>libstdin-controller.so</file>
+            <level>40</level>
+
+        </module>
+           <module>
+            <name>WIEGAND_READER</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>INSTRUMENTATION</name>
+            <file>libinstrumentation.so</file>
+            <level>105</level>
+            <module_config>
+                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+            </module_config>
+        </module>
+
+        <module>
+            <name>MONITOR</name>
+            <file>libmonitor.so</file>
+            <level>1</level>
+
+            <module_config>
+                <file-bus>MY_LOGS.txt</file-bus>
+                <verbose>true</verbose>
+            </module_config>
+        </module>
+
+        <module>
+            <name>TEST_AND_RESET</name>
+            <file>libtest-and-reset.so</file>
+            <level>101</level>
+            <module_config>
+                <devices>
+                    <device>
+                        <name>MY_WIEGAND_1</name>
+                        <reset_card>40:a0:83:80</reset_card>
+                    </device>
+                </devices>
+            </module_config>
+        </module>
+    </modules>
+</kernel>

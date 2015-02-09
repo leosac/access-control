@@ -139,3 +139,20 @@ Sync Dest {#sync_dest}
 This is similar to `sync_source` but is on the receiver side.
 The tag set to true in `sync_dest` are the tag that will be update with the content from the remote server.
 The rules are the same than `sync_source`.
+
+Non Importable Module {#non_importable_module}
+----------------------------------------------
+
+By default all modules are synchronised when using `SYNC_FROM`.
+It's however possible to prevent module configuration from being added, erased or updated.
+
+To do so, define a `<no_import>` tag in the config file.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+    <no_import>
+        <TEST_AND_RESET />
+        <ANOTHER_MODULE />
+    </no_import>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This will have the effect of leaving alone the configuration of Test and Reset and Another Module.

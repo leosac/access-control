@@ -118,9 +118,16 @@ namespace Leosac
         /**
         * Update Leosac's core config ptree.
         *
-        * This will have no effect, unless when saving configuration to disk.
+        * This function filter the new_cfg tree and does not store
+        * configuration for category that are excluded through the `sync_dest` option.
         */
         void set_kconfig(const boost::property_tree::ptree &new_cfg);
+
+        /**
+        * Returns a list of module name that should be imported.
+        * Imported means added or updated when a SYNC_FROM is executed.
+        */
+        std::list<std::string> get_non_importable_modules() const;
 
     private:
         /**

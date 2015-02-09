@@ -185,3 +185,18 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
         }
     }
 }
+
+std::list<std::string> ConfigManager::get_non_importable_modules() const
+{
+    std::list<std::string> ret;
+    const auto &no_import = kernel_config_.get_child_optional("no_import");
+
+    if (no_import)
+    {
+        for (const auto &module : *no_import)
+        {
+            ret.push_back(module.first);
+        }
+    }
+    return ret;
+}
