@@ -5,27 +5,40 @@
     </plugin_directories>
 
     <network>
-        <enabled>false</enabled>
+      <enabled>false</enabled>
     </network>
-
     <modules>
         <module>
-            <name>MONITOR</name>
-            <file>libmonitor.so</file>
-            <level>1</level>
-
+            <name>RPLETH</name>
+            <file>librpleth.so</file>
+            <level>100</level>
             <module_config>
-                <file-bus>./system_bus_log</file-bus>
-                <verbose>false</verbose>
+                <port>4242</port>
+                <reader>MY_WIEGAND_1</reader>
+                <stream_mode>true</stream_mode>
             </module_config>
         </module>
 
         <module>
-            <name>INSTRUMENTATION</name>
-            <file>libinstrumentation.so</file>
-            <level>105</level>
+            <name>LED_BUZZER</name>
+            <file>libled-buzzer.so</file>
+            <level>3</level>
             <module_config>
-                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+                <leds>
+                    <led>
+                        <name>WIEGAND1_GREEN_LED</name>
+                        <gpio>wiegand_green</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+
+                    <led>
+                        <name>WIEGAND1_BUZZER</name>
+                        <gpio>wiegand_buzzer</gpio>
+                        <default_blink_duration>2000</default_blink_duration>
+                        <default_blink_speed>100</default_blink_speed>
+                    </led>
+                </leds>
             </module_config>
         </module>
 
@@ -40,8 +53,8 @@
                         <name>MY_WIEGAND_1</name>
                         <high>wiegand_data_high</high>
                         <low>wiegand_data_low</low>
-                        <green_led></green_led>
-                        <buzzer></buzzer>
+                        <green_led>WIEGAND1_GREEN_LED</green_led>
+                        <buzzer>WIEGAND1_BUZZER</buzzer>
                     </reader>
                 </readers>
             </module_config>
@@ -52,8 +65,6 @@
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <module_config>
-                <test_led></test_led>
-                <run_on_start>false</run_on_start>
                 <devices>
                     <device>
                         <name>MY_WIEGAND_1</name>

@@ -65,6 +65,12 @@ namespace Leosac
                 void test_sequence();
 
                 /**
+                * Search the device_reset_card_ map for an entry whose value
+                * is card_id;
+                */
+                bool has_reset_card(const std::string &card_id) const;
+
+                /**
                 * REQ socket to kernel
                 */
                 zmqpp::socket kernel_sock_;
@@ -98,6 +104,8 @@ namespace Leosac
                 * Play the sequence on module startup.
                 */
                 bool run_on_start_;
+
+                bool promisc_;
             };
 
         }

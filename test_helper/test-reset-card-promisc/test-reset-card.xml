@@ -52,14 +52,9 @@
             <file>libtest-and-reset.so</file>
             <level>101</level>
             <module_config>
-                <test_led></test_led>
+                <promisc>true</promisc>
+                <reset_card>40:a0:83:80</reset_card>
                 <run_on_start>false</run_on_start>
-                <devices>
-                    <device>
-                        <name>MY_WIEGAND_1</name>
-                        <reset_card>40:a0:83:80</reset_card>
-                    </device>
-                </devices>
             </module_config>
         </module>
     </modules>
