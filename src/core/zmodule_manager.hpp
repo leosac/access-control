@@ -173,6 +173,15 @@ public:
     */
     std::vector<std::string> modules_names() const;
 
+    /**
+    * Do we have some informations about the module "name".
+    *
+    * It returns true if we have it in our modules_ list. Returning true here means
+    * that we have a shared library handler, thus meaning the module is loaded (maybe not
+    * initialized).
+    */
+    bool has_module(const std::string &name) const;
+
 private:
     /**
     * Close library handler.
@@ -181,7 +190,7 @@ private:
     */
     void unloadLibraries();
 
-    ModuleInfo *find_module_by_name(const std::string &name);
+    ModuleInfo *find_module_by_name(const std::string &name) const;
 
     /**
     * This will load (actually calling dlopen()) the library file located at full_path.

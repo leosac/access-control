@@ -1,4 +1,7 @@
 #!/bin/bash
+##
+## Test that we can reset the whole configuration.
+##
 
 [ -r ../shell_helper.sh ] || { echo "Cannot source shell_helper.sh"; exit -1; }
 source ../shell_helper.sh

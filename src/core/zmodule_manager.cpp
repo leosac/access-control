@@ -263,7 +263,7 @@ std::vector<std::string> zModuleManager::modules_names() const
     return ret;
 }
 
-zModuleManager::ModuleInfo *zModuleManager::find_module_by_name(const std::string &name)
+zModuleManager::ModuleInfo *zModuleManager::find_module_by_name(const std::string &name) const
 {
    auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
     {
@@ -273,4 +273,9 @@ zModuleManager::ModuleInfo *zModuleManager::find_module_by_name(const std::strin
     if (itr != modules_.end())
         return const_cast<ModuleInfo *>(&(*itr));
     return nullptr;
+}
+
+bool zModuleManager::has_module(const std::string &name) const
+{
+    return find_module_by_name(name) != nullptr;
 }

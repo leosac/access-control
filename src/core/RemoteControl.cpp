@@ -186,21 +186,19 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
 
         kernel_.module_manager().stopModules();
 
-        // module manager code is half-broken.
-        // so for now we iterate over the module to load, later we will be able
-        // to just call initModules();
         for (const auto &name : collector.modules_list())
         {
             kernel_.config_manager().store_config(name, collector.module_config(name));
-            if (!kernel_.module_manager().initModule(name))
-            {
-                // maybe it wasn't preloaded in the module manager.
-                // attempt to load dll and try again.
-                kernel_.module_manager().loadModule(name);
-                bool r = kernel_.module_manager().initModule(name);
-                assert(r);
+            if (!kernel_.module_manager().has_module(name))
+            {   // load new module.
+                bool ret = kernel_.module_manager().loadModule(name);
+                if (!ret)
+                    ERROR("Cannot load module " << name << "after synchronisation.");
+                assert(ret);
             }
         }
+        kernel_.module_manager().initModules();
+
         *message_out << "OK";
     }
     else

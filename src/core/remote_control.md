@@ -174,7 +174,7 @@ security to make sure you are connecting to the server expect to connect to.
 
 The 5th frame is a flag to tell if the general config should also be sync.
 If not set, only modules list (and their configuration) would be synchronised.
-If set to `1`, the general configuration will also be synchronized (honoring `sync_from` and `sync_dest` TODO).
+If set to `1`, the general configuration will also be synchronized (honoring `sync_from` and `sync_dest`).
 
 Syncing general config has no effect unless autocommit is set to `1`. The reason
 is that sync general config will trigger Loesac's restarts. So if the configuration
