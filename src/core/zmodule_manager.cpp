@@ -116,10 +116,10 @@ void zModuleManager::addToPath(const std::string &dir)
         path_.push_back(dir);
 }
 
-bool zModuleManager::loadModule(const boost::property_tree::ptree &cfg)
+bool zModuleManager::loadModule(const std::string &module_name)
 {
+    const auto &cfg = config_manager_.load_config(module_name);
     std::string filename = cfg.get_child("file").data();
-    std::string module_name = cfg.get_child("name").data();
 
     INFO("Attempting to load module nammed " << module_name << " (shared lib file = " << filename << ")");
     for (const std::string &path_entry : path_)

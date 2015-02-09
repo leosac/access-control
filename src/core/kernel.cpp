@@ -154,7 +154,7 @@ void Kernel::module_manager_init()
             // we store the conf in our ConfigManager object, the ModuleManager will use it later.
             config_manager_.store_config(module_name, module_conf);
 
-            if (!module_manager_.loadModule(module_conf))
+            if (!module_manager_.loadModule(module_name))
                 throw LEOSACException("Cannot load modules.");
         }
     }

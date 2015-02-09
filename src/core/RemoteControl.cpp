@@ -196,7 +196,7 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
             {
                 // maybe it wasn't preloaded in the module manager.
                 // attempt to load dll and try again.
-                kernel_.module_manager().loadModule(kernel_.config_manager().load_config(name));
+                kernel_.module_manager().loadModule(name);
                 bool r = kernel_.module_manager().initModule(name);
                 assert(r);
             }

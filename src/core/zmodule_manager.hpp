@@ -166,7 +166,7 @@ public:
     *
     * The first file to match (looping over the path array) will be loaded.
     */
-    bool loadModule(const boost::property_tree::ptree &cfg);
+    bool loadModule(const std::string &module_name);
 
     /**
     * Returns the list of the name of the loaded modules.
