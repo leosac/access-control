@@ -133,6 +133,24 @@ bool RemoteConfigCollector::fetch_module_config(const std::string &module_name)
         assert(result == "OK");
         assert(recv_module_name == module_name);
 
+        // process additional file.
+        if (msg.remaining() % 2 != 0)
+        {
+            ERROR("Msg has " << msg.remaining() << " remaining parts, but need a multiple of 2.");
+            return false;
+        }
+        while (msg.remaining())
+        {
+            std::string file_name;
+            std::string file_content;
+
+            msg >> file_name >> file_content;
+            additional_files_[module_name].push_back(std::make_pair(file_name, file_content));
+        }
+
+        // make sure the map is not empty event if there is no file.
+        additional_files_[module_name];
+
         if (Tools::boost_text_archive_to_ptree(config_str, config_map_[module_name]))
             return true;
     }
@@ -174,4 +192,12 @@ const boost::property_tree::ptree &RemoteConfigCollector::module_config(const st
 const boost::property_tree::ptree &RemoteConfigCollector::general_config() const
 {
     return general_config_;
+}
+
+RemoteConfigCollector::FileNameContentList const &RemoteConfigCollector::additional_files(const std::string module) const
+{
+    if (additional_files_.count(module))
+        return additional_files_.at(module);
+    assert(0);
+    throw std::runtime_error("Module doesn't exist here.");
 }

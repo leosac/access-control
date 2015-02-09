@@ -80,9 +80,11 @@ if [ "${SUM_AFTER_SAVE}" = "${SUM}" ] ; then
     exit 1
 fi
 
+cat leosac-log
+
 ## If sync was successful, we should have the file_auth.xml file
 ## in the current directory.
-AUTH_FILE_SUM_AFTER=$(md5sum auth_file.xml)
+AUTH_FILE_SUM_AFTER=$(md5sum file_auth.xml)
 
 if [ "$AUTH_FILE_SUM_AFTER" = "$AUTH_FILE_SUM" ] ; then
     echo "Auth file checksum is not the same !";

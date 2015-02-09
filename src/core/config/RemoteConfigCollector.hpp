@@ -60,6 +60,11 @@ namespace Leosac
 
         using ModuleConfigMap = std::map<std::string, boost::property_tree::ptree>;
 
+        using FileNameContentList = std::list<std::pair<std::string, std::string>>;
+        /**
+        * Map module name to a list of (file_name, file_content)
+        */
+        using ModuleAdditionalFiles = std::map<std::string, FileNameContentList>;
 
         /**
         * Fetch the complete remote configuration.
@@ -93,6 +98,8 @@ namespace Leosac
         * Returns the tree for the general configuration option.
         */
         const boost::property_tree::ptree &general_config() const;
+
+        const FileNameContentList &additional_files(const std::string module) const;
 
     private:
         /**
@@ -132,6 +139,7 @@ namespace Leosac
         ModuleConfigMap config_map_;
         boost::property_tree::ptree general_config_;
         std::list<std::string> module_list_;
+        ModuleAdditionalFiles additional_files_;
 
         // those 2 boolean are here to enforce the correct use of the object.
         // Call fetch_config() that access various config item.

@@ -193,6 +193,13 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
             {
                 DEBUG("Updating config for {" << name << "}");
                 kernel_.config_manager().store_config(name, collector.module_config(name));
+                // write additional file.
+                for (const std::pair<std::string, std::string> &file_info : collector.additional_files(name))
+                {
+                    INFO("Writing additional config file " << file_info.first);
+                    std::ofstream of(file_info.first);
+                    of << file_info.second;
+                }
             }
             else
             {   // If the module is immutable (aka conf not synchronized)
