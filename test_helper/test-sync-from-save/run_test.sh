@@ -5,6 +5,8 @@
 # will issue the SYNC_FROM command.
 #
 # We test the SAVE command too.
+# We load the auth_file module to check propagation and saving of
+# additional config file.
 #
 # This test runs two Leosac.
 
@@ -38,14 +40,21 @@ sleep 5s
 SUM=$(md5sum $config_file)
 
 ## start leosac and wait for return value
-## Use custom work directory to access the factory config file
 (valgrind --error-exitcode=42 ./install/bin/leosac -k $config_file > leosac-log &
     echo $! > pid-file;  wait $! && echo $? > exit-status) &
 
-(valgrind --error-exitcode=42 ./install/bin/leosac -k $source_cfg_file > leosac-log-2 &
+## We must move the source-configuration to someplace else
+## because the dest will overwrite.
+source_leosac_rundir=$(mktemp -d)
+mv $TMP_DIR/this_test/file_auth.xml $source_leosac_rundir;
+AUTH_FILE_SUM=$(md5sum $source_leosac_rundir/file_auth.xml)
+
+sed -i -e 's:ROOT_PLUGIN_DIR:'"$(pwd)/install/lib"':g' $source_cfg_file;
+
+(valgrind --error-exitcode=42 ./install/bin/leosac -d $source_leosac_rundir -k $source_cfg_file > leosac-log-2 &
     echo $! > pid-file-2;  wait $! && echo $? > exit-status-2) &
 
-sleep 15s
+sleep 10s
 ## Save should have been processed by now.
 SUM_AFTER_SAVE=$(md5sum $config_file)
 
@@ -68,6 +77,15 @@ echo "Process 2 finished with status" $(cat exit-status-2);
 
 if [ "${SUM_AFTER_SAVE}" = "${SUM}" ] ; then
     echo "Config file checksum did not change. Something is wrong."
+    exit 1
+fi
+
+## If sync was successful, we should have the file_auth.xml file
+## in the current directory.
+AUTH_FILE_SUM_AFTER=$(md5sum auth_file.xml)
+
+if [ "$AUTH_FILE_SUM_AFTER" = "$AUTH_FILE_SUM" ] ; then
+    echo "Auth file checksum is not the same !";
     exit 1
 fi
 

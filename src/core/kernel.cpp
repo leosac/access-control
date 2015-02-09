@@ -160,7 +160,7 @@ void Kernel::module_manager_init()
                 std::string search_path;
 
                 search_path = boost::algorithm::join(module_manager().get_module_path(), "\n\t -> ");
-                throw LEOSACException("Cannot load modules. Search path was: " + search_path);
+                throw LEOSACException("Cannot load modules. Search path was: \n\t -> " + search_path);
             }
         }
     }

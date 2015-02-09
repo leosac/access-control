@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <kernel>
     <plugin_directories>
-        <plugindir>./install/lib/leosac</plugindir>
-        <plugindir>./install/lib/leosac/auth</plugindir>
+        <!-- we sed this in the test script -->
+        <plugindir>ROOT_PLUGIN_DIR/leosac</plugindir>
+        <plugindir>ROOT_PLUGIN_DIR/leosac/auth</plugindir>
     </plugin_directories>
 
     <network>
@@ -51,6 +52,26 @@
                         <buzzer></buzzer>
                     </reader>
                 </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>AUTH_FILE</name>
+            <file>libauth-file.so</file>
+            <level>41</level>
+
+            <module_config>
+                <instances>
+                    <!-- Multiple authentication instance are allowed -->
+                    <instance>
+                        <name>AUTH_CONTEXT_1</name>
+
+                        <!-- Device we watch as input source -->
+                        <auth_source>MY_WIEGAND_1</auth_source>
+                        <config_file>file_auth.xml</config_file>
+                        <target>doorA</target>
+                    </instance>
+                </instances>
             </module_config>
         </module>
 
