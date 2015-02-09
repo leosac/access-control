@@ -28,6 +28,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -155,7 +156,12 @@ void Kernel::module_manager_init()
             config_manager_.store_config(module_name, module_conf);
 
             if (!module_manager_.loadModule(module_name))
-                throw LEOSACException("Cannot load modules.");
+            {
+                std::string search_path;
+
+                search_path = boost::algorithm::join(module_manager().get_module_path(), "\n\t -> ");
+                throw LEOSACException("Cannot load modules. Search path was: " + search_path);
+            }
         }
     }
     catch (ptree_error &e)

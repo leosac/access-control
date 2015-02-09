@@ -48,6 +48,14 @@ static int set_working_directory(RuntimeOptions &opts) noexcept
     return ret;
 }
 
+static std::string my_getpwd()
+{
+    std::unique_ptr<char, void(*)(void *)> pwd(get_current_dir_name(), free);
+    assert(pwd);
+
+    return std::string(pwd.get());
+}
+
 int main(int argc, const char **argv)
 {
     RuntimeOptions options;

@@ -182,6 +182,11 @@ public:
     */
     bool has_module(const std::string &name) const;
 
+    /**
+    * Return the list of paths where we search for module.
+    */
+    const std::vector<std::string> &get_module_path() const;
+
 private:
     /**
     * Close library handler.

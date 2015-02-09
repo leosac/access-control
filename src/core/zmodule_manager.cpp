@@ -279,3 +279,8 @@ bool zModuleManager::has_module(const std::string &name) const
 {
     return find_module_by_name(name) != nullptr;
 }
+
+std::vector<std::string> const &zModuleManager::get_module_path() const
+{
+    return path_;
+}
