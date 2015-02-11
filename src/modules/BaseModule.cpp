@@ -83,17 +83,14 @@ void BaseModule::dump_config(ConfigManager::ConfigFormat fmt, zmqpp::message *ou
     {
         out_msg->add(propertyTreeToXml(config_));
     }
-    DEBUG("NB_FRAMES = " << out_msg->parts());
     try
     {
         dump_additional_config(out_msg);
     }
     catch (std::exception &e)
     {
-        ERROR("ERROR: " << e.what());
+        ERROR("Problem while dumping config: " << e.what());
     }
-
-    DEBUG("NB_FRAMES = " << out_msg->parts());
 }
 
 void BaseModule::handle_control()

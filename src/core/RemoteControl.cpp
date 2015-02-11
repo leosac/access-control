@@ -32,8 +32,10 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
     secret_key_ = cfg.get<std::string>("secret_key");
     public_key_ = cfg.get<std::string>("public_key");
 
-    INFO("Binding RemoteControl socket to port " << port);
-    INFO("Use private key {" << secret_key_ << "} and public key {" << public_key_ << "}");
+    INFO("Enabling Remote Control:"
+            << "\n\t " << "Port: " << port
+            << "\n\t " << "Public Key: " << public_key_
+            << "\n\t " << "Private Key: " << secret_key_);
 
     command_handlers_["MODULE_CONFIG"] = std::bind(&RemoteControl::handle_module_config, this, std::placeholders::_1,
             std::placeholders::_2);
@@ -65,12 +67,11 @@ void RemoteControl::handle_msg()
     socket_.receive(msg);
 
     assert(msg.parts() > 1);
-    DEBUG("PARTS = " << msg.parts());
     msg >> source;
     rep << source;
 
     msg >> frame1;
-    DEBUG("Cmd = {" << frame1 << "}");
+    DEBUG("Remote Control command: " << frame1 << " with " << msg.parts() << " parts");
 
     if (command_handlers_.find(frame1) != command_handlers_.end())
     {
@@ -83,16 +84,15 @@ void RemoteControl::handle_msg()
             // therefore, the response shall be empty (except for the zmq id)
             assert(rep.parts() == 1);
             rep << "KO" << "Malformed message: " << frame1;
-            NOTICE("Received malformed message on Remote Control Interface. Message type was " << frame1);
+            WARN("Received malformed message on Remote Control Interface. Message type was " << frame1);
         }
     }
     else
     {
         rep << "KO" << "UNKOWN MESSAGE";
-        WARN("UNKNOWN MESSAGE ON REMOTE CONTROL INTERFACE");
+        WARN("Unknown message on Remote Control interface");
     }
 
-    DEBUG("Sending response, " << rep.parts() << " frames");
     socket_.send(rep);
 }
 
@@ -116,11 +116,9 @@ void RemoteControl::module_config(const std::string &module, ConfigManager::Conf
         zmqpp::socket sock(context_, zmqpp::socket_type::req);
         sock.connect("inproc://module-" + module);
 
-        // ask for a binary dump
         bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << cfg_format);
-
-
         assert(ret);
+
         zmqpp::message rep;
 
         sock.receive(rep);
@@ -191,7 +189,7 @@ void RemoteControl::sync_from(const std::string &endpoint, const std::string &re
         {
             if (kernel_.config_manager().is_module_importable(name))
             {
-                DEBUG("Updating config for {" << name << "}");
+                INFO("Updating config for {" << name << "}");
                 kernel_.config_manager().store_config(name, collector.module_config(name));
                 // write additional file.
                 for (const std::pair<std::string, std::string> &file_info : collector.additional_files(name))

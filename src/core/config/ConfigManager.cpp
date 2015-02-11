@@ -42,7 +42,6 @@ boost::property_tree::ptree ConfigManager::get_application_config()
 
     std::string module_name;
     boost::property_tree::ptree tree;
-    std::shared_ptr<zmqpp::socket> sock;
     for (auto &it : modules_configs_)
     {
         std::tie(module_name, tree) = it;

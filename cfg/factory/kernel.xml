@@ -26,7 +26,7 @@
             <level>1</level>
 
             <module_config>
-                <file>MY_LOGS.txt</file>
+                <file-bus>MY_LOGS.txt</file-bus>
                 <verbose>false</verbose>
             </module_config>
         </module>
