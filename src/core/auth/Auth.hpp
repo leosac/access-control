@@ -33,7 +33,18 @@ namespace Leosac
             * You can find out more [here](@ref auth_data_type).
             */
             SIMPLE_WIEGAND = 1,
+
+            /**
+            * When a reader sends 4bits per key press.
+            */
+            WIEGAND_PIN_4BITS = 2,
         };
+
+        /**
+        * Convert a string to a Source Type.
+        * The name shall match the enum's name
+        */
+        SourceType source_type_from_string(const std::string &t);
 
         enum class AccessStatus : uint8_t
         {

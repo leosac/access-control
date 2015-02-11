@@ -9,6 +9,6 @@ set -e
 mkdir -p /tmp/leosac_build;
 pushd /tmp/leosac_build;
 
-cmake /leosac_src && make -j2 && make install
+cmake /leosac_src && make -j5 && make install
 
 popd;

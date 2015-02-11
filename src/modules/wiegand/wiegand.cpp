@@ -23,6 +23,7 @@
 #include <tools/log.hpp>
 #include <zmqpp/context.hpp>
 #include <fcntl.h>
+#include <core/auth/Auth.hpp>
 #include "wiegand.hpp"
 #include "zmqpp/actor.hpp"
 
@@ -69,15 +70,17 @@ void WiegandReaderModule::process_config()
     {
         boost::property_tree::ptree reader_cfg = node.second;
 
-        std::string reader_name = reader_cfg.get_child("name").data();
-        std::string gpio_high = reader_cfg.get_child("high").data();
-        std::string gpio_low = reader_cfg.get_child("low").data();
-        std::string buzzer_name = reader_cfg.get<std::string>("buzzer", "");
-        std::string greenled_name = reader_cfg.get<std::string>("green_led", "");
+        std::string reader_name     = reader_cfg.get_child("name").data();
+        std::string gpio_high       = reader_cfg.get_child("high").data();
+        std::string gpio_low        = reader_cfg.get_child("low").data();
+        std::string buzzer_name     = reader_cfg.get<std::string>("buzzer", "");
+        std::string greenled_name   = reader_cfg.get<std::string>("green_led", "");
+        std::string mode            = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
 
         INFO("Creating WiegandReader: " << reader_name << "\n\t Green Led: " << greenled_name
                 << "\n\t Buzzer: " << buzzer_name);
-        WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name);
+        WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name,
+                Leosac::Auth::source_type_from_string(mode));
         readers_.push_back(std::move(reader));
     }
 }

@@ -24,9 +24,12 @@ readers    |          |            | Lists of all configured readers            
 ---->      | ---->    | low        | name of the input GPIO that sends "low" data           | YES
 ---->      | ---->    | green_led  | name of the green led device attached to the reader    | NO
 ---->      | ---->    | buzzer     | name of the buzzer device attached to the reader       | NO
+---->      | ---->    | mode       | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
 
 **Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
 the sysfsgpio or pifacedigital module.
+
+There are multiples `mode` available for a reader. See [this](@ref auth_data_type) for more info.
 
 Example {#mod_wiegand_example}
 ------------------------------

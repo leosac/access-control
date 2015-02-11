@@ -54,3 +54,14 @@ zmqpp::message &operator>>(zmqpp::message &msg, Leosac::Auth::AccessStatus &st)
     st = static_cast<Leosac::Auth::AccessStatus>(tmp);
     return msg;
 }
+
+using namespace Leosac;
+Auth::SourceType Auth::source_type_from_string(const std::string &t)
+{
+    if ("SIMPLE_WIEGAND" == t)
+        return SourceType::SIMPLE_WIEGAND;
+    if ("WIEGAND_PIN_4BITS" == t)
+        return SourceType::WIEGAND_PIN_4BITS;
+    assert(0);
+    throw std::runtime_error("should never be here");
+}

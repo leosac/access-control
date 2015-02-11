@@ -82,8 +82,11 @@ Currently we are lucky, we only define one.
 
 1. **SIMPLE_WIEGAND** : This data type requires 2 frames:
   1. A hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"
-  1. An *integer* that holds the number of bits in the card id. 
-  
+  2. An *integer* that holds the number of bits in the card id. 
+2. **WIEGAND_PIN_4BITS**: Configuration mode used when we use the reader only for PIN code, and when
+ the reader sends 4bits per key pressed. The reading timeout after 1.5s.
+  1. A *string* that contains the PIN code. Its easier to use string, because we don't know the length
+    of the PIN code, and it may vary.
 
 Message Passing Specifications {#auth_specc}
 ============================================

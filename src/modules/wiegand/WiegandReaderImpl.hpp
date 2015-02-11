@@ -24,6 +24,7 @@
 #include "zmqpp/zmqpp.hpp"
 #include "hardware/FLED.hpp"
 #include "hardware/FBuzzer.hpp"
+#include "core/auth/Auth.hpp"
 
 namespace Leosac
 {
@@ -47,13 +48,15 @@ namespace Leosac
                 * @param data_low_pin name of the GPIO connected to data low.
                 * @param green_led_name name of the "green led" LED device.
                 * @param buzzer_name name of the buzzer device. -- no buzzer module yet.
+                * @param mode which mode the reader is using
                 */
                 WiegandReaderImpl(zmqpp::context &ctx,
                         const std::string &name,
                         const std::string &data_high_pin,
                         const std::string &data_low_pin,
                         const std::string &green_led_name,
-                        const std::string &buzzer_name);
+                        const std::string &buzzer_name,
+                        ::Leosac::Auth::SourceType mode);
 
                 ~WiegandReaderImpl();
 
@@ -134,6 +137,11 @@ namespace Leosac
                 * Read mode. Default to false.
                 */
                 bool reverse_mode_;
+
+                /**
+                * Wiegand mode.
+                */
+                ::Leosac::Auth::SourceType mode_;
             };
         }
     }

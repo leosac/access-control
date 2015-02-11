@@ -30,7 +30,8 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &data_high_pin,
         const std::string &data_low_pin,
         const std::string &green_led_name,
-        const std::string &buzzer_name) :
+        const std::string &buzzer_name,
+        Auth::SourceType mode) :
         bus_sub_(ctx, zmqpp::socket_type::sub),
         sock_(ctx, zmqpp::socket_type::rep),
         bus_push_(ctx, zmqpp::socket_type::push),
@@ -38,7 +39,8 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         name_(name),
         green_led_(nullptr),
         buzzer_(nullptr),
-        reverse_mode_(false)
+        reverse_mode_(false),
+        mode_(mode)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
@@ -69,7 +71,8 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
         sock_(std::move(o.sock_)),
         bus_push_(std::move(o.bus_push_)),
         name_(std::move(o.name_)),
-        reverse_mode_(o.reverse_mode_)
+        reverse_mode_(o.reverse_mode_),
+        mode_(o.mode_)
 {
     topic_high_ = o.topic_high_;
     topic_low_ = o.topic_low_;
