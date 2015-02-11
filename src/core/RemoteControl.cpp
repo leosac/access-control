@@ -80,7 +80,7 @@ void RemoteControl::handle_msg()
     if (command_handlers_.find(frame1) != command_handlers_.end())
     {
 
-        if (security_.allow_request(frame1, user_pubkey))
+        if (security_.allow_request(user_pubkey, frame1))
         {
             auto h = command_handlers_[frame1];
 

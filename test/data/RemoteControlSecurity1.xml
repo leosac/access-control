@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<kernel>
+
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <remote>
+        <port>12345</port>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+
+        <security>
+            <map>
+                <!-- Can do everything -->
+                <pk>Llama</pk>
+                <default>true</default>
+            </map>
+            <map>
+                <!-- Only allowed the MODULE_CONFIG command -->
+                <pk>Worm</pk>
+                <default>false</default>
+                <MODULE_CONFIG>true</MODULE_CONFIG>
+            </map>
+            <map>
+                <!-- No default means default to false. Shouldn't be able to do anything -->
+                <pk>LlamaWorm</pk>
+            </map>
+        </security>
+    </remote>
+</kernel>
