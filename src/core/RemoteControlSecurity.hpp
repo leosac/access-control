@@ -48,6 +48,11 @@ namespace Leosac
 
         std::unordered_map<std::string, bool> default_permissions_;
         KeyCommandsMap permissions_;
+
+        /**
+        * If everyone has access to everything.
+        */
+        bool unrestricted_;
     };
 }
 

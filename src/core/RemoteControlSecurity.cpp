@@ -6,7 +6,8 @@
 using namespace Leosac;
 
 RemoteControlSecurity::RemoteControlSecurity(const boost::property_tree::ptree &cfg) :
-        cfg_(cfg)
+        cfg_(cfg),
+        unrestricted_(false)
 {
     process_config();
 }
@@ -17,17 +18,21 @@ void RemoteControlSecurity::process_config()
 
     if (security_details)
     {
-
         for (const auto &entry : (*security_details))
         {
             assert(entry.first == "map");
             process_security_entry(entry.second);
         }
     }
+    else
+        unrestricted_ = true;
 }
 
 bool RemoteControlSecurity::allow_request(const std::string &user_pubkey, const std::string &req)
 {
+    if (unrestricted_)
+        return true;
+
     if (default_permissions_.count(user_pubkey) == 0 || permissions_.count(user_pubkey) == 0)
     {
         WARN("Received command from " << user_pubkey << " but no permission information for this user. Denying.");

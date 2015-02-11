@@ -21,12 +21,13 @@ section of this document.
   
 We will now present the configuration of the remote control feature.
 
-**Limitations**: There is no authentication of incoming connection yet. Everyone that manages to connect
- to the remote control socket is allowed to perform ALL available operations.
+**Limitations**: By default there is no authentication of incoming connection yet. Everyone that manages to connect
+to the remote control socket is allowed to perform ALL available operations. It is however possible to configure
+such restrictions.
 
 **Limitations**: When using the Remote Control interface to talk to each other, Leosac units
- must use the same underlying `boost::serialization` library. Otherwise serialization failure
- will arise.
+must use the same underlying `boost::serialization` library. Otherwise serialization failure
+will arise.
 
 Configuration Options {#remote_control_user_config}
 ===================================================
@@ -35,11 +36,17 @@ If no `<remote>` tag is defined in the configuration, the remote control interfa
 will be disabled.
 
 
-Options       | Options  | Options | Description                                      | Mandatory
---------------|----------|---------|--------------------------------------------------|-----------
-port          |          |         | Port to bind the remote control interface to     | YES
-secret_key    |          |         | Z85 encoded secret key                           | YES
-public_key    |          |         | Z85 encoded public key                           | YES
+Options       | Options  | Options          | Description                                      | Mandatory
+--------------|----------|------------------|--------------------------------------------------|-----------
+port          |          |                  | Port to bind the remote control interface to     | YES
+secret_key    |          |                  | Z85 encoded secret key                           | YES
+public_key    |          |                  | Z85 encoded public key                           | YES
+security      |          |                  | Restrict access to the remote control interface  | NO (default to everyone has all access)
+---->         | map      |                  | Define permission for one user                   | YES
+---->         | ---->    | pk               | Z85 public key of the remote user                | YES
+---->         | ---->    | default          | Default permission for unspecified command       | NO (defaultg to `false`)
+---->         | ---->    | COMMAND_NAME     | Name of an existing remote control command.      | NO
+---->         | ---->    | COMMAND_NAME_2   | Another existing remote control command.         | NO
 
 
 Example {#remote_control_example}
@@ -48,6 +55,7 @@ Example {#remote_control_example}
 Remote Control configuration takes place in the `<kernel>` tag. It is **not** configured
 as a module.
 
+The following example gives FULL access to anyone that can connect to the remote control socket.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
     <remote>
         <port>12345</port>
@@ -56,6 +64,34 @@ as a module.
     </remote>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The following example shows how to enable some restrictions.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   <remote>
+        <port>12345</port>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+        <security>
+            <map>
+                <!-- Can do everything -->
+                <pk>a_public_key</pk>
+                <default>true</default>
+            </map>
+            <map>
+                <!-- Only allowed the MODULE_CONFIG command -->
+                <pk>an_other_public_key</pk>
+                <default>false</default>
+                <MODULE_CONFIG>true</MODULE_CONFIG>
+                <MODULE_LIST>true</MODULE_LIST>
+            </map>
+            <map>
+                <!-- No default means default to false. Shouldn't be able to do anything -->
+                <pk>again_an_other_pubkey</pk>
+            </map>
+        </security>
+    </remote>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
 Exposed features {#remote_control_features}
 ===========================================
 

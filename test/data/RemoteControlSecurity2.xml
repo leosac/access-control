@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<kernel>
+
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <remote>
+        <port>12345</port>
+        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+
+        <!-- No security tag means NO restriction -->
+    </remote>
+</kernel>

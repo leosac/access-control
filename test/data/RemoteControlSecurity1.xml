@@ -21,6 +21,7 @@
                 <pk>Worm</pk>
                 <default>false</default>
                 <MODULE_CONFIG>true</MODULE_CONFIG>
+                <MODULE_LIST>true</MODULE_LIST>
             </map>
             <map>
                 <!-- No default means default to false. Shouldn't be able to do anything -->
