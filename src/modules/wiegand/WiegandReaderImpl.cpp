@@ -21,9 +21,12 @@
 #include <core/auth/Auth.hpp>
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
+#include "SimpleWiegandStrategy.hpp"
+#include "WiegandPin4BitsOnly.hpp"
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Hardware;
+using namespace Leosac::Auth;
 
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &name,
@@ -31,7 +34,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &data_low_pin,
         const std::string &green_led_name,
         const std::string &buzzer_name,
-        Auth::SourceType mode) :
+        SourceType mode) :
         bus_sub_(ctx, zmqpp::socket_type::sub),
         sock_(ctx, zmqpp::socket_type::rep),
         bus_push_(ctx, zmqpp::socket_type::push),
@@ -39,7 +42,6 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         name_(name),
         green_led_(nullptr),
         buzzer_(nullptr),
-        reverse_mode_(false),
         mode_(mode)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
@@ -60,6 +62,14 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
 
     if (!buzzer_name.empty())
         buzzer_ = std::unique_ptr<FBuzzer>(new FBuzzer(ctx, buzzer_name));
+
+
+    // fixme to improve
+    if (mode_ == SourceType::SIMPLE_WIEGAND)
+        strategy_ = std::unique_ptr<WiegandStrategy>(new SimpleWiegandStrategy(this));
+    else if (mode_ == SourceType::WIEGAND_PIN_4BITS)
+        strategy_ = std::unique_ptr<WiegandStrategy>(new WiegandPin4BitsOnly(this));
+
 }
 
 WiegandReaderImpl::~WiegandReaderImpl()
@@ -71,18 +81,20 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
         sock_(std::move(o.sock_)),
         bus_push_(std::move(o.bus_push_)),
         name_(std::move(o.name_)),
-        reverse_mode_(o.reverse_mode_),
-        mode_(o.mode_)
+        mode_(o.mode_),
+        strategy_(std::move(o.strategy_))
 {
     topic_high_ = o.topic_high_;
     topic_low_ = o.topic_low_;
 
     buffer_ = o.buffer_;
     counter_ = o.counter_;
-    reverse_mode_ = o.reverse_mode_;
 
     green_led_ = std::move(o.green_led_);
     buzzer_ = std::move(o.buzzer_);
+
+    // when we are move, we must update our strategy's pointer back to the "new" us.
+    strategy_->reader_ = this;
 }
 
 void WiegandReaderImpl::handle_bus_msg()
@@ -111,39 +123,8 @@ void WiegandReaderImpl::handle_bus_msg()
 
 void WiegandReaderImpl::timeout()
 {
-    if (!counter_)
-        return;
-
-    DEBUG("timeout, buffer size = " << counter_);
-    std::size_t size = ((counter_ - 1) / 8) + 1;
-
-    std::stringstream card_hex;
-    if (reverse_mode_)
-    {
-        // we need to reverse the order
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(buffer_[size - i - 1]);
-            if (i + 1 < size)
-                card_hex << ":";
-        }
-    }
-    else
-    {
-        for (std::size_t i = 0; i < size; ++i)
-        {
-            card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(buffer_[i]);
-            if (i + 1 < size)
-                card_hex << ":";
-        }
-    }
-
-    zmqpp::message msg;
-    msg << ("S_" + name_) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_hex.str() << counter_;
-    bus_push_.send(msg);
-
-    std::fill(buffer_.begin(), buffer_.end(), 0);
-    counter_ = 0;
+    assert(strategy_);
+    strategy_->timeout();
 }
 
 void WiegandReaderImpl::handle_request()

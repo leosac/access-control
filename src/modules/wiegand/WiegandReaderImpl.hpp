@@ -33,7 +33,9 @@ namespace Leosac
 
         namespace Wiegand
         {
-
+            class WiegandStrategy;
+            class WiegandPin4BitsOnly;
+            
             /**
             * An implementation class that represents a Wiegand Reader.
             * It's solely for internal use by the Wiegand module.
@@ -134,14 +136,18 @@ namespace Leosac
                 std::unique_ptr<Hardware::FBuzzer> buzzer_;
 
                 /**
-                * Read mode. Default to false.
-                */
-                bool reverse_mode_;
-
-                /**
                 * Wiegand mode.
                 */
                 ::Leosac::Auth::SourceType mode_;
+
+                /**
+                * Concrete implementation of the reader mode.
+                */
+                std::unique_ptr<WiegandStrategy> strategy_;
+
+                friend class SimpleWiegandStrategy;
+                friend class WiegandPin4BitsOnly;
+
             };
         }
     }

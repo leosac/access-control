@@ -3,6 +3,8 @@ set(WIEGAND_BIN wiegand)
 set(WIEGAND_SRCS
     wiegand.cpp
     WiegandReaderImpl.cpp
+    SimpleWiegandStrategy.cpp
+    WiegandPin4BitsOnly.cpp
 )
 
 add_library(${WIEGAND_BIN} SHARED ${WIEGAND_SRCS})
