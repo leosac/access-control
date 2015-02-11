@@ -10,6 +10,7 @@ set(LEOSAC_LIB_SRCS
     core/config/ConfigManager.cpp
     core/config/RemoteConfigCollector.cpp
     core/RemoteControl.cpp
+    core/RemoteControlSecurity.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
     core/netconfig/networkconfig.cpp

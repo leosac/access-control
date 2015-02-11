@@ -19,7 +19,8 @@ RemoteControl::RemoteControl(zmqpp::context &ctx,
         kernel_(kernel),
         socket_(ctx, zmqpp::socket_type::router),
         auth_(ctx),
-        context_(ctx)
+        context_(ctx),
+        security_(cfg)
 {
     auth_.configure_curve("CURVE_ALLOW_ANY");
     process_config(cfg);
@@ -72,19 +73,31 @@ void RemoteControl::handle_msg()
 
     msg >> frame1;
     DEBUG("Remote Control command: " << frame1 << " with " << msg.parts() << " parts");
+    std::string user_pubkey;
+    bool ret = msg.get_property("User-Id", user_pubkey);
+    assert(ret);
 
     if (command_handlers_.find(frame1) != command_handlers_.end())
     {
-        auto h = command_handlers_[frame1];
 
-        bool ret = h(&msg, &rep);
-        if (!ret)
+        if (security_.allow_request(frame1, user_pubkey))
         {
-            // if the handler fails, that means the source message was incorrect.
-            // therefore, the response shall be empty (except for the zmq id)
-            assert(rep.parts() == 1);
-            rep << "KO" << "Malformed message: " << frame1;
-            WARN("Received malformed message on Remote Control Interface. Message type was " << frame1);
+            auto h = command_handlers_[frame1];
+
+            ret = h(&msg, &rep);
+            if (!ret)
+            {
+                // if the handler fails, that means the source message was incorrect.
+                // therefore, the response shall be empty (except for the zmq id)
+                assert(rep.parts() == 1);
+                rep << "KO" << "Malformed message: " << frame1;
+                WARN("Received malformed message on Remote Control Interface. Message type was " << frame1);
+            }
+        }
+        else
+        {
+            WARN("Request denied. Insuficient permission for user " << user_pubkey << ". Command was: " << frame1);
+            rep << "KO" << "Insuficient permission";
         }
     }
     else

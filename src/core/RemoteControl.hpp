@@ -3,6 +3,7 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <core/config/ConfigManager.hpp>
+#include "RemoteControlSecurity.hpp"
 
 namespace Leosac
 {
@@ -139,6 +140,11 @@ namespace Leosac
         using CommandHandlerMap = std::map<std::string, std::function<bool(zmqpp::message *msg_in, zmqpp::message *msg_out)>>;
 
         CommandHandlerMap command_handlers_;
+
+        /**
+        * Object to check remote user permission before processing their request.
+        */
+        RemoteControlSecurity security_;
 
         // Allow kernel full access to this class.
         friend class Kernel;
