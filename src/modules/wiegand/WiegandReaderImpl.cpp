@@ -110,7 +110,9 @@ void WiegandReaderImpl::handle_bus_msg()
         }
         else if (msg == topic_low_)
         {
-            // well, nothing to do here.
+            // set the bit to 0. it doesn't cost much
+            // and is safer in case the buffer wasn't fully filled with 0.
+            buffer_[counter_ / 8] &= ~(1 << (7 - counter_ % 8));
         }
         counter_++;
     }

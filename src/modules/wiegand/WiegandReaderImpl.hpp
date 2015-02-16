@@ -35,7 +35,7 @@ namespace Leosac
         {
             class WiegandStrategy;
             class WiegandPin4BitsOnly;
-            
+
             /**
             * An implementation class that represents a Wiegand Reader.
             * It's solely for internal use by the Wiegand module.

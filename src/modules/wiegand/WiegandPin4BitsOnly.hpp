@@ -37,6 +37,12 @@ namespace Leosac
                 WiegandPin4BitsOnly(WiegandReaderImpl *reader);
 
                 virtual void timeout() override;
+
+            private:
+                std::string inputs_;
+
+                using TimePoint = std::chrono::system_clock::time_point;
+                TimePoint last_update_;
             };
         }
     }
