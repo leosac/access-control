@@ -23,7 +23,9 @@
 using namespace Leosac::Module::Wiegand;
 
 
-WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader) :
+WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader,
+        std::chrono::milliseconds pin_timeout,
+        char pin_end_key) :
         WiegandStrategy(reader)
 {
     last_update_ = std::chrono::system_clock::now();
@@ -79,7 +81,7 @@ void WiegandPin4BitsOnly::timeout()
     // 11 -> #
     if (n == 10)
         inputs_ += '*';
-    else if (n == 1)
+    else if (n == 11)
         inputs_ += '#';
     else
         inputs_ += std::to_string(n);

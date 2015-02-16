@@ -58,6 +58,12 @@ namespace Leosac
                 void process_config();
 
                 /**
+                * Internal factory that build a strategy object based upon a reader configuration.
+                */
+                std::unique_ptr<WiegandStrategy> create_strategy(const boost::property_tree::ptree &reader_config,
+                        WiegandReaderImpl *reader);
+
+                /**
                 * Vector of wiegand reader managed by this module.
                 */
                 std::vector<WiegandReaderImpl> readers_;

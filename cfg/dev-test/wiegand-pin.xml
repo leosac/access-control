@@ -2,8 +2,8 @@
 <kernel>
     <plugin_directories>
         <plugindir>.</plugindir>
-        <plugindir>/root/leosac/lib/leosac</plugindir>
-        <plugindir>/root/leosac/lib/leosac/auth</plugindir>
+        <plugindir>/leosac/lib/leosac</plugindir>
+        <plugindir>/leosac/lib/leosac/auth</plugindir>
     </plugin_directories>
 
     <network>
@@ -81,7 +81,12 @@
                         <low>wiegand_data_low</low>
                         <green_led>WIEGAND1_GREEN_LED</green_led>
                         <buzzer>WIEGAND1_BUZZER</buzzer>
+
                         <mode>WIEGAND_PIN_4BITS</mode>
+                        <mode_config>
+                            <!-- additional, per mode, configuration -->
+                        </mode_config>
+
                     </reader>
                 </readers>
             </module_config>

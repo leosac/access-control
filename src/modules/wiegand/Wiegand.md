@@ -9,27 +9,40 @@ Introduction {#mod_wiegand_intro}
 This module provides support for Wiegand devices. Simply put, it listens to GPIO event,
 gather them, and generate Wiegand events. It supports multiple readers.
 
-As this is an module that provide an authentication source (by reading card ids), it shall
+As this is an module that provide an authentication source (by reading card ids or PIN code, or both), it shall
 conforms to [those specifications](@ref auth_specc) regarding message passing.
+
+There are multiple mode supported by the wiegand module: This mode are known as Auth Source type 
+in the application. Each mode may have additional configuration option that can be specified 
+in the `reader` configuration.
 
 Configuration Options {#mod_wiegand_user_config}
 ================================================
 
-Options    | Options  | Options    | Description                                            | Mandatory
------------|----------|------------|--------------------------------------------------------|-----------
-readers    |          |            | Lists of all configured readers                        | YES
----->      | reader   |            | Configuration of 1 wiegand reader                      | YES
----->      | ---->    | name       | device name                                            | YES
----->      | ---->    | high       | name of the input GPIO that sends "high" data          | YES
----->      | ---->    | low        | name of the input GPIO that sends "low" data           | YES
----->      | ---->    | green_led  | name of the green led device attached to the reader    | NO
----->      | ---->    | buzzer     | name of the buzzer device attached to the reader       | NO
----->      | ---->    | mode       | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
+Options    | Options  | Options     | Description                                            | Mandatory
+-----------|----------|-------------|--------------------------------------------------------|-----------
+readers    |          |             | Lists of all configured readers                        | YES
+---->      | reader   |             | Configuration of 1 wiegand reader                      | YES
+---->      | ---->    | name        | device name                                            | YES
+---->      | ---->    | high        | name of the input GPIO that sends "high" data          | YES
+---->      | ---->    | low         | name of the input GPIO that sends "low" data           | YES
+---->      | ---->    | green_led   | name of the green led device attached to the reader    | NO
+---->      | ---->    | buzzer      | name of the buzzer device attached to the reader       | NO
+---->      | ---->    | mode        | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
+---->      | ---->    | pin_timeout | Timeout when reading a PIN code.                       | NO (only for WIEGAND_PIN_4BITS)
+---->      | ---->    | pin_end_key | Which key is used to signal the end of a PIN code      | NO (only for WIEGAND_PIN_4BITS)
 
 **Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
 the sysfsgpio or pifacedigital module.
 
 There are multiples `mode` available for a reader. See [this](@ref auth_data_type) for more info.
+
+Additional informations:
++ `pin_timeout` is the number of milliseconds (defaults to 2000) of inactivity on the keypad before
+considering the PIN code complete and sending it for processing.
++ `pin_end_key` is the key to press to signal the end of the pin (default to '#'). This key wont be appended to the PIN code.
++ You can either type your PIN and wait, and type your PIN and the `pin_end_key`.
+
 
 Example {#mod_wiegand_example}
 ------------------------------

@@ -26,6 +26,8 @@
 #include <core/auth/Auth.hpp>
 #include "wiegand.hpp"
 #include "zmqpp/actor.hpp"
+#include "SimpleWiegandStrategy.hpp"
+#include "WiegandPin4BitsOnly.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
@@ -75,12 +77,12 @@ void WiegandReaderModule::process_config()
         std::string gpio_low        = reader_cfg.get_child("low").data();
         std::string buzzer_name     = reader_cfg.get<std::string>("buzzer", "");
         std::string greenled_name   = reader_cfg.get<std::string>("green_led", "");
-        std::string mode            = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
 
         INFO("Creating WiegandReader: " << reader_name << "\n\t Green Led: " << greenled_name
                 << "\n\t Buzzer: " << buzzer_name);
+
         WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name,
-                Leosac::Auth::source_type_from_string(mode));
+                create_strategy(reader_cfg, &reader));
         readers_.push_back(std::move(reader));
     }
 }
@@ -95,4 +97,24 @@ void WiegandReaderModule::run()
                 reader.timeout();
         }
     }
+}
+
+std::unique_ptr<WiegandStrategy> WiegandReaderModule::create_strategy(const boost::property_tree::ptree &reader_cfg,
+        WiegandReaderImpl *reader)
+{
+    using namespace Auth;
+    std::string mode_str    = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
+    int pin_timeout         = reader_cfg.get<int>("pin_timeout", 2000);
+    char pin_key_end        = reader_cfg.get<char>("pin_key_end", '#');
+
+    SourceType source_type = source_type_from_string(mode_str);
+
+    std::unique_ptr<WiegandStrategy> strategy;
+
+    if (source_type == SourceType::SIMPLE_WIEGAND)
+        strategy = std::unique_ptr<WiegandStrategy>(new SimpleWiegandStrategy(reader));
+    else if (source_type == SourceType::WIEGAND_PIN_4BITS)
+        strategy = std::unique_ptr<WiegandStrategy>(new WiegandPin4BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
+
+    return strategy;
 }

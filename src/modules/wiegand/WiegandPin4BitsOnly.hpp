@@ -34,15 +34,26 @@ namespace Leosac
             class WiegandPin4BitsOnly : public WiegandStrategy
             {
             public:
-                WiegandPin4BitsOnly(WiegandReaderImpl *reader);
+                /**
+                * Create a strategy that read 4bits-per-key PIN code.
+                *
+                * @param reader         the reader object we provide the strategy for.
+                * @param pin_timeout    nb of msec before flushing user input to the system
+                * @param pin_end_key    key ('1', '*', '5') that will trigger user input flushing.
+                */
+                WiegandPin4BitsOnly(WiegandReaderImpl *reader,
+                        std::chrono::milliseconds pin_timeout,
+                        char pin_end_key);
 
                 virtual void timeout() override;
 
             private:
-                std::string inputs_;
+                std::string                 inputs_;
+                std::chrono::milliseconds   pin_timeout_;
+                char                        pin_end_key;
 
                 using TimePoint = std::chrono::system_clock::time_point;
-                TimePoint last_update_;
+                TimePoint                   last_update_;
             };
         }
     }

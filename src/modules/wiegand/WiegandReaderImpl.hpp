@@ -50,7 +50,7 @@ namespace Leosac
                 * @param data_low_pin name of the GPIO connected to data low.
                 * @param green_led_name name of the "green led" LED device.
                 * @param buzzer_name name of the buzzer device. -- no buzzer module yet.
-                * @param mode which mode the reader is using
+                * @param strategy strategy (mode implementation) the reader is using
                 */
                 WiegandReaderImpl(zmqpp::context &ctx,
                         const std::string &name,
@@ -58,7 +58,7 @@ namespace Leosac
                         const std::string &data_low_pin,
                         const std::string &green_led_name,
                         const std::string &buzzer_name,
-                        ::Leosac::Auth::SourceType mode);
+                        std::unique_ptr<WiegandStrategy> strategy);
 
                 ~WiegandReaderImpl();
 
@@ -134,11 +134,6 @@ namespace Leosac
                 * Facade to the buzzer object
                 */
                 std::unique_ptr<Hardware::FBuzzer> buzzer_;
-
-                /**
-                * Wiegand mode.
-                */
-                ::Leosac::Auth::SourceType mode_;
 
                 /**
                 * Concrete implementation of the reader mode.

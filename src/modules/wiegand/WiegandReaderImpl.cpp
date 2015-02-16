@@ -34,7 +34,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         const std::string &data_low_pin,
         const std::string &green_led_name,
         const std::string &buzzer_name,
-        SourceType mode) :
+        std::unique_ptr<WiegandStrategy> strategy) :
         bus_sub_(ctx, zmqpp::socket_type::sub),
         sock_(ctx, zmqpp::socket_type::rep),
         bus_push_(ctx, zmqpp::socket_type::push),
@@ -42,7 +42,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         name_(name),
         green_led_(nullptr),
         buzzer_(nullptr),
-        mode_(mode)
+        strategy_(std::move(strategy))
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
@@ -62,14 +62,6 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
 
     if (!buzzer_name.empty())
         buzzer_ = std::unique_ptr<FBuzzer>(new FBuzzer(ctx, buzzer_name));
-
-
-    // fixme to improve
-    if (mode_ == SourceType::SIMPLE_WIEGAND)
-        strategy_ = std::unique_ptr<WiegandStrategy>(new SimpleWiegandStrategy(this));
-    else if (mode_ == SourceType::WIEGAND_PIN_4BITS)
-        strategy_ = std::unique_ptr<WiegandStrategy>(new WiegandPin4BitsOnly(this));
-
 }
 
 WiegandReaderImpl::~WiegandReaderImpl()
@@ -81,7 +73,6 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
         sock_(std::move(o.sock_)),
         bus_push_(std::move(o.bus_push_)),
         name_(std::move(o.name_)),
-        mode_(o.mode_),
         strategy_(std::move(o.strategy_))
 {
     topic_high_ = o.topic_high_;
