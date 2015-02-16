@@ -29,7 +29,7 @@ namespace Leosac
         namespace Wiegand
         {
             /**
-            * Strategy for PIN only, 4 bits per key presssed mode.
+            * Strategy for PIN only, 8 bits per key pressed mode.
             */
             class WiegandPin8BitsOnly : public WiegandStrategy
             {

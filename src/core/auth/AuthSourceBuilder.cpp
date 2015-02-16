@@ -19,7 +19,6 @@
 
 #include <tools/log.hpp>
 #include "Auth.hpp"
-#include "core/auth/PINCode.hpp"
 
 using namespace Leosac::Auth;
 

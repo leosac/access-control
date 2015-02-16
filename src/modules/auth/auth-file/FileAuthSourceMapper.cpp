@@ -19,15 +19,11 @@
 
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "FileAuthSourceMapper.hpp"
-#include "core/auth/WiegandCard.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/log.hpp"
-#include <iostream>
-#include <exception/moduleexception.hpp>
-#include <exception/configexception.hpp>
 #include <boost/algorithm/string.hpp>
 #include <core/auth/ProfileMerger.hpp>
-#include <core/auth/PINCode.hpp>
+#include "core/auth/Auth.hpp"
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;

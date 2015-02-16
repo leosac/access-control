@@ -108,7 +108,6 @@ void MonitorModule::log_system_bus()
     }
 
     // system readiness check
-    DEBUG("src = " << src);
     if (src == "KERNEL" && system_led_)
     {
         system_led_->turnOn();

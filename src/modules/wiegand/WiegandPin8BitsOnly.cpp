@@ -54,8 +54,8 @@ void WiegandPin8BitsOnly::timeout()
     }
 
     last_update_ = system_clock::now();
-    // buffer[0] = 1010 0000
-    //             wxyz
+    // buffer[0] = 1010 0101
+    //          reverse wxyz
     // w is first byte, x is second, ...
     // so this example has value of 5
     unsigned int n = 0;

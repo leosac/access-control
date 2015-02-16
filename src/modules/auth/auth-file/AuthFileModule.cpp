@@ -18,7 +18,6 @@
 */
 
 #include "AuthFileModule.hpp"
-#include "tools/log.hpp"
 
 using namespace Leosac::Module::Auth;
 
