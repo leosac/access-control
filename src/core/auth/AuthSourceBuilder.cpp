@@ -42,7 +42,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     {
         return create_simple_wiegand(source_name, msg);
     }
-    else if (type_name == SourceType::WIEGAND_PIN_4BITS)
+    else if (type_name == SourceType::WIEGAND_PIN)
         return create_wiegand_pin_4bits(source_name, msg);
 
     assert(0);

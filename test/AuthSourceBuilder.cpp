@@ -46,7 +46,7 @@ namespace Leosac
                 msg1_ << 32;
 
                 msg2_ << "S_MY_WIEGAND_1";
-                msg2_ << SourceType::WIEGAND_PIN_4BITS;
+                msg2_ << SourceType::WIEGAND_PIN;
                 msg2_ << "1234";
             }
 

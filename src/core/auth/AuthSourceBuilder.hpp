@@ -67,7 +67,7 @@ namespace Leosac
                     zmqpp::message *msg);
 
             /**
-            * Create an auth source from WIEGAND_PIN_4BITS data type.
+            * Create an auth source from WIEGAND_PIN data type.
             */
             IAuthenticationSourcePtr create_wiegand_pin_4bits(const std::string &name,
                     zmqpp::message *msg);

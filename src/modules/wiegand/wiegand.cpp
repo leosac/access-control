@@ -26,6 +26,7 @@
 #include "wiegand.hpp"
 #include "SimpleWiegandStrategy.hpp"
 #include "WiegandPin4BitsOnly.hpp"
+#include "WiegandPin8BitsOnly.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
@@ -101,18 +102,23 @@ std::unique_ptr<WiegandStrategy> WiegandReaderModule::create_strategy(const boos
         WiegandReaderImpl *reader)
 {
     using namespace Auth;
-    std::string mode_str    = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
+    std::string mode        = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
     int pin_timeout         = reader_cfg.get<int>("pin_timeout", 2000);
     char pin_key_end        = reader_cfg.get<char>("pin_key_end", '#');
 
-    SourceType source_type = source_type_from_string(mode_str);
-
     std::unique_ptr<WiegandStrategy> strategy;
 
-    if (source_type == SourceType::SIMPLE_WIEGAND)
+    if (mode == "SIMPLE_WIEGAND")
         strategy = std::unique_ptr<WiegandStrategy>(new SimpleWiegandStrategy(reader));
-    else if (source_type == SourceType::WIEGAND_PIN_4BITS)
+    else if (mode == "WIEGAND_PIN_4BITS")
         strategy = std::unique_ptr<WiegandStrategy>(new WiegandPin4BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
-
+    else if (mode == "WIEGAND_PIN_8BITS")
+        strategy = std::unique_ptr<WiegandStrategy>(new WiegandPin8BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
+    else
+    {
+        ERROR("Wiegand mode " << mode << " is not a valid mode.");
+        assert(0);
+        throw std::runtime_error("Invalid wiegand mode " + mode);
+    }
     return strategy;
 }

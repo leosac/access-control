@@ -18,12 +18,12 @@
 */
 
 #include <tools/log.hpp>
-#include "WiegandPin4BitsOnly.hpp"
+#include "WiegandPin8BitsOnly.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
 
-WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader,
+WiegandPin8BitsOnly::WiegandPin8BitsOnly(WiegandReaderImpl *reader,
         std::chrono::milliseconds pin_timeout,
         char pin_end_key) :
         WiegandStrategy(reader),
@@ -33,7 +33,7 @@ WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader,
     last_update_ = std::chrono::system_clock::now();
 }
 
-void WiegandPin4BitsOnly::timeout()
+void WiegandPin8BitsOnly::timeout()
 {
     using namespace std::chrono;
     auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - last_update_);
@@ -45,9 +45,9 @@ void WiegandPin4BitsOnly::timeout()
         return;
     }
 
-    if (reader_->counter() != 4)
+    if (reader_->counter() != 8)
     {
-        WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 4)");
+        WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 8)");
         reader_->read_reset();
         inputs_ = "";
         return;
@@ -62,7 +62,7 @@ void WiegandPin4BitsOnly::timeout()
     for (int i = 0; i < 4; ++i)
     {
         unsigned int v = ((reader_->buffer()[0] >> (7 - i)) & 0x01);
-        n |= v << (3 - i);
+        n |= !v << (3 - i);
     }
     // this deduced from manual testing. Value for '#' and '*'.
     // 10 -> *
@@ -83,7 +83,7 @@ void WiegandPin4BitsOnly::timeout()
     reader_->read_reset();
 }
 
-void WiegandPin4BitsOnly::end_of_input()
+void WiegandPin8BitsOnly::end_of_input()
 {
     if (inputs_.length())
     {

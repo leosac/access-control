@@ -35,16 +35,10 @@ namespace Leosac
             SIMPLE_WIEGAND = 1,
 
             /**
-            * When a reader sends 4bits per key press.
+            * Message formatting when using a simple PIN code.
             */
-            WIEGAND_PIN_4BITS = 2,
+            WIEGAND_PIN = 2,
         };
-
-        /**
-        * Convert a string to a Source Type.
-        * The name shall match the enum's name
-        */
-        SourceType source_type_from_string(const std::string &t);
 
         enum class AccessStatus : uint8_t
         {

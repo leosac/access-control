@@ -83,8 +83,7 @@ Currently we are lucky, we only define one.
 1. **SIMPLE_WIEGAND** : This data type requires 2 frames:
   1. A hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"
   2. An *integer* that holds the number of bits in the card id. 
-2. **WIEGAND_PIN_4BITS**: Configuration mode used when we use the reader only for PIN code, and when
- the reader sends 4bits per key pressed.
+2. **WIEGAND_PIN**: Configuration mode used when we use the reader only for PIN code.
   1. A *string* that contains the PIN code. Its easier to use string, because we don't know the length
     of the PIN code, and it may vary.
 
@@ -121,12 +120,12 @@ Frame    | Content                                       | Type
 4        | 26                                            | `int` 
 
 
-A second example for the `WIEGAND_PIN_4BITS` auth source mode:
+A second example for the `WIEGAND_PIN` auth source mode:
 
 Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------------------------
 1        | "MY_WIEGAND_1"                                | `string`
-2        | `Leosac::Auth::SourceType::WIEGAND_PIN_4BITS` | [AuthSourceType](@ref Leosac::Auth::SourceType) (`uint8_t`)
+2        | `Leosac::Auth::SourceType::WIEGAND_PIN`       | [AuthSourceType](@ref Leosac::Auth::SourceType) (`uint8_t`)
 3        | "1234591"                                     | `string`
 
 
