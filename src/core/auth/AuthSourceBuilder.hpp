@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/auth/Interfaces/IAuthenticationSource.hpp>
+#include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include <zmqpp/message.hpp>
 
 #pragma once
@@ -64,6 +64,12 @@ namespace Leosac
             * @param msg the message first frame shall be wiegand data (ie previous should be pop'd).
             */
             IAuthenticationSourcePtr create_simple_wiegand(const std::string &name,
+                    zmqpp::message *msg);
+
+            /**
+            * Create an auth source from WIEGAND_PIN_4BITS data type.
+            */
+            IAuthenticationSourcePtr create_wiegand_pin_4bits(const std::string &name,
                     zmqpp::message *msg);
         };
     }

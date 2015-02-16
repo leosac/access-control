@@ -22,6 +22,7 @@
 #include <core/auth/Auth.hpp>
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
+#include "core/auth/PINCode.hpp"
 
 using namespace Leosac::Auth;
 using namespace Leosac::Module::Auth;
@@ -43,6 +44,10 @@ namespace Leosac
                 msg1_ << SourceType::SIMPLE_WIEGAND;
                 msg1_ << "af:bc:12:42";
                 msg1_ << 32;
+
+                msg2_ << "S_MY_WIEGAND_1";
+                msg2_ << SourceType::WIEGAND_PIN_4BITS;
+                msg2_ << "1234";
             }
 
             ~AuthSourceBuilderTest()
@@ -54,6 +59,11 @@ namespace Leosac
             * This looks like a message sent by MY_WIEGAND_1 with SIMPLE_WIEGAND data.
             */
             zmqpp::message msg1_;
+
+            /**
+            * This looks like a message sent by MY_WIEGAND_1 with WIEGAND_PIN_4BITS data.
+            */
+            zmqpp::message msg2_;
         };
 
         TEST_F(AuthSourceBuilderTest, ExtractSourceName)
@@ -72,7 +82,7 @@ namespace Leosac
             ASSERT_FALSE(builder_.extract_source_name("D", &out));
         }
 
-        TEST_F(AuthSourceBuilderTest, SimpleBuild)
+        TEST_F(AuthSourceBuilderTest, BuildWiegandCard)
         {
             IAuthenticationSourcePtr auth_source = builder_.create(&msg1_);
             ASSERT_TRUE(auth_source.get());
@@ -80,6 +90,17 @@ namespace Leosac
             ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
             WiegandCardPtr spec = std::dynamic_pointer_cast<WiegandCard>(auth_source);
             ASSERT_TRUE(spec.get());
+        }
+
+        TEST_F(AuthSourceBuilderTest, BuildPIN4bits)
+        {
+            IAuthenticationSourcePtr auth_source = builder_.create(&msg2_);
+            ASSERT_TRUE(auth_source.get());
+
+            ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
+            PINCodePtr spec = std::dynamic_pointer_cast<PINCode>(auth_source);
+            ASSERT_TRUE(spec.get());
+            ASSERT_EQ("1234", spec->pin_code());
         }
     }
 }

@@ -19,56 +19,45 @@
 
 #pragma once
 
-// Forward declarations
+#include "core/auth/BaseAuthSource.hpp"
+#include <string>
+#include <tools/IVisitor.hpp>
+
 namespace Leosac
 {
     namespace Auth
     {
-        class BaseAuthSource;
-        class WiegandCard;
         class PINCode;
-    }
-}
-
-namespace Leosac
-{
-    namespace Tools
-    {
-        class IVisitable;
+        using PINCodePtr = std::shared_ptr<PINCode>;
 
         /**
-        * Provide an interface from which visitor object can pick methods it
-        * wants to reimplement.
-        *
-        * Each time a new kind of visitor is created, it should be
-        * appended to this class.
-        * The methods in this interface are actually not pure, because this
-        * allows visitor to ignore type they are not interested in.
-        *
-        * @see Leosac::Tools::IVisitable
+        * A wiegand PIN code
         */
-        class IVisitor
+        class PINCode : public BaseAuthSource
         {
         public:
             /**
-            * Visit a Visitable object.
+            * Create a PINCode object.
+            *
+            * @param pin the code in string format.
             */
-            virtual void visit(IVisitable *)
+            PINCode(const std::string &pin) :
+                    pin_code_(pin)
             {
             }
 
-            virtual void visit(Leosac::Auth::BaseAuthSource *)
+            virtual void accept(Tools::IVisitor *visitor) override
             {
+                visitor->visit(this);
             }
 
-            virtual void visit(Leosac::Auth::WiegandCard *)
+            const std::string &pin_code() const
             {
+                return pin_code_;
             }
 
-            virtual void visit(Leosac::Auth::PINCode *)
-            {
-            }
-
+        protected:
+            std::string pin_code_;
         };
     }
 }

@@ -12,6 +12,10 @@
             <WiegandCard>aa:bb:cc:dd</WiegandCard>
         </map>
         <map>
+            <user>MY_USER</user>
+            <PINCode>1234</PINCode>
+        </map>
+        <map>
             <user>Toto</user>
             <WiegandCard>cc:dd:ee:ff</WiegandCard>
         </map>

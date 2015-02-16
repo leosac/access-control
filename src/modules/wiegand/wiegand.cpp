@@ -19,13 +19,11 @@
 
 #include <memory>
 #include <zmqpp/message.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
 #include <zmqpp/context.hpp>
-#include <fcntl.h>
-#include <core/auth/Auth.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include "tools/log.hpp"
+#include "core/auth/Auth.hpp"
 #include "wiegand.hpp"
-#include "zmqpp/actor.hpp"
 #include "SimpleWiegandStrategy.hpp"
 #include "WiegandPin4BitsOnly.hpp"
 

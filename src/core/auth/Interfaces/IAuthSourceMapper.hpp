@@ -44,7 +44,7 @@ namespace Leosac
             /**
             * Must map the AuthenticationSource data to a User.
             *
-            * This is done by setting the calling the `owner()` method on the auth source
+            * This is done by calling the `owner()` method on the auth source
             * object. In case it fails, the field shall be set to `nullptr`.
             *
             * @note The User may be `new`ed.

@@ -30,6 +30,7 @@
 #include "tools/unixshellscript.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
+#include "core/auth/PINCode.hpp"
 
 /**
 * Path to test-data file.
@@ -58,7 +59,8 @@ namespace Leosac
                     doorC_(new AuthTarget("doorC")),
                     my_card_(new WiegandCard("aa:bb:cc:dd", 32)),
                     my_card2_(new WiegandCard("cc:dd:ee:ff", 32)),
-                    unknown_card_(new WiegandCard("00:00:00:00", 32))
+                    unknown_card_(new WiegandCard("00:00:00:00", 32)),
+                    my_pin_(new PINCode("1234"))
             {
                 mapper_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-1.xml");
                 mapper2_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-3.xml");
@@ -155,6 +157,7 @@ namespace Leosac
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
             IAuthenticationSourcePtr unknown_card_;
+            IAuthenticationSourcePtr my_pin_;
         };
 
         /**
@@ -166,6 +169,12 @@ namespace Leosac
             mapper_->mapToUser(my_card_);
             ASSERT_TRUE(my_card_->owner().get());
             ASSERT_EQ("MY_USER", my_card_->owner()->id());
+
+            // MY_USER with a PIN Code.
+            ASSERT_FALSE(my_pin_->owner().get());
+            mapper_->mapToUser(my_pin_);
+            ASSERT_TRUE(my_pin_->owner().get());
+            ASSERT_EQ("MY_USER", my_pin_->owner()->id());
 
             ASSERT_FALSE(my_card2_->owner().get());
             mapper_->mapToUser(my_card2_);
@@ -183,8 +192,13 @@ namespace Leosac
             ASSERT_TRUE(my_card_->owner().get());
             IAccessProfilePtr profile = mapper_->buildProfile(my_card_);
 
-            ASSERT_TRUE(profile.get());
+            // same profile. but using a PIN code instead.
+            mapper_->mapToUser(my_pin_);
+            ASSERT_TRUE(my_pin_->owner().get());
+            IAccessProfilePtr profile_from_pin = mapper_->buildProfile(my_pin_);
 
+            // with wiegand card
+            ASSERT_TRUE(profile.get());
 
             ASSERT_TRUE(profile->isAccessGranted(date_monday_12_00, doorA_));
             ASSERT_TRUE(profile->isAccessGranted(date_monday_16_31, doorA_));
@@ -196,6 +210,20 @@ namespace Leosac
 
             ASSERT_TRUE(profile->isAccessGranted(date_sunday_18_50, doorA_));
             ASSERT_TRUE(profile->isAccessGranted(date_sunday_18_50, doorB_));
+
+            // with pin code.
+            ASSERT_TRUE(profile_from_pin.get());
+
+            ASSERT_TRUE(profile_from_pin->isAccessGranted(date_monday_12_00, doorA_));
+            ASSERT_TRUE(profile_from_pin->isAccessGranted(date_monday_16_31, doorA_));
+            ASSERT_FALSE(profile_from_pin->isAccessGranted(date_thursday_14_00, doorA_));
+
+            ASSERT_TRUE(profile_from_pin->isAccessGranted(date_monday_12_00, doorB_));
+            ASSERT_TRUE(profile_from_pin->isAccessGranted(date_monday_16_31, doorB_));
+            ASSERT_FALSE(profile_from_pin->isAccessGranted(date_thursday_14_00, doorB_));
+
+            ASSERT_TRUE(profile_from_pin->isAccessGranted(date_sunday_18_50, doorA_));
+            ASSERT_TRUE(profile_from_pin->isAccessGranted(date_sunday_18_50, doorB_));
         }
 
         /**

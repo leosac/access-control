@@ -21,8 +21,7 @@
 #include <core/auth/Auth.hpp>
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
-#include "SimpleWiegandStrategy.hpp"
-#include "WiegandPin4BitsOnly.hpp"
+#include "WiegandStrategy.hpp"
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Hardware;

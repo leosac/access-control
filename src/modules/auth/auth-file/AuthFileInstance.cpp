@@ -86,20 +86,21 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         FileAuthSourceMapper mapper(file_path_);
 
         mapper.mapToUser(ptr);
-        if (!ptr->profile())
+        auto profile = mapper.buildProfile(ptr);
+        if (!profile)
         {
-            NOTICE("No profile were created from this auth source message.");
+            NOTICE("No profile was created from this auth source message.");
             return false;
         }
         if (target_name_.empty())
         {
             // check against default target
-            return ptr->profile()->isAccessGranted(std::chrono::system_clock::now(), nullptr);
+            return profile->isAccessGranted(std::chrono::system_clock::now(), nullptr);
         }
         else
         {
             AuthTargetPtr t(new AuthTarget(target_name_));
-            return ptr->profile()->isAccessGranted(std::chrono::system_clock::now(), t);
+            return profile->isAccessGranted(std::chrono::system_clock::now(), t);
         }
     }
     catch (std::exception &e)

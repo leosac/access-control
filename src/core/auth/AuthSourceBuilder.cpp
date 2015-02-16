@@ -19,6 +19,7 @@
 
 #include <tools/log.hpp>
 #include "Auth.hpp"
+#include "core/auth/PINCode.hpp"
 
 using namespace Leosac::Auth;
 
@@ -41,6 +42,9 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     {
         return create_simple_wiegand(source_name, msg);
     }
+    else if (type_name == SourceType::WIEGAND_PIN_4BITS)
+        return create_wiegand_pin_4bits(source_name, msg);
+
     assert(0);
 }
 
@@ -60,7 +64,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
         zmqpp::message *msg)
 {
     // card id and number of bit shall be left.
-   // assert(msg && msg->unread_parts() == 2);
+    assert(msg && msg->remaining() == 2);
 
     std::string card_id;
     int bits;
@@ -70,6 +74,21 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
     INFO("Building an AuthSource object (WiegandCard): " << card_id << " with " <<
             bits << " significants bits.");
     BaseAuthSourcePtr auth_source(new WiegandCard(card_id, bits));
+    auth_source->name(name);
+
+    return auth_source;
+}
+
+IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin_4bits(const std::string &name, zmqpp::message *msg)
+{
+    // pin code only
+    assert(msg && msg->remaining() == 1);
+
+    std::string pin;
+    *msg >> pin;
+
+    INFO("Building an AuthSource object (Wiegand 4bits Pin): " << pin);
+    BaseAuthSourcePtr auth_source(new PINCode(pin));
     auth_source->name(name);
 
     return auth_source;

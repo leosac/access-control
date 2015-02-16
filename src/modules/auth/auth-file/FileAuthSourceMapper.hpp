@@ -46,6 +46,11 @@ namespace Leosac
                 * Try to map a wiegand card_id to a user.
                 */
                 virtual void visit(::Leosac::Auth::WiegandCard *src) override;
+                /**
+                * Try to map a PIN code to a user.
+                */
+                virtual void visit(::Leosac::Auth::PINCode *src) override;
+
 
                 virtual void mapToUser(Leosac::Auth::IAuthenticationSourcePtr auth_source);
 
