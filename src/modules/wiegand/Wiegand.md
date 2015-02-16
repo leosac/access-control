@@ -30,7 +30,7 @@ readers    |          |             | Lists of all configured readers           
 ---->      | ---->    | buzzer      | name of the buzzer device attached to the reader       | NO
 ---->      | ---->    | mode        | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
 ---->      | ---->    | pin_timeout | Timeout when reading a PIN code.                       | NO (only for WIEGAND_PIN_4BITS)
----->      | ---->    | pin_end_key | Which key is used to signal the end of a PIN code      | NO (only for WIEGAND_PIN_4BITS)
+---->      | ---->    | pin_key_end | Which key is used to signal the end of a PIN code      | NO (only for WIEGAND_PIN_4BITS)
 
 **Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
 the sysfsgpio or pifacedigital module.
@@ -40,8 +40,8 @@ There are multiples `mode` available for a reader. See [this](@ref auth_data_typ
 Additional informations:
 + `pin_timeout` is the number of milliseconds (defaults to 2000) of inactivity on the keypad before
 considering the PIN code complete and sending it for processing.
-+ `pin_end_key` is the key to press to signal the end of the pin (default to '#'). This key wont be appended to the PIN code.
-+ You can either type your PIN and wait, and type your PIN and the `pin_end_key`.
++ `pin_key_end` is the key to press to signal the end of the pin (default to '#'). This key wont be appended to the PIN code.
++ You can either type your PIN and wait, and type your PIN and the `pin_key_end`.
 
 
 Example {#mod_wiegand_example}

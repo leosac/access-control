@@ -53,7 +53,7 @@ namespace Leosac
                 * @param strategy strategy (mode implementation) the reader is using
                 */
                 WiegandReaderImpl(zmqpp::context &ctx,
-                        const std::string &name,
+                        const std::string &reader_name,
                         const std::string &data_high_pin,
                         const std::string &data_low_pin,
                         const std::string &green_led_name,
@@ -93,6 +93,30 @@ namespace Leosac
                 * The reader shall publish an event if it received any meaningful message since the last timeout.
                 */
                 void timeout();
+
+                /**
+                * Reset the "read state" of the reader, effectively cleaning the wiegand-bit-buffer
+                * and resetting the counter to 0.
+                */
+                void read_reset();
+
+                /**
+                * Returns the number of bits read.
+                * This number of bits shall never be greater than the number of bits the buffer_ can hold.
+                */
+                int counter() const;
+
+                /**
+                * Return a pointer to internal buffer memory. You can use this
+                * to access the bits read by the reader.
+                * Do not read more bits than counter() returned.
+                */
+                const unsigned char *buffer() const;
+
+                /**
+                * Returns the name of this reader.
+                */
+                const std::string &name() const;
 
             private:
                 /**

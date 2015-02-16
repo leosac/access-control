@@ -29,7 +29,7 @@ using namespace Leosac::Hardware;
 using namespace Leosac::Auth;
 
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
-        const std::string &name,
+        const std::string &reader_name,
         const std::string &data_high_pin,
         const std::string &data_low_pin,
         const std::string &green_led_name,
@@ -39,7 +39,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
         sock_(ctx, zmqpp::socket_type::rep),
         bus_push_(ctx, zmqpp::socket_type::push),
         counter_(0),
-        name_(name),
+        name_(reader_name),
         green_led_(nullptr),
         buzzer_(nullptr),
         strategy_(std::move(strategy))
@@ -47,7 +47,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
 
-    sock_.bind("inproc://" + name);
+    sock_.bind("inproc://" + name_);
 
     topic_high_ = "S_INT:" + data_high_pin;
     topic_low_ = "S_INT:" + data_low_pin;
@@ -181,4 +181,25 @@ void WiegandReaderImpl::handle_request()
         assert(ret);
         sock_.send("OK");
     }
+}
+
+void WiegandReaderImpl::read_reset()
+{
+    counter_ = 0;
+    std::fill(buffer_.begin(), buffer_.end(), 0);
+}
+
+const unsigned char *WiegandReaderImpl::buffer() const
+{
+    return &buffer_[0];
+}
+
+int WiegandReaderImpl::counter() const
+{
+    return counter_;
+}
+
+std::string const &WiegandReaderImpl::name() const
+{
+    return name_;
 }

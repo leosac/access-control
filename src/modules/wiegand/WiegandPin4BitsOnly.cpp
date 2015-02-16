@@ -26,7 +26,9 @@ using namespace Leosac::Module::Wiegand;
 WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader,
         std::chrono::milliseconds pin_timeout,
         char pin_end_key) :
-        WiegandStrategy(reader)
+        WiegandStrategy(reader),
+        pin_timeout_(pin_timeout),
+        pin_end_key_(pin_end_key)
 {
     last_update_ = std::chrono::system_clock::now();
 }
@@ -36,54 +38,57 @@ void WiegandPin4BitsOnly::timeout()
     using namespace std::chrono;
     auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - last_update_);
 
-    if (!reader_->counter_)
+    if (!reader_->counter())
     {
-        // timeout due to inactivity. check how many time since timeout, if more than 1500ms,
-        // full saved number
-        if (elapsed_ms.count() > 1500 && inputs_.length())
-        {
-            // we reset after 1500 ms
-            DEBUG("Reset");
-            reader_->counter_ = 0;
-            DEBUG("Current number streak: " << inputs_);
-            inputs_ = "";
-        }
+        if (elapsed_ms > pin_timeout_)
+            end_of_input();
         return;
     }
 
-    if (reader_->counter_ != 4)
+    if (reader_->counter() != 4)
     {
-        WARN("Expected number of bits invalid. (" << reader_->counter_ << " but we expected 4)");
-        reader_->counter_ = 0;
+        WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 4)");
+        reader_->read_reset();
+        inputs_ = "";
         return;
     }
 
     last_update_ = system_clock::now();
-    // store the number. sent in 4bits.
-    // sent in little endian, but main wiegand store in differently (first received is big)
-
     // buffer[0] = 1010 0000
     //             wxyz
     // w is first byte, x is second, ...
     // so this example has value of 5
-
     unsigned int n = 0;
-    DEBUG("Counter = " << reader_->counter_);
     for (int i = 0; i < 4; ++i)
     {
-        unsigned int v = ((reader_->buffer_[0] >> (7 - i)) & 0x01);
+        unsigned int v = ((reader_->buffer()[0] >> (7 - i)) & 0x01);
         n |= v << (3 - i);
     }
-
-    DEBUG("Registered key {" << n << "}");
-    // this deduced from manual testing
+    // this deduced from manual testing. Value for '#' and '*'.
     // 10 -> *
     // 11 -> #
+    char c;
     if (n == 10)
-        inputs_ += '*';
+        c = '*';
     else if (n == 11)
-        inputs_ += '#';
+        c = '#';
     else
-        inputs_ += std::to_string(n);
-    reader_->counter_ = 0;
+        c = std::to_string(n).at(0);
+    if (c == pin_end_key_)
+    {
+        end_of_input();
+    }
+    else
+        inputs_ += c;
+    reader_->read_reset();
+}
+
+void WiegandPin4BitsOnly::end_of_input()
+{
+    if (inputs_.length())
+    {
+        DEBUG("End of input. PIN code = " << inputs_);
+        reader_->read_reset();
+        inputs_ = "";
+    }
 }

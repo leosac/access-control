@@ -45,12 +45,22 @@ namespace Leosac
                         std::chrono::milliseconds pin_timeout,
                         char pin_end_key);
 
+                // we reset the counter_ and buffer_ for each key.
                 virtual void timeout() override;
 
             private:
+
+                /**
+                * Build and dispatch the auth request since we gathered all user input
+                * (either due to timeout, or to pin_end_key being pressed).
+                *
+                * It does nothing if there is no inputs.
+                */
+                void end_of_input();
+
                 std::string                 inputs_;
                 std::chrono::milliseconds   pin_timeout_;
-                char                        pin_end_key;
+                char                        pin_end_key_;
 
                 using TimePoint = std::chrono::system_clock::time_point;
                 TimePoint                   last_update_;

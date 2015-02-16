@@ -31,25 +31,24 @@ SimpleWiegandStrategy::SimpleWiegandStrategy(WiegandReaderImpl *reader) :
 
 void SimpleWiegandStrategy::timeout()
 {
-    if (!reader_->counter_)
+    if (!reader_->counter())
         return;
 
-    DEBUG("timeout, buffer size = " << reader_->counter_);
-    std::size_t size = ((reader_->counter_ - 1) / 8) + 1;
+    DEBUG("timeout, buffer size = " << reader_->counter());
+    std::size_t size = ((reader_->counter() - 1) / 8) + 1;
 
     std::stringstream card_hex;
 
     for (std::size_t i = 0; i < size; ++i)
     {
-        card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(reader_->buffer_[i]);
+        card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(reader_->buffer()[i]);
         if (i + 1 < size)
             card_hex << ":";
     }
 
     zmqpp::message msg;
-    msg << ("S_" + reader_->name_) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_hex.str() << reader_->counter_;
+    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_hex.str() << reader_->counter();
     reader_->bus_push_.send(msg);
 
-    std::fill(reader_->buffer_.begin(), reader_->buffer_.end(), 0);
-    reader_->counter_ = 0;
+    reader_->read_reset();
 }
