@@ -88,6 +88,10 @@ void WiegandPin4BitsOnly::end_of_input()
     if (inputs_.length())
     {
         DEBUG("End of input. PIN code = " << inputs_);
+        zmqpp::message msg;
+        msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN_4BITS << inputs_;
+        reader_->bus_push_.send(msg);
+
         reader_->read_reset();
         inputs_ = "";
     }

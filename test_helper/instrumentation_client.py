@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import time
 import sys
 import zmq
 
@@ -12,6 +13,10 @@ class CommandHandler(object):
         try:
             if (cmd == "send_card"):
                 self.handle_send_card(self.argv_[3])
+            elif (cmd == "send_pin_4bits"):
+                self.handle_send_pin_4bits(self.argv_[3])
+            else:
+                print "Doing nothing..."
         except IndexError as e:
             print "Not enough argument."
             exit(1)
@@ -20,6 +25,20 @@ class CommandHandler(object):
         print "Will send card id ", card_id
         card_id = card_id.replace(":", "")
         send_card_id(self.socket_, card_id)
+
+    def handle_send_pin_4bits(self, pin):
+        print "Will send PIN: ", pin
+        for key in pin:
+            #bin repr of one key. 4 bits
+            binary = bin(int(key, 16))[2:].zfill(4)
+            for c in binary:
+                if c == "1":
+                    trigger_interrupt(self.socket_, "wiegand_data_high")
+                else:
+                    trigger_interrupt(self.socket_, "wiegand_data_low")
+            ## We need 50ms timeout to process each key, otherwise all keys look
+            ## like one.
+            time.sleep(0.6)
 
 def print_usage():
     print "Usage: ./instrumentation_client ipc_endpoint command [params]"

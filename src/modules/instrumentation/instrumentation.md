@@ -10,7 +10,9 @@ This modules help testing. It expose fake GPIO ping that are controllable
 through IPC, thus allowing some kind of blackbox testing against Leosac.
 
 List of remote command:
-+ Toggle GPIO ON. 'GPIO' + 'NAME' + 'ON': this will emulate gpio interrupt.
++ "GPIO" "my_gpio" "ON": 3 Frames, turn the GPIO `ON`.
++ "GPIO" "my_gpio" "OFF": 3 Frames, turn the GPIO `OFF`.
++ "GPIO" "my_gpio" "INT": 3 Frames, emulate GPIO interrupt.
 
 Configuration Options {#mod_instrumentation_user_config}
 ========================================================
