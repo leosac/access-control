@@ -39,6 +39,8 @@ There are multiples `mode` available for a reader:
 1. `SIMPLE_WIEGAND` is for simply reading a wiegand card.
 2. `WIEGAND_PIN_4BITS` for reading a PIN code, when the reader send 4 bits per key pressed.
 3. `WIEGAND_PIN_8BITS` for reading a PIN code, when the reader send 8 bits per key pressed.
+4. `WIEGAND_PIN_BUFFERED` for reading a PIN code when the reader buffers up to 5key and send them in a 26 bits wiegand frame.
+  Note that in this mode, the `pin_key_end` and `pin_timeout` parameter have no effect.
 
 You can see [this](@ref auth_data_type) for more the message passing specific specification
 about those modes. Note that multiple mode share a common message implementation.

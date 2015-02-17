@@ -42,7 +42,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
         return create_simple_wiegand(source_name, msg);
     }
     else if (type_name == SourceType::WIEGAND_PIN)
-        return create_wiegand_pin_4bits(source_name, msg);
+        return create_wiegand_pin(source_name, msg);
 
     assert(0);
 }
@@ -78,7 +78,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
     return auth_source;
 }
 
-IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin_4bits(const std::string &name, zmqpp::message *msg)
+IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin(const std::string &name, zmqpp::message *msg)
 {
     // pin code only
     assert(msg && msg->remaining() == 1);
@@ -86,7 +86,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin_4bits(const std::
     std::string pin;
     *msg >> pin;
 
-    INFO("Building an AuthSource object (Wiegand 4bits Pin): " << pin);
+    INFO("Building an AuthSource object (PINCode): " << pin);
     BaseAuthSourcePtr auth_source(new PINCode(pin));
     auth_source->name(name);
 

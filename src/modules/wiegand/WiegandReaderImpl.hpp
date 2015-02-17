@@ -36,6 +36,7 @@ namespace Leosac
             class WiegandStrategy;
             class WiegandPin4BitsOnly;
             class WiegandPin8BitsOnly;
+            class WiegandPinBuffered;
 
             /**
             * An implementation class that represents a Wiegand Reader.
@@ -168,6 +169,7 @@ namespace Leosac
                 friend class SimpleWiegandStrategy;
                 friend class WiegandPin4BitsOnly;
                 friend class WiegandPin8BitsOnly;
+                friend class WiegandPinBuffered;
 
             };
         }

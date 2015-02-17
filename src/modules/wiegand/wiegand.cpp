@@ -27,6 +27,7 @@
 #include "SimpleWiegandStrategy.hpp"
 #include "WiegandPin4BitsOnly.hpp"
 #include "WiegandPin8BitsOnly.hpp"
+#include "WiegandPinBuffered.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
@@ -114,6 +115,8 @@ std::unique_ptr<WiegandStrategy> WiegandReaderModule::create_strategy(const boos
         strategy = std::unique_ptr<WiegandStrategy>(new WiegandPin4BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
     else if (mode == "WIEGAND_PIN_8BITS")
         strategy = std::unique_ptr<WiegandStrategy>(new WiegandPin8BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
+    else if (mode == "WIEGAND_PIN_BUFFERED")
+        strategy = std::unique_ptr<WiegandStrategy>(new WiegandPinBuffered(reader));
     else
     {
         ERROR("Wiegand mode " << mode << " is not a valid mode.");

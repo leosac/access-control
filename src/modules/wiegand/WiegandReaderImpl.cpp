@@ -144,11 +144,8 @@ void WiegandReaderImpl::handle_request()
     else if (str == "BEEP")
     {
         assert (msg.parts() == 2);
-        DEBUG("BEEP BEEP");
         int64_t duration;
         msg >> duration;
-        // our buzzer is a LED (this will change later tho)
-        // BEEP:DURATION translates well to ON:DURATION for led.
         if (!buzzer_)
         {
             sock_.send("KO");
