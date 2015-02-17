@@ -109,3 +109,8 @@ void WiegandPin4BitsOnly::signal()
     ready_ = false;
     inputs_ = "";
 }
+
+const std::string &WiegandPin4BitsOnly::get_pin() const
+{
+    return inputs_;
+}

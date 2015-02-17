@@ -22,45 +22,78 @@
 
 using namespace Leosac::Module::Wiegand;
 
-
 WiegandCardAndPin::WiegandCardAndPin(WiegandReaderImpl *reader,
         std::chrono::milliseconds delay,
         std::chrono::milliseconds pin_timeout,
         char pin_end_key) :
         WiegandStrategy(reader),
+        read_card_strategy_(new SimpleWiegandStrategy(reader)),
+        read_pin_strategy_(new WiegandPin4BitsOnly(reader, pin_timeout, pin_end_key)),
         delay_(delay),
+        reading_card_(true),
+        ready_(false),
         pin_timeout_(pin_timeout),
-        pin_end_key_(pin_end_key),
-        reading_card_(true)
+        pin_end_key_(pin_end_key)
 {
-    last_update_ = std::chrono::system_clock::now();
+    time_card_read_ = std::chrono::system_clock::now();
 }
 
 void WiegandCardAndPin::timeout()
 {
+    using namespace std::chrono;
+    auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - time_card_read_);
+
     if (reading_card_)
     {
-        if (!reader_->counter())
-            return;
-
-        DEBUG("timeout, buffer size = " << reader_->counter());
-        std::size_t size = ((reader_->counter() - 1) / 8) + 1;
-
-        std::stringstream card_hex;
-
-        for (std::size_t i = 0; i < size; ++i)
+        read_card_strategy_->timeout();
+        if (read_card_strategy_->completed())
         {
-            card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(reader_->buffer()[i]);
-            if (i + 1 < size)
-                card_hex << ":";
+            DEBUG("Switch to PIN. Current card id = " << read_card_strategy_->get_card_id());
+            reading_card_ = false;
+            time_card_read_ = std::chrono::system_clock::now();
+            reader_->read_reset();
         }
-
-        DEBUG("Card = " << card_hex.str());
-        reader_->read_reset();
-        reading_card_ = false;
     }
     else
     {
-
+        if (elapsed_ms > delay_)
+        {
+            DEBUG("Too slow to enter pin code. Aborting.");
+            reset();
+            return;
+        }
+        read_pin_strategy_->timeout();
+        if (read_pin_strategy_->completed())
+            ready_ = true;
     }
+}
+
+bool WiegandCardAndPin::completed() const
+{
+    return ready_;
+}
+
+void WiegandCardAndPin::signal()
+{
+    DEBUG("Would signal !");
+    DEBUG("Card = " << read_card_strategy_->get_card_id());
+    DEBUG("Pin = " << read_pin_strategy_->get_pin());
+    reset();
+}
+
+void WiegandCardAndPin::set_reader(WiegandReaderImpl *new_ptr)
+{
+    WiegandStrategy::set_reader(new_ptr);
+    read_card_strategy_->set_reader(new_ptr);
+    read_pin_strategy_->set_reader(new_ptr);
+}
+
+void WiegandCardAndPin::reset()
+{
+    ready_ = false;
+    reading_card_ = true;
+    reader_->read_reset();
+
+    read_card_strategy_ = SimpleWiegandStrategyUPtr(new SimpleWiegandStrategy(reader_));
+    read_pin_strategy_ = WiegandPin4BitsOnlyUPtr(new WiegandPin4BitsOnly(reader_, pin_timeout_, pin_end_key_));
 }

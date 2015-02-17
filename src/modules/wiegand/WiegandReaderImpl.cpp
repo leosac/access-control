@@ -84,7 +84,7 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
     buzzer_ = std::move(o.buzzer_);
 
     // when we are move, we must update our strategy's pointer back to the "new" us.
-    strategy_->reader_ = this;
+    strategy_->set_reader(this);
 }
 
 void WiegandReaderImpl::handle_bus_msg()

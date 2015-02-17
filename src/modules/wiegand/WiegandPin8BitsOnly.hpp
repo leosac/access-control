@@ -52,6 +52,8 @@ namespace Leosac
 
                 virtual void signal() override;
 
+                const std::string &get_pin() const;
+
             private:
 
                 /**

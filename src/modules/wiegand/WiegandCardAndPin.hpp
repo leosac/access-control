@@ -20,6 +20,8 @@
 #pragma once
 
 #include "WiegandStrategy.hpp"
+#include "WiegandPin4BitsOnly.hpp"
+#include "SimpleWiegandStrategy.hpp"
 
 namespace Leosac
 {
@@ -31,6 +33,8 @@ namespace Leosac
             /**
             * Strategy for reading a card then a PIN code.
             * We reuse existing strategy.
+            *
+            * Force 4 bits mode for now.
             */
             class WiegandCardAndPin : public WiegandStrategy
             {
@@ -50,25 +54,34 @@ namespace Leosac
 
                 virtual void timeout() override;
 
+                virtual bool completed() const override;
+
+                virtual void signal() override;
+
+                virtual void set_reader(WiegandReaderImpl *new_ptr) override;
+
             private:
 
                 /**
-                * Build and dispatch the auth request since we gathered all user input
-                * (either due to timeout, or to pin_end_key being pressed).
-                *
-                * It does nothing if there is no inputs.
+                * Reset self.
+                * We create new strategy instance, reset the boolean flag to defaults and
+                * reset the underlying reader buffer.
                 */
-                void end_of_input();
+                void reset();
 
-                std::string                 pin_;
-                std::chrono::milliseconds   delay_;
-                std::chrono::milliseconds   pin_timeout_;
-                char                        pin_end_key_;
+                SimpleWiegandStrategyUPtr read_card_strategy_;
+                WiegandPin4BitsOnlyUPtr read_pin_strategy_;
 
+                std::chrono::milliseconds delay_;
                 using TimePoint = std::chrono::system_clock::time_point;
-                TimePoint                   last_update_;
+                TimePoint time_card_read_;
 
                 bool reading_card_;
+                bool ready_;
+
+
+                std::chrono::milliseconds pin_timeout_;
+                char pin_end_key_;
             };
         }
     }

@@ -79,3 +79,8 @@ void WiegandPinBuffered::signal()
     ready_ = false;
     pin_ = "";
 }
+
+const std::string &WiegandPinBuffered::get_pin() const
+{
+    return pin_;
+}

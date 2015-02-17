@@ -33,6 +33,9 @@ namespace Leosac
 
         namespace Wiegand
         {
+            class WiegandStrategy;
+            using WiegandStrategyUPtr = std::unique_ptr<WiegandStrategy>;
+
             /**
             * The multiple modes available to wiegand reader are implemented through the
             * strategy pattern.
@@ -71,6 +74,14 @@ namespace Leosac
                 * only the strategy knows what kind of credential it can generate.
                 */
                 virtual void signal() = 0;
+
+                /**
+                * Update the pointer that points back to the associated reader.
+                */
+                virtual void set_reader(WiegandReaderImpl *new_ptr)
+                {
+                    reader_ = new_ptr;
+                }
 
                 // we may add the handle_msg here, because some mode may want to
                 // have "lower-level" access to gpio event.

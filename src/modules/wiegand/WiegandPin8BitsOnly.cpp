@@ -110,3 +110,7 @@ void WiegandPin8BitsOnly::signal()
     inputs_ = "";
 }
 
+const std::string &WiegandPin8BitsOnly::get_pin() const
+{
+    return inputs_;
+}

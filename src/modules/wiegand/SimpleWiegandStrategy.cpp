@@ -69,3 +69,13 @@ void SimpleWiegandStrategy::signal()
     ready_ = false;
     reader_->read_reset();
 }
+
+const std::string &SimpleWiegandStrategy::get_card_id() const
+{
+    return card_id_;
+}
+
+int SimpleWiegandStrategy::get_nb_bits() const
+{
+    return nb_bits_;
+}

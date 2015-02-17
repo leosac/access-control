@@ -28,6 +28,9 @@ namespace Leosac
 
         namespace Wiegand
         {
+            class WiegandPin4BitsOnly;
+            using WiegandPin4BitsOnlyUPtr = std::unique_ptr<WiegandPin4BitsOnly>;
+
             /**
             * Strategy for PIN only, 4 bits per key pressed mode.
             */
@@ -51,6 +54,8 @@ namespace Leosac
                 virtual bool completed() const override;
 
                 virtual void signal() override;
+
+                const std::string &get_pin() const;
 
             private:
                 void end_of_input();

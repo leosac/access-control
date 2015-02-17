@@ -28,6 +28,9 @@ namespace Leosac
 
         namespace Wiegand
         {
+            class SimpleWiegandStrategy;
+            using SimpleWiegandStrategyUPtr = std::unique_ptr<SimpleWiegandStrategy>;
+
             /**
             * Implementation of a wiegand card only strategy.
             */
@@ -41,6 +44,16 @@ namespace Leosac
                 virtual bool completed() const override;
 
                 virtual void signal() override;
+
+                /**
+                * Returns the card id that was read.
+                */
+                const std::string &get_card_id() const;
+
+                /**
+                * Returns the number of bits in the card.
+                */
+                int get_nb_bits() const;
 
             private:
                 bool ready_;
