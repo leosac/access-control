@@ -25,17 +25,15 @@ using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
 WiegandCardAndPin::WiegandCardAndPin(WiegandReaderImpl *reader,
-        std::chrono::milliseconds delay,
-        std::chrono::milliseconds pin_timeout,
-        char pin_end_key) :
+        CardReadingUPtr read_card,
+        PinReadingUPtr read_pin,
+        std::chrono::milliseconds delay) :
         WiegandStrategy(reader),
-        read_card_strategy_(new SimpleWiegandStrategy(reader)),
-        read_pin_strategy_(new WiegandPin4BitsOnly(reader, pin_timeout, pin_end_key)),
+        read_card_strategy_(std::move(read_card)),
+        read_pin_strategy_(std::move(read_pin)),
         delay_(delay),
         reading_card_(true),
-        ready_(false),
-        pin_timeout_(pin_timeout),
-        pin_end_key_(pin_end_key)
+        ready_(false)
 {
     time_card_read_ = std::chrono::system_clock::now();
 }
@@ -96,6 +94,6 @@ void WiegandCardAndPin::reset()
     reading_card_ = true;
     reader_->read_reset();
 
-    read_card_strategy_->reset();// = SimpleWiegandStrategyUPtr(new SimpleWiegandStrategy(reader_));
-    read_pin_strategy_->reset();// = WiegandPin4BitsOnlyUPtr(new WiegandPin4BitsOnly(reader_, pin_timeout_, pin_end_key_));
+    read_card_strategy_->reset();
+    read_pin_strategy_->reset();
 }

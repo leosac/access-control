@@ -19,9 +19,7 @@
 
 #pragma once
 
-#include "WiegandStrategy.hpp"
-#include "WiegandPin4BitsOnly.hpp"
-#include "SimpleWiegandStrategy.hpp"
+#include "Strategies.hpp"
 
 namespace Leosac
 {
@@ -35,8 +33,6 @@ namespace Leosac
                 /**
                 * Strategy for reading a card then a PIN code.
                 * We reuse existing strategy.
-                *
-                * Force 4 bits mode for now.
                 */
                 class WiegandCardAndPin : public WiegandStrategy
                 {
@@ -50,9 +46,9 @@ namespace Leosac
                     * @param pin_end_key    key ('1', '*', '5') that will trigger user input flushing.
                     */
                     WiegandCardAndPin(WiegandReaderImpl *reader,
-                            std::chrono::milliseconds delay,
-                            std::chrono::milliseconds pin_timeout,
-                            char pin_end_key);
+                            CardReadingUPtr read_card,
+                            PinReadingUPtr read_pin,
+                            std::chrono::milliseconds delay);
 
                     virtual void timeout() override;
 
@@ -71,8 +67,8 @@ namespace Leosac
                     */
                     void reset() override;
 
-                    SimpleWiegandStrategyUPtr read_card_strategy_;
-                    WiegandPin4BitsOnlyUPtr read_pin_strategy_;
+                    CardReadingUPtr read_card_strategy_;
+                    PinReadingUPtr read_pin_strategy_;
 
                     std::chrono::milliseconds delay_;
                     using TimePoint = std::chrono::system_clock::time_point;
@@ -80,10 +76,6 @@ namespace Leosac
 
                     bool reading_card_;
                     bool ready_;
-
-
-                    std::chrono::milliseconds pin_timeout_;
-                    char pin_end_key_;
                 };
             }
         }

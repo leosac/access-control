@@ -52,6 +52,8 @@ namespace Leosac
                 WiegandStrategy(WiegandReaderImpl *reader) : reader_(reader)
                 {}
 
+                virtual ~WiegandStrategy() = default;
+
                 /**
                 * This is called when the module detect a timeout. (2 ms of inactivity).
                 */
