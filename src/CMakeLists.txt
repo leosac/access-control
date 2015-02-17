@@ -23,6 +23,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/AuthTarget.cpp
     core/auth/Interfaces/IUser.cpp
     core/auth/AuthSourceBuilder.cpp
+    core/auth/CredentialValidity.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
