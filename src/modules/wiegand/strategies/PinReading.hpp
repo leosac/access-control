@@ -25,37 +25,31 @@ namespace Leosac
 {
     namespace Module
     {
-
         namespace Wiegand
         {
-            /**
-            * Strategy for PIN only, when up to 5 keys are buffered and sent
-            * as 26 bits. See HID documentation about keypad buffered mode.
-            */
-            class WiegandPinBuffered : public WiegandStrategy
+            namespace Strategy
             {
-            public:
+                class PinReading;
+
+                using PinReadingUPtr = std::unique_ptr<PinReading>;
+
                 /**
-                * Create a strategy that read 4bits-per-key PIN code.
-                *
-                * @param reader the reader object we provide the strategy for.
+                * Interface for a strategy that read a PIN code.
                 */
-                WiegandPinBuffered(WiegandReaderImpl *reader);
+                class PinReading : public WiegandStrategy
+                {
+                public:
+                    PinReading(WiegandReaderImpl *reader) :
+                            WiegandStrategy(reader)
+                    {
+                    }
 
-                virtual void timeout() override;
-
-                virtual bool completed() const override;
-
-                virtual void signal() override;
-
-                const std::string &get_pin() const;
-
-                virtual void reset() override;
-
-            private:
-                bool ready_;
-                std::string pin_;
-            };
+                    /**
+                    * Retrieve the pin code that was read from the reader.
+                    */
+                    virtual const std::string &get_pin() const = 0;
+                };
+            }
         }
     }
 }

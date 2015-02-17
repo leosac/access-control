@@ -19,14 +19,15 @@
 
 #include <tools/log.hpp>
 #include "WiegandPin8BitsOnly.hpp"
+#include "modules/wiegand/WiegandReaderImpl.hpp"
 
 using namespace Leosac::Module::Wiegand;
-
+using namespace Leosac::Module::Wiegand::Strategy;
 
 WiegandPin8BitsOnly::WiegandPin8BitsOnly(WiegandReaderImpl *reader,
         std::chrono::milliseconds pin_timeout,
         char pin_end_key) :
-        WiegandStrategy(reader),
+        PinReading(reader),
         pin_timeout_(pin_timeout),
         pin_end_key_(pin_end_key),
         ready_(false)

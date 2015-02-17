@@ -19,12 +19,14 @@
 
 #include <tools/log.hpp>
 #include "SimpleWiegandStrategy.hpp"
+#include "modules/wiegand/WiegandReaderImpl.hpp"
 
 using namespace Leosac::Module::Wiegand;
+using namespace Leosac::Module::Wiegand::Strategy;
 
 
 SimpleWiegandStrategy::SimpleWiegandStrategy(WiegandReaderImpl *reader) :
-        WiegandStrategy(reader),
+        CardReading(reader),
         ready_(false)
 {
 

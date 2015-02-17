@@ -24,15 +24,16 @@
 #include <boost/any.hpp>
 #include "zmqpp/zmqpp.hpp"
 #include "core/auth/Auth.hpp"
-#include "WiegandReaderImpl.hpp"
 
 namespace Leosac
 {
     namespace Module
     {
-
         namespace Wiegand
         {
+            class WiegandReaderImpl;
+            namespace Strategy
+            {
             class WiegandStrategy;
             using WiegandStrategyUPtr = std::unique_ptr<WiegandStrategy>;
 
@@ -98,6 +99,7 @@ namespace Leosac
             protected:
                 WiegandReaderImpl *reader_;
             };
+        }
         }
     }
 }

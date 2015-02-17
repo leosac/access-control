@@ -33,10 +33,14 @@ namespace Leosac
 
         namespace Wiegand
         {
-            class WiegandStrategy;
-            class WiegandPin4BitsOnly;
-            class WiegandPin8BitsOnly;
-            class WiegandPinBuffered;
+            namespace Strategy
+            {
+                class WiegandStrategy;
+                class SimpleWiegandStrategy;
+                class WiegandPin4BitsOnly;
+                class WiegandPin8BitsOnly;
+                class WiegandPinBuffered;
+            }
 
             /**
             * An implementation class that represents a Wiegand Reader.
@@ -60,7 +64,7 @@ namespace Leosac
                         const std::string &data_low_pin,
                         const std::string &green_led_name,
                         const std::string &buzzer_name,
-                        std::unique_ptr<WiegandStrategy> strategy);
+                        std::unique_ptr<Strategy::WiegandStrategy> strategy);
 
                 ~WiegandReaderImpl();
 
@@ -164,12 +168,12 @@ namespace Leosac
                 /**
                 * Concrete implementation of the reader mode.
                 */
-                std::unique_ptr<WiegandStrategy> strategy_;
+                std::unique_ptr<Strategy::WiegandStrategy> strategy_;
 
-                friend class SimpleWiegandStrategy;
-                friend class WiegandPin4BitsOnly;
-                friend class WiegandPin8BitsOnly;
-                friend class WiegandPinBuffered;
+                friend class Strategy::SimpleWiegandStrategy;
+                friend class Strategy::WiegandPin4BitsOnly;
+                friend class Strategy::WiegandPin8BitsOnly;
+                friend class Strategy::WiegandPinBuffered;
 
             };
         }

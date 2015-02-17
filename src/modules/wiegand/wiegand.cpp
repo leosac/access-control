@@ -24,11 +24,7 @@
 #include "tools/log.hpp"
 #include "core/auth/Auth.hpp"
 #include "wiegand.hpp"
-#include "SimpleWiegandStrategy.hpp"
-#include "WiegandPin4BitsOnly.hpp"
-#include "WiegandPin8BitsOnly.hpp"
-#include "WiegandPinBuffered.hpp"
-#include "WiegandCardAndPin.hpp"
+#include "strategies/Strategies.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
@@ -100,10 +96,11 @@ void WiegandReaderModule::run()
     }
 }
 
-std::unique_ptr<WiegandStrategy> WiegandReaderModule::create_strategy(const boost::property_tree::ptree &reader_cfg,
+Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::property_tree::ptree &reader_cfg,
         WiegandReaderImpl *reader)
 {
     using namespace Auth;
+    using namespace Strategy;
     std::string mode        = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
     int pin_timeout         = reader_cfg.get<int>("pin_timeout", 2000);
     int card_pin_delay      = reader_cfg.get<int>("card_pin_delay", 10000);

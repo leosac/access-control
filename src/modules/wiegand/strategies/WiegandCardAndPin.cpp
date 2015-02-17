@@ -19,8 +19,10 @@
 
 #include <tools/log.hpp>
 #include "WiegandCardAndPin.hpp"
+#include "modules/wiegand/WiegandReaderImpl.hpp"
 
 using namespace Leosac::Module::Wiegand;
+using namespace Leosac::Module::Wiegand::Strategy;
 
 WiegandCardAndPin::WiegandCardAndPin(WiegandReaderImpl *reader,
         std::chrono::milliseconds delay,

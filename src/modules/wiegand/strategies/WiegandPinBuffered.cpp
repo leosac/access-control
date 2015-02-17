@@ -19,12 +19,13 @@
 
 #include <tools/log.hpp>
 #include "WiegandPinBuffered.hpp"
+#include "modules/wiegand/WiegandReaderImpl.hpp"
 
 using namespace Leosac::Module::Wiegand;
-
+using namespace Leosac::Module::Wiegand::Strategy;
 
 WiegandPinBuffered::WiegandPinBuffered(WiegandReaderImpl *reader) :
-        WiegandStrategy(reader),
+        PinReading(reader),
         ready_(false)
 {
 }

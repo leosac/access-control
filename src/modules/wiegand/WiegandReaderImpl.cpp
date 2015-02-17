@@ -21,9 +21,10 @@
 #include <core/auth/Auth.hpp>
 #include "WiegandReaderImpl.hpp"
 #include "tools/log.hpp"
-#include "WiegandStrategy.hpp"
+#include "strategies/WiegandStrategy.hpp"
 
 using namespace Leosac::Module::Wiegand;
+using namespace Leosac::Module::Wiegand::Strategy;
 using namespace Leosac::Hardware;
 using namespace Leosac::Auth;
 

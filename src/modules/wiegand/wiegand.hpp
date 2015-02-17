@@ -22,6 +22,7 @@
 #include "zmqpp/zmqpp.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <modules/BaseModule.hpp>
+#include <modules/wiegand/strategies/WiegandStrategy.hpp>
 #include "WiegandReaderImpl.hpp"
 
 namespace Leosac
@@ -60,7 +61,7 @@ namespace Leosac
                 /**
                 * Internal factory that build a strategy object based upon a reader configuration.
                 */
-                std::unique_ptr<WiegandStrategy> create_strategy(const boost::property_tree::ptree &reader_config,
+                Strategy::WiegandStrategyUPtr create_strategy(const boost::property_tree::ptree &reader_config,
                         WiegandReaderImpl *reader);
 
                 /**
