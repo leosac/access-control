@@ -117,6 +117,13 @@ void WiegandReaderImpl::timeout()
 {
     assert(strategy_);
     strategy_->timeout();
+
+    if (strategy_->completed())
+    {
+        // if we gathered all the data we need, send
+        // and authentication attempt by signaling the application.
+        strategy_->signal();
+    }
 }
 
 void WiegandReaderImpl::handle_request()

@@ -48,14 +48,11 @@ namespace Leosac
                 // we reset the counter_ and buffer_ for each key.
                 virtual void timeout() override;
 
-            private:
+                virtual bool completed() const override;
 
-                /**
-                * Build and dispatch the auth request since we gathered all user input
-                * (either due to timeout, or to pin_end_key being pressed).
-                *
-                * It does nothing if there is no inputs.
-                */
+                virtual void signal() override;
+
+            private:
                 void end_of_input();
 
                 std::string                 inputs_;
@@ -64,6 +61,11 @@ namespace Leosac
 
                 using TimePoint = std::chrono::system_clock::time_point;
                 TimePoint                   last_update_;
+
+                /**
+                * Are we ready to submit the PIN code ?
+                */
+                bool ready_;
             };
         }
     }

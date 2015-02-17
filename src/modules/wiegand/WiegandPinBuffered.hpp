@@ -43,6 +43,14 @@ namespace Leosac
                 WiegandPinBuffered(WiegandReaderImpl *reader);
 
                 virtual void timeout() override;
+
+                virtual bool completed() const override;
+
+                virtual void signal() override;
+
+            private:
+                bool ready_;
+                std::string pin_;
             };
         }
     }

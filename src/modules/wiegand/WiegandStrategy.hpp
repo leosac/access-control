@@ -21,6 +21,7 @@
 
 #include <string>
 #include <chrono>
+#include <boost/any.hpp>
 #include "zmqpp/zmqpp.hpp"
 #include "core/auth/Auth.hpp"
 #include "WiegandReaderImpl.hpp"
@@ -51,6 +52,25 @@ namespace Leosac
                 * This is called when the module detect a timeout. (2 ms of inactivity).
                 */
                 virtual void timeout() = 0;
+
+                /**
+                * Did the strategy gather needed data?
+                * If this function returns true, that means that the strategy implementation
+                * successfully retrieve data from wiegand bits.
+                *
+                * It successfully build a card_id, or a PIN code, etc.
+                * The reader implementation will call signal() if completed() returns true.
+                */
+                virtual bool completed() const = 0;
+
+                /**
+                * Tells the strategy implementation to send a message to the application
+                * containing the received credentials.
+                *
+                * It is up to the strategy to format a correct message. This is required because
+                * only the strategy knows what kind of credential it can generate.
+                */
+                virtual void signal() = 0;
 
                 // we may add the handle_msg here, because some mode may want to
                 // have "lower-level" access to gpio event.

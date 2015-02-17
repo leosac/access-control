@@ -37,6 +37,15 @@ namespace Leosac
                 SimpleWiegandStrategy(WiegandReaderImpl *reader);
 
                 virtual void timeout() override;
+
+                virtual bool completed() const override;
+
+                virtual void signal() override;
+
+            private:
+                bool ready_;
+                int nb_bits_;
+                std::string card_id_;
             };
         }
     }

@@ -24,7 +24,8 @@ using namespace Leosac::Module::Wiegand;
 
 
 WiegandPinBuffered::WiegandPinBuffered(WiegandReaderImpl *reader) :
-        WiegandStrategy(reader)
+        WiegandStrategy(reader),
+        ready_(false)
 {
 }
 
@@ -56,9 +57,25 @@ void WiegandPinBuffered::timeout()
         WARN("Invalid Pin Code");
         return;
     }
-    DEBUG("Pin code = " << n);
+    pin_ = std::to_string(n);
+    ready_ = true;
+}
+
+bool WiegandPinBuffered::completed() const
+{
+    return ready_;
+}
+
+void WiegandPinBuffered::signal()
+{
+    assert(ready_);
+    assert(pin_.length());
+
+    DEBUG("Sending PIN Code: " << pin_);
     zmqpp::message msg;
-    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << std::to_string(n);
+    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << pin_;
     reader_->bus_push_.send(msg);
     reader_->read_reset();
+    ready_ = false;
+    pin_ = "";
 }

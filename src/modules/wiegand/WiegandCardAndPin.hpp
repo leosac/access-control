@@ -29,48 +29,46 @@ namespace Leosac
         namespace Wiegand
         {
             /**
-            * Strategy for PIN only, 8 bits per key pressed mode.
+            * Strategy for reading a card then a PIN code.
+            * We reuse existing strategy.
             */
-            class WiegandPin8BitsOnly : public WiegandStrategy
+            class WiegandCardAndPin : public WiegandStrategy
             {
             public:
                 /**
                 * Create a strategy that read 4bits-per-key PIN code.
                 *
                 * @param reader         the reader object we provide the strategy for.
+                * @param delay          max nb of msec between reading the card and receiving pin code data.
                 * @param pin_timeout    nb of msec before flushing user input to the system
                 * @param pin_end_key    key ('1', '*', '5') that will trigger user input flushing.
                 */
-                WiegandPin8BitsOnly(WiegandReaderImpl *reader,
+                WiegandCardAndPin(WiegandReaderImpl *reader,
+                        std::chrono::milliseconds delay,
                         std::chrono::milliseconds pin_timeout,
                         char pin_end_key);
 
-                // we reset the counter_ and buffer_ for each key.
                 virtual void timeout() override;
-
-                virtual bool completed() const override;
-
-                virtual void signal() override;
 
             private:
 
                 /**
-                * Timeout or pin_end_key read. If we have meaningful data,
-                * set ready to true.
+                * Build and dispatch the auth request since we gathered all user input
+                * (either due to timeout, or to pin_end_key being pressed).
+                *
+                * It does nothing if there is no inputs.
                 */
                 void end_of_input();
 
-                std::string                 inputs_;
+                std::string                 pin_;
+                std::chrono::milliseconds   delay_;
                 std::chrono::milliseconds   pin_timeout_;
                 char                        pin_end_key_;
 
                 using TimePoint = std::chrono::system_clock::time_point;
                 TimePoint                   last_update_;
 
-                /**
-                * Are we ready to submit the PIN code ?
-                */
-                bool ready_;
+                bool reading_card_;
             };
         }
     }

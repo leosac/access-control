@@ -28,7 +28,8 @@ WiegandPin8BitsOnly::WiegandPin8BitsOnly(WiegandReaderImpl *reader,
         char pin_end_key) :
         WiegandStrategy(reader),
         pin_timeout_(pin_timeout),
-        pin_end_key_(pin_end_key)
+        pin_end_key_(pin_end_key),
+        ready_(false)
 {
     last_update_ = std::chrono::system_clock::now();
 }
@@ -86,13 +87,26 @@ void WiegandPin8BitsOnly::timeout()
 void WiegandPin8BitsOnly::end_of_input()
 {
     if (inputs_.length())
-    {
-        DEBUG("End of input. PIN code = " << inputs_);
-        zmqpp::message msg;
-        msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << inputs_;
-        reader_->bus_push_.send(msg);
-
-        reader_->read_reset();
-        inputs_ = "";
-    }
+        ready_ = true;
+    else
+        ready_ = false;
 }
+
+bool WiegandPin8BitsOnly::completed() const
+{
+    return ready_;
+}
+
+void WiegandPin8BitsOnly::signal()
+{
+    assert(ready_);
+    assert(inputs_.length());
+    DEBUG("Sending PIN Code: " << inputs_);
+    zmqpp::message msg;
+    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << inputs_;
+    reader_->bus_push_.send(msg);
+    reader_->read_reset();
+    ready_ = false;
+    inputs_ = "";
+}
+

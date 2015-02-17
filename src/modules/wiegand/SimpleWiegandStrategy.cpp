@@ -24,7 +24,8 @@ using namespace Leosac::Module::Wiegand;
 
 
 SimpleWiegandStrategy::SimpleWiegandStrategy(WiegandReaderImpl *reader) :
-        WiegandStrategy(reader)
+        WiegandStrategy(reader),
+        ready_(false)
 {
 
 }
@@ -46,9 +47,25 @@ void SimpleWiegandStrategy::timeout()
             card_hex << ":";
     }
 
+    ready_ = true;
+    nb_bits_ = reader_->counter();
+    card_id_ = card_hex.str();
+}
+
+bool SimpleWiegandStrategy::completed() const
+{
+    return ready_;
+}
+
+void SimpleWiegandStrategy::signal()
+{
+    assert(ready_);
+    assert(card_id_.length());
+
     zmqpp::message msg;
-    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_hex.str() << reader_->counter();
+    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_id_ << nb_bits_;
     reader_->bus_push_.send(msg);
 
+    ready_ = false;
     reader_->read_reset();
 }

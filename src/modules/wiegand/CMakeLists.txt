@@ -7,6 +7,7 @@ set(WIEGAND_SRCS
     WiegandPin4BitsOnly.cpp
     WiegandPin8BitsOnly.cpp
     WiegandPinBuffered.cpp
+    WiegandCardAndPin.cpp
 )
 
 add_library(${WIEGAND_BIN} SHARED ${WIEGAND_SRCS})
