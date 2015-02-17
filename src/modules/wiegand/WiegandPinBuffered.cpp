@@ -39,7 +39,7 @@ void WiegandPinBuffered::timeout()
     if (reader_->counter() != 26)
     {
         WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 26)");
-        reader_->read_reset();
+        reset();
         return;
     }
 
@@ -75,12 +75,16 @@ void WiegandPinBuffered::signal()
     zmqpp::message msg;
     msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << pin_;
     reader_->bus_push_.send(msg);
-    reader_->read_reset();
-    ready_ = false;
-    pin_ = "";
 }
 
 const std::string &WiegandPinBuffered::get_pin() const
 {
     return pin_;
+}
+
+void WiegandPinBuffered::reset()
+{
+    reader_->read_reset();
+    ready_ = false;
+    pin_ = "";
 }

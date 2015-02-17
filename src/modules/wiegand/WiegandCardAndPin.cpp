@@ -94,6 +94,6 @@ void WiegandCardAndPin::reset()
     reading_card_ = true;
     reader_->read_reset();
 
-    read_card_strategy_ = SimpleWiegandStrategyUPtr(new SimpleWiegandStrategy(reader_));
-    read_pin_strategy_ = WiegandPin4BitsOnlyUPtr(new WiegandPin4BitsOnly(reader_, pin_timeout_, pin_end_key_));
+    read_card_strategy_->reset();// = SimpleWiegandStrategyUPtr(new SimpleWiegandStrategy(reader_));
+    read_pin_strategy_->reset();// = WiegandPin4BitsOnlyUPtr(new WiegandPin4BitsOnly(reader_, pin_timeout_, pin_end_key_));
 }

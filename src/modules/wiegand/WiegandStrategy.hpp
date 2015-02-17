@@ -76,6 +76,14 @@ namespace Leosac
                 virtual void signal() = 0;
 
                 /**
+                * Reset the strategy, meaning that the next time timeout() is called
+                * the behavior should be the same than the first time.
+                *
+                * Basically, implementation should wipe its state (parts of PIN code read, card ID, etc).
+                */
+                virtual void reset() = 0;
+
+                /**
                 * Update the pointer that points back to the associated reader.
                 */
                 virtual void set_reader(WiegandReaderImpl *new_ptr)

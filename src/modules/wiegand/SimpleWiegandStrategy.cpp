@@ -65,9 +65,6 @@ void SimpleWiegandStrategy::signal()
     zmqpp::message msg;
     msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_id_ << nb_bits_;
     reader_->bus_push_.send(msg);
-
-    ready_ = false;
-    reader_->read_reset();
 }
 
 const std::string &SimpleWiegandStrategy::get_card_id() const
@@ -78,4 +75,12 @@ const std::string &SimpleWiegandStrategy::get_card_id() const
 int SimpleWiegandStrategy::get_nb_bits() const
 {
     return nb_bits_;
+}
+
+void SimpleWiegandStrategy::reset()
+{
+    ready_ = false;
+    card_id_ = "";
+    nb_bits_ = 0;
+    reader_->read_reset();
 }

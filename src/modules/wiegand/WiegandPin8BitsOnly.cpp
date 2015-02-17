@@ -49,8 +49,7 @@ void WiegandPin8BitsOnly::timeout()
     if (reader_->counter() != 8)
     {
         WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 8)");
-        reader_->read_reset();
-        inputs_ = "";
+        reset();
         return;
     }
 
@@ -113,4 +112,12 @@ void WiegandPin8BitsOnly::signal()
 const std::string &WiegandPin8BitsOnly::get_pin() const
 {
     return inputs_;
+}
+
+void WiegandPin8BitsOnly::reset()
+{
+    reader_->read_reset();
+    ready_ = false;
+    inputs_ = "";
+    last_update_ = std::chrono::system_clock::now();
 }

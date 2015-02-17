@@ -57,6 +57,8 @@ namespace Leosac
 
                 const std::string &get_pin() const;
 
+                virtual void reset() override;
+
             private:
                 void end_of_input();
 

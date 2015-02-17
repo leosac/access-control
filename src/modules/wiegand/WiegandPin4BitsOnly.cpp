@@ -49,8 +49,7 @@ void WiegandPin4BitsOnly::timeout()
     if (reader_->counter() != 4)
     {
         WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 4)");
-        reader_->read_reset();
-        inputs_ = "";
+        reset();
         return;
     }
 
@@ -105,12 +104,17 @@ void WiegandPin4BitsOnly::signal()
     zmqpp::message msg;
     msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << inputs_;
     reader_->bus_push_.send(msg);
-    reader_->read_reset();
-    ready_ = false;
-    inputs_ = "";
 }
 
 const std::string &WiegandPin4BitsOnly::get_pin() const
 {
     return inputs_;
+}
+
+void WiegandPin4BitsOnly::reset()
+{
+    reader_->read_reset();
+    ready_ = false;
+    inputs_ = "";
+    last_update_ = std::chrono::system_clock::now();
 }

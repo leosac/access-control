@@ -67,7 +67,7 @@ namespace Leosac
                 * We create new strategy instance, reset the boolean flag to defaults and
                 * reset the underlying reader buffer.
                 */
-                void reset();
+                void reset() override;
 
                 SimpleWiegandStrategyUPtr read_card_strategy_;
                 WiegandPin4BitsOnlyUPtr read_pin_strategy_;

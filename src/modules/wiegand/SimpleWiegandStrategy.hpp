@@ -55,6 +55,8 @@ namespace Leosac
                 */
                 int get_nb_bits() const;
 
+                virtual void reset() override;
+
             private:
                 bool ready_;
                 int nb_bits_;
