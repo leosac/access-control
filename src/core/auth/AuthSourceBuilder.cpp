@@ -27,8 +27,8 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     // Auth spec say at least 2 frames: source and type.
     assert(msg && msg->parts() >= 2);
     std::string source_name;
-    SourceType type_name;
-    *msg >> source_name >> type_name;
+    SourceType type;
+    *msg >> source_name >> type;
 
     if (!extract_source_name(source_name, &source_name))
     {
@@ -37,13 +37,12 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
                 "Source name was {" << source_name << "}");
         assert(0);
     }
-    if (type_name == SourceType::SIMPLE_WIEGAND)
-    {
+    if (type == SourceType::SIMPLE_WIEGAND)
         return create_simple_wiegand(source_name, msg);
-    }
-    else if (type_name == SourceType::WIEGAND_PIN)
+    else if (type == SourceType::WIEGAND_PIN)
         return create_wiegand_pin(source_name, msg);
-
+    else if (type == SourceType::WIEGAND_CARD_PIN)
+        return create_wiegand_card_pin(source_name, msg);
     assert(0);
 }
 
@@ -88,6 +87,23 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin(const std::string
 
     INFO("Building an AuthSource object (PINCode): " << pin);
     BaseAuthSourcePtr auth_source(new PINCode(pin));
+    auth_source->name(name);
+
+    return auth_source;
+}
+
+IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_card_pin(const std::string &name, zmqpp::message *msg)
+{
+    // card id; nb bits; pin
+    assert(msg && msg->remaining() == 3);
+
+    std::string card_id;
+    int bits;
+    std::string pin_code;
+
+    *msg >> card_id >> bits >> pin_code;
+    INFO("Building an AuthSource object (Wiegand Card + Pin):" << card_id << ", " << pin_code);
+    BaseAuthSourcePtr auth_source(new WiegandCardPin(card_id, bits, pin_code));
     auth_source->name(name);
 
     return auth_source;

@@ -71,6 +71,9 @@ namespace Leosac
             */
             IAuthenticationSourcePtr create_wiegand_pin(const std::string &name,
                     zmqpp::message *msg);
+
+            IAuthenticationSourcePtr create_wiegand_card_pin(const std::string &name,
+                    zmqpp::message *msg);
         };
     }
 }

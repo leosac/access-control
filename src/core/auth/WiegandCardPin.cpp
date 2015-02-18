@@ -17,29 +17,23 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/IVisitor.hpp>
-#include "WiegandCard.hpp"
+#include "WiegandCardPin.hpp"
 
 using namespace Leosac::Auth;
 
-WiegandCard::WiegandCard(const std::string &card_id, int bits) :
-        id_(card_id),
-        nb_bits_(bits)
+WiegandCardPin::WiegandCardPin(const std::string &card_id, int nb_bits, const std::string &pin_code) :
+        card_(card_id, nb_bits),
+        pin_(pin_code)
 {
 
 }
 
-void WiegandCard::accept(Leosac::Tools::IVisitor *visitor)
+const WiegandCard &WiegandCardPin::card() const
 {
-    visitor->visit(this);
+    return card_;
 }
 
-const std::string &WiegandCard::id() const
+const PINCode &WiegandCardPin::pin() const
 {
-    return id_;
-}
-
-int WiegandCard::nb_bits() const
-{
-    return nb_bits_;
+    return pin_;
 }

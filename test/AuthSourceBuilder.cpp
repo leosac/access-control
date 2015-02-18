@@ -23,6 +23,7 @@
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 #include "core/auth/PINCode.hpp"
+#include "../src/core/auth/Auth.hpp"
 
 using namespace Leosac::Auth;
 using namespace Leosac::Module::Auth;
@@ -48,6 +49,12 @@ namespace Leosac
                 msg2_ << "S_MY_WIEGAND_1";
                 msg2_ << SourceType::WIEGAND_PIN;
                 msg2_ << "1234";
+
+                msg3_ << "S_MY_WIEGAND_1";
+                msg3_ << SourceType::WIEGAND_CARD_PIN;
+                msg3_ << "af:bc:12:42";
+                msg3_ << 32;
+                msg3_ << "1234";
             }
 
             ~AuthSourceBuilderTest()
@@ -64,6 +71,11 @@ namespace Leosac
             * This looks like a message sent by MY_WIEGAND_1 with WIEGAND_PIN_4BITS data.
             */
             zmqpp::message msg2_;
+
+            /**
+            * Message to construct a cardId + pin credential.
+            */
+            zmqpp::message msg3_;
         };
 
         TEST_F(AuthSourceBuilderTest, ExtractSourceName)
@@ -90,9 +102,11 @@ namespace Leosac
             ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
             WiegandCardPtr spec = std::dynamic_pointer_cast<WiegandCard>(auth_source);
             ASSERT_TRUE(spec.get());
+            ASSERT_EQ("af:bc:12:42", spec->id());
+            ASSERT_EQ(32, spec->nb_bits());
         }
 
-        TEST_F(AuthSourceBuilderTest, BuildPIN4bits)
+        TEST_F(AuthSourceBuilderTest, BuildPin)
         {
             IAuthenticationSourcePtr auth_source = builder_.create(&msg2_);
             ASSERT_TRUE(auth_source.get());
@@ -102,5 +116,19 @@ namespace Leosac
             ASSERT_TRUE(spec.get());
             ASSERT_EQ("1234", spec->pin_code());
         }
+
+        TEST_F(AuthSourceBuilderTest, BuildCardAndPing)
+        {
+            IAuthenticationSourcePtr auth_source = builder_.create(&msg3_);
+            ASSERT_TRUE(auth_source.get());
+
+            ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
+            WiegandCardPinPtr spec = std::dynamic_pointer_cast<WiegandCardPin>(auth_source);
+            ASSERT_TRUE(spec.get());
+            ASSERT_EQ("af:bc:12:42", spec->card().id());
+            ASSERT_EQ(32, spec->card().nb_bits());
+            ASSERT_EQ("1234", spec->pin().pin_code());
+        }
+
     }
 }

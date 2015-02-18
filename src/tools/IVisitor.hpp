@@ -27,6 +27,7 @@ namespace Leosac
         class BaseAuthSource;
         class WiegandCard;
         class PINCode;
+        class WiegandCardPin;
     }
 }
 
@@ -41,7 +42,7 @@ namespace Leosac
         * wants to reimplement.
         *
         * Each time a new kind of visitor is created, it should be
-        * appended to this class.
+        * added to this class.
         * The methods in this interface are actually not pure, because this
         * allows visitor to ignore type they are not interested in.
         *
@@ -66,6 +67,10 @@ namespace Leosac
             }
 
             virtual void visit(Leosac::Auth::PINCode *)
+            {
+            }
+
+            virtual void visit(::Leosac::Auth::WiegandCardPin *)
             {
             }
 

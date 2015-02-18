@@ -86,7 +86,7 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
         if (node_name != "map")
             throw ConfigException(config_file_, "Invalid config file content");
 
-        // does this entry map a wiegand card?
+        // does this entry map a to a PIN code?
         auto opt_child = node.get_child_optional("PINCode");
         if (opt_child)
         {
@@ -105,10 +105,41 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
     }
 }
 
+void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
+{
+  /* const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("user_mapping");
+
+    for (const auto &mapping : mapping_tree)
+    {
+        const std::string &node_name = mapping.first;
+        const boost::property_tree::ptree &node = mapping.second;
+
+        if (node_name != "map")
+            throw ConfigException(config_file_, "Invalid config file content");
+
+        // does this entry map a wiegand card + pin code?
+        auto opt_child = node.get_child_optional("CardAndPin");
+        if (opt_child)
+        {
+            if (opt_child->data() == src->pin_code())
+            {
+                // we found the card id
+                std::string user_id = node.get<std::string>("user");
+
+                // if user doesn't already exists this mean its profile is empty.
+                // lets create the user on the fly, he'll still have no profile.
+                if (!users_[user_id])
+                    users_[user_id] = IUserPtr(new IUser(user_id));
+                src->owner(users_[user_id]);
+            }
+        }
+    }*/
+}
+
 
 void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
 {
-    assert(auth_source.get());
+    assert(auth_source);
     try
     {
         auth_source->accept(this);

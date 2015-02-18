@@ -40,6 +40,11 @@ namespace Leosac
         {
         public:
             /**
+            * Default credential is enabled and no time-base limitation.
+            */
+            CredentialValidity();
+
+            /**
             * Check that the current date is between
             * validity start and end and make sure its
             * enabled too.
@@ -59,8 +64,8 @@ namespace Leosac
         private:
             using TimePoint = std::chrono::system_clock::time_point;
 
-            TimePoint validity_start;
-            TimePoint validity_end;
+            TimePoint validity_start_;
+            TimePoint validity_end_;
             bool enabled_;
         };
     }

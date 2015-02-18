@@ -21,46 +21,41 @@
 
 #include "core/auth/BaseAuthSource.hpp"
 #include <string>
+#include <tools/IVisitor.hpp>
+#include "core/auth/WiegandCard.hpp"
+#include "core/auth/PINCode.hpp"
 
 namespace Leosac
 {
     namespace Auth
     {
-        class WiegandCard;
-        using WiegandCardPtr = std::shared_ptr<WiegandCard>;
+        class WiegandCardPin;
+        using WiegandCardPinPtr = std::shared_ptr<WiegandCardPin>;
+
         /**
-        * A wiegand card.
+        * Credentials composed of a Wiegand card and a PIN code.
         */
-        class WiegandCard : public BaseAuthSource
+        class WiegandCardPin : public BaseAuthSource
         {
         public:
             /**
-            * Create a WiegandCard object.
+            * Create a WiegandCardPin object.
             *
-            * @param card_id the id of the card in hexadecimal text format
-            * @param bits number of bits (wiegand 26, wiegand32 ...)
+            * @param pin the code in string format.
             */
-            WiegandCard(const std::string &card_id, int bits);
+            WiegandCardPin(const std::string &card_id, int nb_bits, const std::string &pin_code);
 
-            virtual void accept(Tools::IVisitor *visitor) override;
+            virtual void accept(Tools::IVisitor *visitor) override
+            {
+                visitor->visit(this);
+            }
 
-            /**
-            * Returns the id of the card, as a hexadecimal string.
-            */
-            const std::string &id() const;
-
-            int nb_bits() const;
+            const WiegandCard &card() const;
+            const PINCode &pin() const;
 
         protected:
-            /**
-            * Card id
-            */
-            std::string id_;
-
-            /**
-            * Number of meaningful bit
-            */
-            int nb_bits_;
+            WiegandCard card_;
+            PINCode pin_;
         };
     }
 }

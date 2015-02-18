@@ -21,6 +21,14 @@
 
 using namespace Leosac::Auth;
 
+CredentialValidity::CredentialValidity() :
+        validity_start_(std::chrono::system_clock::time_point::min()),
+        validity_end_(std::chrono::system_clock::time_point::max()),
+        enabled_(true)
+{
+
+}
+
 bool CredentialValidity::is_valid() const
 {
     return is_enabled() && is_in_range();
@@ -35,7 +43,7 @@ bool CredentialValidity::is_in_range() const
 {
     TimePoint now = std::chrono::system_clock::now();
 
-    if (now >= validity_start && now <= validity_end)
+    if (now >= validity_start_ && now <= validity_end_)
         return true;
     return false;
 }

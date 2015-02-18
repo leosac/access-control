@@ -65,3 +65,4 @@ zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::Auth::AccessStatus
 #include "BaseAuthSource.hpp"
 #include "WiegandCard.hpp"
 #include "PINCode.hpp"
+#include "WiegandCardPin.hpp"

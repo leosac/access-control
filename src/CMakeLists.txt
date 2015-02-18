@@ -18,6 +18,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/Group.cpp
     core/auth/ProfileMerger.cpp
     core/auth/WiegandCard.cpp
+    core/auth/WiegandCardPin.cpp
     core/auth/SimpleAccessProfile.cpp
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp

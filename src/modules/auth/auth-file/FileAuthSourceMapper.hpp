@@ -22,6 +22,7 @@
 #include <string>
 #include <map>
 #include <boost/property_tree/ptree.hpp>
+#include <core/auth/WiegandCardPin.hpp>
 #include "core/auth/SimpleAccessProfile.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/WiegandCard.hpp"
@@ -46,11 +47,16 @@ namespace Leosac
                 * Try to map a wiegand card_id to a user.
                 */
                 virtual void visit(::Leosac::Auth::WiegandCard *src) override;
+
                 /**
                 * Try to map a PIN code to a user.
                 */
                 virtual void visit(::Leosac::Auth::PINCode *src) override;
 
+                /**
+                * Try to map a Wiegand card id + a PIN code to a user.
+                */
+                virtual void visit(::Leosac::Auth::WiegandCardPin *src) override;
 
                 virtual void mapToUser(Leosac::Auth::IAuthenticationSourcePtr auth_source);
 
