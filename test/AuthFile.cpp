@@ -31,6 +31,7 @@
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 #include "core/auth/PINCode.hpp"
+#include "../src/core/auth/Interfaces/IAuthSourceMapper.hpp"
 
 /**
 * Path to test-data file.
@@ -60,12 +61,14 @@ namespace Leosac
                     my_card_(new WiegandCard("aa:bb:cc:dd", 32)),
                     my_card2_(new WiegandCard("cc:dd:ee:ff", 32)),
                     unknown_card_(new WiegandCard("00:00:00:00", 32)),
-                    my_pin_(new PINCode("1234"))
+                    my_pin_(new PINCode("1234")),
+                    card_and_pin_(new WiegandCardPin("cc:dd:ee:ff", 32, "1234"))
             {
                 mapper_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-1.xml");
                 mapper2_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-3.xml");
                 mapper3_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-4.xml");
                 mapper4_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-5.xml");
+                mapper5_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-6.xml");
 
                 // initialize date object.
                 std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -119,6 +122,7 @@ namespace Leosac
                 delete mapper2_;
                 delete mapper3_;
                 delete mapper4_;
+                delete mapper5_;
             }
 
             bool is_in_group(const std::string &user_name, const std::string &group_name,
@@ -154,10 +158,13 @@ namespace Leosac
             IAuthSourceMapper *mapper3_;
             // groupe + single user permissions
             IAuthSourceMapper *mapper4_;
+            // wiegand card + pin
+            IAuthSourceMapper *mapper5_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
             IAuthenticationSourcePtr unknown_card_;
             IAuthenticationSourcePtr my_pin_;
+            IAuthenticationSourcePtr card_and_pin_;
         };
 
         /**
@@ -398,6 +405,18 @@ namespace Leosac
             mapper4_->mapToUser(unknown_card_);
             auto profile = mapper4_->buildProfile(unknown_card_);
             ASSERT_FALSE(profile.get());
+        }
+
+        TEST_F(AuthFileMapperTest, TestWiegandCardAndPin)
+        {
+            mapper5_->mapToUser(card_and_pin_);
+            auto profile_toto = mapper5_->buildProfile(card_and_pin_);
+            ASSERT_TRUE(profile_toto.get());
+
+            ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorA_));
+            ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorB_));
+            ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorC_));
+            ASSERT_FALSE(profile_toto->isAccessGranted(date_monday_16_31, doorC_));
         }
     }
 }
