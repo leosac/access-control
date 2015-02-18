@@ -80,12 +80,16 @@ It is an enumeration value, see [AuthSourceType](@ref Leosac::Auth::SourceType).
 
 Currently we are lucky, we only define one.
 
-1. **SIMPLE_WIEGAND** : This data type requires 2 frames:
-  1. A hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"
+1. **SIMPLE_WIEGAND**: This data type requires 2 frames:
+  1. An hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"
   2. An *integer* that holds the number of bits in the card id. 
 2. **WIEGAND_PIN**: Configuration mode used when we use the reader only for PIN code.
   1. A *string* that contains the PIN code. Its easier to use string, because we don't know the length
     of the PIN code, and it may vary.
+3. **WIEGAND_CARD_PIN**: This credential mode holds both a wiegand card number along with a PIN code.
+  1. An hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"
+  2. An *integer* that holds the number of bits in the card id.
+  3. A *string* that contains the PIN code.
 
 Message Passing Specifications {#auth_specc}
 ============================================
