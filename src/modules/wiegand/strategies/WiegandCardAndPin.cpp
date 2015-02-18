@@ -73,11 +73,16 @@ bool WiegandCardAndPin::completed() const
     return ready_;
 }
 
-void WiegandCardAndPin::signal()
+void WiegandCardAndPin::signal(zmqpp::socket &sock)
 {
-    DEBUG("Would signal !");
     DEBUG("Card = " << read_card_strategy_->get_card_id());
     DEBUG("Pin = " << read_pin_strategy_->get_pin());
+
+    zmqpp::message msg;
+    msg << ("S_" + reader_->name()) << Auth::SourceType::WIEGAND_CARD_PIN <<
+            read_card_strategy_->get_card_id() << read_card_strategy_->get_nb_bits() <<
+            read_pin_strategy_->get_pin();
+    sock.send(msg);
     reset();
 }
 

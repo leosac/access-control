@@ -38,6 +38,11 @@ namespace Leosac
             * Message formatting when using a simple PIN code.
             */
             WIEGAND_PIN = 2,
+
+            /**
+            * When reading both a card an a PIN code.
+            */
+            WIEGAND_CARD_PIN = 3,
         };
 
         enum class AccessStatus : uint8_t

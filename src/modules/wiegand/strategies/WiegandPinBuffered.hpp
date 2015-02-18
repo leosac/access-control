@@ -47,7 +47,7 @@ namespace Leosac
 
                     virtual bool completed() const override;
 
-                    virtual void signal() override;
+                    virtual void signal(zmqpp::socket &sock) override;
 
                     virtual const std::string &get_pin() const override;
 

@@ -97,17 +97,15 @@ bool WiegandPin8BitsOnly::completed() const
     return ready_;
 }
 
-void WiegandPin8BitsOnly::signal()
+void WiegandPin8BitsOnly::signal(zmqpp::socket &sock)
 {
     assert(ready_);
     assert(inputs_.length());
     DEBUG("Sending PIN Code: " << inputs_);
     zmqpp::message msg;
     msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << inputs_;
-    reader_->bus_push_.send(msg);
-    reader_->read_reset();
-    ready_ = false;
-    inputs_ = "";
+    sock.send(msg);
+    reset();
 }
 
 const std::string &WiegandPin8BitsOnly::get_pin() const

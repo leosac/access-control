@@ -59,14 +59,14 @@ bool SimpleWiegandStrategy::completed() const
     return ready_;
 }
 
-void SimpleWiegandStrategy::signal()
+void SimpleWiegandStrategy::signal(zmqpp::socket &sock)
 {
     assert(ready_);
     assert(card_id_.length());
 
     zmqpp::message msg;
     msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_id_ << nb_bits_;
-    reader_->bus_push_.send(msg);
+    sock.send(msg);
 }
 
 const std::string &SimpleWiegandStrategy::get_card_id() const

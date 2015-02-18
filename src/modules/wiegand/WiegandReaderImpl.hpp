@@ -21,6 +21,7 @@
 
 #include <string>
 #include <chrono>
+#include "modules/wiegand/strategies/WiegandStrategy.hpp"
 #include "zmqpp/zmqpp.hpp"
 #include "hardware/FLED.hpp"
 #include "hardware/FBuzzer.hpp"
@@ -33,15 +34,6 @@ namespace Leosac
 
         namespace Wiegand
         {
-            namespace Strategy
-            {
-                class WiegandStrategy;
-                class SimpleWiegandStrategy;
-                class WiegandPin4BitsOnly;
-                class WiegandPin8BitsOnly;
-                class WiegandPinBuffered;
-            }
-
             /**
             * An implementation class that represents a Wiegand Reader.
             * It's solely for internal use by the Wiegand module.
@@ -169,12 +161,6 @@ namespace Leosac
                 * Concrete implementation of the reader mode.
                 */
                 std::unique_ptr<Strategy::WiegandStrategy> strategy_;
-
-                friend class Strategy::SimpleWiegandStrategy;
-                friend class Strategy::WiegandPin4BitsOnly;
-                friend class Strategy::WiegandPin8BitsOnly;
-                friend class Strategy::WiegandPinBuffered;
-
             };
         }
     }

@@ -75,8 +75,10 @@ namespace Leosac
                 *
                 * It is up to the strategy to format a correct message. This is required because
                 * only the strategy knows what kind of credential it can generate.
+                *
+                * @param sock the socket where we write the message containing credentials.
                 */
-                virtual void signal() = 0;
+                virtual void signal(zmqpp::socket &sock) = 0;
 
                 /**
                 * Reset the strategy, meaning that the next time timeout() is called

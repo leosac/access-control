@@ -67,7 +67,7 @@ bool WiegandPinBuffered::completed() const
     return ready_;
 }
 
-void WiegandPinBuffered::signal()
+void WiegandPinBuffered::signal(zmqpp::socket & sock)
 {
     assert(ready_);
     assert(pin_.length());
@@ -75,7 +75,7 @@ void WiegandPinBuffered::signal()
     DEBUG("Sending PIN Code: " << pin_);
     zmqpp::message msg;
     msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << pin_;
-    reader_->bus_push_.send(msg);
+    sock.send(msg);
 }
 
 const std::string &WiegandPinBuffered::get_pin() const

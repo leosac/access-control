@@ -123,7 +123,7 @@ void WiegandReaderImpl::timeout()
     {
         // if we gathered all the data we need, send
         // and authentication attempt by signaling the application.
-        strategy_->signal();
+        strategy_->signal(bus_push_);
         strategy_->reset();
     }
 }
