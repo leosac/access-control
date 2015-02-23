@@ -21,6 +21,7 @@
 
 #include "core/auth/BaseAuthSource.hpp"
 #include <string>
+#include <sstream>
 #include <tools/IVisitor.hpp>
 
 namespace Leosac
@@ -28,6 +29,7 @@ namespace Leosac
     namespace Auth
     {
         class PINCode;
+
         using PINCodePtr = std::shared_ptr<PINCode>;
 
         /**
@@ -54,6 +56,17 @@ namespace Leosac
             const std::string &pin_code() const
             {
                 return pin_code_;
+            }
+
+            virtual std::string to_string() const override
+            {
+                std::stringstream ss;
+
+                ss << "Text representation of auth source:" << std::endl << "\t\t";
+                ss << "Source Name: " << source_name_ << std::endl << "\t\t";
+                ss << "Source Type: " << "PIN Code" << std::endl << "\t\t";
+                ss << "Pin Code: " << pin_code_;
+                return ss.str();
             }
 
         protected:

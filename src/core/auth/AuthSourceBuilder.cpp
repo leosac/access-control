@@ -70,7 +70,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
     *msg >> card_id >> bits;
 
     INFO("Building an AuthSource object (WiegandCard): " << card_id << " with " <<
-            bits << " significants bits.");
+            bits << " significants bits. Source name = " << name);
     BaseAuthSourcePtr auth_source(new WiegandCard(card_id, bits));
     auth_source->name(name);
 
@@ -85,7 +85,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin(const std::string
     std::string pin;
     *msg >> pin;
 
-    INFO("Building an AuthSource object (PINCode): " << pin);
+    INFO("Building an AuthSource object (PINCode): " << pin << ". Source name = " << name);
     BaseAuthSourcePtr auth_source(new PINCode(pin));
     auth_source->name(name);
 
@@ -102,7 +102,8 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_card_pin(const std::s
     std::string pin_code;
 
     *msg >> card_id >> bits >> pin_code;
-    INFO("Building an AuthSource object (Wiegand Card + Pin):" << card_id << ", " << pin_code);
+    INFO("Building an AuthSource object (Wiegand Card + Pin):" << card_id
+            << ", " << pin_code << ". Source name = " << name);
     BaseAuthSourcePtr auth_source(new WiegandCardPin(card_id, bits, pin_code));
     auth_source->name(name);
 

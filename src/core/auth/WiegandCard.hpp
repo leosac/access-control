@@ -51,6 +51,8 @@ namespace Leosac
 
             int nb_bits() const;
 
+            virtual std::string to_string() const override;
+
         protected:
             /**
             * Card id

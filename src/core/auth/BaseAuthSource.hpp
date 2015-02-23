@@ -55,6 +55,8 @@ namespace Leosac
             */
             void name(const std::string &n);
 
+            virtual std::string to_string() const override;
+
         protected:
             /**
             * Which user this auth source maps to. May be null

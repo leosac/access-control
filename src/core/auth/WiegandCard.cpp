@@ -18,6 +18,7 @@
 */
 
 #include <tools/IVisitor.hpp>
+#include <sstream>
 #include "WiegandCard.hpp"
 
 using namespace Leosac::Auth;
@@ -42,4 +43,16 @@ const std::string &WiegandCard::id() const
 int WiegandCard::nb_bits() const
 {
     return nb_bits_;
+}
+
+std::string WiegandCard::to_string() const
+{
+    std::stringstream ss;
+
+    ss << "Text representation of auth source:" << std::endl << "\t\t";
+    ss << "Source Name: " << source_name_ << std::endl << "\t\t";
+    ss << "Source Type: " << "WiegandCard" << std::endl << "\t\t";
+    ss << "Number of bits: " << nb_bits_ << std::endl << "\t\t";
+    ss << "Card id: " << id();
+    return ss.str();
 }

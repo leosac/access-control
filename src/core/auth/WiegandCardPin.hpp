@@ -53,6 +53,8 @@ namespace Leosac
             const WiegandCard &card() const;
             const PINCode &pin() const;
 
+            virtual std::string to_string() const override;
+
         protected:
             WiegandCard card_;
             PINCode pin_;

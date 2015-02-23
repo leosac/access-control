@@ -58,3 +58,8 @@ void BaseAuthSource::name(std::string const &n)
 {
     source_name_ = n;
 }
+
+std::string BaseAuthSource::to_string() const
+{
+    return "Base auth source";
+}

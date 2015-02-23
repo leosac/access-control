@@ -17,6 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "WiegandCardPin.hpp"
 
 using namespace Leosac::Auth;
@@ -36,4 +37,17 @@ const WiegandCard &WiegandCardPin::card() const
 const PINCode &WiegandCardPin::pin() const
 {
     return pin_;
+}
+
+std::string WiegandCardPin::to_string() const
+{
+    std::stringstream ss;
+
+    ss << "Text representation of auth source:" << std::endl << "\t\t";
+    ss << "Source Name: " << source_name_ << std::endl << "\t\t";
+    ss << "Source Type: " << "WiegandCard + Pin Code" << std::endl << "\t\t";
+    ss << "Number of bits: " << card_.nb_bits() << std::endl << "\t\t";
+    ss << "Card id: " << card_.id() << std::endl << "\t\t";
+    ss << "Pin Code: " << pin_.pin_code();
+    return ss.str();
 }

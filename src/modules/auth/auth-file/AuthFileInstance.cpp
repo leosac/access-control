@@ -86,6 +86,8 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         FileAuthSourceMapper mapper(file_path_);
 
         mapper.mapToUser(ptr);
+        assert(ptr);
+        INFO("Using AuthSource: " << ptr->to_string());
         auto profile = mapper.buildProfile(ptr);
         if (!profile)
         {

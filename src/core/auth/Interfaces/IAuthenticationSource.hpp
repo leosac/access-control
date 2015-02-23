@@ -74,6 +74,11 @@ namespace Leosac
             * or device that sent the message that lead to this object's creation.
             */
             virtual const std::string &name() const = 0;
+
+            /**
+            * Returns a string representation of the authentication source content.
+            */
+            virtual std::string to_string() const = 0;
         };
     }
 }
