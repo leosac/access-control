@@ -21,6 +21,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <fstream>
+#include "FileAuthSourceMapper.hpp"
 
 namespace Leosac
 {
@@ -89,6 +90,11 @@ namespace Leosac
                 std::string auth_file_content() const;
 
             private:
+
+                /**
+                * Authentication config file parser.
+                */
+                FileAuthSourceMapper mapper_;
 
                 /**
                 * Socket to write to the bus.

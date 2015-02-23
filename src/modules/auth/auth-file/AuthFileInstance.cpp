@@ -34,6 +34,7 @@ AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         const std::list<std::string> &auth_sources_names,
         std::string const &auth_target_name,
         std::string const &input_file) :
+        mapper_(input_file),
         bus_push_(ctx, zmqpp::socket_type::push),
         bus_sub_(ctx, zmqpp::socket_type::sub),
         name_(auth_ctx_name),
@@ -85,12 +86,12 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
     {
         AuthSourceBuilder build;
         IAuthenticationSourcePtr ptr = build.create(msg);
-        FileAuthSourceMapper mapper(file_path_);
-
-        mapper.mapToUser(ptr);
+        DEBUG("Auth source OK... will map");
+        mapper_.mapToUser(ptr);
+        DEBUG("Mapping done");
         assert(ptr);
         INFO("Using AuthSource: " << ptr->to_string());
-        auto profile = mapper.buildProfile(ptr);
+        auto profile = mapper_.buildProfile(ptr);
         if (!profile)
         {
             NOTICE("No profile was created from this auth source message.");

@@ -8,7 +8,7 @@ Introduction {#mod_auth_file_intro}
 
 The module Auth-File is an **authentication backend** module.
 This module is suitable only for a low number of users / cards / groups.
-The whole configuration lives in memory so is where this limitation comes from.
+The whole configuration lives in memory so this is where this limitation comes from.
 
 
 Configuration Options {#mod_auth_file_user_config}
@@ -26,9 +26,44 @@ Notes:
   + If the `target` is not present, the module assumes the default target, and will ignore target-specific
 permissions.
   + the `config_file` path is relative to the working directory of Leosac.
+  + You can enter multiple `auth_source` device. The module instance will listen to all of them.
+
+
+Credentials Type {#mod_auth_cred}
+=================================
+
+The module's config file describes access control. It declares schedule, permissions, user and groups.
+A credential (wiegand card, pin code, or both) maps to a user.
+
+3 types of credentials are supported:
+   1. WiegandCard
+   2. PINCode
+   3. WiegandCardPin
+   
+Below an example for each of those credentials:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+    <user_mapping>
+        <map>
+            <user>MY_USER</user>
+            <WiegandCard>00:11:22:33</WiegandCard>
+        </map>
+        <map>
+            <user>MY_USER</user>
+            <PINCode>1234</PINCode>
+        </map>
+        <map>
+            <user>Toto</user>
+            <WiegandCardPin>
+                <card>cc:dd:ee:ff</card>
+                <pin>1234</pin>
+            </WiegandCardPin>
+        </map>
+    </user_mapping>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Example {#mod_auth_file_example}
------------------------------
+================================
 
 This is the module configuration in the main config file.
 
@@ -126,6 +161,6 @@ the module ("file_auth.xml" based on the previous example).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Notes {#mod_auth_file_notes}
-----------------------------
+============================
 
 Check the [module object documentation](@ref Leosac::Module::Auth::AuthFileModule).

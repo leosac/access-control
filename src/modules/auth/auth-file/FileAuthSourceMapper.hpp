@@ -23,6 +23,8 @@
 #include <map>
 #include <boost/property_tree/ptree.hpp>
 #include <core/auth/WiegandCardPin.hpp>
+#include <unordered_map>
+#include <utility>
 #include "core/auth/SimpleAccessProfile.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/WiegandCard.hpp"
@@ -118,6 +120,12 @@ namespace Leosac
                 static int week_day_to_int(const std::string &day);
 
                 /**
+                * Eager loading of credentials to avoid walking through the
+                * ptree whenever we have to grant/deny an access.
+                */
+                void load_credentials();
+
+                /**
                 * Store the name of the configuration file.
                 */
                 std::string config_file_;
@@ -141,6 +149,21 @@ namespace Leosac
                 * Maps target (eg door) name to object.
                 */
                 std::map<std::string, Leosac::Auth::AuthTargetPtr> targets_;
+
+                /**
+                * Maps a wiegand card id to a user_id
+                */
+                std::unordered_map<std::string, std::string> wiegand_card_user_map_;
+
+                /**
+                * Maps a pin code to a user_id
+                */
+                std::unordered_map<std::string, std::string> pin_code_user_map_;
+
+                /**
+                * Maps a wiegand card id and a pin code to a user
+                */
+                std::map<std::pair<std::string, std::string>, std::string> wiegand_card_pin_code_user_map_;
             };
         }
     }

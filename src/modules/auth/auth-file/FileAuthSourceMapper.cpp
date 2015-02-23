@@ -33,9 +33,13 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 {
     try
     {
+        DEBUG("WIll load tree");
         authentication_data_ = Tools::propertyTreeFromXmlFile(auth_file);
         authentication_data_ = authentication_data_.get_child("root");
+        DEBUG("Tree loaded");
         build_permission();
+        load_credentials();
+        authentication_data_ = boost::property_tree::ptree();
     }
     catch (...)
     {
@@ -45,95 +49,45 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 
 void FileAuthSourceMapper::visit(WiegandCard *src)
 {
-    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("user_mapping");
-
-    for (const auto &mapping : mapping_tree)
+    if (wiegand_card_user_map_.count(src->id()))
     {
-        const std::string &node_name = mapping.first;
-        const boost::property_tree::ptree &node = mapping.second;
-
-        if (node_name != "map")
-            throw ConfigException(config_file_, "Invalid config file content");
-
-        // does this entry map a wiegand card?
-        auto opt_child = node.get_child_optional("WiegandCard");
-        if (opt_child)
+        std::string user_id = wiegand_card_user_map_[src->id()];
+        if (!users_[user_id])
         {
-            if (opt_child->data() == src->id())
-            {
-                // we found the card id
-                std::string user_id = node.get<std::string>("user");
-
-                // if user doesn't already exists this mean its profile is empty.
-                // lets create the user on the fly, he'll still have no profile.
-                if (!users_[user_id])
-                    users_[user_id] = IUserPtr(new IUser(user_id));
-                src->owner(users_[user_id]);
-            }
+            NOTICE("User " << user_id << " didnt exist when visiting his credentials.");
+            users_[user_id] = IUserPtr(new IUser(user_id));
         }
+        src->owner(users_[user_id]);
     }
 }
 
 void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
 {
-   const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("user_mapping");
-
-    for (const auto &mapping : mapping_tree)
+    if (pin_code_user_map_.count(src->pin_code()))
     {
-        const std::string &node_name = mapping.first;
-        const boost::property_tree::ptree &node = mapping.second;
-
-        if (node_name != "map")
-            throw ConfigException(config_file_, "Invalid config file content");
-
-        // does this entry map a to a PIN code?
-        auto opt_child = node.get_child_optional("PINCode");
-        if (opt_child)
+        std::string user_id = pin_code_user_map_[src->pin_code()];
+        if (!users_[user_id])
         {
-            if (opt_child->data() == src->pin_code())
-            {
-                // we found the card id
-                std::string user_id = node.get<std::string>("user");
-
-                // if user doesn't already exists this mean its profile is empty.
-                // lets create the user on the fly, he'll still have no profile.
-                if (!users_[user_id])
-                    users_[user_id] = IUserPtr(new IUser(user_id));
-                src->owner(users_[user_id]);
-            }
+            NOTICE("User " << user_id << " didnt exist when visiting his credentials.");
+            users_[user_id] = IUserPtr(new IUser(user_id));
         }
+        src->owner(users_[user_id]);
     }
 }
 
 void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
 {
-    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("user_mapping");
+    auto key = std::make_pair(src->card().id(), src->pin().pin_code());
 
-    for (const auto &mapping : mapping_tree)
+    if (wiegand_card_pin_code_user_map_.count(key))
     {
-        const std::string &node_name = mapping.first;
-        const boost::property_tree::ptree &node = mapping.second;
-
-        if (node_name != "map")
-            throw ConfigException(config_file_, "Invalid config file content");
-
-        // does this entry map a wiegand card + pin code?
-        auto opt_child = node.get_child_optional("WiegandCardPin");
-        if (opt_child)
+        std::string user_id = wiegand_card_pin_code_user_map_[key];
+        if (!users_[user_id])
         {
-            if (opt_child->get<std::string>("card") == src->card().id()
-                    && opt_child->get<std::string>("pin") == src->pin().pin_code())
-            {
-                // we found our user.
-                std::string user_id = node.get<std::string>("user");
-
-                // if user doesn't already exists this mean its profile is empty.
-                // lets create the user on the fly, he'll still have no profile.
-                if (!users_[user_id])
-                    users_[user_id] = IUserPtr(new IUser(user_id));
-                src->owner(users_[user_id]);
-            }
+            NOTICE("User " << user_id << " didnt exist when visiting his credentials.");
+            users_[user_id] = IUserPtr(new IUser(user_id));
         }
+        src->owner(users_[user_id]);
     }
 }
 
@@ -387,4 +341,41 @@ IAccessProfilePtr FileAuthSourceMapper::merge_profiles(const std::vector<IAccess
             result = merger.merge(result, profile);
     }
     return result;
+}
+
+void FileAuthSourceMapper::load_credentials()
+{
+    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("user_mapping");
+
+    for (const auto &mapping : mapping_tree)
+    {
+        const std::string &node_name = mapping.first;
+        const boost::property_tree::ptree &node = mapping.second;
+
+        if (node_name != "map")
+            throw ConfigException(config_file_, "Invalid config file content");
+
+
+        std::string user_id = node.get<std::string>("user");
+
+        // does this entry map a wiegand card?
+        auto opt_child = node.get_child_optional("WiegandCard");
+        if (opt_child)
+        {
+            std::string card_id = opt_child->data();
+            wiegand_card_user_map_[card_id] = user_id;
+        }
+        else if (opt_child = node.get_child_optional("PINCode"))
+        {
+            // or to a PIN code ?
+            std::string pin = opt_child->data();
+            pin_code_user_map_[pin] = user_id;
+        }
+        else if (opt_child = node.get_child_optional("WiegandCardPin"))
+        {
+            std::string card_id = opt_child->get<std::string>("card");
+            std::string pin = opt_child->get<std::string>("pin");
+            wiegand_card_pin_code_user_map_[std::make_pair(card_id, pin)] = user_id;
+        }
+    }
 }
