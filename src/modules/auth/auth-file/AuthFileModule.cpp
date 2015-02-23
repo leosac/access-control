@@ -45,17 +45,22 @@ void AuthFileModule::process_config()
 
     for (auto &node : module_config.get_child("instances"))
     {
-        boost::property_tree::ptree auth_instance_cfg = node.second;
+        boost::property_tree::ptree auth_instance_cfg   = node.second;
+        std::string auth_ctx_name                       = auth_instance_cfg.get_child("name").data();
+        std::string config_file                         = auth_instance_cfg.get_child("config_file").data();
+        std::string auth_target_name                    = auth_instance_cfg.get<std::string>("target", "");
+        std::list<std::string> auth_sources_names;
 
-        std::string auth_ctx_name = auth_instance_cfg.get_child("name").data();
-        std::string auth_source_name = auth_instance_cfg.get_child("auth_source").data();
-        std::string config_file = auth_instance_cfg.get_child("config_file").data();
-        std::string auth_target_name = auth_instance_cfg.get<std::string>("target", "");
+        for (const auto &subnode : auth_instance_cfg)
+        {
+            if (subnode.first == "auth_source")
+                auth_sources_names.push_back(subnode.second.data());
+        }
 
-        INFO("Creating Auth instance " << auth_ctx_name);
+        INFO("Creating AuthFile instance " << auth_ctx_name);
         authenticators_.push_back(AuthFileInstancePtr(new AuthFileInstance(ctx_,
                 auth_ctx_name,
-                auth_source_name,
+                auth_sources_names,
                 auth_target_name,
                 config_file)));
     }

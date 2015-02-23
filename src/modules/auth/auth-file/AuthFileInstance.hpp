@@ -43,13 +43,13 @@ namespace Leosac
                 * Create a new Authenticator that watch a device and emit authentication message.
                 * @param ctx the ZeroMQ context
                 * @param auth_ctx_name name of this authentication context.
-                * @param auth_source_name name of the source device we watch (ie wiegand reader).
+                * @param auth_sources_names names of the sources devices we watch (ie wiegand reader).
                 * @param auth_target_name name of the target (ie door) we auth against.
                 * @param input_file path to file contain auth configuration
                 */
                 AuthFileInstance(zmqpp::context &ctx,
                         const std::string &auth_ctx_name,
-                        const std::string &auth_source_name,
+                        const std::list<std::string> &auth_sources_names,
                         const std::string &auth_target_name,
                         const std::string &input_file);
 

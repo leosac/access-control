@@ -14,13 +14,13 @@ The whole configuration lives in memory so is where this limitation comes from.
 Configuration Options {#mod_auth_file_user_config}
 ===================================================
 
-Options    | Options     | Options    | Description                                                  | Mandatory
------------|-------------|------------|--------------------------------------------------------------|-----------
-instances  |             |            | List of configured auth file instance                        | YES
----->      | name        |            | Configure of one particular led device                       | YES
----->      | auth_source |            | Which device (auth source) we listen to                      | YES
----->      | config_file |            | Path to the config file that holds permissions data          | YES
----->      | target      |            | Name of the target (door) that we are authenticating against | NO
+Options    | Options     | Options    | Description                                                           | Mandatory
+-----------|-------------|------------|-----------------------------------------------------------------------|-----------
+instances  |             |            | List of configured auth file instance                                 | YES
+---->      | name        |            | Configure of one particular led device                                | YES
+---->      | auth_source |            | Which device (auth source) we listen to. Can appear multiple times.   | YES
+---->      | config_file |            | Path to the config file that holds permissions data                   | YES
+---->      | target      |            | Name of the target (door) that we are authenticating against          | NO
 
 Notes:
   + If the `target` is not present, the module assumes the default target, and will ignore target-specific
@@ -42,6 +42,7 @@ This is the module configuration in the main config file.
                     <instance>
                         <name>AUTH_CONTEXT_1</name>
                         <auth_source>MY_WIEGAND_1</auth_source>
+                        <auth_source>MY_WIEGAND_2</auth_source>
                         <config_file>file_auth.xml</config_file>
                     </instance>
                 </instances>

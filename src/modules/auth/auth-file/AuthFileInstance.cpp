@@ -21,6 +21,7 @@
 #include <core/auth/AuthSourceBuilder.hpp>
 #include <core/auth/Auth.hpp>
 #include <exception/ExceptionsTools.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 #include "FileAuthSourceMapper.hpp"
@@ -30,7 +31,7 @@ using namespace Leosac::Auth;
 
 AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         std::string const &auth_ctx_name,
-        std::string const &auth_source_name,
+        const std::list<std::string> &auth_sources_names,
         std::string const &auth_target_name,
         std::string const &input_file) :
         bus_push_(ctx, zmqpp::socket_type::push),
@@ -42,8 +43,9 @@ AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
 
-    INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << auth_source_name);
-    bus_sub_.subscribe("S_" + auth_source_name);
+    INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << boost::algorithm::join(auth_sources_names, ", "));
+    for (const auto &auth_source : auth_sources_names)
+        bus_sub_.subscribe("S_" + auth_source);
 }
 
 AuthFileInstance::~AuthFileInstance()
