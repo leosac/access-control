@@ -12,9 +12,9 @@ Leosac has a built-in remote control functionality. This means two things:
 
 We aim to provide this functionality in a secure fashion. This means all connections to the
 remote control socket will be encrypted. We use the CURVE security mechanism from ZeroMQ to
-reach a good level of security. This security mechanism both prevent eavesdropping and man in the 
+reach a good level of security. This security mechanism prevent both eavesdropping and man in the 
 middle attack. 
-Note that this an asymmetric security mechanism and require the use of both a private (secret) and public key.
+Note that this an asymmetric security mechanism and require the use of a private / public keypair.
 
 Currently what you can do with remote control is rather limited, and is described in a later
 section of this document.
@@ -22,8 +22,8 @@ section of this document.
 We will now present the configuration of the remote control feature.
 
 **Limitations**: By default there is no authentication of incoming connection yet. Everyone that manages to connect
-to the remote control socket is allowed to perform ALL available operations. It is however possible to configure
-such restrictions.
+to the remote control socket is allowed to perform ALL available operations. **It is however possible to configure
+such restrictions.**
 
 **Limitations**: When using the Remote Control interface to talk to each other, Leosac units
 must use the same underlying `boost::serialization` library. Otherwise serialization failure
@@ -44,7 +44,7 @@ public_key    |          |                  | Z85 encoded public key            
 security      |          |                  | Restrict access to the remote control interface  | NO (default to everyone has all access)
 ---->         | map      |                  | Define permission for one user                   | YES
 ---->         | ---->    | pk               | Z85 public key of the remote user                | YES
----->         | ---->    | default          | Default permission for unspecified command       | NO (defaultg to `false`)
+---->         | ---->    | default          | Default permission for unspecified command       | NO (default to `false`)
 ---->         | ---->    | COMMAND_NAME     | Name of an existing remote control command.      | NO
 ---->         | ---->    | COMMAND_NAME_2   | Another existing remote control command.         | NO
 
@@ -57,38 +57,38 @@ as a module.
 
 The following example gives FULL access to anyone that can connect to the remote control socket.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <remote>
-        <port>12345</port>
-        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
-        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
-    </remote>
+<remote>
+    <port>12345</port>
+    <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+    <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+</remote>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following example shows how to enable some restrictions.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   <remote>
-        <port>12345</port>
-        <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
-        <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
-        <security>
-            <map>
-                <!-- Can do everything -->
-                <pk>a_public_key</pk>
-                <default>true</default>
-            </map>
-            <map>
-                <!-- Only allowed the MODULE_CONFIG command -->
-                <pk>an_other_public_key</pk>
-                <default>false</default>
-                <MODULE_CONFIG>true</MODULE_CONFIG>
-                <MODULE_LIST>true</MODULE_LIST>
-            </map>
-            <map>
-                <!-- No default means default to false. Shouldn't be able to do anything -->
-                <pk>again_an_other_pubkey</pk>
-            </map>
-        </security>
-    </remote>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<remote>
+    <port>12345</port>
+    <secret_key>Ygk2EVo#hr*uTG=U[jFFWrb9HDW-V?388=kj)AUz</secret_key>
+    <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
+    <security>
+        <map>
+            <!-- Can do everything -->
+            <pk>a_public_key</pk>
+            <default>true</default>
+        </map>
+        <map>
+            <!-- Only allowed the MODULE_CONFIG command -->
+            <pk>an_other_public_key</pk>
+            <default>false</default>
+            <MODULE_CONFIG>true</MODULE_CONFIG>
+            <MODULE_LIST>true</MODULE_LIST>
+        </map>
+        <map>
+            <!-- No default means default to false. Shouldn't be able to do anything -->
+            <pk>again_an_other_pubkey</pk>
+        </map>
+    </security>
+</remote>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     

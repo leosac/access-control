@@ -111,8 +111,7 @@ Sync Source {#sync_source}
 ==========================
 
 From all these configuration options, you may want to limit which one gets
-exported over the network when a remote command to fetch the configuration
-(GENERAL_CONFIG -- todo) are received.
+exported over the network when a remote command to fetch the global configuration is received.
 
 If no `<sync_source>` is present, export everything.
 Here is a list of exportable config tag:
@@ -121,7 +120,9 @@ Here is a list of exportable config tag:
  + `<log>`
  + `<network>`
  + `<remote>`
-
+ + `<sync_dest>`
+ + `<no_import>`
+ 
 Example {#sync_source_ex}
 -------------------------
 
@@ -137,7 +138,7 @@ Sync Dest {#sync_dest}
 ======================
 
 This is similar to `sync_source` but is on the receiver side.
-The tag set to true in `sync_dest` are the tag that will be update with the content from the remote server.
+The tag set to true in `sync_dest` are the tag that will be updated with the content from the remote server.
 The rules are the same than `sync_source`.
 
 Non Importable Module {#non_importable_module}
@@ -156,3 +157,4 @@ To do so, define a `<no_import>` tag in the config file.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This will have the effect of leaving alone the configuration of Test and Reset and Another Module.
+It will not prevent the module config from being exported.

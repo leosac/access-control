@@ -43,24 +43,56 @@ A credential (wiegand card, pin code, or both) maps to a user.
 Below an example for each of those credentials:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <user_mapping>
-        <map>
-            <user>MY_USER</user>
-            <WiegandCard>00:11:22:33</WiegandCard>
-        </map>
-        <map>
-            <user>MY_USER</user>
-            <PINCode>1234</PINCode>
-        </map>
-        <map>
-            <user>Toto</user>
-            <WiegandCardPin>
-                <card>cc:dd:ee:ff</card>
-                <pin>1234</pin>
-            </WiegandCardPin>
-        </map>
-    </user_mapping>
+<user_mapping>
+    <map>
+        <user>MY_USER</user>
+        <WiegandCard>00:11:22:33</WiegandCard>
+    </map>
+    <map>
+        <user>MY_USER</user>
+        <PINCode>1234</PINCode>
+    </map>
+    <map>
+        <user>Toto</user>
+        <WiegandCardPin>
+            <card>cc:dd:ee:ff</card>
+            <pin>1234</pin>
+        </WiegandCardPin>
+    </map>
+</user_mapping>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Group Mapping {#mod_auth_group_map}
+===================================
+
+The module also supports groups. It is possible to assign user to group, and to
+assign schedule to groups.
+
+Mapping user to group {#mod_auth_user_to_group}
+-----------------------------------------------
+
+A `<group_mapping>` block can be used to map user to groups.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<group_mapping>
+    <map>
+        <group>Admins</group>
+        <user>MY_USER</user>
+        <user>Toto</user>
+    </map>
+</group_mapping>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Note**: It is *not* possible to map credentials directly to group.  
+
+
+Mapping schedule to group {#mod_auth_schedule_to_group}
+-------------------------------------------------------
+
+Schedules (defined in `<permissions>` tag can be mapper to either group or user.
+To map to a user, use `<user>MY_USER</user>` and to map to a group
+simply do this instead: `<group>my_group</group>`.
+
 
 Example {#mod_auth_file_example}
 ================================
@@ -68,21 +100,21 @@ Example {#mod_auth_file_example}
 This is the module configuration in the main config file.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>AUTH-MANAGER-FILE</name>
-            <file>libauth-file.so</file>
-            <level>41</level>
-            <module_config>
-                <instances>
-                    <instance>
-                        <name>AUTH_CONTEXT_1</name>
-                        <auth_source>MY_WIEGAND_1</auth_source>
-                        <auth_source>MY_WIEGAND_2</auth_source>
-                        <config_file>file_auth.xml</config_file>
-                    </instance>
-                </instances>
-            </module_config>
-        </module>
+<module>
+    <name>AUTH-MANAGER-FILE</name>
+    <file>libauth-file.so</file>
+    <level>41</level>
+    <module_config>
+        <instances>
+            <instance>
+                <name>AUTH_CONTEXT_1</name>
+                <auth_source>MY_WIEGAND_1</auth_source>
+                <auth_source>MY_WIEGAND_2</auth_source>
+                <config_file>file_auth.xml</config_file>
+            </instance>
+        </instances>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

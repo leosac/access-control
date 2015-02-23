@@ -53,7 +53,7 @@ namespace Leosac
             /**
             * list all files with the extension ".extension" in folder
             * @param folder
-            * @param extension name without the comma
+            * @param extension name without the dot
             * @return file list
             */
             static FileList listFiles(const std::string &folder, const std::string &extension = std::string());
