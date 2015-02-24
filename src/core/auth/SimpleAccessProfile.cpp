@@ -22,6 +22,7 @@
 #include "SimpleAccessProfile.hpp"
 
 using namespace Leosac::Auth;
+using SingleTimeFrame = Leosac::Tools::SingleTimeFrame;
 
 bool SimpleAccessProfile::isAccessGranted(const std::chrono::system_clock::time_point &date, AuthTargetPtr target)
 {
@@ -51,7 +52,6 @@ void SimpleAccessProfile::addAccessHour(AuthTargetPtr target,
 
     SingleTimeFrame tf;
 
-    tf.authorized = true;
     tf.day = day;
     tf.start_hour = start_hour;
     tf.start_min = start_min;

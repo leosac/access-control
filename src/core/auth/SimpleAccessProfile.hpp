@@ -25,31 +25,12 @@
 #include <vector>
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/AuthTarget.hpp"
+#include "tools/SingleTimeFrame.hpp"
 
 namespace Leosac
 {
     namespace Auth
     {
-        /**
-        * A single time frame, in a day.
-        */
-        struct SingleTimeFrame
-        {
-            SingleTimeFrame() : authorized(false),
-                                day(0),
-                                start_hour(0),
-                                start_min(0),
-                                end_hour(0),
-                                end_min(0)
-            {}
-            bool authorized;
-            int day;
-            int start_hour;
-            int start_min;
-            int end_hour;
-            int end_min;
-        };
-
         class SimpleAccessProfile;
         using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
 
@@ -72,17 +53,17 @@ namespace Leosac
             /**
             * Adds a time frame for a target.
             */
-            virtual void addAccessTimeFrame(AuthTargetPtr target, const SingleTimeFrame& tf);
+            virtual void addAccessTimeFrame(AuthTargetPtr target, const Tools::SingleTimeFrame& tf);
 
             /**
             * Provide informations about time frames that apply to non-specific door (ie when target is nullptr).
             */
-            virtual const std::vector<SingleTimeFrame>& defaultTimeFrames() const;
+            virtual const std::vector<Tools::SingleTimeFrame>& defaultTimeFrames() const;
 
             /**
             * Provide informations about the doors specific timeframe.
             */
-            virtual const std::map<std::string, std::vector<SingleTimeFrame>>& timeFrames() const;
+            virtual const std::map<std::string, std::vector<Tools::SingleTimeFrame>>& timeFrames() const;
 
         protected:
             /**
@@ -90,17 +71,17 @@ namespace Leosac
             *
             * @return true if the time frame grant access; false otherwise
             */
-            bool check_timeframe(const SingleTimeFrame &tf, const std::chrono::system_clock::time_point &date);
+            bool check_timeframe(const Tools::SingleTimeFrame &tf, const std::chrono::system_clock::time_point &date);
 
             /**
             * Map target name to target's time frame.
             */
-            std::map<std::string, std::vector<SingleTimeFrame>> time_frames_;
+            std::map<std::string, std::vector<Tools::SingleTimeFrame>> time_frames_;
 
             /**
             * Time frames to use when we have nothing for a specific target.
             */
-            std::vector<SingleTimeFrame> default_time_frames_;
+            std::vector<Tools::SingleTimeFrame> default_time_frames_;
         };
     }
 }

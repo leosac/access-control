@@ -23,6 +23,8 @@
 
 using namespace Leosac::Auth;
 
+using SingleTimeFrame = Leosac::Tools::SingleTimeFrame;
+
 IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1, std::shared_ptr<const IAccessProfile> p2)
 {
     assert(p1 && p2);

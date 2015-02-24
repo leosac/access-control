@@ -33,14 +33,33 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 {
     try
     {
+        // load config file.
+        // load/build group and users.
+        // load schedule.
+        // map schedule to group and user.
+        // load credentials.
         DEBUG("Will load tree");
         authentication_data_ = Tools::propertyTreeFromXmlFile(auth_file);
         authentication_data_ = authentication_data_.get_child("root");
         DEBUG("Tree loaded");
+
+        const auto &users_tree = authentication_data_.get_child_optional("users");
+        if (users_tree)
+            load_users(*users_tree);
+
+        const auto &groups_tree = authentication_data_.get_child_optional("group_mapping");
+        if (groups_tree)
+            load_groups(*groups_tree);
+
         const auto &schedules_tree = authentication_data_.get_child_optional("schedules");
         if (schedules_tree)
             load_schedules(*schedules_tree);
-        build_permission();
+
+        const auto &schedule_mapping_tree = authentication_data_.get_child_optional("schedules_mapping");
+        if (schedule_mapping_tree)
+            load_schedules(*schedule_mapping_tree);
+
+        //build_permission();
         load_credentials();
         authentication_data_ = boost::property_tree::ptree();
     }
@@ -133,7 +152,7 @@ void FileAuthSourceMapper::build_permission()
 
     auto opt_group_mapping = authentication_data_.get_child_optional("group_mapping");
     if (opt_group_mapping)
-        membership_group(*opt_group_mapping);
+        load_groups(*opt_group_mapping);
 
     for (const auto &permission_mapping : mapping_tree)
     {
@@ -166,7 +185,7 @@ void FileAuthSourceMapper::build_schedule(Leosac::Auth::SimpleAccessProfilePtr p
 
     if (!is_default)
     {
-        // if target is "default" it doesn't apply for a specific one so we dont care about door name.
+        // if target was "default" it doesn't apply for a specific one so we dont care about door name.
         target_name = schedule_cfg.get<std::string>("door");
         target = targets_[target_name];
 
@@ -273,7 +292,7 @@ void FileAuthSourceMapper::permission_group(const std::string &group_name,
     }
 }
 
-void FileAuthSourceMapper::membership_group(const boost::property_tree::ptree &group_mapping)
+void FileAuthSourceMapper::load_groups(const boost::property_tree::ptree &group_mapping)
 {
     for (const auto &group_info : group_mapping)
     {
@@ -284,6 +303,7 @@ void FileAuthSourceMapper::membership_group(const boost::property_tree::ptree &g
             throw ConfigException(config_file_, "Invalid config file content");
 
         GroupPtr grp = groups_[group_name] = GroupPtr(new Group(group_name));
+        grp->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
 
         for (const auto &membership : node)
         {
@@ -291,8 +311,7 @@ void FileAuthSourceMapper::membership_group(const boost::property_tree::ptree &g
                 continue;
             std::string user_name = membership.second.data();
             IUserPtr user = users_[user_name];
-            if (!user)
-                user = users_[user_name] = IUserPtr(new IUser(user_name));
+            assert(user);
             grp->member_add(user);
         }
     }
@@ -348,7 +367,7 @@ IAccessProfilePtr FileAuthSourceMapper::merge_profiles(const std::vector<IAccess
 
 void FileAuthSourceMapper::load_credentials()
 {
-    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("user_mapping");
+    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("credentials");
 
     for (const auto &mapping : mapping_tree)
     {
@@ -430,5 +449,100 @@ void FileAuthSourceMapper::load_schedules(const boost::property_tree::ptree &sch
 
 void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &schedules_mapping)
 {
+    for (const auto & mapping_entry : schedules_mapping)
+    {
+        const std::string &node_name            = mapping_entry.first;
+        const boost::property_tree::ptree &node = mapping_entry.second;
 
+        if (node_name != "map")
+            throw ConfigException(config_file_, "Invalid config file content");
+
+        // we can map multiple schedule at once.
+        std::list<std::string> schedule_names;
+        std::list<std::string> user_names;
+        std::list<std::string> group_names;
+        std::string target_door;
+        target_door = node.get<std::string>("door", "");
+
+        // lets loop over all the info we have
+        for (const auto & mapping_data : node)
+        {
+            if (mapping_data.first == "door")
+                continue;
+            if (mapping_data.first == "schedule")
+                schedule_names.push_back(mapping_data.second.data());
+            if (mapping_data.first == "user")
+                user_names.push_back(mapping_data.second.data());
+            if (mapping_data.first == "group")
+                group_names.push_back(mapping_data.second.data());
+        }
+
+        for (const auto & schedule_name : schedule_names)
+        {
+            for (const auto &user_name : user_names)
+            {
+                IUserPtr user = users_[user_name];
+                assert(user);
+                assert(user->profile());
+                SimpleAccessProfilePtr profile = std::dynamic_pointer_cast<SimpleAccessProfile>(user->profile());
+                assert(profile);
+                add_schedule_to_profile(schedule_name, profile, target_door);
+               }
+            // now for groups
+            for (const auto &group_name : group_names)
+            {
+                GroupPtr grp = groups_[group_name];
+                assert(grp);
+                assert(grp->profile());
+                SimpleAccessProfilePtr profile = std::dynamic_pointer_cast<SimpleAccessProfile>(grp->profile());
+                assert(profile);
+                add_schedule_to_profile(schedule_name, profile, target_door);
+            }
+        }
+    }
+}
+
+void FileAuthSourceMapper::add_schedule_to_profile(const std::string &schedule_name,
+        ::Leosac::Auth::SimpleAccessProfilePtr profile,
+        const std::string &door_name)
+{
+    assert(unmapped_schedules_.count(schedule_name));
+    for (const auto & sched_part : unmapped_schedules_[schedule_name])
+    {
+        // auth target is hacky
+        if (!door_name.empty())
+            profile->addAccessTimeFrame(AuthTargetPtr(new AuthTarget(door_name)), sched_part);
+        else
+            profile->addAccessTimeFrame(nullptr, sched_part);
+    }
+}
+
+void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
+{
+    for (const auto &user : users)
+    {
+        const std::string &node_name            = user.first;
+        const boost::property_tree::ptree &node = user.second;
+
+        if (node_name != "user")
+            throw ConfigException(config_file_, "Invalid config file content");
+        std::string name        = node.get<std::string>("name");
+        std::string firstname   = node.get<std::string>("firstname", "");
+        std::string lastname    = node.get<std::string>("lastname", "");
+        std::string email       = node.get<std::string>("email", "");
+
+        IUserPtr uptr(new IUser(name));
+        uptr->firstname(firstname);
+        uptr->lastname(lastname);
+        uptr->email(email);
+
+        // create an empty profile
+        uptr->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
+
+        if (users_.count(name))
+        {
+            NOTICE("User " << name << " was already defined. Will overwrite.");
+        }
+        users_[name] = uptr;
+    }
 }

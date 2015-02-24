@@ -31,6 +31,7 @@
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "tools/SingleTimeFrame.hpp"
+#include "core/auth/SimpleAccessProfile.hpp"
 
 namespace Leosac
 {
@@ -68,6 +69,8 @@ namespace Leosac
                 std::vector<Leosac::Auth::GroupPtr> groups() const override;
             private:
 
+                void load_users(const boost::property_tree::ptree &users);
+
                 /**
                 * Load the schedules information from the config tree.
                 * @param schedules The `<schedules>` subtree.
@@ -79,6 +82,14 @@ namespace Leosac
                 * This effectively build access profile for user.
                 */
                 void map_schedules(const boost::property_tree::ptree &schedules_mapping);
+
+                /**
+                * This add a schedule to a profile.
+                * This is used by map_schedules.
+                */
+                void add_schedule_to_profile(const std::string &schedule_name,
+                        ::Leosac::Auth::SimpleAccessProfilePtr profile,
+                        const std::string &door_name);
 
                 /**
                 * Build user/group permissions from configuration.
@@ -100,7 +111,7 @@ namespace Leosac
                 /**
                 * Extract group membership.
                 */
-                void membership_group(const boost::property_tree::ptree &group_mapping);
+                void load_groups(const boost::property_tree::ptree &group_mapping);
 
                 /**
                 * Naive method that bruteforce groups to try to find

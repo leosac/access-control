@@ -31,39 +31,6 @@ permissions.
   + You can enter multiple `auth_source` device. The module instance will listen to all of them.
 
 
-Credentials Type {#mod_auth_cred}
-=================================
-
-The module's config file describes access control. It declares schedule, permissions, user and groups.
-A credential (wiegand card, pin code, or both) maps to a user.
-
-3 types of credentials are supported:
-   1. WiegandCard
-   2. PINCode
-   3. WiegandCardPin
-   
-Below an example for each of those credentials:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-<user_mapping>
-    <map>
-        <user>MY_USER</user>
-        <WiegandCard>00:11:22:33</WiegandCard>
-    </map>
-    <map>
-        <user>MY_USER</user>
-        <PINCode>1234</PINCode>
-    </map>
-    <map>
-        <user>Toto</user>
-        <WiegandCardPin>
-            <card>cc:dd:ee:ff</card>
-            <pin>1234</pin>
-        </WiegandCardPin>
-    </map>
-</user_mapping>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Users {#mod_auth_user}
 ======================
 
@@ -101,6 +68,37 @@ users   |         |            | List of users we declare                       
 </users>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Credentials Type {#mod_auth_cred}
+=================================
+
+A credentials maps to a user.
+
+3 types of credentials are supported:
+   1. WiegandCard
+   2. PINCode
+   3. WiegandCardPin
+   
+Below an example for each of those credentials:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<credentials>
+    <map>
+        <user>MY_USER</user>
+        <WiegandCard>00:11:22:33</WiegandCard>
+    </map>
+    <map>
+        <user>MY_USER</user>
+        <PINCode>1234</PINCode>
+    </map>
+    <map>
+        <user>Toto</user>
+        <WiegandCardPin>
+            <card>cc:dd:ee:ff</card>
+            <pin>1234</pin>
+        </WiegandCardPin>
+    </map>
+</credentials>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Groups {#mod_auth_group}
 ===================================
