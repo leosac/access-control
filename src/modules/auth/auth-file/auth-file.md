@@ -64,7 +64,45 @@ Below an example for each of those credentials:
 </user_mapping>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Groups {#mod_auth_group_map}
+Users {#mod_auth_user}
+======================
+
+Users are obviously a core component of an authentication module. The users
+will map to group, credentials, etc.
+Users can hold additional property, like their name, email address, or
+the status of their account (`enabled`, or `disabled`).
+
+Declaring the users {#mod_auth_user_declare}
+--------------------------------------------
+
+This section is about describing how to declare users.
+This takes place in the additional config file.
+
+Options | Options | Options    | Description                                             | Mandatory
+--------|---------|------------|---------------------------------------------------------|-----------
+users   |         |            | List of users we declare                                | YES
+---->   | user    |            | Declaration of one user                                 | YES
+---->   | ---->   | name       | Globally unique name to identify a user.                | YES
+---->   | ---->   | firstname  | The firstname of the user.                              | NO
+---->   | ---->   | lastname   | The family name of the user                             | NO
+---->   | ---->   | email      | An email address for the user.                          | NO
+
+
+### Example {#mod_auth_user_declare_example}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<users>
+    <user>
+        <name>edgar_hoover</name>
+        <firstname>Edgar</firstname>
+        <lastname>Hoover</lastime>
+        <email>eh@fbi.gov</email>
+    </user>
+</users>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Groups {#mod_auth_group}
 ===================================
 
 The module also supports groups. A user can be in multiple groups, and will collect

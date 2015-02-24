@@ -39,7 +39,7 @@ namespace Leosac
             virtual ~IUser() = default;
 
             /**
-            * Get the current id.
+            * Get the current id/name.
             */
             const std::string &id() const noexcept;
 
@@ -52,11 +52,23 @@ namespace Leosac
 
             void profile(IAccessProfilePtr user_profile);
 
+            const std::string &firstname() const;
+            const std::string &lastname() const;
+            const std::string &email() const;
+
+            void firstname(const std::string &);
+            void lastname(const std::string &);
+            void email(const std::string &);
+
         protected:
             /**
             * This is an (unique) identifier for the user.
             */
             std::string id_;
+
+            std::string firstname_;
+            std::string lastname_;
+            std::string email_;
 
             IAccessProfilePtr profile_;
         };

@@ -46,3 +46,33 @@ void IUser::profile(IAccessProfilePtr user_profile)
 {
     profile_ = user_profile;
 }
+
+const std::string &IUser::firstname() const
+{
+    return firstname_;
+}
+
+const std::string &IUser::lastname() const
+{
+    return lastname_;
+}
+
+const std::string &IUser::email() const
+{
+    return email_;
+}
+
+void IUser::firstname(std::string const &f)
+{
+    firstname_ = f;
+}
+
+void IUser::lastname(std::string const &l)
+{
+    lastname_ = l;
+}
+
+void IUser::email(std::string const &e)
+{
+    email_ = e;
+}
