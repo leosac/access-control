@@ -57,14 +57,15 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 
         const auto &schedule_mapping_tree = authentication_data_.get_child_optional("schedules_mapping");
         if (schedule_mapping_tree)
-            load_schedules(*schedule_mapping_tree);
+            map_schedules(*schedule_mapping_tree);
 
         //build_permission();
         load_credentials();
         authentication_data_ = boost::property_tree::ptree();
     }
-    catch (...)
+    catch (std::exception &e)
     {
+        ERROR("Exception: " << e.what());
         std::throw_with_nested(ModuleException("AuthFile cannot load configuration"));
     }
 }
@@ -311,7 +312,11 @@ void FileAuthSourceMapper::load_groups(const boost::property_tree::ptree &group_
                 continue;
             std::string user_name = membership.second.data();
             IUserPtr user = users_[user_name];
-            assert(user);
+            if (!user)
+            {
+                ERROR("Unkown user " << user_name);
+                throw ConfigException(config_file_, "Unkown user " + user_name);
+            }
             grp->member_add(user);
         }
     }
@@ -410,7 +415,8 @@ void FileAuthSourceMapper::load_schedules(const boost::property_tree::ptree &sch
         const boost::property_tree::ptree &node = sched.second;
 
         if (node_name != "schedule")
-            throw ConfigException(config_file_, "Invalid config file content");
+            throw ConfigException(config_file_, "Invalid config file content. Expected "
+                    "a node named 'schedule', found " + node_name + " instead");
 
         std::string schedule_name   = node.get<std::string>("name");
         Schedule time_frame_list;

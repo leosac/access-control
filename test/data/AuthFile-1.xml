@@ -1,8 +1,17 @@
 <root>
+    <users>
+        <user>
+            <name>MY_USER</name>
+        </user>
+        <user>
+            <name>Toto</name>
+        </user>
+    </users>
+
     <!--
     Maps WiegandCard to user
     -->
-    <user_mapping>
+    <credentials>
         <map>
             <user>MY_USER</user>
             <WiegandCard>00:11:22:33</WiegandCard>
@@ -19,36 +28,41 @@
             <user>Toto</user>
             <WiegandCard>cc:dd:ee:ff</WiegandCard>
         </map>
-    </user_mapping>
+    </credentials>
 
-    <permissions>
+    <schedules>
+        <schedule>
+            <name>my_user_sched</name>
+            <!-- Has full access on monday and sunday -->
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+
+        <schedule>
+            <name>toto_sched</name>
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
         <map>
-            <!-- Time frame mapping for MY_USER -->
+            <schedule>my_user_sched</schedule>
             <user>MY_USER</user>
-
-            <default_schedule>
-                <!-- Has full access to all on monday and sunday -->
-                <monday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </monday>
-
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
         </map>
         <map>
-            <!-- Time frame mapping for Toto -->
+            <schedule>toto_sched</schedule>
             <user>Toto</user>
-
-            <default_schedule>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
         </map>
-    </permissions>
+    </schedules_mapping>
+
 </root>

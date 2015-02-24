@@ -1,8 +1,13 @@
 <root>
+    <users>
+        <user>
+            <name>Toto</name>
+        </user>
+    </users>
     <!--
     Maps WiegandCard to user
     -->
-    <user_mapping>
+    <credentials>
         <map>
             <user>Toto</user>
             <WiegandCardPin>
@@ -10,19 +15,23 @@
                 <pin>1234</pin>
             </WiegandCardPin>
         </map>
-    </user_mapping>
+    </credentials>
 
-    <permissions>
+    <schedules>
+        <schedule>
+            <name>full_sunday</name>
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
         <map>
-            <!-- Time frame mapping for Toto -->
+            <schedule>full_sunday</schedule>
             <user>Toto</user>
-
-            <default_schedule>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
         </map>
-    </permissions>
+    </schedules_mapping>
+
 </root>

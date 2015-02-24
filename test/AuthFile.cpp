@@ -320,6 +320,7 @@ namespace Leosac
 
             auto profile = mapper2_->buildProfile(my_card_);
             ASSERT_TRUE(profile.get());
+            ASSERT_TRUE(is_in_group("MY_USER", "Admins", mapper2_));
 
             ASSERT_TRUE(profile->isAccessGranted(date_monday_12_00, doorA_));
             ASSERT_FALSE(profile->isAccessGranted(date_monday_16_31, doorA_));

@@ -1,4 +1,16 @@
 <root>
+    <users>
+        <user>
+            <name>MY_USER</name>
+        </user>
+        <user>
+            <name>Toto</name>
+        </user>
+        <user>
+            <name>Useless</name>
+        </user>
+    </users>
+
     <group_mapping>
         <map>
             <group>Admins</group>
@@ -22,10 +34,11 @@
             <user>MY_USER</user>
         </map>
     </group_mapping>
+
     <!--
     Maps WiegandCard to user
     -->
-    <user_mapping>
+    <credentials>
         <map>
             <user>MY_USER</user>
             <WiegandCard>aa:bb:cc:dd</WiegandCard>
@@ -38,85 +51,111 @@
             <user>Useless</user>
             <WiegandCard>00:11:22:33</WiegandCard>
         </map>
-    </user_mapping>
+    </credentials>
 
-    <permissions>
+    <schedules>
+        <schedule>
+            <name>full_sunday</name>
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+
+        <schedule>
+            <name>monday_1</name>
+            <monday>
+                <start>10:00</start>
+                <end>14:59</end>
+            </monday>
+
+            <monday>
+                <start>16:35</start>
+                <end>23:59</end>
+            </monday>
+        </schedule>
+
+        <schedule>
+            <name>monday_2</name>
+            <monday>
+                <start>15:00</start>
+                <end>23:59</end>
+            </monday>
+        </schedule>
+
+        <schedule>
+            <name>full_monday</name>
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+        </schedule>
+
+        <schedule>
+            <name>full_wednesday</name>
+            <wednesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </wednesday>
+        </schedule>
+
+        <schedule>
+            <name>thursday_1</name>
+            <thursday>
+                <start>13:25</start>
+                <end>14:30</end>
+            </thursday>
+        </schedule>
+
+        <schedule>
+            <name>thursday_2</name>
+            <thursday>
+                <start>10:00</start>
+                <end>14:30</end>
+            </thursday>
+        </schedule>
+
+    </schedules>
+
+    <schedules_mapping>
         <map>
+            <schedule>full_sunday</schedule>
             <group>Admins</group>
-            <default_schedule>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
-
-            <schedule>
-                <door>doorA</door>
-                <monday>
-                    <start>10:00</start>
-                    <end>14:59</end>
-                </monday>
-
-                <monday>
-                    <start>16:35</start>
-                    <end>23:59</end>
-                </monday>
-            </schedule>
-
-            <schedule>
-                <door>doorB</door>
-                <monday>
-                    <start>15:00</start>
-                    <end>23:59</end>
-                </monday>
-            </schedule>
         </map>
-
         <map>
+            <schedule>monday_1</schedule>
+            <group>Admins</group>
+            <door>doorA</door>
+        </map>
+        <map>
+            <schedule>monday_2</schedule>
+            <group>Admins</group>
+            <door>doorB</door>
+        </map>
+        <map>
+            <schedule>full_monday</schedule>
             <group>Operators</group>
-            <schedule>
-                <door>doorC</door>
-                <monday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </monday>
-            </schedule>
+            <door>doorC</door>
         </map>
-
         <map>
+            <schedule>full_wednesday</schedule>
             <group>Users</group>
-            <default_schedule>
-                <wednesday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </wednesday>
-            </default_schedule>
-
-            <schedule>
-                <door>doorA</door>
-                <thursday>
-                    <start>13:25</start>
-                    <end>14:30</end>
-                </thursday>
-            </schedule>
         </map>
-
         <map>
-            <group>YetAnotherGroup</group>
-            <schedule>
-                <door>doorA</door>
-                <thursday>
-                    <start>10:00</start>
-                    <end>14:30</end>
-                </thursday>
-                </schedule>
-            <schedule>
-                <door>doorB</door>
-                <thursday>
-                    <start>10:00</start>
-                    <end>14:30</end>
-                </thursday>
-            </schedule>
+            <schedule>thursday_1</schedule>
+            <group>Users</group>
+            <door>doorA</door>
         </map>
-    </permissions>
+        <map>
+            <schedule>thursday_2</schedule>
+            <group>YetAnotherGroup</group>
+            <door>doorA</door>
+        </map>
+        <!-- TODO REMOVE DUP -->
+        <map>
+            <schedule>thursday_2</schedule>
+            <group>YetAnotherGroup</group>
+            <door>doorB</door>
+        </map>
+    </schedules_mapping>
 </root>
