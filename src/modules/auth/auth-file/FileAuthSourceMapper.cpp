@@ -33,10 +33,13 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 {
     try
     {
-        DEBUG("WIll load tree");
+        DEBUG("Will load tree");
         authentication_data_ = Tools::propertyTreeFromXmlFile(auth_file);
         authentication_data_ = authentication_data_.get_child("root");
         DEBUG("Tree loaded");
+        const auto &schedules_tree = authentication_data_.get_child_optional("schedules");
+        if (schedules_tree)
+            load_schedules(*schedules_tree);
         build_permission();
         load_credentials();
         authentication_data_ = boost::property_tree::ptree();
@@ -378,4 +381,54 @@ void FileAuthSourceMapper::load_credentials()
             wiegand_card_pin_code_user_map_[std::make_pair(card_id, pin)] = user_id;
         }
     }
+}
+
+void FileAuthSourceMapper::load_schedules(const boost::property_tree::ptree &schedules)
+{
+    for (const auto & sched : schedules)
+    {
+        const std::string &node_name            = sched.first;
+        const boost::property_tree::ptree &node = sched.second;
+
+        if (node_name != "schedule")
+            throw ConfigException(config_file_, "Invalid config file content");
+
+        std::string schedule_name   = node.get<std::string>("name");
+        Schedule time_frame_list;
+
+        // loop on all proprety of the schedule.
+        // those will be weekday and the <name> tag too.
+        for (const auto & sched_data : node)
+        {
+            if (sched_data.first == "name") // we already got the name.
+                continue;
+            std::string start           = sched_data.second.get<std::string>("start");
+            std::string end             = sched_data.second.get<std::string>("end");
+            std::vector<std::string> temp;
+
+            boost::split(temp, start, boost::is_any_of(":"));
+            if (temp.size() != 2)
+                throw ModuleException("AuthFail schedule building error.");
+            int start_hour = std::stoi(temp[0]);
+            int start_min = std::stoi(temp[1]);
+
+            temp.clear();
+            boost::split(temp, end, boost::is_any_of(":"));
+            if (temp.size() != 2)
+                throw ModuleException("AuthFail schedule building error.");
+            int end_hour = std::stoi(temp[0]);
+            int end_min = std::stoi(temp[1]);
+
+            Tools::SingleTimeFrame tf(week_day_to_int(sched_data.first),
+            start_hour, start_min,
+                    end_hour, end_min);
+            time_frame_list.push_back(tf);
+        }
+        unmapped_schedules_[schedule_name] = time_frame_list;
+    }
+}
+
+void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &schedules_mapping)
+{
+
 }

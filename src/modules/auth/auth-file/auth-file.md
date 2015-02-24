@@ -1,6 +1,8 @@
 Auth-File (backend) Module Documentation {#mod_auth_file_main}
 ==============================================================
 
+@brief Documentation for an auth module that stores its config in XML.
+
 [TOC]
 
 Introduction {#mod_auth_file_intro}
@@ -62,11 +64,13 @@ Below an example for each of those credentials:
 </user_mapping>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Group Mapping {#mod_auth_group_map}
+Groups {#mod_auth_group_map}
 ===================================
 
-The module also supports groups. It is possible to assign user to group, and to
-assign schedule to groups.
+The module also supports groups. A user can be in multiple groups, and will collect
+permissions from all the groups he's a member of.
+
+There is no definition of groups, they are lazily created when mapping users to them.
 
 Mapping user to group {#mod_auth_user_to_group}
 -----------------------------------------------
@@ -86,12 +90,100 @@ A `<group_mapping>` block can be used to map user to groups.
 **Note**: It is *not* possible to map credentials directly to group.  
 
 
-Mapping schedule to group {#mod_auth_schedule_to_group}
--------------------------------------------------------
+Schedules {#mod_auth_schedule}
+=============================
 
-Schedules (defined in `<permissions>` tag can be mapper to either group or user.
-To map to a user, use `<user>MY_USER</user>` and to map to a group
-simply do this instead: `<group>my_group</group>`.
+TODO !
+
+Schedules can be defined. They represents time-frame where access **is granted**.
+Schedules are then mapped to user or to group.
+
+They can apply to any `auth_target` (aka doors) or they can target specific doors
+only. This is configured when mapping a schedule, so that the same schedule
+can be better reused.
+
+See below for an example of how to declare schedules.
+
+Declaring schedules {#mod_auth_sched_declare}
+---------------------------------------------
+
+Options           | Options     | Options    | Options | Description                                           | Mandatory
+------------------|-------------|------------|---------|-------------------------------------------------------|-----------
+schedules         |             |            |         | We declare our schedules here                         | YES
+---->             | schedule    |            |         | Description of on schedule entry                      | YES
+---->             | ---->       | name       |         | A unique name for a schedule                          | YES
+---->             | ---->       | "weekday"  |         | A day of the week (`monday`, `sunday`, ...)           | NO
+---->             | ---->       | ---->      | start   | Start hour (format is `hh:mm`)                        | NO
+---->             | ---->       | ---->      | end     | End hour (format is `hh:mm`)                          | NO
+
+
+### Example {#mod_auth_sched_declare_example}
+
+This is a simple example that declares one schedule, named `my_schedule`. It would grants access 
+anytime on monday, and wednesday from 11h to 13h and from 17h to 19h.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<schedules>
+    <schedule>
+        <name>my_schedule</name>
+         <monday>
+            <start>00:00</start>
+            <end>23:59</end>
+        </monday>
+        <wednesday>
+            <start>11:00</start>
+            <end>13:00</end>
+        </wednesday>
+        <wednesday>
+            <start>17:00</start>
+            <end>19:00</end>
+        </wednesday>
+    </schedule>
+</schedules>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Schedules Mapping {#mod_auth_schedule_map}
+------------------------------------------
+
+Schedules can, or rather must, be referenced by name. They can
+be mapped to user and / or groups.
+
+Options           | Options     | Options    | Description                                                           | Mandatory
+------------------|-------------|------------|-----------------------------------------------------------------------|-----------
+schedules_mapping |             |            | Defines the mapping between schedule and user/group/we                | YES
+---->             | map         |            | One mapping entry                                                     | YES
+---->             | ---->       | schedule   | Which schedule are we mapping                                         | YES
+---->             | ---->       | user       | To which user are we applying the schedule(s)                         | NO
+---->             | ---->       | group      | To which group are we applying the schedules(s)                       | NO
+---->             | ---->       | door       | Name of the auth target the mapping apply to                          | NO
+
+Note that `schedule`, `user` and `group` can be used multiple times in the same mapping entry.
+
+
+### Example {#mod_auth_schedule_map_example}
+
+There is 2 mappings entry in the following example.
+   1. The first maps 2 schedules, `name_of_schedule` and `name_of_another_schedule` and applies them
+      to the user `My_User`, `A_Second_User` and to anyone who is a member of the group `the_whole_group_has_the_schedule`.
+   2. The seconds enable the `sysadmin_access_schedule` to the `sysadmins` group when the authentication
+      attempt target the `sysadmin_room`. See the `target` field in the [module options](@ref mod_auth_file_user_config).
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<schedules_mapping>
+   <map>
+       <schedule>name_of_schedule</schedule>
+       <schedule>name_of_another_schedule</schedule>
+       <user>My_User</user>
+       <user>A_Second_User</user>
+       <group>the_whole_group_has_the_schedule</group>
+   </map>
+   <map>
+       <schedule>sysadmin_access_schedule</schedule>
+       <group>sysadmins</group>
+       <door>sysadmin_room</door>
+   </map>
+</schedules_mapping>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 Example {#mod_auth_file_example}

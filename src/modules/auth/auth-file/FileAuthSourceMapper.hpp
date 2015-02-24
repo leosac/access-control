@@ -30,6 +30,7 @@
 #include "core/auth/WiegandCard.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
+#include "tools/SingleTimeFrame.hpp"
 
 namespace Leosac
 {
@@ -66,6 +67,18 @@ namespace Leosac
 
                 std::vector<Leosac::Auth::GroupPtr> groups() const override;
             private:
+
+                /**
+                * Load the schedules information from the config tree.
+                * @param schedules The `<schedules>` subtree.
+                */
+                void load_schedules(const boost::property_tree::ptree &schedules);
+
+                /**
+                * Interpret the schedule mapping content of the config file.
+                * This effectively build access profile for user.
+                */
+                void map_schedules(const boost::property_tree::ptree &schedules_mapping);
 
                 /**
                 * Build user/group permissions from configuration.
@@ -164,6 +177,14 @@ namespace Leosac
                 * Maps a wiegand card id and a pin code to a user
                 */
                 std::map<std::pair<std::string, std::string>, std::string> wiegand_card_pin_code_user_map_;
+
+                using Schedule = std::vector<Tools::SingleTimeFrame>;
+
+                /**
+                * A map where the key is the name of a schedule, and
+                * its value is how we represent a schedule.
+                */
+                std::map<std::string, Schedule> unmapped_schedules_;
             };
         }
     }
