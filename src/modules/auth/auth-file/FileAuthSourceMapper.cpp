@@ -39,29 +39,29 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
         // map schedule to group and user.
         // load credentials.
         DEBUG("Will load tree");
-        authentication_data_ = Tools::propertyTreeFromXmlFile(auth_file);
-        authentication_data_ = authentication_data_.get_child("root");
+        auto &&additional_config = Tools::propertyTreeFromXmlFile(auth_file);
+        additional_config = additional_config.get_child("root");
         DEBUG("Tree loaded");
 
-        const auto &users_tree = authentication_data_.get_child_optional("users");
+        const auto &users_tree = additional_config.get_child_optional("users");
         if (users_tree)
             load_users(*users_tree);
 
-        const auto &groups_tree = authentication_data_.get_child_optional("group_mapping");
+        const auto &groups_tree = additional_config.get_child_optional("group_mapping");
         if (groups_tree)
             load_groups(*groups_tree);
 
-        const auto &schedules_tree = authentication_data_.get_child_optional("schedules");
+        const auto &schedules_tree = additional_config.get_child_optional("schedules");
         if (schedules_tree)
             load_schedules(*schedules_tree);
 
-        const auto &schedule_mapping_tree = authentication_data_.get_child_optional("schedules_mapping");
+        const auto &schedule_mapping_tree = additional_config.get_child_optional("schedules_mapping");
         if (schedule_mapping_tree)
             map_schedules(*schedule_mapping_tree);
 
-        //build_permission();
-        load_credentials();
-        authentication_data_ = boost::property_tree::ptree();
+        const auto &credentials_tree = additional_config.get_child_optional("credentials");
+        if (credentials_tree)
+            load_credentials(*credentials_tree);
     }
     catch (std::exception &e)
     {
@@ -147,83 +147,6 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
     return merge_profiles(profiles);
 }
 
-void FileAuthSourceMapper::build_permission()
-{
-    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("permissions");
-
-    auto opt_group_mapping = authentication_data_.get_child_optional("group_mapping");
-    if (opt_group_mapping)
-        load_groups(*opt_group_mapping);
-
-    for (const auto &permission_mapping : mapping_tree)
-    {
-        const std::string &node_name = permission_mapping.first;
-        const boost::property_tree::ptree &node = permission_mapping.second;
-
-        if (node_name != "map")
-            throw ConfigException(config_file_, "Invalid config file content");
-
-        auto opt_child_user = node.get_child_optional("user");
-        auto opt_child_group = node.get_child_optional("group");
-        if (opt_child_user)
-        {
-            permission_user(opt_child_user->data(), node);
-        }
-        else if (opt_child_group)
-        {
-            permission_group(opt_child_group->data(), node);
-        }
-    }
-}
-
-void FileAuthSourceMapper::build_schedule(Leosac::Auth::SimpleAccessProfilePtr profile,
-        const boost::property_tree::ptree &schedule_cfg,
-        bool is_default)
-{
-    assert(profile);
-    std::string target_name;
-    AuthTargetPtr target;
-
-    if (!is_default)
-    {
-        // if target was "default" it doesn't apply for a specific one so we dont care about door name.
-        target_name = schedule_cfg.get<std::string>("door");
-        target = targets_[target_name];
-
-        if (!target)
-            target = targets_[target_name] = AuthTargetPtr(new AuthTarget(target_name));
-    }
-
-    // loop over every subnodes
-    // we have to ignore the <door> name as it doesn't directly hold scheduling data
-    for (const auto &schedule_info : schedule_cfg)
-    {
-        std::string day = schedule_info.first;
-        std::vector<std::string> temp;
-
-        if (day == "door")
-            continue;
-        std::string start = schedule_info.second.get<std::string>("start");
-        std::string end = schedule_info.second.get<std::string>("end");
-
-        boost::split(temp, start, boost::is_any_of(":"));
-        if (temp.size() != 2)
-            throw ModuleException("AuthFail schedule building error.");
-        int start_hour = std::stoi(temp[0]);
-        int start_min = std::stoi(temp[1]);
-
-        temp.clear();
-        boost::split(temp, end, boost::is_any_of(":"));
-        if (temp.size() != 2)
-            throw ModuleException("AuthFail schedule building error.");
-        int end_hour = std::stoi(temp[0]);
-        int end_min = std::stoi(temp[1]);
-
-        profile->addAccessHour(target,
-                week_day_to_int(day), start_hour, start_min, end_hour, end_min);
-    }
-}
-
 int FileAuthSourceMapper::week_day_to_int(const std::string &day)
 {
     if (day == "sunday")
@@ -241,56 +164,6 @@ int FileAuthSourceMapper::week_day_to_int(const std::string &day)
     if (day == "saturday")
         return 6;
     assert(0);
-}
-
-void FileAuthSourceMapper::permission_user(const std::string &user_name,
-        const boost::property_tree::ptree &node)
-{
-    // we a are building permission for a user
-
-    IUserPtr user = users_[user_name];
-    if (user && user->profile())
-        WARN("We already had data for this user. Will override");
-    else if (!user)
-    {
-        user = IUserPtr(new IUser(user_name));
-        users_[user_name] = user;
-    }
-
-    SimpleAccessProfilePtr profile(new SimpleAccessProfile());
-    user->profile(profile);
-
-    for (const auto &schedule : node)
-    {
-        if (schedule.first == "default_schedule")
-            build_schedule(profile, schedule.second, true);
-        if (schedule.first == "schedule")
-            build_schedule(profile, schedule.second, false);
-    }
-}
-
-void FileAuthSourceMapper::permission_group(const std::string &group_name,
-        const boost::property_tree::ptree &node)
-{
-    GroupPtr group = groups_[group_name];
-
-    if (group && group->profile())
-        WARN("Already had some data for this group. Will override.");
-    else if (!group)
-    {
-        group = groups_[group_name] = GroupPtr(new Group(group_name));
-    }
-
-    SimpleAccessProfilePtr profile(new SimpleAccessProfile());
-    group->profile(profile);
-
-    for (const auto &schedule : node)
-    {
-        if (schedule.first == "default_schedule")
-            build_schedule(profile, schedule.second, true);
-        if (schedule.first == "schedule")
-            build_schedule(profile, schedule.second, false);
-    }
 }
 
 void FileAuthSourceMapper::load_groups(const boost::property_tree::ptree &group_mapping)
@@ -370,11 +243,9 @@ IAccessProfilePtr FileAuthSourceMapper::merge_profiles(const std::vector<IAccess
     return result;
 }
 
-void FileAuthSourceMapper::load_credentials()
+void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &credentials)
 {
-    const boost::property_tree::ptree &mapping_tree = authentication_data_.get_child("credentials");
-
-    for (const auto &mapping : mapping_tree)
+    for (const auto &mapping : credentials)
     {
         const std::string &node_name = mapping.first;
         const boost::property_tree::ptree &node = mapping.second;

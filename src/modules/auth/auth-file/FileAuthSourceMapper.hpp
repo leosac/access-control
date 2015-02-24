@@ -92,26 +92,15 @@ namespace Leosac
                         const std::string &door_name);
 
                 /**
-                * Build user/group permissions from configuration.
-                */
-                void build_permission();
-
-                /**
-                * We are building permissions for an user.
-                */
-                void permission_user(const std::string &user_name,
-                        const boost::property_tree::ptree &);
-
-                /**
-                * We are building permissions for a group.
-                */
-                void permission_group(const std::string &group_name,
-                        const boost::property_tree::ptree &);
-
-                /**
                 * Extract group membership.
                 */
                 void load_groups(const boost::property_tree::ptree &group_mapping);
+
+                /**
+                * Eager loading of credentials to avoid walking through the
+                * ptree whenever we have to grant/deny an access.
+                */
+                void load_credentials(const boost::property_tree::ptree &credentials);
 
                 /**
                 * Naive method that bruteforce groups to try to find
@@ -128,36 +117,14 @@ namespace Leosac
                 Leosac::Auth::IAccessProfilePtr merge_profiles(const std::vector<Leosac::Auth::IAccessProfilePtr> profiles);
 
                 /**
-                * Build the schedule for an access profile.
-                *
-                * It adds some schedule to an existing profile.
-                * @param profile cannot be null
-                * @param schedule_cfg property_tree that contains data from a `<schedule>` block.
-                * @param is_default is this a `default_schedule` block ?
-                */
-                void build_schedule(Leosac::Auth::SimpleAccessProfilePtr profile,
-                        const boost::property_tree::ptree &schedule_cfg, bool is_default);
-
-                /**
                 * Maps string day to int day (starting with sunday = 0)
                 */
                 static int week_day_to_int(const std::string &day);
 
                 /**
-                * Eager loading of credentials to avoid walking through the
-                * ptree whenever we have to grant/deny an access.
-                */
-                void load_credentials();
-
-                /**
                 * Store the name of the configuration file.
                 */
                 std::string config_file_;
-
-                /**
-                * Property tree that holds the whole authentication tree.
-                */
-                boost::property_tree::ptree authentication_data_;
 
                 /**
                 * Maps user id (or name) to object.
