@@ -72,23 +72,27 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 
 void FileAuthSourceMapper::visit(WiegandCard *src)
 {
-    if (wiegand_card_user_map_.count(src->card_id()))
+    auto it = wiegand_cards_.find(src->card_id());
+    if (it != wiegand_cards_.end())
     {
-        std::string user_id = wiegand_card_user_map_[src->card_id()];
-        assert(!user_id.empty());
-        assert(users_.count(user_id));
-        src->owner(users_[user_id]);
+        // By copying our instance of the credential to the
+        // caller credential object, we store additional info we gathered
+        // (like owner) and made them accessible to them.
+        auto cred = it->second;
+        *src = *cred;
     }
 }
 
 void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
 {
-    if (pin_code_user_map_.count(src->pin_code()))
+    auto it = pin_codes_.find(src->pin_code());
+    if (it != pin_codes_.end())
     {
-        std::string user_id = pin_code_user_map_[src->pin_code()];
-        assert(!user_id.empty());
-        assert(users_.count(user_id));
-        src->owner(users_[user_id]);
+        // By copying our instance of the credential to the
+        // caller credential object, we store additional info we gathered
+        // (like owner) and made them accessible to them.
+        auto cred = it->second;
+        *src = *cred;
     }
 }
 
@@ -96,12 +100,14 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
 {
     auto key = std::make_pair(src->card().card_id(), src->pin().pin_code());
 
-    if (wiegand_card_pin_code_user_map_.count(key))
+    auto it = wiegand_cards_pins_.find(key);
+    if (it != wiegand_cards_pins_.end())
     {
-        std::string user_id = wiegand_card_pin_code_user_map_[key];
-        assert(!user_id.empty());
-        assert(users_.count(user_id));
-        src->owner(users_[user_id]);
+        // By copying our instance of the credential to the
+        // caller credential object, we store additional info we gathered
+        // (like owner) and made them accessible to them.
+        auto cred = it->second;
+        *src = *cred;
     }
 }
 
@@ -252,6 +258,8 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
 
         std::string user_id = node.get<std::string>("user");
+        IUserPtr user       = users_[user_id];
+        assert(user);
 
         // todo validity !
 
@@ -265,9 +273,9 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
             WiegandCardPtr card(new WiegandCard(card_id, bits));
             card->id(cred_id);
+            card->owner(user);
 
             wiegand_cards_[card_id] = card;
-            wiegand_card_user_map_[card_id] = user_id;
         }
         else if (opt_child = node.get_child_optional("PINCode"))
         {
@@ -277,9 +285,9 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
             PINCodePtr pin_code(new PINCode(pin));
             pin_code->id(cred_id);
+            pin_code->owner(user);
 
             pin_codes_[pin] = pin_code;
-            pin_code_user_map_[pin] = user_id;
         }
         else if (opt_child = node.get_child_optional("WiegandCardPin"))
         {
@@ -290,9 +298,9 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
             WiegandCardPinPtr cred(new WiegandCardPin(card_id, bits, pin));
             cred->id(cred_id);
-            wiegand_cards_pins_[std::make_pair(card_id, pin)] = cred;
+            cred->owner(user);
 
-            wiegand_card_pin_code_user_map_[std::make_pair(card_id, pin)] = user_id;
+            wiegand_cards_pins_[std::make_pair(card_id, pin)] = cred;
         }
     }
 }

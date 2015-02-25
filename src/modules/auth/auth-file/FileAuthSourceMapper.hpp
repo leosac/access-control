@@ -142,11 +142,6 @@ namespace Leosac
                 std::map<std::string, Leosac::Auth::AuthTargetPtr> targets_;
 
                 /**
-                * Maps a wiegand card id to a user_id
-                */
-                std::unordered_map<std::string, std::string> wiegand_card_user_map_;
-
-                /**
                 * Maps card_id to object.
                 */
                 std::unordered_map<std::string, Leosac::Auth::WiegandCardPtr> wiegand_cards_;
@@ -160,16 +155,6 @@ namespace Leosac
                 * Maps WiegandCard + PIN code to object.
                 */
                 std::map<std::pair<std::string, std::string>, Leosac::Auth::WiegandCardPinPtr> wiegand_cards_pins_;
-
-                /**
-                * Maps a pin code to a user_id
-                */
-                std::unordered_map<std::string, std::string> pin_code_user_map_;
-
-                /**
-                * Maps a wiegand card id and a pin code to a user
-                */
-                std::map<std::pair<std::string, std::string>, std::string> wiegand_card_pin_code_user_map_;
 
                 using Schedule = std::vector<Tools::SingleTimeFrame>;
 
