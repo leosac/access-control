@@ -253,23 +253,45 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
         std::string user_id = node.get<std::string>("user");
 
+        // todo validity !
+
         // does this entry map a wiegand card?
         auto opt_child = node.get_child_optional("WiegandCard");
         if (opt_child)
         {
-            std::string card_id = opt_child->data();
+            std::string card_id = opt_child->get<std::string>("card_id");
+            int bits            = opt_child->get<int>("bits");
+            std::string cred_id = opt_child->get<std::string>("id", "");
+
+            WiegandCardPtr card(new WiegandCard(card_id, bits));
+            card->id(cred_id);
+
+            wiegand_cards_[card_id] = card;
             wiegand_card_user_map_[card_id] = user_id;
         }
         else if (opt_child = node.get_child_optional("PINCode"))
         {
             // or to a PIN code ?
-            std::string pin = opt_child->data();
+            std::string pin     = opt_child->get<std::string>("pin");
+            std::string cred_id = opt_child->get<std::string>("id", "");
+
+            PINCodePtr pin_code(new PINCode(pin));
+            pin_code->id(cred_id);
+
+            pin_codes_[pin] = pin_code;
             pin_code_user_map_[pin] = user_id;
         }
         else if (opt_child = node.get_child_optional("WiegandCardPin"))
         {
-            std::string card_id = opt_child->get<std::string>("card");
-            std::string pin = opt_child->get<std::string>("pin");
+            std::string card_id = opt_child->get<std::string>("card_id");
+            std::string pin     = opt_child->get<std::string>("pin");
+            int bits            = opt_child->get<int>("bits");
+            std::string cred_id = opt_child->get<std::string>("id", "");
+
+            WiegandCardPinPtr cred(new WiegandCardPin(card_id, bits, pin));
+            cred->id(cred_id);
+            wiegand_cards_pins_[std::make_pair(card_id, pin)] = cred;
+
             wiegand_card_pin_code_user_map_[std::make_pair(card_id, pin)] = user_id;
         }
     }

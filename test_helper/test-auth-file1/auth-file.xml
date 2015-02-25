@@ -13,11 +13,17 @@
     <credentials>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>80:83:a0:40</WiegandCard>
+            <WiegandCard>
+                <card_id>80:83:a0:40</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
             <user>Toto</user>
-            <WiegandCard>80:81:61:40</WiegandCard>
+            <WiegandCard>
+                <card_id>80:81:61:40</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
     </credentials>
 

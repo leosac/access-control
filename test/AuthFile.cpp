@@ -69,6 +69,7 @@ namespace Leosac
                 mapper3_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-4.xml");
                 mapper4_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-5.xml");
                 mapper5_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-6.xml");
+                mapper6_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-7.xml");
 
                 // initialize date object.
                 std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -123,6 +124,7 @@ namespace Leosac
                 delete mapper3_;
                 delete mapper4_;
                 delete mapper5_;
+                delete mapper6_;
             }
 
             bool is_in_group(const std::string &user_name, const std::string &group_name,
@@ -160,6 +162,8 @@ namespace Leosac
             IAuthSourceMapper *mapper4_;
             // wiegand card + pin
             IAuthSourceMapper *mapper5_;
+            // cred validity
+            IAuthSourceMapper *mapper6_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
             IAuthenticationSourcePtr unknown_card_;
@@ -420,7 +424,7 @@ namespace Leosac
             ASSERT_FALSE(profile_toto->isAccessGranted(date_monday_16_31, doorC_));
         }
 
-        TEST_F(AuthFileMapperTest, TestValidityLimit)
+        TEST_F(AuthFileMapperTest, TestUserValidityLimit)
         {
             mapper5_->mapToUser(my_card_);
             mapper5_->mapToUser(my_card2_);
@@ -429,11 +433,26 @@ namespace Leosac
             auto profile_llamasticot = mapper5_->buildProfile(my_card_);
             ASSERT_FALSE(profile_llamasticot.get());
 
-            std::cout << "LAMA1" << std::endl;
             auto profile_llama1 = mapper5_->buildProfile(my_card2_);
             ASSERT_TRUE(profile_llama1.get());
 
             auto profile_llama2 = mapper5_->buildProfile(my_pin_);
+            ASSERT_FALSE(profile_llama2.get());
+        }
+
+        TEST_F(AuthFileMapperTest, TestCredentialsValidityLimit)
+        {
+            mapper6_->mapToUser(my_card_);
+            mapper6_->mapToUser(my_card2_);
+            mapper6_->mapToUser(my_pin_);
+            // this user is disabled. should have a NULL profile.
+            auto profile_llamasticot = mapper6_->buildProfile(my_card_);
+            ASSERT_FALSE(profile_llamasticot.get());
+
+            auto profile_llama1 = mapper6_->buildProfile(my_card2_);
+            ASSERT_TRUE(profile_llama1.get());
+
+            auto profile_llama2 = mapper6_->buildProfile(my_pin_);
             ASSERT_FALSE(profile_llama2.get());
         }
     }

@@ -21,11 +21,17 @@
     <credentials>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>aa:bb:cc:dd</WiegandCard>
+            <WiegandCard>
+                <card_id>aa:bb:cc:dd</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
             <user>Toto</user>
-            <WiegandCard>cc:dd:ee:ff</WiegandCard>
+            <WiegandCard>
+                <card_id>cc:dd:ee:ff</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
     </credentials>
 

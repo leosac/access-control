@@ -147,6 +147,21 @@ namespace Leosac
                 std::unordered_map<std::string, std::string> wiegand_card_user_map_;
 
                 /**
+                * Maps card_id to object.
+                */
+                std::unordered_map<std::string, Leosac::Auth::WiegandCardPtr> wiegand_cards_;
+
+                /**
+                * Maps PIN code to object.
+                */
+                std::unordered_map<std::string, Leosac::Auth::PINCodePtr> pin_codes_;
+
+                /**
+                * Maps WiegandCard + PIN code to object.
+                */
+                std::map<std::pair<std::string, std::string>, Leosac::Auth::WiegandCardPinPtr> wiegand_cards_pins_;
+
+                /**
                 * Maps a pin code to a user_id
                 */
                 std::unordered_map<std::string, std::string> pin_code_user_map_;

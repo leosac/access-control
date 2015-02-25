@@ -21,28 +21,35 @@
             <validity_end>01/02/2015 00:00</validity_end>
         </user>
     </users>
-    <!--
-    Maps WiegandCard to user
-    -->
+
     <credentials>
         <map>
             <user>Toto</user>
             <WiegandCardPin>
-                <card>cc:dd:ee:ff</card>
+                <card_id>cc:dd:ee:ff</card_id>
+                <bits>32</bits>
                 <pin>1234</pin>
             </WiegandCardPin>
         </map>
         <map>
             <user>Llamasticot</user>
-            <WiegandCard>aa:bb:cc:dd</WiegandCard>
+            <WiegandCard>
+                <card_id>aa:bb:cc:dd</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
             <user>llama1</user>
-            <WiegandCard>cc:dd:ee:ff</WiegandCard>
+            <WiegandCard>
+                <card_id>cc:dd:ee:ff</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
             <user>llama2</user>
-            <PINCode>1234</PINCode>
+            <PINCode>
+                <pin>1234</pin>
+            </PINCode>
         </map>
     </credentials>
 
