@@ -3,6 +3,11 @@
         <user>
             <name>Toto</name>
         </user>
+
+        <user>
+            <name>Llamasticot</name>
+            <enabled>false</enabled>
+        </user>
     </users>
     <!--
     Maps WiegandCard to user
@@ -14,6 +19,10 @@
                 <card>cc:dd:ee:ff</card>
                 <pin>1234</pin>
             </WiegandCardPin>
+        </map>
+        <map>
+            <user>Llamasticot</user>
+            <WiegandCard>aa:bb:cc:dd</WiegandCard>
         </map>
     </credentials>
 
@@ -31,6 +40,7 @@
         <map>
             <schedule>full_sunday</schedule>
             <user>Toto</user>
+            <user>Llamasticot</user>
         </map>
     </schedules_mapping>
 

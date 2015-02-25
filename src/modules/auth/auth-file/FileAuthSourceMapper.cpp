@@ -139,6 +139,12 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
         return nullptr;
     }
 
+    if (!auth_source->owner()->is_valid())
+    {
+        NOTICE("The user (" << auth_source->owner()->id() << ") is disabled or out of its validity period.");
+        return nullptr;
+    }
+
     grps = get_user_groups(auth_source->owner());
     for (auto & grp : grps)
         profiles.push_back(grp->profile());
@@ -407,11 +413,17 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
         std::string firstname   = node.get<std::string>("firstname", "");
         std::string lastname    = node.get<std::string>("lastname", "");
         std::string email       = node.get<std::string>("email", "");
+        CredentialValidity v;
+
+        v.set_start_date(node.get<std::string>("validity_start", ""));
+        v.set_end_date(node.get<std::string>("validity_end", ""));
+        v.set_enabled(node.get<bool>("enabled", true));
 
         IUserPtr uptr(new IUser(name));
         uptr->firstname(firstname);
         uptr->lastname(lastname);
         uptr->email(email);
+        uptr->validity(v);
 
         // create an empty profile
         uptr->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));

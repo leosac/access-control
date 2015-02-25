@@ -64,12 +64,16 @@ namespace Leosac
             /**
             * Set the start validity date.
             * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
+            *
+             This method accept an empty string, if that case it will set the end_date to `time_point::min()`.
             */
             void set_start_date(const std::string &s);
 
             /**
             * Set the end validity date.
             * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
+            *
+            * This method accept an empty string, if that case it will set the end_date to `time_point::max()`.
             */
             void set_end_date(const std::string &s);
 

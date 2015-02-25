@@ -45,15 +45,19 @@ Declaring the users {#mod_auth_user_declare}
 This section is about describing how to declare users.
 This takes place in the additional config file.
 
-Options | Options | Options    | Description                                             | Mandatory
---------|---------|------------|---------------------------------------------------------|-----------
-users   |         |            | List of users we declare                                | YES
----->   | user    |            | Declaration of one user                                 | YES
----->   | ---->   | name       | Globally unique name to identify a user.                | YES
----->   | ---->   | firstname  | The firstname of the user.                              | NO
----->   | ---->   | lastname   | The family name of the user                             | NO
----->   | ---->   | email      | An email address for the user.                          | NO
+Options | Options | Options        | Description                                             | Mandatory
+--------|---------|----------------|---------------------------------------------------------|-----------
+users   |         |                | List of users we declare                                | YES
+---->   | user    |                | Declaration of one user                                 | YES
+---->   | ---->   | name           | Globally unique name to identify a user.                | YES
+---->   | ---->   | firstname      | The firstname of the user.                              | NO
+---->   | ---->   | lastname       | The family name of the user                             | NO
+---->   | ---->   | email          | An email address for the user.                          | NO
+---->   | ---->   | validity_start | Date when the user starts becoming valid / enabled      | NO
+---->   | ---->   | validity_end   | Date when the user becomes invalid / disabled           | NO
+---->   | ---->   | enabled        | A boolean to fully enable or disable an account         | NO (defaults to `true`)
 
+The datetime format for `validity_{start,end}` is this: `%d/%m/%Y %H:%M` (see man (3) `strptime`).
 
 ### Example {#mod_auth_user_declare_example}
 
@@ -64,6 +68,8 @@ users   |         |            | List of users we declare                       
         <firstname>Edgar</firstname>
         <lastname>Hoover</lastime>
         <email>eh@fbi.gov</email>
+
+        <validity_start>25/10/2015 17:05</validity_start>
     </user>
 </users>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

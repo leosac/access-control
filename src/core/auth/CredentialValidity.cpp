@@ -53,6 +53,13 @@ bool CredentialValidity::is_in_range() const
 void CredentialValidity::set_start_date(const std::string &s)
 {
     struct tm tm;
+
+    if (s.empty())
+    {
+        validity_start_ = std::chrono::system_clock::time_point::min();
+        return;
+    }
+
     if (strptime(s.c_str(), "%d/%m/%Y", &tm))
     {
         validity_start_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
@@ -66,6 +73,12 @@ void CredentialValidity::set_start_date(const std::string &s)
 
 void CredentialValidity::set_end_date(const std::string &s)
 {
+    if (s.empty())
+    {
+        validity_end_ = std::chrono::system_clock::time_point::max();
+        return;
+    }
+
     struct tm tm;
     if (strptime(s.c_str(), "%d/%m/%Y", &tm))
     {

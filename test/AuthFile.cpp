@@ -419,6 +419,14 @@ namespace Leosac
             ASSERT_TRUE(profile_toto->isAccessGranted(date_sunday_18_50, doorC_));
             ASSERT_FALSE(profile_toto->isAccessGranted(date_monday_16_31, doorC_));
         }
+
+        TEST_F(AuthFileMapperTest, TestValidityLimit)
+        {
+            mapper5_->mapToUser(my_card_);
+            // this user is disabled. should have a NULL profile.
+            auto profile_llamasticot = mapper5_->buildProfile(my_card_);
+            ASSERT_FALSE(profile_llamasticot.get());
+        }
     }
 }
 
