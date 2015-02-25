@@ -98,9 +98,11 @@ Exposed features {#remote_control_features}
 The set of feature available through the remote control API is rather thin.
 
 You can retrieve some information about the running configuration of Leosac:
-+ The MODULE_LIST command will return the list of the module currently loaded on the target Leosac unit.
-+ The MODULE_CONFIG command retrieve the configuration for one given module. 
-+ The SYNC_FROM command order Leosac to fetch and apply the configuration of an other, remote, Leosac unit.
++ The `MODULE_LIST` command will return the list of the module currently loaded on the target Leosac unit.
++ The `GENERAL_CONFIG` command retrieve the global configuration of Leosac.
++ The `MODULE_CONFIG` command retrieve the configuration for one given module. 
++ The `SYNC_FROM` command order Leosac to fetch and apply the configuration of an other, remote, Leosac unit.
++ The `SAVE` command order the receiving Leosac to save its current configuration to disk.
 
 See below for a detailed description of messages.
 
@@ -237,9 +239,8 @@ Frame    | Content                               | Type
 SAVE {#remote_control_save}
 ---------------------------
 
-When `SYNC_FROM` configuration, the new configuration is apply directly. However,
-it is not persisted to disk. Moreover, it will not be persisted to disk, unless
-the `<autosave>BOOLEAN</autosave>` configuration option is set to `true`.
+When `SYNC_FROM` configuration, the new configuration is applied directly but it is
+not saved to disk, unless the `<autosave>BOOLEAN</autosave>` configuration option is set to `true`.
 
 The `SAVE` command will make Leosac save its current configuration to disk.
 
@@ -255,3 +256,11 @@ From Server to Client:
 Frame    | Content                         | Type
 ---------|---------------------------------|------------
 1        | "OK"                            | `string`
+
+It is possible the `SAVE` command fails, if that's the case, the response will
+be 2 frames:
+
+Frame    | Content                         | Type
+---------|---------------------------------|------------
+1        | "KO"                            | `string`
+2        | "Some reason of why it fails."  | `string`
