@@ -423,9 +423,18 @@ namespace Leosac
         TEST_F(AuthFileMapperTest, TestValidityLimit)
         {
             mapper5_->mapToUser(my_card_);
+            mapper5_->mapToUser(my_card2_);
+            mapper5_->mapToUser(my_pin_);
             // this user is disabled. should have a NULL profile.
             auto profile_llamasticot = mapper5_->buildProfile(my_card_);
             ASSERT_FALSE(profile_llamasticot.get());
+
+            std::cout << "LAMA1" << std::endl;
+            auto profile_llama1 = mapper5_->buildProfile(my_card2_);
+            ASSERT_TRUE(profile_llama1.get());
+
+            auto profile_llama2 = mapper5_->buildProfile(my_pin_);
+            ASSERT_FALSE(profile_llama2.get());
         }
     }
 }

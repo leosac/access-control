@@ -75,11 +75,8 @@ void FileAuthSourceMapper::visit(WiegandCard *src)
     if (wiegand_card_user_map_.count(src->id()))
     {
         std::string user_id = wiegand_card_user_map_[src->id()];
-        if (!users_[user_id])
-        {
-            NOTICE("User " << user_id << " didnt exist when visiting his credentials.");
-            users_[user_id] = IUserPtr(new IUser(user_id));
-        }
+        assert(!user_id.empty());
+        assert(users_.count(user_id));
         src->owner(users_[user_id]);
     }
 }
@@ -89,11 +86,8 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
     if (pin_code_user_map_.count(src->pin_code()))
     {
         std::string user_id = pin_code_user_map_[src->pin_code()];
-        if (!users_[user_id])
-        {
-            NOTICE("User " << user_id << " didnt exist when visiting his credentials.");
-            users_[user_id] = IUserPtr(new IUser(user_id));
-        }
+        assert(!user_id.empty());
+        assert(users_.count(user_id));
         src->owner(users_[user_id]);
     }
 }
@@ -105,11 +99,8 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
     if (wiegand_card_pin_code_user_map_.count(key))
     {
         std::string user_id = wiegand_card_pin_code_user_map_[key];
-        if (!users_[user_id])
-        {
-            NOTICE("User " << user_id << " didnt exist when visiting his credentials.");
-            users_[user_id] = IUserPtr(new IUser(user_id));
-        }
+        assert(!user_id.empty());
+        assert(users_.count(user_id));
         src->owner(users_[user_id]);
     }
 }
@@ -298,7 +289,7 @@ void FileAuthSourceMapper::load_schedules(const boost::property_tree::ptree &sch
         std::string schedule_name   = node.get<std::string>("name");
         Schedule time_frame_list;
 
-        // loop on all proprety of the schedule.
+        // loop on all properties of the schedule.
         // those will be weekday and the <name> tag too.
         for (const auto & sched_data : node)
         {

@@ -44,6 +44,8 @@ namespace Leosac
             */
             CredentialValidity();
 
+            CredentialValidity(const CredentialValidity &) = default;
+
             /**
             * Check that the current date is between
             * validity start and end and make sure its

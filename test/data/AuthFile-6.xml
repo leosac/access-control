@@ -8,6 +8,18 @@
             <name>Llamasticot</name>
             <enabled>false</enabled>
         </user>
+
+        <user>
+            <name>llama1</name>
+            <validity_start>01/01/2015 00:00</validity_start>
+            <validity_end>01/01/2020 00:00</validity_end>
+        </user>
+
+        <user>
+            <name>llama2</name>
+            <validity_start>01/01/2015 00:00</validity_start>
+            <validity_end>01/02/2015 00:00</validity_end>
+        </user>
     </users>
     <!--
     Maps WiegandCard to user
@@ -23,6 +35,14 @@
         <map>
             <user>Llamasticot</user>
             <WiegandCard>aa:bb:cc:dd</WiegandCard>
+        </map>
+        <map>
+            <user>llama1</user>
+            <WiegandCard>cc:dd:ee:ff</WiegandCard>
+        </map>
+        <map>
+            <user>llama2</user>
+            <PINCode>1234</PINCode>
         </map>
     </credentials>
 
@@ -41,6 +61,8 @@
             <schedule>full_sunday</schedule>
             <user>Toto</user>
             <user>Llamasticot</user>
+            <user>llama1</user>
+            <user>llama2</user>
         </map>
     </schedules_mapping>
 
