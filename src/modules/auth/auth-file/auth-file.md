@@ -1,7 +1,7 @@
-Auth-File (backend) Module Documentation {#mod_auth_file_main}
+AuthFile Module Documentation {#mod_auth_file_main}
 ==============================================================
 
-@brief Documentation for an auth module that stores its config in XML.
+@brief Documentation for a backend authentication module that stores its config in XML.
 
 [TOC]
 
@@ -251,72 +251,57 @@ the module ("file_auth.xml" based on the previous example).
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <root>
+    <users>
+        <user>
+            <name>MY_USER</name>
+        </user>
+    </users>
+
     <!--
     Maps WiegandCard to user
     -->
-    <user_mapping>
+    <credentials>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>00:11:22:33</WiegandCard>
+            <WiegandCard>80:83:a0:40</WiegandCard>
         </map>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>aa:bb:cc:dd</WiegandCard>
+            <PINCode>1234</PINCode>
         </map>
+    </credentials>
+
+    <schedules>
+        <schedule>
+            <name>all</name>
+            <!-- Has full access on monday and sunday -->
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+            <tuesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </tuesday>
+            <wednesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </wednesday>
+
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
         <map>
-            <user>Toto</user>
-            <WiegandCard>cc:dd:ee:ff</WiegandCard>
-        </map>
-    </user_mapping>
-    <permissions>
-        <map>
-            <!-- Time frame mapping for MY_USER -->
+            <schedule>all</schedule>
             <user>MY_USER</user>
-            <default_schedule>
-                <!-- The scheduling information here *only* apply for door
-                that have no other scheduling information.
-                 In the test suite that use this file, its DoorC.
-                 It is the default schedule FOR THIS USER.
-                 -->
-                <monday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </monday>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
-            <schedule>
-                <door>doorA</door>
-                <monday>
-                    <start>10:00</start>
-                    <end>14:59</end>
-                </monday>
-                <monday>
-                    <start>16:35</start>
-                    <end>23:59</end>
-                </monday>
-            </schedule>
-            <schedule>
-                <door>doorB</door>
-                <monday>
-                    <start>15:00</start>
-                    <end>23:59</end>
-                </monday>
-            </schedule>
         </map>
-        <map>
-            <!-- Time frame mapping for Toto -->
-            <user>Toto</user>
-            <default_schedule>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
-        </map>
-    </permissions>
+    </schedules_mapping>
+
 </root>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

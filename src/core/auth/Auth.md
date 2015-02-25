@@ -7,6 +7,8 @@ Authentication Documentation {#auth_main}
 [Cards]: @ref Leosac::Auth::ICard "Card"
 [Users]: @ref Leosac::Auth::IUser "User"
 
+@brief Explain how the authentication and authorization subsystem works.
+
 Introduction {#auth_intro}
 =============================
 
@@ -44,8 +46,8 @@ Two kinds of modules
 
 We break down the authentication & authorization code in multiple parts.
 There are two kinds of modules:
-    1. Authentication Source module (eg [Wiegand](@ref @mod_wiegand_main))
-    2. Authentication Backend module (eg [Files](@ref @mod_authfile_main))
+    1. Authentication Source module (eg [Wiegand](@ref mod_wiegand_main))
+    2. Authentication Backend module (eg [Files](@ref mod_auth_file_main))
 
 Authentication Source
 ---------------------
@@ -67,8 +69,8 @@ Authentication Backend
 An **authentication backend** module gather event from **authentication source**
 and check their own backend to build a profile (raw files, database, remote webservices, ...)
 
-TODO:
-( Who checks the profiles?? TBD)
+The profile is built by checking group-membership, credentials mapping, etc.
+The newly built profile is then queried to determine whether or not the user should be granted access.
 
 In order for this to work properly, we need a decent message passing specifications.
 

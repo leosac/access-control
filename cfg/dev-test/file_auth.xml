@@ -1,51 +1,53 @@
 <root>
+    <users>
+        <user>
+            <name>MY_USER</name>
+        </user>
+    </users>
+
     <!--
     Maps WiegandCard to user
     -->
-    <user_mapping>
+    <credentials>
         <map>
             <user>MY_USER</user>
             <WiegandCard>80:83:a0:40</WiegandCard>
         </map>
         <map>
-            <user>Toto</user>
-            <WiegandCard>80:81:61:40</WiegandCard>
-        </map>
-    </user_mapping>
-
-    <permissions>
-        <map>
-            <user>Toto</user>
-            <default_schedule>
-            </default_schedule>
-        </map>
-        <map>
-            <!-- Time frame mapping for MY_USER -->
             <user>MY_USER</user>
-
-            <default_schedule>
-                <monday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </monday>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
-
-            <schedule>
-                <door>doorA</door>
-                <wednesday>
-                    <start>11:00</start>
-                    <end>13:00</end>
-                </wednesday>
-                <wednesday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </wednesday>
-            </schedule>
+            <PINCode>1234</PINCode>
         </map>
-    </permissions>
-</root>
+    </credentials>
 
+    <schedules>
+        <schedule>
+            <name>all</name>
+            <!-- Has full access on monday and sunday -->
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+            <tuesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </tuesday>
+            <wednesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </wednesday>
+
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
+        <map>
+            <schedule>all</schedule>
+            <user>MY_USER</user>
+        </map>
+    </schedules_mapping>
+
+</root>
