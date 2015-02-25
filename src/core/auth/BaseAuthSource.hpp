@@ -33,6 +33,7 @@ namespace Leosac
         class BaseAuthSource : public IAuthenticationSource
         {
         public:
+            BaseAuthSource(const std::string &id = "");
             virtual ~BaseAuthSource() = default;
             virtual void addAuthSource(IAuthenticationSourcePtr source) override;
 
@@ -57,6 +58,10 @@ namespace Leosac
 
             virtual std::string to_string() const override;
 
+            virtual const std::string &id() const override;
+
+            void id(const std::string &cred_id);
+
         protected:
             /**
             * Which user this auth source maps to. May be null
@@ -72,6 +77,11 @@ namespace Leosac
             * Name of the source (generally the module / device that sent it)
             */
             std::string source_name_;
+
+            /**
+            * Credentials ID.
+            */
+            std::string id_;
         };
     }
 }

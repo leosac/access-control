@@ -22,6 +22,12 @@
 
 using namespace Leosac::Auth;
 
+BaseAuthSource::BaseAuthSource(const std::string &cred_id) :
+        id_(cred_id)
+{
+
+}
+
 void BaseAuthSource::addAuthSource(IAuthenticationSourcePtr source)
 {
     subsources_.push_back(source);
@@ -62,4 +68,14 @@ void BaseAuthSource::name(std::string const &n)
 std::string BaseAuthSource::to_string() const
 {
     return "Base auth source";
+}
+
+const std::string &BaseAuthSource::id() const
+{
+    return id_;
+}
+
+void BaseAuthSource::id(const std::string &cred_id)
+{
+    id_ = cred_id;
 }

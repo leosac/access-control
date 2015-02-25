@@ -79,6 +79,12 @@ namespace Leosac
             * Returns a string representation of the authentication source content.
             */
             virtual std::string to_string() const = 0;
+
+            /**
+            * Returns the ID of the credentials.
+            * It is possible that this ID be empty.
+            */
+            virtual const std::string &id() const = 0;
         };
     }
 }

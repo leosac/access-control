@@ -37,10 +37,10 @@ namespace Leosac
             /**
             * Create a WiegandCard object.
             *
-            * @param card_id the id of the card in hexadecimal text format
+            * @param cardid the id of the card in hexadecimal text format
             * @param bits number of bits (wiegand 26, wiegand32 ...)
             */
-            WiegandCard(const std::string &card_id, int bits);
+            WiegandCard(const std::string &cardid, int bits);
 
             virtual void accept(Tools::IVisitor *visitor) override;
 

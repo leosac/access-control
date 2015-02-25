@@ -23,8 +23,8 @@
 
 using namespace Leosac::Auth;
 
-WiegandCard::WiegandCard(const std::string &card_id, int bits) :
-        card_id_(card_id),
+WiegandCard::WiegandCard(const std::string &cardid, int bits) :
+        card_id_(cardid),
         nb_bits_(bits)
 {
 
