@@ -79,3 +79,13 @@ void BaseAuthSource::id(const std::string &cred_id)
 {
     id_ = cred_id;
 }
+
+const CredentialValidity &BaseAuthSource::validity() const
+{
+    return validity_;
+}
+
+void BaseAuthSource::validity(const CredentialValidity &c)
+{
+    validity_ = c;
+}

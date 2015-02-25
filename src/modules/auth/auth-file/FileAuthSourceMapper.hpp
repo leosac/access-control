@@ -121,6 +121,8 @@ namespace Leosac
                 */
                 static int week_day_to_int(const std::string &day);
 
+                Leosac::Auth::CredentialValidity extract_credentials_validity(const boost::property_tree::ptree &node);
+
                 /**
                 * Store the name of the configuration file.
                 */

@@ -62,6 +62,10 @@ namespace Leosac
 
             void id(const std::string &cred_id);
 
+            virtual const CredentialValidity &validity() const override;
+
+            virtual void validity(const CredentialValidity &c) override;
+
         protected:
             /**
             * Which user this auth source maps to. May be null
@@ -82,6 +86,8 @@ namespace Leosac
             * Credentials ID.
             */
             std::string id_;
+
+            CredentialValidity validity_;
         };
     }
 }

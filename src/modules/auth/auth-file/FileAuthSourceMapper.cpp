@@ -62,6 +62,7 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
         const auto &credentials_tree = additional_config.get_child_optional("credentials");
         if (credentials_tree)
             load_credentials(*credentials_tree);
+        DEBUG("Ready");
     }
     catch (std::exception &e)
     {
@@ -129,6 +130,12 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
     assert(auth_source);
     std::vector<GroupPtr> grps;
     std::vector<IAccessProfilePtr> profiles; // profiles that apply to the user.
+
+    if (!auth_source->validity().is_valid())
+    {
+        NOTICE("Credentials is invalid. It was disabled or out of its validity period.");
+        return nullptr;
+    }
 
     if (!auth_source->owner())
     {
@@ -261,7 +268,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
         IUserPtr user       = users_[user_id];
         assert(user);
 
-        // todo validity !
+        // todo deduplication
 
         // does this entry map a wiegand card?
         auto opt_child = node.get_child_optional("WiegandCard");
@@ -274,6 +281,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
             WiegandCardPtr card(new WiegandCard(card_id, bits));
             card->id(cred_id);
             card->owner(user);
+            card->validity(extract_credentials_validity(*opt_child));
 
             wiegand_cards_[card_id] = card;
         }
@@ -286,6 +294,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
             PINCodePtr pin_code(new PINCode(pin));
             pin_code->id(cred_id);
             pin_code->owner(user);
+            pin_code->validity(extract_credentials_validity(*opt_child));
 
             pin_codes_[pin] = pin_code;
         }
@@ -299,6 +308,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
             WiegandCardPinPtr cred(new WiegandCardPin(card_id, bits, pin));
             cred->id(cred_id);
             cred->owner(user);
+            cred->validity(extract_credentials_validity(*opt_child));
 
             wiegand_cards_pins_[std::make_pair(card_id, pin)] = cred;
         }
@@ -434,17 +444,12 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
         std::string firstname   = node.get<std::string>("firstname", "");
         std::string lastname    = node.get<std::string>("lastname", "");
         std::string email       = node.get<std::string>("email", "");
-        CredentialValidity v;
-
-        v.set_start_date(node.get<std::string>("validity_start", ""));
-        v.set_end_date(node.get<std::string>("validity_end", ""));
-        v.set_enabled(node.get<bool>("enabled", true));
 
         IUserPtr uptr(new IUser(name));
         uptr->firstname(firstname);
         uptr->lastname(lastname);
         uptr->email(email);
-        uptr->validity(v);
+        uptr->validity(extract_credentials_validity(node));
 
         // create an empty profile
         uptr->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
@@ -455,4 +460,15 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
         }
         users_[name] = uptr;
     }
+}
+
+Leosac::Auth::CredentialValidity FileAuthSourceMapper::extract_credentials_validity(const boost::property_tree::ptree &node)
+{
+    CredentialValidity v;
+
+    v.set_start_date(node.get<std::string>("validity_start", ""));
+    v.set_end_date(node.get<std::string>("validity_end", ""));
+    v.set_enabled(node.get<bool>("enabled", true));
+
+    return v;
 }

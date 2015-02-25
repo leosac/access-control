@@ -85,6 +85,16 @@ namespace Leosac
             * It is possible that this ID be empty.
             */
             virtual const std::string &id() const = 0;
+
+            /**
+            * Get the object that store info about the credential's validity
+            */
+            virtual const CredentialValidity &validity() const = 0;
+
+            /**
+            * Update the validity of the credential.
+            */
+            virtual void validity(const CredentialValidity &c) = 0;
         };
     }
 }
