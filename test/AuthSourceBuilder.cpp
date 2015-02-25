@@ -102,7 +102,7 @@ namespace Leosac
             ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
             WiegandCardPtr spec = std::dynamic_pointer_cast<WiegandCard>(auth_source);
             ASSERT_TRUE(spec.get());
-            ASSERT_EQ("af:bc:12:42", spec->id());
+            ASSERT_EQ("af:bc:12:42", spec->card_id());
             ASSERT_EQ(32, spec->nb_bits());
         }
 
@@ -125,7 +125,7 @@ namespace Leosac
             ASSERT_EQ(auth_source->name(), "MY_WIEGAND_1");
             WiegandCardPinPtr spec = std::dynamic_pointer_cast<WiegandCardPin>(auth_source);
             ASSERT_TRUE(spec.get());
-            ASSERT_EQ("af:bc:12:42", spec->card().id());
+            ASSERT_EQ("af:bc:12:42", spec->card().card_id());
             ASSERT_EQ(32, spec->card().nb_bits());
             ASSERT_EQ("1234", spec->pin().pin_code());
         }

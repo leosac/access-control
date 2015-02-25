@@ -24,7 +24,7 @@
 using namespace Leosac::Auth;
 
 WiegandCard::WiegandCard(const std::string &card_id, int bits) :
-        id_(card_id),
+        card_id_(card_id),
         nb_bits_(bits)
 {
 
@@ -35,9 +35,9 @@ void WiegandCard::accept(Leosac::Tools::IVisitor *visitor)
     visitor->visit(this);
 }
 
-const std::string &WiegandCard::id() const
+const std::string &WiegandCard::card_id() const
 {
-    return id_;
+    return card_id_;
 }
 
 int WiegandCard::nb_bits() const
@@ -53,6 +53,6 @@ std::string WiegandCard::to_string() const
     ss << "Source Name: " << source_name_ << std::endl << "\t\t";
     ss << "Source Type: " << "WiegandCard" << std::endl << "\t\t";
     ss << "Number of bits: " << nb_bits_ << std::endl << "\t\t";
-    ss << "Card id: " << id();
+    ss << "Card id: " << card_id();
     return ss.str();
 }

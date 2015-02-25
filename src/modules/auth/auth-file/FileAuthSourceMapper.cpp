@@ -72,9 +72,9 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 
 void FileAuthSourceMapper::visit(WiegandCard *src)
 {
-    if (wiegand_card_user_map_.count(src->id()))
+    if (wiegand_card_user_map_.count(src->card_id()))
     {
-        std::string user_id = wiegand_card_user_map_[src->id()];
+        std::string user_id = wiegand_card_user_map_[src->card_id()];
         assert(!user_id.empty());
         assert(users_.count(user_id));
         src->owner(users_[user_id]);
@@ -94,7 +94,7 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
 
 void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
 {
-    auto key = std::make_pair(src->card().id(), src->pin().pin_code());
+    auto key = std::make_pair(src->card().card_id(), src->pin().pin_code());
 
     if (wiegand_card_pin_code_user_map_.count(key))
     {

@@ -47,7 +47,7 @@ namespace Leosac
             /**
             * Returns the id of the card, as a hexadecimal string.
             */
-            const std::string &id() const;
+            const std::string &card_id() const;
 
             int nb_bits() const;
 
@@ -57,7 +57,7 @@ namespace Leosac
             /**
             * Card id
             */
-            std::string id_;
+            std::string card_id_;
 
             /**
             * Number of meaningful bit

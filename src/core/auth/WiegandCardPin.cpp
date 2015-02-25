@@ -47,7 +47,7 @@ std::string WiegandCardPin::to_string() const
     ss << "Source Name: " << source_name_ << std::endl << "\t\t";
     ss << "Source Type: " << "WiegandCard + Pin Code" << std::endl << "\t\t";
     ss << "Number of bits: " << card_.nb_bits() << std::endl << "\t\t";
-    ss << "Card id: " << card_.id() << std::endl << "\t\t";
+    ss << "Card id: " << card_.card_id() << std::endl << "\t\t";
     ss << "Pin Code: " << pin_.pin_code();
     return ss.str();
 }
