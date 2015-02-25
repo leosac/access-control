@@ -268,7 +268,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
         IUserPtr user       = users_[user_id];
         assert(user);
 
-        // todo deduplication
+        IAuthenticationSourcePtr credential;
 
         // does this entry map a wiegand card?
         auto opt_child = node.get_child_optional("WiegandCard");
@@ -276,42 +276,31 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
         {
             std::string card_id = opt_child->get<std::string>("card_id");
             int bits            = opt_child->get<int>("bits");
-            std::string cred_id = opt_child->get<std::string>("id", "");
 
-            WiegandCardPtr card(new WiegandCard(card_id, bits));
-            card->id(cred_id);
-            card->owner(user);
-            card->validity(extract_credentials_validity(*opt_child));
-
-            wiegand_cards_[card_id] = card;
+            credential = std::make_shared<WiegandCard>(card_id, bits);
+            wiegand_cards_[card_id] = std::static_pointer_cast<WiegandCard>(credential);
         }
         else if (opt_child = node.get_child_optional("PINCode"))
         {
             // or to a PIN code ?
             std::string pin     = opt_child->get<std::string>("pin");
-            std::string cred_id = opt_child->get<std::string>("id", "");
 
-            PINCodePtr pin_code(new PINCode(pin));
-            pin_code->id(cred_id);
-            pin_code->owner(user);
-            pin_code->validity(extract_credentials_validity(*opt_child));
-
-            pin_codes_[pin] = pin_code;
+            credential = std::make_shared<PINCode>(pin);
+            pin_codes_[pin] = std::static_pointer_cast<PINCode>(credential);
         }
         else if (opt_child = node.get_child_optional("WiegandCardPin"))
         {
             std::string card_id = opt_child->get<std::string>("card_id");
             std::string pin     = opt_child->get<std::string>("pin");
             int bits            = opt_child->get<int>("bits");
-            std::string cred_id = opt_child->get<std::string>("id", "");
 
-            WiegandCardPinPtr cred(new WiegandCardPin(card_id, bits, pin));
-            cred->id(cred_id);
-            cred->owner(user);
-            cred->validity(extract_credentials_validity(*opt_child));
-
-            wiegand_cards_pins_[std::make_pair(card_id, pin)] = cred;
+            credential = std::make_shared<WiegandCardPin>(card_id, bits, pin);
+            wiegand_cards_pins_[std::make_pair(card_id, pin)] =
+                    std::static_pointer_cast<WiegandCardPin>(credential);
         }
+        credential->validity(extract_credentials_validity(*opt_child));
+        credential->owner(user);
+        credential->id(opt_child->get<std::string>("id", ""));
     }
 }
 

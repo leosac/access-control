@@ -60,7 +60,7 @@ namespace Leosac
 
             virtual const std::string &id() const override;
 
-            void id(const std::string &cred_id);
+            void id(const std::string &cred_id) override;
 
             virtual const CredentialValidity &validity() const override;
 

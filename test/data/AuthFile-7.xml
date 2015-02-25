@@ -1,0 +1,63 @@
+<root>
+    <users>
+        <user>
+            <name>llamasticot</name>
+        </user>
+
+        <user>
+            <name>llama1</name>
+        </user>
+
+        <user>
+            <name>llama2</name>
+        </user>
+    </users>
+
+    <credentials>
+        <map>
+            <user>llamasticot</user>
+            <WiegandCard>
+                <card_id>aa:bb:cc:dd</card_id>
+                <bits>32</bits>
+                <enabled>false</enabled>
+            </WiegandCard>
+        </map>
+        <map>
+            <user>llama1</user>
+            <WiegandCard>
+                <card_id>cc:dd:ee:ff</card_id>
+                <bits>32</bits>
+                <validity_start>01/01/2015 00:00</validity_start>
+                <validity_end>01/01/2020 00:00</validity_end>
+            </WiegandCard>
+        </map>
+        <map>
+            <user>llama2</user>
+            <PINCode>
+                <pin>1234</pin>
+                <validity_start>01/01/2015 00:00</validity_start>
+                <validity_end>01/02/2015 00:00</validity_end>
+            </PINCode>
+        </map>
+    </credentials>
+
+    <schedules>
+        <schedule>
+            <name>full_sunday</name>
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
+        <map>
+            <schedule>full_sunday</schedule>
+            <user>llamasticot</user>
+            <user>llama1</user>
+            <user>llama2</user>
+        </map>
+    </schedules_mapping>
+
+</root>

@@ -86,6 +86,8 @@ namespace Leosac
             */
             virtual const std::string &id() const = 0;
 
+            virtual void id(const std::string &new_id) = 0;
+
             /**
             * Get the object that store info about the credential's validity
             */
