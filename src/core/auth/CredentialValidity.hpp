@@ -61,6 +61,20 @@ namespace Leosac
             */
             bool is_in_range() const;
 
+            /**
+            * Set the start validity date.
+            * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
+            */
+            void set_start_date(const std::string &s);
+
+            /**
+            * Set the end validity date.
+            * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
+            */
+            void set_end_date(const std::string &s);
+
+            void set_enabled(bool v);
+
         private:
             using TimePoint = std::chrono::system_clock::time_point;
 

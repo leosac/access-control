@@ -20,6 +20,7 @@
 #pragma once
 
 #include <memory>
+#include <core/auth/CredentialValidity.hpp>
 #include "IAccessProfile.hpp"
 
 namespace Leosac
@@ -55,10 +56,17 @@ namespace Leosac
             const std::string &firstname() const;
             const std::string &lastname() const;
             const std::string &email() const;
+            const CredentialValidity &validity() const;
 
             void firstname(const std::string &);
             void lastname(const std::string &);
             void email(const std::string &);
+            void validity(const CredentialValidity &c);
+
+            /**
+            * Check the credentials validity object.
+            */
+            bool is_valid()const;
 
         protected:
             /**
@@ -70,6 +78,10 @@ namespace Leosac
             std::string lastname_;
             std::string email_;
 
+            /**
+            * A user can have the same validity than credentials.
+            */
+            CredentialValidity validity_;
             IAccessProfilePtr profile_;
         };
 

@@ -76,3 +76,18 @@ void IUser::email(std::string const &e)
 {
     email_ = e;
 }
+
+const CredentialValidity &IUser::validity() const
+{
+    return validity_;
+}
+
+void IUser::validity(const CredentialValidity &c)
+{
+    validity_ = c;
+}
+
+bool IUser::is_valid() const
+{
+    return validity_.is_valid();
+}

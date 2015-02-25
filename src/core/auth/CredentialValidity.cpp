@@ -17,6 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <stdexcept>
+#include <cassert>
 #include "core/auth/CredentialValidity.hpp"
 
 using namespace Leosac::Auth;
@@ -46,4 +48,37 @@ bool CredentialValidity::is_in_range() const
     if (now >= validity_start_ && now <= validity_end_)
         return true;
     return false;
+}
+
+void CredentialValidity::set_start_date(const std::string &s)
+{
+    struct tm tm;
+    if (strptime(s.c_str(), "%d/%m/%Y", &tm))
+    {
+        validity_start_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    }
+    else
+    {
+        assert(0);
+        throw std::runtime_error("invalid date.");
+    }
+}
+
+void CredentialValidity::set_end_date(const std::string &s)
+{
+    struct tm tm;
+    if (strptime(s.c_str(), "%d/%m/%Y", &tm))
+    {
+        validity_end_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    }
+    else
+    {
+        assert(0);
+        throw std::runtime_error("invalid date.");
+    }
+}
+
+void CredentialValidity::set_enabled(bool v)
+{
+    enabled_ = v;
 }
