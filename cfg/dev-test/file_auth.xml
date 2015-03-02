@@ -11,11 +11,16 @@
     <credentials>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>80:83:a0:40</WiegandCard>
+            <WiegandCard>
+                <card_id>80:83:a0:40</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
             <user>MY_USER</user>
-            <PINCode>1234</PINCode>
+            <PINCode>
+                <pin>1234</pin>
+            </PINCode>
         </map>
     </credentials>
 

@@ -83,36 +83,57 @@ A credentials maps to a user.
    1. WiegandCard
    2. PINCode
    3. WiegandCardPin
-
-
-Options          | Options        | Description                                                           | Mandatory
------------------|----------------|-----------------------------------------------------------------------|------------
-WiegandCard      |                | Defines a WiegandCard credential                                      | NO
---->             | id             | The id of the credentials. Used when mapping credentials to schedules | NO
---->             | card_id        | The id of the card, text string (`aa:bb:cc:dd`)                       | **YES**
---->             | bits           | Number of meaningful bits                                             | **YES**
---->             | enabled        | Is the card active (aka can it be used)                               | NO
---->             | validity_start | Optional date at which the credentials becomes active                 | NO
---->             | validity_end   | Optional date at which the credentials stops being active             | NO
-PINCode          |                | Defines a PINCode that will be a credentials                          | NO
---->             | id             | The id of the credentials. Used when mapping credentials to schedules | NO
---->             | pin            | The PIN code to be used. This is a string.                            | **YES**
---->             | enabled        | Is the PIN code active (aka can it be used)                           | NO
---->             | validity_start | Optional date at which the credentials becomes active                 | NO
---->             | validity_end   | Optional date at which the credentials stops being active             | NO   
-WiegandCardPin   |                | Defines a credentials composed of a card and a PIN code               | NO
---->             | id             | The id of the credentials. Used when mapping credentials to schedules | NO
---->             | pin            | The PIN code to be used. This is a string.                            | **YES**
---->             | card_id        | The id of the card, text string (`aa:bb:cc:dd`)                       | **YES**
---->             | bits           | Number of meaningful bits                                             | **YES**
---->             | enabled        | Is the PIN code active (aka can it be used)                           | NO
---->             | validity_start | Optional date at which the credentials becomes active                 | NO
---->             | validity_end   | Optional date at which the credentials stops being active             | NO   
+   
+All credentials type share 4 optional properties that you can configure per credentials:
+   1. `id`: The id of the credentials. Used when mapping credentials to schedules. This can be whatever you want,
+       as long as it is unique.
+   2. `enabled`: Is the card active? If true, the credentials can be used, otherwise it will look like it
+       doesn't exist.
+   3. `validity_start`: Optional date at which the credentials becomes active.
+   4. `validity_end`: Optional date at which the credentials stops being active
 
 
 It is possible to omit the `id` field. It is necessary only if you plan to map credentials directly to
 schedules, instead of mapping user to schedules. The direct mapping of credentials to schedules can be used
-to create temporary card with more privilege than the user usually have.
+to create temporary cards with more privilege than the user usually have.
+
+WiegandCard {#mod_auth_cred_wiegandcard}
+-----------------------------------------
+
+This credentials is simply a Wiegand card number. Is it qualified through a string
+representing the card id, and an integer representing the number of meaningful bits in 
+the card id.
+
+Options          | Options        | Description                                                           | Mandatory
+-----------------|----------------|-----------------------------------------------------------------------|------------
+WiegandCard      |                | Defines a WiegandCard credential                                      | NO
+--->             | card_id        | The id of the card, text string (`aa:bb:cc:dd`)                       | **YES**
+--->             | bits           | Number of meaningful bits                                             | **YES**
+
+
+PINCode {#mod_auth_cred_pincode}
+---------------------------------
+
+This credentials is simply a PIN code. The number of character in the code is variable.
+
+Options          | Options        | Description                                                           | Mandatory
+-----------------|----------------|-----------------------------------------------------------------------|------------
+PINCode          |                | Defines a PINCode that will be a credentials                          | NO
+--->             | pin            | The PIN code to be used. This is a string.                            | **YES**
+
+
+WiegandCardPin {#mod_auth_cred_wiegandcard_pin}
+------------------------------------------------
+
+This is the combination of a PIN code a WiegandCard. This is currently the most complex credential type.
+
+Options          | Options        | Description                                                           | Mandatory
+-----------------|----------------|-----------------------------------------------------------------------|------------
+WiegandCardPin   |                | Defines a credentials composed of a card and a PIN code               | NO
+--->             | pin            | The PIN code to be used. This is a string.                            | **YES**
+--->             | card_id        | The id of the card, text string (`aa:bb:cc:dd`)                       | **YES**
+--->             | bits           | Number of meaningful bits                                             | **YES**
+
 
 Example {#mod_auth_cred_example}
 --------------------------------
@@ -122,12 +143,19 @@ Below an example for each of those credentials:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <credentials>
     <map>
-        <user>MY_USER</user>
-        <WiegandCard>00:11:22:33</WiegandCard>
+        <user>llamasticot</user>
+        <WiegandCard>
+            <card_id>aa:bb:cc:dd</card_id>
+            <bits>32</bits>
+            <enabled>false</enabled>
+        </WiegandCard>
     </map>
     <map>
         <user>MY_USER</user>
-        <PINCode>1234</PINCode>
+        <PINCode>
+            <id>my_unique_id_for_this_cred</id>
+            <pin>1234</pin>
+        </PINCode>
     </map>
     <map>
         <user>Toto</user>
@@ -167,8 +195,6 @@ A `<group_mapping>` block can be used to map user to groups.
 
 Schedules {#mod_auth_schedule}
 =============================
-
-TODO !
 
 Schedules can be defined. They represents time-frame where access **is granted**.
 Schedules are then mapped to user or to group.
@@ -302,11 +328,16 @@ the module ("file_auth.xml" based on the previous example).
     <credentials>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>80:83:a0:40</WiegandCard>
+            <WiegandCard>
+                <card_id>80:83:a0:40</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
             <user>MY_USER</user>
-            <PINCode>1234</PINCode>
+            <PINCode>
+                <pin>1234</pin>
+            </PINCode>
         </map>
     </credentials>
 
