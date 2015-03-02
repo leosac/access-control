@@ -43,6 +43,10 @@ void DoormanModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
 
+    auto doors_cfg = module_config.get_child_optional("doors");
+    if (doors_cfg)
+        process_doors_config(*doors_cfg);
+
     for (const auto &node : module_config.get_child("instances"))
     {
         // one doorman instance
@@ -88,8 +92,53 @@ void DoormanModule::run()
 {
     while (is_running_)
     {
-        reactor_.poll(1000);
+        update();
+        reactor_.poll(10000);
         for (auto &&instance : doormen_)
             instance->update();
+    }
+}
+
+void DoormanModule::process_doors_config(const boost::property_tree::ptree &doors)
+{
+    DEBUG("Processing doors config");
+    for (const auto &door : doors)
+    {
+        Tools::XmlScheduleLoader xml_sched;
+        std::string gpio = door.second.get<std::string>("gpio");
+        const auto &open_schedule = door.second.get_child_optional("on.schedules");
+
+        if (open_schedule)
+        {
+            xml_sched.load(*open_schedule);
+            std::shared_ptr<Door> d(new Door);
+            //d->gpio_ = std::make_unique<Hardware::FGPIO>(ctx_, gpio);
+            d->gpio_ = std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, gpio));
+            for (const auto &map_entry : xml_sched.schedules())
+            {
+                DEBUG("BLA");
+                d->always_on.push_back(map_entry.second);
+            }
+            doors_.push_back(d);
+        }
+    }
+}
+
+void DoormanModule::update()
+{
+    DEBUG("UPDATE");
+    for (auto &&door : doors_)
+    {
+        for (const auto &sched : door->always_on)
+        {
+            for (const auto &time_frame : sched)
+            {
+                if (time_frame.is_in_timeframe(std::chrono::system_clock::now()))
+                {
+                    DEBUG("UPDATE HERE");
+                    door->gpio_->turnOn();
+                }
+            }
+        }
     }
 }

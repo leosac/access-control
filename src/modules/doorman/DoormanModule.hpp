@@ -24,6 +24,8 @@
 #include <vector>
 #include <memory>
 #include <modules/BaseModule.hpp>
+#include <hardware/FGPIO.hpp>
+#include <tools/XmlScheduleLoader.hpp>
 
 namespace Leosac
 {
@@ -39,6 +41,13 @@ namespace Leosac
         {
 
             class DoormanInstance;
+
+            class Door
+            {
+            public:
+                std::list<Tools::XmlScheduleLoader::Schedule> always_on;
+                std::unique_ptr<Hardware::FGPIO> gpio_;
+            };
 
             /**
             * Main class for the module, it create handlers and run them
@@ -63,16 +72,25 @@ namespace Leosac
 
             private:
 
+                void update();
+
                 /**
                 * Processing the configuration tree, spawning AuthFileInstance object as described in the
                 * configuration file.
                 */
                 void process_config();
 
+                void process_doors_config(const boost::property_tree::ptree &t);
+
                 /**
                 * Authenticator instances.
                 */
                 std::vector<std::shared_ptr<DoormanInstance>> doormen_;
+
+                /**
+                * Doors, to manage the always-on or always off stuff.
+                */
+                std::vector<std::shared_ptr<Door>> doors_;
             };
 
         }

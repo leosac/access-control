@@ -51,8 +51,5 @@ namespace Leosac
         * This function does not throw.
         */
         bool boost_text_archive_to_ptree(const std::string &data, boost::property_tree::ptree &tree) noexcept;
-
-
-        void toto() noexcept;
     }
 }
