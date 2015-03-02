@@ -22,20 +22,20 @@ Below are the configuration options available.
 Options | Options | Options        | Description                                                                             | Mandatory
 --------|---------|----------------|-----------------------------------------------------------------------------------------|-----------
 aliases |         |                | Define GPIO aliases. This is useful to support multiple platform                        | YES
------>  | default |                | Default name resolution for pin. `__NO__` will be replace by the `no` field             | NO 
------>  | PIN_ID  |                | Option name shall be the pin number, **not** textual `PIN_ID`. Value is the identifier for the pin. | NO
+--->    | default |                | Default name resolution for pin. `__NO__` will be replace by the `no` field             | NO 
+--->    | PIN_ID  |                | Option name shall be the pin number, **not** textual `PIN_ID`. Value is the identifier for the pin. | NO
 export_path |     |                | Absolute path to "export" sysfs file                                                    | YES
 unexport_path |   |                | Absolute path to "unexport" sysfs file                                                  | YES
 value_path |      |                | Absolute path to "value" file. `__REPLACE_ME__` shall act as a placeholder for pin id   | YES
 edge_path  |      |                | Absolute path to "edge" file. `__REPLACE_ME__` shall act as a placeholder for pin id    | YES
 direction_path |  |                | Absolute path to "direction" file. `__REPLACE_ME__` shall act as a placeholder          | YES
 gpios   |         |                | List of GPIOs pins we configure                                                         | YES
------>  | gpio    |                | Configuration informations for one GPIO pin.                                            | YES
------>  | ----->  | name           | Name of the GPIO pin                                                                    | YES
------>  | ----->  | no             | Number of the GPIO pin.                                                                 | YES
------>  | ----->  | direction      | Direction of the pin. This in either `in` or `out`                                      | YES
------>  | ----->  | interrupt_mode | What interrupt do we care about? See below for details                                  | NO
------>  | ----->  | value          | Default value of the PIN. Either `1` or `0`                                             | NO
+--->    | gpio    |                | Configuration informations for one GPIO pin.                                            | YES
+--->    | --->    | name           | Name of the GPIO pin                                                                    | YES
+--->    | --->    | no             | Number of the GPIO pin.                                                                 | YES
+--->    | --->    | direction      | Direction of the pin. This in either `in` or `out`                                      | YES
+--->    | --->    | interrupt_mode | What interrupt do we care about? See below for details                                  | NO
+--->    | --->    | value          | Default value of the PIN. Either `1` or `0`                                             | NO
 
 Path information
 ----------------

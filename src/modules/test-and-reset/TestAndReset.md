@@ -25,10 +25,10 @@ run_on_start  |           |            | Should we beep/blink when the module st
 promisc       |           |            | Listen to all event to watch for reset card.                   | NO (defaults to false)
 reset_card    |           |            | Wiegand ID of reset card. Only useful if promisc is `true`.    | YES if promisc is `true`. 
 devices       |           |            | List of devices to watch for                                   | NO
----->         | device    |            | Watch for event sent by this device                            | YES
----->         | ---->     | name       | Name of the device                                             | YES
----->         | ---->     | reset_card | Content / number of the card                                   | NO
----->         | ---->     | test_card  | Id of the card that trigger test led/beep stuff                | NO
+--->          | device    |            | Watch for event sent by this device                            | YES
+--->          | --->      | name       | Name of the device                                             | YES
+--->          | --->      | reset_card | Content / number of the card                                   | NO
+--->          | --->      | test_card  | Id of the card that trigger test led/beep stuff                | NO
 
 About `promisc` mode: It will listen to everything on the message bus to try and detect the reset card.
 This comes at a little performance cost because we watch way more message than needed. However, this

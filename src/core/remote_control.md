@@ -1,6 +1,8 @@
 Remote Control Documentation {#remote_control_main}
 ====================================================
 
+@brief Documentation of Leosac's remote interface.
+
 [TOC]
 
 Introduction {#remote_control_intro}
@@ -42,11 +44,11 @@ port          |          |                  | Port to bind the remote control in
 secret_key    |          |                  | Z85 encoded secret key                           | YES
 public_key    |          |                  | Z85 encoded public key                           | YES
 security      |          |                  | Restrict access to the remote control interface  | NO (default to everyone has all access)
----->         | map      |                  | Define permission for one user                   | YES
----->         | ---->    | pk               | Z85 public key of the remote user                | YES
----->         | ---->    | default          | Default permission for unspecified command       | NO (default to `false`)
----->         | ---->    | COMMAND_NAME     | Name of an existing remote control command.      | NO
----->         | ---->    | COMMAND_NAME_2   | Another existing remote control command.         | NO
+--->          | map      |                  | Define permission for one user                   | YES
+--->          | --->     | pk               | Z85 public key of the remote user                | YES
+--->          | --->     | default          | Default permission for unspecified command       | NO (default to `false`)
+--->          | --->     | COMMAND_NAME     | Name of an existing remote control command.      | NO
+--->          | --->     | COMMAND_NAME_2   | Another existing remote control command.         | NO
 
 
 Example {#remote_control_example}

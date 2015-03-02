@@ -17,11 +17,11 @@ Configuration Options {#mod_rpleth_user_config}
 
 Below are the configuration options available.
 
-Options    | Options  | Options    | Description                                            | Mandatory
------------|----------|------------|--------------------------------------------------------|-----------
-port       |          |            | Which port should we bind to ?                         | YES
-reader     |          |            | Name of the wiegand reader the module handles          | YES
-stream_mode|          |            | If enabled, should forward to client all card read     | NO (default to true)
+Options    | Description                                            | Mandatory
+-----------|--------------------------------------------------------|-----------
+port       | Which port should we bind to ?                         | YES
+reader     | Name of the wiegand reader the module handles          | YES
+stream_mode| If enabled, should forward to client all card read     | NO (default to true)
 
 Example {#mod_rpleth_example}
 -----------------------------
@@ -29,16 +29,16 @@ Example {#mod_rpleth_example}
 This is a example of Rpleth possible configuration for Rpleth module into Leosac:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>RPLETH</name>
-            <file>librpleth.so</file>
-            <level>100</level>
-            <module_config>
-                <port>4242</port>
-                <reader>MY_WIEGAND_1</reader>
-                <stream_mode>true</stream_mode>
-            </module_config>
-        </module>
+<module>
+    <name>RPLETH</name>
+    <file>librpleth.so</file>
+    <level>100</level>
+    <module_config>
+        <port>4242</port>
+        <reader>MY_WIEGAND_1</reader>
+        <stream_mode>true</stream_mode>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
 Notes {#mod_rpleth_notes}

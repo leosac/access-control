@@ -1,6 +1,8 @@
 Doorman Module Documentation {#mod_doorman_main}
 ================================================
 
+@brief Module that reacts to authentication event.
+
 [TOC]
 
 Introduction {#mod_doorman_intro}
@@ -20,17 +22,17 @@ Configuration Options {#mod_doorman_user_config}
 Options    | Options   | Options         | Options      | Options     | Description                                            | Mandatory
 -----------|-----------|-----------------|--------------|-------------|--------------------------------------------------------|-----------
 instances  |           |                 |              |             | Multiples (unrelated) doorman instance are allowed     | YES
------>     | instance  |                 |              |             | Configuration information for 1 instance               | YES
------>     | ----->    | name            |              |             | Name of this doorman instance                          | YES
------>     | ----->    | auth_contexts   |              |             | We can use multiple auth context (not recommended yet) | YES
------>     | ----->    | ------>         | auth_context |             | Information for an Auth Context                        | YES
------>     | ----->    | ------>         | ----->       | name        | Name of the auth context we are using                  | YES
------>     | ----->    | timeout         |              |             | When using multiple auth context (not recommended yet) | YES
------>     | ----->    | actions         |              |             | Configure the actions to take when something happens   | YES
------>     | ----->    | ----->          | action       |             | Configuration information for one action               | YES
------>     | ----->    | ----->          | ----->       | on          | When should the action be taken (DENIED / GRANTED)     | YES
------>     | ----->    | ----->          | ----->       | target      | Name of the targeted object that will receive the action command | YES
------>     | ----->    | ----->          | ----->       | cmd         | Description for the command that will be sent | YES
+---->      | instance  |                 |              |             | Configuration information for 1 instance               | YES
+---->      | ---->     | name            |              |             | Name of this doorman instance                          | YES
+---->      | ---->     | auth_contexts   |              |             | We can use multiple auth context (not recommended yet) | YES
+---->      | ---->     | ----->          | auth_context |             | Information for an Auth Context                        | YES
+---->      | ---->     | ----->          | ---->        | name        | Name of the auth context we are using                  | YES
+---->      | ---->     | timeout         |              |             | When using multiple auth context (not recommended yet) | YES
+---->      | ---->     | actions         |              |             | Configure the actions to take when something happens   | YES
+---->      | ---->     | ---->           | action       |             | Configuration information for one action               | YES
+---->      | ---->     | ---->           | ---->        | on          | When should the action be taken (DENIED / GRANTED)     | YES
+---->      | ---->     | ---->           | ---->        | target      | Name of the targeted object that will receive the action command | YES
+---->      | ---->     | ---->           | ---->        | cmd         | Description for the command that will be sent | YES
 
 The `<cmd>` tag is quite simple. It looks like this:
 

@@ -74,6 +74,7 @@ Grab the lastest armhf package from the [Github Release tab](https://github.com/
 Install the package and install missing dependencies:
 
 ~~~~~~~~~~.sh
+apt-get update;
 dpkg -i leosac_armhf.deb;
 apt-get install -f;
 ~~~~~~~~~~
@@ -149,31 +150,31 @@ We also have 1 OUTPUT gpio for the door.
 We add this to our config file:
 
 ~~~~~~~~~~~~~~~~~~~.xml
- <module>
-            <name>PIFACEDIGITAL_GPIO</name>
-            <file>libpifacedigital.so</file>
-            <level>2</level>
-            <module_config>
-                <gpios>
-                    <gpio>
-                        <name>my_door_gpio</name>
-                        <no>3</no>
-                        <direction>out</direction>
-                        <value>false</value>
-                    </gpio>
-                    <gpio>
-                        <name>wiegand_data_high</name>
-                        <no>4</no>
-                        <direction>in</direction>
-                    </gpio>
-                    <gpio>
-                        <name>wiegand_data_low</name>
-                        <no>2</no>
-                        <direction>in</direction>
-                    </gpio>
-                </gpios>
-            </module_config>
-        </module>
+<module>
+    <name>PIFACEDIGITAL_GPIO</name>
+    <file>libpifacedigital.so</file>
+    <level>2</level>
+    <module_config>
+        <gpios>
+            <gpio>
+                <name>my_door_gpio</name>
+                <no>3</no>
+                <direction>out</direction>
+                <value>false</value>
+            </gpio>
+            <gpio>
+                <name>wiegand_data_high</name>
+                <no>4</no>
+                <direction>in</direction>
+            </gpio>
+            <gpio>
+                <name>wiegand_data_low</name>
+                <no>2</no>
+                <direction>in</direction>
+            </gpio>
+        </gpios>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~
 
 As you can see, we are defining GPIO using the gpio port `<no>` we wired our reader and door.
@@ -191,22 +192,22 @@ module that will understand our Wiegand Card Reader.
 We have 1 reader to configure, and we will use both INPUT pin: `wiegand_data_low` and `wiegand_data_high`.
 
 ~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>WIEGAND</name>
-            <file>libwiegand.so</file>
-            <level>5</level>
-            <module_config>
-                <readers>
-                    <reader>
-                        <name>MY_WIEGAND_1</name>
-                        <high>wiegand_data_high</high>
-                        <low>wiegand_data_low</low>
-                        <green_led></green_led>
-                        <buzzer></buzzer>
-                    </reader>
-                </readers>
-            </module_config>
-        </module>
+<module>
+    <name>WIEGAND</name>
+    <file>libwiegand.so</file>
+    <level>5</level>
+    <module_config>
+        <readers>
+            <reader>
+                <name>MY_WIEGAND_1</name>
+                <high>wiegand_data_high</high>
+                <low>wiegand_data_low</low>
+                <green_led></green_led>
+                <buzzer></buzzer>
+            </reader>
+        </readers>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~
 
 As you can see, we are re-using `wiegand_data_low` and `wiegand_data_high`. We assign them to our
@@ -228,69 +229,80 @@ Lets say this file is named "auth.xml".
 
 ~~~~~~~~~~~~~~~~~~~.xml
 <root>
-    <user_mapping>
+    <users>
+        <user>
+            <name>MY_USER</name>
+        </user>
+    </users>
+    <credentials>
         <map>
             <user>MY_USER</user>
-            <WiegandCard>80:83:a0:40</WiegandCard>
+            <WiegandCard>
+                <card_id>80:83:a0:40</card_id>
+                <bits>32</bits>
+            </WiegandCard>
         </map>
         <map>
-            <user>Toto</user>
-            <WiegandCard>80:81:61:40</WiegandCard>
-        </map>
-    </user_mapping>
-    <permissions>
-        <map>
-            <user>Toto</user>
-            <default_schedule>
-            </default_schedule>
-        </map>
-        <map>
-            <!-- Time frame mapping for MY_USER -->
             <user>MY_USER</user>
-            <default_schedule>
-                <monday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </monday>
-                <sunday>
-                    <start>00:00</start>
-                    <end>23:59</end>
-                </sunday>
-            </default_schedule>
-            <schedule>
-                <door>doorA</door>
-                <wednesday>
-                    <start>11:00</start>
-                    <end>13:00</end>
-                </wednesday>
-            </schedule>
+            <PINCode>
+                <pin>1234</pin>
+            </PINCode>
         </map>
-    </permissions>
+    </credentials>
+    <schedules>
+        <schedule>
+            <name>all</name>
+            <!-- Has full access on monday and sunday -->
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+            <tuesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </tuesday>
+            <wednesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </wednesday>
+
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+    <schedules_mapping>
+        <map>
+            <schedule>all</schedule>
+            <user>MY_USER</user>
+        </map>
+    </schedules_mapping>
 </root>
 ~~~~~~~~~~~~~~~~~~~
 
-As you can see, the `Toto` user has no access. `MY_USER` has full access on monday and sunday.
-`MY_USER` also has access to `doorA` on wednesday, from 11 to 13.
+For more information about the authentication and authorization config file, you can
+read [this](@ref mod_auth_file_main).
 
 To enable this module, we also need to add something in the main configuration file. This something
 looks like this:
 
 ~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>AUTH_FILE</name>
-            <file>libauth-file.so</file>
-            <level>41</level>
-            <module_config>
-                <instances>
-                    <instance>
-                        <name>AUTH_CONTEXT_1</name>
-                        <auth_source>MY_WIEGAND_1</auth_source>
-                        <config_file>auth.xml</config_file>
-                        <target>doorA</target>
-                    </instance>
-                </instances>
-            </module_config>
-        </module>
+<module>
+    <name>AUTH_FILE</name>
+    <file>libauth-file.so</file>
+    <level>41</level>
+    <module_config>
+        <instances>
+            <instance>
+                <name>AUTH_CONTEXT_1</name>
+                <auth_source>MY_WIEGAND_1</auth_source>
+                <config_file>auth.xml</config_file>
+                <target>doorA</target>
+            </instance>
+        </instances>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~
 
 The `<target>` match `<door>` in the `auth.xml` file. `<auth_source>` is the name of the reader
@@ -308,33 +320,33 @@ an access is failed, we do nothing.
 This is easy to do using the doorman module.
 
 ~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>DOORMAN</name>
-            <file>libdoorman.so</file>
-            <level>50</level>
-            <module_config>
-                <instances>
-                    <instance>
-                        <name>A_DOORMAN_INSTANCE</name>
-                        <auth_contexts>
-                            <auth_context>
-                                <name>AUTH_CONTEXT_1</name>
-                            </auth_context>
-                        </auth_contexts>
-                        <actions>
-                            <action>
-                                <on>GRANTED</on>
-                                <target>my_door_gpio</target>
-                                <cmd>
-                                    <f1>ON</f2>
-                                    <f2>3000</f3>
-                                </cmd>
-                            </action>
-                        </actions>
-                    </instance>
-                </instances>
-            </module_config>
-        </module>
+<module>
+    <name>DOORMAN</name>
+    <file>libdoorman.so</file>
+    <level>50</level>
+    <module_config>
+        <instances>
+            <instance>
+                <name>A_DOORMAN_INSTANCE</name>
+                <auth_contexts>
+                    <auth_context>
+                        <name>AUTH_CONTEXT_1</name>
+                    </auth_context>
+                </auth_contexts>
+                <actions>
+                    <action>
+                        <on>GRANTED</on>
+                        <target>my_door_gpio</target>
+                        <cmd>
+                            <f1>ON</f2>
+                            <f2>3000</f3>
+                        </cmd>
+                    </action>
+                </actions>
+            </instance>
+        </instances>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~
 
 We are defining an action that will target `my_door_gpio` and send the `ON` command for `3000` ms.

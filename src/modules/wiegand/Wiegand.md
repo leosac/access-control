@@ -22,15 +22,15 @@ Configuration Options {#mod_wiegand_user_config}
 Options    | Options  | Options     | Description                                            | Mandatory
 -----------|----------|-------------|--------------------------------------------------------|-----------
 readers    |          |             | Lists of all configured readers                        | YES
----->      | reader   |             | Configuration of 1 wiegand reader                      | YES
----->      | ---->    | name        | device name                                            | YES
----->      | ---->    | high        | name of the input GPIO that sends "high" data          | YES
----->      | ---->    | low         | name of the input GPIO that sends "low" data           | YES
----->      | ---->    | green_led   | name of the green led device attached to the reader    | NO
----->      | ---->    | buzzer      | name of the buzzer device attached to the reader       | NO
----->      | ---->    | mode        | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
----->      | ---->    | pin_timeout | Timeout when reading a PIN code.                       | NO (only for WIEGAND_PIN mode)
----->      | ---->    | pin_key_end | Which key is used to signal the end of a PIN code      | NO (only for WIEGAND_PIN mode)
+--->       | reader   |             | Configuration of 1 wiegand reader                      | YES
+--->       | --->     | name        | device name                                            | YES
+--->       | --->     | high        | name of the input GPIO that sends "high" data          | YES
+--->       | --->     | low         | name of the input GPIO that sends "low" data           | YES
+--->       | --->     | green_led   | name of the green led device attached to the reader    | NO
+--->       | --->     | buzzer      | name of the buzzer device attached to the reader       | NO
+--->       | --->     | mode        | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
+--->       | --->     | pin_timeout | Timeout when reading a PIN code.                       | NO (only for WIEGAND_PIN mode)
+--->       | --->     | pin_key_end | Which key is used to signal the end of a PIN code      | NO (only for WIEGAND_PIN mode)
 
 **Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
 the sysfsgpio or pifacedigital module.

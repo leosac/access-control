@@ -16,17 +16,17 @@ that some FGPIO device be available and configured as it needs them to
 control the Led device.
 
 
-Options    | Options  | Options                | Description                                            | Mandatory
------------|----------|------------------------|--------------------------------------------------------|-----------
-file-bus   |          |                        | Where we write event from the application bus          | NO
-verbose    |          |                        | Be verbose and write to stdout everything we log       | NO
-ping       |          |                        | Configure network testing                              | NO
----->      | ip       |                        | An ip address to ping to check network connectivity    | YES
----->      | led      |                        | Name of led that represents status of network          | YES
-reader     |          |                        | Feedback for reader activity                           | NO
----->      | name     |                        | Name of the reader object to watch                     | YES
----->      | led      |                        | Led to turn ON when we detect reader activity          | YES
-system_ok  |          |                        | A led to turn ON when the system is ready              | NO
+Options    | Options  | Description                                            | Mandatory
+-----------|----------|--------------------------------------------------------|-----------
+file-bus   |          | Where we write event from the application bus          | NO
+verbose    |          | Be verbose and write to stdout everything we log       | NO
+ping       |          | Configure network testing                              | NO
+--->       | ip       | An ip address to ping to check network connectivity    | YES
+--->       | led      | Name of led that represents status of network          | YES
+reader     |          | Feedback for reader activity                           | NO
+--->       | name     | Name of the reader object to watch                     | YES
+--->       | led      | Led to turn ON when we detect reader activity          | YES
+system_ok  |          | A led to turn ON when the system is ready              | NO
 
 Notes:
 + `file-bus`: If not set (or empty) we ignore the system bus.
@@ -38,15 +38,14 @@ stay on, always.
 Example {#mod_monitor_example}
 ------------------------------
 
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>MONITOR</name>
-            <file>libmonitor.so</file>
-            <level>1</level>
-            <module_config>
-                <file-bus>MY_LOGS.txt</file-bus>
-                <verbose>false</verbose>
-            </module_config>
-        </module>
+    <module>
+        <name>MONITOR</name>
+        <file>libmonitor.so</file>
+        <level>1</level>
+        <module_config>
+            <file-bus>MY_LOGS.txt</file-bus>
+            <verbose>false</verbose>
+        </module_config>
+    </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
