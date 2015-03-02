@@ -69,6 +69,11 @@ namespace Leosac
                 std::vector<Leosac::Auth::GroupPtr> groups() const override;
             private:
 
+                /**
+                * Lookup a credentials by ID.
+                */
+                Leosac::Auth::IAuthenticationSourcePtr find_cred_by_id(const std::string &id);
+
                 void load_users(const boost::property_tree::ptree &users);
 
                 /**
@@ -157,6 +162,12 @@ namespace Leosac
                 * Maps WiegandCard + PIN code to object.
                 */
                 std::map<std::pair<std::string, std::string>, Leosac::Auth::WiegandCardPinPtr> wiegand_cards_pins_;
+
+                /**
+                * Maps credentials ID to object.
+                * If id is empty, the cred wont end up is this list.
+                */
+                std::unordered_map<std::string, Leosac::Auth::IAuthenticationSourcePtr> id_to_cred_;
 
                 using Schedule = std::vector<Tools::SingleTimeFrame>;
 

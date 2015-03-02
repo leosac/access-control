@@ -70,6 +70,7 @@ namespace Leosac
                 mapper4_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-5.xml");
                 mapper5_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-6.xml");
                 mapper6_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-7.xml");
+                mapper7_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-8.xml");
 
                 // initialize date object.
                 std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -125,6 +126,7 @@ namespace Leosac
                 delete mapper4_;
                 delete mapper5_;
                 delete mapper6_;
+                delete mapper7_;
             }
 
             bool is_in_group(const std::string &user_name, const std::string &group_name,
@@ -164,6 +166,8 @@ namespace Leosac
             IAuthSourceMapper *mapper5_;
             // cred validity
             IAuthSourceMapper *mapper6_;
+            // per-credentials schedules.
+            IAuthSourceMapper *mapper7_;
             IAuthenticationSourcePtr my_card_;
             IAuthenticationSourcePtr my_card2_;
             IAuthenticationSourcePtr unknown_card_;
@@ -454,6 +458,44 @@ namespace Leosac
 
             auto profile_llama2 = mapper6_->buildProfile(my_pin_);
             ASSERT_FALSE(profile_llama2.get());
+        }
+
+        TEST_F(AuthFileMapperTest, TestCredentialSchedule)
+        {
+            mapper7_->mapToUser(my_card_);
+            mapper7_->mapToUser(my_pin_);
+            auto profile = mapper7_->buildProfile(my_card_);
+
+            // this maps to the same user, but use a credential
+            // with additional schedules.
+            auto profile_magic_cred = mapper7_->buildProfile(my_pin_);
+
+            ASSERT_TRUE(profile.get());
+            ASSERT_TRUE(profile_magic_cred.get());
+
+            // User permissions.
+            ASSERT_TRUE(profile->isAccessGranted(date_monday_12_00, nullptr));
+            ASSERT_TRUE(profile->isAccessGranted(date_monday_16_31, nullptr));
+
+            ASSERT_TRUE(profile_magic_cred->isAccessGranted(date_monday_12_00, nullptr));
+            ASSERT_TRUE(profile_magic_cred->isAccessGranted(date_monday_16_31, nullptr));
+            // Not allowed
+            ASSERT_FALSE(profile->isAccessGranted(date_sunday_18_50, nullptr));
+            ASSERT_FALSE(profile->isAccessGranted(date_wednesday_23_42, doorB_));
+            ASSERT_FALSE(profile->isAccessGranted(date_wednesday_23_42, doorC_));
+            ASSERT_FALSE(profile->isAccessGranted(date_wednesday_23_42, nullptr));
+
+            ASSERT_FALSE(profile_magic_cred->isAccessGranted(date_sunday_18_50, nullptr));
+            ASSERT_FALSE(profile_magic_cred->isAccessGranted(date_wednesday_23_42, doorB_));
+            ASSERT_FALSE(profile_magic_cred->isAccessGranted(date_wednesday_23_42, doorC_));
+            ASSERT_FALSE(profile_magic_cred->isAccessGranted(date_wednesday_23_42, nullptr));
+
+            // Per credentials schedule
+            ASSERT_TRUE(profile_magic_cred->isAccessGranted(date_wednesday_23_42, doorA_));
+            ASSERT_TRUE(profile_magic_cred->isAccessGranted(date_thursday_14_00, nullptr));
+            // if we used the "normal" those default permission shall fail
+            ASSERT_FALSE(profile->isAccessGranted(date_wednesday_23_42, doorA_));
+            ASSERT_FALSE(profile->isAccessGranted(date_thursday_14_00, nullptr));
         }
     }
 }

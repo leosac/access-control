@@ -64,10 +64,17 @@ namespace Leosac
             * Return (or generate) an Access Profile that make sense
             * based on the data available in this AuthenticationSource object.
             *
-            * This profile will later be used to chose between granting and denying
-            * access to an end user.
+            * In addition to the user's profile, this profile will later be used
+            * to chose between granting and denying access to an end user.
             */
             virtual IAccessProfilePtr profile() const = 0;
+
+            /**
+            * Set an access profile for this credentials.
+            * This profile will be added to the user's profile
+            * when granting/denying acccess.
+            */
+            virtual void profile(IAccessProfilePtr p) = 0;
 
             /**
             * Return the name of the source. This could be the name of the name of the module

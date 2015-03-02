@@ -1,0 +1,72 @@
+<root>
+    <users>
+        <user>
+            <name>llamasticot</name>
+        </user>
+    </users>
+
+    <credentials>
+        <map>
+            <user>llamasticot</user>
+            <WiegandCard>
+                <card_id>aa:bb:cc:dd</card_id>
+                <bits>32</bits>
+            </WiegandCard>
+        </map>
+        <map>
+            <user>llamasticot</user>
+            <PINCode>
+                <id>my_pin_code</id>
+                <pin>1234</pin>
+            </PINCode>
+        </map>
+    </credentials>
+
+    <schedules>
+        <schedule>
+            <name>full_sunday</name>
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+        <schedule>
+            <name>full_monday</name>
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+        </schedule>
+        <schedule>
+            <name>full_wednesday</name>
+            <wednesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </wednesday>
+        </schedule>
+        <schedule>
+            <name>full_thursday</name>
+            <thursday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </thursday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
+        <map>
+            <schedule>full_monday</schedule>
+            <user>llamasticot</user>
+        </map>
+        <map>
+            <schedule>full_wednesday</schedule>
+            <door>doorA</door>
+            <credential>my_pin_code</credential>
+        </map>
+        <map>
+            <schedule>full_thursday</schedule>
+            <credential>my_pin_code</credential>
+        </map>
+    </schedules_mapping>
+
+</root>

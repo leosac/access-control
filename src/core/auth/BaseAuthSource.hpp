@@ -44,10 +44,12 @@ namespace Leosac
             virtual IUserPtr owner() const override;
 
             /**
-            * This implementation simply return the owner_ profile, or null
-            * if not available.
+            * This implementation simply return the profile associated with
+            * the credential, or null if not available.
             */
             virtual IAccessProfilePtr profile() const override;
+
+            virtual void profile(IAccessProfilePtr p) override;
 
             virtual const std::string &name() const override;
 
@@ -88,6 +90,8 @@ namespace Leosac
             std::string id_;
 
             CredentialValidity validity_;
+
+            IAccessProfilePtr profile_;
         };
     }
 }

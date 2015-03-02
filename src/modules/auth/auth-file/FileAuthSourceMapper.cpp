@@ -33,11 +33,12 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
 {
     try
     {
-        // load config file.
-        // load/build group and users.
-        // load schedule.
-        // map schedule to group and user.
-        // load credentials.
+        // Loading order:
+        //          - Users
+        //          - Groups
+        //          - Credentials
+        //          - Schedule, and schedule mapping
+
         DEBUG("Will load tree");
         auto &&additional_config = Tools::propertyTreeFromXmlFile(auth_file);
         additional_config = additional_config.get_child("root");
@@ -51,6 +52,10 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
         if (groups_tree)
             load_groups(*groups_tree);
 
+        const auto &credentials_tree = additional_config.get_child_optional("credentials");
+        if (credentials_tree)
+            load_credentials(*credentials_tree);
+
         const auto &schedules_tree = additional_config.get_child_optional("schedules");
         if (schedules_tree)
             load_schedules(*schedules_tree);
@@ -59,10 +64,7 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file) :
         if (schedule_mapping_tree)
             map_schedules(*schedule_mapping_tree);
 
-        const auto &credentials_tree = additional_config.get_child_optional("credentials");
-        if (credentials_tree)
-            load_credentials(*credentials_tree);
-        DEBUG("Ready");
+       DEBUG("Ready");
     }
     catch (std::exception &e)
     {
@@ -154,6 +156,10 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
         profiles.push_back(grp->profile());
 
     profiles.push_back(auth_source->owner()->profile());
+    if (auth_source->profile())
+    {
+        profiles.push_back(auth_source->profile());
+    }
     return merge_profiles(profiles);
 }
 
@@ -298,9 +304,16 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
             wiegand_cards_pins_[std::make_pair(card_id, pin)] =
                     std::static_pointer_cast<WiegandCardPin>(credential);
         }
+        assert(opt_child);
         credential->validity(extract_credentials_validity(*opt_child));
         credential->owner(user);
         credential->id(opt_child->get<std::string>("id", ""));
+        credential->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
+
+        if (!credential->id().empty())
+        {
+            id_to_cred_[credential->id()] = credential;
+        }
     }
 }
 
@@ -364,6 +377,7 @@ void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &sche
         std::list<std::string> schedule_names;
         std::list<std::string> user_names;
         std::list<std::string> group_names;
+        std::list<std::string> credential_names;
         std::string target_door;
         target_door = node.get<std::string>("door", "");
 
@@ -378,6 +392,8 @@ void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &sche
                 user_names.push_back(mapping_data.second.data());
             if (mapping_data.first == "group")
                 group_names.push_back(mapping_data.second.data());
+            if (mapping_data.first == "credential")
+                credential_names.push_back(mapping_data.second.data());
         }
 
         // now build object based on what we extracted.
@@ -400,6 +416,14 @@ void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &sche
                 assert(grp->profile());
                 SimpleAccessProfilePtr profile = std::dynamic_pointer_cast<SimpleAccessProfile>(grp->profile());
                 assert(profile);
+                add_schedule_to_profile(schedule_name, profile, target_door);
+            }
+            for (const auto &cred_id : credential_names)
+            {
+                DEBUG("CRED  = " << cred_id);
+                IAuthenticationSourcePtr auth_src = find_cred_by_id(cred_id);
+                assert(auth_src);
+                SimpleAccessProfilePtr profile = std::dynamic_pointer_cast<SimpleAccessProfile>(auth_src->profile());
                 add_schedule_to_profile(schedule_name, profile, target_door);
             }
         }
@@ -461,4 +485,12 @@ Leosac::Auth::CredentialValidity FileAuthSourceMapper::extract_credentials_valid
     v.set_enabled(node.get<bool>("enabled", true));
 
     return v;
+}
+
+IAuthenticationSourcePtr FileAuthSourceMapper::find_cred_by_id(const std::string &id)
+{
+    auto &&itr = id_to_cred_.find(id);
+    if (itr != id_to_cred_.end())
+        return itr->second;
+    return nullptr;
 }

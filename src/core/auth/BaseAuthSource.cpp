@@ -45,9 +45,7 @@ IUserPtr BaseAuthSource::owner() const
 
 IAccessProfilePtr BaseAuthSource::profile() const
 {
-    if (owner_)
-        return owner_->profile();
-    return nullptr;
+    return profile_;
 }
 
 void BaseAuthSource::accept(Leosac::Tools::IVisitor *visitor)
@@ -88,4 +86,9 @@ const CredentialValidity &BaseAuthSource::validity() const
 void BaseAuthSource::validity(const CredentialValidity &c)
 {
     validity_ = c;
+}
+
+void BaseAuthSource::profile(IAccessProfilePtr p)
+{
+    profile_ = p;
 }
