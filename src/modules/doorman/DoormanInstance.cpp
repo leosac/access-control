@@ -26,11 +26,9 @@ using namespace Leosac::Module::Doorman;
 DoormanInstance::DoormanInstance(zmqpp::context &ctx,
         std::string const &name,
         const std::vector<std::string> &auth_contexts,
-        const std::vector<DoormanAction> &actions,
-        int timeout) :
+        const std::vector<DoormanAction> &actions) :
         name_(name),
         actions_(actions),
-        timeout_(timeout),
         bus_sub_(ctx, zmqpp::socket_type::sub)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
@@ -109,4 +107,9 @@ void DoormanInstance::command_send_recv(std::string const &target_name, zmqpp::m
     {
         WARN("Command failed :(");
     }
+}
+
+void DoormanInstance::update()
+{
+
 }

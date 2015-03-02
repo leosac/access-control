@@ -21,6 +21,7 @@
 
 #include <map>
 #include <zmqpp/zmqpp.hpp>
+#include "core/auth/Auth.hpp"
 
 namespace Leosac
 {
@@ -65,13 +66,11 @@ namespace Leosac
                 * @param name the name of this doorman
                 * @param auth_contexts list of authentication context (by name) that we wish to watch
                 * @param actions list of action to do when an event
-                * @param timeout see timeout field description.
                 */
                 DoormanInstance(zmqpp::context &ctx,
                         const std::string &name,
                         const std::vector<std::string> &auth_contexts,
-                        const std::vector<DoormanAction> &actions,
-                        int timeout);
+                        const std::vector<DoormanAction> &actions);
 
                 DoormanInstance(const DoormanInstance &) = delete;
 
@@ -83,6 +82,11 @@ namespace Leosac
                 * Activity we care about happened on the bus.
                 */
                 void handle_bus_msg();
+
+                /**
+                * Called regularly so the instance can do housekeeping task.
+                */
+                void update();
 
             private:
 
@@ -97,13 +101,6 @@ namespace Leosac
                 std::string name_;
 
                 std::vector<DoormanAction> actions_;
-
-                /**
-                * This timeout value is used to determine if 2 auth event are accepted "as one".
-                * Passed this delay, one event will not have any impact to the other.
-                * //fixme rephrase that.
-                */
-                int timeout_;
 
                 zmqpp::socket bus_sub_;
 

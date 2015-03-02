@@ -19,6 +19,7 @@
 
 #include <tools/log.hpp>
 #include "DoormanModule.hpp"
+#include "DoormanInstance.hpp"
 
 using namespace Leosac::Module::Doorman;
 

@@ -22,6 +22,7 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
+#include <memory>
 #include <modules/BaseModule.hpp>
 
 namespace Leosac
@@ -56,7 +57,9 @@ namespace Leosac
 
                 DoormanModule &operator=(const DoormanModule &) = delete;
 
-                ~DoormanModule();
+                ~DoormanModule() = default;
+
+                virtual void run() override;
 
             private:
 
@@ -69,7 +72,7 @@ namespace Leosac
                 /**
                 * Authenticator instances.
                 */
-                std::vector<DoormanInstance *> doormen_;
+                std::vector<std::shared_ptr<DoormanInstance>> doormen_;
             };
 
         }

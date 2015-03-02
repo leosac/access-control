@@ -32,18 +32,10 @@ DoormanModule::DoormanModule(zmqpp::context &ctx,
 {
     process_config();
 
-    for (auto doorman : doormen_)
+    for (auto &&doorman : doormen_)
     {
         reactor_.add(doorman->bus_sub(),
                 std::bind(&DoormanInstance::handle_bus_msg, doorman));
-    }
-}
-
-DoormanModule::~DoormanModule()
-{
-    for (auto doorman : doormen_)
-    {
-        delete doorman;
     }
 }
 
@@ -51,7 +43,7 @@ void DoormanModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
 
-    for (auto &node : module_config.get_child("instances"))
+    for (const auto &node : module_config.get_child("instances"))
     {
         // one doorman instance
         boost::property_tree::ptree cfg_doorman = node.second;
@@ -59,15 +51,14 @@ void DoormanModule::process_config()
         std::vector<std::string> auth_ctx_names;
         std::vector<DoormanAction> actions;
         std::string doorman_name = cfg_doorman.get_child("name").data();
-        int timeout = cfg_doorman.get<int>("timeout", 1000);
 
-        for (auto &auth_contexts_node : cfg_doorman.get_child("auth_contexts"))
+        for (const auto &auth_contexts_node : cfg_doorman.get_child("auth_contexts"))
         {
             // each auth context we listen to
             auth_ctx_names.push_back(auth_contexts_node.second.get<std::string>("name"));
         }
 
-        for (auto &action_node : cfg_doorman.get_child("actions"))
+        for (const auto &action_node : cfg_doorman.get_child("actions"))
         {
             // every action we take
             boost::property_tree::ptree cfg_action = action_node.second;
@@ -88,7 +79,17 @@ void DoormanModule::process_config()
         }
 
         INFO("Creating Doorman instance " << doorman_name);
-        doormen_.push_back(new DoormanInstance(ctx_,
-                doorman_name, auth_ctx_names, actions, timeout));
+        doormen_.push_back(std::make_shared<DoormanInstance>(ctx_,
+                doorman_name, auth_ctx_names, actions));
+    }
+}
+
+void DoormanModule::run()
+{
+    while (is_running_)
+    {
+        reactor_.poll(1000);
+        for (auto &&instance : doormen_)
+            instance->update();
     }
 }
