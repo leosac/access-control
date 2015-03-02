@@ -74,6 +74,16 @@ namespace Leosac
                 */
                 Leosac::Auth::IAuthenticationSourcePtr find_cred_by_id(const std::string &id);
 
+                /**
+                * Store the credential to the id <-> credential map if the id is
+                * non-empty.
+                */
+                void add_cred_to_id_map(Leosac::Auth::IAuthenticationSourcePtr cred);
+
+                /**
+                * Load users from configuration tree, storing them
+                * in the `users_` map.
+                */
                 void load_users(const boost::property_tree::ptree &users);
 
                 /**

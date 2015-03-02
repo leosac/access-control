@@ -246,8 +246,8 @@ anytime on monday, and wednesday from 11h to 13h and from 17h to 19h.
 Schedules Mapping {#mod_auth_schedule_map}
 ------------------------------------------
 
-Schedules can, or rather must, be referenced by name. They can
-be mapped to user and / or groups.
+Schedules can, or rather must, be referenced by name. They can be mapped to either
+`users`, `groups`, or directly to `credentials`.
 
 Options           | Options     | Options    | Description                                                           | Mandatory
 ------------------|-------------|------------|-----------------------------------------------------------------------|-----------
@@ -256,6 +256,7 @@ schedules_mapping |             |            | Defines the mapping between sched
 ---->             | ---->       | schedule   | Which schedule are we mapping                                         | YES
 ---->             | ---->       | user       | To which user are we applying the schedule(s)                         | NO
 ---->             | ---->       | group      | To which group are we applying the schedules(s)                       | NO
+---->             | ---->       | credential | To which credential (identified by its `id`) do we apply the schedule | NO
 ---->             | ---->       | door       | Name of the auth target the mapping apply to                          | NO
 
 Note that `schedule`, `user` and `group` can be used multiple times in the same mapping entry.

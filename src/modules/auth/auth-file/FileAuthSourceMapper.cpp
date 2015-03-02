@@ -309,11 +309,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
         credential->owner(user);
         credential->id(opt_child->get<std::string>("id", ""));
         credential->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
-
-        if (!credential->id().empty())
-        {
-            id_to_cred_[credential->id()] = credential;
-        }
+        add_cred_to_id_map(credential);
     }
 }
 
@@ -493,4 +489,17 @@ IAuthenticationSourcePtr FileAuthSourceMapper::find_cred_by_id(const std::string
     if (itr != id_to_cred_.end())
         return itr->second;
     return nullptr;
+}
+
+void FileAuthSourceMapper::add_cred_to_id_map(Leosac::Auth::IAuthenticationSourcePtr credential)
+{
+    if (!credential->id().empty())
+    {
+        if (id_to_cred_.count(credential->id()))
+        {
+            NOTICE("Credential with ID = " << credential->id() << " already exist and "
+                    "will be overwritten.");
+        }
+        id_to_cred_[credential->id()] = credential;
+    }
 }

@@ -65,7 +65,8 @@ namespace Leosac
         {
             IAccessProfilePtr p;
 
-            p = auth_source_->profile();
+            p = user->profile();
+            ASSERT_TRUE(p.get());
 
             // Monday
             std::tm date = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
