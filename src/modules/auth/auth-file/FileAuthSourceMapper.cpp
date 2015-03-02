@@ -169,25 +169,6 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
     return merge_profiles(profiles);
 }
 
-int FileAuthSourceMapper::week_day_to_int(const std::string &day)
-{
-    if (day == "sunday")
-        return 0;
-    if (day == "monday")
-        return 1;
-    if (day == "tuesday")
-        return 2;
-    if (day == "wednesday")
-        return 3;
-    if (day == "thursday")
-        return 4;
-    if (day == "friday")
-        return 5;
-    if (day == "saturday")
-        return 6;
-    assert(0);
-}
-
 void FileAuthSourceMapper::load_groups(const boost::property_tree::ptree &group_mapping)
 {
     for (const auto &group_info : group_mapping)
@@ -321,48 +302,8 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
 void FileAuthSourceMapper::load_schedules(const boost::property_tree::ptree &schedules)
 {
-    for (const auto & sched : schedules)
-    {
-        const std::string &node_name            = sched.first;
-        const boost::property_tree::ptree &node = sched.second;
-
-        if (node_name != "schedule")
-            throw ConfigException(config_file_, "Invalid config file content. Expected "
-                    "a node named 'schedule', found " + node_name + " instead");
-
-        std::string schedule_name   = node.get<std::string>("name");
-        Schedule time_frame_list;
-
-        // loop on all properties of the schedule.
-        // those will be weekday and the <name> tag too.
-        for (const auto & sched_data : node)
-        {
-            if (sched_data.first == "name") // we already got the name.
-                continue;
-            std::string start           = sched_data.second.get<std::string>("start");
-            std::string end             = sched_data.second.get<std::string>("end");
-            std::vector<std::string> temp;
-
-            boost::split(temp, start, boost::is_any_of(":"));
-            if (temp.size() != 2)
-                throw ModuleException("AuthFail schedule building error.");
-            int start_hour = std::stoi(temp[0]);
-            int start_min = std::stoi(temp[1]);
-
-            temp.clear();
-            boost::split(temp, end, boost::is_any_of(":"));
-            if (temp.size() != 2)
-                throw ModuleException("AuthFail schedule building error.");
-            int end_hour = std::stoi(temp[0]);
-            int end_min = std::stoi(temp[1]);
-
-            Tools::SingleTimeFrame tf(week_day_to_int(sched_data.first),
-            start_hour, start_min,
-                    end_hour, end_min);
-            time_frame_list.push_back(tf);
-        }
-        unmapped_schedules_[schedule_name] = time_frame_list;
-    }
+    bool ret = xml_schedules_.load(schedules);
+    assert(ret);
 }
 
 void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &schedules_mapping)
@@ -436,8 +377,8 @@ void FileAuthSourceMapper::add_schedule_to_profile(const std::string &schedule_n
         ::Leosac::Auth::SimpleAccessProfilePtr profile,
         const std::string &door_name)
 {
-    assert(unmapped_schedules_.count(schedule_name));
-    for (const auto & sched_part : unmapped_schedules_[schedule_name])
+    assert(xml_schedules_.schedules().count(schedule_name));
+    for (const auto & sched_part : xml_schedules_.schedules().at(schedule_name))
     {
         // auth target is hacky
         if (!door_name.empty())

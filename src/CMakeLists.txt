@@ -40,6 +40,7 @@ set(LEOSAC_LIB_SRCS
     tools/unixfs.cpp
     tools/version.cpp
     tools/XmlPropertyTree.cpp
+    tools/XmlScheduleLoader.cpp
 )
 
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
