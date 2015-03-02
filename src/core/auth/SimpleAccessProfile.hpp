@@ -67,13 +67,6 @@ namespace Leosac
 
         protected:
             /**
-            * Check whether this time frame permits access or not.
-            *
-            * @return true if the time frame grant access; false otherwise
-            */
-            bool check_timeframe(const Tools::SingleTimeFrame &tf, const std::chrono::system_clock::time_point &date);
-
-            /**
             * Map target name to target's time frame.
             */
             std::map<std::string, std::vector<Tools::SingleTimeFrame>> time_frames_;

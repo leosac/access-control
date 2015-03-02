@@ -380,6 +380,7 @@ void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &sche
                 group_names.push_back(mapping_data.second.data());
         }
 
+        // now build object based on what we extracted.
         for (const auto & schedule_name : schedule_names)
         {
             for (const auto &user_name : user_names)
