@@ -8,6 +8,7 @@ set(WIEGAND_SRCS
     strategies/WiegandPin8BitsOnly.cpp
     strategies/WiegandPinBuffered.cpp
     strategies/WiegandCardAndPin.cpp
+    strategies/Autodetect.cpp
 )
 
 add_library(${WIEGAND_BIN} SHARED ${WIEGAND_SRCS})

@@ -41,8 +41,8 @@ There are multiples `mode` available for a reader:
 3. `WIEGAND_PIN_8BITS` for reading a PIN code, when the reader send 8 bits per key pressed.
 4. `WIEGAND_PIN_BUFFERED` for reading a PIN code when the reader buffers up to 5key and send them in a 26 bits wiegand frame.
   Note that in this mode, the `pin_key_end` and `pin_timeout` parameter have no effect.
-5. `WEIGAND_CARD_PIN_4BITS` reads a card number followed by a PIN code read in 4bits mode.
-6. `WEIGAND_CARD_PIN_8BITS` reads a card number followed by a PIN code read in 8bits mode.
+5. `WIEGAND_CARD_PIN_4BITS` reads a card number followed by a PIN code read in 4bits mode.
+6. `WIEGAND_CARD_PIN_8BITS` reads a card number followed by a PIN code read in 8bits mode.
 7. `WIEGAND_CARD_PIN_BUFFERED` reads a card number followed by a PIN code read in buffered mode.
 
 You can see [this](@ref auth_data_type) for more the message passing specific specification

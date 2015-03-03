@@ -27,7 +27,8 @@ using namespace Leosac::Module::Wiegand::Strategy;
 
 SimpleWiegandStrategy::SimpleWiegandStrategy(WiegandReaderImpl *reader) :
         CardReading(reader),
-        ready_(false)
+        ready_(false),
+        nb_bits_(0)
 {
 
 }

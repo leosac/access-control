@@ -21,6 +21,7 @@
 #include <zmqpp/message.hpp>
 #include <zmqpp/context.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <modules/wiegand/strategies/Autodetect.hpp>
 #include "tools/log.hpp"
 #include "core/auth/Auth.hpp"
 #include "wiegand.hpp"
@@ -139,6 +140,10 @@ Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::
                 std::move(simple_wiegand),
                 std::move(pin_buffered),
                 std::chrono::milliseconds(card_pin_delay)));
+    }
+    else if (mode == "AUTODETECT")
+    {
+        return std::unique_ptr<WiegandStrategy>(new Autodetect(reader, std::chrono::milliseconds(card_pin_delay)));
     }
     else
     {

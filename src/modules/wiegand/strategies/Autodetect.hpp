@@ -31,23 +31,25 @@ namespace Leosac
             namespace Strategy
             {
                 /**
-                * Strategy for reading a card then a PIN code.
-                * We reuse existing strategy.
+                * Variable strategy that tries to autodetect what it reads.
+                * It can credentials multiple type of credentials, based on what was detected.
+                *
+                * We have 3 possible scenario:
+                *     + User only swipes their card.
+                *     + User swipes their card, and then input a PIN code.
+                *     + User input a PIN code.
                 */
-                class WiegandCardAndPin : public WiegandStrategy
+                class Autodetect : public WiegandStrategy
                 {
                 public:
                     /**
-                    * Create a strategy that read card and PIN code.
+                    * Create a strategy that read whatever it can and tries its best
+                    * to determine what is was that it read.
                     *
                     * @param reader         the reader object we provide the strategy for.
-                    * @param read_card      strategy object that will read a card number.
-                    * @param read_pin       strategy object that will read a PIN code.
                     * @param delay          max nb of msec between reading the card and receiving pin code data.
                     */
-                    WiegandCardAndPin(WiegandReaderImpl *reader,
-                            CardReadingUPtr read_card,
-                            PinReadingUPtr read_pin,
+                    Autodetect(WiegandReaderImpl *reader,
                             std::chrono::milliseconds delay);
 
                     virtual void timeout() override;
@@ -73,7 +75,11 @@ namespace Leosac
                     std::chrono::milliseconds delay_;
                     using TimePoint = std::chrono::system_clock::time_point;
                     TimePoint time_card_read_;
+                    TimePoint last_pin_read_;
 
+
+
+                    bool reading_pin_;
                     bool reading_card_;
                     bool ready_;
                 };
