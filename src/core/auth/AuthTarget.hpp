@@ -21,6 +21,8 @@
 
 #include <memory>
 #include <string>
+#include <hardware/FGPIO.hpp>
+#include <tools/Schedule.hpp>
 
 namespace Leosac
 {
@@ -41,8 +43,41 @@ namespace Leosac
             const std::string &name() const;
             void name(const std::string &new_name);
 
+            void add_always_open_sched(const Tools::Schedule &sched);
+            void add_always_close_sched(const Tools::Schedule &sched);
+
+            /**
+            * Check whether the door is in "always open" mode at the given time point.
+            */
+            bool is_always_open(const std::chrono::system_clock::time_point &tp) const;
+
+            /**
+            * Check whether the door is in "always closed" mode at the given time point.
+            */
+            bool is_always_closed(const std::chrono::system_clock::time_point &tp) const;
+
+            /**
+            * Returns the pointer to the optional FGPIO associated with the door.
+            * It may be NULL.
+            *
+            * Do not free or keep reference on it longer than the lifetime of the AuthTarget object.
+            * If you ever set a new gpio() pointer for this AuthTarget, the previous reference will
+            * become invalid.
+            */
+            Hardware::FGPIO *gpio();
+
+            void gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
+
         protected:
             std::string name_;
+
+            std::vector<Tools::Schedule> always_open_;
+            std::vector<Tools::Schedule> always_close_;
+
+            /**
+            * Optional GPIO associated with the door.
+            */
+            std::unique_ptr<Hardware::FGPIO> gpio_;
         };
     }
 }

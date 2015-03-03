@@ -38,3 +38,43 @@ AuthTarget::AuthTarget(const std::string target_name) :
 {
 
 }
+
+void AuthTarget::add_always_open_sched(Leosac::Tools::Schedule const &sched)
+{
+    always_open_.push_back(sched);
+}
+
+void AuthTarget::add_always_close_sched(Leosac::Tools::Schedule const &sched)
+{
+always_close_.push_back(sched);
+}
+
+Leosac::Hardware::FGPIO *AuthTarget::gpio()
+{
+    return gpio_.get();
+}
+
+void AuthTarget::gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
+{
+    gpio_ = std::move(new_gpio);
+}
+
+bool AuthTarget::is_always_open(const std::chrono::system_clock::time_point &tp) const
+{
+    for (const auto &sched : always_open_)
+    {
+        if (sched.is_in_schedule(tp))
+            return true;
+    }
+    return false;
+}
+
+bool AuthTarget::is_always_closed(const std::chrono::system_clock::time_point &tp) const
+{
+    for (const auto &sched : always_close_)
+    {
+        if (sched.is_in_schedule(tp))
+            return true;
+    }
+    return false;
+}

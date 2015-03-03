@@ -102,43 +102,53 @@ void DoormanModule::run()
 void DoormanModule::process_doors_config(const boost::property_tree::ptree &doors)
 {
     DEBUG("Processing doors config");
-    for (const auto &door : doors)
+    for (const auto &door_cfg : doors)
     {
-        Tools::XmlScheduleLoader xml_sched;
-        std::string gpio = door.second.get<std::string>("gpio");
-        const auto &open_schedule = door.second.get_child_optional("on.schedules");
+        std::string gpio = door_cfg.second.get<std::string>("gpio");
+        const auto &open_schedule = door_cfg.second.get_child_optional("on.schedules");
+        const auto &close_schedule = door_cfg.second.get_child_optional("off.schedules");
+
+        AuthTargetPtr door(new AuthTarget("no_name"));
+        door->gpio(std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, gpio)));
 
         if (open_schedule)
         {
+            Tools::XmlScheduleLoader xml_sched;
             xml_sched.load(*open_schedule);
-            std::shared_ptr<Door> d(new Door);
-            //d->gpio_ = std::make_unique<Hardware::FGPIO>(ctx_, gpio);
-            d->gpio_ = std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, gpio));
             for (const auto &map_entry : xml_sched.schedules())
             {
-                DEBUG("BLA");
-  //              d->always_on.push_back(map_entry.second);
+                door->add_always_open_sched(map_entry.second);
             }
-            doors_.push_back(d);
         }
+        if (close_schedule)
+        {
+            Tools::XmlScheduleLoader xml_sched;
+            xml_sched.load(*close_schedule);
+            for (const auto &map_entry : xml_sched.schedules())
+            {
+                door->add_always_close_sched(map_entry.second);
+            }
+        }
+        doors_.push_back(door);
     }
 }
 
 void DoormanModule::update()
 {
-/*    DEBUG("UPDATE");
+    auto now = std::chrono::system_clock::now();
+
+    DEBUG("UPDATE");
     for (auto &&door : doors_)
     {
-        for (const auto &sched : door->always_on)
+        if (door->is_always_open(now))
         {
-            for (const auto &time_frame : sched)
-            {
-                if (time_frame.is_in_timeframe(std::chrono::system_clock::now()))
-                {
-                    DEBUG("UPDATE HERE");
-                    door->gpio_->turnOn();
-                }
-            }
+            assert(door->gpio());
+            door->gpio()->turnOn();
         }
-    }*/
+        if (door->is_always_closed(now))
+        {
+            assert(door->gpio());
+            door->gpio()->turnOff();
+        }
+    }
 }

@@ -26,6 +26,7 @@
 #include <modules/BaseModule.hpp>
 #include <hardware/FGPIO.hpp>
 #include <tools/XmlScheduleLoader.hpp>
+#include <core/auth/AuthTarget.hpp>
 
 namespace Leosac
 {
@@ -90,7 +91,7 @@ namespace Leosac
                 /**
                 * Doors, to manage the always-on or always off stuff.
                 */
-                std::vector<std::shared_ptr<Door>> doors_;
+                std::vector<std::shared_ptr<Leosac::Auth::AuthTarget>> doors_;
             };
 
         }
