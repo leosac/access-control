@@ -378,14 +378,13 @@ void FileAuthSourceMapper::add_schedule_to_profile(const std::string &schedule_n
         const std::string &door_name)
 {
     assert(xml_schedules_.schedules().count(schedule_name));
-    for (const auto & sched_part : xml_schedules_.schedules().at(schedule_name))
-    {
-        // auth target is hacky
-        if (!door_name.empty())
-            profile->addAccessTimeFrame(AuthTargetPtr(new AuthTarget(door_name)), sched_part);
-        else
-            profile->addAccessTimeFrame(nullptr, sched_part);
-    }
+    const auto &sched = xml_schedules_.schedules().at(schedule_name);
+
+    // auth target is hacky
+    if (!door_name.empty())
+        profile->addAccessSchedule(AuthTargetPtr(new AuthTarget(door_name)), sched);
+    else
+        profile->addAccessSchedule(nullptr, sched);
 }
 
 void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)

@@ -39,6 +39,7 @@ set(LEOSAC_LIB_SRCS
     tools/unixfilewatcher.cpp
     tools/unixfs.cpp
     tools/version.cpp
+    tools/Schedule.cpp
     tools/XmlPropertyTree.cpp
     tools/XmlScheduleLoader.cpp
 )

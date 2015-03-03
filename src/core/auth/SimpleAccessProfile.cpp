@@ -27,54 +27,44 @@ using SingleTimeFrame = Leosac::Tools::SingleTimeFrame;
 bool SimpleAccessProfile::isAccessGranted(const std::chrono::system_clock::time_point &date, AuthTargetPtr target)
 {
     // check "general" permissions that apply to all target
-    for (const auto &time_frame : default_time_frames_)
-        if (time_frame.is_in_timeframe(date))
+    for (const auto &sched : default_schedule_)
+    {
+        if (sched.is_in_schedule(date))
+        {
+            INFO("Access is granted through schedule '" << sched.name() << "'");
             return true;
+        }
+    }
 
     // check door specific permissions.
-    if (target && time_frames_[target->name()].size())
+    if (target && schedules_[target->name()].size())
     {
-        for (const auto &time_frame : time_frames_[target->name()])
-            if (time_frame.is_in_timeframe(date))
+        for (const auto &sched : schedules_[target->name()])
+        {
+            if (sched.is_in_schedule(date))
+            {
+                INFO("Access is granted through schedule '" << sched.name() << "'");
                 return true;
+            }
+        }
     }
     return false;
 }
 
-void SimpleAccessProfile::addAccessHour(AuthTargetPtr target,
-        int day, int start_hour, int start_min, int end_hour, int end_min)
-{
-    assert(day >= 0 && day <= 7);
-    assert(start_hour >= 0 && start_hour < 24);
-    assert(end_hour >= 0 && end_hour < 24);
-    assert(start_min >= 0 && start_min <= 60);
-    assert(end_min >= 0 && end_min <= 60);
-
-    SingleTimeFrame tf;
-
-    tf.day = day;
-    tf.start_hour = start_hour;
-    tf.start_min = start_min;
-    tf.end_hour = end_hour;
-    tf.end_min = end_min;
-
-    addAccessTimeFrame(target, tf);
-}
-
-const std::map<std::string, std::vector<SingleTimeFrame>> &SimpleAccessProfile::timeFrames() const
-{
-    return time_frames_;
-}
-
-const std::vector<SingleTimeFrame> &SimpleAccessProfile::defaultTimeFrames() const
-{
-    return default_time_frames_;
-}
-
-void SimpleAccessProfile::addAccessTimeFrame(AuthTargetPtr target, const SingleTimeFrame &tf)
+void SimpleAccessProfile::addAccessSchedule(AuthTargetPtr target, Leosac::Tools::Schedule const &sched)
 {
     if (target)
-        time_frames_[target->name()].push_back(tf);
+        schedules_[target->name()].push_back(sched);
     else
-        default_time_frames_.push_back(tf);
+        default_schedule_.push_back(sched);
+}
+
+std::map<std::string, std::vector<Leosac::Tools::Schedule>> const &SimpleAccessProfile::schedules() const
+{
+    return schedules_;
+}
+
+std::vector<Leosac::Tools::Schedule> const &SimpleAccessProfile::defaultSchedules() const
+{
+    return default_schedule_;
 }

@@ -45,7 +45,7 @@ namespace Leosac
             class Door
             {
             public:
-                std::list<Tools::XmlScheduleLoader::Schedule> always_on;
+                //std::list<Tools::XmlScheduleLoader::Schedule> always_on;
                 std::unique_ptr<Hardware::FGPIO> gpio_;
             };
 

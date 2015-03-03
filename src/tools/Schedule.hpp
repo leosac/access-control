@@ -18,8 +18,9 @@
 */
 
 #include <boost/property_tree/ptree.hpp>
-#include "Schedule.hpp"
+#include "SingleTimeFrame.hpp"
 #include <chrono>
+#include <vector>
 #include <map>
 
 #pragma once
@@ -29,37 +30,32 @@ namespace Leosac
     namespace Tools
     {
         /**
-        * Load a list of schedules from a boost::property_tree.
-        *
-        * The format is defined [here](@ref mod_auth_sched_declare).
-        * This class was introduced to avoid code duplication.
+        * A schedule is simply a list of time frame (SingleTimeFrame) with
+        * a name.
         */
-        class XmlScheduleLoader
+        class Schedule
         {
         public:
-            /**
-            * Load all schedules from a tree and stores them in the map.
-            */
-            bool load(const boost::property_tree::ptree &t);
+            Schedule(const std::string &sched_name = "");
 
             /**
-            * Helper function.
+            * Retrieve the name of the schedule.
             */
-            static int week_day_to_int(const std::string &day);
+            const std::string &name() const;
 
             /**
-            * Access the map of stored schedules.
+            * Check whether or not the given time point can be found in the schedule.
             */
-            const std::map<std::string, Schedule> &schedules() const;
+            bool is_in_schedule(const std::chrono::system_clock::time_point &tp) const;
+
+            /**
+            * Add the given timeframe to this schedule;
+            */
+            void add_timeframe(const SingleTimeFrame &tf);
 
         private:
-            /**
-            * Adds a new schedule to the map.
-            */
-            bool extract_one(const boost::property_tree::ptree &node);
-
-            std::map<std::string, Schedule> schedules_;
+            std::vector<SingleTimeFrame> timeframes_;
+            std::string name_;
         };
-
     }
 }

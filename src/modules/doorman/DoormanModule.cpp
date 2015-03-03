@@ -117,7 +117,7 @@ void DoormanModule::process_doors_config(const boost::property_tree::ptree &door
             for (const auto &map_entry : xml_sched.schedules())
             {
                 DEBUG("BLA");
-                d->always_on.push_back(map_entry.second);
+  //              d->always_on.push_back(map_entry.second);
             }
             doors_.push_back(d);
         }
@@ -126,7 +126,7 @@ void DoormanModule::process_doors_config(const boost::property_tree::ptree &door
 
 void DoormanModule::update()
 {
-    DEBUG("UPDATE");
+/*    DEBUG("UPDATE");
     for (auto &&door : doors_)
     {
         for (const auto &sched : door->always_on)
@@ -140,5 +140,5 @@ void DoormanModule::update()
                 }
             }
         }
-    }
+    }*/
 }

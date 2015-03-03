@@ -68,7 +68,7 @@ bool XmlScheduleLoader::load(const boost::property_tree::ptree &schedules_tree)
 bool XmlScheduleLoader::extract_one(const boost::property_tree::ptree &node)
 {
     std::string schedule_name = node.get<std::string>("name");
-    std::vector<SingleTimeFrame> time_frame_list;
+    Schedule sched(schedule_name);
 
     // loop on all properties of the schedule.
     // those will be weekday and the <name> tag too.
@@ -96,16 +96,16 @@ bool XmlScheduleLoader::extract_one(const boost::property_tree::ptree &node)
         Tools::SingleTimeFrame tf(week_day_to_int(sched_data.first),
                 start_hour, start_min,
                 end_hour, end_min);
-        time_frame_list.push_back(tf);
+        sched.add_timeframe(tf);
     }
     if (schedules_.count(schedule_name))
         NOTICE("A schedule with name " << schedule_name << " already exists. It will be overriden");
 
-    schedules_[schedule_name] = time_frame_list;
+    schedules_[schedule_name] = sched;
     return true;
 }
 
-const std::map<std::string, XmlScheduleLoader::Schedule> &XmlScheduleLoader::schedules() const
+const std::map<std::string, Schedule> &XmlScheduleLoader::schedules() const
 {
     return schedules_;
 }
