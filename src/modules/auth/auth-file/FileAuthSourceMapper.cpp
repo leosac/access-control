@@ -82,6 +82,8 @@ void FileAuthSourceMapper::visit(WiegandCard *src)
         // caller credential object, we store additional info we gathered
         // (like owner) and made them accessible to them.
         auto cred = it->second;
+        // the auth source name is only set in the original credential object
+        cred->name(src->name());
         *src = *cred;
     }
 }
@@ -95,6 +97,8 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
         // caller credential object, we store additional info we gathered
         // (like owner) and made them accessible to them.
         auto cred = it->second;
+        // the auth source name is only set in the original credential object
+        cred->name(src->name());
         *src = *cred;
     }
 }
@@ -110,6 +114,8 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
         // caller credential object, we store additional info we gathered
         // (like owner) and made them accessible to them.
         auto cred = it->second;
+        // the auth source name is only set in the original credential object
+        cred->name(src->name());
         *src = *cred;
     }
 }
