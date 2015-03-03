@@ -23,9 +23,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <modules/wiegand/strategies/Autodetect.hpp>
 #include "tools/log.hpp"
-#include "core/auth/Auth.hpp"
 #include "wiegand.hpp"
-#include "strategies/Strategies.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
@@ -102,13 +100,13 @@ Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::
 {
     using namespace Auth;
     using namespace Strategy;
-    std::string mode        = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
-    int pin_timeout         = reader_cfg.get<int>("pin_timeout", 2000);
-    char pin_key_end        = reader_cfg.get<char>("pin_key_end", '#');
+    std::string mode                        = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
+    std::chrono::milliseconds pin_timeout   = std::chrono::milliseconds(reader_cfg.get<int>("pin_timeout", 2500));
+    char pin_key_end                        = reader_cfg.get<char>("pin_key_end", '#');
 
     auto simple_wiegand = std::unique_ptr<CardReading>(new SimpleWiegandStrategy(reader));
-    auto pin_4bits      = std::unique_ptr<PinReading>(new WiegandPin4BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
-    auto pin_8bits      = std::unique_ptr<PinReading>(new WiegandPin8BitsOnly(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
+    auto pin_4bits      = std::unique_ptr<PinReading>(new WiegandPin4BitsOnly(reader, pin_timeout, pin_key_end));
+    auto pin_8bits      = std::unique_ptr<PinReading>(new WiegandPin8BitsOnly(reader, pin_timeout, pin_key_end));
     auto pin_buffered   = std::unique_ptr<PinReading>(new WiegandPinBuffered(reader));
 
     if (mode == "SIMPLE_WIEGAND")
@@ -124,25 +122,25 @@ Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::
        return std::unique_ptr<WiegandStrategy>(new WiegandCardAndPin(reader,
                 std::move(simple_wiegand),
                 std::move(pin_4bits),
-                std::chrono::milliseconds(pin_timeout)));
+                pin_timeout));
     }
     else if (mode == "WIEGAND_CARD_PIN_8BITS")
     {
         return std::unique_ptr<WiegandStrategy>(new WiegandCardAndPin(reader,
                 std::move(simple_wiegand),
                 std::move(pin_8bits),
-                std::chrono::milliseconds(pin_timeout)));
+                pin_timeout));
     }
     else if (mode == "WIEGAND_CARD_PIN_BUFFERED")
     {
              return std::unique_ptr<WiegandStrategy>(new WiegandCardAndPin(reader,
                 std::move(simple_wiegand),
                 std::move(pin_buffered),
-                std::chrono::milliseconds(pin_timeout)));
+                pin_timeout));
     }
     else if (mode == "AUTODETECT")
     {
-        return std::unique_ptr<WiegandStrategy>(new Autodetect(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
+        return std::unique_ptr<WiegandStrategy>(new Autodetect(reader, pin_timeout, pin_key_end));
     }
     else
     {

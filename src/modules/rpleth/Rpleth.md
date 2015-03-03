@@ -3,6 +3,8 @@ Rpleth Module Documentation {#mod_rpleth_main}
 
 [TOC]
 
+@brief Documentation for how to use the Rpleth module.
+
 Introduction {#mod_rpleth_intro}
 ================================
 

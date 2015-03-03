@@ -3,6 +3,8 @@ Wiegand Module Documentation {#mod_wiegand_main}
 
 [TOC]
 
+@brief Explains how to configure the module to work with various Wiegand reader.
+
 Introduction {#mod_wiegand_intro}
 =================================
 
@@ -12,9 +14,8 @@ gather them, and generate Wiegand events. It supports multiple readers.
 As this is an module that provide an authentication source (by reading card ids or PIN code, or both), it shall
 conforms to [those specifications](@ref auth_specc) regarding message passing.
 
-There are multiple mode supported by the wiegand module: This mode are known as Auth Source type 
-in the application. Each mode may have additional configuration option that can be specified 
-in the `reader` configuration.
+There are multiple mode supported by the wiegand module. They allows the module to read from differently configured
+hardware, and allows you to chose what kind of credentials the module shall generate.
 
 Configuration Options {#mod_wiegand_user_config}
 ================================================
@@ -28,9 +29,9 @@ readers    |          |             | Lists of all configured readers           
 --->       | --->     | low         | name of the input GPIO that sends "low" data           | YES
 --->       | --->     | green_led   | name of the green led device attached to the reader    | NO
 --->       | --->     | buzzer      | name of the buzzer device attached to the reader       | NO
---->       | --->     | mode        | Which mode the reader is using (see below)             | NO (defaults to SIMPLE_WIEGAND)
---->       | --->     | pin_timeout | Timeout when reading a PIN code.                       | NO (only for WIEGAND_PIN mode)
---->       | --->     | pin_key_end | Which key is used to signal the end of a PIN code      | NO (only for WIEGAND_PIN mode)
+--->       | --->     | mode        | Which mode the reader is using (see below)             | NO (defaults to `SIMPLE_WIEGAND`)
+--->       | --->     | pin_timeout | Timeout when reading a PIN code.                       | NO (defaults to 2500ms)
+--->       | --->     | pin_key_end | Which key is used to signal the end of a PIN code      | NO (defaults to '#')
 
 **Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
 the sysfsgpio or pifacedigital module.
@@ -47,7 +48,7 @@ There are multiples `mode` available for a reader:
 8. `AUTODETECT` allows the module to read and create different type of credentials. It can read a pin code or a card number, or both.
 The pin code can be read if the reader is either in 4 bits or 8 bits mode.
 
-@warning The `AUTODETECT` mode is not compatible with the Wiegand Buffered mode.
+@warning The `AUTODETECT` mode is not compatible with the hardware Wiegand-Buffered mode.
 
 You can see [this](@ref auth_data_type) for more the message passing specific specification
 about those modes. Note that multiple mode share a common message implementation.
@@ -66,22 +67,22 @@ Example {#mod_wiegand_example}
 This is a example of Rpleth possible configuration for Rpleth module into Leosac:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>WIEGAND</name>
-            <file>libwiegand.so</file>
-            <level>5</level>
-            <module_config>
-                <readers>
-                    <reader>
-                        <name>MY_WIEGAND_1</name>
-                        <high>wiegand_data_high</high>
-                        <low>wiegand_data_low</low>
-                        <green_led>WIEGAND1_GREEN_LED</green_led>
-                        <buzzer>WIEGAND1_BUZZER</buzzer>
-                    </reader>
-                </readers>
-            </module_config>
-        </module>
+<module>
+    <name>WIEGAND</name>
+    <file>libwiegand.so</file>
+    <level>5</level>
+    <module_config>
+        <readers>
+            <reader>
+                <name>MY_WIEGAND_1</name>
+                <high>wiegand_data_high</high>
+                <low>wiegand_data_low</low>
+                <green_led>WIEGAND1_GREEN_LED</green_led>
+                <buzzer>WIEGAND1_BUZZER</buzzer>
+            </reader>
+        </readers>
+    </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
 Notes {#mod_wiegand_notes}

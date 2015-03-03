@@ -109,9 +109,9 @@ Auth backend must be able to distinguish between those to handles them properly.
 
 Workflow for an **authentication source** module:
  1. Having enough meaningful data that represents an authentication source (card id, pin code, fingerprint, ...)
-    the module shall publish the message bus the let other know.
+    the module shall publish a message on the message bus the let others know.
  2. The message shall be multiparts.
-    1. Its first frame must be the auth source's name prefixed by "S_".
+    1. Its first frame must be the auth source's name prefixed by `S_`.
     2. The second frame shall be the type of data. See [this](@ref auth_data_type).    
     3. Optional (but likely presents) frames that contains different data based on the [auth data type](@ref auth_data_type)
 
@@ -141,7 +141,7 @@ Workflow for an **authentication backend** module:
  1. Receive a message from an **auth source**.
  2. Process the message, and decide whether access shall be granted or not.
  3. Send a multiparts response message.
-   1. The first frame MUST be "S_{AUTH_INSTANCE_NAME}".
+   1. The first frame MUST be `S_{AUTH_INSTANCE_NAME}`.
    2. The second frame shall be an [AccessStatus](@ref Leosac::Auth::AccessStatus).
 
 Frame    | Content                                       | Type

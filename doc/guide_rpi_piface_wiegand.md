@@ -6,6 +6,8 @@ It will walk you through a complete install on a Raspbian system.
 
 [TOC]
 
+@brief Describe the installation process when using a Raspberry PI + Piface Board + Wiegand Reader.
+
 Goals {#install_guide_goals}
 ============================
 
@@ -70,7 +72,7 @@ Note that building on Raspberry Pi will take quite a while, and cross compiling 
 Debian Package {#install_guide_installing_deb}
 ----------------------------------------------
 
-Grab the lastest armhf package from the [Github Release tab](https://github.com/islog/leosac/releases).
+Grab the latest armhf package from the [Github Release tab](https://github.com/islog/leosac/releases).
 Install the package and install missing dependencies:
 
 ~~~~~~~~~~.sh

@@ -3,6 +3,8 @@ PifaceDigital Module Documentation {#mod_piface_main}
 
 [TOC]
 
+@brief Explain how to use the Piface board as a GPIO backend.
+
 Introduction {#mod_piface_intro}
 =================================
 
@@ -25,7 +27,7 @@ gpios      |           | GPIOS definitions                                      
 --->       | name      | A name for the GPIO device                             | YES
 --->       | no        | The GPIO number of the piface. Range from 0 to 7       | YES
 --->       | direction | Direction of the PIN. in or out                        | YES
---->       | value     | Only for out PIN. The default value of the PIN         | YES
+--->       | value     | Only for out PIN. The default value of the PIN         | YES for output pin
 
 Notes:
 + `value` is a boolean. It's only for output GPIO and represents the default value.
