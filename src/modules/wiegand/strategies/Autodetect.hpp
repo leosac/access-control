@@ -48,9 +48,11 @@ namespace Leosac
                     *
                     * @param reader         the reader object we provide the strategy for.
                     * @param delay          max nb of msec between reading the card and receiving pin code data.
+                    * @param pin_key_end    what key on the reader signals the end of the pin code ?
                     */
                     Autodetect(WiegandReaderImpl *reader,
-                            std::chrono::milliseconds delay);
+                            std::chrono::milliseconds delay,
+                            char pin_key_end);
 
                     virtual void timeout() override;
 
@@ -69,6 +71,22 @@ namespace Leosac
                     */
                     void reset() override;
 
+                    /**
+                    * Dynamically instanciate a new strategy based on the number of bits
+                    * available.
+                    *
+                    * This depends on the wiegand reader mode, and this class support either 4 or 8 bits.
+                    *
+                    * @return a new strategy to handle 4 or 8 bits mode.
+                    * @note Assert if !(bits == 4 || bits == 8);
+                    */
+                    PinReadingUPtr build_strategy(int bits);
+
+                    /**
+                    * Called when `timeout()` was called but nothing was read.
+                    */
+                    void check_timeout();
+
                     CardReadingUPtr read_card_strategy_;
                     PinReadingUPtr read_pin_strategy_;
 
@@ -77,11 +95,11 @@ namespace Leosac
                     TimePoint time_card_read_;
                     TimePoint last_pin_read_;
 
-
-
                     bool reading_pin_;
                     bool reading_card_;
                     bool ready_;
+
+                    char pin_key_end_;
                 };
             }
         }

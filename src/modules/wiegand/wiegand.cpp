@@ -104,7 +104,6 @@ Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::
     using namespace Strategy;
     std::string mode        = reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
     int pin_timeout         = reader_cfg.get<int>("pin_timeout", 2000);
-    int card_pin_delay      = reader_cfg.get<int>("card_pin_delay", 10000);
     char pin_key_end        = reader_cfg.get<char>("pin_key_end", '#');
 
     auto simple_wiegand = std::unique_ptr<CardReading>(new SimpleWiegandStrategy(reader));
@@ -125,25 +124,25 @@ Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::
        return std::unique_ptr<WiegandStrategy>(new WiegandCardAndPin(reader,
                 std::move(simple_wiegand),
                 std::move(pin_4bits),
-                std::chrono::milliseconds(card_pin_delay)));
+                std::chrono::milliseconds(pin_timeout)));
     }
     else if (mode == "WIEGAND_CARD_PIN_8BITS")
     {
         return std::unique_ptr<WiegandStrategy>(new WiegandCardAndPin(reader,
                 std::move(simple_wiegand),
                 std::move(pin_8bits),
-                std::chrono::milliseconds(card_pin_delay)));
+                std::chrono::milliseconds(pin_timeout)));
     }
     else if (mode == "WIEGAND_CARD_PIN_BUFFERED")
     {
              return std::unique_ptr<WiegandStrategy>(new WiegandCardAndPin(reader,
                 std::move(simple_wiegand),
                 std::move(pin_buffered),
-                std::chrono::milliseconds(card_pin_delay)));
+                std::chrono::milliseconds(pin_timeout)));
     }
     else if (mode == "AUTODETECT")
     {
-        return std::unique_ptr<WiegandStrategy>(new Autodetect(reader, std::chrono::milliseconds(card_pin_delay)));
+        return std::unique_ptr<WiegandStrategy>(new Autodetect(reader, std::chrono::milliseconds(pin_timeout), pin_key_end));
     }
     else
     {

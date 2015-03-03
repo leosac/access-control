@@ -62,6 +62,10 @@ void WiegandCardAndPin::timeout()
             reset();
             return;
         }
+        // if we received anything, update the last activity time to give
+        // more time to user to eventually finish to type its code.
+        if (reader_->counter())
+            time_card_read_ = std::chrono::system_clock::now();
         read_pin_strategy_->timeout();
         if (read_pin_strategy_->completed())
             ready_ = true;
@@ -79,8 +83,10 @@ void WiegandCardAndPin::signal(zmqpp::socket &sock)
     DEBUG("Pin = " << read_pin_strategy_->get_pin());
 
     zmqpp::message msg;
-    msg << ("S_" + reader_->name()) << Auth::SourceType::WIEGAND_CARD_PIN <<
-            read_card_strategy_->get_card_id() << read_card_strategy_->get_nb_bits() <<
+    msg << ("S_" + reader_->name()) <<
+            Auth::SourceType::WIEGAND_CARD_PIN <<
+            read_card_strategy_->get_card_id() <<
+            read_card_strategy_->get_nb_bits() <<
             read_pin_strategy_->get_pin();
     sock.send(msg);
     reset();

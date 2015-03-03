@@ -44,13 +44,18 @@ There are multiples `mode` available for a reader:
 5. `WIEGAND_CARD_PIN_4BITS` reads a card number followed by a PIN code read in 4bits mode.
 6. `WIEGAND_CARD_PIN_8BITS` reads a card number followed by a PIN code read in 8bits mode.
 7. `WIEGAND_CARD_PIN_BUFFERED` reads a card number followed by a PIN code read in buffered mode.
+8. `AUTODETECT` allows the module to read and create different type of credentials. It can read a pin code or a card number, or both.
+The pin code can be read if the reader is either in 4 bits or 8 bits mode.
+
+@warning The `AUTODETECT` mode is not compatible with the Wiegand Buffered mode.
 
 You can see [this](@ref auth_data_type) for more the message passing specific specification
 about those modes. Note that multiple mode share a common message implementation.
 
 Additional informations:
 + `pin_timeout` is the number of milliseconds (defaults to 2000) of inactivity on the keypad before
-considering the PIN code complete and sending it for processing.
+considering the PIN code complete and sending it for processing. It's also the delay you have to enter your PIN after
+swiping your card.
 + `pin_key_end` is the key to press to signal the end of the pin (default to '#'). This key wont be appended to the PIN code.
 + You can either type your PIN and wait, and type your PIN and the `pin_key_end`.
 

@@ -25,12 +25,14 @@ using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
 Autodetect::Autodetect(WiegandReaderImpl *reader,
-        std::chrono::milliseconds delay) :
+        std::chrono::milliseconds delay,
+        char pin_key_end) :
         WiegandStrategy(reader),
         delay_(delay),
         reading_pin_(false),
         reading_card_(true),
-        ready_(false)
+        ready_(false),
+        pin_key_end_(pin_key_end)
 {
     time_card_read_ = std::chrono::system_clock::now();
     last_pin_read_ =  std::chrono::system_clock::now();
@@ -40,14 +42,19 @@ Autodetect::Autodetect(WiegandReaderImpl *reader,
 void Autodetect::timeout()
 {
     using namespace std::chrono;
-    if (reader_->counter() == 4)
+
+    // When finishing reading a PIN code we mark as ready.
+    // This is because we have a choice between: PIN / Card / Card + PIN, so if PIN is presents,
+    // it is always last.
+
+    if (reader_->counter() == 4 || reader_->counter() == 8)
     {
         reading_pin_ = true;
         if (!read_pin_strategy_)
-            read_pin_strategy_ = std::unique_ptr<PinReading>(new WiegandPin4BitsOnly(reader_,
-                    std::chrono::milliseconds(2000), '#'));
+            read_pin_strategy_ = build_strategy(reader_->counter());
         read_pin_strategy_->set_reader(reader_);
         DEBUG("This is likely a PIN card");
+
         read_pin_strategy_->timeout();
         last_pin_read_ = system_clock::now();
         if (read_pin_strategy_->completed())
@@ -60,10 +67,6 @@ void Autodetect::timeout()
     }
     else if (reader_->counter())
     {
-        //  if (elapsed_ms > std::chrono::milliseconds(2000))
-        //{
-        //  DEBUG("Internal timeout... or something.");
-        //}
         read_card_strategy_->timeout();
         DEBUG("DOING SOME CARD READING");
         time_card_read_ = system_clock::now();
@@ -73,15 +76,26 @@ void Autodetect::timeout()
             reader_->read_reset();
         }
     }
+    else
+    {
+        check_timeout();
+    }
+}
+
+void Autodetect::check_timeout()
+{
+    using namespace std::chrono;
+
+    // Nothing was read, this is an inactivity timeout() tick.
+    // We do 2 things here: If we were reading a PIN code, check timeout and finish if timeout
+    // Check inactivity timeout for card + pin, to timeout and send a Card only credentials.
 
     auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - time_card_read_);
     auto elapsed_ms_pin = duration_cast<milliseconds>(system_clock::now() - last_pin_read_);
 
-
     if (reading_pin_)
     {
-        // make sure it timeout sometime.
-        if (elapsed_ms_pin > std::chrono::milliseconds(2000))
+        if (elapsed_ms_pin > delay_)
         {
             read_pin_strategy_->timeout();
             DEBUG("PIN READING TIMEOUT");
@@ -94,18 +108,16 @@ void Autodetect::timeout()
             }
         }
     }
-
-    // 2 sec of total inactivitry and we valid card.
-    if (elapsed_ms > std::chrono::milliseconds(3000)
-            && elapsed_ms_pin > std::chrono::milliseconds(3000))
+    // 2 sec of total inactivity and we valid card.
+    if (elapsed_ms > delay_ && elapsed_ms_pin > delay_)
     {
         if (read_card_strategy_->completed() && read_card_strategy_->get_nb_bits())
         {
+            // mark as ready since no pin were typed after swiping the card
+            // for delay_ milliseconds.
             ready_ = true;
-            DEBUG("BLABLA ALERT DOWN");
         }
     }
-
 }
 
 bool Autodetect::completed() const
@@ -117,16 +129,6 @@ void Autodetect::signal(zmqpp::socket &sock)
 {
     bool with_card  = read_card_strategy_->get_nb_bits();
     bool with_pin   = read_pin_strategy_ && read_pin_strategy_->get_pin().length();
-
-    if (with_card)
-        DEBUG("Card = " << read_card_strategy_->get_card_id());
-    else
-        DEBUG("NO CARD");
-
-    if (with_pin)
-        DEBUG("Pin = " << read_pin_strategy_->get_pin());
-    else
-        DEBUG("NO PIN");
 
     zmqpp::message msg;
     msg << ("S_" + reader_->name());
@@ -159,9 +161,25 @@ void Autodetect::reset()
     ready_ = false;
     reading_card_ = true;
     reader_->read_reset();
-
     read_card_strategy_->reset();
-    if (read_pin_strategy_)
-        read_pin_strategy_->reset();
 
+    // we hard-reset the pin strategy so we can instantiate a new one
+    // next time. We can then switch between 4 or 8 bits mode without problem.
+    read_pin_strategy_ = nullptr;
+}
+
+PinReadingUPtr Autodetect::build_strategy(int bits)
+{
+    assert(bits == 4 || bits == 8);
+    if (bits == 4)
+    {
+        return std::unique_ptr<PinReading>(new WiegandPin4BitsOnly(reader_,
+                delay_, pin_key_end_));
+    }
+    else if (bits == 8)
+    {
+        return std::unique_ptr<PinReading>(new WiegandPin8BitsOnly(reader_,
+                delay_, pin_key_end_));
+    }
+    return nullptr;
 }
