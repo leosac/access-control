@@ -30,7 +30,14 @@ DoormanModule::DoormanModule(zmqpp::context &ctx,
         const boost::property_tree::ptree &cfg) :
         BaseModule(ctx, pipe, cfg)
 {
-    process_config();
+    try
+    {
+        process_config();
+    }
+    catch (boost::property_tree::ptree_error &e)
+    {
+        std::throw_with_nested(ConfigException("main", "Doorman module configuration is invalid"));
+    }
 
     for (auto &&doorman : doormen_)
     {
