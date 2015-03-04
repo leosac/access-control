@@ -68,17 +68,9 @@ void DoormanInstance::handle_bus_msg()
 
     for (auto &action : actions_)
     {
-        if (action.on_ != access_status)
-            continue; // status doesn't match what we expected.
-        DEBUG("ACTION (target = " << action.target_ << ")");
-
-        auto target = find_target(action.target_);
-        if (target && (target->is_always_closed(std::chrono::system_clock::now()) ||
-                target->is_always_open(std::chrono::system_clock::now())))
-        {
-            NOTICE("Door " << target->name() << "is in immutable state (always open, or always closed) so we ignore this action against it");
+        if (ignore_action(action, access_status))
             continue;
-        }
+        DEBUG("ACTION (target = " << action.target_ << ")");
 
         zmqpp::message msg;
         for (auto &frame : action.cmd_)
@@ -121,7 +113,7 @@ void DoormanInstance::command_send_recv(std::string const &target_name, zmqpp::m
     }
 }
 
-Leosac::Auth::AuthTargetPtr DoormanInstance::find_target(const std::string &name)
+Leosac::Auth::AuthTargetPtr DoormanInstance::find_target(const std::string &name) const
 {
     for (const auto &d : module_.doors())
     {
@@ -129,4 +121,19 @@ Leosac::Auth::AuthTargetPtr DoormanInstance::find_target(const std::string &name
             return d;
     }
     return nullptr;
+}
+
+bool DoormanInstance::ignore_action(const DoormanAction &action, Leosac::Auth::AccessStatus status) const
+{
+    if (action.on_ != status)
+        return true;
+
+    auto target = find_target(action.target_);
+    if (target && (target->is_always_closed(std::chrono::system_clock::now()) ||
+            target->is_always_open(std::chrono::system_clock::now())))
+    {
+        NOTICE("Door " << target->name() << " is in immutable state (always open, or always closed) so we ignore this action against it");
+        return true;
+    }
+    return false;
 }

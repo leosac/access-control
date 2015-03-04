@@ -136,17 +136,19 @@ void DoormanModule::update()
 {
     auto now = std::chrono::system_clock::now();
 
-    DEBUG("UPDATE");
     for (auto &&door : doors_)
     {
-        if (door->is_always_open(now))
+        if (door->is_always_open(now) && door->is_always_closed(now))
         {
-            assert(door->gpio());
+            WARN("Oops, door " << door->name() << " is both always open and always close at the same time.");
+            continue;
+        }
+        if (door->is_always_open(now) && !door->gpio()->isOn())
+        {
             door->gpio()->turnOn();
         }
-        if (door->is_always_closed(now))
+        if (door->is_always_closed(now) && !door->gpio()->isOff())
         {
-            assert(door->gpio());
             door->gpio()->turnOff();
         }
     }

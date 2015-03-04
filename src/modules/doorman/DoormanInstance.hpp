@@ -86,8 +86,16 @@ namespace Leosac
                 void handle_bus_msg();
 
             private:
+                /**
+                * Should we ignore this action.
+                *
+                * There are multiple reason why we might wanna ignore an action:
+                *    1. The expected status (`granted` / `denied`) does not match the received status.
+                *    2. The door is in always_open (or alway_closed) mode.
+                */
+                bool ignore_action(const DoormanAction &action, Auth::AccessStatus status) const;
 
-                Auth::AuthTargetPtr find_target(const std::string &name);
+                Auth::AuthTargetPtr find_target(const std::string &name) const;
 
                 DoormanModule &module_;
 
