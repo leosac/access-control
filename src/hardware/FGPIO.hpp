@@ -120,7 +120,14 @@ namespace Leosac
             */
             bool isOff();
 
+            /**
+            * Name of the GPIO pin as defined in the configuration file.
+            */
+            const std::string &name() const;
+
         private:
+            std::string gpio_name_;
+
             /**
             * A socket to talk to the backend GPIO.
             */

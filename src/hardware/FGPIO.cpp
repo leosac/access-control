@@ -23,6 +23,7 @@
 using namespace Leosac::Hardware;
 
 FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name) :
+        gpio_name_(gpio_name),
         backend_(ctx, zmqpp::socket_type::req)
 {
     backend_.connect("inproc://" + gpio_name);
@@ -91,4 +92,9 @@ bool FGPIO::isOn()
 bool FGPIO::isOff()
 {
     return !isOn();
+}
+
+std::string const &FGPIO::name() const
+{
+    return gpio_name_;
 }
