@@ -20,13 +20,16 @@
 #include <core/auth/Auth.hpp>
 #include "DoormanInstance.hpp"
 #include "tools/log.hpp"
+#include "DoormanModule.hpp"
 
 using namespace Leosac::Module::Doorman;
 
-DoormanInstance::DoormanInstance(zmqpp::context &ctx,
+DoormanInstance::DoormanInstance(DoormanModule &module,
+        zmqpp::context &ctx,
         std::string const &name,
         const std::vector<std::string> &auth_contexts,
         const std::vector<DoormanAction> &actions) :
+        module_(module),
         name_(name),
         actions_(actions),
         bus_sub_(ctx, zmqpp::socket_type::sub)
@@ -68,6 +71,15 @@ void DoormanInstance::handle_bus_msg()
         if (action.on_ != access_status)
             continue; // status doesn't match what we expected.
         DEBUG("ACTION (target = " << action.target_ << ")");
+
+        auto target = find_target(action.target_);
+        if (target && (target->is_always_closed(std::chrono::system_clock::now()) ||
+                target->is_always_open(std::chrono::system_clock::now())))
+        {
+            NOTICE("Door " << target->name() << "is in immutable state (always open, or always closed) so we ignore this action against it");
+            continue;
+        }
+
         zmqpp::message msg;
         for (auto &frame : action.cmd_)
         {
@@ -109,7 +121,12 @@ void DoormanInstance::command_send_recv(std::string const &target_name, zmqpp::m
     }
 }
 
-void DoormanInstance::update()
+Leosac::Auth::AuthTargetPtr DoormanInstance::find_target(const std::string &name)
 {
-
+    for (const auto &d : module_.doors())
+    {
+        if (d->gpio()->name() == name)
+            return d;
+    }
+    return nullptr;
 }

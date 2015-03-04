@@ -43,13 +43,6 @@ namespace Leosac
 
             class DoormanInstance;
 
-            class Door
-            {
-            public:
-                //std::list<Tools::XmlScheduleLoader::Schedule> always_on;
-                std::unique_ptr<Hardware::FGPIO> gpio_;
-            };
-
             /**
             * Main class for the module, it create handlers and run them
             * to, well, handle events and send command.
@@ -71,6 +64,8 @@ namespace Leosac
 
                 virtual void run() override;
 
+                const std::vector<Auth::AuthTargetPtr> &doors() const;
+
             private:
 
                 void update();
@@ -91,7 +86,7 @@ namespace Leosac
                 /**
                 * Doors, to manage the always-on or always off stuff.
                 */
-                std::vector<std::shared_ptr<Leosac::Auth::AuthTarget>> doors_;
+                std::vector<Auth::AuthTargetPtr> doors_;
             };
 
         }

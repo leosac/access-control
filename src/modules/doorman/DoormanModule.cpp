@@ -83,7 +83,7 @@ void DoormanModule::process_config()
         }
 
         INFO("Creating Doorman instance " << doorman_name);
-        doormen_.push_back(std::make_shared<DoormanInstance>(ctx_,
+        doormen_.push_back(std::make_shared<DoormanInstance>(*this, ctx_,
                 doorman_name, auth_ctx_names, actions));
     }
 }
@@ -93,22 +93,21 @@ void DoormanModule::run()
     while (is_running_)
     {
         update();
-        reactor_.poll(10000);
-        for (auto &&instance : doormen_)
-            instance->update();
+        reactor_.poll(2000);
     }
 }
 
-void DoormanModule::process_doors_config(const boost::property_tree::ptree &doors)
+void DoormanModule::process_doors_config(const boost::property_tree::ptree &doors_cfg)
 {
     DEBUG("Processing doors config");
-    for (const auto &door_cfg : doors)
+    for (const auto &door_cfg : doors_cfg)
     {
+        std::string name = door_cfg.second.get<std::string>("name");
         std::string gpio = door_cfg.second.get<std::string>("gpio");
         const auto &open_schedule = door_cfg.second.get_child_optional("on.schedules");
         const auto &close_schedule = door_cfg.second.get_child_optional("off.schedules");
 
-        AuthTargetPtr door(new AuthTarget("no_name"));
+        AuthTargetPtr door(new AuthTarget(name));
         door->gpio(std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, gpio)));
 
         if (open_schedule)
@@ -151,4 +150,9 @@ void DoormanModule::update()
             door->gpio()->turnOff();
         }
     }
+}
+
+std::vector<AuthTargetPtr> const &DoormanModule::doors() const
+{
+    return doors_;
 }

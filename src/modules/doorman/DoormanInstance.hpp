@@ -29,6 +29,7 @@ namespace Leosac
     {
         namespace Doorman
         {
+            class DoormanModule;
             /**
             * Helper struct to wrap an "action".
             * It is composed of a `target_` (object name), a field (`on_`) to know when the
@@ -67,7 +68,8 @@ namespace Leosac
                 * @param auth_contexts list of authentication context (by name) that we wish to watch
                 * @param actions list of action to do when an event
                 */
-                DoormanInstance(zmqpp::context &ctx,
+                DoormanInstance(DoormanModule &module,
+                        zmqpp::context &ctx,
                         const std::string &name,
                         const std::vector<std::string> &auth_contexts,
                         const std::vector<DoormanAction> &actions);
@@ -83,12 +85,11 @@ namespace Leosac
                 */
                 void handle_bus_msg();
 
-                /**
-                * Called regularly so the instance can do housekeeping task.
-                */
-                void update();
-
             private:
+
+                Auth::AuthTargetPtr find_target(const std::string &name);
+
+                DoormanModule &module_;
 
                 /**
                 * Send a command to a target and wait for response.
