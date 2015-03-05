@@ -21,6 +21,7 @@
 
 #include <map>
 #include <zmqpp/zmqpp.hpp>
+#include "core/auth/AuthFwd.hpp"
 #include "core/auth/Auth.hpp"
 
 namespace Leosac

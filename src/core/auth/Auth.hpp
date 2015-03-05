@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/message.hpp>
-
 #pragma once
+#include <zmqpp/message.hpp>
+#include "AuthFwd.hpp"
 
 namespace Leosac
 {
@@ -60,9 +60,3 @@ zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::Auth::SourceType &
 zmqpp::message &operator>>(zmqpp::message &msg, Leosac::Auth::AccessStatus &st);
 
 zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::Auth::AccessStatus &st);
-
-#include "AuthSourceBuilder.hpp"
-#include "BaseAuthSource.hpp"
-#include "WiegandCard.hpp"
-#include "PINCode.hpp"
-#include "WiegandCardPin.hpp"
