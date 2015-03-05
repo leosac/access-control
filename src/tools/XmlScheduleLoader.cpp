@@ -17,11 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <exception/configexception.hpp>
-#include <cassert>
 #include "XmlScheduleLoader.hpp"
 #include "log.hpp"
+#include "exception/configexception.hpp"
+#include <cassert>
 #include <boost/algorithm/string.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 using namespace Leosac::Tools;
 
