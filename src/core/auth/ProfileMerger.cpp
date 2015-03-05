@@ -34,34 +34,34 @@ IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1,
 
     SimpleAccessProfilePtr result(new SimpleAccessProfile());
 
-    // merge strategy: simply add all time frames from both profile.
+    // merge strategy: simply add all schedule from both profile.
 
-    for (const auto &time_frame : t_p1->defaultTimeFrames())
+    for (const auto &schedule : t_p1->defaultSchedules())
     {
-        result->addAccessTimeFrame(nullptr, time_frame);
+        result->addAccessSchedule(nullptr, schedule);
     }
-    for (const auto &time_frame : t_p2->defaultTimeFrames())
+    for (const auto &schedule : t_p2->defaultSchedules())
     {
-        result->addAccessTimeFrame(nullptr, time_frame);
+        result->addAccessSchedule(nullptr, schedule);
     }
 
     std::string door_name;
-    std::vector<SingleTimeFrame> time_frames;
-    for (const auto &name_tf_pair : t_p1->timeFrames())
+    std::vector<Tools::Schedule> schedules;
+    for (const auto &name_sched_pair : t_p1->schedules())
     {
-        std::tie(door_name, time_frames) = name_tf_pair;
+        std::tie(door_name, schedules) = name_sched_pair;
         // hack
         AuthTargetPtr target(new AuthTarget(door_name));
-        for (const SingleTimeFrame &tf : time_frames)
-            result->addAccessTimeFrame(target, tf);
+        for (const Tools::Schedule &sched : schedules)
+            result->addAccessSchedule(target, sched);
     }
-    for (const auto &name_tf_pair : t_p2->timeFrames())
+    for (const auto &name_sched_pair : t_p2->schedules())
     {
-        std::tie(door_name, time_frames) = name_tf_pair;
+        std::tie(door_name, schedules) = name_sched_pair;
         // hack
         AuthTargetPtr target(new AuthTarget(door_name));
-        for (const SingleTimeFrame &tf : time_frames)
-            result->addAccessTimeFrame(target, tf);
+        for (const Tools::Schedule &sched : schedules)
+            result->addAccessSchedule(target, sched);
     }
 
     return result;

@@ -39,10 +39,15 @@ set(LEOSAC_LIB_SRCS
     tools/unixfilewatcher.cpp
     tools/unixfs.cpp
     tools/version.cpp
+    tools/Schedule.cpp
     tools/XmlPropertyTree.cpp
+    tools/XmlScheduleLoader.cpp
 )
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+include(cotire)
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
+
 add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
 
 set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -83,6 +88,11 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES})
+
+set_target_properties(${LEOSAC_LIB} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
+cotire(${LEOSAC_LIB})
+set_target_properties(${LEOSAC_BIN} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
+cotire(${LEOSAC_BIN})
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

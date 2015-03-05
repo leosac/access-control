@@ -25,6 +25,7 @@
 #include <core/auth/WiegandCardPin.hpp>
 #include <unordered_map>
 #include <utility>
+#include <tools/XmlScheduleLoader.hpp>
 #include "core/auth/SimpleAccessProfile.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/WiegandCard.hpp"
@@ -131,11 +132,6 @@ namespace Leosac
                 */
                 Leosac::Auth::IAccessProfilePtr merge_profiles(const std::vector<Leosac::Auth::IAccessProfilePtr> profiles);
 
-                /**
-                * Maps string day to int day (starting with sunday = 0)
-                */
-                static int week_day_to_int(const std::string &day);
-
                 Leosac::Auth::CredentialValidity extract_credentials_validity(const boost::property_tree::ptree &node);
 
                 /**
@@ -179,13 +175,7 @@ namespace Leosac
                 */
                 std::unordered_map<std::string, Leosac::Auth::IAuthenticationSourcePtr> id_to_cred_;
 
-                using Schedule = std::vector<Tools::SingleTimeFrame>;
-
-                /**
-                * A map where the key is the name of a schedule, and
-                * its value is how we represent a schedule.
-                */
-                std::map<std::string, Schedule> unmapped_schedules_;
+                Tools::XmlScheduleLoader xml_schedules_;
             };
         }
     }

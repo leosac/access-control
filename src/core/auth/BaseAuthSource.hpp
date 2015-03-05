@@ -22,6 +22,7 @@
 #include <memory>
 #include <vector>
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
+#include "core/auth/CredentialValidity.hpp"
 
 namespace Leosac
 {

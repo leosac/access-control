@@ -1,7 +1,25 @@
-#include <tools/log.hpp>
-#include <tools/XmlPropertyTree.hpp>
-#include <boost/algorithm/string/join.hpp>
+/*
+    Copyright (C) 2014-2015 Islog
+
+    This file is part of Leosac.
+
+    Leosac is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Leosac is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "core/RemoteControlSecurity.hpp"
+#include "tools/log.hpp"
+#include <boost/algorithm/string/join.hpp>
 
 using namespace Leosac;
 
@@ -40,7 +58,7 @@ bool RemoteControlSecurity::allow_request(const std::string &user_pubkey, const 
     }
 
     const auto &cmds = permissions_[user_pubkey];
-    if (default_permissions_[user_pubkey]) // check cmd is not explicitely denied
+    if (default_permissions_[user_pubkey]) // check cmd is not explicitly denied
         return std::find(cmds.begin(), cmds.end(), req) == cmds.end();
     else
         return std::find(cmds.begin(), cmds.end(), req) != cmds.end();
@@ -48,7 +66,6 @@ bool RemoteControlSecurity::allow_request(const std::string &user_pubkey, const 
 
 void RemoteControlSecurity::process_security_entry(const boost::property_tree::ptree &entry)
 {
-    //DEBUG(Tools::propertyTreeToXml(entry));
     const std::string &pk = entry.get<std::string>("pk");
     bool default_access   = entry.get<bool>("default", false);
 

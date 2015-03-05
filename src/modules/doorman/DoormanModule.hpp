@@ -22,7 +22,11 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
+#include <memory>
 #include <modules/BaseModule.hpp>
+#include <hardware/FGPIO.hpp>
+#include <tools/XmlScheduleLoader.hpp>
+#include <core/auth/AuthTarget.hpp>
 
 namespace Leosac
 {
@@ -56,9 +60,15 @@ namespace Leosac
 
                 DoormanModule &operator=(const DoormanModule &) = delete;
 
-                ~DoormanModule();
+                ~DoormanModule() = default;
+
+                virtual void run() override;
+
+                const std::vector<Auth::AuthTargetPtr> &doors() const;
 
             private:
+
+                void update();
 
                 /**
                 * Processing the configuration tree, spawning AuthFileInstance object as described in the
@@ -66,10 +76,17 @@ namespace Leosac
                 */
                 void process_config();
 
+                void process_doors_config(const boost::property_tree::ptree &t);
+
                 /**
                 * Authenticator instances.
                 */
-                std::vector<DoormanInstance *> doormen_;
+                std::vector<std::shared_ptr<DoormanInstance>> doormen_;
+
+                /**
+                * Doors, to manage the always-on or always off stuff.
+                */
+                std::vector<Auth::AuthTargetPtr> doors_;
             };
 
         }

@@ -20,8 +20,7 @@
 #pragma once
 
 #include <memory>
-#include "IUser.hpp"
-#include "core/auth/AuthTarget.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "tools/IVisitable.hpp"
 
 namespace Leosac

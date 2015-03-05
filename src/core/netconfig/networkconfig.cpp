@@ -28,7 +28,6 @@
 #include "core/kernel.hpp"
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
-#include "exception/scriptexception.hpp"
 
 using namespace Leosac::Tools;
 using namespace Leosac;

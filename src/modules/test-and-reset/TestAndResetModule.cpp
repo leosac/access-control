@@ -18,7 +18,7 @@
 */
 
 #include <tools/log.hpp>
-#include <core/auth/Auth.hpp>
+#include "core/auth/Auth.hpp"
 #include "TestAndResetModule.hpp"
 
 using namespace Leosac::Module::TestAndReset;

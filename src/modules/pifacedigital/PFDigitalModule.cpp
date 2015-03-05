@@ -35,7 +35,7 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
     if (pifacedigital_open(0) == -1)
     {
         ERROR("Cannot open PifaceDigital device");
-        throw LEOSACException("Cannot open PifaceDigital device");
+        throw LEOSACException("Cannot open PifaceDigital device (is SPI module enabled ?)");
     }
     int ret = pifacedigital_enable_interrupts();
     assert(ret == 0);

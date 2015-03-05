@@ -17,26 +17,32 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include "DoormanModule.hpp"
-#include "DoormanInstance.hpp"
+#include "Schedule.hpp"
 
-using namespace Leosac::Module::Doorman;
+using namespace Leosac::Tools;
 
-extern "C"
+Schedule::Schedule(const std::string &sched_name) :
+        name_(sched_name)
 {
-const char *get_module_name()
-{
-    return "DOORMAN";
-}
+
 }
 
-/**
-* Entry point for the Doorman module.
-*/
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
-        zmqpp::context &zmq_ctx)
+bool Schedule::is_in_schedule(const std::chrono::system_clock::time_point &tp) const
 {
-    return Leosac::Module::start_module_helper<DoormanModule>(pipe, cfg, zmq_ctx);
+    for (const auto &tf : timeframes_)
+    {
+        if (tf.is_in_timeframe(tp))
+            return true;
+    }
+    return false;
+}
+
+void Schedule::add_timeframe(const SingleTimeFrame &tf)
+{
+    timeframes_.push_back(tf);
+}
+
+const std::string &Schedule::name() const
+{
+    return name_;
 }

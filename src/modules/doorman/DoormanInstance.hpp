@@ -21,6 +21,8 @@
 
 #include <map>
 #include <zmqpp/zmqpp.hpp>
+#include "core/auth/AuthFwd.hpp"
+#include "core/auth/Auth.hpp"
 
 namespace Leosac
 {
@@ -28,6 +30,7 @@ namespace Leosac
     {
         namespace Doorman
         {
+            class DoormanModule;
             /**
             * Helper struct to wrap an "action".
             * It is composed of a `target_` (object name), a field (`on_`) to know when the
@@ -65,13 +68,12 @@ namespace Leosac
                 * @param name the name of this doorman
                 * @param auth_contexts list of authentication context (by name) that we wish to watch
                 * @param actions list of action to do when an event
-                * @param timeout see timeout field description.
                 */
-                DoormanInstance(zmqpp::context &ctx,
+                DoormanInstance(DoormanModule &module,
+                        zmqpp::context &ctx,
                         const std::string &name,
                         const std::vector<std::string> &auth_contexts,
-                        const std::vector<DoormanAction> &actions,
-                        int timeout);
+                        const std::vector<DoormanAction> &actions);
 
                 DoormanInstance(const DoormanInstance &) = delete;
 
@@ -85,6 +87,18 @@ namespace Leosac
                 void handle_bus_msg();
 
             private:
+                /**
+                * Should we ignore this action.
+                *
+                * There are multiple reason why we might wanna ignore an action:
+                *    1. The expected status (`granted` / `denied`) does not match the received status.
+                *    2. The door is in always_open (or alway_closed) mode.
+                */
+                bool ignore_action(const DoormanAction &action, Auth::AccessStatus status) const;
+
+                Auth::AuthTargetPtr find_target(const std::string &name) const;
+
+                DoormanModule &module_;
 
                 /**
                 * Send a command to a target and wait for response.
@@ -97,13 +111,6 @@ namespace Leosac
                 std::string name_;
 
                 std::vector<DoormanAction> actions_;
-
-                /**
-                * This timeout value is used to determine if 2 auth event are accepted "as one".
-                * Passed this delay, one event will not have any impact to the other.
-                * //fixme rephrase that.
-                */
-                int timeout_;
 
                 zmqpp::socket bus_sub_;
 

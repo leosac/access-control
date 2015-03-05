@@ -23,6 +23,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <tools/Schedule.hpp>
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/AuthTarget.hpp"
 #include "tools/SingleTimeFrame.hpp"
@@ -44,37 +45,27 @@ namespace Leosac
                      AuthTargetPtr target) override;
 
             /**
-            * Add range in which access is allowed.
-            * @param target door we target. if this is null, it means this is a default access rule.
+            * Adds a schedule where access to a given target is allowed.
             */
-            virtual void addAccessHour(AuthTargetPtr target,
-                    int day, int start_hour, int start_min, int end_hour, int end_min);
+            virtual void addAccessSchedule(AuthTargetPtr target, const Tools::Schedule &sched);
+
+            virtual const std::vector<Tools::Schedule> &defaultSchedules() const;
 
             /**
-            * Adds a time frame for a target.
+            * Returns the map of schedule for each target (except the default target)
             */
-            virtual void addAccessTimeFrame(AuthTargetPtr target, const Tools::SingleTimeFrame& tf);
-
-            /**
-            * Provide informations about time frames that apply to non-specific door (ie when target is nullptr).
-            */
-            virtual const std::vector<Tools::SingleTimeFrame>& defaultTimeFrames() const;
-
-            /**
-            * Provide informations about the doors specific timeframe.
-            */
-            virtual const std::map<std::string, std::vector<Tools::SingleTimeFrame>>& timeFrames() const;
+            virtual const std::map<std::string, std::vector<Tools::Schedule>> &schedules() const;
 
         protected:
             /**
-            * Map target name to target's time frame.
+            * Map target name to target's schedules.
             */
-            std::map<std::string, std::vector<Tools::SingleTimeFrame>> time_frames_;
+            std::map<std::string, std::vector<Tools::Schedule>> schedules_;
 
             /**
-            * Time frames to use when we have nothing for a specific target.
+            * Schedule for default target.
             */
-            std::vector<Tools::SingleTimeFrame> default_time_frames_;
+            std::vector<Tools::Schedule> default_schedule_;
         };
     }
 }

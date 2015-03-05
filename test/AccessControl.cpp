@@ -23,6 +23,7 @@
 #include "core/auth/WiegandCard.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"
 #include "core/auth/AuthTarget.hpp"
+#include "../src/tools/Schedule.hpp"
 
 using namespace Leosac::Auth;
 namespace Leosac
@@ -47,7 +48,16 @@ namespace Leosac
 
                 // add access monday from 10 to 14.
                 auto profile_r = std::dynamic_pointer_cast<SimpleAccessProfile>(profile);
-                profile_r->addAccessHour(target, 1, 10, 0, 14, 0);
+                Tools::Schedule s;
+                Tools::SingleTimeFrame tf;
+                tf.day = 1;
+                tf.start_hour = 10;
+                tf.start_min = 0;
+                tf.end_hour = 14;
+                tf.end_min = 0;
+                s.add_timeframe(tf);
+
+                profile_r->addAccessSchedule(target, s);
             }
 
             ~AccessControlTest()

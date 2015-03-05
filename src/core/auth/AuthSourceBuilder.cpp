@@ -18,7 +18,11 @@
 */
 
 #include <tools/log.hpp>
+#include "AuthSourceBuilder.hpp"
 #include "Auth.hpp"
+#include "WiegandCard.hpp"
+#include "PINCode.hpp"
+#include "WiegandCardPin.hpp"
 
 using namespace Leosac::Auth;
 
