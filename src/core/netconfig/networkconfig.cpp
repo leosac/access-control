@@ -32,8 +32,6 @@
 using namespace Leosac::Tools;
 using namespace Leosac;
 
-const std::string NetworkConfig::NetCfgFile = "interfaces";
-
 NetworkConfig::NetworkConfig(const Kernel &k,
         const boost::property_tree::ptree &cfg) :
         config_(cfg),

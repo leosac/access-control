@@ -35,11 +35,11 @@ namespace Leosac
     /**
     * Class that helps configuring the network.
     *
-    * @see @ref network_main for end-user documentation.
+    * @see @ref general_config_network for end-user documentation.
     */
     class NetworkConfig
     {
-        static const std::string NetCfgFile;
+        static constexpr const char * NetCfgFile = "interfaces";
 
     public:
         explicit NetworkConfig(const Kernel &k,

@@ -50,6 +50,15 @@ Options       | Options  | Options | Description                                
 enable_syslog |          |         | Enable logging to syslog                         | NO (default to `true`)
 min_syslog    |          |         | Minimal log entry level to write to syslog       | NO (default to `WARNING`)
 
+Here is a list of the various log level available:
+   + `DEBUG`
+   + `INFO`
+   + `NOTICE`
+   + `WARNING`
+   + `ERROR`
+   + `CRITICAL`
+   + `ALERT`
+   + `EMERGENCY`
 
 Example {#logger_example}
 -------------------------
@@ -75,7 +84,13 @@ This allows the Remote Control API (or Rpleth API) to change the network configu
 of the Leosac unit.
 
 However, if you do not plan on changing your IP address or see no use for this feature,
-it is recommended to use Linux tools to configure your network instead (ie, write to `/etc/network/interface/`).
+it is recommended to use Linux tools to configure your network instead (ie, write to `/etc/network/interfaces`).
+
+@note Disabling the network subsystem (with `<enabled>false</enabled>`) doesn't disable the network. It disables
+the network management that Leosac does. If you want to fully disable the network, you'll have to do this
+at the operating system level.
+
+@note CIDR notation is not supported (see [#54](https://github.com/islog/leosac/issues/54)).
 
 Example {#network_example}
 --------------------------
