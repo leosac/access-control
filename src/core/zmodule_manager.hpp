@@ -24,10 +24,10 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <dynlib/dynamiclibrary.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <core/config/ConfigManager.hpp>
-#include "zmqpp/actor.hpp"
+#include <zmqpp/actor.hpp>
+#include "dynlib/dynamiclibrary.hpp"
+#include "boost/property_tree/ptree.hpp"
+#include "core/config/ConfigManager.hpp"
 
 namespace Leosac
 {

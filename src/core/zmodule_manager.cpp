@@ -17,13 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <algorithm>
-#include <tools/unixfs.hpp>
-#include <tools/log.hpp>
 #include "zmodule_manager.hpp"
-#include <zmqpp/zmqpp.hpp>
-#include <exception/ExceptionsTools.hpp>
-#include <core/config/ConfigManager.hpp>
+#include "tools/unixfs.hpp"
+#include "tools/log.hpp"
+#include "exception/ExceptionsTools.hpp"
 
 using Leosac::Tools::UnixFs;
 
