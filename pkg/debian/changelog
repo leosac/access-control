@@ -1,3 +1,11 @@
+leosac (0.5.0-1) UNRELEASED; urgency=medium
+
+  * New authentication module, with more feature.
+  * Improved doorman module.
+  * Ability to (partially) remote control Leosac.
+
+ --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 14:09:15 +0100
+
 leosac (0.4.1-1) UNRELEASED; urgency=medium
 
   * Fix package dependecies
