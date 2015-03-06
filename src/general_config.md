@@ -67,10 +67,10 @@ Logger configuration takes place in the `<kernel>` tag. It is **not** configured
 as a module.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <log>
-        <enable_syslog>true</enable_syslog>
-        <min_syslog>INFO</min_syslog>
-    </log>
+<log>
+    <enable_syslog>true</enable_syslog>
+    <min_syslog>INFO</min_syslog>
+</log>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -98,22 +98,22 @@ Network configuration takes place in the `<kernel>` tag. It is **not** configure
 as a module.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <network>
-        <enabled>false</enabled>
-    </network>
+<network>
+    <enabled>false</enabled>
+</network>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 An other example with enabled network management.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <network>
-        <enabled>true</enabled>
-        <interface>eth0</interface>
-        <dhcp>true</dhcp>
-        <netmask>255.255.255.0</netmask>
-        <default_ip>192.168.0.18</default_ip>
-        <gateway>192.168.0.1</gateway>
-    </network>
+<network>
+    <enabled>true</enabled>
+    <interface>eth0</interface>
+    <dhcp>true</dhcp>
+    <netmask>255.255.255.0</netmask>
+    <default_ip>192.168.0.18</default_ip>
+    <gateway>192.168.0.1</gateway>
+</network>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Remote Control {#remote_control}
@@ -142,11 +142,11 @@ Example {#sync_source_ex}
 -------------------------
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <sync_source>
-        <log>true</log>
-        <network>false</network>
-        <remote>false</remote>
-    </sync_source>
+<sync_source>
+    <log>true</log>
+    <network>false</network>
+    <remote>false</remote>
+</sync_source>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sync Dest {#sync_dest}
@@ -165,10 +165,10 @@ It's however possible to prevent module configuration from being added, erased o
 To do so, define a `<no_import>` tag in the config file.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-    <no_import>
-        <TEST_AND_RESET />
-        <ANOTHER_MODULE />
-    </no_import>
+<no_import>
+    <TEST_AND_RESET />
+    <ANOTHER_MODULE />
+</no_import>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This will have the effect of leaving alone the configuration of Test and Reset and Another Module.

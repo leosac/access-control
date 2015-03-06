@@ -16,6 +16,9 @@ If an access is granted (or denied) one (or more) actions can be taken by this m
 + Raise an alarm.
 + ...
 
+The main goal of this module is to trigger action on others components in the system. This is done
+by sending message to them.
+
 Configuration Options {#mod_doorman_user_config}
 ================================================
 
@@ -55,6 +58,15 @@ For each frame you want in the command message, use `<fX>` where `X` is growing 
 
 Example {#mod_doorman_example}
 ------------------------------
+
+The following example file defines the following:
+   + The door is always open on wednesday, between 13:13 and 13:15.
+   + The door is always closed on wednesday, between 13:15 and 15:16.
+   + On successful authentication (except when always open/close) we
+      send the `GREEN_LED` (with `ON` and `1500` as parameters) command to the
+      `MY_WIEGAND_1` device. This will light the green led of the reader for 1.5second.
+   + On failure (again, except when always open/close) we send the `ON` command (with `500` as
+      parameter) to the `wiegand_buzzer` GPIO, causing the device to beep for 0.5 second.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <module>

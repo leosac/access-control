@@ -2,13 +2,16 @@ Leosac Documentation Mainpage {#mainpage}
 =========================================
 
 Introduction {#main_intro}
-=========================
+==========================
 
-See [modules](@ref modules) for an overview of available modules.
+See [modules](@ref modules) for a bit of info about writing a module.
+
+We recommend you read through the related pages informations, there you will find documentation for 
+each module and how to configure and use them.
 
 Interesting stuff:
-   + See FGPIO detailed description for GPIO command.
-   + See FLED detailed description for LED command.
+   + See [FGPIO](@ref Leosac::Hardware::FGPIO) detailed description for GPIO command.
+   + See [FLED](@ref Leosac::Hardware::FLED) detailed description for LED command.
    + [General configuration information](@ref general_config_main) (logger / network / remote control).
    + Understand the [authentication system](@ref auth_main)
    + [Firmware](@ref firmware_main) info
