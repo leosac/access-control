@@ -28,6 +28,10 @@ with each other. Modules communicate using message-passing: [libzmq](http://zero
 are used to implement this message passing. Various specifications about how messages are supposed to be formatted and
 the expected interaction between components are defined through the project.
 
+This is a graphic overview of hardware modules. The GPIO module can be changed without impacting the other
+modules on top if it, provided that it properly implements the specifications.
+![Modules Images](../hardware.png).
+
 
 An example of hardware management {#hardware_management_example}
 ----------------------------------------------------------------
