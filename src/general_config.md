@@ -6,7 +6,7 @@ General Configuration Information {#general_config_main}
 Introduction {#general_config_intro}
 ====================================
 
-Even though Leosac is heavily based on modules, they are general
+Even though Leosac is heavily based on modules, there are general
 configuration options. Those are defined in the main configuration file,
 outside of the `<modules>` and `</modules>` tags.
 

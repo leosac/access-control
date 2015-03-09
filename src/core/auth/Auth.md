@@ -12,34 +12,15 @@ Authentication Documentation {#auth_main}
 Introduction {#auth_intro}
 =============================
 
-rewrite this.
-
-In an access control system, the authentication subsystem is complex.
+In an access control system, the authentication & authorization subsystem is complex.
 This page aims to explain how it works in Leosac.
 
-This is a job shared by authentication module (their job is to extract data, and
-create decent mapping between [AccessProfile], [Users] and [Cards]. Leosac core, through \n
-the implementation of those class provide facility to authorize (or deny) the user. \n
-We can somehow say that Authentication Module will **authenticate** while the core
-classes will **authorize**
+The task of reading credentials, validating them and taking action (opening doors) is split
+over multiple module. This gives us more flexibility and helps keeping the code clear and relatively simple.
 
+Below is a diagram that illustrate how thing works:
+![Auth overview diagram](../overview_auth.png)
 
-The [AccessProfile] interface define a base class for implementing access control rules.
-
-It is the responsibility of various authentication modules to build a coherent
-chains of [Cards], [Users], and [AccessProfile].
-
-Once this "building" is done, the [AccessProfile] class shall have all it needs
-to perform the access check.
-
-
-Workflow:
-    1. Send raw data (module wiegand)
-    2. Build [Cards] from input data (auth module code).
-    3. Maps cards to [Users]. (auth module).
-    3.1 If card is temporary, map to access profile.
-    4. Map [Users] to [AccessProfile]. (auth module)
-    
 
 Two kinds of modules
 ====================
