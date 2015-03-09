@@ -4,7 +4,7 @@ Leosac Documentation Mainpage {#mainpage}
 Introduction {#main_intro}
 ==========================
 
-See [modules](@ref modules) for a bit of info about writing a module.
+See [modules](@ref modules) for a bit of info about modules.
 
 We recommend you read through the related pages informations, there you will find documentation for 
 each module and how to configure and use them.

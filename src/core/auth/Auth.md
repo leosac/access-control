@@ -77,10 +77,10 @@ In order for this to work properly, we need a decent message passing specificati
 Authentication data type {#auth_data_type}
 ------------------------------------------
 
-Data types information helps authentication backend understand message from authentication sources.
+Data type information helps authentication backends understand messages from authentication sources.
 It is an enumeration value, see [AuthSourceType](@ref Leosac::Auth::SourceType).
 
-Currently we are lucky, we only define one.
+Currently we are lucky, we only define a few.
 
 1. **SIMPLE_WIEGAND**: This data type requires 2 frames:
   1. An hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"

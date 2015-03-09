@@ -72,6 +72,52 @@ So, in our example, here is what happens when a card is presented to the reader:
    4. The authentication module chose whether the access shall be granted or not, and publish this information.
    5. The `doorman` module picks this up, and eventually open a door.
 
+
+Hardware modules specifications {#hardware_mod_spec}
+====================================================
+
+You can find below the specifications that must be implemented when writing a module that provide
+support for some kind of hardware. 
+
+Specification for GPIOs modules {#hardware_spec_gpio}
+-----------------------------------------------------
+
+A module that implements GPIOs support must:
+    1. Allow user to configure `input` / `output` pin and let them associate a name per GPIO.
+    2. Allow other modules to talk to each GPIO individually, by name.
+
+Commands are sent (and response received) using REQ/REP socket. Here is a message specs:
+    1. Frame 1: `COMMAND_NAME`
+    2. Frame 2: `PARAMETER_1`
+    3. Frame 3: `PARAMETER_2`
+    
+A facade object, [FGPIO](@ref Leosac::Hardware::FGPIO) implements client-code of those specs.
+
+We define 4 commands that can be send to a GPIO device:
+    + `STATE` to query the state (high / low).
+    + `ON` command.
+    + `TOGGLE` to inverse the value of a pin.
+    + `OFF` to turn the GPIO to low.
+
+### STATE {#hardware_spec_gpio_state}
+ This asks for the state of the GPIO pin. It sends its value back, in textual format.
+ Therefore it shall always send either "ON" or "OFF".
+
+### ON {#hardware_spec_gpio_on}
+ This turns the pin high. It accepts an optional `duration` parameter.
+ If set, this parameter express the `duration` for which the GPIO shall stay high.
+ This `duration` is expressed in milliseconds.
+
+ The implementation shall turn the GPIO off after this `duration` has expired.
+
+### OFF {#hardware_spec_gpio_off}
+ This turns the GPIO low. There is no parameter.
+
+### TOGGLE {#hardware_spec_gpio_toggle}
+ Toggle the GPIO, setting it to low it was set to high, and vice versa. This command
+ doesn't expect any parameter either.
+
+
 @namespace Leosac::Hardware
 @brief Provides facade classes to hardware device implementation.
 

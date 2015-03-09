@@ -45,6 +45,18 @@ to use Leosac. However, if you're doing access-control you will generally need:
    3. An authentication backend module that will determine whether an user shall be granted access or not.
    4. A module to take action when an authentication attempt happen. This is the [doorman](@ref mod_doorman_main) module.
 
+Overview of existing modules {#module_enduser_overview}
+-------------------------------------------------------
+
+Name                 | Description                                                   | More info
+---------------------|---------------------------------------------------------------|--------------
+SysFS GPIO           | Provide support for GPIO through SysFS                        | Hardware module
+PifaceDigital        | Provide support for GPIO through the Piface digital device    | Hardware module
+Led-Buzzer           | Support Led and buzzer devices.                               | Hardware module, requires a GPIO module
+Wiegand              | Support wiegand device.                                       | Hardware module, Authentication Source module. Requires GPIO module.
+Auth-File            | Implementation permissions checking / auth validation         | Authentication backend module.
+Doorman              | Take actions when an authentication attempt succeed or fails  | 
+
 <HR>
 
 Developers Informations {#modules_dev}
@@ -64,7 +76,7 @@ How modules communicate ? {#modules_communication}
 --------------------------------------------------
 
 Modules to modules communication and core to modules communication does **NOT** happen
-by invoking method on each other. Instead, we have a higher level of abstraction in place:
+by invoking methods on each other. Instead, we have a higher level of abstraction in place:
 we use message passing. Each module has a mailbox and can receive (and send)
 messages to anyone.
 
@@ -77,6 +89,7 @@ is load and provide the support for the GPIOs.
 Leosac's core also set up a message-bus where everyone can write and read from everyone else.
 This is useful to broadcast information and is used a lot.
 
+![Modules communications](../modules_communication.png)
 
 Writing a new module {#modules_write}
 -------------------------------------

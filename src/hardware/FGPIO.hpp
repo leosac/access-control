@@ -36,42 +36,7 @@ namespace Leosac
         * The backend GPIO object (implemented by the gpio module (either sysfs or piface)) MUST exist.
         * All you need is the GPIO name defined in the configuration file to create a facade.
         *
-        * Since Leosac works through message passing, we have to define messages specifications.
-        *
-        * ### Find below the GPIO related specs:
-        *
-        * Commands are sent (and response received) using REQ/REP socket. Here is a message specs:
-        *    1. Frame 1: `COMMAND_NAME`
-        *    2. Frame 2: `PARAMETER_1`
-        *    3. Frame 3: `PARAMETER_2`
-        *
-        * See command description for more info about parameter.
-        * - - - - -
-        *
-        * We define 4 commands that can be send to a GPIO device:
-        *    + `STATE` to query the state (high / low)
-        *    + The `ON` command.
-        *    + `TOGGLE` to inverse the value of a pin
-        *    + `OFF` to turn the GPIO to low.
-        *
-        * #### `STATE`
-        * This asks for the state of the GPIO pin. It sends its value back, in textual format.
-        * Therefore it shall always send either "ON" or "OFF".
-        *
-        * #### `ON`
-        * This turns the pin high. It accepts an optional `duration` parameter.
-        * If set, this parameter express the `duration` for which the GPIO shall stay high.
-        * This `duration` is expressed in milliseconds.
-        *
-        * The implementation shall turn the GPIO off after this `duration` has expired.
-        *
-        * #### `OFF`
-        * This turns the GPIO low. There is no parameter.
-        *
-        * #### `TOGGLE`
-        * Toggle the GPIO, setting it to low it was set to high, and vice versa. This command
-        * doesn't expect any parameter either.
-        *
+        * @note This class implements the client code to [theses specifications](@ref hardware_spec_gpio).
         */
         class FGPIO
         {
