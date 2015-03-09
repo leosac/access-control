@@ -35,68 +35,7 @@ namespace Leosac
         * It requires a module that implements the behavior to work properly. However, unlike GPIO modules, we are unlikely
         * to have multiple implementation of a LED module.
         *
-        * ### Configuration Requirement
-        * When defining a LED device in a configuration file, 2 optional configuration parameters shall be available.
-        *     1. `default_blink_duration` which defines how long a LED will blink if no blink duration is specified.
-        *     2. `default_blink_speed` which defines how fast a led will blink.
-        *
-        * Both theses options are expressed in milliseconds.
-        *
-        *
-        * ### Find below the LED object specifications:
-        *
-        * Note that GPIO commands are also valid LED command.
-        *
-        * Commands are sent (and response received) using REQ/REP socket. Here is a message specs:
-        *    1. Frame 1: `COMMAND_NAME`
-        *    2. Frame 2: `PARAMETER_1`
-        *    3. Frame 3: `PARAMETER_2`
-        *
-        * See command description for more info about parameter.
-        * - - - - -
-        *
-        * We define 5 commands that can be send to a LED device:
-        *    + `STATE` to query the current state of the device.
-        *    + `ON` to turn the LED on.
-        *    + `TOGGLE` the LED: if on if goes off; if off it goes on.
-        *    + `OFF` to turn the LED off.
-        *    + `BLINK` so that the LED will blink.
-        *
-        * #### `STATE`
-        * Shall return the state of the LED device. It is a bit more verbose
-        * than the `STATE` command directed to GPIO device.
-        * It can return "ON" or "OFF" (in a single frame) if the device is
-        * simply on or off.
-        *
-        * However, if the device is blinking this shall returns a multi
-        * frames message:
-        *
-        *    1. "BLINKING"
-        *    2. BLINK_DURATION (int64_t)
-        *    3. BLINK_SPEED (int64_t)
-        *    4. "ON" | "OFF" (the real current state of the underlying gpio)
-        *
-        *
-        * #### `ON`
-        * This turns the LED on. It accepts an optional `duration` parameter.
-        * If set, this parameter express the `duration` for which the LED shall stay on.
-        * This `duration` is expressed in milliseconds.
-        *
-        * The implementation shall turn the LED off after this `duration` has expired.
-        *
-        * #### `OFF`
-        * This turns the LED low. There is no parameter.
-        *
-        * #### `TOGGLE`
-        * Toggle the LED, setting it to low it was set to high, and vice versa. This command
-        * doesn't expect any parameter either.
-        *
-        * #### `BLINK`
-        * This makes the LED blink, useful for controlling your christmas tree.
-        * The `BLINK` command accepts 2 optionals parameter: a `duration` and a `speed`. Both are expressed in milliseconds.
-        *
-        * The second frame shall contain the duration (use -1 for infinite blink) and the third frame the speed.
-        *
+        * @note This class implements the client code to [theses specifications](@ref hardware_spec_led).
         */
         class FLED
         {

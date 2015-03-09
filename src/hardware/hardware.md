@@ -72,6 +72,8 @@ So, in our example, here is what happens when a card is presented to the reader:
    4. The authentication module chose whether the access shall be granted or not, and publish this information.
    5. The `doorman` module picks this up, and eventually open a door.
 
+<HR>
+
 
 Hardware modules specifications {#hardware_mod_spec}
 ====================================================
@@ -85,37 +87,164 @@ Specification for GPIOs modules {#hardware_spec_gpio}
 A module that implements GPIOs support must:
     1. Allow user to configure `input` / `output` pin and let them associate a name per GPIO.
     2. Allow other modules to talk to each GPIO individually, by name.
-
-Commands are sent (and response received) using REQ/REP socket. Here is a message specs:
-    1. Frame 1: `COMMAND_NAME`
-    2. Frame 2: `PARAMETER_1`
-    3. Frame 3: `PARAMETER_2`
     
-A facade object, [FGPIO](@ref Leosac::Hardware::FGPIO) implements client-code of those specs.
+A facade object, [FGPIO](@ref Leosac::Hardware::FGPIO) implements client-code (requests) of those specs, and
+the module must implement the server-code (responses).
 
 We define 4 commands that can be send to a GPIO device:
-    + `STATE` to query the state (high / low).
-    + `ON` command.
-    + `TOGGLE` to inverse the value of a pin.
-    + `OFF` to turn the GPIO to low.
+    + [STATE](@ref hardware_spec_gpio_state).
+    + [ON](@ref hardware_spec_gpio_on).
+    + [OFF](@ref hardware_spec_gpio_off).
+    + [TOGGLE](@ref hardware_spec_gpio_toggle).
 
 ### STATE {#hardware_spec_gpio_state}
- This asks for the state of the GPIO pin. It sends its value back, in textual format.
- Therefore it shall always send either "ON" or "OFF".
+ 
+This is used to query the state of the GPIO pin.
+
+_Request_:
+
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "STATE"                                       | `string`
+
+_Response_:
+ 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "ON" or "OFF"                                 | `string`
+
 
 ### ON {#hardware_spec_gpio_on}
- This turns the pin high. It accepts an optional `duration` parameter.
- If set, this parameter express the `duration` for which the GPIO shall stay high.
- This `duration` is expressed in milliseconds.
 
- The implementation shall turn the GPIO off after this `duration` has expired.
+This turns the pin high. It accepts an optional `duration` parameter.
+If set, this parameter express the `duration` for which the GPIO shall stay high.
+This `duration` is expressed in milliseconds.
+The module shall turn the GPIO off after this `duration` has expired.
+
+_Request_:
+
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "ON"                                          | `string`
+2        | 3500                                          | `int64_t`
+
+_Response_:
+ 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                                  | `string`
+
+@note While it would return "KO" on error, it shouldn't fail, ever.
+
 
 ### OFF {#hardware_spec_gpio_off}
- This turns the GPIO low. There is no parameter.
+
+This turns the GPIO low. There is no parameter.
+
+_Request_:
+
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "OFF"                                         | `string`
+
+_Response_:
+ 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                                  | `string`
+
+@note While it would return "KO" on error, it shouldn't fail, ever.
+
 
 ### TOGGLE {#hardware_spec_gpio_toggle}
- Toggle the GPIO, setting it to low it was set to high, and vice versa. This command
- doesn't expect any parameter either.
+
+Toggle the GPIO, setting it to low it was set to high, and vice versa. This command takes no parameter.
+
+_Request_:
+
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "TOGGLE"                                      | `string`
+
+_Response_:
+ 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                                  | `string`
+
+@note While it would return "KO" on error, it shouldn't fail, ever.
+
+<HR>
+
+Specification for LEDs modules {#hardware_spec_led}
+----------------------------------------------------
+
+A module that implements LED devices support must:
+    1. Allow user to identified LED by name.
+    2. Allows module to communicate with configured LED device, by name.
+    3. Let the user chose a default
+
+Note that some GPIO commands are also valid LED command.
+
+We define 5 commands that can be send to a LED device:
+   + [STATE](@ref hardware_spec_led_state).
+   + [ON](@ref hardware_spec_gpio_on). This works exactly like the `ON` command for GPIO.
+   + [OFF](@ref hardware_spec_gpio_off). This works exactly like the `ON` command for GPIO.
+   + [TOGGLE](@ref hardware_spec_gpio_toggle). This works exactly like the `TOGGLE` command for GPIO.
+   + [BLINK](@ref hardware_spec_led_blink).
+
+### STATE {#hardware_spec_led_state}
+
+Shall return the state of the LED device. 
+
+_Request_:
+
+Frame    | Content                               | Type
+---------|---------------------------------------|-------------------------------------------
+1        | "STATE"                               | `string`
+
+_Response_:
+ 
+Frame    | Content                               | Type        | Comment
+---------|---------------------------------------|-------------|------------------------------
+1        | "ON" or "OFF" or "BLINKING"           | `string`    | -
+2        | BLINK_DURATION                        | `int64_t`   | Only if frame 1 is "BLINKING"
+3        | BLINK_SPEED                           | `int64_t`   | Only if frame 1 is "BLINKING"
+4        | "ON" or "OFF"                         | `string`    | Only if frame 1 is "BLINKING" - indicate the current value when the command was received.
+
+
+### BLINK {#hardware_spec_led_blink}
+
+This makes the LED blink, useful for controlling your christmas tree.
+The `BLINK` command accepts 2 optionals parameter: a `duration` and a `speed`. Both are expressed in milliseconds.
+
+The second frame shall contain the duration (use -1 for infinite blink) and the third frame the speed.
+
+_Request_:
+
+Frame    | Content                               | Type      | Comment
+---------|---------------------------------------|-----------|--------------------------------
+1        | "BLINK"                               | `string`  | -
+2        | BLINK_DURATION                        | `int64_t` | Optional. In milliseconds.
+3        | BLINK_SPEED                           | `int64_t` | Optional. In milliseconds.
+
+_Response_:
+ 
+Frame    | Content                                       | Type
+---------|-----------------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                                  | `string`
+
+@note While it would return "KO" on error, it shouldn't fail, ever.
+
+<HR>
+
+Specification for Buzzer modules {#hardware_spec_buzzer}
+----------------------------------------------------
+
+Buzzer and LED share the same code. See the [led module specifications](@ref hardware_spec_led).
+
+
+<HR>
 
 
 @namespace Leosac::Hardware
