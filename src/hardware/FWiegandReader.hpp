@@ -32,26 +32,7 @@ namespace Leosac
         *
         * You can control a reader through this class by acting on its led and buzzer.
         *
-        * ### Wiegand Reader specifications:
-        * A wiegand reader device shall have 2 inputs GPIO configured and an optional greenled and buzzer
-        * devices.
-        *
-        * ### Command specifications:
-        * A wiegand device shall accept 4 commands:
-        *    + `BEEP` to activate the buzzer device for a given amount of time.
-        *    + `BEEP_ON` to activate the buzzer.
-        *    + `BEEP_OFF` to deactivate the buzzer.
-        *    + `GREEN_LED` to execute a command on the associated led device.
-        *
-        * Command (Frame 1)        | Frame 2             | Frame 3          | Description
-        * -------------------------|---------------------|------------------|--------------
-        * BEEP                     | Duration (msec)     |                  | Make the buzzer beep for the given duration
-        * BEEP_ON                  |                     |                  | Turn the buzzer on (for an undefined time span)
-        * BEEP_OFF                 |                     |                  | Turn the buzzer off
-        * GREEN_LED                | A valid LED command | Parameters for command | Forward a LED command (and its parameters) to the green led
-        *
-        * @note A GREEN_LED command shall return a response as-if we sent a message to a LED device.
-        * @see FLED for a list of led command.
+        * @note This class implements the client code to [theses specifications](@ref hardware_spec_wiegand).
         */
         class FWiegandReader
         {

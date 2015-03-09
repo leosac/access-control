@@ -84,7 +84,7 @@ WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
     green_led_ = std::move(o.green_led_);
     buzzer_ = std::move(o.buzzer_);
 
-    // when we are move, we must update our strategy's pointer back to the "new" us.
+    // when we are moved, we must update our strategy's pointer back to the "new" us.
     strategy_->set_reader(this);
 }
 

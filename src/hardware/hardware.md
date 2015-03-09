@@ -246,6 +246,100 @@ Buzzer and LED share the same code. See the [led module specifications](@ref har
 
 <HR>
 
+Specification for Wiegand module {#hardware_spec_wiegand}
+----------------------------------------------------------
+
+A wiegand reader device shall have 2 inputs GPIO configured and optional greenled and buzzer
+devices.
+
+### Command specifications:
+
+A wiegand device shall accept 4 commands:
+   + [BEEP](@ref hardware_spec_wiegand_beep).
+   + [BEEP_ON](@ref hardware_spec_wiegand_beep_on).
+   + [BEEP_OFF](@ref hardware_spec_wiegand_beep_off).
+   + [GREEN_LED](@ref hardware_spec_wiegand_greenled).
+
+
+### BEEP {#hardware_spec_wiegand_beep}
+
+Make the reader beep for a given duration. The duration is expressed in milliseconds.
+
+_Request_:
+
+Frame    | Content                               | Type      | Comment
+---------|---------------------------------------|-----------|-------------------------------
+1        | "BEEP"                                | `string`  | -
+2        | BEEP_DURATION                         | `int64_t` | In milliseconds.
+
+_Response_:
+ 
+Frame    | Content                               | Type
+---------|---------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                          | `string`
+
+@note Would return "KO" if the reader had no associated buzzer (or if the underlying GPIO returned KO -- unlikely).
+
+
+### BEEP_ON {#hardware_spec_wiegand_beep_on}
+
+Turn the buzzer of the reader on. No duration.
+
+_Request_:
+
+Frame    | Content                               | Type      | Comment
+---------|---------------------------------------|-----------|-------------------------------
+1        | "BEEP_ON"                                | `string`  | -
+
+_Response_:
+ 
+Frame    | Content                               | Type
+---------|---------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                          | `string`
+
+@note Would return "KO" if the reader had no associated buzzer (or if the underlying GPIO returned KO -- unlikely).
+
+
+### BEEP_OFF {#hardware_spec_wiegand_beep_off}
+
+Turn the buzzer of the reader off.
+
+_Request_:
+
+Frame    | Content                               | Type      | Comment
+---------|---------------------------------------|-----------|-------------------------------
+1        | "BEEP_OFF"                            | `string`  | -
+
+_Response_:
+ 
+Frame    | Content                               | Type
+---------|---------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                          | `string`
+
+@note Would return "KO" if the reader had no associated buzzer (or if the underlying GPIO returned KO -- unlikely).
+
+
+### GREEN_LED {#hardware_spec_wiegand_greenled}
+
+Forward a command to the greenled device of the reader.
+
+_Request_:
+
+Frame    | Content                               | Type      | Comment
+---------|---------------------------------------|-----------|-------------------------------
+1        | "GREEN_LED"                           | `string`  | -
+2        | xxx                                   | `xxx`     | Command for the LED device.
+3        | yyy                                   | `yyy`     | Parameter 1 for the command. Can have more, or none.
+
+_Response_:
+ 
+Frame    | Content                               | Type
+---------|---------------------------------------|-------------------------------------------
+1        | "OK" or "KO"                          | `string`
+
+@note Would return "KO" if the reader had no associated green led.
+
+<HR>
 
 @namespace Leosac::Hardware
 @brief Provides facade classes to hardware device implementation.
