@@ -46,7 +46,8 @@ There are multiples `mode` available for a reader:
 6. `WIEGAND_CARD_PIN_8BITS` reads a card number followed by a PIN code read in 8bits mode.
 7. `WIEGAND_CARD_PIN_BUFFERED` reads a card number followed by a PIN code read in buffered mode.
 8. `AUTODETECT` allows the module to read and create different type of credentials. It can read a pin code or a card number, or both.
-The pin code can be read if the reader is either in 4 bits or 8 bits mode.
+The pin code can be read if the reader is either in 4 bits or 8 bits mode. If you are doing card-only authentication,
+note that you will notice a delay of ~2second. This delay is here to let the user have a chance to enter his PIN code.
 
 @warning The `AUTODETECT` mode is not compatible with the hardware Wiegand-Buffered mode.
 

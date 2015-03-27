@@ -30,7 +30,9 @@ the expected interaction between components are defined through the project.
 
 This is a graphic overview of hardware modules. The GPIO module can be changed without impacting the other
 modules on top if it, provided that it properly implements the specifications.
-![Modules Images](../hardware.png).
+
+![Modules Images](../hardware.png)
+@image latex "../hardware.png"
 
 
 An example of hardware management {#hardware_management_example}

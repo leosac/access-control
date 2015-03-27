@@ -53,7 +53,7 @@ void Autodetect::timeout()
         if (!read_pin_strategy_)
             read_pin_strategy_ = build_strategy(reader_->counter());
         read_pin_strategy_->set_reader(reader_);
-        DEBUG("This is likely a PIN card");
+        DEBUG("This is likely a PIN code");
 
         read_pin_strategy_->timeout();
         last_pin_read_ = system_clock::now();

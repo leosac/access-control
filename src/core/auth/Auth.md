@@ -20,6 +20,7 @@ over multiple module. This gives us more flexibility and helps keeping the code 
 
 Below is a diagram that illustrate how thing works:
 ![Auth overview diagram](../overview_auth.png)
+@image latex "../overview_auth.png"
 
 
 Two kinds of modules
