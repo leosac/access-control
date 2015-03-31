@@ -33,21 +33,17 @@ namespace Leosac
     namespace Module
     {
         /**
-        * Module that allows user to configure action to be taken
-        * to react to messages from other modules.
+        * Module that publish wiegand auth event on a ZMQ publisher.
         *
-        * @see @ref mod_doorman_main for end-user documentation.
+        * @see @ref mod_event_publish_main for end-user documentation.
         */
         namespace EventPublish
         {
 
-            class DoormanInstance;
-
             /**
-            * Main class for the module, it create handlers and run them
-            * to, well, handle events and send command.
+            * Run the Event publication module.
             *
-            * @see @ref mod_doorman_user_config for configuration information.
+            * @see @ref mod_event_publish_user_config for configuration information.
             */
             class EventPublish : public BaseModule
             {
@@ -80,6 +76,8 @@ namespace Leosac
                  * Publish to the internet.
                  */
                 zmqpp::socket network_pub_;
+
+                bool publish_source_;
             };
 
         }

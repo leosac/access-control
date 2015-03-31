@@ -14,10 +14,7 @@ EventPublish::EventPublish(zmqpp::context &ctx, zmqpp::socket *pipe,
         network_pub_(ctx, zmqpp::socket_type::pub)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
-    bus_sub_.subscribe("S_MY_WIEGAND_1");
-
-    network_pub_.bind("tcp://*:4243");
-
+    process_config();
     reactor_.add(bus_sub_, std::bind(&EventPublish::handle_msg_bus, this));
 }
 
@@ -40,10 +37,22 @@ void EventPublish::handle_msg_bus()
         INFO("EventPublish cannot handle this type of credential yet.");
         return;
     }
-    network_pub_.send(card);
+
+    if (publish_source_)
+        network_pub_.send(zmqpp::message() << card << src);
+    else
+        network_pub_.send(card);
 }
 
 void EventPublish::process_config()
 {
+    auto port = config_.get<int>("module_config.port");
+    network_pub_.bind("tcp://*:" + std::to_string(port));
+    publish_source_ = config_.get<bool>("module_config.publish_source", false);
 
+    for (auto && itr : config_.get_child("module_config.sources"))
+    {
+        auto name = itr.second.get<std::string>("");
+        bus_sub_.subscribe("S_" + name);
+    }
 }
