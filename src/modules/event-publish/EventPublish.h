@@ -1,0 +1,87 @@
+/*
+    Copyright (C) 2014-2015 Islog
+
+    This file is part of Leosac.
+
+    Leosac is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Leosac is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#pragma once
+
+#include <zmqpp/zmqpp.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <vector>
+#include <memory>
+#include <modules/BaseModule.hpp>
+#include <hardware/FGPIO.hpp>
+#include <tools/XmlScheduleLoader.hpp>
+#include <core/auth/AuthTarget.hpp>
+
+namespace Leosac
+{
+    namespace Module
+    {
+        /**
+        * Module that allows user to configure action to be taken
+        * to react to messages from other modules.
+        *
+        * @see @ref mod_doorman_main for end-user documentation.
+        */
+        namespace EventPublish
+        {
+
+            class DoormanInstance;
+
+            /**
+            * Main class for the module, it create handlers and run them
+            * to, well, handle events and send command.
+            *
+            * @see @ref mod_doorman_user_config for configuration information.
+            */
+            class EventPublish : public BaseModule
+            {
+            public:
+                EventPublish(zmqpp::context &ctx,
+                        zmqpp::socket *pipe,
+                        const boost::property_tree::ptree &cfg);
+
+                EventPublish(const EventPublish &) = delete;
+
+                EventPublish &operator=(const EventPublish &) = delete;
+
+                ~EventPublish() = default;
+
+            private:
+                void handle_msg_bus();
+
+                /**
+                * Processing the configuration tree, spawning AuthFileInstance object as described in the
+                * configuration file.
+                */
+                void process_config();
+
+                /**
+                 * Read internal message bus.
+                 */
+                zmqpp::socket bus_sub_;
+
+                /**
+                 * Publish to the internet.
+                 */
+                zmqpp::socket network_pub_;
+            };
+
+        }
+    }
+}

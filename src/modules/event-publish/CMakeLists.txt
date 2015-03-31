@@ -1,0 +1,14 @@
+set(EVENT_PUBLISH_BIN event-publish)
+
+set(EVENT_PUBLISH_SRCS
+    init.cpp
+    EventPublish.cpp
+)
+
+add_library(${EVENT_PUBLISH_BIN} SHARED ${EVENT_PUBLISH_SRCS})
+
+set_target_properties(${EVENT_PUBLISH_BIN} PROPERTIES
+    COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
+    )
+
+install(TARGETS ${EVENT_PUBLISH_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})
