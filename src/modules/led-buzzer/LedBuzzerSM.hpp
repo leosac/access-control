@@ -20,6 +20,7 @@
 #include <boost/msm/back/state_machine.hpp>
 #include <boost/msm/front/state_machine_def.hpp>
 #include <boost/msm/front/functor_row.hpp>
+#include <hardware/FLED.hpp>
 
 namespace Leosac
 {
@@ -64,7 +65,7 @@ namespace Leosac
                 };
 
                 /**
-                * Fired when we want to "play" a pettern
+                * Fired when we want to "play" a pattern
                 */
                 struct EventPlayingPattern
                 {
@@ -94,7 +95,6 @@ namespace Leosac
 
                     LedBuzzerSM_(Hardware::FGPIO &h) :
                             playing_pattern_(false),
-                            is_state_blinking_(false),
                             gpio_(h),
                             next_update_time_(std::chrono::system_clock::time_point::max())
                     {
@@ -175,7 +175,9 @@ namespace Leosac
                             fsm.next_update_time_ = std::chrono::system_clock::now();
                             nb_itr_ = e.duration / e.speed;
                             speed_ = e.speed;
-                            fsm.is_state_blinking_ = true;
+                            fsm.led_state_.duration = e.duration;
+                            fsm.led_state_.speed = e.speed;
+                            fsm.led_state_.st = Hardware::FLED::State::BLINKING;
                         }
 
                         // Exit action
@@ -183,7 +185,9 @@ namespace Leosac
                         void on_exit(Event const &, Fsm &fsm)
                         {
                             std::cout << "StateBlinking::on_exit()" << std::endl;
-                            fsm.is_state_blinking_ = false;
+                            // we don't know nor care what is real state. We just care
+                            // that it's not blinking anymore.
+                            fsm.led_state_.st = Hardware::FLED::State::UNKNOWN;
                         }
 
                         int speed_;
@@ -205,7 +209,7 @@ namespace Leosac
                         /**
                         * Updating PlayingPattern.
                         *
-                        * Chose to stop or setup a bliking behavior by firing an event.
+                        * Chose to stop or setup a blinking behavior by firing an event.
                         */
                         template<class Event, class Fsm, class TargetState>
                         void operator()(Event const &, Fsm &fsm, PlayingPattern &ss, TargetState &) const
@@ -286,10 +290,15 @@ namespace Leosac
                     * If we are currently blinking in pattern, this will be true
                     */
                     bool playing_pattern_;
+
                     /**
-                    * If we are blinking, this will be true
-                    */
-                    bool is_state_blinking_;
+                     * The state of the LED.
+                     * @warning It is not completely accurate ! The `duration` and `speed`
+                     * are correct, but the `value` is not, since it is not
+                     * maintained by the state machine.
+                     */
+                    Hardware::FLED::State led_state_;
+
 
                     /**
                     * Facade to the underlying gpio

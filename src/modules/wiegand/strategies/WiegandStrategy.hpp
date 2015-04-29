@@ -65,7 +65,8 @@ namespace Leosac
                 * successfully retrieve data from wiegand bits.
                 *
                 * It successfully build a card_id, or a PIN code, etc.
-                * The reader implementation will call signal() if completed() returns true.
+                * The reader implementation will call `signal()` if `completed()` returns true.
+                *
                 */
                 virtual bool completed() const = 0;
 

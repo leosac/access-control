@@ -24,10 +24,10 @@
 using namespace Leosac::Module::LedBuzzer;
 
 LedBuzzerImpl::LedBuzzerImpl(zmqpp::context &ctx,
-        std::string const &led_name,
-        std::string const &gpio_name,
-        int blink_duration,
-        int blink_speed) :
+                             std::string const &led_name,
+                             std::string const &gpio_name,
+                             int blink_duration,
+                             int blink_speed) :
         ctx_(ctx),
         frontend_(ctx, zmqpp::socket_type::rep),
         backend_(ctx, zmqpp::socket_type::req),
@@ -130,13 +130,11 @@ bool LedBuzzerImpl::start_blink(zmqpp::message *msg)
 void LedBuzzerImpl::send_state()
 {
     zmqpp::message st;
-    if (stmachine_.is_state_blinking_)
+    if (stmachine_.led_state_.st == Hardware::FLED::State::BLINKING)
     {
-        // means we are blinking
         st << "BLINKING";
-        // we are lying... but we'll tell the truth soon
-        st << static_cast<int64_t>(1000) << static_cast<int64_t>(100);
-        //	st << blink_duration_ << blink_speed_;
+        st << static_cast<int64_t>(stmachine_.led_state_.duration)
+           << static_cast<int64_t>(stmachine_.led_state_.speed);
     }
     st << (gpio_.isOn() ? "ON" : "OFF");
     frontend_.send(st);

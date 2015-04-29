@@ -133,7 +133,7 @@ namespace Leosac
                 ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             }
             ASSERT_TRUE(my_led.isOff());
-	    ASSERT_EQ(FLED::State::OFF, my_led.state().st);
+            ASSERT_EQ(FLED::State::OFF, my_led.state().st);
         }
 
         /**
@@ -160,7 +160,25 @@ namespace Leosac
             }
             ASSERT_TRUE(bus_read(bus_sub_, "S_my_gpio", "OFF"));
             ASSERT_TRUE(my_led.isOff());
-	    ASSERT_EQ(FLED::State::OFF, my_led.state().st);
+            ASSERT_EQ(FLED::State::OFF, my_led.state().st);
+        }
+
+        /**
+         * Test regression for #61
+         */
+        TEST_F(LedTest, blink3)
+        {
+            FLED my_led(ctx_, "my_led");
+            ASSERT_TRUE(my_led.isOff());
+            ASSERT_TRUE(my_led.state().st == FLED::State::OFF);
+            ASSERT_FALSE(my_led.isBlinking());
+
+            my_led.blink(100, 10);
+            ASSERT_TRUE(my_led.isBlinking());
+            ASSERT_TRUE(my_led.state().st == FLED::State::BLINKING);
+
+            ASSERT_EQ(my_led.state().duration, 100);
+            ASSERT_EQ(my_led.state().speed, 10);
         }
     }
 }

@@ -125,7 +125,7 @@ namespace Leosac
         void set_kconfig(const boost::property_tree::ptree &new_cfg);
 
         /**
-        * Returns a list of module name that should be imported.
+        * Returns a list of module name that should not be imported.
         * Imported means added or updated when a SYNC_FROM is executed.
         */
         std::list<std::string> get_non_importable_modules() const;
