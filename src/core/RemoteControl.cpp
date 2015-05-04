@@ -71,6 +71,10 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
     command_handlers_["GENERAL_CONFIG"] = std::bind(&RemoteControl::handle_general_config, this, std::placeholders::_1,
             std::placeholders::_2);
 
+    command_handlers_["CONFIG_VERSION"] = std::bind(&RemoteControl::handle_config_version,
+                                                    this, std::placeholders::_1,
+                                                    std::placeholders::_2);
+
     socket_.set(zmqpp::socket_option::curve_server, true);
     socket_.set(zmqpp::socket_option::curve_secret_key, secret_key_);
     socket_.set(zmqpp::socket_option::curve_public_key, public_key_);
@@ -89,8 +93,12 @@ void RemoteControl::handle_msg()
     msg >> source;
     rep << source;
 
+    msg.pop_front();          // otherwise getting the "User-Id" property
+    msg.reset_read_cursor();  // wont work.
+
     msg >> frame1;
     DEBUG("Remote Control command: " << frame1 << " with " << msg.parts() << " parts");
+
     std::string user_pubkey;
     bool ret = msg.get_property("User-Id", user_pubkey);
     assert(ret);
@@ -339,6 +347,19 @@ bool RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message
         ConfigManager::ConfigFormat format;
         *msg_in >> format;
         general_config(format, msg_out);
+        return true;
+    }
+    return false;
+}
+
+bool RemoteControl::handle_config_version(zmqpp::message *msg_in, zmqpp::message *msg_out)
+{
+    assert(msg_in);
+    assert(msg_out);
+
+    if (msg_in->remaining() == 0)
+    {
+        *msg_out << static_cast<uint64_t>(kernel_.config_manager().config_version());
         return true;
     }
     return false;

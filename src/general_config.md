@@ -1,6 +1,8 @@
 General Configuration Information {#general_config_main}
 ========================================================
 
+Global configuration option.
+
 [TOC]
 
 Introduction {#general_config_intro}
@@ -173,3 +175,11 @@ To do so, define a `<no_import>` tag in the config file.
 
 This will have the effect of leaving alone the configuration of Test and Reset and Another Module.
 It will not prevent the module config from being exported.
+
+Version {#version}
+==================
+
+A `version` field is configurable. This is mostly used when running a master/slave
+configuration.
+If you make a change to the configuration, and increments this `version` field,
+slave should automatically update their configuration.

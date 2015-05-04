@@ -135,6 +135,19 @@ namespace Leosac
         */
         bool is_module_importable(const std::string &) const;
 
+        /**
+         * Return the current configuration version.
+         * This is supposed to work similar to Bind9 serial.
+         *
+         * It should only ever increase.
+         */
+        uint64_t config_version() const;
+
+        /**
+         * Increment by 1 the current version number.
+         */
+        void incr_version();
+
     private:
         /**
         * Maps a module's name to a property tree object.
@@ -146,6 +159,8 @@ namespace Leosac
         * This is the base config tree.
         */
         boost::property_tree::ptree kernel_config_;
+
+        uint64_t version_;
 
     };
 }

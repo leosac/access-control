@@ -80,6 +80,14 @@ namespace Leosac
         bool handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out);
 
         /**
+         * Command handler for CONFIG_VERSION command.
+         *
+         * It shall return the current version of the configuration.
+         * This is used for synchronization purpose.
+         */
+        bool handle_config_version(zmqpp::message *msg_in, zmqpp::message *msg_out);
+
+        /**
         * Implements the module list command.
         *
         * It fetch the list of module from the module manager object.

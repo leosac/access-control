@@ -28,9 +28,10 @@
 using namespace Leosac;
 
 ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg) :
-        kernel_config_(cfg)
+        kernel_config_(cfg),
+        version_(0)
 {
-
+    version_ = cfg.get<uint64_t>("version", 0);
 }
 
 boost::property_tree::ptree ConfigManager::get_application_config()
@@ -204,4 +205,14 @@ bool ConfigManager::is_module_importable(std::string const &module_name) const
 {
     auto lst = get_non_importable_modules();
     return std::find(lst.begin(), lst.end(), module_name) == lst.end();
+}
+
+uint64_t ConfigManager::config_version() const
+{
+    return version_;
+}
+
+void ConfigManager::incr_version()
+{
+    ++version_;
 }

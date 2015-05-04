@@ -12,6 +12,7 @@ class CommandHandler(object):
         self.argv_offset = 4
 
     def handle_command(self, cmd):
+        cmd = cmd.lower()
         if (cmd == "module_list"):
             return self.handle_module_list();
         elif (cmd == "module_config"):
@@ -22,6 +23,8 @@ class CommandHandler(object):
             return self.handle_save()
         elif (cmd == "general_config"):
             return self.handle_general_config()
+        elif (cmd == "config_version"):
+            return self.handle_config_version();
         else:
             print "Non-handled command: ", cmd
 
@@ -63,6 +66,14 @@ class CommandHandler(object):
         cfg_format = struct.pack("!B", 1)
         self.socket_.send_multipart(["GENERAL_CONFIG", cfg_format])
         ret = self.socket_.recv_multipart()
+        return ret
+
+    def handle_config_version(self):
+        print "Will ask for the current configuration version"
+        self.socket_.send_multipart(["CONFIG_VERSION"])
+        ret = self.socket_.recv_multipart()
+        version = int(struct.unpack("!Q", ret[0])[0])
+        print "Configuration Version = " + str(version)
         return ret
 
 def print_usage():

@@ -105,6 +105,8 @@ You can retrieve some information about the running configuration of Leosac:
 + The `MODULE_CONFIG` command retrieve the configuration for one given module. 
 + The `SYNC_FROM` command order Leosac to fetch and apply the configuration of an other, remote, Leosac unit.
 + The `SAVE` command order the receiving Leosac to save its current configuration to disk.
++ The `CONFIG_VERSION` command returns the current serial number of the configuration. This can be
+  used to poll for config update.
 
 See below for a detailed description of messages.
 
@@ -266,3 +268,26 @@ Frame    | Content                         | Type
 ---------|---------------------------------|------------
 1        | "KO"                            | `string`
 2        | "Some reason of why it fails."  | `string`
+
+
+CONFIG_VERSION {#remote_control_config_version}
+------------------------------------------------
+
+This returns the current version number of the configuration. This number
+should ever always increase. It is used in master/slave mode to poll
+for configuration change.
+
+From Client to Server:
+
+Frame    | Content                                 | Type
+---------|-----------------------------------------|-------------------
+1        | "CONFIG_VERSION"                        | `string`
+
+
+From Server to Client:
+
+Frame    | Content                         | Type
+---------|---------------------------------|------------
+1        | 42                              | `uint64_t`
+
+This command cannot fail.
