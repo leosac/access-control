@@ -119,7 +119,8 @@ bool Kernel::run()
 
     while (is_running_)
     {
-        reactor_.poll(-1);
+        reactor_.poll(100); // this is good enough. May be improved later tho.
+        task_manager_.update();
     }
 
     if (autosave_)
@@ -361,4 +362,9 @@ void Kernel::restart_later()
 {
     want_restart_ = true;
     is_running_ = false;
+}
+
+TaskManager &Kernel::task_manager()
+{
+    return task_manager_;
 }

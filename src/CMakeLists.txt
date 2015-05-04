@@ -13,6 +13,8 @@ set(LEOSAC_LIB_SRCS
     core/RemoteControlSecurity.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
+    core/Task.cpp
+    core/TaskManager.cpp
     core/netconfig/networkconfig.cpp
     core/auth/Auth.cpp
     core/auth/Group.cpp

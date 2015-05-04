@@ -27,6 +27,7 @@
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
 #include "RemoteControl.hpp"
+#include "TaskManager.h"
 
 namespace Leosac
 {
@@ -118,7 +119,15 @@ namespace Leosac
         */
         zmqpp::context &get_context();
 
+        /**
+         * Retrieve a reference to the configuration manager object.
+         */
         ConfigManager &config_manager();
+
+        /**
+         * Retrieve a reference to the task manager object.
+         */
+        TaskManager &task_manager();
 
         /**
         * Save the current configuration to its original file if `autosave` is enabled.
@@ -170,6 +179,8 @@ namespace Leosac
         std::string get_full_config();
 
         ConfigManager config_manager_;
+
+        TaskManager  task_manager_;
 
         /**
         * The application ZMQ context.

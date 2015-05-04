@@ -28,6 +28,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/archive/text_oarchive.hpp>
+#include "Task.h"
 
 using namespace Leosac;
 
@@ -310,6 +311,8 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
         *msg_in >> sync_general_config;
         sync_from(endpoint, remote_server_pubkey, sync_general_config, msg_out);
 
+        
+
         if (autocommit)
         {
             INFO("Saving configuration to disk after synchronization.");
@@ -356,6 +359,9 @@ bool RemoteControl::handle_config_version(zmqpp::message *msg_in, zmqpp::message
 {
     assert(msg_in);
     assert(msg_out);
+
+    TaskPtr t = std::make_shared<Task>();
+    kernel_.task_manager().schedule(t);
 
     if (msg_in->remaining() == 0)
     {
