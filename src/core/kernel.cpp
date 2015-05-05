@@ -119,8 +119,11 @@ bool Kernel::run()
 
     while (is_running_)
     {
-        reactor_.poll(100); // this is good enough. May be improved later tho.
-        task_manager_.update();
+        reactor_.poll(25); // this is good enough. May be improved later tho.
+        sched_.update(TargetThread::MAIN);
+
+        if (remote_controller_)
+            remote_controller_->update();
     }
 
     if (autosave_)
@@ -364,7 +367,7 @@ void Kernel::restart_later()
     is_running_ = false;
 }
 
-TaskManager &Kernel::task_manager()
+Scheduler &Kernel::scheduler()
 {
-    return task_manager_;
+    return sched_;
 }

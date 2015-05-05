@@ -19,22 +19,25 @@
 
 #pragma once
 
-#include <list>
-#include "LeosacFwd.hpp"
+#include <zmqpp/context.hpp>
+#include "core/tasks/Task.hpp"
 
 namespace Leosac
 {
-
-    class TaskManager
+    namespace Tasks
     {
-    public:
-        void update();
 
-        void schedule(const TaskPtr &task);
+        class SyncFrom : public Task
+        {
+        public:
+            SyncFrom(zmqpp::context &ctx,
+                     const std::string &endpoint,
+                     const std::string &remote_server_pk,
+                     bool sync_general_cfg);
 
-    private:
-        std::list<TaskPtr> tasks_;
-        mutable std::mutex mutex_;
-    };
+        private:
+            virtual void do_run();
+        };
 
+    }
 }

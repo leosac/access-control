@@ -17,14 +17,20 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
-#include <tools/log.hpp>
-#include "Task.h"
+#include "SyncFrom.h"
 
-using namespace Leosac;
+using namespace Leosac::Tasks;
 
-bool Task::is_complete() const
+SyncFrom::SyncFrom(zmqpp::context &ctx,
+                   const std::string &endpoint,
+                   const std::string &remote_server_pk,
+                   bool sync_general_cfg)
 {
-    assert(my_future.valid());
-    return my_future.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
+
+}
+
+void SyncFrom::do_run()
+{
+
+
 }

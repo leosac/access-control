@@ -23,8 +23,14 @@
 
 namespace Leosac
 {
-    class Task;
-    class TaskManager;
+    class Scheduler;
 
-    using TaskPtr = std::shared_ptr<Task>;
+    namespace Tasks
+    {
+        class Task;
+        using TaskPtr = std::shared_ptr<Task>;
+
+        class SyncFrom;
+        using SyncFromUPtr = std::unique_ptr<SyncFrom>;
+    }
 }

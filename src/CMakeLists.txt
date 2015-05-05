@@ -13,8 +13,8 @@ set(LEOSAC_LIB_SRCS
     core/RemoteControlSecurity.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
-    core/Task.cpp
-    core/TaskManager.cpp
+    core/Scheduler.cpp
+    core/tasks/Task.cpp
     core/netconfig/networkconfig.cpp
     core/auth/Auth.cpp
     core/auth/Group.cpp
@@ -45,6 +45,7 @@ set(LEOSAC_LIB_SRCS
     tools/XmlPropertyTree.cpp
     tools/XmlScheduleLoader.cpp
     tools/gettid.cpp
+    core/tasks/SyncFrom.cpp
 )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)

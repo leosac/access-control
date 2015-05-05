@@ -27,7 +27,7 @@
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
 #include "RemoteControl.hpp"
-#include "TaskManager.h"
+#include "Scheduler.hpp"
 
 namespace Leosac
 {
@@ -125,9 +125,9 @@ namespace Leosac
         ConfigManager &config_manager();
 
         /**
-         * Retrieve a reference to the task manager object.
+         * Retrieve a reference to the scheduler object.
          */
-        TaskManager &task_manager();
+        Scheduler &scheduler();
 
         /**
         * Save the current configuration to its original file if `autosave` is enabled.
@@ -180,7 +180,7 @@ namespace Leosac
 
         ConfigManager config_manager_;
 
-        TaskManager  task_manager_;
+        Scheduler  sched_;
 
         /**
         * The application ZMQ context.
