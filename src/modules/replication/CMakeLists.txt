@@ -1,0 +1,14 @@
+set(REPLICATION_BIN replication)
+
+set(REPLICATION_SRCS
+    init.cpp
+    ReplicationModule.cpp
+)
+
+add_library(${REPLICATION_BIN} SHARED ${REPLICATION_SRCS})
+
+set_target_properties(${REPLICATION_BIN} PROPERTIES
+    COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
+    )
+
+install(TARGETS ${REPLICATION_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})
