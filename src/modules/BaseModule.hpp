@@ -21,6 +21,7 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <tools/gettid.hpp>
 #include "tools/log.hpp"
 #include "core/config/ConfigManager.hpp"
 
@@ -46,7 +47,7 @@ namespace Leosac
         {
             {
                 UserModule module(zmq_ctx, pipe, cfg);
-                INFO("Module " << get_module_name() << " is now initialized.");
+                INFO("Module " << get_module_name() << " is now initialized. Thread id = " << Leosac::gettid());
                 pipe->send(zmqpp::signal::ok);
 
                 module.run();

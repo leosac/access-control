@@ -21,6 +21,7 @@
 #include "tools/unixfs.hpp"
 #include "tools/log.hpp"
 #include "exception/ExceptionsTools.hpp"
+#include "tools/gettid.hpp"
 
 using Leosac::Tools::UnixFs;
 

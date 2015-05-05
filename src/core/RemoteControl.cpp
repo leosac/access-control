@@ -360,8 +360,8 @@ bool RemoteControl::handle_config_version(zmqpp::message *msg_in, zmqpp::message
     assert(msg_in);
     assert(msg_out);
 
-    TaskPtr t = std::make_shared<Task>();
-    kernel_.task_manager().schedule(t);
+//    TaskPtr t = std::make_shared<Task>();
+  //  kernel_.task_manager().schedule(t);
 
     if (msg_in->remaining() == 0)
     {

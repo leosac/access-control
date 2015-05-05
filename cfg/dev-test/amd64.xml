@@ -20,7 +20,20 @@
     </remote>
 
     <modules>
-        <module>
+
+      <module>
+	<name>REPLICATION</name>
+	<file>libreplication.so</file>
+	<level>11</level>
+	<module_config>
+	  <delay>42</delay>
+	  <endpoint>qqeq</endpoint>
+	  <pubkey>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</pubkey>
+	</module_config>
+      </module>
+
+      
+      <module>
             <name>STDIN_CONTROLLER</name>
             <file>libstdin-controller.so</file>
             <level>40</level>

@@ -44,6 +44,7 @@ set(LEOSAC_LIB_SRCS
     tools/Schedule.cpp
     tools/XmlPropertyTree.cpp
     tools/XmlScheduleLoader.cpp
+    tools/gettid.cpp
 )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
