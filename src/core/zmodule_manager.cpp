@@ -21,9 +21,10 @@
 #include "tools/unixfs.hpp"
 #include "tools/log.hpp"
 #include "exception/ExceptionsTools.hpp"
-#include "tools/gettid.hpp"
+#include "core/kernel.hpp"
 
 using Leosac::Tools::UnixFs;
+using namespace Leosac;
 
 void zModuleManager::unloadLibraries()
 {
@@ -75,12 +76,13 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
         void *symptr = modinfo->lib_->getSymbol("start_module");
         assert(symptr);
         // take the module init function and make a std::function out of it.
-        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)> actor_fun =
-                ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &)) symptr);
+        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, Scheduler &)> actor_fun =
+                ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, Scheduler &)) symptr);
 
         auto new_module = std::unique_ptr<zmqpp::actor>(new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
                 config_manager_.load_config(modinfo->name_),
-                std::ref(ctx_))));
+                std::ref(ctx_),
+                std::ref(scheduler_))));
         modinfo->actor_ = std::move(new_module);
 
         INFO("Module {" << modinfo->name_ << "} initialized. (level = " <<
@@ -218,9 +220,10 @@ zModuleManager::~zModuleManager()
     }
 }
 
-zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::ConfigManager &cfg_mgr) :
+zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
         ctx_(ctx),
-        config_manager_(cfg_mgr)
+        config_manager_(k.config_manager()),
+        scheduler_(k.scheduler())
 {
 
 }

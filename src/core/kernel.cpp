@@ -37,13 +37,14 @@ using namespace Leosac;
 
 Kernel::Kernel(const boost::property_tree::ptree &config) :
         config_manager_(config),
+        sched_(this),
         ctx_(),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
         bus_push_(ctx_, zmqpp::socket_type::push),
         is_running_(true),
         want_restart_(false),
-        module_manager_(ctx_, config_manager_),
+        module_manager_(ctx_, *this),
         network_config_(nullptr),
         remote_controller_(nullptr),
         autosave_(false)

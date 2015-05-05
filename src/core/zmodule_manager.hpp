@@ -28,6 +28,7 @@
 #include "dynlib/dynamiclibrary.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "core/config/ConfigManager.hpp"
+#include "LeosacFwd.hpp"
 
 namespace Leosac
 {
@@ -53,7 +54,7 @@ public:
     * Construct the module manager.
     * @param ctx the zeroMQ context to pass around to module.
     */
-    zModuleManager(zmqpp::context &ctx, Leosac::ConfigManager &cfg_mgr);
+    zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k);
 
     ~zModuleManager();
 
@@ -208,5 +209,6 @@ private:
     std::set<ModuleInfo> modules_;
 
     zmqpp::context &ctx_;
+    Leosac::Scheduler     &scheduler_;
     Leosac::ConfigManager &config_manager_;
 };

@@ -22,6 +22,7 @@
 #include "helper/TestHelper.hpp"
 #include "hardware/FLED.hpp"
 #include "tools/runtimeoptions.hpp"
+#include "core/Scheduler.hpp"
 
 using namespace Leosac::Module::LedBuzzer;
 using namespace Leosac::Test::Helper;
@@ -50,7 +51,8 @@ namespace Leosac
                 cfg.add("name", "LED_BUZZER");
                 cfg.add_child("module_config", module_cfg);
 
-                return test_run_module<LEDBuzzerModule>(&ctx_, pipe, cfg);
+
+                return test_run_module<LEDBuzzerModule>(&ctx_, pipe, cfg, sched_);
             }
 
         public:
@@ -58,7 +60,8 @@ namespace Leosac
             LedTest() :
                     TestHelper(),
                     gpio_(ctx_, "my_gpio"),
-                    gpio_actor_(std::bind(&FakeGPIO::run, &gpio_, std::placeholders::_1))
+                    gpio_actor_(std::bind(&FakeGPIO::run, &gpio_, std::placeholders::_1)),
+                    sched_(nullptr)
             {
                 bus_sub_.subscribe("");
             }
@@ -71,6 +74,8 @@ namespace Leosac
 
             // to allow the fake gpio to react to command.
             zmqpp::actor gpio_actor_;
+
+            Scheduler sched_;
         };
 
         TEST_F(LedTest, turnOn)

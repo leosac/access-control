@@ -19,19 +19,23 @@
 
 #pragma once
 
-#include <memory>
+#include "Task.hpp"
 
 namespace Leosac
 {
-    class Kernel;
-    class Scheduler;
-
     namespace Tasks
     {
-        class Task;
-        using TaskPtr = std::shared_ptr<Task>;
+        /**
+         * Run in the main thread and retrieve the current configuration version.
+         */
+        class GetLocalConfigVersion : public Task
+        {
+        public:
+            GetLocalConfigVersion();
 
-        class SyncFrom;
-        using SyncFromUPtr = std::unique_ptr<SyncFrom>;
+        private:
+            virtual void do_run() override;
+        };
     }
 }
+

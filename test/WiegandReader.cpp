@@ -20,6 +20,7 @@
 #include <tools/runtimeoptions.hpp>
 #include <modules/wiegand/wiegand.hpp>
 #include <core/auth/Auth.hpp>
+#include <core/Scheduler.hpp>
 #include "helper/TestHelper.hpp"
 
 using namespace Leosac::Module::Wiegand;
@@ -46,7 +47,7 @@ namespace Leosac
                 cfg.add("name", "WIEGAND_READER");
                 cfg.add_child("module_config", module_cfg);
 
-                return test_run_module<WiegandReaderModule>(&ctx_, pipe, cfg);
+                return test_run_module<WiegandReaderModule>(&ctx_, pipe, cfg, sched_);
             }
 
         public:
@@ -54,7 +55,8 @@ namespace Leosac
             WiegandReaderTest() :
                     TestHelper(),
                     high_(ctx_, "GPIO_HIGH"),
-                    low_(ctx_, "GPIO_LOW")
+                    low_(ctx_, "GPIO_LOW"),
+                    sched_(nullptr)
             {
                 bus_sub_.subscribe("S_WIEGAND_1");
             }
@@ -65,7 +67,7 @@ namespace Leosac
 
             FakeGPIO high_;
             FakeGPIO low_;
-
+            Scheduler sched_;
         };
 
         TEST_F(WiegandReaderTest, readCard)

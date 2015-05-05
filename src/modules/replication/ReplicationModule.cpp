@@ -18,7 +18,9 @@
 */
 
 #include <tools/log.hpp>
+#include <core/tasks/GetLocalConfigVersion.h>
 #include "ReplicationModule.hpp"
+#include "core/Scheduler.hpp"
 
 using namespace Leosac::Module::Replication;
 
@@ -57,5 +59,9 @@ void ReplicationModule::process_config()
 
 void ReplicationModule::replicate()
 {
-    DEBUG("REPLICATING");
+    auto task = std::make_shared<Tasks::GetLocalConfigVersion>();
+    scheduler_.enqueue(task, TargetThread::MAIN);
+
+    task->wait();
+    DEBUG("REPLICATING " << Leosac::gettid());
 }

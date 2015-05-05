@@ -36,10 +36,11 @@ namespace Leosac
             * This runs in "module"'s thread.
             */
             template<typename ModuleType>
-            bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg)
+            bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg,
+                                 Scheduler &sched)
             {
                 {
-                    ModuleType module(*ctx, pipe, cfg);
+                    ModuleType module(*ctx, pipe, cfg, sched);
 
                     pipe->send(zmqpp::signal::ok);
                     module.run();

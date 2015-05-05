@@ -22,6 +22,7 @@
 #include <modules/rpleth/rplethprotocol.hpp>
 #include <tools/log.hpp>
 #include <core/auth/Auth.hpp>
+#include <core/Scheduler.hpp>
 #include "helper/TestHelper.hpp"
 #include "helper/FakeWiegandReader.hpp"
 
@@ -46,12 +47,13 @@ namespace Leosac
 
                 cfg.add("name", "RPLETH");
                 cfg.add_child("module_config", module_cfg);
-                return test_run_module<RplethModule>(&ctx_, pipe, cfg);
+                return test_run_module<RplethModule>(&ctx_, pipe, cfg, sched_);
             }
 
             RplethTest() :
                     w1(ctx_, "WIEGAND1"),
-                    w1_actor(std::bind(&FakeWiegandReader::run, &w1, std::placeholders::_1))
+                    w1_actor(std::bind(&FakeWiegandReader::run, &w1, std::placeholders::_1)),
+                    sched_(nullptr)
             {
             }
 
@@ -109,6 +111,7 @@ namespace Leosac
             FakeWiegandReader w1;
             // to run the fake reader in a thread.
             zmqpp::actor w1_actor;
+            Scheduler sched_;
         };
 
         TEST(Rpleth, TestConvertCard)
