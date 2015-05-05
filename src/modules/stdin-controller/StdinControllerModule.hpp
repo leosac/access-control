@@ -30,7 +30,10 @@ namespace Leosac
         {
 
         public:
-            StdinControllerModule(zmqpp::context &ctx, zmqpp::socket *pipe, boost::property_tree::ptree const &cfg);
+            StdinControllerModule(zmqpp::context &ctx,
+                                  zmqpp::socket *pipe,
+                                  boost::property_tree::ptree const &cfg,
+                                  Scheduler &sched);
 
             /**
             * We can read from standard input;
@@ -42,7 +45,8 @@ namespace Leosac
             * Send the request to the target and handle the response.
             * Return false if no response in 1s.
             */
-            bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1);
+            bool send_request(std::shared_ptr<zmqpp::socket> target,
+                              const std::string &cmd1);
 
         private:
             // map a device name or anything that can be a target for a command to socket that are connected to it.

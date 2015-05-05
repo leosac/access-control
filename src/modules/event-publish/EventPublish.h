@@ -50,7 +50,8 @@ namespace Leosac
             public:
                 EventPublish(zmqpp::context &ctx,
                         zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg);
+                        const boost::property_tree::ptree &cfg,
+                        Scheduler &sched);
 
                 EventPublish(const EventPublish &) = delete;
 

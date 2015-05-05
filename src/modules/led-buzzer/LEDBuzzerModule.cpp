@@ -24,9 +24,10 @@
 using namespace Leosac::Module::LedBuzzer;
 
 LEDBuzzerModule::LEDBuzzerModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        boost::property_tree::ptree const &cfg) :
-        BaseModule(ctx, pipe, cfg)
+                                 zmqpp::socket *pipe,
+                                 boost::property_tree::ptree const &cfg,
+                                 Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched)
 {
     process_config();
     for (auto &led : leds_)

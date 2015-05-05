@@ -180,6 +180,9 @@ namespace Leosac
 
         ConfigManager config_manager_;
 
+        /**
+         * Scheduler object, allows anyone to queue task.
+         */
         Scheduler  sched_;
 
         /**

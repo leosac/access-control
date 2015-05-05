@@ -28,7 +28,6 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <boost/archive/text_oarchive.hpp>
-#include "Task.h"
 
 using namespace Leosac;
 

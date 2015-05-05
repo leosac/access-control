@@ -43,8 +43,9 @@ namespace Leosac
             {
             public:
                 PFDigitalModule(zmqpp::context &ctx,
-                        zmqpp::socket *module_manager_pipe,
-                        const boost::property_tree::ptree &config);
+                                zmqpp::socket *module_manager_pipe,
+                                const boost::property_tree::ptree &config,
+                                Scheduler &sched);
 
                 /**
                 * Module's main loop.

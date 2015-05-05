@@ -33,6 +33,13 @@ namespace Leosac
     class Scheduler
     {
     public:
+        Scheduler()                             = default;
+
+        Scheduler(const Scheduler &)            = delete;
+        Scheduler(Scheduler &&)                 = delete;
+        Scheduler &operator=(const Scheduler &) = delete;
+        Scheduler &operator=(Scheduler &&)      = delete;
+        
         /**
          * Enqueue a task, a schedule to run on thread `policy`.
          */

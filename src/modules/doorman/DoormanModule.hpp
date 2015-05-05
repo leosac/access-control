@@ -53,8 +53,9 @@ namespace Leosac
             {
             public:
                 DoormanModule(zmqpp::context &ctx,
-                        zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg);
+                              zmqpp::socket *pipe,
+                              const boost::property_tree::ptree &cfg,
+                              Scheduler &sched);
 
                 DoormanModule(const DoormanModule &) = delete;
 

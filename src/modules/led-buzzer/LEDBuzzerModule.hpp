@@ -54,7 +54,8 @@ namespace Leosac
             public:
                 LEDBuzzerModule(zmqpp::context &ctx,
                         zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg);
+                        const boost::property_tree::ptree &cfg,
+                        Scheduler &sched);
 
                 virtual ~LEDBuzzerModule() = default;
 

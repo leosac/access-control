@@ -23,8 +23,9 @@ using namespace Leosac::Module::Auth;
 
 AuthFileModule::AuthFileModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg)
+        const boost::property_tree::ptree &cfg,
+        Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched)
 {
     process_config();
 

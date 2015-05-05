@@ -30,8 +30,9 @@ TestAndResetModule::~TestAndResetModule()
 
 TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg),
+        const boost::property_tree::ptree &cfg,
+        Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched),
         kernel_sock_(ctx, zmqpp::socket_type::req),
         sub_(ctx, zmqpp::socket_type::sub),
         test_led_(nullptr),

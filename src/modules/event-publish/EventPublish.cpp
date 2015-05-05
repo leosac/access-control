@@ -8,8 +8,9 @@
 using namespace Leosac::Module::EventPublish;
 
 EventPublish::EventPublish(zmqpp::context &ctx, zmqpp::socket *pipe,
-                           const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg),
+                           const boost::property_tree::ptree &cfg,
+                           Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched),
         bus_sub_(ctx, zmqpp::socket_type::sub),
         network_pub_(ctx, zmqpp::socket_type::pub)
 {

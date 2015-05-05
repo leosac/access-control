@@ -36,9 +36,11 @@ using namespace Leosac::Module::Piface;
 * This function is the entry point of the PifaceDigital module.
 * @see PFDigitalModule description.
 */
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
-        zmqpp::context &zmq_ctx)
+extern "C" __attribute__((visibility("default")))
+bool start_module(zmqpp::socket *pipe,
+                  boost::property_tree::ptree cfg,
+                  zmqpp::context &zmq_ctx,
+                  Leosac::Scheduler &sched)
 {
     // this thread need realtime priority so it doesn't miss interrupt.
     struct sched_param p;
@@ -47,9 +49,11 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
 
     if (ret != 0)
     {
-        WARN("Setting realtime priority for " << get_module_name() << " module failed. " <<
-        "The program will keep running but could encounter issues like missing some Wiegand bits.");
+        WARN("Setting realtime priority for " << get_module_name() <<
+             " module failed. " <<
+             "The program will keep running but could encounter issues like missing some Wiegand bits.");
     }
 
-    return Leosac::Module::start_module_helper<PFDigitalModule>(pipe, cfg, zmq_ctx);
+    return Leosac::Module::start_module_helper<PFDigitalModule>(pipe, cfg, zmq_ctx,
+                                                                sched);
 }

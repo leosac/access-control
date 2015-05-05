@@ -27,9 +27,10 @@
 using namespace Leosac::Module::Piface;
 
 PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
-        zmqpp::socket *module_manager_pipe,
-        const boost::property_tree::ptree &config)
-        : BaseModule(ctx, module_manager_pipe, config),
+                                 zmqpp::socket *module_manager_pipe,
+                                 const boost::property_tree::ptree &config,
+                                 Scheduler &sched)
+        : BaseModule(ctx, module_manager_pipe, config, sched),
           bus_push_(ctx_, zmqpp::socket_type::push)
 {
     if (pifacedigital_open(0) == -1)

@@ -24,6 +24,7 @@
 #include <tools/gettid.hpp>
 #include "tools/log.hpp"
 #include "core/config/ConfigManager.hpp"
+#include "LeosacFwd.hpp"
 
 extern "C"
 {
@@ -42,12 +43,14 @@ namespace Leosac
         */
         template<typename UserModule>
         bool start_module_helper(zmqpp::socket *pipe,
-                boost::property_tree::ptree cfg,
-                zmqpp::context &zmq_ctx)
+                                 boost::property_tree::ptree cfg,
+                                 zmqpp::context &zmq_ctx,
+                                 Scheduler &sched)
         {
             {
-                UserModule module(zmq_ctx, pipe, cfg);
-                INFO("Module " << get_module_name() << " is now initialized. Thread id = " << Leosac::gettid());
+                UserModule module(zmq_ctx, pipe, cfg, sched);
+                INFO("Module " << get_module_name() <<
+                     " is now initialized. Thread id = " << Leosac::gettid());
                 pipe->send(zmqpp::signal::ok);
 
                 module.run();
@@ -99,8 +102,9 @@ namespace Leosac
             * Constructor of BaseModule. It will register the pipe_ to reactor_.
             */
             BaseModule(zmqpp::context &ctx,
-                    zmqpp::socket *pipe,
-                    const boost::property_tree::ptree &cfg);
+                       zmqpp::socket *pipe,
+                       const boost::property_tree::ptree &cfg,
+                       Scheduler &sched);
 
             virtual ~BaseModule() = default;
 
@@ -144,7 +148,8 @@ namespace Leosac
             * This method calls the `dump_additional_config()` method.
             * @param out_msg MUST not be null.
             */
-           void dump_config(ConfigManager::ConfigFormat fmt, zmqpp::message *out_msg) const;
+            void dump_config(ConfigManager::ConfigFormat fmt,
+                             zmqpp::message *out_msg) const;
 
             /**
             * A reference to the ZeroMQ context in case you need it to create additional socket.
@@ -160,6 +165,11 @@ namespace Leosac
             * The configuration tree passed to the `start_module` function.
             */
             boost::property_tree::ptree config_;
+
+            /**
+             * A reference to the core scheduler.
+             */
+            Scheduler &scheduler_;
 
             /**
             * Boolean indicating whether the main loop should run or not.

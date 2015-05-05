@@ -44,8 +44,9 @@ namespace Leosac
             {
             public:
                 RplethModule(zmqpp::context &ctx,
-                        zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg);
+                             zmqpp::socket *pipe,
+                             const boost::property_tree::ptree &cfg,
+                             Scheduler &sched);
 
                 ~RplethModule();
 
@@ -60,7 +61,8 @@ namespace Leosac
                 * @param dest destination vector for binary version (cannot be null)
                 * @returns true if conversion went well. false otherwise
                 */
-                static bool card_convert_from_text(std::pair<std::string, int> card_info, std::vector<uint8_t> *dest);
+                static bool card_convert_from_text(std::pair<std::string, int> card_info,
+                                                   std::vector<uint8_t> *dest);
 
             private:
                 void process_config();
@@ -89,7 +91,8 @@ namespace Leosac
                 * and report a failed client by returning false. Message from failed client are ignored until reception of
                 * disconnection notification.
                 */
-                bool handle_client_msg(const std::string &client_identity, CircularBuffer &buf);
+                bool handle_client_msg(const std::string &client_identity,
+                                       CircularBuffer &buf);
 
                 /**
                 * If we successfully built a packet, lets handle it.

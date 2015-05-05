@@ -39,6 +39,7 @@ namespace Leosac
         namespace SysFsGpio
         {
             class SysFsGpioPin;
+
             class SysFsGpioConfig;
 
             /**
@@ -49,12 +50,14 @@ namespace Leosac
             {
             public:
                 SysFsGpioModule(zmqpp::context &ctx,
-                        zmqpp::socket *module_manager_pipe,
-                        const boost::property_tree::ptree &config);
+                                zmqpp::socket *module_manager_pipe,
+                                const boost::property_tree::ptree &config,
+                                Scheduler &sched);
 
                 ~SysFsGpioModule();
 
                 SysFsGpioModule(const SysFsGpioModule &) = delete;
+
                 SysFsGpioModule &operator=(SysFsGpioModule &&) = delete;
 
                 /**

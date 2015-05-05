@@ -28,11 +28,13 @@ using namespace Leosac::Module;
 using namespace Leosac::Tools;
 
 BaseModule::BaseModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        boost::property_tree::ptree const &cfg) :
+                       zmqpp::socket *pipe,
+                       boost::property_tree::ptree const &cfg,
+                       Scheduler &sched) :
         ctx_(ctx),
         pipe_(*pipe),
         config_(cfg),
+        scheduler_(sched),
         is_running_(true),
         control_(ctx, zmqpp::socket_type::rep)
 {
@@ -65,11 +67,13 @@ void BaseModule::handle_pipe()
     {
         ERROR("Module receive a message on its pipe that wasn't a signal. Aborting.");
         assert(0);
-        throw std::runtime_error("Module receive a message on its pipe that wasn't a signal. Aborting.");
+        throw std::runtime_error(
+                "Module receive a message on its pipe that wasn't a signal. Aborting.");
     }
 }
 
-void BaseModule::dump_config(ConfigManager::ConfigFormat fmt, zmqpp::message *out_msg) const
+void BaseModule::dump_config(ConfigManager::ConfigFormat fmt,
+                             zmqpp::message *out_msg) const
 {
     assert(out_msg);
     if (fmt == ConfigManager::ConfigFormat::BOOST_ARCHIVE)

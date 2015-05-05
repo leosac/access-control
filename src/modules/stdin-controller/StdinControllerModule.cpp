@@ -3,9 +3,10 @@
 using namespace Leosac::Module;
 
 StdinControllerModule::StdinControllerModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        boost::property_tree::ptree const &cfg)
-        : BaseModule(ctx, pipe, cfg)
+                                             zmqpp::socket *pipe,
+                                             boost::property_tree::ptree const &cfg,
+                                             Scheduler &sched)
+        : BaseModule(ctx, pipe, cfg, sched)
 {
     reactor_.add(0, std::bind(&StdinControllerModule::handleStdin, this));
 }
@@ -26,7 +27,8 @@ void StdinControllerModule::handleStdin()
     {
         if (endpoints_.count(target) == 0)
         {
-            endpoints_[target] = std::shared_ptr<zmqpp::socket>(new zmqpp::socket(ctx_, zmqpp::socket_type::req));
+            endpoints_[target] = std::shared_ptr<zmqpp::socket>(
+                    new zmqpp::socket(ctx_, zmqpp::socket_type::req));
             endpoints_[target]->connect("inproc://" + target);
         }
 
@@ -39,7 +41,8 @@ void StdinControllerModule::handleStdin()
     }
 }
 
-bool StdinControllerModule::send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1)
+bool StdinControllerModule::send_request(std::shared_ptr<zmqpp::socket> target,
+                                         const std::string &cmd1)
 {
 
     target->send(cmd1);

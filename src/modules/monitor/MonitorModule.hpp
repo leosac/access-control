@@ -40,12 +40,16 @@ namespace Leosac
             {
             public:
                 MonitorModule(zmqpp::context &ctx,
-                        zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg);
-                
+                              zmqpp::socket *pipe,
+                              const boost::property_tree::ptree &cfg,
+                              Scheduler &sched);
+
                 MonitorModule(const MonitorModule &) = delete;
+
                 MonitorModule(MonitorModule &&) = delete;
+
                 MonitorModule &operator=(const MonitorModule &) = delete;
+
                 MonitorModule &operator=(MonitorModule &&) = delete;
 
                 virtual void run() override;

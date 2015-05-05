@@ -122,8 +122,8 @@ bool Kernel::run()
         reactor_.poll(25); // this is good enough. May be improved later tho.
         sched_.update(TargetThread::MAIN);
 
-        if (remote_controller_)
-            remote_controller_->update();
+//        if (remote_controller_)
+  //          remote_controller_->update();
     }
 
     if (autosave_)

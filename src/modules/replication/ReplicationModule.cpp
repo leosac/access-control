@@ -23,9 +23,10 @@
 using namespace Leosac::Module::Replication;
 
 ReplicationModule::ReplicationModule(zmqpp::context &ctx,
-                        zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg),
+                                     zmqpp::socket *pipe,
+                                     const boost::property_tree::ptree &cfg,
+                                     Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched),
         last_sync_(TimePoint::max())
 {
     process_config();

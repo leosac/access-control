@@ -26,9 +26,10 @@ using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;
 
 DoormanModule::DoormanModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg)
+                             zmqpp::socket *pipe,
+                             const boost::property_tree::ptree &cfg,
+                             Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched)
 {
     try
     {
@@ -36,13 +37,14 @@ DoormanModule::DoormanModule(zmqpp::context &ctx,
     }
     catch (boost::property_tree::ptree_error &e)
     {
-        std::throw_with_nested(ConfigException("main", "Doorman module configuration is invalid"));
+        std::throw_with_nested(
+                ConfigException("main", "Doorman module configuration is invalid"));
     }
 
     for (auto &&doorman : doormen_)
     {
         reactor_.add(doorman->bus_sub(),
-                std::bind(&DoormanInstance::handle_bus_msg, doorman));
+                     std::bind(&DoormanInstance::handle_bus_msg, doorman));
     }
 }
 
@@ -77,7 +79,8 @@ void DoormanModule::process_config()
             std::string on_status;
 
             on_status = cfg_action.get<std::string>("on");
-            a.on_ = (on_status == "GRANTED" ? AccessStatus::GRANTED : AccessStatus::DENIED);
+            a.on_ = (on_status == "GRANTED" ? AccessStatus::GRANTED
+                                            : AccessStatus::DENIED);
             a.target_ = cfg_action.get<std::string>("target");
             for (auto &cmd_node : cfg_action.get_child("cmd"))
             {
@@ -91,7 +94,8 @@ void DoormanModule::process_config()
 
         INFO("Creating Doorman instance " << doorman_name);
         doormen_.push_back(std::make_shared<DoormanInstance>(*this, ctx_,
-                doorman_name, auth_ctx_names, actions));
+                                                             doorman_name, auth_ctx_names,
+                                                             actions));
     }
 }
 
@@ -147,7 +151,8 @@ void DoormanModule::update()
     {
         if (door->is_always_open(now) && door->is_always_closed(now))
         {
-            WARN("Oops, door " << door->name() << " is both always open and always close at the same time.");
+            WARN("Oops, door " << door->name() <<
+                 " is both always open and always close at the same time.");
             continue;
         }
         if (door->is_always_open(now) && !door->gpio()->isOn())

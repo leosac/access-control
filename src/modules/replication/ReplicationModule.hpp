@@ -41,7 +41,8 @@ namespace Leosac
             public:
                 ReplicationModule(zmqpp::context &ctx,
                         zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg);
+                        const boost::property_tree::ptree &cfg,
+                        Scheduler &sched);
 
                 ReplicationModule(const ReplicationModule &)            = delete;
                 ReplicationModule(ReplicationModule &&)                 = delete;

@@ -23,6 +23,10 @@ namespace Leosac
         {
         public:
             Task();
+            Task(const Task &)              = delete;
+            Task(Task &&)                   = delete;
+            Task &operator=(const Task &)   = delete;
+            Task &operator=(Task &&)        = delete;
 
             /**
              * Has the tasks completed its execution.

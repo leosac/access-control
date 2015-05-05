@@ -33,10 +33,12 @@ const char *get_module_name()
 *
 * do signaling when ready
 */
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
-        zmqpp::context &zmq_ctx)
+extern "C" __attribute__((visibility("default")))
+bool start_module(zmqpp::socket *pipe,
+                  boost::property_tree::ptree cfg,
+                  zmqpp::context &zmq_ctx,
+                  Leosac::Scheduler &sched)
 {
     using namespace Leosac::Module;
-    return start_module_helper<StdinControllerModule>(pipe, cfg, zmq_ctx);
+    return start_module_helper<StdinControllerModule>(pipe, cfg, zmq_ctx, sched);
 }

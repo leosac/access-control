@@ -30,9 +30,10 @@ using Leosac::Tools::UnixFs;
 
 
 SysFsGpioModule::SysFsGpioModule(zmqpp::context &ctx,
-        zmqpp::socket *module_manager_pipe,
-        const boost::property_tree::ptree &config)
-        : BaseModule(ctx, module_manager_pipe, config),
+                                 zmqpp::socket *module_manager_pipe,
+                                 const boost::property_tree::ptree &config,
+                                 Scheduler &sched)
+        : BaseModule(ctx, module_manager_pipe, config, sched),
           bus_push_(ctx_, zmqpp::socket_type::push),
           general_cfg_(nullptr)
 {
@@ -68,7 +69,8 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
         gpio_initial_value = gpio_cfg.get<bool>("value", false);
 
-        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction);
+        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no <<
+             ". direction = " << gpio_direction);
 
         export_gpio(gpio_no);
 
@@ -81,9 +83,11 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         else if (gpio_interrupt == "rising")
             interrupt_mode = SysFsGpioPin::InterruptMode::Rising;
 
-        direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In : SysFsGpioPin::Direction::Out);
-        gpios_.push_back(new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, interrupt_mode,
-                gpio_initial_value, *this));
+        direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In
+                                            : SysFsGpioPin::Direction::Out);
+        gpios_.push_back(
+                new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, interrupt_mode,
+                                 gpio_initial_value, *this));
     }
 }
 

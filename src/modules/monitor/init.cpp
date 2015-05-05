@@ -56,10 +56,12 @@ const char *get_module_name()
 /**
 * This is the entry point of the Monitor module.
 */
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
-        zmqpp::context &zmq_ctx)
+extern "C" __attribute__((visibility("default")))
+bool start_module(zmqpp::socket *pipe,
+                  boost::property_tree::ptree cfg,
+                  zmqpp::context &zmq_ctx,
+                  Leosac::Scheduler &sched)
 {
     logger_guard g({"system_bus_event", "monitor_stdout"});
-    return Leosac::Module::start_module_helper<MonitorModule>(pipe, cfg, zmq_ctx);
+    return Leosac::Module::start_module_helper<MonitorModule>(pipe, cfg, zmq_ctx, sched);
 }

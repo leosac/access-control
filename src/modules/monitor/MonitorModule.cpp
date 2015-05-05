@@ -34,9 +34,10 @@ static std::string z85_pad(const std::string &in, char pad_char)
 }
 
 MonitorModule::MonitorModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg),
+                             zmqpp::socket *pipe,
+                             const boost::property_tree::ptree &cfg,
+                             Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched),
         bus_(ctx, zmqpp::socket_type::sub),
         verbose_(false),
         last_ping_(TimePoint::max()),
@@ -55,7 +56,8 @@ void MonitorModule::run()
     {
         reactor_.poll(1000);
         if (last_ping_ == TimePoint::max() ||
-                std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - last_ping_).count() > 3)
+            std::chrono::duration_cast<std::chrono::seconds>(
+                    std::chrono::system_clock::now() - last_ping_).count() > 3)
         {
             test_ping();
             last_ping_ = std::chrono::system_clock::now();
@@ -81,7 +83,8 @@ void MonitorModule::log_system_bus()
         {
             src = buf;
         }
-        if (std::find_if(buf.begin(), buf.end(), [](char c) { return !isprint(c);})
+        if (std::find_if(buf.begin(), buf.end(), [](char c)
+        { return !isprint(c); })
             != buf.end())
         {
             // encode frame in z85 since it contains non printable char
@@ -123,12 +126,13 @@ void MonitorModule::test_ping()
     int ret = script.run(addr_to_ping_);
     if (ret == 0)
     {
-        INFO("Ping against " << addr_to_ping_<< " was successful. Looks like network is up.");
+        INFO("Ping against " << addr_to_ping_ <<
+             " was successful. Looks like network is up.");
         network_led_->turnOn();
     }
     else
     {
-        INFO("Ping against " << addr_to_ping_<< " failed. Network is probably down.");
+        INFO("Ping against " << addr_to_ping_ << " failed. Network is probably down.");
         network_led_->turnOff();
     }
 }
@@ -150,11 +154,13 @@ std::string MonitorModule::req_scripts_dir()
 
 void MonitorModule::process_config()
 {
-    std::string system_bus_log_file = config_.get_child("module_config").get<std::string>("file-bus", "");
+    std::string system_bus_log_file = config_.get_child("module_config")
+                                             .get<std::string>("file-bus", "");
     if (!system_bus_log_file.empty())
     {
         bus_.subscribe("");
-        spdlog::rotating_logger_mt("system_bus_event", system_bus_log_file, 1024 * 1024 * 3, 2);
+        spdlog::rotating_logger_mt("system_bus_event", system_bus_log_file,
+                                   1024 * 1024 * 3, 2);
     }
     verbose_ = config_.get_child("module_config").get<bool>("verbose", false);
     if (verbose_)
@@ -162,10 +168,12 @@ void MonitorModule::process_config()
         spdlog::stdout_logger_mt("monitor_stdout");
     }
 
-    std::string system_led_name = config_.get_child("module_config").get<std::string>("system_ok", "");
+    std::string system_led_name = config_.get_child("module_config")
+                                         .get<std::string>("system_ok", "");
     if (!system_led_name.empty())
     {
-        system_led_ = std::unique_ptr<Leosac::Hardware::FLED>(new Leosac::Hardware::FLED(ctx_, system_led_name));
+        system_led_ = std::unique_ptr<Leosac::Hardware::FLED>(
+                new Leosac::Hardware::FLED(ctx_, system_led_name));
     }
 
     process_network_config();
@@ -179,7 +187,9 @@ void MonitorModule::process_network_config()
     {
         addr_to_ping_ = ping_node->get<std::string>("ip");
         std::string network_led_name = ping_node->get<std::string>("led");
-        network_led_ = decltype (network_led_) (new Leosac::Hardware::FLED(ctx_, network_led_name));
+        network_led_ =
+        decltype(network_led_) (
+        new Leosac::Hardware::FLED(ctx_, network_led_name));
     }
 }
 
@@ -191,6 +201,7 @@ void MonitorModule::process_reader_config()
         reader_to_watch_ = reader_node->get<std::string>("name");
         bus_.subscribe("S_" + reader_to_watch_);
         std::string reader_led_name = reader_node->get<std::string>("led");
-        reader_led_ = std::unique_ptr<Leosac::Hardware::FLED>(new Leosac::Hardware::FLED(ctx_, reader_led_name));
+        reader_led_ = std::unique_ptr<Leosac::Hardware::FLED>(
+                new Leosac::Hardware::FLED(ctx_, reader_led_name));
     }
 }

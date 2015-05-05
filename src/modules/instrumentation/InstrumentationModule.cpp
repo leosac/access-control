@@ -24,8 +24,9 @@ using namespace Leosac::Module::Instrumentation;
 
 InstrumentationModule::InstrumentationModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg) :
-        BaseModule(ctx, pipe, cfg),
+        const boost::property_tree::ptree &cfg,
+        Scheduler &sched) :
+        BaseModule(ctx, pipe, cfg, sched),
         bus_push_(ctx, zmqpp::socket_type::push),
         controller_(ctx, zmqpp::socket_type::router)
 {

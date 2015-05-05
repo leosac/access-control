@@ -38,7 +38,10 @@ namespace Leosac
             class TestAndResetModule : public BaseModule
             {
             public:
-                explicit TestAndResetModule(zmqpp::context &ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg);
+                explicit TestAndResetModule(zmqpp::context &ctx,
+                                            zmqpp::socket *pipe,
+                                            const boost::property_tree::ptree &cfg,
+                                            Scheduler &sched);
 
                 TestAndResetModule(const TestAndResetModule &) = delete;
                 TestAndResetModule(TestAndResetModule &&) = delete;
