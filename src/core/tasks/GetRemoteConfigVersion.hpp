@@ -20,22 +20,32 @@
 #pragma once
 
 #include "Task.hpp"
+#include "LeosacFwd.hpp"
 
 namespace Leosac
 {
     namespace Tasks
     {
         /**
-         * Run in the main thread and retrieve the current configuration version.
+         * Fetch the configuration version of the master server.
+         *
+         * This tasks should be scheduled in a pool thread.
          */
-        class GetLocalConfigVersion : public Task
+        class GetRemoteConfigVersion : public Task
         {
         public:
-            GetLocalConfigVersion();
+            GetRemoteConfigVersion(const std::string &endpoint,
+                                   const std::string &pubkey);
+
+            uint64_t config_version_;
+
+            static constexpr const int timeout = 2000;
 
         private:
-            virtual void do_run() override;
+            virtual bool do_run() override;
+
+            std::string endpoint_;
+            std::string pubkey_;
         };
     }
 }
-

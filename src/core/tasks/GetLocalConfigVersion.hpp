@@ -17,21 +17,31 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <tools/gettid.hpp>
-#include "GetLocalConfigVersion.hpp"
-#include "core/kernel.hpp"
+#pragma once
 
-Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k) :
-        kernel_(k)
+#include "Task.hpp"
+#include "LeosacFwd.hpp"
+
+namespace Leosac
 {
+    namespace Tasks
+    {
+        /**
+         * Run in the main thread and retrieve the current configuration version.
+         *
+         * This is done by querying the kernel's configuration manager.
+         */
+        class GetLocalConfigVersion : public Task
+        {
+        public:
+            GetLocalConfigVersion(Kernel &k);
+            uint64_t config_version_;
 
+        private:
+            virtual bool do_run() override;
+
+            Kernel &kernel_;
+        };
+    }
 }
 
-bool Leosac::Tasks::GetLocalConfigVersion::do_run()
-{
-    DEBUG("I AM IN MAIN THREAD. I GUESS. Thread = "<< Leosac::gettid());
-    config_version_ = kernel_.config_manager().config_version();\
-
-    return true;
-}

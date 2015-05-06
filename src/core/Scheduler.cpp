@@ -63,7 +63,8 @@ void Scheduler::register_thread(TargetThread me)
     queues_[me];
 }
 
-Scheduler::Scheduler(Kernel *kptr)
+Scheduler::Scheduler(Kernel *kptr) :
+        kptr_(kptr)
 {
 
 }

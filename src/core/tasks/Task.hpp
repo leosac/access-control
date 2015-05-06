@@ -58,8 +58,15 @@ namespace Leosac
 
             void run();
 
+            bool succeed() const;
+
+            std::exception_ptr get_exception() const;
+
         private:
-            virtual void do_run() = 0;
+            virtual bool do_run() = 0;
+
+            bool                    success_;
+            std::exception_ptr      eptr_;
 
             std::mutex              mutex_;
             std::atomic_bool        complete_;

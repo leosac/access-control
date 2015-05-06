@@ -17,8 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <core/tasks/GetLocalConfigVersion.h>
+#include <core/tasks/GetRemoteConfigVersion.hpp>
+#include "tools/log.hpp"
+#include "core/tasks/GetLocalConfigVersion.hpp"
 #include "ReplicationModule.hpp"
 #include "core/Scheduler.hpp"
 
@@ -59,9 +60,50 @@ void ReplicationModule::process_config()
 
 void ReplicationModule::replicate()
 {
-    auto task = std::make_shared<Tasks::GetLocalConfigVersion>();
-    scheduler_.enqueue(task, TargetThread::MAIN);
+    uint64_t local;
+    uint64_t remote;
+    bool ok = true;
 
+    ok &= fetch_local_version(local);
+    ok &= fetch_remote_version(remote);
+
+    if (ok)
+        DEBUG("Current cfg version = " << local << ". Remote = " << remote);
+    else
+        WARN("Failed to retrieve config version");
+}
+
+bool ReplicationModule::fetch_local_version(uint64_t &local)
+{
+    auto task = std::make_shared<Tasks::GetLocalConfigVersion>(scheduler_.kernel());
+    scheduler_.enqueue(task, TargetThread::MAIN);
     task->wait();
-    DEBUG("REPLICATING " << Leosac::gettid());
+    assert(task->succeed());
+
+    local = task->config_version_;
+    return true;
+}
+
+bool ReplicationModule::fetch_remote_version(uint64_t &remote)
+{
+    auto task = std::make_shared<Tasks::GetRemoteConfigVersion>(endpoint_, pubkey_);
+    scheduler_.enqueue(task, TargetThread::POOL);
+    task->wait();
+
+    if (!task->succeed())
+    {
+        if (task->get_exception())
+        {
+            try
+            { std::rethrow_exception(task->get_exception()); }
+            catch (const std::exception &e)
+            {
+                ERROR("Fetching remote version failed: " << e.what());
+                return false;
+            }
+        }
+        return false;
+    }
+    remote = task->config_version_;
+    return true;
 }

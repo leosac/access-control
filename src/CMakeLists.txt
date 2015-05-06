@@ -47,6 +47,7 @@ set(LEOSAC_LIB_SRCS
     tools/gettid.cpp
     core/tasks/SyncFrom.cpp
     core/tasks/GetLocalConfigVersion.cpp
+    core/tasks/GetRemoteConfigVersion.cpp
 )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)

@@ -58,6 +58,18 @@ namespace Leosac
                 void replicate();
 
                 /**
+                 * Fetch the local configuration version by running
+                 * a task in the main thread.
+                 */
+                bool fetch_local_version(uint64_t &local);
+
+                /**
+                 * Fetch the remote configuration version by running a task
+                 * in a pool, and sending the CONFIG_VERSION message.
+                 */
+                bool fetch_remote_version(uint64_t &remote);
+
+                /**
                  * Delay between 2 replications attempt.
                  */
                 int delay_;
