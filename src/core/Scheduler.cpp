@@ -42,7 +42,7 @@ void Scheduler::update(TargetThread me)
 {
     mutex_.lock();
     auto &queue = queues_[me];
-    bool run = queue.size();
+    int run = queue.size();
     mutex_.unlock();
 
     while (run)
@@ -50,9 +50,9 @@ void Scheduler::update(TargetThread me)
         mutex_.lock();
         auto task = queue.front();
         queue.pop();
-        run = queue.size();
         mutex_.unlock();
         task->run();
+        run--;
     }
 }
 
