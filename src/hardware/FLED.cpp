@@ -19,6 +19,7 @@
 
 #include "FLED.hpp"
 #include <zmqpp/message.hpp>
+#include <tools/log.hpp>
 
 using namespace Leosac::Hardware;
 
@@ -26,6 +27,7 @@ FLED::FLED(zmqpp::context &ctx, const std::string &led_name) :
         backend_(ctx, zmqpp::socket_type::req)
 {
     backend_.connect("inproc://" + led_name);
+    poller_.add(backend_);
 }
 
 bool FLED::turnOn(std::chrono::milliseconds duration)
@@ -36,6 +38,8 @@ bool FLED::turnOn(std::chrono::milliseconds duration)
     msg << "ON" << duration.count();
 
     backend_.send(msg);
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked.");
     backend_.receive(rep);
     if (rep == "OK")
         return true;
@@ -52,6 +56,8 @@ bool FLED::turnOn()
     std::string rep;
 
     backend_.send("ON");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked.");
     backend_.receive(rep);
     if (rep == "OK")
         return true;
@@ -63,6 +69,8 @@ bool FLED::turnOff()
     std::string rep;
 
     backend_.send("OFF");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked.");
     backend_.receive(rep);
     if (rep == "OK")
         return true;
@@ -74,6 +82,8 @@ bool FLED::toggle()
     std::string rep;
 
     backend_.send("TOGGLE");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked.");
     backend_.receive(rep);
     if (rep == "OK")
         return true;
@@ -85,6 +95,8 @@ bool FLED::blink()
     std::string rep;
 
     backend_.send("BLINK");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked.");
     backend_.receive(rep);
     if (rep == "OK")
         return true;
@@ -99,6 +111,8 @@ bool FLED::blink(std::chrono::milliseconds duration, std::chrono::milliseconds s
     msg << "BLINK" << duration.count() << speed.count();
 
     backend_.send(msg);
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked.");
     backend_.receive(rep);
     if (rep == "OK")
         return true;

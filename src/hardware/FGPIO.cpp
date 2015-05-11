@@ -19,6 +19,7 @@
 
 #include "FGPIO.hpp"
 #include <zmqpp/message.hpp>
+#include <tools/log.hpp>
 
 using namespace Leosac::Hardware;
 
@@ -27,6 +28,7 @@ FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name) :
         backend_(ctx, zmqpp::socket_type::req)
 {
     backend_.connect("inproc://" + gpio_name);
+    poller_.add(backend_);
 }
 
 bool FGPIO::turnOn(std::chrono::milliseconds duration)
@@ -37,7 +39,10 @@ bool FGPIO::turnOn(std::chrono::milliseconds duration)
     msg << "ON" << duration.count();
 
     backend_.send(msg);
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked");
     backend_.receive(rep);
+
     if (rep == "OK")
         return true;
     return false;
@@ -48,7 +53,10 @@ bool FGPIO::turnOn()
     std::string rep;
 
     backend_.send("ON");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked");
     backend_.receive(rep);
+
     if (rep == "OK")
         return true;
     return false;
@@ -59,7 +67,10 @@ bool FGPIO::turnOff()
     std::string rep;
 
     backend_.send("OFF");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked");
     backend_.receive(rep);
+
     if (rep == "OK")
         return true;
     return false;
@@ -70,7 +81,10 @@ bool FGPIO::toggle()
     std::string rep;
 
     backend_.send("TOGGLE");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked");
     backend_.receive(rep);
+
     if (rep == "OK")
         return true;
     return false;
@@ -81,6 +95,8 @@ bool FGPIO::isOn()
     std::string rep;
 
     backend_.send("STATE");
+    poller_.poll(5000);
+    ASSERT_LOG(poller_.has_input(backend_), "Operation was blocked");
     backend_.receive(rep);
 
     if (rep == "ON")

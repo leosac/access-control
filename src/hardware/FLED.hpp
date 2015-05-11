@@ -22,6 +22,7 @@
 #include <string>
 #include <chrono>
 #include <zmqpp/socket.hpp>
+#include <zmqpp/poller.hpp>
 
 namespace Leosac
 {
@@ -165,6 +166,11 @@ namespace Leosac
             * A socket to talk to the backend LED.
             */
             zmqpp::socket backend_;
+
+            /**
+             * A poller to not wait for infinity in case something went wrong.
+             */
+            zmqpp::poller poller_;
         };
     }
 }

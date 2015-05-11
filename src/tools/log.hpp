@@ -296,4 +296,13 @@ ERROR_0(__VA_ARGS__), \
 ERROR_NO_PARAM(__VA_ARGS__), \
 )
 
+#define ASSERT_LOG(cond, msg)       \
+do {                                \
+  if (!(cond)) {                    \
+    ERROR(msg);                     \
+    assert(0);                      \
+  }                                 \
+}                                   \
+while (0)
+
 #endif // LOG_HPP
