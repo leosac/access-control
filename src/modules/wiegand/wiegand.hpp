@@ -46,7 +46,7 @@ namespace Leosac
                 WiegandReaderModule(zmqpp::context &ctx,
                         zmqpp::socket *pipe,
                         const boost::property_tree::ptree &cfg,
-                                    Scheduler &sched);
+                                    CoreUtilsPtr  utils);
 
                 /**
                 * Module's main loop. Will exit upon reception of signal::stop from module manager

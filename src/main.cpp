@@ -65,16 +65,19 @@ int main(int argc, const char **argv)
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ', Leosac::getVersionString());
         TCLAP::SwitchArg verboseSwitch("v", "verbose", "Increase verbosity", false);
+        TCLAP::SwitchArg strict("s", "strict", "Be strict regarding configuration error", false); // assert on configuration error.
         TCLAP::ValueArg<std::string> kernelFile("k", "kernel-cfg", "Kernel Configuration file", true, "", "config_file");
         TCLAP::ValueArg<std::string> working_directory("d", "working-directory", "Leosac's working directory", false, "", "working_directory");
 
         cmd.add(verboseSwitch);
+        cmd.add(strict);
         cmd.add(kernelFile);
         cmd.add(working_directory);
         cmd.parse(argc, argv);
         options.setFlag(RuntimeOptions::Verbose, verboseSwitch.getValue());
         options.setParam("kernel-cfg", kernelFile.getValue());
         options.setParam("working_directory", working_directory.getValue());
+        options.set_strict(strict.getValue());
     }
     catch (const TCLAP::ArgException &e)
     {
@@ -91,7 +94,7 @@ int main(int argc, const char **argv)
 
         try
         {
-            Kernel kernel(Kernel::make_config(options));
+            Kernel kernel(Kernel::make_config(options), options.is_strict());
             relaunch = kernel.run();
         }
         catch (const std::exception &e)

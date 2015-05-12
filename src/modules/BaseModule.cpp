@@ -21,8 +21,10 @@
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <tools/log.hpp>
 #include <core/config/ConfigManager.hpp>
+#include <signal.h>
 #include "BaseModule.hpp"
 #include "tools/XmlPropertyTree.hpp"
+#include "core/CoreUtils.hpp"
 
 using namespace Leosac::Module;
 using namespace Leosac::Tools;
@@ -30,11 +32,11 @@ using namespace Leosac::Tools;
 BaseModule::BaseModule(zmqpp::context &ctx,
                        zmqpp::socket *pipe,
                        boost::property_tree::ptree const &cfg,
-                       Scheduler &sched) :
+                       CoreUtilsPtr utils) :
         ctx_(ctx),
         pipe_(*pipe),
         config_(cfg),
-        scheduler_(sched),
+        utils_(utils),
         is_running_(true),
         control_(ctx, zmqpp::socket_type::rep)
 {
@@ -126,4 +128,52 @@ void BaseModule::handle_control()
 void BaseModule::dump_additional_config(zmqpp::message *) const
 {
 
+}
+
+void BaseModule::config_check(const std::string &obj_name)
+{
+    if (utils_->config_checker().has_object(obj_name))
+        return;
+
+    std::string prefix = "Configuration Error (module "
+                         + name_ + ") ";
+    ERROR(prefix << "Object " << obj_name << " cannot be found.");
+
+    if (utils_->is_strict())
+        raise(SIGABRT); // BOOM
+}
+
+void BaseModule::config_check(const std::string &obj_name,
+                              ConfigChecker::ObjectType type)
+{
+    bool res = utils_->config_checker().has_object(obj_name, type);
+
+    if (res)
+        return;
+
+    std::string prefix = "Configuration Error (module "
+                         + name_ + ") ";
+
+    switch (type)
+    {
+        case ConfigChecker::ObjectType::GPIO:
+            ERROR(prefix << "GPIO " << obj_name << " doesn't exist.");
+            break;
+        case ConfigChecker::ObjectType::LED:
+            ERROR(prefix << "LED " << obj_name << " doesn't exist.");
+            break;
+        case ConfigChecker::ObjectType::BUZZER:
+            ERROR(prefix << "BUZZER " << obj_name << " doesn't exists.");
+            break;
+        case ConfigChecker::ObjectType::READER:
+            ERROR(prefix << "READER " << obj_name << " doesn't exists.");
+            break;
+        default:
+            ASSERT_LOG(false, prefix << "Missing case in switch: value "
+                              << static_cast<int>(type) << " Need code fix.");
+            raise(SIGABRT);
+            break;
+    }
+    if (utils_->is_strict())
+        raise(SIGABRT); // lets suicide.
 }

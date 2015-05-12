@@ -33,7 +33,7 @@ namespace Leosac
             StdinControllerModule(zmqpp::context &ctx,
                                   zmqpp::socket *pipe,
                                   boost::property_tree::ptree const &cfg,
-                                  Scheduler &sched);
+                                  CoreUtilsPtr  utils);
 
             /**
             * We can read from standard input;

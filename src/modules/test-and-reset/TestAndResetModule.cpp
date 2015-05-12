@@ -31,8 +31,8 @@ TestAndResetModule::~TestAndResetModule()
 TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         const boost::property_tree::ptree &cfg,
-        Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched),
+        CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils),
         kernel_sock_(ctx, zmqpp::socket_type::req),
         sub_(ctx, zmqpp::socket_type::sub),
         test_led_(nullptr),
@@ -70,6 +70,7 @@ void TestAndResetModule::process_config()
             boost::property_tree::ptree device_cfg = node.second;
 
             std::string device_name = device_cfg.get_child("name").data();
+            config_check(device_name);
             std::string reset_card = device_cfg.get<std::string>("reset_card", "");
             std::string test_card = device_cfg.get<std::string>("test_card", "");
 

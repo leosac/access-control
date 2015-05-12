@@ -35,9 +35,13 @@ using boost::property_tree::ptree_error;
 using namespace Leosac::Tools;
 using namespace Leosac;
 
-Kernel::Kernel(const boost::property_tree::ptree &config) :
+Kernel::Kernel(const boost::property_tree::ptree &config,
+               bool strict) :
+        utils_(std::make_shared<CoreUtils>(this,
+                       std::make_shared<Scheduler>(this),
+                       std::make_shared<ConfigChecker>(),
+                                           strict)),
         config_manager_(config),
-        sched_(this),
         ctx_(),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
@@ -121,7 +125,7 @@ bool Kernel::run()
     while (is_running_)
     {
         reactor_.poll(25); // this is good enough. May be improved later tho.
-        sched_.update(TargetThread::MAIN);
+        utils_->scheduler().update(TargetThread::MAIN);
 
 //        if (remote_controller_)
   //          remote_controller_->update();
@@ -368,7 +372,7 @@ void Kernel::restart_later()
     is_running_ = false;
 }
 
-Scheduler &Kernel::scheduler()
+CoreUtilsPtr Kernel::core_utils()
 {
-    return sched_;
+    return utils_;
 }

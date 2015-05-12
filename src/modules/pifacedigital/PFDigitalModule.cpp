@@ -23,14 +23,15 @@
 #include "pifacedigital.h"
 #include "exception/gpioexception.hpp"
 #include "tools/log.hpp"
+#include "core/CoreUtils.hpp"
 
 using namespace Leosac::Module::Piface;
 
 PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
                                  zmqpp::socket *module_manager_pipe,
                                  const boost::property_tree::ptree &config,
-                                 Scheduler &sched)
-        : BaseModule(ctx, module_manager_pipe, config, sched),
+                                 CoreUtilsPtr utils)
+        : BaseModule(ctx, module_manager_pipe, config, utils),
           bus_push_(ctx_, zmqpp::socket_type::push)
 {
     if (pifacedigital_open(0) == -1)
@@ -132,10 +133,10 @@ void PFDigitalModule::process_config(const boost::property_tree::ptree &cfg)
     {
         boost::property_tree::ptree gpio_cfg = node.second;
 
-        std::string gpio_name = gpio_cfg.get_child("name").data();
-        int gpio_no = std::stoi(gpio_cfg.get_child("no").data());
-        std::string gpio_direction = gpio_cfg.get_child("direction").data();
-        bool gpio_value = gpio_cfg.get<bool>("value", false);
+        std::string gpio_name       = gpio_cfg.get_child("name").data();
+        int gpio_no                 = std::stoi(gpio_cfg.get_child("no").data());
+        std::string gpio_direction  = gpio_cfg.get_child("direction").data();
+        bool gpio_value             = gpio_cfg.get<bool>("value", false);
 
         INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction);
 
@@ -148,5 +149,6 @@ void PFDigitalModule::process_config(const boost::property_tree::ptree &cfg)
         if (gpio_direction != "in" && gpio_direction != "out")
             throw GpioException("Direction (" + gpio_direction + ") is invalid");
         gpios_.push_back(std::move(pin));
+        utils_->config_checker().register_object(gpio_name, ConfigChecker::ObjectType::GPIO);
     }
 }

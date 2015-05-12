@@ -40,7 +40,7 @@ extern "C" __attribute__((visibility("default")))
 bool start_module(zmqpp::socket *pipe,
                   boost::property_tree::ptree cfg,
                   zmqpp::context &zmq_ctx,
-                  Leosac::Scheduler &sched)
+                  Leosac::CoreUtilsPtr utils)
 {
     // this thread need realtime priority so it doesn't miss interrupt.
     struct sched_param p;
@@ -55,5 +55,5 @@ bool start_module(zmqpp::socket *pipe,
     }
 
     return Leosac::Module::start_module_helper<PFDigitalModule>(pipe, cfg, zmq_ctx,
-                                                                sched);
+                                                                utils);
 }

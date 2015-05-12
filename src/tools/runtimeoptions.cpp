@@ -55,3 +55,13 @@ bool RuntimeOptions::hasParam(const std::string &key) const
 {
     return _params.count(key);
 }
+
+bool RuntimeOptions::is_strict() const
+{
+    return strict_;
+}
+
+bool RuntimeOptions::set_strict(bool v)
+{
+    strict_ = v;
+}

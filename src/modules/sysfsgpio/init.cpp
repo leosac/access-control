@@ -42,12 +42,12 @@ const char *get_module_name()
 extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx,
-        Leosac::Scheduler &sched)
+        Leosac::CoreUtilsPtr utils)
 {
     // this thread need realtime priority so it doesn't miss interrupt.
     struct sched_param p;
     p.sched_priority = 90;
     int ret = pthread_setschedparam(pthread_self(), SCHED_FIFO, &p);
     assert(ret == 0);
-    return Leosac::Module::start_module_helper<SysFsGpioModule>(pipe, cfg, zmq_ctx, sched);
+    return Leosac::Module::start_module_helper<SysFsGpioModule>(pipe, cfg, zmq_ctx, utils);
 }

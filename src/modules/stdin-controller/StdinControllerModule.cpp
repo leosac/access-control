@@ -5,8 +5,8 @@ using namespace Leosac::Module;
 StdinControllerModule::StdinControllerModule(zmqpp::context &ctx,
                                              zmqpp::socket *pipe,
                                              boost::property_tree::ptree const &cfg,
-                                             Scheduler &sched)
-        : BaseModule(ctx, pipe, cfg, sched)
+                                             CoreUtilsPtr utils)
+        : BaseModule(ctx, pipe, cfg, utils)
 {
     reactor_.add(0, std::bind(&StdinControllerModule::handleStdin, this));
 }

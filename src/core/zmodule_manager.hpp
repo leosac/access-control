@@ -209,6 +209,6 @@ private:
     std::set<ModuleInfo> modules_;
 
     zmqpp::context &ctx_;
-    Leosac::Scheduler     &scheduler_;
     Leosac::ConfigManager &config_manager_;
+    Leosac::CoreUtilsPtr  core_utils_;
 };

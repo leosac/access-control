@@ -33,7 +33,7 @@ leds       |          |                        | List of configured Led devices 
 --->       | --->     | default_blink_speed    | Blink speed (in ms) if no speed is specified           | YES
 
 
-You can use "buzzers" and "buzzer" instead of "leds" and "led", or you can use all four if you want.
+You can use `buzzers` and `buzzer` instead of `leds` and `led`, or you can use all four if you want.
 
 Example {#mod_ledbuzzer_example}
 --------------------------------

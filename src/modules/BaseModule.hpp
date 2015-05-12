@@ -22,6 +22,7 @@
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <tools/gettid.hpp>
+#include <core/config/ConfigChecker.hpp>
 #include "tools/log.hpp"
 #include "core/config/ConfigManager.hpp"
 #include "LeosacFwd.hpp"
@@ -45,10 +46,10 @@ namespace Leosac
         bool start_module_helper(zmqpp::socket *pipe,
                                  boost::property_tree::ptree cfg,
                                  zmqpp::context &zmq_ctx,
-                                 Scheduler &sched)
+                                 CoreUtilsPtr utils)
         {
             {
-                UserModule module(zmq_ctx, pipe, cfg, sched);
+                UserModule module(zmq_ctx, pipe, cfg, utils);
                 INFO("Module " << get_module_name() <<
                      " is now initialized. Thread id = " << Leosac::gettid());
                 pipe->send(zmqpp::signal::ok);
@@ -104,7 +105,7 @@ namespace Leosac
             BaseModule(zmqpp::context &ctx,
                        zmqpp::socket *pipe,
                        const boost::property_tree::ptree &cfg,
-                       Scheduler &sched);
+                       CoreUtilsPtr utils);
 
             virtual ~BaseModule() = default;
 
@@ -152,6 +153,20 @@ namespace Leosac
                              zmqpp::message *out_msg) const;
 
             /**
+             * An helper that checks configuration the existence of some objects.
+             * Based on whether or not strict mode is enable, it prints a warning or
+             * prints an error and assert.
+             */
+            void config_check(const std::string &obj_name, ConfigChecker::ObjectType type);
+
+            /**
+             * An helper that checks configuration the existence of some objects.
+             * Based on whether or not strict mode is enable, it prints a warning or
+             * prints an error and assert.
+             */
+            void config_check(const std::string &obj_name);
+
+            /**
             * A reference to the ZeroMQ context in case you need it to create additional socket.
             */
             zmqpp::context &ctx_;
@@ -167,9 +182,9 @@ namespace Leosac
             boost::property_tree::ptree config_;
 
             /**
-             * A reference to the core scheduler.
+             * Pointer to the core utils, which gives access to scheduler and others.
              */
-            Scheduler &scheduler_;
+            CoreUtilsPtr utils_;
 
             /**
             * Boolean indicating whether the main loop should run or not.

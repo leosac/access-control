@@ -23,6 +23,7 @@
 #include <map>
 #include <thread>
 #include <mutex>
+#include <core/tasks/GenericTask.hpp>
 #include "LeosacFwd.hpp"
 
 namespace Leosac
@@ -58,7 +59,15 @@ namespace Leosac
         Scheduler(Scheduler &&)                 = delete;
         Scheduler &operator=(const Scheduler &) = delete;
         Scheduler &operator=(Scheduler &&)      = delete;
-        
+
+        template<typename Callable>
+        typename std::enable_if<!std::is_convertible<Callable, std::shared_ptr<Tasks::Task>>::value, void>::type
+        enqueue(const Callable &call, TargetThread policy)
+        {
+            auto t = std::make_shared<Tasks::GenericTask>(call);
+            enqueue(t, policy);
+        }
+
         /**
          * Enqueue a task, a schedule to run on thread `policy`.
          */

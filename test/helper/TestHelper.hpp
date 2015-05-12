@@ -24,6 +24,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include "gtest/gtest.h"
 #include "core/MessageBus.hpp"
+#include "core/CoreUtils.hpp"
+#include "core/config/ConfigChecker.hpp"
 
 namespace Leosac
 {
@@ -36,11 +38,12 @@ namespace Leosac
             * This runs in "module"'s thread.
             */
             template<typename ModuleType>
-            bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg,
-                                 Scheduler &sched)
+            bool test_run_module(zmqpp::context *ctx, zmqpp::socket *pipe, const boost::property_tree::ptree &cfg)
             {
                 {
-                    ModuleType module(*ctx, pipe, cfg, sched);
+                    CoreUtilsPtr u = std::make_shared<CoreUtils>(nullptr, nullptr,
+                                                                 std::make_shared<ConfigChecker>(), false);
+                    ModuleType module(*ctx, pipe, cfg, u);
 
                     pipe->send(zmqpp::signal::ok);
                     module.run();

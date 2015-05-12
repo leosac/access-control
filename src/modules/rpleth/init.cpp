@@ -44,7 +44,7 @@ extern "C" __attribute__((visibility("default")))
 bool start_module(zmqpp::socket *pipe,
                   boost::property_tree::ptree cfg,
                   zmqpp::context &zmq_ctx,
-                  Leosac::Scheduler &sched)
+                  Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx, sched);
+    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx, utils);
 }

@@ -37,7 +37,7 @@ namespace Leosac
                 InstrumentationModule(zmqpp::context &ctx,
                         zmqpp::socket *pipe,
                         const boost::property_tree::ptree &cfg,
-                        Scheduler &sched);
+                        CoreUtilsPtr  utils);
                 
                 InstrumentationModule(const InstrumentationModule &) = delete;
                 InstrumentationModule(InstrumentationModule &&) = delete;

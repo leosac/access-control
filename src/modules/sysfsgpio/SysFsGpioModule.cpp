@@ -32,8 +32,8 @@ using Leosac::Tools::UnixFs;
 SysFsGpioModule::SysFsGpioModule(zmqpp::context &ctx,
                                  zmqpp::socket *module_manager_pipe,
                                  const boost::property_tree::ptree &config,
-                                 Scheduler &sched)
-        : BaseModule(ctx, module_manager_pipe, config, sched),
+                                 CoreUtilsPtr utils)
+        : BaseModule(ctx, module_manager_pipe, config, utils),
           bus_push_(ctx_, zmqpp::socket_type::push),
           general_cfg_(nullptr)
 {

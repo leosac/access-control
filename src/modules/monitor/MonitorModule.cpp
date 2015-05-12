@@ -36,8 +36,8 @@ static std::string z85_pad(const std::string &in, char pad_char)
 MonitorModule::MonitorModule(zmqpp::context &ctx,
                              zmqpp::socket *pipe,
                              const boost::property_tree::ptree &cfg,
-                             Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched),
+                             CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils),
         bus_(ctx, zmqpp::socket_type::sub),
         verbose_(false),
         last_ping_(TimePoint::max()),

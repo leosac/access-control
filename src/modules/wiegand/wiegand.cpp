@@ -24,6 +24,8 @@
 #include <modules/wiegand/strategies/Autodetect.hpp>
 #include "tools/log.hpp"
 #include "wiegand.hpp"
+#include "core/Scheduler.hpp"
+#include "core/kernel.hpp"
 
 using namespace Leosac::Module::Wiegand;
 
@@ -43,16 +45,16 @@ extern "C" __attribute__((visibility("default")))
 bool start_module(zmqpp::socket *pipe,
         boost::property_tree::ptree cfg,
         zmqpp::context &zmq_ctx,
-        Leosac::Scheduler &sched)
+        Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<WiegandReaderModule>(pipe, cfg, zmq_ctx, sched);
+    return Leosac::Module::start_module_helper<WiegandReaderModule>(pipe, cfg, zmq_ctx, utils);
 }
 
 WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx,
         zmqpp::socket *pipe,
         boost::property_tree::ptree const &cfg,
-        Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched)
+        CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils)
 {
     process_config();
 
@@ -78,11 +80,22 @@ void WiegandReaderModule::process_config()
         std::string greenled_name   = reader_cfg.get<std::string>("green_led", "");
 
         INFO("Creating WiegandReader: " << reader_name << "\n\t Green Led: " << greenled_name
-                << "\n\t Buzzer: " << buzzer_name);
+             << "\n\t Buzzer: " << buzzer_name
+             << "\n\t GPIO Low: " << gpio_low
+             << "\n\t GPIO High: " << gpio_high);
+
+        config_check(gpio_low, ConfigChecker::ObjectType::GPIO);
+        config_check(gpio_high, ConfigChecker::ObjectType::GPIO);
+
+        if (greenled_name.size())
+            config_check(greenled_name, ConfigChecker::ObjectType::LED);
+        if (buzzer_name.size())
+            config_check(buzzer_name, ConfigChecker::ObjectType::BUZZER);
 
         WiegandReaderImpl reader(ctx_, reader_name, gpio_high, gpio_low, greenled_name, buzzer_name,
                 create_strategy(reader_cfg, &reader));
         readers_.push_back(std::move(reader));
+        utils_->config_checker().register_object(reader_name, ConfigChecker::ObjectType::READER);
     }
 }
 

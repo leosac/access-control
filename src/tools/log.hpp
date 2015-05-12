@@ -26,6 +26,7 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
+#include <cassert>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -301,6 +302,7 @@ do {                                \
   if (!(cond)) {                    \
     ERROR(msg);                     \
     assert(0);                      \
+    exit(-1);                       \
   }                                 \
 }                                   \
 while (0)

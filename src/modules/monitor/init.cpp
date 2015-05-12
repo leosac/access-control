@@ -60,8 +60,8 @@ extern "C" __attribute__((visibility("default")))
 bool start_module(zmqpp::socket *pipe,
                   boost::property_tree::ptree cfg,
                   zmqpp::context &zmq_ctx,
-                  Leosac::Scheduler &sched)
+                  Leosac::CoreUtilsPtr utils)
 {
     logger_guard g({"system_bus_event", "monitor_stdout"});
-    return Leosac::Module::start_module_helper<MonitorModule>(pipe, cfg, zmq_ctx, sched);
+    return Leosac::Module::start_module_helper<MonitorModule>(pipe, cfg, zmq_ctx, utils);
 }

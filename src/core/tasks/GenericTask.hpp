@@ -17,30 +17,28 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
-#include "TestAndResetModule.hpp"
+#pragma once
 
-using namespace Leosac::Module::TestAndReset;
+#include "Task.hpp"
 
-extern "C"
+namespace Leosac
 {
-const char *get_module_name()
-{
-    return "TEST_AND_RESET";
-}
-}
+    namespace Tasks
+    {
+        /**
+         * This task type is used whenever a lambda is passed to the scheduler.
+         * The scheduler use std::function to type-erase the callable object so that
+         * it can fit into GenericTask.
+         */
+        class GenericTask : public Task
+        {
+        public:
+            GenericTask(const std::function<bool (void)> &fct);
 
-/**
-* This function is the entry point of the Test And Reset module.
-*/
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
-{
-    return Leosac::Module::start_module_helper<TestAndResetModule>(pipe, cfg, zmq_ctx,
-                                                                   utils);
+        private:
+            virtual bool do_run();
+
+            std::function<bool (void)> fct_;
+        };
+    }
 }

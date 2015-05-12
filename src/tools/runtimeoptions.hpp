@@ -70,9 +70,13 @@ namespace Leosac
 
             const std::string &getParam(const std::string &key) const;
 
+            bool is_strict() const;
+            bool set_strict(bool v);
+
         private:
             std::bitset<FlagCount> _flags;
             std::map<std::string, std::string> _params;
+            bool strict_;
         };
 
     }

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "modules/BaseModule.hpp"
+#include "core/CoreUtils.hpp"
 
 namespace Leosac
 {
@@ -42,7 +43,7 @@ namespace Leosac
                 ReplicationModule(zmqpp::context &ctx,
                         zmqpp::socket *pipe,
                         const boost::property_tree::ptree &cfg,
-                        Scheduler &sched);
+                        CoreUtilsPtr utils);
 
                 ReplicationModule(const ReplicationModule &)            = delete;
                 ReplicationModule(ReplicationModule &&)                 = delete;

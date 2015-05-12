@@ -17,17 +17,19 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <core/kernel.hpp>
 #include "LEDBuzzerModule.hpp"
 #include "LedBuzzerImpl.hpp"
 #include "tools/log.hpp"
+#include "core/Scheduler.hpp"
 
 using namespace Leosac::Module::LedBuzzer;
 
 LEDBuzzerModule::LEDBuzzerModule(zmqpp::context &ctx,
                                  zmqpp::socket *pipe,
                                  boost::property_tree::ptree const &cfg,
-                                 Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched)
+                                 CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils)
 {
     process_config();
     for (auto &led : leds_)
@@ -84,7 +86,10 @@ void LEDBuzzerModule::process_config()
             int default_blink_speed = led_cfg.get<int>("default_blink_speed", 200);
 
             INFO("Creating LED " << led_name << ", linked to GPIO " << gpio_name);
+            config_check(gpio_name, ConfigChecker::ObjectType::GPIO);
+
             leds_.push_back(std::shared_ptr<LedBuzzerImpl>(new LedBuzzerImpl(ctx_, led_name, gpio_name, default_blink_duration, default_blink_speed)));
+            utils_->config_checker().register_object(led_name, ConfigChecker::ObjectType::LED);
         }
     }
 
@@ -100,8 +105,11 @@ void LEDBuzzerModule::process_config()
             int default_blink_speed = buzzer_cfg.get<int>("default_blink_speed", 200);
 
             INFO("Creating Buzzer " << buzzer_name << ", linked to GPIO " << gpio_name);
+            config_check(gpio_name, ConfigChecker::ObjectType::GPIO);
+
             // internally we do not care if its a buzzer or a led.
             leds_.push_back(std::shared_ptr<LedBuzzerImpl>(new LedBuzzerImpl(ctx_, buzzer_name, gpio_name, default_blink_duration, default_blink_speed)));
+            utils_->config_checker().register_object(buzzer_name, ConfigChecker::ObjectType::BUZZER);
         }
     }
 }

@@ -26,6 +26,31 @@
 using Leosac::Tools::UnixFs;
 using namespace Leosac;
 
+zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
+        ctx_(ctx),
+        config_manager_(k.config_manager()),
+        core_utils_(k.core_utils())
+{
+
+}
+
+zModuleManager::~zModuleManager()
+{
+    try
+    {
+        stopModules();
+        unloadLibraries();
+    }
+    catch (const std::exception &e)
+    {
+        Leosac::print_exception(e);
+    }
+    catch (...)
+    {
+        std::cerr << "Unkown exception in zModuleManager destructor" << std::endl;
+    }
+}
+
 void zModuleManager::unloadLibraries()
 {
     for (auto &module_info : modules_)
@@ -76,13 +101,13 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
         void *symptr = modinfo->lib_->getSymbol("start_module");
         assert(symptr);
         // take the module init function and make a std::function out of it.
-        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, Scheduler &)> actor_fun =
-                ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, Scheduler &)) symptr);
+        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, CoreUtilsPtr)> actor_fun =
+                ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, CoreUtilsPtr)) symptr);
 
         auto new_module = std::unique_ptr<zmqpp::actor>(new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
                 config_manager_.load_config(modinfo->name_),
                 std::ref(ctx_),
-                std::ref(scheduler_))));
+                core_utils_)));
         modinfo->actor_ = std::move(new_module);
 
         INFO("Module {" << modinfo->name_ << "} initialized. (level = " <<
@@ -201,31 +226,6 @@ bool zModuleManager::stopModule(const std::string &name)
         return false;
     }
     return false;
-}
-
-zModuleManager::~zModuleManager()
-{
-    try
-    {
-        stopModules();
-        unloadLibraries();
-    }
-    catch (const std::exception &e)
-    {
-        Leosac::print_exception(e);
-    }
-    catch (...)
-    {
-        std::cerr << "Unkown exception in zModuleManager destructor" << std::endl;
-    }
-}
-
-zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
-        ctx_(ctx),
-        config_manager_(k.config_manager()),
-        scheduler_(k.scheduler())
-{
-
 }
 
 zModuleManager::ModuleInfo::~ModuleInfo()

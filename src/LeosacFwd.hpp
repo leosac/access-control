@@ -25,6 +25,13 @@ namespace Leosac
 {
     class Kernel;
     class Scheduler;
+    class ConfigChecker;
+
+    using SchedulerPtr = std::shared_ptr<Scheduler>;
+    using ConfigCheckerPtr = std::shared_ptr<ConfigChecker>;
+
+    class CoreUtils;
+    using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
 
     namespace Tasks
     {

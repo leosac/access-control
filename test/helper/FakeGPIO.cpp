@@ -50,7 +50,6 @@ bool FakeGPIO::run(zmqpp::socket *pipe)
     while (true)
     {
         poller.poll(-1);
-
         if (poller.has_input(*pipe))
             break;
 

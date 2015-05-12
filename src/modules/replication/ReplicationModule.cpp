@@ -22,14 +22,15 @@
 #include "core/tasks/GetLocalConfigVersion.hpp"
 #include "ReplicationModule.hpp"
 #include "core/Scheduler.hpp"
+#include "core/CoreUtils.hpp"
 
 using namespace Leosac::Module::Replication;
 
 ReplicationModule::ReplicationModule(zmqpp::context &ctx,
                                      zmqpp::socket *pipe,
                                      const boost::property_tree::ptree &cfg,
-                                     Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched),
+                                     CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils),
         last_sync_(TimePoint::max())
 {
     process_config();
@@ -75,8 +76,8 @@ void ReplicationModule::replicate()
 
 bool ReplicationModule::fetch_local_version(uint64_t &local)
 {
-    auto task = std::make_shared<Tasks::GetLocalConfigVersion>(scheduler_.kernel());
-    scheduler_.enqueue(task, TargetThread::MAIN);
+    auto task = std::make_shared<Tasks::GetLocalConfigVersion>(utils_->kernel());
+    utils_->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
     assert(task->succeed());
 
@@ -87,7 +88,7 @@ bool ReplicationModule::fetch_local_version(uint64_t &local)
 bool ReplicationModule::fetch_remote_version(uint64_t &remote)
 {
     auto task = std::make_shared<Tasks::GetRemoteConfigVersion>(endpoint_, pubkey_);
-    scheduler_.enqueue(task, TargetThread::POOL);
+    utils_->scheduler().enqueue(task, TargetThread::POOL);
     task->wait();
 
     if (!task->succeed())

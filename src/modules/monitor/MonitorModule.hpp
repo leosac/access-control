@@ -42,7 +42,7 @@ namespace Leosac
                 MonitorModule(zmqpp::context &ctx,
                               zmqpp::socket *pipe,
                               const boost::property_tree::ptree &cfg,
-                              Scheduler &sched);
+                              CoreUtilsPtr  utils);
 
                 MonitorModule(const MonitorModule &) = delete;
 

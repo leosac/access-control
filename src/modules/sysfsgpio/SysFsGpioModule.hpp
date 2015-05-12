@@ -52,7 +52,7 @@ namespace Leosac
                 SysFsGpioModule(zmqpp::context &ctx,
                                 zmqpp::socket *module_manager_pipe,
                                 const boost::property_tree::ptree &config,
-                                Scheduler &sched);
+                                CoreUtilsPtr  utils);
 
                 ~SysFsGpioModule();
 

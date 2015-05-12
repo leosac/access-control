@@ -9,12 +9,15 @@ set(LEOSAC_LIB_SRCS
     core/kernel.cpp
     core/config/ConfigManager.cpp
     core/config/RemoteConfigCollector.cpp
+    core/config/ConfigChecker.cpp
+    core/CoreUtils.cpp
     core/RemoteControl.cpp
     core/RemoteControlSecurity.cpp
     core/zmodule_manager.cpp
     core/MessageBus.cpp
     core/Scheduler.cpp
     core/tasks/Task.cpp
+    core/tasks/GenericTask.cpp
     core/netconfig/networkconfig.cpp
     core/auth/Auth.cpp
     core/auth/Group.cpp

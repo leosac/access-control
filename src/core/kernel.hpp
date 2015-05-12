@@ -22,12 +22,14 @@
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/context.hpp>
 #include <core/config/ConfigManager.hpp>
+#include <core/config/ConfigChecker.hpp>
 #include "tools/runtimeoptions.hpp"
 #include "core/netconfig/networkconfig.hpp"
 #include "zmodule_manager.hpp"
 #include "MessageBus.hpp"
 #include "RemoteControl.hpp"
 #include "Scheduler.hpp"
+#include "CoreUtils.hpp"
 
 namespace Leosac
 {
@@ -58,9 +60,11 @@ namespace Leosac
         * cause problem.
         *
         * @param config initial configuration tree
+        * @param strict_mode are we running in strict mode ? (This is wrt configuration validation)
         * @note You can use Kernel::make_config() to build a configuration tree.
         */
-        explicit Kernel(const boost::property_tree::ptree &config);
+        explicit Kernel(const boost::property_tree::ptree &config,
+                        bool strict_mode = false);
 
         /**
         * Disable copy constructor as it makes no sense to copy this.
@@ -120,14 +124,14 @@ namespace Leosac
         zmqpp::context &get_context();
 
         /**
+         * Returns a (smart) pointer to the core utils: some thread-safe utilities.
+         */
+        CoreUtilsPtr core_utils();
+
+        /**
          * Retrieve a reference to the configuration manager object.
          */
         ConfigManager &config_manager();
-
-        /**
-         * Retrieve a reference to the scheduler object.
-         */
-        Scheduler &scheduler();
 
         /**
         * Save the current configuration to its original file if `autosave` is enabled.
@@ -178,12 +182,9 @@ namespace Leosac
         */
         std::string get_full_config();
 
-        ConfigManager config_manager_;
+        CoreUtilsPtr utils_;
 
-        /**
-         * Scheduler object, allows anyone to queue task.
-         */
-        Scheduler  sched_;
+        ConfigManager config_manager_;
 
         /**
         * The application ZMQ context.

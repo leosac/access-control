@@ -31,8 +31,8 @@ using namespace Leosac::Module::Rpleth;
 RplethModule::RplethModule(zmqpp::context &ctx,
                            zmqpp::socket *pipe,
                            const boost::property_tree::ptree &cfg,
-                           Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched),
+                           CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils),
         ctx_(ctx),
         server_(ctx, zmqpp::socket_type::stream),
         bus_sub_(ctx, zmqpp::socket_type::sub),

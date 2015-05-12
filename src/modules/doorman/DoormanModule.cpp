@@ -21,6 +21,8 @@
 #include "DoormanModule.hpp"
 #include "DoormanInstance.hpp"
 #include "tools/log.hpp"
+#include "core/Scheduler.hpp"
+#include "core/kernel.hpp"
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;
@@ -28,8 +30,8 @@ using namespace Leosac::Auth;
 DoormanModule::DoormanModule(zmqpp::context &ctx,
                              zmqpp::socket *pipe,
                              const boost::property_tree::ptree &cfg,
-                             Scheduler &sched) :
-        BaseModule(ctx, pipe, cfg, sched)
+                             CoreUtilsPtr utils) :
+        BaseModule(ctx, pipe, cfg, utils)
 {
     try
     {
@@ -82,6 +84,8 @@ void DoormanModule::process_config()
             a.on_ = (on_status == "GRANTED" ? AccessStatus::GRANTED
                                             : AccessStatus::DENIED);
             a.target_ = cfg_action.get<std::string>("target");
+            config_check(a.target_);
+
             for (auto &cmd_node : cfg_action.get_child("cmd"))
             {
                 // each frame in command
