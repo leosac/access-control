@@ -80,7 +80,7 @@ namespace Leosac
          * @warning It is **important** to call this function with the correct
          * parameter.
          */
-        void update(TargetThread me);
+        void update(TargetThread me) noexcept;
 
         /**
          * This is currently useless.

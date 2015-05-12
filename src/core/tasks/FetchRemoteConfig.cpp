@@ -17,20 +17,29 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SyncFrom.h"
+#include <tools/log.hpp>
+#include "FetchRemoteConfig.hpp"
 
+using namespace Leosac;
 using namespace Leosac::Tasks;
 
-SyncFrom::SyncFrom(zmqpp::context &ctx,
-                   const std::string &endpoint,
-                   const std::string &remote_server_pk,
-                   bool sync_general_cfg)
+FetchRemoteConfig::FetchRemoteConfig(const std::string &endpoint,
+                                     const std::string &pubkey) :
+        ctx_(),
+        collector_(ctx_, endpoint, pubkey)
 {
 
 }
 
-void SyncFrom::do_run()
+bool FetchRemoteConfig::do_run()
 {
+    DEBUG("SLEEPING FOR A WHILE");
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000)); // done sleeping
+    DEBUG("WAKING UP");
+    return collector_.fetch_config(nullptr);
+}
 
-
+const RemoteConfigCollector &FetchRemoteConfig::collector() const
+{
+    return collector_;
 }

@@ -38,7 +38,7 @@ void Scheduler::enqueue(TaskPtr t, TargetThread policy)
     }
 }
 
-void Scheduler::update(TargetThread me)
+void Scheduler::update(TargetThread me) noexcept
 {
     mutex_.lock();
     auto &queue = queues_[me];

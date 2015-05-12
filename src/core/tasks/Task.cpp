@@ -25,6 +25,7 @@
 using namespace Leosac::Tasks;
 
 Task::Task() :
+        on_completion_([] () {}),
         complete_(false),
         success_(false),
         eptr_(nullptr)
@@ -50,6 +51,10 @@ void Task::run()
         Leosac::print_exception(e);
         eptr_ = std::current_exception();
     }
+    on_completion_();
+    on_completion_ = [] () {};   // destroy the lambda and its copied parameter
+                                 // this is important because it'll destroy potential
+                                 // shared pointer that could leak to cycle reference.
 
     {
         mutex_.lock();

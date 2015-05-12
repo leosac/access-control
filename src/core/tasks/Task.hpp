@@ -37,6 +37,7 @@ namespace Leosac
         {
         public:
             Task();
+            virtual ~Task() {}
             Task(const Task &)              = delete;
             Task(Task &&)                   = delete;
             Task &operator=(const Task &)   = delete;
@@ -62,15 +63,22 @@ namespace Leosac
 
             std::exception_ptr get_exception() const;
 
+            template<typename Callback>
+            void set_on_completion(Callback c)
+            {
+                on_completion_ = [=] () { c() ;} ;
+            }
+
         private:
             virtual bool do_run() = 0;
 
-            bool                    success_;
-            std::exception_ptr      eptr_;
+            std::function<void(void)>   on_completion_;
+            bool                        success_;
+            std::exception_ptr          eptr_;
 
-            std::mutex              mutex_;
-            std::atomic_bool        complete_;
-            std::condition_variable cv_;
+            std::mutex                  mutex_;
+            std::atomic_bool            complete_;
+            std::condition_variable     cv_;
         };
 
     }

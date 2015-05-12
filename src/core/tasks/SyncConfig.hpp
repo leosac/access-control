@@ -19,25 +19,40 @@
 
 #pragma once
 
-#include <zmqpp/context.hpp>
-#include "core/tasks/Task.hpp"
+#include "Task.hpp"
+#include "LeosacFwd.hpp"
 
 namespace Leosac
 {
     namespace Tasks
     {
-
-        class SyncFrom : public Task
+        /**
+         * Sync the configuration using the configuration fetched from the master
+         * server.
+         *
+         * @note This tasks needs to run on the main thread.
+         * @note The configuration must have been already fetched.
+         */
+        class SyncConfig : public Task
         {
         public:
-            SyncFrom(zmqpp::context &ctx,
-                     const std::string &endpoint,
-                     const std::string &remote_server_pk,
-                     bool sync_general_cfg);
+            SyncConfig(Kernel &kref,
+                       FetchRemoteConfigPtr fetch_task,
+                       bool sync_general_config,
+                       bool autocommit);
 
         private:
-            virtual void do_run();
-        };
+            virtual bool do_run();
+            void sync_config();
 
+            Kernel &kernel_;
+            /**
+             * The task that fetch the data.
+             */
+            FetchRemoteConfigPtr fetch_task_;
+
+            bool sync_general_config_;
+            bool autocommit_;
+        };
     }
 }
