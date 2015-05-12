@@ -21,8 +21,11 @@
 #include <exception/ExceptionsTools.hpp>
 #include <tools/log.hpp>
 #include <tools/XmlPropertyTree.hpp>
+#include <core/tasks/FetchRemoteConfig.hpp>
+#include <core/tasks/GetRemoteConfigVersion.hpp>
 #include "core/config/RemoteConfigCollector.hpp"
 #include "core/config/ConfigManager.hpp"
+#include "core/tasks/FetchRemoteConfig.hpp"
 
 using namespace Leosac;
 
@@ -30,8 +33,9 @@ RemoteConfigCollector::RemoteConfigCollector(zmqpp::context_t &ctx,
         std::string const &remote_endpoint,
         std::string const &remote_pk) :
         remote_endpoint_(remote_endpoint),
+        remote_pk_(remote_pk),
         sock_(ctx, zmqpp::socket_type::dealer),
-        mstimeout_(1500),
+        mstimeout_(2500),
         first_call_(true),
         succeed_(false)
 {
@@ -51,6 +55,13 @@ bool RemoteConfigCollector::fetch_config(std::string *error_str) noexcept
     try
     {
         sock_.connect(remote_endpoint_);
+        if (!fetch_remote_config_version(remote_version_))
+        {
+            WARN("Cannot retrieve remote config version.");
+            if (error_str)
+                *error_str = "Cannot retrieve remote config version.";
+            return false;
+        }
 
         if (!fetch_general_config())
         {
@@ -73,6 +84,23 @@ bool RemoteConfigCollector::fetch_config(std::string *error_str) noexcept
                 *error_str = "Fetching remote modules configuration failed.";
             return false;
         }
+        // fetch the version again, and compare
+        uint64_t version2;
+        if (!fetch_remote_config_version(version2))
+        {
+            WARN("Cannot retrieve remote config version.");
+            if (error_str)
+                *error_str = "Cannot retrieve remote config version.";
+            return false;
+        }
+        if (version2 != remote_version_)
+        {
+            WARN("Looks like configuration changed while we were retrieving it.");
+            if (error_str)
+                *error_str = "Looks like configuration changed while we were retrieving it.";
+            return false;
+        }
+
         succeed_ = true;
         return true;
     }
@@ -219,4 +247,21 @@ RemoteConfigCollector::FileNameContentList const &RemoteConfigCollector::additio
         return additional_files_.at(module);
     assert(0);
     throw std::runtime_error("Module doesn't exist here.");
+}
+
+bool RemoteConfigCollector::fetch_remote_config_version(uint64_t &version)
+{
+    auto task = std::make_shared<Tasks::GetRemoteConfigVersion>(remote_endpoint_, remote_pk_);
+    task->run();
+    if (task->succeed())
+    {
+        version = task->config_version_;
+        return true;
+    }
+    return false;
+}
+
+uint64_t RemoteConfigCollector::remote_version() const
+{
+    return remote_version_;
 }

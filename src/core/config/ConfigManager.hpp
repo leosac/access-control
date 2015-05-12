@@ -148,10 +148,14 @@ namespace Leosac
          */
         uint64_t config_version() const;
 
+        void config_version(uint64_t new_version);
+
         /**
          * Increment by 1 the current version number.
          */
         void incr_version();
+
+
 
     private:
         /**

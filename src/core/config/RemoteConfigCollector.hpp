@@ -31,11 +31,22 @@ namespace Leosac
     /**
     * This class provides an API to collect the configuration of a remote Leosac unit.
     *
-    * It is used by the Remote Control code in order to retrieve the remote configuration
-    * when handling a SYNC_FROM command.
+    * This class is wrapped by the Tasks::FetchRemoteConfig object.
+    * The implementation is a BLOCKING collection (with timeout), which is why one should
+    * use the Task object that wraps the collection.
     *
-    * The current behavior of the object is a BLOCKING collection. This is not the best
-    * way, but it is simpler and with proper timeout to avoid infinite recv() call, it works.
+    * #### Consistency concerns (and solutions):
+    *
+    * Fetching the remote configuration requires multiple messages: 1 for the global
+    * configuration, and one per modules, at least. There is no "remote locking", which
+    * means that it is possible for the remote configuration to change while we are
+    * fetching it.
+    *
+    * Fortunately, there is a global `version` field that represents the version of the
+    * whole configuration. This number can only increase. What we do is similar to
+    * Optimistic Concurrency Control: we fetch the configuration version once before
+    * retrieving the configuration, then we fetch it again when we are done. If the
+    * number is the same, it means that the configuration didn't change.
     */
     class RemoteConfigCollector
     {
@@ -101,6 +112,8 @@ namespace Leosac
 
         const FileNameContentList &additional_files(const std::string module) const;
 
+        uint64_t remote_version() const;
+
     private:
         /**
         * Send the GENERAL_CONFIG command to the remote, and wait for response.
@@ -122,7 +135,14 @@ namespace Leosac
         */
         bool fetch_modules_config();
 
+        /**
+         * Fetch the version of the remote configuration.
+         * @param version store the version into the reference.
+         */
+        bool fetch_remote_config_version(uint64_t &version);
+
         std::string remote_endpoint_;
+        std::string remote_pk_;
 
         /**
         * Poll on the socket.
@@ -131,6 +151,8 @@ namespace Leosac
         zmqpp::socket_t sock_;
 
         long mstimeout_;
+
+        uint64_t remote_version_;
 
         /**
         * Map module name to their config tree.

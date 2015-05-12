@@ -64,7 +64,6 @@ bool SyncConfig::do_run()
 
 void SyncConfig::sync_config()
 {
-
     const RemoteConfigCollector &collector = fetch_task_->collector();
     ConfigManager backup = kernel_.config_manager();
 
@@ -133,8 +132,8 @@ void SyncConfig::sync_config()
             assert(ret);
         }
     }
+    kernel_.config_manager().config_version(collector.remote_version());
     kernel_.module_manager().initModules();
-
     if (autocommit_)
     {
         INFO("Saving configuration to disk after synchronization.");

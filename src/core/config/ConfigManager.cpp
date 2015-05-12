@@ -63,6 +63,8 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
         if (child_opt)
             general_cfg.add_child(cfg_name, *child_opt);
     }
+    // Use the in-memory configuration version.
+    general_cfg.add("version", config_version());
     return general_cfg;
 }
 
@@ -232,4 +234,9 @@ void ConfigManager::incr_version()
 bool ConfigManager::has_config(const std::string &module) const
 {
     return modules_configs_.count(module);
+}
+
+void ConfigManager::config_version(uint64_t new_version)
+{
+    version_ = new_version;
 }
