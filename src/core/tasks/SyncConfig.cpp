@@ -76,9 +76,6 @@ void SyncConfig::sync_config()
         kernel_.restart_later();
     }
 
-    assert(kernel_.config_manager().has_config("PIFACEDIGITAL_GPIO") == 0);
-    assert(kernel_.config_manager().is_module_importable("PIFACEDIGITAL_GPIO") == 0);
-
     kernel_.module_manager().stopModules();
     for (const auto &name : collector.modules_list())
     {
@@ -99,7 +96,7 @@ void SyncConfig::sync_config()
         else
         {   // If the module is immutable (aka conf not synchronized)
             // we simply load its config from backup.
-            DEBUG("Apparently {" << name << "} is immutable");
+            DEBUG("Apparently {" << name << "} is immutable (declared in <no_import>)");
             if (backup.has_config(name))
             {
                 // if we prevent the import of a non-loaded module, we can't
@@ -108,8 +105,6 @@ void SyncConfig::sync_config()
             }
         }
     }
-
-    assert(kernel_.config_manager().has_config("PIFACEDIGITAL_GPIO") == 0);
 
     // reload config for our local immutable modules.
     for (const auto &name : backup.get_non_importable_modules())
@@ -127,13 +122,11 @@ void SyncConfig::sync_config()
         }
     }
 
-    assert(kernel_.config_manager().has_config("PIFACEDIGITAL_GPIO") == 0);
-
+    assert(kernel_.module_manager().modules_names().empty()); // we should have 0 module loaded.
     for (const auto &name : collector.modules_list())
     {
-        if (!kernel_.module_manager().has_module(name) && kernel_.config_manager().has_config(name))
+        if (kernel_.config_manager().has_config(name))
         {   // load new module.
-            assert(name != "PIFACEDIGITAL_GPIO");
             bool ret = kernel_.module_manager().loadModule(name);
             if (!ret)
                 ERROR("Cannot load module " << name << "after synchronisation.");

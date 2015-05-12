@@ -191,6 +191,8 @@ void zModuleManager::stopModules()
     {
         stopModule(const_cast<ModuleInfo *>(&(*itr)));
     }
+    modules_.clear();
+    assert(modules_.size() == 0);
 }
 
 void zModuleManager::stopModule(ModuleInfo *modinfo)
@@ -204,7 +206,8 @@ void zModuleManager::stopModule(ModuleInfo *modinfo)
         // fixme i believe we may have a potential deadlock here.
         modinfo->actor_->stop(true);
         modinfo->actor_ = nullptr;
-        config_manager_.remove_config(modinfo->name_);
+        //modules_.erase(*modinfo);
+        //config_manager_.remove_config(modinfo->name_);
     }
     else
     {
@@ -217,7 +220,7 @@ bool zModuleManager::stopModule(const std::string &name)
     if (ModuleInfo *ptr = find_module_by_name(name))
     {
         stopModule(ptr);
-        config_manager_.remove_config(name);
+        //config_manager_.remove_config(name);
         return true;
     }
     else
@@ -284,4 +287,12 @@ bool zModuleManager::has_module(const std::string &name) const
 std::vector<std::string> const &zModuleManager::get_module_path() const
 {
     return path_;
+}
+
+bool zModuleManager::ModuleInfo::operator<(const ModuleInfo &o) const
+{
+    int level_me = cfg_.load_config(name_).get<int>("level", 100);
+    int level_o = cfg_.load_config(o.name_).get<int>("level", 100);
+
+    return level_me < level_o;
 }

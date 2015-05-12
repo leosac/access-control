@@ -94,6 +94,7 @@ int main(int argc, const char **argv)
 
         try
         {
+            INFO("Creating Leosac Kernel...");
             Kernel kernel(Kernel::make_config(options), options.is_strict());
             relaunch = kernel.run();
         }

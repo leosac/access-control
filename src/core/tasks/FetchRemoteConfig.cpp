@@ -33,9 +33,6 @@ FetchRemoteConfig::FetchRemoteConfig(const std::string &endpoint,
 
 bool FetchRemoteConfig::do_run()
 {
-    DEBUG("SLEEPING FOR A WHILE");
-    std::this_thread::sleep_for(std::chrono::milliseconds(5000)); // done sleeping
-    DEBUG("WAKING UP");
     return collector_.fetch_config(nullptr);
 }
 

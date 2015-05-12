@@ -96,18 +96,7 @@ public:
         */
         mutable std::unique_ptr<zmqpp::actor> actor_;
 
-        /**
-        * Comparison operator: used by the module manager set.
-        * We do not really care about uniqueness, we use this
-        * to sort module by their loading priority.
-        */
-        bool operator<(const ModuleInfo &o) const
-        {
-            int level_me = cfg_.load_config(name_).get<int>("level", 100);
-            int level_o = cfg_.load_config(o.name_).get<int>("level", 100);
-
-            return level_me < level_o;
-        }
+        bool operator<(const ModuleInfo &o) const;
 
     private:
         const Leosac::ConfigManager &cfg_;
@@ -137,24 +126,6 @@ public:
     * @note Dynamic libraries handlers are NOT released.
     */
     void stopModules();
-
-    /**
-    * Stop a module by name and remove its config info from the config manager.
-    * @note This does not unload the underlying shared library.
-    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
-    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
-    * @return false if a module with this name cannot be found. True otherwise.
-    */
-    bool stopModule(const std::string &name);
-
-    /**
-    * Stop a specific module and remove its config info from the config manager.
-    * @note This does not unload the underlying shared library.
-    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
-    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
-    * @return false if a module with this name cannot be found. True otherwise.
-    */
-    void stopModule(ModuleInfo *modinfo);
 
     /**
     * Add a directory to a path. If the path already exist, it is ignored.
@@ -195,6 +166,26 @@ private:
     * Cleanup code, call from destructor only.
     */
     void unloadLibraries();
+
+    /**
+    * Stop a module by name and remove its config info from the config manager.
+    * @note This does not unload the underlying shared library.
+    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
+    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
+    * @return false if a module with this name cannot be found. True otherwise.
+    * @warning OUTDATED
+    */
+    bool stopModule(const std::string &name);
+
+    /**
+    * Stop a specific module and remove its config info from the config manager.
+    * @note This does not unload the underlying shared library.
+    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
+    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
+    @ @warning OUTDATED
+    */
+    void stopModule(ModuleInfo *modinfo);
+
 
     ModuleInfo *find_module_by_name(const std::string &name) const;
 
