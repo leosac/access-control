@@ -56,7 +56,18 @@ namespace Leosac
                 using TimePoint = std::chrono::system_clock::time_point;
                 void process_config();
 
+                /**
+                 * Start the replication process.
+                 *
+                 * It first checks if it needs to sync, and if it doesn't, it stops
+                 * here.
+                 */
                 void replicate();
+
+                /**
+                 * Launch the tasks so that the synchronisation may take place.
+                 */
+                void start_sync();
 
                 /**
                  * Fetch the local configuration version by running

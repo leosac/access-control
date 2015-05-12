@@ -17,15 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <exception/ExceptionsTools.hpp>
-#include <tools/log.hpp>
+#include "exception/ExceptionsTools.hpp"
+#include "tools/log.hpp"
 #include "Task.hpp"
 
 using namespace Leosac::Tasks;
 
 Task::Task() :
         on_completion_([] () {}),
+        on_success_([] () {}),
+        on_failure_([] () {}),
         complete_(false),
         success_(false),
         eptr_(nullptr)
@@ -51,10 +52,18 @@ void Task::run()
         Leosac::print_exception(e);
         eptr_ = std::current_exception();
     }
+    if (success_)
+        on_success_();
+    else
+        on_failure_();
     on_completion_();
-    on_completion_ = [] () {};   // destroy the lambda and its copied parameter
-                                 // this is important because it'll destroy potential
-                                 // shared pointer that could leak to cycle reference.
+
+    // Re-initialize the lambdas to an empty lambda.
+    // This is important because it destroys copied parameter, including potential
+    // shared_ptr that would otherwise cause cyclic references.
+    on_success_ = [] () {};
+    on_failure_ = [] () {};
+    on_completion_ = [] () {};
 
     {
         mutex_.lock();

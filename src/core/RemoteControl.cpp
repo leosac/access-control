@@ -273,17 +273,17 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
         auto sync_task = std::make_shared<Tasks::SyncConfig>(kernel_, fetch_task,
                                                              sync_general_config,
                                                              autocommit);
-        sync_task->set_on_completion([]()
-                                     {
-                                         DEBUG("FINAL COMPLETION. YAY");
-                                     });
+        sync_task->set_on_success([]()
+                                  {
+                                      DEBUG("FINAL COMPLETION. YAY");
+                                  });
 
         auto *sched = &kernel_.core_utils()->scheduler();
-        fetch_task->set_on_completion([=]()
-                                      {
-                                          DEBUG("FETCH TASK COMPLETE. WILL QUEUE SYNC_CONFIG");
-                                          sched->enqueue(sync_task, TargetThread::MAIN);
-                                      });
+        fetch_task->set_on_success([=]()
+                                   {
+                                       DEBUG("FETCH TASK COMPLETE. WILL QUEUE SYNC_CONFIG");
+                                       sched->enqueue(sync_task, TargetThread::MAIN);
+                                   });
 
         kernel_.core_utils()->scheduler().enqueue(fetch_task, TargetThread::POOL);
 

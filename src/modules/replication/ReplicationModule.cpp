@@ -23,6 +23,8 @@
 #include "ReplicationModule.hpp"
 #include "core/Scheduler.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/tasks/SyncConfig.hpp"
+#include "core/tasks/FetchRemoteConfig.hpp"
 
 using namespace Leosac::Module::Replication;
 
@@ -43,7 +45,7 @@ void ReplicationModule::run()
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
                 std::chrono::system_clock::now() - last_sync_).count();
         if (last_sync_ == TimePoint::max() ||
-                elapsed > delay_)
+            elapsed > delay_)
         {
             replicate();
             last_sync_ = std::chrono::system_clock::now();
@@ -54,9 +56,9 @@ void ReplicationModule::run()
 
 void ReplicationModule::process_config()
 {
-    delay_      = config_.get_child("module_config").get<int>("delay", 15);
-    endpoint_   = config_.get_child("module_config").get<std::string>("endpoint");
-    pubkey_     = config_.get_child("module_config").get<std::string>("pubkey");
+    delay_ = config_.get_child("module_config").get<int>("delay", 15);
+    endpoint_ = config_.get_child("module_config").get<std::string>("endpoint");
+    pubkey_ = config_.get_child("module_config").get<std::string>("pubkey");
 }
 
 void ReplicationModule::replicate()
@@ -69,9 +71,22 @@ void ReplicationModule::replicate()
     ok &= fetch_remote_version(remote);
 
     if (ok)
-        DEBUG("Current cfg version = " << local << ". Remote = " << remote);
+        INFO("Current cfg version = " << local << ". Remote = " << remote);
     else
-        WARN("Failed to retrieve config version");
+    {
+        ERROR("Failed to retrieve config version");
+        return;
+    }
+
+    if (remote > local)
+    {
+        start_sync();
+    }
+    else
+    {
+        INFO("Local configuration version is either equal or greated than the remote's." <<
+             " Doing nothing.");
+    }
 }
 
 bool ReplicationModule::fetch_local_version(uint64_t &local)
@@ -107,4 +122,29 @@ bool ReplicationModule::fetch_remote_version(uint64_t &remote)
     }
     remote = task->config_version_;
     return true;
+}
+
+void ReplicationModule::start_sync()
+{
+    INFO("Starting the synchronization process...");
+    // two tasks queued. Fetch and Sync.
+
+    auto fetch_task = std::make_shared<Tasks::FetchRemoteConfig>(endpoint_,
+                                                                 pubkey_);
+
+    auto sync_task = std::make_shared<Tasks::SyncConfig>(utils_->kernel(),
+                                                         fetch_task,
+                                                         true,
+                                                         true);
+    sync_task->set_on_success([]()
+                              {
+                                  INFO("Synchronization complete.");
+                              });
+
+    auto *sched = &utils_->scheduler();
+    fetch_task->set_on_success([=]()
+                               {
+                                   sched->enqueue(sync_task, TargetThread::MAIN);
+                               });
+    utils_->scheduler().enqueue(fetch_task, TargetThread::POOL);
 }

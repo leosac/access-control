@@ -63,16 +63,50 @@ namespace Leosac
 
             std::exception_ptr get_exception() const;
 
+            /**
+             * Set a callback that will be invoked when the tasks is completed, no
+             * matter if it succeeded or not.
+             *
+             * @note: Status dependent callback (`on_success`/`on_failure`) will
+             * be called before the `on_complete` callback.
+             */
             template<typename Callback>
             void set_on_completion(Callback c)
             {
-                on_completion_ = [=] () { c() ;} ;
+                on_completion_ = [=] () { c(); };
+            }
+
+            /**
+             * Set a callback that will be invoked if and when the task succeed.
+             *
+             * @note: Status dependent callback (`on_success`/`on_failure`) will
+             * be called before the `on_complete` callback.
+             */
+            template<typename Callback>
+            void set_on_success(Callback c)
+            {
+                on_success_ = [=] () { c(); };
+            }
+
+            /**
+             * Set a callback that will be invoked if and when the task fails.
+             *
+             * @note: Status dependent callback (`on_success`/`on_failure`) will
+             * be called before the `on_complete` callback.
+             */
+            template<typename Callback>
+            void set_on_failure(Callback c)
+            {
+                on_failure_ = [=] () { c(); };
             }
 
         private:
             virtual bool do_run() = 0;
 
             std::function<void(void)>   on_completion_;
+            std::function<void(void)>   on_success_;
+            std::function<void(void)>   on_failure_;
+
             bool                        success_;
             std::exception_ptr          eptr_;
 
