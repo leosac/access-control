@@ -57,7 +57,7 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
     boost::property_tree::ptree general_cfg;
 
     for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network",
-                                        "autosave", "sync_dest"})
+                                        "autosave", "sync_dest", "no_import"})
     {
         auto child_opt = kernel_config_.get_child_optional(cfg_name);
         if (child_opt)
@@ -74,10 +74,21 @@ boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
     boost::property_tree::ptree ret;
 
     if (!child_opt)
+    {
+        // return all minus the `no_import` tag.
+        general_cfg.erase("no_import");
         return general_cfg;
+    }
 
     for (const auto &c : *child_opt)
     {
+        ASSERT_LOG(c.first != "no_import", "Cannot export the `no_import` tag. Check your"
+                " `sync_source` configuration tag.");
+        if (c.first == "no_import")
+        {
+            WARN("You cannot export the `no_import ` tag.");
+            continue;
+        }
         if (c.second.get_value<bool>())
             exportable_config.push_back(c.first);
     }

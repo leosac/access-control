@@ -68,8 +68,8 @@ if [ "${SUM_AFTER_UPDATE}" = "${SUM}" ] ; then
     exit 1
 fi
 
-## Also make sure we can grep "remote_config" info from the config of the
-## instance that received the SYNC_FROM command.
+## Also make sure we cannot grep "MY_SUPER_WIEGAND_1" as this would mean
+## that this module was synchronized while it shouldn't.
 if grep 'MY_SUPER_WIEGAND_1' $config_file ; then
 echo "Looks like module wiegand synchronize while it should'nt have"
 echo "Dumping cfg file"

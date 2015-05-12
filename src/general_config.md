@@ -138,7 +138,9 @@ Here is a list of exportable config tag:
  + `<network>`
  + `<remote>`
  + `<sync_dest>`
- 
+
+Note that the `no_import` tag cannot be exported.
+
 Example {#sync_source_ex}
 -------------------------
 
