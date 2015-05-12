@@ -86,6 +86,11 @@ namespace Leosac
         bool store_config(const std::string &module, const boost::property_tree::ptree &cfg);
 
         /**
+         * Do we have config information for the module.
+         */
+        bool has_config(const std::string &module) const;
+
+        /**
         * Return the stored configuration for a given module.
         */
         const boost::property_tree::ptree &load_config(const std::string &module) const;

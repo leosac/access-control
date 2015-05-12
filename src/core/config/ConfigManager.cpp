@@ -216,3 +216,8 @@ void ConfigManager::incr_version()
 {
     ++version_;
 }
+
+bool ConfigManager::has_config(const std::string &module) const
+{
+    return modules_configs_.count(module);
+}

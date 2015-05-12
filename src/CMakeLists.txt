@@ -48,9 +48,10 @@ set(LEOSAC_LIB_SRCS
     tools/XmlPropertyTree.cpp
     tools/XmlScheduleLoader.cpp
     tools/gettid.cpp
-    core/tasks/SyncFrom.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
+    core/tasks/FetchRemoteConfig.cpp
+    core/tasks/SyncConfig.cpp
 )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)

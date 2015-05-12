@@ -142,7 +142,7 @@ namespace Leosac
         ModuleAdditionalFiles additional_files_;
 
         // those 2 boolean are here to enforce the correct use of the object.
-        // Call fetch_config() that access various config item.
+        // Call fetch_config() then access various config item.
 
         bool first_call_;
         bool succeed_;

@@ -38,7 +38,10 @@ namespace Leosac
         class Task;
         using TaskPtr = std::shared_ptr<Task>;
 
-        class SyncFrom;
-        using SyncFromUPtr = std::unique_ptr<SyncFrom>;
+        class SyncConfig;
+        using SyncConfigPtr = std::shared_ptr<SyncConfig>;
+
+        class FetchRemoteConfig;
+        using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
     }
 }

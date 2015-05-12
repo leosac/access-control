@@ -26,7 +26,8 @@ void ConfigChecker::register_object(const std::string &name,
                                     const ConfigChecker::ObjectType &type)
 {
     std::lock_guard<std::mutex> lg(mutex_);
-    ASSERT_LOG(objects_.count(name) == 0, "Already have an object with name " << name << "registered");
+    ASSERT_LOG(objects_.count(name) == 0, "Already have an object with name "
+                                          << name << " registered");
     objects_[name] = type;
 }
 
@@ -44,4 +45,10 @@ bool ConfigChecker::has_object(const std::string &name,
     if (itr != objects_.end() && type == itr->second)
         return true;
     return false;
+}
+
+void ConfigChecker::clear()
+{
+    std::lock_guard<std::mutex> lg(mutex_);
+    objects_.clear();
 }

@@ -70,6 +70,12 @@ namespace Leosac
          */
         bool has_object(const std::string &name, const ObjectType &type) const;
 
+        /**
+         * Clear all informations.
+         * This is useful when synchronizing with remote.
+         */
+        void clear();
+
     private:
         std::map<std::string, ObjectType> objects_;
         mutable std::mutex mutex_;

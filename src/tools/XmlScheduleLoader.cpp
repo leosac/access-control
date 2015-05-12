@@ -42,7 +42,8 @@ int XmlScheduleLoader::week_day_to_int(const std::string &day)
         return 5;
     if (day == "saturday")
         return 6;
-    assert(0);
+    ASSERT_LOG(0, "{" << day << "} is not a valid day of the week.");
+    return -1;
 }
 
 bool XmlScheduleLoader::load(const boost::property_tree::ptree &schedules_tree)

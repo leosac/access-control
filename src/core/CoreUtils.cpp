@@ -54,3 +54,9 @@ bool Leosac::CoreUtils::is_strict() const
 {
     return strict_mode_;
 }
+
+Leosac::Kernel &Leosac::CoreUtils::kernel()
+{
+    ASSERT_LOG(kptr_, "Kernel pointer is NULL in CoreUtils");
+    return *kptr_;
+}
