@@ -138,7 +138,6 @@ Here is a list of exportable config tag:
  + `<network>`
  + `<remote>`
  + `<sync_dest>`
- + `<no_import>`
  
 Example {#sync_source_ex}
 -------------------------
@@ -159,12 +158,17 @@ The tag set to true in `sync_dest` are the tag that will be updated with the con
 The rules are the same than `sync_source`.
 
 Non Importable Module {#non_importable_module}
-----------------------------------------------
+===============================================
 
-By default all modules are synchronised when using `SYNC_FROM`.
+By default all modules are synchronised when syncing configuration - be it when the Replication module
+runs, or when the server receive the `SYNC_FROM` remote control command.
 It's however possible to prevent module configuration from being added, erased or updated.
 
 To do so, define a `<no_import>` tag in the config file.
+
+**Note**: The `<no_import>` tag will **NEVER** be synchronized from a remote server.
+
+*Security notice:* This is because it is not exported, not because we carefully ignore it when importing.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <no_import>
