@@ -30,6 +30,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <csignal>
 #include "unixfs.hpp"
 #include "spdlog/spdlog.h"
 
@@ -297,14 +298,19 @@ ERROR_0(__VA_ARGS__), \
 ERROR_NO_PARAM(__VA_ARGS__), \
 )
 
-#define ASSERT_LOG(cond, msg)       \
-do {                                \
-  if (!(cond)) {                    \
-    ERROR(msg);                     \
-    assert(0);                      \
-    exit(-1);                       \
-  }                                 \
-}                                   \
+#ifdef NDEBUG
+#define ASSERT_LOG(cond, msg) do {} while (0)
+#else
+#define ASSERT_LOG(cond, msg)               \
+do {                                        \
+  if (!(cond)) {                            \
+    ERROR(msg);                             \
+    ERROR("Assertion failed. Aborting.");   \
+    raise(SIGABRT);                         \
+  }                                         \
+}                                           \
 while (0)
+#endif
+
 
 #endif // LOG_HPP

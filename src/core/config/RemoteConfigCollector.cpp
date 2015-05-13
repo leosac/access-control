@@ -26,6 +26,7 @@
 #include "core/config/RemoteConfigCollector.hpp"
 #include "core/config/ConfigManager.hpp"
 #include "core/tasks/FetchRemoteConfig.hpp"
+#include "tools/BuildString.hpp"
 
 using namespace Leosac;
 
@@ -47,6 +48,15 @@ RemoteConfigCollector::RemoteConfigCollector(zmqpp::context_t &ctx,
     poller_.add(sock_);
 }
 
+
+static bool warn_and_set_error(std::string *error_str, const std::string &msg)
+{
+    WARN(msg);
+    if (error_str)
+        *error_str = msg;
+    return false;
+}
+
 bool RemoteConfigCollector::fetch_config(std::string *error_str) noexcept
 {
     assert(first_call_);
@@ -56,51 +66,27 @@ bool RemoteConfigCollector::fetch_config(std::string *error_str) noexcept
     {
         sock_.connect(remote_endpoint_);
         if (!fetch_remote_config_version(remote_version_))
-        {
-            WARN("Cannot retrieve remote config version.");
-            if (error_str)
-                *error_str = "Cannot retrieve remote config version.";
-            return false;
-        }
+            return warn_and_set_error(error_str, "Cannot retrieve remote config version.");
 
         if (!fetch_general_config())
-        {
-            WARN("Error fetching general configuration of remote Leosac (" << remote_endpoint_ << ")");
-            if (error_str)
-                *error_str = "Fetching general remote configuration failed.";
-            return false;
-        }
+            return warn_and_set_error(error_str,
+                                      build_str("Error fetching general configuration of remote Leosac (", remote_endpoint_, ")"));
+
         if (!fetch_module_list())
-        {
-            WARN("Error fetching module list from remote Leosac (" << remote_endpoint_ << ")");
-            if (error_str)
-                *error_str = "Fetching remote module list failed.";
-            return false;
-        }
+            return warn_and_set_error(error_str,
+                                      build_str("Error fetching module list from remote Leosac (", remote_endpoint_ ,")"));
+
         if (!fetch_modules_config())
-        {
-            WARN("Error fetching modules configuration from remote Leosac (" << remote_endpoint_ << ")");
-            if (error_str)
-                *error_str = "Fetching remote modules configuration failed.";
-            return false;
-        }
+            return warn_and_set_error(error_str,
+                                      build_str("Error fetching modules configuration from remote Leosac (", remote_endpoint_, ")"));
         // fetch the version again, and compare
         uint64_t version2;
         if (!fetch_remote_config_version(version2))
-        {
-            WARN("Cannot retrieve remote config version.");
-            if (error_str)
-                *error_str = "Cannot retrieve remote config version.";
-            return false;
-        }
+            return warn_and_set_error(error_str,
+                                      build_str("Cannot retrieve remote config version."));
         if (version2 != remote_version_)
-        {
-            WARN("Looks like configuration changed while we were retrieving it.");
-            if (error_str)
-                *error_str = "Looks like configuration changed while we were retrieving it.";
-            return false;
-        }
-
+            return warn_and_set_error(error_str,
+                                      build_str("Looks like configuration changed while we were retrieving it."));
         succeed_ = true;
         return true;
     }
