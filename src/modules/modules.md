@@ -25,12 +25,12 @@ As an end-user, what should I know? {#modules_enduser}
 You should know (or be able to find out) what modules you need for your use case.
 You then need to be able to properly configure them.
 
-Using and configuration modules {#modules_enduser_use}
+Using and configuring modules {#modules_enduser_use}
 -------------------------------------------------------------
 
 Where to find modules, which modules to load, and their basic configuration take
 place in the the `core configuration file`. You can read-up a per-module documentation
-that will details how the configure is done for the module.
+that will detail and explain how to configure the module.
 
 Some module may have additional configuration files in order to not bloat the main
 config file.
@@ -55,7 +55,9 @@ PifaceDigital        | Provide support for GPIO through the Piface digital devic
 Led-Buzzer           | Support Led and buzzer devices.                               | Hardware module, requires a GPIO module
 Wiegand              | Support wiegand device.                                       | Hardware module, Authentication Source module. Requires GPIO module.
 Auth-File            | Implementation permissions checking / auth validation         | Authentication backend module.
-Doorman              | Take actions when an authentication attempt succeed or fails  | 
+Doorman              | Take actions when an authentication attempt succeed or fails  | Policy implementation module (takes actions on event)
+Replication          | Allows Leosac to run in a master/slave configuration          | -
+Monitor              | Additional logs. Provide activity feedback (is network down?) | -
 
 <HR>
 
@@ -64,7 +66,7 @@ Developers Informations {#modules_dev}
 
 The following section is aimed toward developers.
 
-Leosac's core load a bunch of modules (as defined in the configuration file) and
+Leosac's core loads a bunch of modules (as defined in the configuration file) and
 everything talks to each other.
 
 See the [Leosac::Module](@ref Leosac::Module) namespace for a reference of all modules.
@@ -84,7 +86,7 @@ For this to work, proper specifications must be in place, so that we can swap an
 implementation with an other without changing anything else in dependants modules. For example,
 we can use either the Piface device (and the Piface module) to implements GPIO, but we could
 also use the SysfsGPIO module. Other modules that needs to use GPIO do not care which GPIO module
-is load and provide the support for the GPIOs.
+is loaded and provide the support for the GPIOs.
 
 Leosac's core also set up a message-bus where everyone can write and read from everyone else.
 This is useful to broadcast information and is used a lot.
@@ -110,8 +112,9 @@ Tips {#modules_write_tips}
 It is recommended to derive from [BaseModule](@ref Leosac::Module::BaseModule) to implement your own module.
 This base class make things easier. However, it doesn't take care of everything.
 
-There are hard requirements what symbols your shared library (aka modules) must export:
-1. A function named `start_module()` with the following prototype: `bool start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg, zmqpp::context &zmq_ctx)`
+There are hard requirements regarding which symbols your shared library (aka modules) must export:
+1. A function named `start_module()` with the following prototype:
+   `bool start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg, zmqpp::context &zmq_ctx, CoreUtilsPtr utils)`
 2. A function named `get_module_name()` that takes no parameters and return a `const char *` that points to the name of the module. This string must be `NULL` terminated.
    Note that the returned module name shall be composed of capital letter, number and underscore only.
 
