@@ -39,7 +39,7 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
         // invalid message.
         ERROR("Failed to extract source name: cannot construct the AuthSource object. " <<
                 "Source name was {" << source_name << "}");
-        assert(0);
+        raise(SIGABRT);
     }
     if (type == SourceType::SIMPLE_WIEGAND)
         return create_simple_wiegand(source_name, msg);
@@ -47,7 +47,8 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
         return create_wiegand_pin(source_name, msg);
     else if (type == SourceType::WIEGAND_CARD_PIN)
         return create_wiegand_card_pin(source_name, msg);
-    assert(0);
+    ASSERT_LOG(0, "Unkown auth source type.");
+    exit(-1);
 }
 
 bool AuthSourceBuilder::extract_source_name(const std::string &input, std::string *output) const

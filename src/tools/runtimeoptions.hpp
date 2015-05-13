@@ -71,7 +71,7 @@ namespace Leosac
             const std::string &getParam(const std::string &key) const;
 
             bool is_strict() const;
-            bool set_strict(bool v);
+            void set_strict(bool v);
 
         private:
             std::bitset<FlagCount> _flags;

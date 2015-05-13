@@ -61,7 +61,7 @@ bool RuntimeOptions::is_strict() const
     return strict_;
 }
 
-bool RuntimeOptions::set_strict(bool v)
+void RuntimeOptions::set_strict(bool v)
 {
     strict_ = v;
 }

@@ -134,7 +134,8 @@ bool FLED::isOn()
         return false;
     if (st.st == State::ON)
         return true;
-    assert(0);
+    ASSERT_LOG(0, "Unkown LED state. Aborting.");
+    exit(-1);
 }
 
 bool FLED::isOff()
