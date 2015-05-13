@@ -357,7 +357,7 @@ Wiring everything {#install_guide_wiring}
 =========================================
 
 This is the board with the PiFace plug onto it.
-![Raspi and board](../piface-front.png)
+![Raspi and board](../resources/piface-front.png)
 The orange port are output ports. Green ports are for inputs.
 
 We have 3 wire to connect:
@@ -365,7 +365,7 @@ We have 3 wire to connect:
     2. Purple wire is wiegand low.
     3. Yellow wire is wiegand high.
     
-![Raspi wired](../piface-wire.png)
+![Raspi wired](../resources/piface-wire.png)
 
 
 Conclusion {#install_guide_end}
