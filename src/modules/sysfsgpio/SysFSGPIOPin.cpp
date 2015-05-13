@@ -154,9 +154,9 @@ void SysFsGpioPin::handle_interrupt()
     // flush interrupt by reading.
     // if we fail we cant recover, this means hardware failure.
     ret = ::read(file_fd_, &buffer[0], buffer.size());
-    assert(ret >= 0);
+    ASSERT_LOG(ret >= 0, "Read failed on GPIO pin.");
     ret = ::lseek(file_fd_, 0, SEEK_SET);
-    assert(ret >= 0);
+    ASSERT_LOG(ret >= 0, "Lseek failed on GPIO pin.");
 
     module_.publish_on_bus(zmqpp::message() << "S_INT:" + name_);
 }

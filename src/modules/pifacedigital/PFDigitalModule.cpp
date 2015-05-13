@@ -40,7 +40,7 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
         throw LEOSACException("Cannot open PifaceDigital device (is SPI module enabled ?)");
     }
     int ret = pifacedigital_enable_interrupts();
-    assert(ret == 0);
+    ASSERT_LOG(ret == 0, "Failed to enable interrupt on piface board");
 
     process_config(config);
     bus_push_.connect("inproc://zmq-bus-pull");
@@ -51,7 +51,7 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
 
     std::string path_to_gpio = "/sys/class/gpio/gpio" + std::to_string(GPIO_INTERRUPT_PIN) + "/value";
     interrupt_fd_ = open(path_to_gpio.c_str(), O_RDONLY | O_NONBLOCK);
-    assert(interrupt_fd_ > 0);
+    ASSERT_LOG(interrupt_fd_, "Failed to open GPIO file");
     pifacedigital_read_reg(0x11, 0);//flush
     reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this), zmqpp::poller::poll_pri);
 }
@@ -93,9 +93,9 @@ void PFDigitalModule::handle_interrupt()
     ssize_t ret;
 
     ret = ::read(interrupt_fd_, &buffer[0], buffer.size());
-    assert(ret >= 0);
+    ASSERT_LOG(ret >= 0, "Reading on interrupt_fd gave unexpected return value: " << ret);
     ret = ::lseek(interrupt_fd_, 0, SEEK_SET);
-    assert(ret >= 0);
+    ASSERT_LOG(ret >= 0, "Lseeking on interrupt_fd gave unexpected return value: " << ret);
 
     uint8_t states = pifacedigital_read_reg(0x11, 0);
     for (int i = 0; i < 8; ++i)

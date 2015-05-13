@@ -48,6 +48,8 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
     struct sched_param p;
     p.sched_priority = 90;
     int ret = pthread_setschedparam(pthread_self(), SCHED_FIFO, &p);
-    assert(ret == 0);
+    ASSERT_LOG(ret == 0, "Cannot set thread priority");
+    if (ret != 0)
+        WARN("Cannot set realtime priority for SysFsGPIO module.");
     return Leosac::Module::start_module_helper<SysFsGpioModule>(pipe, cfg, zmq_ctx, utils);
 }

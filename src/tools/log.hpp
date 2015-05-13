@@ -299,7 +299,7 @@ ERROR_NO_PARAM(__VA_ARGS__), \
 )
 
 #ifdef NDEBUG
-#define ASSERT_LOG(cond, msg) do {} while (0)
+#define ASSERT_LOG(cond, msg) do {(void)sizeof(cond);} while (0)
 #else
 #define ASSERT_LOG(cond, msg)               \
 do {                                        \

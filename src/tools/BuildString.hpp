@@ -26,7 +26,7 @@ static void add_one(const T & arg, std::stringstream &ss)
     ss << arg;
 }
 
-static void print_more(std::stringstream &s)
+static void print_more(std::stringstream &)
 {
 }
 

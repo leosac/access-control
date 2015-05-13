@@ -27,9 +27,9 @@ Task::Task() :
         on_completion_([] () {}),
         on_success_([] () {}),
         on_failure_([] () {}),
-        complete_(false),
         success_(false),
-        eptr_(nullptr)
+        eptr_(nullptr),
+        complete_(false)
 {
 
 }

@@ -170,7 +170,7 @@ void RemoteControl::module_config(const std::string &module,
         sock.connect("inproc://module-" + module);
 
         bool ret = sock.send(zmqpp::message() << "DUMP_CONFIG" << cfg_format);
-        assert(ret);
+        ASSERT_LOG(ret, "Failed to send");
 
         zmqpp::message rep;
 

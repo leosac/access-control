@@ -303,7 +303,7 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 void FileAuthSourceMapper::load_schedules(const boost::property_tree::ptree &schedules)
 {
     bool ret = xml_schedules_.load(schedules);
-    assert(ret);
+    ASSERT_LOG(ret, "Failed to load schedules");
 }
 
 void FileAuthSourceMapper::map_schedules(const boost::property_tree::ptree &schedules_mapping)

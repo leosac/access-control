@@ -161,7 +161,7 @@ void WiegandReaderImpl::handle_request()
             return;
         }
         bool ret = buzzer_->turnOn(std::chrono::milliseconds(duration));
-        assert(ret);
+        ASSERT_LOG(ret, "Turning the buzzer ON failed.");
         sock_.send("OK");
     }
     else if (str == "BEEP_ON")
@@ -172,7 +172,7 @@ void WiegandReaderImpl::handle_request()
             return;
         }
         bool ret = buzzer_->turnOn();
-        assert(ret);
+        ASSERT_LOG(ret, "Turning the buzzer ON failed.");
         sock_.send("OK");
     }
     else if (str == "BEEP_OFF")
@@ -183,7 +183,7 @@ void WiegandReaderImpl::handle_request()
             return;
         }
         bool ret = buzzer_->turnOff();
-        assert(ret);
+        ASSERT_LOG(ret, "Turning the buzzer OFF failed.");
         sock_.send("OK");
     }
 }
