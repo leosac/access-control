@@ -100,6 +100,8 @@ namespace Leosac
                 on_failure_ = [=] () { c(); };
             }
 
+            const std::string &get_guid() const;
+
         private:
             virtual bool do_run() = 0;
 
@@ -113,6 +115,7 @@ namespace Leosac
             std::mutex                  mutex_;
             std::atomic_bool            complete_;
             std::condition_variable     cv_;
+            std::string                 guid_;
         };
 
     }

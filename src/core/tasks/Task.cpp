@@ -17,6 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <tools/GenGuid.h>
 #include "exception/ExceptionsTools.hpp"
 #include "tools/log.hpp"
 #include "Task.hpp"
@@ -29,7 +30,8 @@ Task::Task() :
         on_failure_([] () {}),
         success_(false),
         eptr_(nullptr),
-        complete_(false)
+        complete_(false),
+        guid_(Leosac::gen_uuid())
 {
 
 }
@@ -71,6 +73,7 @@ void Task::run()
         mutex_.unlock();
         cv_.notify_all();
     }
+    INFO("Task ~" << guid_ << "~ completed " << (success_ ? "successfully" : "with error."));
 }
 
 void Task::wait()
@@ -87,4 +90,9 @@ bool Task::succeed() const
 std::exception_ptr Task::get_exception() const
 {
     return eptr_;
+}
+
+const std::string &Task::get_guid() const
+{
+    return guid_;
 }

@@ -22,7 +22,7 @@ find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
 find_package(Boost 1.41.0 REQUIRED serialization regex)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11_FLAGS} -O2")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 #Build Options
