@@ -172,6 +172,8 @@ namespace Leosac
         */
         RemoteControlSecurity security_;
 
+        std::string current_client_idt_;
+
         // Allow kernel full access to this class.
         friend class Kernel;
     };

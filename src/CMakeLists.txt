@@ -53,6 +53,7 @@ set(LEOSAC_LIB_SRCS
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
     core/tasks/SyncConfig.cpp
+    core/tasks/RemoteControlAsyncResponse.cpp
 )
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)

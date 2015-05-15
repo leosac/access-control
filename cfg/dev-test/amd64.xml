@@ -19,27 +19,33 @@
         <public_key>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</public_key>
     </remote>
 
+    <no_import>
+        <TEST_AND_RESET />
+        <LED_BUZZER />
+        <PIFACEDIGITAL_GPIO />
+    </no_import>
+
     <modules>
 
-      <module>
-	<name>REPLICATION</name>
-	<file>libreplication.so</file>
-	<level>11</level>
-	<module_config>
-	  <delay>42</delay>
-	  <endpoint>qqeq</endpoint>
-	  <pubkey>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</pubkey>
-	</module_config>
-      </module>
+        <module>
+            <name>REPLICATION</name>
+            <file>libreplication.so</file>
+            <level>11</level>
+            <module_config>
+                <delay>42</delay>
+                <endpoint>qqeq</endpoint>
+                <pubkey>TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT</pubkey>
+            </module_config>
+        </module>
 
-      
-      <module>
+
+        <module>
             <name>STDIN_CONTROLLER</name>
             <file>libstdin-controller.so</file>
             <level>40</level>
 
         </module>
-           <module>
+        <module>
             <name>WIEGAND_READER</name>
             <file>libwiegand.so</file>
             <level>5</level>
@@ -73,13 +79,13 @@
             <module_config>
                 <file-bus>MY_LOGS.txt</file-bus>
                 <verbose>false</verbose>
-<!--                <ping>
-                    <ip>8.8.8.8</ip>
-                    <led>dummy</led>
-                </ping>-->
+                <!--                <ping>
+                                    <ip>8.8.8.8</ip>
+                                    <led>dummy</led>
+                                </ping>-->
             </module_config>
         </module>
-
+<!--
         <module>
             <name>TEST_AND_RESET</name>
             <file>libtest-and-reset.so</file>
@@ -92,6 +98,6 @@
                     </device>
                 </devices>
             </module_config>
-        </module>
+        </module>-->
     </modules>
 </kernel>

@@ -17,19 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <tools/gettid.hpp>
-#include "GetLocalConfigVersion.hpp"
-#include "core/kernel.hpp"
+#include "RemoteControlAsyncResponse.hpp"
 
-Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k) :
-        kernel_(k)
+using namespace Leosac;
+using namespace Leosac::Tasks;
+
+bool RemoteControlAsyncResponse::do_run()
 {
-
+    return socket_.send(msg_);
 }
 
-bool Leosac::Tasks::GetLocalConfigVersion::do_run()
+RemoteControlAsyncResponse::RemoteControlAsyncResponse(const std::string identity,
+                                                       const zmqpp::message_t &msg,
+                                                       zmqpp::socket_t &socket) :
+        socket_(socket)
 {
-    config_version_ = kernel_.config_manager().config_version();
-    return true;
+    msg_ = msg.copy();
+    msg_.push_front(identity);
 }

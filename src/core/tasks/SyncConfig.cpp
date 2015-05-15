@@ -117,7 +117,7 @@ void SyncConfig::sync_config()
         }
         else
         {
-            DEBUG("Ignoring module " << name);
+            DEBUG("Not reload config from backup for " << name);
         }
     }
 

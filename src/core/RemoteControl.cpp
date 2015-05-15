@@ -24,6 +24,7 @@
 #include "core/config/RemoteConfigCollector.hpp"
 #include "core/tasks/FetchRemoteConfig.hpp"
 #include "core/tasks/SyncConfig.hpp"
+#include "core/tasks/RemoteControlAsyncResponse.hpp"
 #include <cassert>
 #include <zmqpp/curve.hpp>
 #include <boost/regex.hpp>
@@ -94,13 +95,12 @@ void RemoteControl::handle_msg()
 {
     zmqpp::message msg;
     zmqpp::message rep;
-    std::string source;
     std::string frame1;
     socket_.receive(msg);
 
     assert(msg.parts() > 1);
-    msg >> source;
-    rep << source;
+    msg >> current_client_idt_;
+    rep << current_client_idt_;
 
     msg.pop_front();          // otherwise getting the "User-Id" property
     msg.reset_read_cursor();  // wont work.
@@ -273,12 +273,38 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
         auto sync_task = std::make_shared<Tasks::SyncConfig>(kernel_, fetch_task,
                                                              sync_general_config,
                                                              autocommit);
-        sync_task->set_on_success([]()
-                                  {
-                                      DEBUG("FINAL COMPLETION. YAY");
-                                  });
-
         auto *sched = &kernel_.core_utils()->scheduler();
+
+        auto success_response_task = std::make_shared<Tasks::RemoteControlAsyncResponse>
+                (current_client_idt_,
+                 zmqpp::message() << "Success" << sync_task->get_guid(), socket_);
+
+        auto failure_response_task = std::make_shared<Tasks::RemoteControlAsyncResponse>
+                (current_client_idt_,
+                 zmqpp::message() << "Failed" << sync_task->get_guid(), socket_);
+
+        auto abort_response_task = std::make_shared<Tasks::RemoteControlAsyncResponse>
+                (current_client_idt_,
+                 zmqpp::message() << "Aborted" << sync_task->get_guid(), socket_);
+
+        sync_task->set_on_success([=]()
+                                  {
+                                      success_response_task->run();
+                                      ASSERT_LOG(success_response_task->succeed(),
+                                                 "TASK FAILED");
+                                  });
+        sync_task->set_on_failure([=]()
+                                  {
+                                      failure_response_task->run();
+                                      ASSERT_LOG(failure_response_task->succeed(),
+                                                 "TASK FAILED");
+                                  });
+        fetch_task->set_on_failure([=]()
+                                   {
+                                       // not run on main thread, need to be queued.
+                                       sched->enqueue(abort_response_task, TargetThread::MAIN);
+                                   });
+
         fetch_task->set_on_success([=]()
                                    {
                                        DEBUG("FETCH TASK COMPLETE. WILL QUEUE SYNC_CONFIG");
@@ -287,7 +313,7 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
 
         kernel_.core_utils()->scheduler().enqueue(fetch_task, TargetThread::POOL);
 
-        *msg_out << "DELAYED";
+        *msg_out << "DELAYED" << sync_task->get_guid();
         return true;
     }
     return false;
