@@ -178,8 +178,17 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
 
     if (!child_opt)
     {
-        // import all
+        auto no_import_child = kernel_config_.get_child_optional("no_import");
+        boost::property_tree::ptree cpy;
+        if (no_import_child)
+        {
+             cpy = *no_import_child;
+        }
+        // import all (except no_import tag)
         kernel_config_ = new_cfg;
+        // restore
+        if (no_import_child)
+            kernel_config_.put_child("no_import", cpy);
         kernel_config_.add("kernel-cfg", kernel_cfg_file);
     }
     else
