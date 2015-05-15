@@ -56,7 +56,7 @@ void ReplicationModule::run()
 
 void ReplicationModule::process_config()
 {
-    delay_ = config_.get_child("module_config").get<int>("delay", 15);
+    delay_ = config_.get_child("module_config").get<int>("delay", 120);
     endpoint_ = config_.get_child("module_config").get<std::string>("endpoint");
     pubkey_ = config_.get_child("module_config").get<std::string>("pubkey");
 }

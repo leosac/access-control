@@ -5,6 +5,7 @@ import time
 import sys
 import zmq
 
+
 class CommandHandler(object):
     def __init__(self, sock, argv):
         self.socket_ = sock
@@ -13,18 +14,19 @@ class CommandHandler(object):
 
     def handle_command(self, cmd):
         cmd = cmd.lower()
-        if (cmd == "module_list"):
+        if cmd == "module_list":
             return self.handle_module_list();
-        elif (cmd == "module_config"):
+        elif cmd == "module_config":
             return self.handle_module_config(self.argv_[self.argv_offset])
-        elif (cmd == "sync_from"):
-            return self.sync_from(self.argv_[self.argv_offset], self.argv_[self.argv_offset + 1], self.argv_[self.argv_offset + 2], self.argv_[self.argv_offset + 3])
-        elif (cmd == "save"):
+        elif cmd == "sync_from":
+            return self.sync_from(self.argv_[self.argv_offset], self.argv_[self.argv_offset + 1],
+                                  self.argv_[self.argv_offset + 2], self.argv_[self.argv_offset + 3])
+        elif cmd == "save":
             return self.handle_save()
-        elif (cmd == "general_config"):
+        elif cmd == "general_config":
             return self.handle_general_config()
-        elif (cmd == "config_version"):
-            return self.handle_config_version();
+        elif cmd == "config_version":
+            return self.handle_config_version()
         else:
             print "Non-handled command: ", cmd
 
@@ -52,7 +54,10 @@ class CommandHandler(object):
         gl_cfg_sync = struct.pack("!B", int(global_cfg_sync))
         self.socket_.send_multipart(["SYNC_FROM", endpoint, autocommit, target_server_key, gl_cfg_sync])
         ret = self.socket_.recv_multipart()
-        return ret
+        print "First response", ret
+        print "Waiting to task completion / failure status message"
+        ret2 = self.socket_.recv_multipart()
+        return {"instant_response": ret, "async_response": ret2}
 
     def handle_save(self):
         print "Will ask Leosac to save its config to disk"
@@ -76,8 +81,10 @@ class CommandHandler(object):
         print "Configuration Version = " + str(version)
         return ret
 
+
 def print_usage():
     print "Usage: ./remote_control tcp_endpoint server_key command [params]"
+
 
 def run(user_params):
     if len(user_params) < 4:
@@ -89,7 +96,7 @@ def run(user_params):
     context = zmq.Context.instance()
     dealer = context.socket(zmq.DEALER)
 
-    #random key as the server doesn't check those
+    # random key as the server doesn't check those
     client_public, client_secret = zmq.curve_keypair()
     dealer.curve_serverkey = server_key
     dealer.curve_publickey = client_public
@@ -100,16 +107,19 @@ def run(user_params):
     print "Connected to " + connect_str
 
     ch = CommandHandler(dealer, user_params
-);
+                        );
     ret = ch.handle_command(user_params[3])
-    
+
     time.sleep(1)
     context.destroy(linger=5000)
     return ret
 
+
 def main():
     ret = run(sys.argv)
     print "Result = ", ret
+    return 0
+
 
 if __name__ == "__main__":
     ret = main()
