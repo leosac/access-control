@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <kernel>
+    <instance_name>blaha</instance_name>
     <plugin_directories>
         <plugindir>../install/lib/leosac/</plugindir>
     </plugin_directories>

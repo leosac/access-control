@@ -18,6 +18,8 @@
 */
 
 #include "AuthFileModule.hpp"
+#include "core/CoreUtils.hpp"
+#include "core/kernel.hpp"
 
 using namespace Leosac::Module::Auth;
 
@@ -58,7 +60,10 @@ void AuthFileModule::process_config()
                 auth_sources_names.push_back(subnode.second.data());
         }
 
-        INFO("Creating AuthFile instance " << auth_ctx_name);
+        if (!auth_target_name.empty())
+            auth_target_name = utils_->kernel().instance_name();
+
+        INFO("Creating AuthFile instance " << auth_ctx_name << ". Target door = " << auth_target_name);
         authenticators_.push_back(AuthFileInstancePtr(new AuthFileInstance(ctx_,
                 auth_ctx_name,
                 auth_sources_names,

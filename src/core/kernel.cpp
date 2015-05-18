@@ -41,7 +41,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config,
                        std::make_shared<Scheduler>(this),
                        std::make_shared<ConfigChecker>(),
                                            strict)),
-        config_manager_(config),
+        config_manager_(config, *this),
         ctx_(),
         bus_(ctx_),
         control_(ctx_, zmqpp::socket_type::rep),
@@ -55,6 +55,8 @@ Kernel::Kernel(const boost::property_tree::ptree &config,
 {
     configure_logger();
     extract_environ();
+
+    instance_name_ = config.get<std::string>("instance_name");
 
     if (config.get_child_optional("network"))
     {
@@ -375,4 +377,9 @@ void Kernel::restart_later()
 CoreUtilsPtr Kernel::core_utils()
 {
     return utils_;
+}
+
+const std::string &Kernel::instance_name() const
+{
+    return instance_name_;
 }

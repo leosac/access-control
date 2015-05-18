@@ -21,11 +21,21 @@ Here is an overview of what we call "general configuration":
 Path Management {#general_config_path_mng}
 ==========================================
 
-Leosac has to know 2 importants paths:
+Leosac has to know 2 important paths:
   1. The path to the factory configuration directory: this can be set with the environment variable
    `LEOSAC_FACTORY_CONFIG_DIR`.
   2. Paths to where Leosac's shell scripts are saved. Customizable with `LEOSAC_SCRIPTS_DIR` env variable.
-  
+
+
+Instance Name {#general_instance_name}
+--------------------------------------
+
+Each unit is given an `instance_name` to help identify it when running in a environment
+with multiple Leosac system. This field is mandatory.
+   1. This `instance_name` information is never synchronized.
+   2. It is used to automatically prefix some configuration option: for example
+   the `target` (door) in the auth file module. This allows easier config synchronization.
+
 
 Automatic Configuration Saving {#general_config_save}
 =====================================================

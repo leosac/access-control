@@ -27,9 +27,10 @@
 
 using namespace Leosac;
 
-ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg) :
+ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg, Kernel &kernel) :
         kernel_config_(cfg),
-        version_(0)
+        version_(0),
+        kernel_(kernel)
 {
     version_ = cfg.get<uint64_t>("version", 0);
 }
@@ -57,7 +58,7 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
     boost::property_tree::ptree general_cfg;
 
     for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network",
-                                        "autosave", "sync_dest", "no_import"})
+                                        "autosave", "sync_dest", "no_import", "instance_name"})
     {
         auto child_opt = kernel_config_.get_child_optional(cfg_name);
         if (child_opt)
@@ -79,16 +80,18 @@ boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
     {
         // return all minus the `no_import` tag.
         general_cfg.erase("no_import");
+        general_cfg.erase("instance_name");
         return general_cfg;
     }
 
     for (const auto &c : *child_opt)
     {
-        ASSERT_LOG(c.first != "no_import", "Cannot export the `no_import` tag. Check your"
-                " `sync_source` configuration tag.");
-        if (c.first == "no_import")
+        ASSERT_LOG(c.first != "no_import" || c.first == "instance_name",
+                   "Cannot export the " << c.first << " tag. Check your"
+                                                              " `sync_source` configuration tag.");
+        if (c.first == "no_import" || c.first == "instance_name")
         {
-            WARN("You cannot export the `no_import ` tag.");
+            WARN("You cannot export the " << c.first << " tag.");
             continue;
         }
         if (c.second.get_value<bool>())
@@ -190,6 +193,7 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
         if (no_import_child)
             kernel_config_.put_child("no_import", cpy);
         kernel_config_.add("kernel-cfg", kernel_cfg_file);
+        kernel_config_.put("instance_name", kernel_.instance_name());
     }
     else
     {

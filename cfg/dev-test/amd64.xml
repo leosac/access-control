@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <kernel>
-    <plugin_directories>
+  <instance_name>fixe</instance_name>
+  <plugin_directories>
         <plugindir>.</plugindir>
     </plugin_directories>
 
