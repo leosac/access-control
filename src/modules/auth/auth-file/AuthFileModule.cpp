@@ -61,7 +61,7 @@ void AuthFileModule::process_config()
         }
 
         if (!auth_target_name.empty())
-            auth_target_name = utils_->kernel().instance_name();
+            auth_target_name = utils_->kernel().config_manager().instance_name() + auth_target_name;
 
         INFO("Creating AuthFile instance " << auth_ctx_name << ". Target door = " << auth_target_name);
         authenticators_.push_back(AuthFileInstancePtr(new AuthFileInstance(ctx_,

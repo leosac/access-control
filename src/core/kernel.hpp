@@ -116,12 +116,6 @@ namespace Leosac
         std::string factory_config_directory() const;
 
 
-        /**
-         * Return the name of the instanced assigned in the configuration file.
-         * @note This method is thread safe because the instance name shall never
-         * change.
-         */
-        const std::string &instance_name() const;
 
         /**
          * Returns a reference to the module manager object (const version).

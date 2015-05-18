@@ -3,6 +3,7 @@
 merge those config file, and that the merge honor <sync_dest>
 -->
 <kernel>
+    <instance_name>blah</instance_name>
 
     <!-- Normal kernel-cfg is set by leosac core. Since we are unit testing,
     we fake it and add it ourselves -->

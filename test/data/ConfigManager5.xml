@@ -3,6 +3,7 @@
 merge those config file, and that the merge honor <sync_dest>
 -->
 <kernel>
+    <instance_name>blah</instance_name>
 
     <plugin_directories>
         <plugindir>llama</plugindir>

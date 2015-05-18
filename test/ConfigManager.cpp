@@ -38,7 +38,9 @@ namespace Leosac
         public:
             ConfigManagerTest()
             {
-                cfg0 = std::make_shared<ConfigManager>(boost::property_tree::ptree());
+                boost::property_tree::ptree empty_cfg;
+                empty_cfg.add<std::string>("instance_name", "OoOoO");
+                cfg0 = std::make_shared<ConfigManager>(empty_cfg);
 
                 auto cfg_tree = Tools::propertyTreeFromXmlFile(gl_data_path + "ConfigManager1.xml");
                 cfg1 = std::make_shared<ConfigManager>(cfg_tree.get_child("kernel"));

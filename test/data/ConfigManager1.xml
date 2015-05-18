@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <kernel>
+    <instance_name>blah</instance_name>
     <sync_source>
         <log>true</log>
         <network>false</network>

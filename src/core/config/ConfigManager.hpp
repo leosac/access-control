@@ -43,11 +43,8 @@ namespace Leosac
     public:
         /**
          * Construct the Configuration Manager from a property tree.
-         *
-         * The Kernel reference is used to retrieve the instance_name.
          */
-        ConfigManager(const boost::property_tree::ptree &cfg,
-                      Kernel &kernel);
+        ConfigManager(const boost::property_tree::ptree &cfg);
         virtual ~ConfigManager() = default;
         
         ConfigManager(const ConfigManager &)= default;
@@ -161,6 +158,13 @@ namespace Leosac
          */
         void incr_version();
 
+        /**
+         * Return the name of the instanced assigned in the configuration file.
+         * @note This method is thread safe because the instance name shall never
+         * change.
+         */
+        const std::string &instance_name() const;
+
     private:
         /**
         * Maps a module's name to a property tree object.
@@ -175,7 +179,7 @@ namespace Leosac
 
         uint64_t version_;
 
-        Kernel &kernel_;
+        std::string instance_name_;
     };
 }
 

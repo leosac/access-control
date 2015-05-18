@@ -27,12 +27,13 @@
 
 using namespace Leosac;
 
-ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg, Kernel &kernel) :
+ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg) :
         kernel_config_(cfg),
-        version_(0),
-        kernel_(kernel)
+        version_(0)
 {
     version_ = cfg.get<uint64_t>("version", 0);
+    ASSERT_LOG(cfg.get_child_optional("instance_name"), "No instance_name specified.");
+    instance_name_ = cfg.get<std::string>("instance_name");
 }
 
 boost::property_tree::ptree ConfigManager::get_application_config()
@@ -193,7 +194,7 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
         if (no_import_child)
             kernel_config_.put_child("no_import", cpy);
         kernel_config_.add("kernel-cfg", kernel_cfg_file);
-        kernel_config_.put("instance_name", kernel_.instance_name());
+        kernel_config_.put("instance_name", instance_name());
     }
     else
     {
@@ -252,4 +253,9 @@ bool ConfigManager::has_config(const std::string &module) const
 void ConfigManager::config_version(uint64_t new_version)
 {
     version_ = new_version;
+}
+
+const std::string &ConfigManager::instance_name() const
+{
+    return instance_name_;
 }
