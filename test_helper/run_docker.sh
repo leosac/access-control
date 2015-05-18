@@ -15,6 +15,7 @@ Red='\e[0;31m';
 DOCKER_CONTAINER=leosac
 
 docker run --privileged=true -t ${DOCKER_CONTAINER} "(pushd /leosac_src/test_helper/$1/ && INSTALL_DIR=/usr/local ./run_test.sh && popd)" \
-    || { echo  -e ${Red}"Test $1 failed :(" ${RCol} ; exit 1; }
+    && echo "Test $1 succeeded" >> RES \
+	|| { echo  -e ${Red}"Test $1 failed :(" ${RCol} ; echo "Test $1 failed" >> RES ; exit 1; }
 
 exit 0

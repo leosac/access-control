@@ -13,6 +13,7 @@ Blu='\e[0;34m';
 which parallel > /dev/null || { echo "Need GNU parallel." ; exit 1; }
 
 echo "Running tests, using $1 as install directory"
+echo "New tests suite: `date`" > RES
 
 total_test=`find . -maxdepth 1 -mindepth 1 -type d | wc -l`
 echo -e ${Yel} "We will run ${total_test} tests" ${RCol}
