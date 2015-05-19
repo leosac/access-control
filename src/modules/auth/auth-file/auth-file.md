@@ -36,10 +36,11 @@ permissions.
   + the `config_file` path is relative to the working directory of Leosac.
   + You can enter multiple `auth_source` device. The module instance will listen to all of them.
 
-@warning The `target` field is prefixed by the instance name when checking for permission
+@warning The `target` field is prefixed by the instance name and a dot when checking for permission
 in the permission configuration file. This makes it easier to synchronize: you put all
 configuration in the permission file and simply sync everything, the name of the door will
-adapt based on the instance name.
+adapt based on the instance name. Assuming `instance_name` being `rpi-1` and `target` being
+`door1` the matching name in the permission file shall be `rpi-1.door1`.
 
 Users {#mod_auth_user}
 ======================
