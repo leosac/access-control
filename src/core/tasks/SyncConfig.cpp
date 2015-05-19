@@ -36,7 +36,7 @@ SyncConfig::SyncConfig(Kernel &kref,
         sync_general_config_(sync_general_config),
         autocommit_(autocommit)
 {
-
+    INFO("Creating SyncConfig task. Guid = " << get_guid());
 }
 
 bool SyncConfig::do_run()

@@ -17,12 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <tools/log.hpp>
 #include "GenericTask.hpp"
 
 Leosac::Tasks::GenericTask::GenericTask(const std::function<bool(void)> &fct) :
         fct_(fct)
 {
-
+    INFO("Creating GenericTask task. Guid = " << get_guid());
 }
 
 bool Leosac::Tasks::GenericTask::do_run()

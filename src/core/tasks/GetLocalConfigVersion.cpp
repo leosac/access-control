@@ -25,7 +25,7 @@
 Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k) :
         kernel_(k)
 {
-
+    INFO("Creating GetLocalConfigVersion task. Guid = " << get_guid());
 }
 
 bool Leosac::Tasks::GetLocalConfigVersion::do_run()

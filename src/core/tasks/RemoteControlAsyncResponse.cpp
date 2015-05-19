@@ -17,6 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <tools/log.hpp>
 #include "RemoteControlAsyncResponse.hpp"
 
 using namespace Leosac;
@@ -32,6 +33,7 @@ RemoteControlAsyncResponse::RemoteControlAsyncResponse(const std::string identit
                                                        zmqpp::socket_t &socket) :
         socket_(socket)
 {
+    INFO("Creating RemoteControlAsyncResponse task. Guid = " << get_guid());
     msg_ = msg.copy();
     msg_.push_front(identity);
 }

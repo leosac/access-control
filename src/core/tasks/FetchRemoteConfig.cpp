@@ -28,7 +28,7 @@ FetchRemoteConfig::FetchRemoteConfig(const std::string &endpoint,
         ctx_(),
         collector_(ctx_, endpoint, pubkey)
 {
-
+    INFO("Creating FetchRemoteConfig task. Guid = " << get_guid());
 }
 
 bool FetchRemoteConfig::do_run()

@@ -30,7 +30,7 @@ Tasks::GetRemoteConfigVersion::GetRemoteConfigVersion(const std::string &endpoin
         endpoint_(endpoint),
         pubkey_(pubkey)
 {
-
+    INFO("Creating GetRemoteConfigVersion task. Guid = " << get_guid());
 }
 
 bool Tasks::GetRemoteConfigVersion::do_run()

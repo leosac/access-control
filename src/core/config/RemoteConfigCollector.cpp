@@ -36,7 +36,7 @@ RemoteConfigCollector::RemoteConfigCollector(zmqpp::context_t &ctx,
         remote_endpoint_(remote_endpoint),
         remote_pk_(remote_pk),
         sock_(ctx, zmqpp::socket_type::dealer),
-        mstimeout_(2500),
+        mstimeout_(5000),
         first_call_(true),
         succeed_(false)
 {

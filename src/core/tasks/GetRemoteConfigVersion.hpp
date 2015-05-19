@@ -39,7 +39,7 @@ namespace Leosac
 
             uint64_t config_version_;
 
-            static constexpr const int timeout = 2000;
+            static constexpr const int timeout = 5000;
 
         private:
             virtual bool do_run() override;
