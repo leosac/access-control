@@ -52,15 +52,15 @@ class RemoteController():
 
 class Command():
     """
-    Base class for command object
+    Base class for command object.
     """
 
     def __init__(self):
-        pass
+        self.status = None
 
     def to_zmq_message(self):
         """
-        Convert the command to its ZeroMQ representation (a list of frames)
+        Convert the command to its ZeroMQ representation (a list of frames).
 
         :return: A list of ZeroMQ frames
         """
@@ -79,7 +79,7 @@ class Command():
 
 class GeneralConfigCommand(Command):
     """
-    Command object to retrieve the GeneralConfiguration from the remote host
+    Command object to retrieve the GeneralConfiguration from the remote host.
     """
 
     def __init__(self, config_format):
@@ -99,7 +99,6 @@ class GeneralConfigCommand(Command):
             logging.error("Invalid config format: {0}".format(config_format))
             exit(-1)
         self.format = config_format
-        self.status = None
         self.config = ""
 
     def to_zmq_message(self):
@@ -116,3 +115,40 @@ class GeneralConfigCommand(Command):
 
     def __str__(self):
         return "<RemoteControl.GeneralConfigCommand>"
+
+
+class ModuleConfigCommand(Command):
+    """
+    Command object to retrieve the configuration of a Leosac module.
+
+    Config format is force to XML.
+    """
+
+    def __init__(self, module_name):
+        """
+        Initialize the command so that it fetches the config for module_name.
+
+        :param module_name: Name of the config to fetch config for.
+        :return:
+        """
+        self.module_name = module_name.encode("utf-8")
+
+        # Module name sent by server.
+        self.module = None
+        self.config = None
+
+    def to_zmq_message(self):
+        cfg_format = struct.pack("!B", 1)
+        return ["MODULE_CONFIG".encode("utf-8"), self.module_name, cfg_format]
+
+    def feed_response(self, frames):
+        if frames[0] == bytes("OK", "ascii"):
+            self.status = True
+        else:
+            self.status = False
+            return
+        self.module = frames[1].decode("utf-8")
+        self.config = frames[2].decode("utf-8")
+
+    def __str__(self):
+        return "<RemoteControl.ModuleConfigCommand>"

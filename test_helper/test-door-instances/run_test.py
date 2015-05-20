@@ -11,11 +11,10 @@
 # + Simulate Auth against Leosac 2. Should fail.
 
 import subprocess
-import logging
-import signal
 import re
 from InstrumentationClient import WiegandClient
 from Utils import *
+from Runner import LeosacRunner
 
 
 def insert_card_and_get_output(process):
@@ -32,7 +31,7 @@ def insert_card_and_get_output(process):
             break
         except subprocess.TimeoutExpired:
             logging.info("Communicate() timeout expired.")
-            process.send_signal(signal.SIGINT)
+            process.interrupt()
             count += 1
 
     process.wait()
@@ -54,12 +53,12 @@ def check_access_denied(log):
 def main():
     try:
         logging.info("Leosac path is [{0}]".format(get_leosac_path()))
-        leosac_1 = subprocess.Popen([get_leosac_path(), "-k", "this_test/rpi1-cfg.xml"], stdout=subprocess.PIPE)
+        leosac_1 = LeosacRunner("this_test/rpi1-cfg.xml")
         out = insert_card_and_get_output(leosac_1)
         logging.info("Leosac 1 output: {0}".format(out))
         check_access_granted(out)
 
-        leosac_2 = subprocess.Popen([get_leosac_path(), "-k", "this_test/rpi2-cfg.xml"], stdout=subprocess.PIPE)
+        leosac_2 = LeosacRunner("this_test/rpi2-cfg.xml")
         out = insert_card_and_get_output(leosac_2)
         logging.info("Leosac 2 output: {0}".format(out))
         check_access_denied(out)
