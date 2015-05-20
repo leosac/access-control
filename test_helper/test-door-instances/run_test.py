@@ -52,9 +52,6 @@ def check_access_denied(log):
 
 
 def main():
-    logging.basicConfig(format='%(asctime)s %(message)s',
-                        level=logging.DEBUG,
-                        datefmt='%m/%d/%Y %H:%M:%S:')
     try:
         logging.info("Leosac path is [{0}]".format(get_leosac_path()))
         leosac_1 = subprocess.Popen([get_leosac_path(), "-k", "this_test/rpi1-cfg.xml"], stdout=subprocess.PIPE)
@@ -83,4 +80,5 @@ def main():
 
 
 if __name__ == "__main__":
+    preconfigure()
     main()

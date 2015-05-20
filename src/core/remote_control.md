@@ -137,7 +137,7 @@ The `GENERAL_CONFIG` command retrieve Leosac's general configuration. This mean 
 data except the modules' configuration.
 
 It is wise to not export all the configuration. For example, the `<remote>` tag include the server
-private. You probably don't want to share this.
+private key. You probably don't want to share this.
 To control what information are sent when receiving a GENERAL_CONFIG command, see
 [the sync_source configuration option](@ref sync_source).
 
@@ -145,6 +145,8 @@ Frame    | Content                                        | Type
 ---------|------------------------------------------------|-------------------------------------------------------------
 1        | "GENERAL_CONFIG"                               | `string`
 2        | Configuration Type (boost text archive or xml) | `uint8_t`
+
+@note: Configuration is an enumeration named [ConfigFormat](@ref Leosac::ConfigManager::ConfigFormat).
 
 Response
 

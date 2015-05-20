@@ -32,3 +32,16 @@ def get_leosac_path():
         return path
     logging.error("Cannot find Leosac.")
     exit(-1)
+
+
+def preconfigure():
+    """
+    Run some global pre configuration stuff.
+    This method should be called before python main().
+
+    Currently, it configures the logger.
+    :return:
+    """
+    logging.basicConfig(format='%(asctime)s %(message)s',
+                        level=logging.DEBUG,
+                        datefmt='%m/%d/%Y %H:%M:%S:')

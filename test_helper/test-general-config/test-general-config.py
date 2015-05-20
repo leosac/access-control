@@ -1,32 +1,31 @@
 #!/usr/bin/env python
 
-import remote_control
-import sys
+from RemoteControl import *
+from Utils import preconfigure
+
 
 def main():
-    print "Hello, I will query the general config information"
-    
-    p = ["", "127.0.0.1:12345", "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT", "general_config"]
-    ret = remote_control.run(p)
+    print("Hello, I will query the general config information")
 
-    print ret
-    if len(ret) != 2 or ret[0] != "OK":
-        print "Failed to retrieve general config."
-        return 1
+    rc = RemoteController("127.0.0.1:12345", "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT")
+    cmd = GeneralConfigCommand(1)  # xml format
 
-    cfg = ret[1];
+    rc.execute_command(cmd)
+    test_assert(cmd.status is True, "Command failed")
+
     expected = """<?xml version="1.0" encoding="utf-8"?>
 <plugin_directories>
 	<plugindir>./install/lib/leosac</plugindir>
 	<plugindir>./install/lib/leosac/auth</plugindir>
 </plugin_directories>
-"""
-    ## test the contain of the response.
-    if ret[1] != expected:
-        print "Invalid content in response"
-        return 1
+""".encode("utf-8")
+
+    # Make sure the config received is what we expect.
+    test_assert(cmd.config == expected, "Invalid content in response")
     return 0
 
+
 if __name__ == "__main__":
+    preconfigure()
     ret = main()
     exit(ret)
