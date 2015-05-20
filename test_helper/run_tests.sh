@@ -19,7 +19,7 @@ total_test=`find . -maxdepth 1 -mindepth 1 -type d | wc -l`
 echo -e ${Yel} "We will run ${total_test} tests" ${RCol}
 
 ## the run_docker script require a test-folder name.
-find . -maxdepth 1 -mindepth 1 -type d | parallel ./run_docker.sh {} ;
+find . -name "test-*" -maxdepth 1 -mindepth 1 -type d | parallel ./run_docker.sh {} ;
 
 RET_VALUE=$?
 ## parallel ret value is our test suite return value.

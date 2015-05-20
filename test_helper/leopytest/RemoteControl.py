@@ -121,7 +121,7 @@ class ModuleConfigCommand(Command):
     """
     Command object to retrieve the configuration of a Leosac module.
 
-    Config format is force to XML.
+    Config format is forced to XML.
     """
 
     def __init__(self, module_name):
@@ -152,3 +152,53 @@ class ModuleConfigCommand(Command):
 
     def __str__(self):
         return "<RemoteControl.ModuleConfigCommand>"
+
+
+class ModuleListCommand(Command):
+    """
+    Command object to retrieve the list of modules running on Leosac.
+    """
+
+    def __init__(self):
+        """
+        Initialize the command
+        :return:
+        """
+        self.modules = None
+
+    def to_zmq_message(self):
+        return ["MODULE_LIST".encode("utf-8")]
+
+    def feed_response(self, frames):
+        self.status = True
+        self.modules = []
+        for frame in frames:
+            self.modules.append(frame.decode("ascii"))
+
+    def __str__(self):
+        return "<RemoteControl.ModuleListCommand>"
+
+
+class SaveCommand(Command):
+    """
+    Command object to retrieve to trigger configuration save.
+    """
+
+    def __init__(self):
+        """
+        Initialize the command
+        :return:
+        """
+        pass
+
+    def to_zmq_message(self):
+        return ["SAVE".encode("utf-8")]
+
+    def feed_response(self, frames):
+        if frames[0] == bytes("OK", "ascii"):
+            self.status = True
+        else:
+            self.status = False
+
+    def __str__(self):
+        return "<RemoteControl.SaveCommand>"

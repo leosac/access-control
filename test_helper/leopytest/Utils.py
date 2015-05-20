@@ -1,5 +1,6 @@
 import logging
 import os
+import subprocess
 
 
 def test_assert(res, msg):
@@ -23,15 +24,11 @@ def get_leosac_path():
     """
 
     path = os.getcwd() + "/install/bin/leosac"
+    if not os.path.isfile(path):
+        path = subprocess.check_output(["which", "leosac"])
+
     test_assert(os.path.isfile(path), "Cannot find leosac binary")
     return path
-
-    if os.environ.get("INSTALL_DIR"):
-        path = os.environ["INSTALL_DIR"] + "/install/bin/leosac"
-        test_assert(os.path.isfile(path), "Cannot find leosac binary")
-        return path
-    logging.error("Cannot find Leosac.")
-    exit(-1)
 
 
 def preconfigure():

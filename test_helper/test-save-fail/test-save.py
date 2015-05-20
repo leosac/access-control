@@ -1,21 +1,18 @@
-#!/usr/bin/env python
+# Test the SAVE command.
+#
 
-import remote_control
-import sys
+from RemoteControl import RemoteController, SaveCommand
+from Utils import *
+
 
 def main():
-    print "Hello, will attempt to SAVE"
+    rc = RemoteController("127.0.0.1:12345", "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT")
+    cmd = SaveCommand()
 
-    p = ["", "127.0.0.1:12345", "TJz$:^DbZvFN@wv/ct&[Su6Nnu6w!fMGHEcIttyT", "save"]
-    ret = remote_control.run(p)
-
-    print ret
-
-    if len(ret) == 2 and ret[0] == "KO":
-        return 0;
-    print "Looks like SAVE succeeded but should have failed"
-    return 1
+    rc.execute_command(cmd)
+    test_assert(cmd.status is False,
+                "Successfully saved configuration while it was supposed to fail")
 
 if __name__ == "__main__":
-    ret = main()
-    exit(ret)
+    preconfigure()
+    main()
