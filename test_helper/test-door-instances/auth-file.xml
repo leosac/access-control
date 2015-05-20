@@ -1,0 +1,60 @@
+<root>
+    <users>
+        <user>
+            <name>MY_USER</name>
+        </user>
+    </users>
+
+    <credentials>
+        <map>
+            <user>MY_USER</user>
+            <WiegandCard>
+                <card_id>aa:bb:cc:42</card_id>
+                <bits>32</bits>
+            </WiegandCard>
+        </map>
+    </credentials>
+
+    <schedules>
+        <schedule>
+            <name>all</name>
+            <monday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </monday>
+            <tuesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </tuesday>
+            <wednesday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </wednesday>
+            <thursday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </thursday>
+            <friday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </friday>
+            <saturday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </saturday>
+            <sunday>
+                <start>00:00</start>
+                <end>23:59</end>
+            </sunday>
+        </schedule>
+    </schedules>
+
+    <schedules_mapping>
+        <map>
+            <schedule>all</schedule>
+            <user>MY_USER</user>
+            <door>rpi-1.doorA</door>
+        </map>
+    </schedules_mapping>
+
+</root>

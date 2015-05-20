@@ -5,7 +5,7 @@
 #
 # It also set useful variables and sanitize test environment by
 # copying binary and config files and making sure the script is
-# launch from an appropriate directory.
+# launched from an appropriate directory.
 
 RCol='\e[0m' # Text Reset
 Bla='\e[0;30m';
@@ -43,6 +43,9 @@ echo -e ${Yel}"Working directory for this test:"${RCol} $TMP_DIR
 
 ## This test source directory
 SCRIPT_DIR=`pwd`
+
+## Install Leopytest (Python test helper package for Leosac)
+pip3 install /leosac_src/test_helper/leopytest/
 
 ## Instrumentation Client (python script)
 INSTR="$SCRIPT_DIR/../instrumentation_client.py /tmp/leosac-ipc"

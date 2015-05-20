@@ -11,7 +11,9 @@ RUN apt-get install autotools-dev automake pkg-config libsodium-dev -y
 
 RUN apt-get install libgtest-dev python valgrind python-pip libpython2.7-dev -y
 
-RUN pip install pyzmq
+RUN apt-get install python3 python3-pip -y
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.4 2
+RUN pip3 install pyzmq
 
 RUN git clone git://github.com/zeromq/libzmq.git; \
 cd libzmq; \
