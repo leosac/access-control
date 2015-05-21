@@ -1,4 +1,6 @@
-# Leosac [![Build Status](https://travis-ci.org/islog/leosac.png?branch=develop)](https://travis-ci.org/islog/leosac)
+# Leosac
+
+[![Build Status](https://travis-ci.org/islog/leosac.png?branch=develop)](https://travis-ci.org/islog/leosac)
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/islog/leosac?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
