@@ -1,3 +1,9 @@
+leosac (0.6.0-1) UNRELEASED; urgency=medium
+
+  * Master / Slave mode
+
+ --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 18:00:25 +0100
+
 leosac (0.5.2-1) UNRELEASED; urgency=medium
 
   * A few documentation patches
