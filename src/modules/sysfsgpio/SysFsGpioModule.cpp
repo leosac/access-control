@@ -20,10 +20,12 @@
 #include <memory>
 #include <zmqpp/message.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
+#include "tools/log.hpp"
 #include <zmqpp/context.hpp>
 #include "SysFsGpioModule.hpp"
 #include "SysFsGpioConfig.hpp"
+#include <core/kernel.hpp>
+
 
 using namespace Leosac::Module::SysFsGpio;
 using Leosac::Tools::UnixFs;
@@ -82,12 +84,17 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
             interrupt_mode = SysFsGpioPin::InterruptMode::Falling;
         else if (gpio_interrupt == "rising")
             interrupt_mode = SysFsGpioPin::InterruptMode::Rising;
+        else
+            interrupt_mode = SysFsGpioPin::InterruptMode::None;
 
         direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In
                                             : SysFsGpioPin::Direction::Out);
         gpios_.push_back(
                 new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, interrupt_mode,
                                  gpio_initial_value, *this));
+
+        utils_->config_checker().register_object(gpio_name, ConfigChecker::ObjectType::GPIO);
+
     }
 }
 
