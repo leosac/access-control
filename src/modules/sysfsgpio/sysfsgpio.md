@@ -41,8 +41,8 @@ Path information
 ----------------
 Path configuration allows the user the use the same `sysfsgpio` module on multiple platform even when
 the path-to-gpio / naming-convention of GPIO pins varies.
-The `__REPLACE__ME` placeholder will be replaced by the *identifier* of the pin. This identifier is the GPIO
-pin number. This replace involve the `aliases` configuration options.
+The `__REPLACE__ME__` placeholder will be replaced by the *identifier* of the pin. This identifier is the GPIO
+pin number. This replacement involve the `aliases` configuration options.
 
 A simple example:
     + We have pin `14` and `value_path` = `/sys/class/gpio/__REPLACE_ME__/value`.

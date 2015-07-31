@@ -55,7 +55,7 @@ Short | Long                   | Description
 -d    | `--working-directory`  | Directory to cd to.
 -k    | `--kernel-cfg`         | Leosac's core configuration file
 -h    | `--help`               | Print the help
--s    | `--scrict`             | Run more deadly check against the configuration (recommended)
+-s    | `--strict`             | Run more deadly check against the configuration (recommended)
 N/A   | `--version`            | Display version informations and exit
 
 Notes {#notes}
