@@ -93,6 +93,7 @@ Below is a base configuration file:
 ~~~~~~~~~~~~~~~~~~~~~.xml
 <?xml version="1.0"?>
 <kernel>
+    <instance_name>my_leosac</instance_name>
     <plugin_directories>
         <plugindir>/usr/lib/leosac</plugindir>
         <plugindir>/usr/lib/leosac/auth</plugindir>

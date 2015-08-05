@@ -67,8 +67,7 @@ std::string Leosac::Tools::propertyTreeToXml(const boost::property_tree::ptree &
     std::stringstream ss;
     try
     {
-        boost::property_tree::xml_writer_settings<char> settings('\t', 1);
-        write_xml(ss, tree, settings);
+        write_xml(ss, tree, boost::property_tree::xml_writer_make_settings<std::string>('\t', 1));
     }
     catch (ptree_error &e)
     {

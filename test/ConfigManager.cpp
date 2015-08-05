@@ -121,9 +121,9 @@ namespace Leosac
             auto c2 = cfg.get_child_optional("log");
             auto c3 = cfg.get_child_optional("network");
 
-            ASSERT_FALSE(c1);
-            ASSERT_TRUE(c2);
-            ASSERT_FALSE(c3);
+            ASSERT_FALSE(!!c1);
+            ASSERT_TRUE(!!c2);
+            ASSERT_FALSE(!!c3);
         }
 
         /**
@@ -139,9 +139,9 @@ namespace Leosac
             auto c2 = cfg.get_child_optional("log");
             auto c3 = cfg.get_child_optional("network");
 
-            ASSERT_TRUE(c1);
-            ASSERT_TRUE(c2);
-            ASSERT_TRUE(c3);
+            ASSERT_TRUE(!!c1);
+            ASSERT_TRUE(!!c2);
+            ASSERT_TRUE(!!c3);
         }
 
         TEST_F(ConfigManagerTest, build_safe_cfg3)
@@ -177,9 +177,9 @@ namespace Leosac
             auto c2 = merged_cfg.get_child_optional("remote");
             auto c3 = merged_cfg.get_child_optional("plugin_directories");
 
-            ASSERT_TRUE(c1);
-            ASSERT_FALSE(c2);
-            ASSERT_TRUE(c3);
+            ASSERT_TRUE(!!c1);
+            ASSERT_FALSE(!!c2);
+            ASSERT_TRUE(!!c3);
         }
 
         /**
@@ -205,9 +205,9 @@ namespace Leosac
             auto c2 = merged_cfg.get_child_optional("remote");
             auto c3 = merged_cfg.get_child_optional("plugin_directories");
 
-            ASSERT_TRUE(c1);
-            ASSERT_TRUE(c2);
-            ASSERT_TRUE(c3);
+            ASSERT_TRUE(!!c1);
+            ASSERT_TRUE(!!c2);
+            ASSERT_TRUE(!!c3);
 
             auto port = (*c2).get<int>("port");
             ASSERT_EQ(12347, port);

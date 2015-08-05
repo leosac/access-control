@@ -111,7 +111,7 @@ to create temporary cards with more privilege than the user usually have.
 WiegandCard {#mod_auth_cred_wiegandcard}
 -----------------------------------------
 
-This credentials is simply a Wiegand card number. Is it qualified through a string
+This credentials is simply a Wiegand card number. It is qualified through a string
 representing the card id, and an integer representing the number of meaningful bits in 
 the card id.
 
