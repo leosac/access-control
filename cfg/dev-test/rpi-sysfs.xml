@@ -8,6 +8,8 @@
         <enabled>false</enabled>
     </network>
 
+    <instance_name>blah</instance_name>
+
     <modules>
         <module>
             <name>STDIN_CONTROLLER</name>
@@ -38,7 +40,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
 
         <module>
             <name>MONITOR</name>
-            <file>libpersistent-monitor.so</file>
+            <file>libmonitor.so</file>
             <level>1</level>
 
             <module_config>
@@ -48,7 +50,7 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
         </module>
 
         <module>
-            <name>SYSFS-GPIO</name>
+            <name>SYSFS_GPIO</name>
             <file>libsysfsgpio.so</file>
             <level>2</level>
 

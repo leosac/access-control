@@ -17,19 +17,22 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include "SysFsGpioConfig.hpp"
 #include <boost/algorithm/string.hpp>
+#include "SysFsGpioConfig.hpp"
+#include "tools/log.hpp"
+#include "tools/PropertyTreeExtractor.hpp"
 
 using namespace Leosac::Module::SysFsGpio;
 
 SysFsGpioConfig::SysFsGpioConfig(const boost::property_tree::ptree &cfg)
 {
-    cfg_export_path_ = cfg.get<std::string>("export_path");
-    cfg_unexport_path_ = cfg.get<std::string>("unexport_path");
-    cfg_value_path_ = cfg.get<std::string>("value_path");
-    cfg_edge_path_ = cfg.get<std::string>("edge_path");
-    cfg_direction_path_ = cfg.get<std::string>("direction_path");
+    Tools::PropertyTreeExtractor extractor(cfg, "SysFsGpio");
+
+    cfg_export_path_    = extractor.get<std::string>("export_path");
+    cfg_unexport_path_  = extractor.get<std::string>("unexport_path");
+    cfg_value_path_     = extractor.get<std::string>("value_path");
+    cfg_edge_path_      = extractor.get<std::string>("edge_path");
+    cfg_direction_path_ = extractor.get<std::string>("direction_path");
 
     auto aliases_cfg = cfg.get_child("aliases");
     for (auto alias : aliases_cfg)

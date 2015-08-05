@@ -115,19 +115,10 @@ void SysFsGpioModule::publish_on_bus(zmqpp::message &msg)
     bus_push_.send(msg);
 }
 
-bool SysFsGpioModule::process_general_config()
+void SysFsGpioModule::process_general_config()
 {
-    try
-    {
-        assert(general_cfg_ == nullptr);
-        general_cfg_ = new SysFsGpioConfig(config_.get_child("module_config"));
-        return true;
-    }
-    catch (std::exception &e)
-    {
-        ERROR("SysFsGpio Invalid Configuration:" << e.what());
-        throw e;
-    }
+    assert(general_cfg_ == nullptr);
+    general_cfg_ = new SysFsGpioConfig(config_.get_child("module_config"));
 }
 
 const SysFsGpioConfig &SysFsGpioModule::general_config() const

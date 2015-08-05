@@ -21,6 +21,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <tools/XmlPropertyTree.hpp>
+#include <tools/PropertyTreeExtractor.hpp>
 #include "ConfigManager.hpp"
 #include "core/kernel.hpp"
 #include "tools/log.hpp"
@@ -31,9 +32,10 @@ ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg) :
         kernel_config_(cfg),
         version_(0)
 {
-    version_ = cfg.get<uint64_t>("version", 0);
-    ASSERT_LOG(cfg.get_child_optional("instance_name"), "No instance_name specified.");
-    instance_name_ = cfg.get<std::string>("instance_name");
+    Tools::PropertyTreeExtractor extractor(cfg, "General Config");
+
+    version_        = extractor.get<uint64_t>("version", 0);
+    instance_name_  = extractor.get<std::string>("instance_name");
 }
 
 boost::property_tree::ptree ConfigManager::get_application_config()

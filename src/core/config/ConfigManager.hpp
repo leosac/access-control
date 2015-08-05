@@ -25,6 +25,8 @@
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include "../../exception/leosacexception.hpp"
+#include "../../tools/log.hpp"
 
 namespace Leosac
 {

@@ -80,7 +80,7 @@ namespace Leosac
                 /**
                 * General configuration (file paths, etc).
                 */
-                bool process_general_config();
+                void process_general_config();
 
                 /**
                 * Write to "gpio_export_path" so the kernel export the socket to sysfs.
