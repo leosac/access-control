@@ -1,6 +1,8 @@
 SysFsGpio Module Documentation {#mod_sysfsgpio_main}
 ====================================================
 
+@brief Driving GPIO pin through Linux's sysfs.
+
 [TOC]
 
 Introduction {#mod_sysfsgpio_intro}
@@ -21,19 +23,19 @@ Below are the configuration options available.
 
 Options | Options | Options        | Description                                                                             | Mandatory
 --------|---------|----------------|-----------------------------------------------------------------------------------------|-----------
-aliases |         |                | Define GPIO aliases. This is useful to support multiple platform                        | YES
+aliases |         |                | Define GPIO aliases. This is useful to support multiple platform                        | **YES**
 --->    | default |                | Default name resolution for pin. `__NO__` will be replace by the `no` field             | NO 
 --->    | PIN_ID  |                | Option name shall be the pin number, **not** textual `PIN_ID`. Value is the identifier for the pin. | NO
-export_path |     |                | Absolute path to "export" sysfs file                                                    | YES
-unexport_path |   |                | Absolute path to "unexport" sysfs file                                                  | YES
-value_path |      |                | Absolute path to "value" file. `__REPLACE_ME__` shall act as a placeholder for pin id   | YES
-edge_path  |      |                | Absolute path to "edge" file. `__REPLACE_ME__` shall act as a placeholder for pin id    | YES
-direction_path |  |                | Absolute path to "direction" file. `__REPLACE_ME__` shall act as a placeholder          | YES
-gpios   |         |                | List of GPIOs pins we configure                                                         | YES
---->    | gpio    |                | Configuration informations for one GPIO pin.                                            | YES
---->    | --->    | name           | Name of the GPIO pin                                                                    | YES
---->    | --->    | no             | Number of the GPIO pin.                                                                 | YES
---->    | --->    | direction      | Direction of the pin. This in either `in` or `out`                                      | YES
+export_path |     |                | Absolute path to "export" sysfs file                                                    | **YES**
+unexport_path |   |                | Absolute path to "unexport" sysfs file                                                  | **YES**
+value_path |      |                | Absolute path to "value" file. `__PLACEHOLDER__` shall act as a placeholder for pin identifier.   | **YES**
+edge_path  |      |                | Absolute path to "edge" file. `__PLACEHOLDER__` shall act as a placeholder for pin identifier.    | **YES**
+direction_path |  |                | Absolute path to "direction" file. `__PLACEHOLDER__` shall act as a placeholder for pin identifier | **YES**
+gpios   |         |                | List of GPIOs pins we configure                                                         | **YES**
+--->    | gpio    |                | Configuration informations for one GPIO pin.                                            | **YES**
+--->    | --->    | name           | Name of the GPIO pin                                                                    | **YES**
+--->    | --->    | no             | Number of the GPIO pin.                                                                 | **YES**
+--->    | --->    | direction      | Direction of the pin. This in either `in` or `out`                                      | **YES**
 --->    | --->    | interrupt_mode | What interrupt do we care about? See below for details                                  | NO
 --->    | --->    | value          | Default value of the PIN. Either `1` or `0`                                             | NO
 
@@ -41,13 +43,17 @@ Path information
 ----------------
 Path configuration allows the user the use the same `sysfsgpio` module on multiple platform even when
 the path-to-gpio / naming-convention of GPIO pins varies.
-The `__REPLACE__ME__` placeholder will be replaced by the *identifier* of the pin. This identifier is the GPIO
-pin number. This replacement involve the `aliases` configuration options.
+The `__PLACEHOLDER__` placeholder will be replaced by the *identifier* of the pin.
+The *identifier* is computed through aliases resolution.
 
 A simple example:
-    + We have pin `14` and `value_path` = `/sys/class/gpio/__REPLACE_ME__/value`.
-    + `aliases/default` = `gpio__NO__`.
-    + The module will resolve the value path of the PIN to `/sys/class/gpio/gpio14/value`
+    + Pin id / ping number is `14`.
+    + `value_path` = `/sys/class/gpio/__PLACEHOLDER__/value`.
+    + `aliases.default` = `gpio__NO__`.
+    + The pin *identifier* is resolved as `gpio14` (since `__NO__` from the default alias is replace
+      by `14`).
+    + `__PLACEHOLDER__` is replaced by the pin identifier: The module will resolve
+      the value path of the PIN to `/sys/class/gpio/gpio14/value`
     
 @see SysFsGpioConfigTest for more example.
 
@@ -82,9 +88,9 @@ This is a example of SysFsGpio possible configuration for SysFsGpio module into 
                 </aliases>
                 <export_path>/sys/class/gpio/export</export_path>
                 <unexport_path>/sys/class/gpio/unexport</unexport_path>
-                <edge_path>/sys/class/gpio/__REPLACE_ME__/edge</edge_path>
-                <value_path>/sys/class/gpio/__REPLACE_ME__/value</value_path>
-                <direction_path>/sys/class/gpio/__REPLACE_ME__/value</direction_path>                
+                <edge_path>/sys/class/gpio/__PLACEHOLDER__/edge</edge_path>
+                <value_path>/sys/class/gpio/__PLACEHOLDER__/value</value_path>
+                <direction_path>/sys/class/gpio/__PLACEHOLDER__/value</direction_path>                
                 <gpios>
                     <gpio>
                         <name>wiegand_data_high</name>

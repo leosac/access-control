@@ -28,7 +28,7 @@
 
         <module>
             <name>MONITOR</name>
-            <file>libpersistent-monitor.so</file>
+            <file>libmonitor.so</file>
             <level>1</level>
 
             <module_config>
@@ -38,7 +38,7 @@
         </module>
 
         <module>
-            <name>SYSFS-GPIO</name>
+            <name>SYSFS_GPIO</name>
             <file>libsysfsgpio.so</file>
             <level>2</level>
 
@@ -51,9 +51,9 @@
                 <export_path>/sys/class/gpio/export</export_path>
                 <unexport_path>/sys/class/gpio/unexport</unexport_path>
 
-                <edge_path>/sys/class/gpio/__REPLACE_ME__/edge</edge_path>
-                <value_path>/sys/class/gpio/__REPLACE_ME__/value</value_path>
-                <direction_path>/sys/class/gpio/__REPLACE_ME__/direction</direction_path>
+                <edge_path>/sys/class/gpio/__PLACEHOLDER__/edge</edge_path>
+                <value_path>/sys/class/gpio/__PLACEHOLDER__/value</value_path>
+                <direction_path>/sys/class/gpio/__PLACEHOLDER__/direction</direction_path>
 
                 <gpios>
                     <!-- Prepare GPIO for our Wiegand reader -->

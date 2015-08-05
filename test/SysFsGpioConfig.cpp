@@ -57,9 +57,9 @@ namespace Leosac
 
                 module_cfg.add("export_path", "/path/to/export");
                 module_cfg.add("unexport_path", "/path/to/unexport");
-                module_cfg.add("value_path", "/path/to/gpios/__REPLACE_ME__/value");
-                module_cfg.add("edge_path", "/path/to/gpios/__REPLACE_ME__/edge");
-                module_cfg.add("direction_path", "/path/to/gpios/__REPLACE_ME__/direction");
+                module_cfg.add("value_path", "/path/to/gpios/__PLACEHOLDER__/value");
+                module_cfg.add("edge_path", "/path/to/gpios/__PLACEHOLDER__/edge");
+                module_cfg.add("direction_path", "/path/to/gpios/__PLACEHOLDER__/direction");
 
                 module_cfg.add_child("aliases", aliases_cfg);
                 cfg_case_1_ = module_cfg;
@@ -71,9 +71,9 @@ namespace Leosac
 
                 module_cfg.add("export_path", "/path/to/export");
                 module_cfg.add("unexport_path", "/path/to/unexport");
-                module_cfg.add("value_path", "/random/path/to/__REPLACE_ME__/value");
-                module_cfg.add("edge_path", "/random/path/to/__REPLACE_ME__/edge");
-                module_cfg.add("direction_path", "/random/path/to/__REPLACE_ME__/direction");
+                module_cfg.add("value_path", "/random/path/to/__PLACEHOLDER__/value");
+                module_cfg.add("edge_path", "/random/path/to/__PLACEHOLDER__/edge");
+                module_cfg.add("direction_path", "/random/path/to/__PLACEHOLDER__/direction");
 
                 // we define default aliases rules.
                 aliases_cfg.add("default", "gpio__NO__");
@@ -87,9 +87,9 @@ namespace Leosac
 
                 module_cfg.add("export_path", "/path/to/export");
                 module_cfg.add("unexport_path", "/path/to/unexport");
-                module_cfg.add("value_path", "/path/to/gpios/__REPLACE_ME__/value");
-                module_cfg.add("edge_path", "/path/to/gpios/__REPLACE_ME__/edge");
-                module_cfg.add("direction_path", "/path/to/gpios/__REPLACE_ME__/direction");
+                module_cfg.add("value_path", "/path/to/gpios/__PLACEHOLDER__/value");
+                module_cfg.add("edge_path", "/path/to/gpios/__PLACEHOLDER__/edge");
+                module_cfg.add("direction_path", "/path/to/gpios/__PLACEHOLDER__/direction");
 
                 // we define default aliases rules.
                 aliases_cfg.add("default", "gpio__NO__");

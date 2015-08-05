@@ -91,8 +91,8 @@ namespace Leosac
                 std::string cfg_unexport_path_;
 
                 /**
-                * Absolute path of the "value file" sysfs file: use `__REPLACE_ME__` as a placeholder
-                * for the PIN identifier (likely its number).
+                * Absolute path of the "value file" sysfs file: use `__PLACEHOLDER__` as a placeholder
+                * for the PIN identifier (likely its number, potentially -- prefixed by "gpio" on raspberry pi).
                 */
                 std::string cfg_value_path_;
 

@@ -30,7 +30,7 @@
 
                         <!-- Device we watch as input source -->
                         <auth_source>MY_WIEGAND_1</auth_source>
-                                <!-- File that contains (1 per line) the textual data that is valid.
+                        <!-- File that contains (1 per line) the textual data that is valid.
 With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
                         <valid_input_file>valid-cards.txt</valid_input_file>
                     </instance>
@@ -55,6 +55,16 @@ With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
             <level>2</level>
 
             <module_config>
+
+                <aliases>
+                    <default>gpio__NO__</default>
+                </aliases>
+                <export_path>/sys/class/gpio/export</export_path>
+                <unexport_path>/sys/class/gpio/unexport</unexport_path>
+                <edge_path>/sys/class/gpio/__PLACEHOLDER__/edge</edge_path>
+                <value_path>/sys/class/gpio/__PLACEHOLDER__/value</value_path>
+                <direction_path>/sys/class/gpio/__PLACEHOLDER__/value</direction_path>
+
                 <gpios>
                     <!-- Prepare GPIO for our Wiegand reader -->
                     <gpio>
