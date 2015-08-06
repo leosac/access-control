@@ -23,7 +23,6 @@ set(HELPER_SRC  helper/FakeGPIO.cpp helper/FakeWiegandReader.cpp)
 endfunction()
 
 leosacCreateSingleSourceTest(version)
-leosacCreateSingleSourceTest(automaton)
 leosacCreateSingleSourceTest(WiegandReader)
 leosacCreateSingleSourceTest(Led)
 leosacCreateSingleSourceTest(Rpleth)
