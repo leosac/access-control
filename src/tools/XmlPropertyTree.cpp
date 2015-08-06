@@ -21,6 +21,7 @@
 #include <boost/serialization/string.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include <boost/version.hpp>
 #include "exception/configexception.hpp"
 #include "XmlPropertyTree.hpp"
 #include "log.hpp"
@@ -49,7 +50,7 @@ boost::property_tree::ptree Leosac::Tools::propertyTreeFromXmlFile(const std::st
     }
     catch (ptree_error &e)
     {
-        std::throw_with_nested(ConfigException(filename, ""));
+        std::throw_with_nested(Ex::Config(filename));
     }
 }
 
@@ -67,7 +68,11 @@ std::string Leosac::Tools::propertyTreeToXml(const boost::property_tree::ptree &
     std::stringstream ss;
     try
     {
+#if ((BOOST_VERSION / 100000) == 1 && (BOOST_VERSION / 100 % 1000) >= 58) || (BOOST_VERSION / 100000) > 1
         write_xml(ss, tree, boost::property_tree::xml_writer_make_settings<std::string>('\t', 1));
+#else
+        write_xml(ss, tree, boost::property_tree::xml_writer_make_settings<char>('\t', 1));
+#endif
     }
     catch (ptree_error &e)
     {
