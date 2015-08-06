@@ -22,9 +22,29 @@
 #include <tools/log.hpp>
 #include "ExceptionsTools.hpp"
 
+namespace
+{
+    /**
+     * Create a string to prepend to the exception message, for
+     * pretty printing.
+     */
+    std::string build_prepend_identation(int level)
+    {
+        std::string prepend;
+        if (level)
+            prepend = '|';
+        for (int i = 0 ; i < level; ++i)
+            prepend += "--";
+        if (level)
+            prepend += "> ";
+
+        return prepend;
+    }
+}
+
 void Leosac::print_exception(const std::exception &e, int level /* = 0 */)
 {
-    std::cerr << std::string(level, ' ') << "exception: " << e.what() << '\n';
+    std::cerr << build_prepend_identation(level) << "exception: " << e.what() << '\n';
     try
     {
         std::rethrow_if_nested(e);
@@ -41,7 +61,7 @@ void Leosac::print_exception(const std::exception &e, int level /* = 0 */)
 
 void Leosac::log_exception(const std::exception &e, int level /* = 0 */)
 {
-    ERROR(std::string(level, ' ') << "exception: " << e.what());
+    ERROR(build_prepend_identation(level) << "exception: " << e.what());
     try
     {
         std::rethrow_if_nested(e);

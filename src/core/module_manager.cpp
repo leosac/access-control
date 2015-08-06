@@ -82,6 +82,7 @@ void ModuleManager::initModule(ModuleInfo *modinfo)
     // if not null, may still be running
     assert(modinfo->actor_ == nullptr);
     assert(modinfo->lib_);
+    using namespace Colorize;
 
     try
     {
@@ -110,13 +111,15 @@ void ModuleManager::initModule(ModuleInfo *modinfo)
                 core_utils_)));
         modinfo->actor_ = std::move(new_module);
 
-        INFO("Module {" << modinfo->name_ << "} initialized. (level = " <<
+        INFO("Module " << green(modinfo->name_) << " initialized. (level = " <<
                 config_manager_.load_config(modinfo->name_).get<int>("level", 100) << ")");
     }
     catch (std::exception &e)
     {
-        ERROR("Unable to init module {" << modinfo->name_ << "}: " << e.what());
-        std::throw_with_nested(ModuleException("Unable to init module {" + modinfo->name_ + "}: " + e.what()));
+        ERROR("Unable to init module " << red(modinfo->name_) << ". See below for "
+                "exception information.");
+        log_exception(e);
+        std::throw_with_nested(ModuleException("Unable to init module " + red(modinfo->name_) + ": " + e.what()));
     }
 }
 
