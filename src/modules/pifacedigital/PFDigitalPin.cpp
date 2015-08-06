@@ -142,7 +142,7 @@ void PFDigitalPin::update()
     want_update_ = false;
 }
 
-std::chrono::system_clock::time_point PFDigitalPin::next_update()
+std::chrono::system_clock::time_point PFDigitalPin::next_update() const
 {
     if (want_update_)
         return next_update_time_;

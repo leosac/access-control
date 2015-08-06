@@ -18,13 +18,17 @@
 */
 
 #include <fcntl.h>
+#include <boost/iterator/transform_iterator.hpp>
 #include "PFDigitalModule.hpp"
 #include "mcp23s17.h"
 #include "pifacedigital.h"
 #include "exception/gpioexception.hpp"
 #include "tools/log.hpp"
+#include "tools/timeout.hpp"
 #include "core/CoreUtils.hpp"
 
+using namespace Leosac;
+using namespace Leosac::Module;
 using namespace Leosac::Module::Piface;
 
 PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
@@ -56,28 +60,18 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
     reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this), zmqpp::poller::poll_pri);
 }
 
-int PFDigitalModule::compute_timeout()
-{
-    std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
-
-    for (auto &gpio_pin : gpios_)
-    {
-        if (gpio_pin.next_update() < tp)
-            tp = gpio_pin.next_update();
-    }
-    if (tp == std::chrono::system_clock::time_point::max())
-        return -1; // no update asked.
-
-    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - std::chrono::system_clock::now()).count();
-    DEBUG("GPIO TIMEOUT =" << timeout);
-    return timeout < 0 ? 0 : timeout;
-}
-
 void PFDigitalModule::run()
 {
     while (is_running_)
     {
-        reactor_.poll(compute_timeout());
+        auto itr_transform = [] (const PFDigitalPin& p) -> std::chrono::system_clock::time_point
+        {
+            return p.next_update();
+        };
+
+        auto timeout = Tools::compute_timeout(boost::make_transform_iterator(gpios_.begin(), itr_transform),
+                                              boost::make_transform_iterator(gpios_.end(), itr_transform));
+        reactor_.poll(timeout);
         for (auto &gpio_pin : gpios_)
         {
             if (gpio_pin.next_update() < std::chrono::system_clock::now())

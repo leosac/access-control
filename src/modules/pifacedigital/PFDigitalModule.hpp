@@ -65,12 +65,6 @@ namespace Leosac
                 void process_config(const boost::property_tree::ptree &cfg);
 
                 /**
-                * Compute the poll timeout (in milliseconds) and returns it.
-                * This timeout is calculated by calling `next_update()` on the available GPIO.
-                */
-                int compute_timeout();
-
-                /**
                 * Socket to push event to the bus.
                 */
                 zmqpp::socket bus_push_;

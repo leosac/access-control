@@ -74,7 +74,7 @@ struct PFDigitalPin
     * This method shall returns the number of the time point at which we want to be updated.
     * If you do not want to be updated, return time_point::max() basically making sure we wont be called.
     */
-    std::chrono::system_clock::time_point next_update();
+    std::chrono::system_clock::time_point next_update() const;
 
     /**
     * Write to PFDigital to turn the gpio on.
