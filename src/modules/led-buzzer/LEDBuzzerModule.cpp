@@ -17,11 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/kernel.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+#include "core/kernel.hpp"
+#include "tools/timeout.hpp"
 #include "LEDBuzzerModule.hpp"
-#include "LedBuzzerImpl.hpp"
-#include "tools/log.hpp"
-#include "core/Scheduler.hpp"
 
 using namespace Leosac::Module::LedBuzzer;
 
@@ -38,30 +37,16 @@ LEDBuzzerModule::LEDBuzzerModule(zmqpp::context &ctx,
     }
 }
 
-int LEDBuzzerModule::compute_timeout()
-{
-    std::chrono::system_clock::time_point tp = std::chrono::system_clock::time_point::max();
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-
-    for (auto &led : leds_)
-    {
-        if (led->next_update() < tp)
-        {
-            tp = led->next_update();
-        }
-    }
-    if (tp == std::chrono::system_clock::time_point::max())
-        return -1; // no update asked.
-
-    int timeout = std::chrono::duration_cast<std::chrono::milliseconds>(tp - now).count();
-    return timeout < 0 ? 0 : timeout;
-}
-
 void LEDBuzzerModule::run()
 {
     while (is_running_)
     {
-        reactor_.poll(compute_timeout());
+        auto itr_transform = [] (const std::shared_ptr<LedBuzzerImpl> &lb)
+        {
+            return lb->next_update();
+        };
+        reactor_.poll(Tools::compute_timeout(boost::make_transform_iterator(leds_.begin(), itr_transform),
+                                             boost::make_transform_iterator(leds_.end(), itr_transform)));
         for (auto &led : leds_)
         {
             if (led->next_update() <= std::chrono::system_clock::now())

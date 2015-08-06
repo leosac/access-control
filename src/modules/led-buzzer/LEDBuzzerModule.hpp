@@ -67,13 +67,6 @@ namespace Leosac
                 void run() override;
 
             private:
-                /**
-                * Compute timeout based on next_update_time of the LedBuzzerImpl object.
-                * Allow for handling BLINK easily.
-                */
-                int compute_timeout();
-
-
                 void process_config();
 
                 std::vector<std::shared_ptr<LedBuzzerImpl>> leds_;
