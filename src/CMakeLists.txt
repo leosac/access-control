@@ -49,7 +49,6 @@ set(LEOSAC_LIB_SRCS
     tools/XmlScheduleLoader.cpp
     tools/gettid.cpp
     tools/GenGuid.cpp
-    tools/Colorize.cpp
     tools/PropertyTreeExtractor.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp

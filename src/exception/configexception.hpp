@@ -34,7 +34,7 @@ namespace Leosac
     {
     public:
       /**
-       * Construct a config exception.
+       * Construct a config exception for when we failed to load a property.
        *
        * @param config_target The subsystem that tried to use / load the
        *                      configuration.
@@ -50,9 +50,19 @@ namespace Leosac
       {
       }
 
+      /**
+       * Create a config exception when we failed to parse a
+       * configuration file.
+       */
+      Config(const std::string &filename)
+          : LEOSACException(build_message(filename))
+      {
+      }
+
     private:
-      std::string build_message(const std::string &config_target,
-                                const std::string &config_entry, bool not_found)
+      static std::string build_message(const std::string &config_target,
+                                       const std::string &config_entry,
+                                       bool not_found)
       {
         using namespace Colorize;
         if (not_found)
@@ -65,6 +75,13 @@ namespace Leosac
           return "Invalid configuration entry for " + green(config_target) +
                  ": " + underline(red(config_entry));
         }
+      }
+
+      static std::string build_message(const std::string &filename)
+      {
+        using namespace Colorize;
+        return "Failed to parse configuration file " +
+               underline(green(filename));
       }
     };
   }

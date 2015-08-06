@@ -10,6 +10,15 @@ Gre='\e[0;32m';
 Yel='\e[0;33m';
 Blu='\e[0;34m';
 
+if [ "$1" = "serial" ]
+then
+    ## Run test serialy, one by one.
+    for f in `find . -name "test-*" -maxdepth 1 -mindepth 1 -type d`
+    do
+        ./run_docker.sh $f || { echo -e ${Red} "Error in test $f" ${RCol} ; exit -1 ; }
+    done    
+fi
+
 which parallel > /dev/null || { echo "Need GNU parallel." ; exit 1; }
 
 echo "Running tests, using $1 as install directory"

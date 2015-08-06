@@ -4,6 +4,8 @@
         <plugindir>.</plugindir>
     </plugin_directories>
 
+    <instance_name>lama</instance_name>
+
     <modules>
         <module>
             <name>STDIN_CONTROLLER</name>

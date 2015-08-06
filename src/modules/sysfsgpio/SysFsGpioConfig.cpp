@@ -20,6 +20,7 @@
 #include <boost/algorithm/string.hpp>
 #include "SysFsGpioConfig.hpp"
 #include "tools/log.hpp"
+#include "tools/Colorize.hpp"
 #include "tools/PropertyTreeExtractor.hpp"
 
 using namespace Leosac::Module::SysFsGpio;
@@ -43,20 +44,21 @@ SysFsGpioConfig::SysFsGpioConfig(const boost::property_tree::ptree &cfg)
       continue;
     }
 
-    int pin_no = std::stoi(alias.first);
+    int pin_no           = std::stoi(alias.first);
     pin_aliases_[pin_no] = alias.second.data();
   }
 
+  using namespace Colorize;
   INFO("SysFsGpio Path Configuration:"
        << std::endl
-       << '\t' << "Export path: " << cfg_export_path_ << std::endl
-       << '\t' << "Unexport path: " << cfg_unexport_path_ << std::endl
-       << '\t' << "Value path: " << cfg_value_path_ << std::endl
-       << '\t' << "Edge path: " << cfg_edge_path_ << std::endl
-       << '\t' << "Direction path: " << cfg_direction_path_ << std::endl
-       << '\t' << "Default aliases rule: " << default_aliases_ << std::endl);
+       << '\t' << "Export path: " << green(cfg_export_path_) << std::endl
+       << '\t' << "Unexport path: " << green(cfg_unexport_path_) << std::endl
+       << '\t' << "Value path: " << green(cfg_value_path_) << std::endl
+       << '\t' << "Edge path: " << green(cfg_edge_path_) << std::endl
+       << '\t' << "Direction path: " << green(cfg_direction_path_) << std::endl
+       << '\t' << "Default aliases rule: " << green(default_aliases_)
+       << std::endl);
 }
-
 
 const std::string &SysFsGpioConfig::export_path() const
 {

@@ -71,8 +71,10 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
         gpio_initial_value = gpio_cfg.get<bool>("value", false);
 
-        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no <<
-             ". direction = " << gpio_direction);
+        using namespace Colorize;
+        INFO("Creating GPIO " << green(underline(gpio_name)) << ", with no "
+                     << green(underline(gpio_no)) <<
+                     ". direction = " << green(underline(gpio_direction)));
 
         export_gpio(gpio_no);
 
