@@ -1,7 +1,7 @@
 General Configuration Information {#general_config_main}
 ========================================================
 
-Global configuration option.
+@brief Global configuration option.
 
 [TOC]
 

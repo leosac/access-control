@@ -18,6 +18,7 @@
 */
 
 #include <cassert>
+#include <fstream>
 #include "tools/log.hpp"
 #include "core/config/ConfigManager.hpp"
 #include "SyncConfig.hpp"

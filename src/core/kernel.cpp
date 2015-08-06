@@ -18,17 +18,18 @@
 */
 
 #include <fstream>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include "kernel.hpp"
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixshellscript.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/XmlPropertyTree.hpp"
-#include <boost/property_tree/ptree_serialization.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/algorithm/string/join.hpp>
+#include "tools/unixfs.hpp"
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;

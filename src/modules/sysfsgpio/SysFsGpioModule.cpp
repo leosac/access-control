@@ -19,12 +19,13 @@
 
 #include <memory>
 #include <zmqpp/message.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include "tools/log.hpp"
 #include <zmqpp/context.hpp>
+#include <boost/property_tree/ptree.hpp>
 #include "SysFsGpioModule.hpp"
 #include "SysFsGpioConfig.hpp"
-#include <core/kernel.hpp>
+#include "core/kernel.hpp"
+#include "tools/unixfs.hpp"
+#include "tools/log.hpp"
 
 
 using namespace Leosac::Module::SysFsGpio;

@@ -20,6 +20,7 @@
 #include <tools/log.hpp>
 #include <fcntl.h>
 #include <unistd.h>
+#include "tools/unixfs.hpp"
 #include "SysFSGPIOPin.hpp"
 
 using namespace Leosac::Module::SysFsGpio;

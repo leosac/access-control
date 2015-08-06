@@ -50,6 +50,7 @@ set(LEOSAC_LIB_SRCS
     tools/gettid.cpp
     tools/GenGuid.cpp
     tools/PropertyTreeExtractor.cpp
+    tools/log.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
