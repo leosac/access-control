@@ -332,12 +332,12 @@ void Kernel::configure_logger()
     console->set_level(spdlog::level::DEBUG);
 }
 
-const zModuleManager &Kernel::module_manager() const
+const ModuleManager &Kernel::module_manager() const
 {
     return module_manager_;
 }
 
-zModuleManager &Kernel::module_manager()
+ModuleManager &Kernel::module_manager()
 {
     return module_manager_;
 }

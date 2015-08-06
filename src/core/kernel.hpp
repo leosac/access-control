@@ -25,7 +25,7 @@
 #include <core/config/ConfigChecker.hpp>
 #include "tools/runtimeoptions.hpp"
 #include "core/netconfig/networkconfig.hpp"
-#include "zmodule_manager.hpp"
+#include "module_manager.hpp"
 #include "MessageBus.hpp"
 #include "RemoteControl.hpp"
 #include "Scheduler.hpp"
@@ -120,12 +120,12 @@ namespace Leosac
         /**
          * Returns a reference to the module manager object (const version).
          */
-        const zModuleManager &module_manager() const;
+        const ModuleManager &module_manager() const;
 
         /**
          * Returns a reference to the module manager object.
          */
-        zModuleManager &module_manager();
+        ModuleManager &module_manager();
 
         /**
         * Returns a reference to the zmqpp context create for the application.
@@ -233,7 +233,7 @@ namespace Leosac
         /**
         * Manages the different libraries (.so) we load, path to those libraries, modules instantiation.
         */
-        zModuleManager module_manager_;
+        ModuleManager module_manager_;
 
         /**
         * Object that handle networking configuration.

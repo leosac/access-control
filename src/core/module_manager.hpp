@@ -41,22 +41,22 @@ namespace Leosac
 * No reference to an object is returned when loading a module. The module will lives in its own thread and other components
 * can talk to it.
 *
-* @note: Only the zModuleManager object has "direct access" to the module object. It is zmqpp::actor that launches the module
+* @note: Only the ModuleManager object has "direct access" to the module object. It is zmqpp::actor that launches the module
 * in its own thread.
 *
 * @note: Use the "level" property to define module initialization order.
 * This initialization order is mandatory, and the lower the value is, the sooner the module is loaded.
 */
-class zModuleManager
+class ModuleManager
 {
 public:
     /**
     * Construct the module manager.
     * @param ctx the zeroMQ context to pass around to module.
     */
-    zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k);
+    ModuleManager(zmqpp::context &ctx, Leosac::Kernel &k);
 
-    ~zModuleManager();
+    ~ModuleManager();
 
 
     /**
@@ -182,7 +182,7 @@ private:
     * @note This does not unload the underlying shared library.
     * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
     *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
-    @ @warning OUTDATED
+    * @warning OUTDATED
     */
     void stopModule(ModuleInfo *modinfo);
 

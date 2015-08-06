@@ -13,7 +13,7 @@ set(LEOSAC_LIB_SRCS
     core/CoreUtils.cpp
     core/RemoteControl.cpp
     core/RemoteControlSecurity.cpp
-    core/zmodule_manager.cpp
+    core/module_manager.cpp
     core/MessageBus.cpp
     core/Scheduler.cpp
     core/tasks/Task.cpp

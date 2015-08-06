@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "zmodule_manager.hpp"
+#include "module_manager.hpp"
 #include "tools/unixfs.hpp"
 #include "tools/log.hpp"
 #include "exception/ExceptionsTools.hpp"
@@ -26,7 +26,7 @@
 using Leosac::Tools::UnixFs;
 using namespace Leosac;
 
-zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
+ModuleManager::ModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
         ctx_(ctx),
         config_manager_(k.config_manager()),
         core_utils_(k.core_utils())
@@ -34,7 +34,7 @@ zModuleManager::zModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
 
 }
 
-zModuleManager::~zModuleManager()
+ModuleManager::~ModuleManager()
 {
     try
     {
@@ -47,11 +47,11 @@ zModuleManager::~zModuleManager()
     }
     catch (...)
     {
-        std::cerr << "Unkown exception in zModuleManager destructor" << std::endl;
+        std::cerr << "Unkown exception in ModuleManager destructor" << std::endl;
     }
 }
 
-void zModuleManager::unloadLibraries()
+void ModuleManager::unloadLibraries()
 {
     for (auto &module_info : modules_)
     {
@@ -67,7 +67,7 @@ void zModuleManager::unloadLibraries()
     modules_.clear();
 }
 
-void zModuleManager::initModules()
+void ModuleManager::initModules()
 {
     for (const ModuleInfo &module_info : modules_)
     {
@@ -76,7 +76,7 @@ void zModuleManager::initModules()
     }
 }
 
-void zModuleManager::initModule(ModuleInfo *modinfo)
+void ModuleManager::initModule(ModuleInfo *modinfo)
 {
     assert(modinfo);
     // if not null, may still be running
@@ -120,7 +120,7 @@ void zModuleManager::initModule(ModuleInfo *modinfo)
     }
 }
 
-bool zModuleManager::initModule(const std::string &name)
+bool ModuleManager::initModule(const std::string &name)
 {
     if (ModuleInfo *ptr = find_module_by_name(name))
     {
@@ -135,13 +135,13 @@ bool zModuleManager::initModule(const std::string &name)
     return false;
 }
 
-void zModuleManager::addToPath(const std::string &dir)
+void ModuleManager::addToPath(const std::string &dir)
 {
     if (std::find(path_.begin(), path_.end(), dir) == path_.end())
         path_.push_back(dir);
 }
 
-bool zModuleManager::loadModule(const std::string &module_name)
+bool ModuleManager::loadModule(const std::string &module_name)
 {
     const auto &cfg = config_manager_.load_config(module_name);
     std::string filename = cfg.get_child("file").data();
@@ -167,7 +167,7 @@ bool zModuleManager::loadModule(const std::string &module_name)
     return false;
 }
 
-std::shared_ptr<DynamicLibrary> zModuleManager::load_library_file(const std::string &full_path)
+std::shared_ptr<DynamicLibrary> ModuleManager::load_library_file(const std::string &full_path)
 {
     INFO("Loading library at: " << full_path);
     std::shared_ptr<DynamicLibrary> lib(new DynamicLibrary(full_path));
@@ -183,7 +183,7 @@ std::shared_ptr<DynamicLibrary> zModuleManager::load_library_file(const std::str
     return lib;
 }
 
-void zModuleManager::stopModules()
+void ModuleManager::stopModules()
 {
     for (std::set<ModuleInfo>::const_reverse_iterator itr = modules_.rbegin();
          itr != modules_.rend();
@@ -195,7 +195,7 @@ void zModuleManager::stopModules()
     assert(modules_.size() == 0);
 }
 
-void zModuleManager::stopModule(ModuleInfo *modinfo)
+void ModuleManager::stopModule(ModuleInfo *modinfo)
 {
     assert(modinfo);
 
@@ -215,7 +215,7 @@ void zModuleManager::stopModule(ModuleInfo *modinfo)
     }
 }
 
-bool zModuleManager::stopModule(const std::string &name)
+bool ModuleManager::stopModule(const std::string &name)
 {
     if (ModuleInfo *ptr = find_module_by_name(name))
     {
@@ -231,12 +231,12 @@ bool zModuleManager::stopModule(const std::string &name)
     return false;
 }
 
-zModuleManager::ModuleInfo::~ModuleInfo()
+ModuleManager::ModuleInfo::~ModuleInfo()
 {
 
 }
 
-zModuleManager::ModuleInfo::ModuleInfo(const Leosac::ConfigManager &cfg) :
+ModuleManager::ModuleInfo::ModuleInfo(const Leosac::ConfigManager &cfg) :
         lib_(nullptr),
         actor_(nullptr),
         cfg_(cfg)
@@ -244,7 +244,7 @@ zModuleManager::ModuleInfo::ModuleInfo(const Leosac::ConfigManager &cfg) :
 
 }
 
-zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o) :
+ModuleManager::ModuleInfo::ModuleInfo(ModuleManager::ModuleInfo &&o) :
         cfg_(o.cfg_)
 {
     actor_ = std::move(o.actor_);
@@ -255,7 +255,7 @@ zModuleManager::ModuleInfo::ModuleInfo(zModuleManager::ModuleInfo &&o) :
     o.lib_ = nullptr;
 }
 
-std::vector<std::string> zModuleManager::modules_names() const
+std::vector<std::string> ModuleManager::modules_names() const
 {
     std::vector<std::string> ret;
 
@@ -267,7 +267,7 @@ std::vector<std::string> zModuleManager::modules_names() const
     return ret;
 }
 
-zModuleManager::ModuleInfo *zModuleManager::find_module_by_name(const std::string &name) const
+ModuleManager::ModuleInfo *ModuleManager::find_module_by_name(const std::string &name) const
 {
    auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
     {
@@ -279,17 +279,17 @@ zModuleManager::ModuleInfo *zModuleManager::find_module_by_name(const std::strin
     return nullptr;
 }
 
-bool zModuleManager::has_module(const std::string &name) const
+bool ModuleManager::has_module(const std::string &name) const
 {
     return find_module_by_name(name) != nullptr;
 }
 
-std::vector<std::string> const &zModuleManager::get_module_path() const
+std::vector<std::string> const &ModuleManager::get_module_path() const
 {
     return path_;
 }
 
-bool zModuleManager::ModuleInfo::operator<(const ModuleInfo &o) const
+bool ModuleManager::ModuleInfo::operator<(const ModuleInfo &o) const
 {
     int level_me = cfg_.load_config(name_).get<int>("level", 100);
     int level_o = cfg_.load_config(o.name_).get<int>("level", 100);
