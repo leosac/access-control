@@ -19,10 +19,11 @@ cd $REPO_DIRECTORY
 git checkout develop
 doxygen && tar cvf /tmp/leosac_develop_doc.tar -C doc/html .
 tar cvf /tmp/leosac_develop_doc_rc.tar -C doc/resources .
+cp doc/doxy-boot.js /tmp
 
 ## Create a new gh-pages from the static-pages tree. 
 git checkout static-pages
-git branch -D gh-pages
+git branch -D gh-pages || true
 git checkout -b gh-pages
 
 BRANCH=develop
@@ -31,9 +32,13 @@ BRANCH=develop
 mkdir -p doc_output/$BRANCH/html/ doc_output/$BRANCH/resources
 tar xvf /tmp/leosac_develop_doc.tar -C doc_output/$BRANCH/html/
 tar xvf /tmp/leosac_develop_doc_rc.tar -C doc_output/$BRANCH/resources
+for directory in `find doc_output/$BRANCH/ -type d`
+do
+    cp /tmp/doxy-boot.js $directory
+done
 git add doc_output/$BRANCH
 git commit -m "Adding generated documentation"
-git push origin gh-pages -f
+#git push origin gh-pages -f
 
 
 echo "Success!"
