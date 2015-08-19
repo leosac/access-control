@@ -37,7 +37,8 @@ SysFsGpioPin::SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpi
         direction_(direction),
         initial_value_(initial_value),
         module_(module),
-        path_cfg_(module.general_config())
+        path_cfg_(module.general_config()),
+        next_update_time_(std::chrono::system_clock::time_point::max())
 {
     sock_.bind("inproc://" + name);
 
@@ -112,7 +113,7 @@ void SysFsGpioPin::handle_message()
     msg >> frame1;
     bool ok = false;
     if (frame1 == "ON")
-        ok = turn_on();
+        ok = turn_on(&msg);
     else if (frame1 == "OFF")
         ok = turn_off();
     else if (frame1 == "TOGGLE")
@@ -123,8 +124,17 @@ void SysFsGpioPin::handle_message()
     module_.publish_on_bus(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
 }
 
-bool SysFsGpioPin::turn_on()
+bool SysFsGpioPin::turn_on(zmqpp::message *msg /* = nullptr */)
 {
+    DEBUG("Remaining = " << msg->remaining());
+    if (msg && msg->remaining() == 1)
+    {
+        //ASSERT_LOG(msg->parts() == 2 && msg->remaining() == 1, "Invalid internal message.");
+        // optional parameter is present
+        int64_t duration;
+        *msg >> duration;
+        next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
+    }
     UnixFs::writeSysFsValue(path_cfg_.value_path(gpio_no_), 1);
     return true;
 }
@@ -168,4 +178,16 @@ void SysFsGpioPin::register_sockets(zmqpp::reactor *reactor)
     if (direction_ == Direction::In)
         reactor->add(file_fd_, std::bind(&SysFsGpioPin::handle_interrupt, this),
                 zmqpp::poller::poll_pri);
+}
+
+std::chrono::system_clock::time_point SysFsGpioPin::next_update() const
+{
+    return next_update_time_;
+}
+
+void SysFsGpioPin::update()
+{
+    DEBUG("Turning off SysFsGPIO pin.");
+    turn_off();
+    next_update_time_ = std::chrono::system_clock::time_point::max();
 }

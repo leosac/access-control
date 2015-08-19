@@ -71,6 +71,10 @@ namespace Leosac
                 */
                 const SysFsGpioConfig &general_config() const;
 
+                virtual void run() override;
+
+
+
             private:
                 /**
                 * Process the configuration, preparing configured GPIO pin.

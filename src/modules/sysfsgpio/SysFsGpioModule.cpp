@@ -21,6 +21,8 @@
 #include <zmqpp/message.hpp>
 #include <zmqpp/context.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+#include "tools/timeout.hpp"
 #include "SysFsGpioModule.hpp"
 #include "SysFsGpioConfig.hpp"
 #include "core/kernel.hpp"
@@ -47,6 +49,20 @@ SysFsGpioModule::SysFsGpioModule(zmqpp::context &ctx,
     {
         gpio->register_sockets(&reactor_);
     }
+}
+
+static SysFsGpioPin::InterruptMode gpio_interrupt_from_string(const std::string &str)
+{
+    if (str == "none")
+        return SysFsGpioPin::InterruptMode::None;
+    else if (str == "both")
+        return SysFsGpioPin::InterruptMode::Both;
+    else if (str == "falling")
+        return SysFsGpioPin::InterruptMode::Falling;
+    else if (str == "rising")
+        return SysFsGpioPin::InterruptMode::Rising;
+    else
+        return SysFsGpioPin::InterruptMode::None;
 }
 
 void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
@@ -78,17 +94,7 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
                      ". direction = " << green(underline(gpio_direction)));
 
         export_gpio(gpio_no);
-
-        if (gpio_interrupt == "none")
-            interrupt_mode = SysFsGpioPin::InterruptMode::None;
-        else if (gpio_interrupt == "both")
-            interrupt_mode = SysFsGpioPin::InterruptMode::Both;
-        else if (gpio_interrupt == "falling")
-            interrupt_mode = SysFsGpioPin::InterruptMode::Falling;
-        else if (gpio_interrupt == "rising")
-            interrupt_mode = SysFsGpioPin::InterruptMode::Rising;
-        else
-            interrupt_mode = SysFsGpioPin::InterruptMode::None;
+        interrupt_mode = gpio_interrupt_from_string(gpio_interrupt);
 
         direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In
                                             : SysFsGpioPin::Direction::Out);
@@ -127,4 +133,24 @@ void SysFsGpioModule::process_general_config()
 const SysFsGpioConfig &SysFsGpioModule::general_config() const
 {
     return *general_cfg_;
+}
+
+void SysFsGpioModule::run()
+{
+     while (is_running_)
+    {
+        auto itr_transform = [] (const SysFsGpioPin *p) -> std::chrono::system_clock::time_point
+        {
+            return p->next_update();
+        };
+
+        auto timeout = Tools::compute_timeout(boost::make_transform_iterator(gpios_.begin(), itr_transform),
+                                              boost::make_transform_iterator(gpios_.end(), itr_transform));
+        reactor_.poll(timeout);
+        for (auto &gpio_pin : gpios_)
+        {
+            if (gpio_pin->next_update() < std::chrono::system_clock::now())
+                gpio_pin->update();
+        }
+    }
 }

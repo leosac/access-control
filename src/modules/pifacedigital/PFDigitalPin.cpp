@@ -134,7 +134,6 @@ bool PFDigitalPin::read_value()
     return pifacedigital_read_bit(gpio_no_, direction_ == Direction::Out ? OUTPUT : INPUT, 0);
 }
 
-
 void PFDigitalPin::update()
 {
     DEBUG("UPDATING");

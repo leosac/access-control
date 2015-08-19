@@ -78,6 +78,20 @@ namespace Leosac
                 */
                 void register_sockets(zmqpp::reactor *reactor);
 
+                /**
+                * This method shall returns the time point at which we want to be updated.
+                */
+                std::chrono::system_clock::time_point next_update() const;
+
+                /**
+                 * Update the PIN.
+                 *
+                 * The update will simply turn the PIN off (as a timeout for `ON` command).
+                 *
+                 * @note This is similar to PFDigitalPin.
+                 */
+                void update();
+
             private:
                 /**
                 * Interrupt happened for this GPIO ping.
@@ -92,7 +106,7 @@ namespace Leosac
                 /**
                 * Write to sysfs to turn the gpio on.
                 */
-                bool turn_on();
+                bool turn_on(zmqpp::message *msg = nullptr);
 
                 /**
                 * Write to sysfs to turn the gpio on.
@@ -153,6 +167,11 @@ namespace Leosac
                 SysFsGpioModule &module_;
 
                 const SysFsGpioConfig &path_cfg_;
+
+                /**
+                * Time point of next wished update. (Used for timeout on `ON`)
+                */
+                std::chrono::system_clock::time_point next_update_time_;
             };
         }
     }
