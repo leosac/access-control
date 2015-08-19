@@ -19,10 +19,12 @@ void StdinControllerModule::handleStdin()
     std::stringstream ss(tmp);
 
     std::string target;
-    std::string cmd1;
+    std::string tmp2;
+    std::vector<std::string> cmds;
 
     ss >> target;
-    ss >> cmd1;
+    while (ss >> tmp2)
+        cmds.push_back(tmp2);
     if (!target.empty())
     {
         if (endpoints_.count(target) == 0)
@@ -34,18 +36,39 @@ void StdinControllerModule::handleStdin()
 
         DEBUG("Read {" << std::string(&txt[0]) << "}, target = " << target);
 
-        if (!send_request(endpoints_[target], cmd1))
+        if (!send_request(endpoints_[target], cmds))
         {
             endpoints_.erase(target);
         }
     }
 }
 
-bool StdinControllerModule::send_request(std::shared_ptr<zmqpp::socket> target,
-                                         const std::string &cmd1)
+static bool is_number(const std::string& s)
 {
+    return !s.empty() && std::find_if(s.begin(),
+        s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+}
 
-    target->send(cmd1);
+bool StdinControllerModule::send_request(std::shared_ptr<zmqpp::socket> target,
+                                         const std::vector<std::string> &cmds)
+{
+    zmqpp::message msg;
+
+    for (const auto &str : cmds)
+    {
+        if (is_number(str))
+        {
+            int64_t nbr;
+            std::stringstream ss(str);
+            ss >> nbr;
+            msg << nbr;
+        }
+        else
+        {
+            msg << str;
+        }
+    }
+    target->send(msg);
 
     zmqpp::poller p;
 
