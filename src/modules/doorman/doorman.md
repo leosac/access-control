@@ -44,8 +44,8 @@ doors      |           |                 |              |             | Optional
 --->       | --->      | off             |              |             | Some schedules for when the door is in "always closed" mode       | NO
 --->       | --->      | --->            | schedules    |             | See [here](@ref mod_auth_sched_declare) to learn how to declare schedules | YES
 
-The `<cmd>` tag is quite simple. It looks like this:
 
+@note The `<cmd>` tag is quite simple. It looks like this:
 ~~~~~~~~~~~~~~~~~~~~~~~.xml
 <cmd>
     <f1>GREEN_LED</f1>
@@ -53,11 +53,68 @@ The `<cmd>` tag is quite simple. It looks like this:
     <f3>1500</f3>
 </cmd>
 ~~~~~~~~~~~~~~~~~~~~~~~
-
 For each frame you want in the command message, use `<fX>` where `X` is growing for each frame you want.
 
-Example {#mod_doorman_example}
-------------------------------
+@hr
+
+@note `instances.instance.actions.action.target` is the name of an object that has been defined in the system.
+It could be the name of a GPIO you defined before ("my_super_gpio")
+or some reader object ("my_wiegand1"), etc.
+
+@hr
+
+@note Declaring `doors` is optional, and is only ever useful if you make use of 
+the "always open" or "always close" feature.
+
+Example 0 {#mod_doorman_example_0}
+----------------------------------
+
+This is a very simple example that requires a component named "gpio_door" to open
+for 2.5 seconds when an successful authentication happens. If the authentication fails,
+it would ask the "led_failure" to turns on to 2.5s.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<module>
+    <!-- Doorman module: react to authentication broadcast -->
+    <name>DOORMAN</name>
+    <file>libdoorman.so</file>
+    <level>50</level>
+    <module_config>
+        <instances>
+            <instance>
+                <name>DOORMAN_JARVIS_1</name>
+                <auth_contexts>
+                    <auth_context>
+                        <name>AUTH_CONTEXT_1</name>
+                    </auth_context>
+                </auth_contexts>
+                <actions>
+                    <action>
+                        <on>DENIED</on>
+                        <target>led_failure</target>
+                        <cmd>
+                            <f1>ON</f1>
+                            <f2>2500</f2>
+                        </cmd>
+                    </action>
+                    <action>
+                        <on>GRANTED</on>
+                        <target>gpio_door</target>
+                        <cmd>
+                            <f1>ON</f1>
+                            <f2>2500</f2>
+                        </cmd>
+                    </action>
+                </actions>
+            </instance>
+        </instances>
+    </module_config>
+</module>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Example 1 {#mod_doorman_example_1}
+----------------------------------
 
 The following example file defines the following:
    + The door is always open on wednesday, between 13:13 and 13:15.
@@ -105,7 +162,6 @@ The following example file defines the following:
                 </off>
             </door>
         </doors>
-
         <instances>
             <instance>
                 <name>DOORMAN_JARVIS_1</name>
