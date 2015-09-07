@@ -71,6 +71,13 @@ namespace Leosac
             private:
 
                 /**
+                 * Make sure the current tag name is what we expect, otherwise
+                 * throw ConfigException.
+                 */
+                void enforce_xml_node_name(const std::string &expected,
+                                           const std::string &current);
+
+                /**
                 * Lookup a credentials by ID.
                 */
                 Leosac::Auth::IAuthenticationSourcePtr find_cred_by_id(const std::string &id);
