@@ -11,10 +11,14 @@ class LeosacRunner(subprocess.Popen):
     It runs Leosac in valgrind for example.
     """
 
-    def __init__(self, config_file_path):
-        super().__init__(["valgrind", "--error-exitcode=42",
-                          get_leosac_path(), "-k", config_file_path],
-                         stdout=subprocess.PIPE)
+    def __init__(self, config_file_path, valgrind=True):
+        if valgrind:
+            super().__init__(["valgrind", "--error-exitcode=42",
+            get_leosac_path(), "-k", config_file_path],
+            stdout=subprocess.PIPE)
+        else:
+            super().__init__([get_leosac_path(), "-k", config_file_path],
+            stdout=subprocess.PIPE)
 
     def interrupt(self):
         """

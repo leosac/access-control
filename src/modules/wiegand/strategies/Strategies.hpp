@@ -20,8 +20,7 @@
 #pragma once
 
 #include "SimpleWiegandStrategy.hpp"
-#include "WiegandPin4BitsOnly.hpp"
-#include "WiegandPin8BitsOnly.hpp"
+#include "WiegandPinNBitsOnly.hpp"
 #include "WiegandPinBuffered.hpp"
 #include "WiegandCardAndPin.hpp"
 

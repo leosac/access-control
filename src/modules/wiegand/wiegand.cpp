@@ -121,8 +121,8 @@ Strategy::WiegandStrategyUPtr WiegandReaderModule::create_strategy(const boost::
     char pin_key_end                        = reader_cfg.get<char>("pin_key_end", '#');
 
     auto simple_wiegand = std::unique_ptr<CardReading>(new SimpleWiegandStrategy(reader));
-    auto pin_4bits      = std::unique_ptr<PinReading>(new WiegandPin4BitsOnly(reader, pin_timeout, pin_key_end));
-    auto pin_8bits      = std::unique_ptr<PinReading>(new WiegandPin8BitsOnly(reader, pin_timeout, pin_key_end));
+    auto pin_4bits      = std::unique_ptr<PinReading>(new WiegandPinNBitsOnly<4>(reader, pin_timeout, pin_key_end));
+    auto pin_8bits      = std::unique_ptr<PinReading>(new WiegandPinNBitsOnly<8>(reader, pin_timeout, pin_key_end));
     auto pin_buffered   = std::unique_ptr<PinReading>(new WiegandPinBuffered(reader));
 
     if (mode == "SIMPLE_WIEGAND")

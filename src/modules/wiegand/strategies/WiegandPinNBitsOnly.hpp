@@ -30,19 +30,22 @@ namespace Leosac
             namespace Strategy
             {
                 /**
-                * Strategy for PIN only, 8 bits per key pressed mode.
+                * Strategy for ready PIN only.
+                 * The number of bits sent by the reader per key pressed
+                 * is NbBits.
                 */
-                class WiegandPin8BitsOnly : public PinReading
+                template<unsigned int NbBits>
+                class WiegandPinNBitsOnly : public PinReading
                 {
                 public:
                     /**
-                    * Create a strategy that read 4bits-per-key PIN code.
+                    * Create a strategy that read N bits-per-key PIN code.
                     *
                     * @param reader         the reader object we provide the strategy for.
                     * @param pin_timeout    nb of msec before flushing user input to the system
                     * @param pin_end_key    key ('1', '*', '5') that will trigger user input flushing.
                     */
-                    WiegandPin8BitsOnly(WiegandReaderImpl *reader,
+                    WiegandPinNBitsOnly(WiegandReaderImpl *reader,
                             std::chrono::milliseconds pin_timeout,
                             char pin_end_key);
 
@@ -58,6 +61,11 @@ namespace Leosac
                     virtual void reset() override;
 
                 private:
+                    /**
+                     * Extract the character that was pressed from
+                     * raw data.
+                     */
+                    char extract_from_raw(uint8_t input) const;
 
                     /**
                     * Timeout or pin_end_key read. If we have meaningful data,

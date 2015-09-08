@@ -18,14 +18,14 @@
 */
 
 #include <tools/log.hpp>
-#include "WiegandPin4BitsOnly.hpp"
+#include "WiegandPinNBitsOnly.hpp"
 #include "modules/wiegand/WiegandReaderImpl.hpp"
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
-
-WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader,
+template <unsigned int NbBits>
+WiegandPinNBitsOnly<NbBits>::WiegandPinNBitsOnly(WiegandReaderImpl *reader,
         std::chrono::milliseconds pin_timeout,
         char pin_end_key) :
         PinReading(reader),
@@ -36,8 +36,42 @@ WiegandPin4BitsOnly::WiegandPin4BitsOnly(WiegandReaderImpl *reader,
     last_update_ = std::chrono::system_clock::now();
 }
 
-void WiegandPin4BitsOnly::timeout()
+template <unsigned int NbBits>
+char WiegandPinNBitsOnly<NbBits>::extract_from_raw(uint8_t input) const
 {
+    // If we receive 4 bits per key, the
+    // data looks like this:
+    // buffer[0] = 0101 ...
+    //             ^^^^ key pressed.
+    // For 8 bits mode, it looks like this:
+    // buffer[0] = 1010 0101
+    //        ~bits^^^^ ^^^^ key value
+    // If this example, the key pressed is '5'.
+    DEBUG("Buffer value = " << (unsigned int) input);
+    unsigned int n = 0;
+    for (int i = 0; i < 4; ++i)
+    {
+        bool v = ((input >> (7 - i)) & 0x01);
+        if (NbBits == 8)
+            v = !v;
+        n |= v << (3 - i);
+    }
+    // this deduced from manual testing. Value for '#' and '*'.
+    // 10 -> *
+    // 11 -> #
+    if (n == 10)
+        return '*';
+    else if (n == 11)
+        return '#';
+    else
+        return std::to_string(n).at(0);
+}
+
+template <unsigned int NbBits>
+void WiegandPinNBitsOnly<NbBits>::timeout()
+{
+    static_assert(NbBits == 4 || NbBits == 8,
+                  "Must either be 4 or 8 bits per key pressed");
     using namespace std::chrono;
     auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - last_update_);
 
@@ -48,34 +82,16 @@ void WiegandPin4BitsOnly::timeout()
         return;
     }
 
-    if (reader_->counter() != 4)
+    if (reader_->counter() != NbBits)
     {
-        WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 4)");
+        WARN("Expected number of bits invalid. (" << reader_->counter() <<
+                     " but we expected " << NbBits << ")");
         reset();
         return;
     }
 
     last_update_ = system_clock::now();
-    // buffer[0] = 1010 0000
-    //             wxyz
-    // w is first byte, x is second, ...
-    // so this example has value of 5
-    unsigned int n = 0;
-    for (int i = 0; i < 4; ++i)
-    {
-        unsigned int v = ((reader_->buffer()[0] >> (7 - i)) & 0x01);
-        n |= v << (3 - i);
-    }
-    // this deduced from manual testing. Value for '#' and '*'.
-    // 10 -> *
-    // 11 -> #
-    char c;
-    if (n == 10)
-        c = '*';
-    else if (n == 11)
-        c = '#';
-    else
-        c = std::to_string(n).at(0);
+    char c = extract_from_raw(reader_->buffer()[0]);
     if (c == pin_end_key_)
     {
         end_of_input();
@@ -85,7 +101,8 @@ void WiegandPin4BitsOnly::timeout()
     reader_->read_reset();
 }
 
-void WiegandPin4BitsOnly::end_of_input()
+template <unsigned int NbBits>
+void WiegandPinNBitsOnly<NbBits>::end_of_input()
 {
     if (inputs_.length())
         ready_ = true;
@@ -93,12 +110,14 @@ void WiegandPin4BitsOnly::end_of_input()
         ready_ = false;
 }
 
-bool WiegandPin4BitsOnly::completed() const
+template <unsigned int NbBits>
+bool WiegandPinNBitsOnly<NbBits>::completed() const
 {
     return ready_;
 }
 
-void WiegandPin4BitsOnly::signal(zmqpp::socket &sock)
+template <unsigned int NbBits>
+void WiegandPinNBitsOnly<NbBits>::signal(zmqpp::socket &sock)
 {
     assert(ready_);
     assert(inputs_.length());
@@ -109,15 +128,20 @@ void WiegandPin4BitsOnly::signal(zmqpp::socket &sock)
     reset();
 }
 
-const std::string &WiegandPin4BitsOnly::get_pin() const
+template <unsigned int NbBits>
+const std::string &WiegandPinNBitsOnly<NbBits>::get_pin() const
 {
     return inputs_;
 }
 
-void WiegandPin4BitsOnly::reset()
+template <unsigned int NbBits>
+void WiegandPinNBitsOnly<NbBits>::reset()
 {
     reader_->read_reset();
     ready_ = false;
     inputs_ = "";
     last_update_ = std::chrono::system_clock::now();
 }
+
+template class WiegandPinNBitsOnly<4>;
+template class WiegandPinNBitsOnly<8>;

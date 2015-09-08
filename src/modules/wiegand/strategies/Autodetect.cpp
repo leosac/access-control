@@ -173,12 +173,12 @@ PinReadingUPtr Autodetect::build_strategy(int bits)
     assert(bits == 4 || bits == 8);
     if (bits == 4)
     {
-        return std::unique_ptr<PinReading>(new WiegandPin4BitsOnly(reader_,
+        return std::unique_ptr<PinReading>(new WiegandPinNBitsOnly<4>(reader_,
                 delay_, pin_key_end_));
     }
     else if (bits == 8)
     {
-        return std::unique_ptr<PinReading>(new WiegandPin8BitsOnly(reader_,
+        return std::unique_ptr<PinReading>(new WiegandPinNBitsOnly<8>(reader_,
                 delay_, pin_key_end_));
     }
     return nullptr;

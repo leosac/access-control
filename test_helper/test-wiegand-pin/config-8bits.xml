@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<kernel>
+    <instance_name>blah</instance_name>
+    <plugin_directories>
+        <plugindir>./install/lib/leosac/</plugindir>
+    </plugin_directories>
+
+    <modules>
+           <module>
+            <name>WIEGAND_READER</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                        <mode>WIEGAND_PIN_8BITS</mode>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>INSTRUMENTATION</name>
+            <file>libinstrumentation.so</file>
+            <level>105</level>
+            <module_config>
+                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+            </module_config>
+        </module>
+    </modules>
+</kernel>

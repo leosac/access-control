@@ -98,3 +98,28 @@ class WiegandClient(InstrumentationClient):
             # We need 50ms timeout to process each key, otherwise all keys look
             # like one.
             time.sleep(0.6)
+
+    def send_8bits_pin(self, pin):
+        """
+        Simulate the insertion of a PIN code coded with 8bits per number.
+
+        :param pin: The pin number, in decimal.
+        :return:
+        """
+        logging.info("Attempting to send 8bits pin code {0}".format(pin))
+
+        for key in pin:
+            binary = bin(int(key, 16))[2:].zfill(4)
+            # first send the reversed bits.
+            for c in binary:
+                if c == "0":
+                    self.send_interrupt(self.gpio_high)
+                else:
+                    self.send_interrupt(self.gpio_low)
+            # Now send the "normal" bits.
+            for c in binary:
+                if c == "1":
+                    self.send_interrupt(self.gpio_high)
+                else:
+                    self.send_interrupt(self.gpio_low)
+            time.sleep(0.6)

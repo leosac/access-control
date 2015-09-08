@@ -4,8 +4,7 @@ set(WIEGAND_SRCS
     wiegand.cpp
     WiegandReaderImpl.cpp
     strategies/SimpleWiegandStrategy.cpp
-    strategies/WiegandPin4BitsOnly.cpp
-    strategies/WiegandPin8BitsOnly.cpp
+    strategies/WiegandPinNBitsOnly.cpp
     strategies/WiegandPinBuffered.cpp
     strategies/WiegandCardAndPin.cpp
     strategies/Autodetect.cpp
