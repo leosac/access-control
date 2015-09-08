@@ -143,5 +143,7 @@ void WiegandPinNBitsOnly<NbBits>::reset()
     last_update_ = std::chrono::system_clock::now();
 }
 
-template class WiegandPinNBitsOnly<4>;
-template class WiegandPinNBitsOnly<8>;
+namespace Leosac { namespace Module { namespace  Wiegand { namespace Strategy {
+                template class WiegandPinNBitsOnly<4>;
+                template class WiegandPinNBitsOnly<8>;
+            }}}}
