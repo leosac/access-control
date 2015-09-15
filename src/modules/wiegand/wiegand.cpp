@@ -79,10 +79,12 @@ void WiegandReaderModule::process_config()
         std::string buzzer_name     = reader_cfg.get<std::string>("buzzer", "");
         std::string greenled_name   = reader_cfg.get<std::string>("green_led", "");
 
-        INFO("Creating WiegandReader: " << reader_name << "\n\t Green Led: " << greenled_name
-             << "\n\t Buzzer: " << buzzer_name
-             << "\n\t GPIO Low: " << gpio_low
-             << "\n\t GPIO High: " << gpio_high);
+        using namespace Colorize;
+        INFO("Creating WiegandReader: " << green(underline(reader_name))
+                << "\n\t Green Led: " << green(underline(greenled_name))
+                << "\n\t Buzzer: " << green(underline(buzzer_name))
+                << "\n\t GPIO Low: " << green(underline(gpio_low))
+                << "\n\t GPIO High: " << green(underline(gpio_high)));
 
         config_check(gpio_low, ConfigChecker::ObjectType::GPIO);
         config_check(gpio_high, ConfigChecker::ObjectType::GPIO);

@@ -10,6 +10,7 @@ RUN apt-get install libtclap-dev cmake -y
 RUN apt-get install autotools-dev automake pkg-config libsodium-dev -y
 
 RUN apt-get install libgtest-dev python valgrind python-pip libpython2.7-dev -y
+RUN apt-get install libcurl4-openssl-dev
 
 RUN pip install pyzmq
 

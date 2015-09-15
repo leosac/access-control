@@ -23,7 +23,7 @@ Configuration Options {#mod_ws-notifier_user_config}
 
 Options        | Options  | URL             | Description                                                    | Mandatory
 ---------------|----------|-----------------|----------------------------------------------------------------|-----------
-sources        |          |                 | Multiples message source (wiegand reader)                      | YES
+sources        |          |                 | Multiples message source (wiegand reader)                      | NO
 --->           | source   |                 | Name of one reader to watch for event                          | YES
 targets        |          |                 | Remote webservice to send information to                       | NO
 --->           | target   |                 | Describe a webservice server target.                           | NO
