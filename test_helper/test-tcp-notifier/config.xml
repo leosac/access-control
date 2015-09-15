@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<kernel>
+    <instance_name>blah</instance_name>
+    <plugin_directories>
+        <plugindir>./install/lib/leosac/</plugindir>
+    </plugin_directories>
+
+    <modules>
+           <module>
+            <name>WIEGAND_READER</name>
+            <file>libwiegand.so</file>
+            <level>5</level>
+            <module_config>
+                <readers>
+                    <reader>
+                        <name>MY_WIEGAND_1</name>
+                        <high>wiegand_data_high</high>
+                        <low>wiegand_data_low</low>
+                        <green_led></green_led>
+                        <buzzer></buzzer>
+                        <mode>SIMPLE_WIEGAND</mode>
+                    </reader>
+                </readers>
+            </module_config>
+        </module>
+
+        <module>
+            <name>TCP_NOTIFIER</name>
+            <file>libtcp-notifier.so</file>
+            <level>90</level>
+            <module_config>
+                <sources>
+                    <source>MY_WIEGAND_1</source>
+                </sources>
+                <targets>
+                    <target>
+                        <url>127.0.0.1:4242</url>
+                    </target>
+                </targets>
+            </module_config>
+        </module>
+
+        <module>
+            <name>INSTRUMENTATION</name>
+            <file>libinstrumentation.so</file>
+            <level>105</level>
+            <module_config>
+                <ipc_endpoint>/tmp/leosac-ipc</ipc_endpoint>
+            </module_config>
+        </module>
+    </modules>
+</kernel>
