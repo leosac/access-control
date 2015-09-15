@@ -18,7 +18,7 @@
 */
 
 #include <curl/curl.h>
-#include <boost/algorithm/string.hpp>
+#include "core/auth/WiegandCard.hpp"
 #include "WebServiceNotifier.hpp"
 #include "core/auth/Auth.hpp"
 
@@ -88,39 +88,24 @@ void WebServiceNotifier::process_config()
     target.request_timeout_ = itr.second.get<int>("request_timeout", 7000);
 
     INFO("WS-Notifier remote target: "
-         << Colorize::green(target.url_) << " (connect_timeout: "
-         << Colorize::green(target.connect_timeout_) << ", request_timeout: "
-         << Colorize::green(target.request_timeout_) << ")");
-    targets_.push_back(target);
+         << Colorize::green(target.url_)
+         << " (connect_timeout: " << Colorize::green(target.connect_timeout_)
+         << ", request_timeout: " << Colorize::green(target.request_timeout_)
+         << ")");
+    targets_.push_back(std::move(target));
   }
 }
 
-void WebServiceNotifier::send_card_info_to_remote(const std::string &card,
+void WebServiceNotifier::send_card_info_to_remote(const std::string &card_hex,
                                                   int nb_bits)
 {
-  int num                 = card_id_to_dec(card, nb_bits);
-  std::string post_fields = "card_id=" + std::to_string(num);
-
+  auto card = Auth::WiegandCard(card_hex, nb_bits);
   for (const auto &target : targets_)
   {
     auto curl = curl_easy_init();
     if (curl)
     {
-      curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
-
-      // POST data
-      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
-
-      // timeouts
-      curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS,
-                       target.connect_timeout_);
-      curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, target.request_timeout_);
-
-      auto res = curl_easy_perform(curl);
-      if (res != CURLE_OK)
-      {
-        WARN("curl_easy_perform() failed: " << curl_easy_strerror(res));
-      }
+      send_to_target(curl, card, target);
       curl_easy_cleanup(curl);
     }
     else
@@ -130,9 +115,38 @@ void WebServiceNotifier::send_card_info_to_remote(const std::string &card,
   }
 }
 
-uint64_t WebServiceNotifier::card_id_to_dec(const std::string &card,
-                                            int /*nb_bits*/) const
+/**
+ * We don't care about getting the resulting page from the webservice.
+ *
+ * We use this function as a callback for CURL.
+ */
+static size_t write_callback(char * /*ptr*/, size_t size, size_t nmemb,
+                             void * /*userdata*/)
 {
-  auto card_num_hex = boost::replace_all_copy(card, ":", "");
-  return std::stoul(card_num_hex, nullptr, 16);
+  return size * nmemb;
+}
+
+void WebServiceNotifier::send_to_target(
+    void *curl, const Auth::WiegandCard &card,
+    const WebServiceNotifier::TargetInfo &target) noexcept
+{
+  assert(curl);
+
+  std::string post_fields = "card_id=" + std::to_string(card.to_int());
+
+  curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
+
+  // timeouts
+  curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, target.connect_timeout_);
+  curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, target.request_timeout_);
+
+  curl_easy_setopt(curl, CURLOPT_WRITEDATA, nullptr);
+  curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &write_callback);
+
+  auto res = curl_easy_perform(curl);
+  if (res != CURLE_OK)
+  {
+    WARN("curl_easy_perform() failed: " << curl_easy_strerror(res));
+  }
 }

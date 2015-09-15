@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include <modules/BaseModule.hpp>
+#include "modules/BaseModule.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
@@ -53,7 +54,6 @@ namespace Leosac
          */
         void send_card_info_to_remote(const std::string &card, int nb_bits);
 
-        uint64_t card_id_to_dec(const std::string &card, int nb_bits) const;
 
         /**
          * Read internal message bus.
@@ -71,6 +71,9 @@ namespace Leosac
         };
 
         std::vector<TargetInfo> targets_;
+
+        void send_to_target(void *curl, const Auth::WiegandCard &card,
+                            const TargetInfo &target) noexcept;
       };
     }
   }

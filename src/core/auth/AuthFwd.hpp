@@ -22,5 +22,7 @@ namespace Leosac
 
         class BaseAuthSource;
         using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
+
+        class WiegandCard;
     }
 }
