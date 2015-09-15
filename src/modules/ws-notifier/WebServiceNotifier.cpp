@@ -89,7 +89,7 @@ void WebServiceNotifier::process_config()
 
     INFO("WS-Notifier remote target: "
          << Colorize::green(target.url_) << " (connect_timeout: "
-         << Colorize::green(target.connect_timeout_) << ", request_timeout"
+         << Colorize::green(target.connect_timeout_) << ", request_timeout: "
          << Colorize::green(target.request_timeout_) << ")");
     targets_.push_back(target);
   }
