@@ -62,7 +62,7 @@ namespace Leosac
              * Returns the integer representation of the
              * card ID.
              */
-            int64_t to_int() const;
+            uint64_t to_int() const;
 
         protected:
             /**

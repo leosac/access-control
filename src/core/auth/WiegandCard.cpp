@@ -58,7 +58,7 @@ std::string WiegandCard::to_string() const
     return ss.str();
 }
 
-int64_t WiegandCard::to_int() const
+uint64_t WiegandCard::to_int() const
 {
     auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
     return std::stoul(card_num_hex, nullptr, 16);
