@@ -28,6 +28,7 @@ namespace Leosac
     {
         class WiegandCard;
         using WiegandCardPtr = std::shared_ptr<WiegandCard>;
+
         /**
         * A wiegand card.
         */
@@ -51,7 +52,17 @@ namespace Leosac
 
             int nb_bits() const;
 
+            /**
+             * Formats a pretty printed string containing information
+             * regarding this card.
+             */
             virtual std::string to_string() const override;
+
+            /**
+             * Returns the integer representation of the
+             * card ID.
+             */
+            int64_t to_int() const;
 
         protected:
             /**

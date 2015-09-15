@@ -17,8 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/IVisitor.hpp>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
+#include "tools/IVisitor.hpp"
 #include "WiegandCard.hpp"
 
 using namespace Leosac::Auth;
@@ -55,4 +56,10 @@ std::string WiegandCard::to_string() const
     ss << "Number of bits: " << nb_bits_ << std::endl << "\t\t";
     ss << "Card id: " << card_id();
     return ss.str();
+}
+
+int64_t WiegandCard::to_int() const
+{
+    auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
+    return std::stoul(card_num_hex, nullptr, 16);
 }
