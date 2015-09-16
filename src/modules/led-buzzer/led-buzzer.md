@@ -44,7 +44,7 @@ This assume that a `my_gpio_1` and `my_gpio_2` gpios devices are configured.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
         <module>
             <name>LED_BUZZER</name>
-            <file>libled.so</file>
+            <file>libled-buzzer.so</file>
             <level>3</level>
             <module_config>
                 <leds>

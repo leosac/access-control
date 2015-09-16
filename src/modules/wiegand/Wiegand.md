@@ -69,7 +69,7 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <module>
-    <name>WIEGAND</name>
+    <name>WIEGAND_READER</name>
     <file>libwiegand.so</file>
     <level>5</level>
     <module_config>

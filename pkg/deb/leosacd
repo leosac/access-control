@@ -16,7 +16,7 @@ LEOSAC_PID_FILE=/var/run/leosac.pid
 LEOSAC_DIR="/etc/leosac.d"
 
 ## some env variable that you may customize
-LEOSAC_SCRIPTS_DIR=""
+LEOSAC_SCRIPTS_DIR="/usr/scripts/"
 LEOSAC_FACTORY_CONFIG_DIR=""
 
 test -x "$DAEMON" || exit 0

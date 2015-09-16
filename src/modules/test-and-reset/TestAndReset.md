@@ -41,20 +41,20 @@ Example {#mod_testandreset_example}
 This is a example of Rpleth possible configuration for Rpleth module into Leosac:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-            <name>TEST_AND_RESET</name>
-            <file>libtest-and-reset.so</file>
-            <level>101</level>
-            <beep_on_start>false</beep_on_start>
+    <module>
+        <name>TEST_AND_RESET</name>
+        <file>libtest-and-reset.so</file>
+        <level>101</level>
+        <module_config>
+            <run_on_start>false</run_on_start>
             <test_buzzer>my_buzzer</test_buzzer>
             <test_led>my_blinking_led</test_led>
-            <module_config>
-                <devices>
-                    <device>
-                        <name>MY_WIEGAND_1</name>
-                        <reset_card>40:a0:83:80</reset_card>
-                    </device>
-                </devices>
-            </module_config>
-        </module> 
+            <devices>
+                <device>
+                    <name>MY_WIEGAND_1</name>
+                    <reset_card>40:a0:83:80</reset_card>
+                </device>
+            </devices>
+        </module_config>
+    </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
