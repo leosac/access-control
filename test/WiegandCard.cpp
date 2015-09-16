@@ -35,7 +35,7 @@ namespace Leosac
       WiegandCard c2("aa:bb:cc:dd", 32);
       ASSERT_EQ(2864434397, c2.to_int());
 
-      WiegandCard c3("39:4B:C5:8", 26);
+      WiegandCard c3("39:4B:C5:8", 32);
       ASSERT_EQ(60079192, c3.to_int());
 
       WiegandCard c4("00:00:00:01", 32);
@@ -43,6 +43,27 @@ namespace Leosac
 
       WiegandCard c5("00:00:00:10", 32);
       ASSERT_EQ(16, c5.to_int());
+    }
+
+    TEST(TestWiegandCard, wiegand_26)
+    {
+      WiegandCard c1("80:80:33:80", 26);
+      ASSERT_EQ(103, c1.to_int());
+
+      WiegandCard c2("80:80:33:40", 26);
+      ASSERT_EQ(102, c2.to_int());
+
+      WiegandCard c3("80:80:40:00", 26);
+      ASSERT_EQ(128, c3.to_int());
+
+      WiegandCard c4("80:80:41:40", 26);
+      ASSERT_EQ(130, c4.to_int());
+
+      WiegandCard c5("80:80:41:80", 26);
+      ASSERT_EQ(131, c5.to_int());
+
+      WiegandCard c6("80:80:43:00", 26);
+      ASSERT_EQ(134, c6.to_int());
     }
   }
 }

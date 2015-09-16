@@ -66,6 +66,11 @@ namespace Leosac
 
         protected:
             /**
+             * Extract the card ID.
+             */
+            uint64_t to_wiegand_26() const;
+
+            /**
             * Card id
             */
             std::string card_id_;

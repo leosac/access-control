@@ -19,6 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <sstream>
+#include <tools/log.hpp>
 #include "tools/IVisitor.hpp"
 #include "WiegandCard.hpp"
 
@@ -60,6 +61,32 @@ std::string WiegandCard::to_string() const
 
 uint64_t WiegandCard::to_int() const
 {
+    switch (nb_bits_)
+    {
+        case 26:
+            return to_wiegand_26();
+        default:
+        {
+            auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
+            return std::stoul(card_num_hex, nullptr, 16);
+        }
+    }
+}
+
+uint64_t WiegandCard::to_wiegand_26() const
+{
+    assert(nb_bits_ == 26);
+    assert(card_id_.size() == 2*4 + 3);
+
     auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
-    return std::stoul(card_num_hex, nullptr, 16);
+    uint64_t tmp = std::stoul(card_num_hex, nullptr, 16);
+
+    // we have 32 bits of data (8 hex character)
+
+    // we want to drop the last bit from wiegand 26 frame.
+    // so drop 7 bits (6 useless (32-26) + last one)
+    tmp = tmp >> 7;
+    // keep 16 bits
+    tmp &= 0xFFFF;
+    return tmp;
 }
