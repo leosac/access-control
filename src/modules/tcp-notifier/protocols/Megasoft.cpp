@@ -39,7 +39,7 @@ void MegasoftProtocol::validate(const Auth::WiegandCard &card)
   }
 }
 
-ByteVector MegasoftProtocol::build_cred_msg(Leosac::Auth::WiegandCard &card)
+ByteVector MegasoftProtocol::build_cred_msg(const Auth::WiegandCard &card)
 {
   // According to the protocol, the UID is 4bytes.
   // We have to take each byte - in reverse order -

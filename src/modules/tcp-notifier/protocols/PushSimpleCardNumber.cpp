@@ -24,7 +24,7 @@
 
 Leosac::ByteVector
 Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
-    Leosac::Auth::WiegandCard &card)
+        const Auth::WiegandCard &card)
 {
   ByteVector data(8);
   uint64_t network_card_id = zmqpp::htonll(card.to_int());

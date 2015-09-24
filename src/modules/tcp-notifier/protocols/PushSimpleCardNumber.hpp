@@ -34,7 +34,7 @@ namespace Leosac
       {
 
       public:
-        virtual ByteVector build_cred_msg(Auth::WiegandCard &card);
+        virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) override;
       };
     }
   }
