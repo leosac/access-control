@@ -86,9 +86,16 @@ void NotifierInstance::handle_credential(Leosac::Auth::WiegandCard &card)
     zmqpp::message msg;
 
     msg << target.zmq_identity_;
-    auto data = protocol_->build_cred_msg(card);
-    msg.add_raw(&data[0], data.size());
-
+    try
+    {
+      auto data = protocol_->build_cred_msg(card);
+      msg.add_raw(&data[0], data.size());
+    }
+    catch (const ProtocolException &e)
+    {
+      WARN("TCPNotifier: Protocol error: " << e.what());
+      continue;
+    }
     auto ret = tcp_.send(msg, true);
     if (ret == false) // would block. woops
     {
@@ -115,7 +122,7 @@ void NotifierInstance::handle_tcp_msg()
     auto target = find_target(routing_id);
     if (act_as_server_)
     {
-      // As a server we drop disconnected peer, or create TargetInfo
+      // As a server we drop disconnected peer, or create a TargetInfo
       // for newly connected peer.
       if (!target)
       {

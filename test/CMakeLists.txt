@@ -6,7 +6,7 @@ list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES} )
 
 function(leosacCreateSingleSourceTest NAME)
 ## module we link against
-set(MODULES_LIB wiegand led-buzzer rpleth sysfsgpio auth-file)
+set(MODULES_LIB wiegand led-buzzer rpleth sysfsgpio auth-file tcp-notifier)
 set(HELPER_SRC  helper/FakeGPIO.cpp helper/FakeWiegandReader.cpp)
 
     set(TEST_NAME test-${NAME})
@@ -33,3 +33,4 @@ leosacCreateSingleSourceTest(AuthSourceBuilder)
 leosacCreateSingleSourceTest(ConfigManager)
 leosacCreateSingleSourceTest(RemoteControlSecurity)
 leosacCreateSingleSourceTest(WiegandCard)
+leosacCreateSingleSourceTest(TcpNotifierProtocol)

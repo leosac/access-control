@@ -27,14 +27,25 @@ namespace Leosac
   {
     namespace TCPNotifier
     {
-      /**
-       * Simple protocol that sends the card number.
-       */
-      class PushSimpleCardNumber : public ProtocolHandler
+      class MegasoftProtocol : public ProtocolHandler
       {
-
       public:
         virtual ByteVector build_cred_msg(Auth::WiegandCard &card);
+
+      private:
+        /**
+         * Build a protocol frame ready to send over the network.
+         */
+        ByteVector build_protocol_frame(uint32_t card_id);
+
+
+        /**
+         * Perform some check on the card representation, making sure it is
+         * suitable for use by this protocol.
+         *
+         * If validation fails, this function will throw ProtocolException.
+         */
+        void validate(const Auth::WiegandCard &card);
       };
     }
   }

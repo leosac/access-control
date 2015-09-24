@@ -86,12 +86,13 @@ namespace Leosac
         NotifierInstance(NotifierInstance &&o) = delete;
         NotifierInstance &operator=(NotifierInstance &&o) = delete;
 
+      private:
         /**
          * Notify the peers of the `card` credential.
          */
         void handle_credential(Auth::WiegandCard &card);
 
-      private:
+
         void handle_msg_bus();
 
         /**

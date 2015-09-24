@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <stdexcept>
 #include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 
@@ -31,11 +32,26 @@ namespace Leosac
       enum Protocol
       {
         SIMPLE_CARD_NUMBER,
-        ARNE
+        MEGASOFT
       };
 
       class ProtocolHandler;
       using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
+
+
+      /**
+       * An specialized exception that ProtocolHandler can
+       * throw when converting the credential to a
+       * message failed.
+       */
+      class ProtocolException : public ::std::runtime_error
+      {
+      public:
+        ProtocolException(const std::string &msg)
+            : runtime_error(msg)
+        {
+        }
+      };
 
       /**
        * Implements a given (TCP) protocol for notifying
