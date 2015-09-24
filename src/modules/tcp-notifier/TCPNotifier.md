@@ -14,10 +14,23 @@ authentication credentials to some configured tcp-server.
 Currently, only auth source event of type `Leosac::Auth::SourceType::SIMPLE_WIEGAND` are
 handled, all the other are simply ignored.
 
+The TCP-Notifier module is flexible. It can spawn multiple instance
+of notifier.
+
+This allows the module to act as a client to some servers
+using some protocol P1, to some other servers using protocol P2 and
+be itself a server from client using protocol P3.
+
+Protocols are built into this module.
+
+
 Protocol Specifications {#mod_tcp-notifier_spec}
 ================================================
 
-The protocol is a simple as possible.
+Protocol 0 {#mod_tcp-notifier_spec0}
+------------------------------------
+
+This protocol is a simple as possible.
 It consists of fixed-size packet, and there is only 1 packet type.
 
 The size of a packet is 8 bytes: those are the card's serial number.
@@ -29,15 +42,18 @@ In C, the corresponding type would be `uint64_t`.
 Configuration Options {#mod_tcp-notifier_config}
 ====================================================
 
-Options        | Options  | URL             | Description                                                    | Mandatory
----------------|----------|-----------------|----------------------------------------------------------------|-----------
-sources        |          |                 | Multiples message source (wiegand reader)                      | NO
---->           | source   |                 | Name of one reader to watch for event                          | YES
-targets        |          |                 | Remote webservice to send information to                       | NO
---->           | target   |                 | Describe a tcp server target.                           | NO
---->           | --->     | url             | A complete URL that will be used as the request's destination. | YES
+Options        | Options  | Options  | Description                                                    | Mandatory
+---------------|----------|----------|----------------------------------------------------------------|-----------
+instance       |          |          | Multiple instance can coexist. Defines one.                    | NO
+--->           | sources  |          | Multiples message source (wiegand reader)                      | NO
+--->           | --->     | source   | Name of one reader to watch for event                          | YES
+--->           | connect  |          | Remote client to connect to.                                   | NO
+--->           | --->     | endpoint | Endpoint to connect to.  Can be given multiple time.           | NO
+--->           | bind     |          | URLs to bind to.                                               | NO
+--->           | --->     | endpoint | Endpoint to bind to.  Can be given multiple time.              | NO
+--->           | protocol |          | ID of the protocol to use. See below.                          | YES
 
-@note The URL has the form `IP:PORT`.
+@note The endpoint shall have the form `IP:PORT`.
 
 Example {#mod_tcp-notifier_example}
 ----------------------------------

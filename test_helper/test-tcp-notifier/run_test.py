@@ -9,7 +9,7 @@ import re
 
 
 def receive_card_number():
-    stdout = ""
+    stdout = u""
     tcp_server = subprocess.Popen(["this_test/tcp_server.py"])
     time.sleep(1)
 
@@ -21,8 +21,6 @@ def receive_card_number():
     wiegand.send_card("00:00:00:10")
 
     tcp_server.wait()
-    test_assert(tcp_server.returncode == 0,
-                "TCPServer returned with non zero code")
 
     count = 0
     while count < 5:
@@ -36,6 +34,9 @@ def receive_card_number():
             count += 1
 
     leosac_1.wait()
+
+    test_assert(tcp_server.returncode == 0,
+                "TCPServer returned with non zero code")
     test_assert(leosac_1.returncode == 0,
                 "Process returned with non-zero exit code ({0})".format(leosac_1.returncode))
 

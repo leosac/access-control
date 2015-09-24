@@ -22,6 +22,7 @@
 #include "modules/BaseModule.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "protocols/PushSimpleCardNumber.hpp"
+#include "NotifierInstance.hpp"
 
 namespace Leosac
 {
@@ -43,57 +44,11 @@ namespace Leosac
 
       private:
         /**
-         * Process a message that was read on the bus.
-         */
-        void handle_msg_bus();
-
-        /**
-         * Some event on our ZMQ Stream socket.
-         */
-        void handle_tcp_msg();
-
-        /**
          * Process the configuration file.
          */
         void process_config();
 
-        /**
-         * Send a TCP packet to every configured and active
-         * tcp server.
-         */
-        void send_card_info_to_remote(const std::string &card, int nb_bits);
-
-        /**
-         * Read internal message bus.
-         */
-        zmqpp::socket bus_sub_;
-
-        /**
-        * Stream socket used to connect to remote client we want to
-        * notify.
-        */
-        zmqpp::socket tcp_;
-
-        /**
-         * Some information for each tcp server target.
-         */
-        struct TargetInfo
-        {
-          // Url is IP:PORT
-          std::string url_;
-
-          // The ZMQ routing-id for this target.
-          std::string zmq_identity_;
-
-          // ZMQ provide auto reconnection
-          // This tracks the status.
-          bool status_;
-
-          ProtocolHandlerUPtr protocol_;
-        };
-
-        std::vector<TargetInfo> targets_;
-        TargetInfo &find_target(const std::string &routing_id);
+        std::vector<NotifierInstanceUPtr> instances_;
       };
     }
   }

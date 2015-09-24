@@ -30,13 +30,7 @@ TCPNotifierModule::TCPNotifierModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                                      const boost::property_tree::ptree &cfg,
                                      CoreUtilsPtr utils)
     : BaseModule(ctx, pipe, cfg, utils)
-    , bus_sub_(ctx, zmqpp::socket_type::sub)
-    , tcp_(ctx, zmqpp::socket_type::stream)
 {
-  bus_sub_.connect("inproc://zmq-bus-pub");
-  reactor_.add(bus_sub_, std::bind(&TCPNotifierModule::handle_msg_bus, this));
-  reactor_.add(tcp_, std::bind(&TCPNotifierModule::handle_tcp_msg, this));
-
   process_config();
 }
 
@@ -44,112 +38,72 @@ TCPNotifierModule::~TCPNotifierModule()
 {
 }
 
-void TCPNotifierModule::handle_msg_bus()
+void enforce_xml_node_name(const std::string &expected,
+                           const std::string &current)
 {
-  zmqpp::message msg;
-  std::string src;
-  Leosac::Auth::SourceType type;
-  std::string card;
-  int bits;
-
-  bus_sub_.receive(msg);
-  if (msg.parts() < 4)
+  if (current != expected)
   {
-    WARN("Unexpected message content.");
-    return;
+    std::stringstream ss;
+    ss << "Invalid configuration file content. Expected xml tag "
+       << Colorize::green(expected) << " but has " << Colorize::green(current)
+       << " instead.";
+    throw ConfigException("", ss.str());
   }
-  msg >> src >> type >> card >> bits;
-  if (type != Leosac::Auth::SourceType::SIMPLE_WIEGAND)
-  {
-    INFO("TCP-Notifier cannot handle this type of credential yet.");
-    return;
-  }
-
-  send_card_info_to_remote(card, bits);
 }
 
 void TCPNotifierModule::process_config()
 {
-  for (auto &&itr : config_.get_child("module_config.sources"))
+  for (auto &&itr : config_.get_child("module_config"))
   {
-    auto name = itr.second.get<std::string>("");
-    bus_sub_.subscribe("S_" + name);
-  }
+    enforce_xml_node_name("instance", itr.first);
+    std::vector<std::string> auth_sources;
+    std::vector<std::string> connects;
+    std::vector<std::string> binds;
 
-  for (auto &&itr : config_.get_child("module_config.targets"))
-  {
-    Tools::PropertyTreeExtractor extractor(itr.second, "TCP-Notifier");
-
-    TargetInfo target;
-    target.url_      = extractor.get<std::string>("url");
-    target.protocol_ = ProtocolHandler::create((int)SIMPLE_CARD_NUMBER);
-    target.status_   = false;
-
-    INFO("TCP-Notifier remote target: " << Colorize::green(target.url_));
-
-    tcp_.connect("tcp://" + target.url_);
-    tcp_.get(zmqpp::socket_option::identity, target.zmq_identity_);
-    INFO("ZMQ-Routing ID: {" << Colorize::green(target.zmq_identity_) << "}");
-
-    targets_.push_back(std::move(target));
-  }
-}
-
-void TCPNotifierModule::send_card_info_to_remote(const std::string &card_hex,
-                                                 int nb_bits)
-{
-  auto card = Auth::WiegandCard(card_hex, nb_bits);
-  for (const auto &target : targets_)
-  {
-    // Skip disconnected client.
-    if (!target.status_)
-      continue;
-    zmqpp::message msg;
-
-    msg << target.zmq_identity_;
-    auto data = target.protocol_->build_cred_msg(card);
-    msg.add_raw(&data[0], data.size());
-    auto ret = tcp_.send(msg, true);
-    if (ret == false) // would block. woops
+    for (auto &&srcs : itr.second.get_child("sources"))
     {
-      ERROR("Sending to client would block.");
+      enforce_xml_node_name("source", srcs.first);
+      auto name = srcs.second.get<std::string>("");
+      auth_sources.push_back(name);
     }
+
+    if (itr.second.get_child_optional("connect"))
+    {
+      for (auto &&srcs : itr.second.get_child("connect"))
+      {
+        enforce_xml_node_name("endpoint", srcs.first);
+        auto name = srcs.second.get<std::string>("");
+        connects.push_back(name);
+      }
+    }
+
+    if (itr.second.get_child_optional("bind"))
+    {
+      for (auto &&srcs : itr.second.get_child("bind"))
+      {
+        enforce_xml_node_name("endpoint", srcs.first);
+        auto name = srcs.second.get<std::string>("");
+        binds.push_back(name);
+      }
+    }
+
+    if (!(connects.empty() || binds.empty()))
+    {
+      ERROR("Bind or connect. Not both !");
+      continue;
+    }
+
+    Tools::PropertyTreeExtractor extractor(itr.second, "TCP-Notifier");
+    int protocol_id = extractor.get<int>("protocol");
+    auto protocol   = ProtocolHandler::create(protocol_id);
+
+    if (!protocol)
+    {
+      ERROR("Cannot instanciate a protocol number " << protocol_id);
+      continue;
+    }
+    auto ni = std::make_unique<NotifierInstance>(
+        ctx_, reactor_, auth_sources, connects, binds, std::move(protocol));
+    instances_.push_back(std::move(ni));
   }
-}
-
-void TCPNotifierModule::handle_tcp_msg()
-{
-  zmqpp::message msg;
-
-  tcp_.receive(msg);
-  std::string routing_id;
-  std::string data;
-
-  assert(msg.parts() == 2);
-  msg >> routing_id >> data;
-
-  INFO("Received TCP data from client " << routing_id << ", data {" << data
-                                        << "}");
-  if (data.size() == 0)
-  {
-    auto &target = find_target(routing_id);
-    if (target.status_)
-      INFO("Lost connection with client");
-    else
-      INFO("Successfully connected to client.");
-
-    target.status_ = !target.status_;
-  }
-}
-
-TCPNotifierModule::TargetInfo &
-TCPNotifierModule::find_target(const std::string &routing_id)
-{
-  auto itr = std::find_if(targets_.begin(), targets_.end(),
-                          [&](const TargetInfo &target)
-                          {
-                            return target.zmq_identity_ == routing_id;
-                          });
-  assert(itr != targets_.end());
-  return *itr;
 }

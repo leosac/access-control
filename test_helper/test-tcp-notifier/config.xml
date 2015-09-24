@@ -29,14 +29,15 @@
             <file>libtcp-notifier.so</file>
             <level>90</level>
             <module_config>
-                <sources>
-                    <source>MY_WIEGAND_1</source>
-                </sources>
-                <targets>
-                    <target>
-                        <url>127.0.0.1:4242</url>
-                    </target>
-                </targets>
+                <instance>
+                    <sources>
+                        <source>MY_WIEGAND_1</source>
+                    </sources>
+                    <connect>
+                        <endpoint>127.0.0.1:4242</endpoint>
+                    </connect>
+                    <protocol>0</protocol>
+                </instance>
             </module_config>
         </module>
 

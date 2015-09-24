@@ -3,6 +3,7 @@ set(TCP_NOTIFIER_BIN tcp-notifier)
 set(TCP_NOTIFIER_SRCS
     init.cpp
     TcpNotifier.cpp
+    NotifierInstance.cpp
     ProtocolHandler.cpp
     protocols/PushSimpleCardNumber.cpp
 )
