@@ -113,18 +113,31 @@ void NotifierInstance::handle_tcp_msg()
   if (data.size() == 0)
   {
     auto target = find_target(routing_id);
-    if (!target && act_as_server_)
+    if (act_as_server_)
     {
-      TargetInfo ti;
-      ti.status_       = true;
-      ti.zmq_identity_ = routing_id;
+      // As a server we drop disconnected peer, or create TargetInfo
+      // for newly connected peer.
+      if (!target)
+      {
+        TargetInfo ti;
+        ti.status_       = true;
+        ti.zmq_identity_ = routing_id;
 
-      targets_.push_back(std::move(ti));
-      INFO("New client connected to us.");
+        targets_.push_back(std::move(ti));
+        INFO("New client connected to us.");
+      }
+      else
+      {
+        targets_.erase(std::remove_if(targets_.begin(), targets_.end(),
+                                      [&](const TargetInfo &info)
+                                      {
+                                        return info.zmq_identity_ == routing_id;
+                                      }),
+                       targets_.end());
+      }
       return;
     }
-    else
-      ASSERT_LOG(target, "Why did we lose a target?");
+    ASSERT_LOG(target, "Why did we lose a target?");
 
     if (target->status_)
       INFO("Lost connection with client");
