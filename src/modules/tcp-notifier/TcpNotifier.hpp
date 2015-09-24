@@ -21,6 +21,7 @@
 
 #include "modules/BaseModule.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "protocols/PushSimpleCardNumber.hpp"
 
 namespace Leosac
 {
@@ -28,6 +29,9 @@ namespace Leosac
   {
     namespace TCPNotifier
     {
+      class ProtocolHandler;
+      using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
+
       class TCPNotifierModule : public BaseModule
       {
       public:
@@ -84,6 +88,8 @@ namespace Leosac
           // ZMQ provide auto reconnection
           // This tracks the status.
           bool status_;
+
+          ProtocolHandlerUPtr protocol_;
         };
 
         std::vector<TargetInfo> targets_;

@@ -17,34 +17,18 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include <zmqpp/zmqpp.hpp>
+#include <zmqpp/inet.hpp>
+#include "PushSimpleCardNumber.hpp"
+#include "core/auth/WiegandCard.hpp"
 
-#include <memory>
-#include <vector>
-
-namespace Leosac
+Leosac::ByteVector
+Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
+    Leosac::Auth::WiegandCard &card)
 {
-    class Kernel;
-    class Scheduler;
-    class ConfigChecker;
+  ByteVector data(8);
+  uint64_t network_card_id = zmqpp::htonll(card.to_int());
+  std::memcpy(&data[0], &network_card_id, 8);
 
-    using SchedulerPtr = std::shared_ptr<Scheduler>;
-    using ConfigCheckerPtr = std::shared_ptr<ConfigChecker>;
-
-    class CoreUtils;
-    using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
-
-    using ByteVector = std::vector<uint8_t>;
-
-    namespace Tasks
-    {
-        class Task;
-        using TaskPtr = std::shared_ptr<Task>;
-
-        class SyncConfig;
-        using SyncConfigPtr = std::shared_ptr<SyncConfig>;
-
-        class FetchRemoteConfig;
-        using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
-    }
+  return data;
 }

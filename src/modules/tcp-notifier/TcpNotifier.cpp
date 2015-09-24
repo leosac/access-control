@@ -18,6 +18,7 @@
 */
 
 #include <core/auth/Auth.hpp>
+#include <tools/PropertyTreeExtractor.hpp>
 #include "core/auth/WiegandCard.hpp"
 #include "TcpNotifier.hpp"
 
@@ -60,7 +61,7 @@ void TCPNotifierModule::handle_msg_bus()
   msg >> src >> type >> card >> bits;
   if (type != Leosac::Auth::SourceType::SIMPLE_WIEGAND)
   {
-    INFO("WS-Notifier cannot handle this type of credential yet.");
+    INFO("TCP-Notifier cannot handle this type of credential yet.");
     return;
   }
 
@@ -77,9 +78,12 @@ void TCPNotifierModule::process_config()
 
   for (auto &&itr : config_.get_child("module_config.targets"))
   {
+    Tools::PropertyTreeExtractor extractor(itr.second, "TCP-Notifier");
+
     TargetInfo target;
-    target.url_    = itr.second.get<std::string>("url");
-    target.status_ = false;
+    target.url_      = extractor.get<std::string>("url");
+    target.protocol_ = ProtocolHandler::create((int)SIMPLE_CARD_NUMBER);
+    target.status_   = false;
 
     INFO("TCP-Notifier remote target: " << Colorize::green(target.url_));
 
@@ -103,7 +107,8 @@ void TCPNotifierModule::send_card_info_to_remote(const std::string &card_hex,
     zmqpp::message msg;
 
     msg << target.zmq_identity_;
-    msg << card.to_int();
+    auto data = target.protocol_->build_cred_msg(card);
+    msg.add_raw(&data[0], data.size());
     auto ret = tcp_.send(msg, true);
     if (ret == false) // would block. woops
     {

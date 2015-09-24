@@ -17,34 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "ProtocolHandler.hpp"
+#include "protocols/PushSimpleCardNumber.hpp"
 
-#include <memory>
-#include <vector>
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::TCPNotifier;
 
-namespace Leosac
+ProtocolHandlerUPtr ProtocolHandler::create(int protocol_id)
 {
-    class Kernel;
-    class Scheduler;
-    class ConfigChecker;
-
-    using SchedulerPtr = std::shared_ptr<Scheduler>;
-    using ConfigCheckerPtr = std::shared_ptr<ConfigChecker>;
-
-    class CoreUtils;
-    using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
-
-    using ByteVector = std::vector<uint8_t>;
-
-    namespace Tasks
-    {
-        class Task;
-        using TaskPtr = std::shared_ptr<Task>;
-
-        class SyncConfig;
-        using SyncConfigPtr = std::shared_ptr<SyncConfig>;
-
-        class FetchRemoteConfig;
-        using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
-    }
+  switch (protocol_id)
+  {
+  case SIMPLE_CARD_NUMBER:
+    return std::make_unique<PushSimpleCardNumber>();
+  default:
+    return nullptr;
+  }
+  return nullptr;
 }

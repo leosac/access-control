@@ -19,32 +19,20 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "modules/tcp-notifier/ProtocolHandler.hpp"
 
 namespace Leosac
 {
-    class Kernel;
-    class Scheduler;
-    class ConfigChecker;
-
-    using SchedulerPtr = std::shared_ptr<Scheduler>;
-    using ConfigCheckerPtr = std::shared_ptr<ConfigChecker>;
-
-    class CoreUtils;
-    using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
-
-    using ByteVector = std::vector<uint8_t>;
-
-    namespace Tasks
+  namespace Module
+  {
+    namespace TCPNotifier
     {
-        class Task;
-        using TaskPtr = std::shared_ptr<Task>;
+      class PushSimpleCardNumber : public ProtocolHandler
+      {
 
-        class SyncConfig;
-        using SyncConfigPtr = std::shared_ptr<SyncConfig>;
-
-        class FetchRemoteConfig;
-        using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
+      public:
+        virtual ByteVector build_cred_msg(Auth::WiegandCard &card);
+      };
     }
+  }
 }
