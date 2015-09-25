@@ -6,7 +6,7 @@ import logging
 import time
 
 
-class InstrumentationClient():
+class InstrumentationClient:
     """
     A base client object to talk to the Leosac Instrumentation module.
 
@@ -63,6 +63,7 @@ class WiegandClient(InstrumentationClient):
     def send_card(self, card_id):
         """
         Simulate the reading of a card.
+        After the card is sent, sleep for 1 sec.
 
         :param card_id: A card in hexadecimal format like: 11:bc:de:42
         :return:
@@ -77,6 +78,7 @@ class WiegandClient(InstrumentationClient):
                 self.send_interrupt(self.gpio_high)
             else:
                 self.send_interrupt(self.gpio_low)
+        time.sleep(1)
 
     def send_4bits_pin(self, pin):
         """
@@ -98,6 +100,7 @@ class WiegandClient(InstrumentationClient):
             # We need 50ms timeout to process each key, otherwise all keys look
             # like one.
             time.sleep(0.6)
+        time.sleep(1)
 
     def send_8bits_pin(self, pin):
         """
@@ -123,3 +126,4 @@ class WiegandClient(InstrumentationClient):
                 else:
                     self.send_interrupt(self.gpio_low)
             time.sleep(0.6)
+        time.sleep(1)

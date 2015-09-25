@@ -7,7 +7,7 @@ import struct
 from Utils import test_assert
 
 
-class RemoteController():
+class RemoteController:
     """
     The driver to talk to a remote Leosac.
 
@@ -50,7 +50,7 @@ class RemoteController():
         self.zmq_context.destroy(linger=1000)
 
 
-class Command():
+class Command:
     """
     Base class for command object.
     """

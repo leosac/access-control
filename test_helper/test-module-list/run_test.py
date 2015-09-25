@@ -19,8 +19,7 @@ def main():
                 and ("NOT_A_MODULE" not in cmd.modules),
                 "Failed to retrieve config from valid module.")
 
-    leosac.interrupt()
-    leosac.wait_abort(30)
+    leosac.run_at_most(10)
 
 if __name__ == "__main__":
     preconfigure()
