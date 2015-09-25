@@ -92,6 +92,7 @@ namespace Leosac
          */
         void handle_credential(Auth::WiegandCard &card);
 
+        void handle_one(zmqpp::message &msg);
 
         void handle_msg_bus();
 
@@ -100,11 +101,23 @@ namespace Leosac
          */
         void handle_tcp_msg();
 
+
+        void configure_tcp_socket(const std::vector<std::string> &endpoints);
+
         /**
          * Some information for each tcp server target.
          */
         struct TargetInfo
         {
+          TargetInfo()
+              : status_(false)
+          {
+          }
+          TargetInfo(const TargetInfo &) = default;
+          TargetInfo(TargetInfo &&o) = default;
+          TargetInfo &operator=(const TargetInfo &o) = default;
+          TargetInfo &operator=(TargetInfo &&o) = default;
+
           // Url is IP:PORT
           // Maybe be empty is peer is connecting to us.
           std::string url_;
@@ -128,7 +141,7 @@ namespace Leosac
          */
         zmqpp::socket tcp_;
 
-        std::vector<TargetInfo> targets_;
+        std::list<TargetInfo> targets_;
 
         ProtocolHandlerUPtr protocol_;
 

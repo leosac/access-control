@@ -45,35 +45,14 @@ NotifierInstance::NotifierInstance(zmqpp::context &ctx, zmqpp::reactor &reactor,
   act_as_server_ = !bind_to.empty();
 
   bus_sub_.connect("inproc://zmq-bus-pub");
-  reactor.add(bus_sub_, std::bind(&NotifierInstance::handle_msg_bus, this));
-  reactor.add(tcp_, std::bind(&NotifierInstance::handle_tcp_msg, this));
-
   for (const auto &src : auth_sources)
   {
     bus_sub_.subscribe("S_" + src);
   }
+  reactor.add(bus_sub_, std::bind(&NotifierInstance::handle_msg_bus, this));
 
-  if (act_as_server_)
-  {
-    for (auto &endpoint : bind_to)
-    {
-      INFO("TCP-Notifier binding to: tcp://" << endpoint);
-      tcp_.bind("tcp://" + endpoint);
-    }
-  }
-  else
-  {
-    for (auto &endpoint : connect_to)
-    {
-      TargetInfo target;
-      target.url_    = "tcp://" + endpoint;
-      target.status_ = false;
-      tcp_.connect(target.url_);
-      INFO("TCP-Notifier remote target: " << Colorize::green(target.url_));
-      tcp_.get(zmqpp::socket_option::identity, target.zmq_identity_);
-      targets_.push_back(std::move(target));
-    }
-  }
+  configure_tcp_socket(act_as_server_ ? bind_to : connect_to);
+  reactor.add(tcp_, std::bind(&NotifierInstance::handle_tcp_msg, this));
 }
 
 void NotifierInstance::handle_credential(Leosac::Auth::WiegandCard &card)
@@ -104,19 +83,14 @@ void NotifierInstance::handle_credential(Leosac::Auth::WiegandCard &card)
   }
 }
 
-void NotifierInstance::handle_tcp_msg()
+void NotifierInstance::handle_one(zmqpp::message &msg)
 {
-  zmqpp::message msg;
-
-  tcp_.receive(msg);
   std::string routing_id;
   std::string data;
 
   assert(msg.parts() == 2);
   msg >> routing_id >> data;
 
-  INFO("Received TCP data from client " << routing_id << ", data {" << data
-                                        << "}");
   if (data.size() == 0)
   {
     auto target = find_target(routing_id);
@@ -131,7 +105,7 @@ void NotifierInstance::handle_tcp_msg()
         ti.zmq_identity_ = routing_id;
 
         targets_.push_back(std::move(ti));
-        INFO("New client connected to us.");
+        INFO("TCP-Notifier: New client connected.");
       }
       else
       {
@@ -141,17 +115,28 @@ void NotifierInstance::handle_tcp_msg()
                                         return info.zmq_identity_ == routing_id;
                                       }),
                        targets_.end());
+        INFO("TCP-Notifier: Client disconnected.");
       }
       return;
     }
     ASSERT_LOG(target, "Why did we lose a target?");
 
     if (target->status_)
-      INFO("Lost connection with client");
+      INFO("Lost connection with client.");
     else
       INFO("Successfully connected to client.");
 
     target->status_ = !target->status_;
+  }
+}
+
+void NotifierInstance::handle_tcp_msg()
+{
+  zmqpp::message msg;
+
+  while (tcp_.receive(msg, true))
+  {
+    handle_one(msg);
   }
 }
 
@@ -191,4 +176,31 @@ void NotifierInstance::handle_msg_bus()
   auto wiegand_card = Auth::WiegandCard(card, bits);
 
   handle_credential(wiegand_card);
+}
+
+void NotifierInstance::configure_tcp_socket(
+    const std::vector<std::string> &endpoints)
+{
+  tcp_.set(zmqpp::socket_option::backlog, 5);
+  if (act_as_server_)
+  {
+    for (auto &endpoint : endpoints)
+    {
+      INFO("TCP-Notifier binding to: tcp://" << endpoint);
+      tcp_.bind("tcp://" + endpoint);
+    }
+  }
+  else
+  {
+    for (auto &endpoint : endpoints)
+    {
+      TargetInfo target;
+      target.url_    = "tcp://" + endpoint;
+      target.status_ = false;
+      tcp_.connect(target.url_);
+      INFO("TCP-Notifier remote target: " << Colorize::green(target.url_));
+      tcp_.get(zmqpp::socket_option::identity, target.zmq_identity_);
+      targets_.push_back(std::move(target));
+    }
+  }
 }
