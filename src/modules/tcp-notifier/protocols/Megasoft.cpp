@@ -80,7 +80,7 @@ ByteVector MegasoftProtocol::build_protocol_frame(uint32_t card_id)
 {
   std::string card_id_txt = std::to_string(card_id);
   std::string protocol_frame =
-      "check_card: data: <'CARD_ID_PLACEHOLDER\\r'> <<type 'str'>>";
+      "check_card: data: <'CARD_ID_PLACEHOLDER\r'> <<type 'str'>>";
   auto final_str = boost::replace_all_copy(protocol_frame,
                                            "CARD_ID_PLACEHOLDER", card_id_txt);
   ByteVector ret(final_str.begin(), final_str.end());

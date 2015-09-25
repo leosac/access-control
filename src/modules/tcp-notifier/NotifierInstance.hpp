@@ -101,7 +101,6 @@ namespace Leosac
          */
         void handle_tcp_msg();
 
-
         void configure_tcp_socket(const std::vector<std::string> &endpoints);
 
         /**

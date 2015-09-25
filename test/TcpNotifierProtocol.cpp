@@ -34,8 +34,12 @@ namespace Leosac
 
             auto protocol_bytes = proto.build_cred_msg(c1);
             auto protocol_str = std::string(protocol_bytes.begin(), protocol_bytes.end());
-            ASSERT_EQ("check_card: data: <'4294967295\\r'> <<type 'str'>>",
+            ASSERT_EQ("check_card: data: <'4294967295\r'> <<type 'str'>>",
                       protocol_str);
+            std::cout << "Hexadecimal representation: ";
+            for (auto &byte : protocol_bytes)
+                std::cout << std::hex << +byte << ", ";
+            std::cout << std::endl;
         }
 
         TEST(TestTcpNotifierProtocol, Megasoft1)
@@ -45,7 +49,7 @@ namespace Leosac
 
             auto protocol_bytes = proto.build_cred_msg(c1);
             auto protocol_str = std::string(protocol_bytes.begin(), protocol_bytes.end());
-            ASSERT_EQ("check_card: data: <'0\\r'> <<type 'str'>>",
+            ASSERT_EQ("check_card: data: <'0\r'> <<type 'str'>>",
                       protocol_str);
         }
 
@@ -56,7 +60,7 @@ namespace Leosac
 
             auto protocol_bytes = proto.build_cred_msg(c1);
             auto protocol_str = std::string(protocol_bytes.begin(), protocol_bytes.end());
-            ASSERT_EQ("check_card: data: <'1330470483\\r'> <<type 'str'>>",
+            ASSERT_EQ("check_card: data: <'1330470483\r'> <<type 'str'>>",
                       protocol_str);
         }
     }
