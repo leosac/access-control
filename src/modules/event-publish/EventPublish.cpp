@@ -42,12 +42,12 @@ void EventPublish::handle_msg_bus()
     std::string card;
     int bits;
 
-    INFO("Publishing card id {" << card << "}");
     bus_sub_.receive(msg);
 
     if (msg.parts() < 4)
         return;
     msg >> src >> type >> card >> bits;
+    INFO("Will publish card id {" << card << "}");
 
     if (type != Leosac::Auth::SourceType::SIMPLE_WIEGAND)
     {

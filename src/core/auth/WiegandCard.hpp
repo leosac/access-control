@@ -66,7 +66,7 @@ namespace Leosac
 
         protected:
             /**
-             * Extract the card ID.
+             * Extract the card ID, assuming the format to be Wiegand26.
              */
             uint64_t to_wiegand_26() const;
 

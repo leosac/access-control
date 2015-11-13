@@ -128,6 +128,10 @@ namespace Leosac
             ASSERT_TRUE(RplethModule::card_convert_from_text(std::make_pair("80:81:61:40", 26), &out));
             ASSERT_EQ(card_binary, out);
 
+            card_binary = {0x80, 0x81, 0x61, 0x40};
+            ASSERT_TRUE(RplethModule::card_convert_from_text(std::make_pair("80:81:61:40", 32), &out));
+            ASSERT_EQ(card_binary, out);
+
             ASSERT_FALSE(RplethModule::card_convert_from_text(std::make_pair("0x:adfw:23", 32), &out));
             ASSERT_FALSE(RplethModule::card_convert_from_text(std::make_pair("fff:aa:bb:d", 32), &out));
             ASSERT_FALSE(RplethModule::card_convert_from_text(std::make_pair("d:bb:aa:fff", 32), &out));
