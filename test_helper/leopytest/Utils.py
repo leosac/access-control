@@ -3,6 +3,20 @@ import os
 import subprocess
 
 
+def to_bytes(o):
+    """
+    Convert an object to a bytes().
+
+    If the type of ``o`` is str(), encode in UTF8. If bytes() does nothing
+    :param o:
+    :return:
+    """
+    if isinstance(o, bytes):
+        return o
+    if isinstance(o, str):
+        return o.encode("utf-8")
+
+
 def test_assert(res, msg):
     """
     Test that the res variable is not false. Log msg if it is and exit.

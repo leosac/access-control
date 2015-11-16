@@ -4,6 +4,7 @@
 import zmq
 import logging
 import time
+from Utils import to_bytes
 
 
 class InstrumentationClient:
@@ -36,7 +37,7 @@ class InstrumentationClient:
         :return:
         """
         msg = [zmq.Frame('GPIO'.encode("ascii")),
-               zmq.Frame(gpio_name),
+               zmq.Frame(to_bytes(gpio_name)),
                zmq.Frame("INT".encode("ascii"))]
         self.ipc_socket.send_multipart(msg)
 
