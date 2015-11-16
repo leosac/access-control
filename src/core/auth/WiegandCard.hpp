@@ -61,8 +61,19 @@ namespace Leosac
             /**
              * Returns the integer representation of the
              * card ID.
+             *
+             * The format (Wiegand 26, 32, ....) is used to build the
+             * card number. If no format is recognized, fallback to `to_raw_int()`
              */
             uint64_t to_int() const;
+
+        /**
+         * Convert the bits of the card to an integer.
+         *
+         * This format (Wiegand26, 32, ...) is ignored: all bits are used
+         * to build the number.
+         */
+        uint64_t to_raw_int() const;
 
         protected:
             /**

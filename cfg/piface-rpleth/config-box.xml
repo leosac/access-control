@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <kernel>
+    <instance_name>leosac0</instance_name>
     <plugin_directories>
         <plugindir>.</plugindir>
         <plugindir>/root/leosac/lib/leosac</plugindir>
@@ -18,7 +19,7 @@
 
         <module>
             <name>MONITOR</name>
-            <file>libpersistent-monitor.so</file>
+            <file>libmonitor.so</file>
             <level>1</level>
 
             <module_config>
@@ -76,7 +77,7 @@
 
         <module>
             <name>LED_BUZZER</name>
-            <file>libled.so</file>
+            <file>libled-buzzer.so</file>
             <level>3</level>
             <module_config>
                 <leds>

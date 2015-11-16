@@ -59,18 +59,29 @@ std::string WiegandCard::to_string() const
     return ss.str();
 }
 
+uint64_t WiegandCard::to_raw_int() const
+{
+        auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
+
+        static_assert(sizeof(decltype(std::stoull(card_num_hex, nullptr, 16)))
+                              == sizeof(uint64_t), "stoul not big enough");
+
+        uint64_t tmp = std::stoull(card_num_hex, nullptr, 16);
+        int trailing_zero = (64 - nb_bits_) % 8;
+        tmp >>= trailing_zero;
+        return tmp;
+}
+
 uint64_t WiegandCard::to_int() const
 {
-    switch (nb_bits_)
-    {
-        case 26:
-            return to_wiegand_26();
-        default:
-        {
-            auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
-            return std::stoul(card_num_hex, nullptr, 16);
-        }
-    }
+                switch (nb_bits_)
+                {
+                        case 26:
+                                return to_wiegand_26();
+                        default:
+                                INFO("Not using format to convert WiegandCard to integer because not format match.");
+                                return to_raw_int();
+                }
 }
 
 uint64_t WiegandCard::to_wiegand_26() const
@@ -78,14 +89,9 @@ uint64_t WiegandCard::to_wiegand_26() const
     assert(nb_bits_ == 26);
     assert(card_id_.size() == 2*4 + 3);
 
-    auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
-    uint64_t tmp = std::stoul(card_num_hex, nullptr, 16);
-
-    // we have 32 bits of data (8 hex character)
-
-    // we want to drop the last bit from wiegand 26 frame.
-    // so drop 7 bits (6 useless (32-26) + last one)
-    tmp = tmp >> 7;
+    uint64_t tmp = to_raw_int();
+        // Drop the last bit (parity) from the raw frame.
+        tmp >>= 1;
     // keep 16 bits
     tmp &= 0xFFFF;
     return tmp;

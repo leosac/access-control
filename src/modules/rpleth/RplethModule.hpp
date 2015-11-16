@@ -57,6 +57,9 @@ namespace Leosac
                 /**
                 * Convert a card number from text to binary and store the result
                 * into dest.
+                * The result is a vector of 8bytes containing the Card Serial Number
+                * in MSB order.
+                *
                 * @param card_info pair (string, int) with hex representation and number of bit.
                 * @param dest destination vector for binary version (cannot be null)
                 * @returns true if conversion went well. false otherwise

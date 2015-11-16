@@ -16,4 +16,4 @@ install
 doc/html
 
 ## IDE stuff
-.idea
+.idea/dictionaries/*

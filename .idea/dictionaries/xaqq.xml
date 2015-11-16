@@ -3,14 +3,17 @@
     <words>
       <w>concat</w>
       <w>deserialize</w>
+      <w>dhcp</w>
       <w>dont</w>
       <w>fgpio</w>
       <w>gpio</w>
       <w>gpios</w>
+      <w>greenled</w>
       <w>informations</w>
       <w>inproc</w>
       <w>leds</w>
       <w>leosac</w>
+      <w>netmask</w>
       <w>piface</w>
       <w>ptree</w>
       <w>realtime</w>

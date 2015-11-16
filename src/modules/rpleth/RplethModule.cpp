@@ -25,6 +25,8 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <core/auth/Auth.hpp>
+#include <core/auth/WiegandCard.hpp>
+#include <netinet/in.h>
 
 using namespace Leosac::Module::Rpleth;
 
@@ -367,44 +369,33 @@ void RplethModule::rpleth_publish_card()
     cards_read_stream_.clear();
 }
 
+static uint64_t htonll(uint64_t value)
+{
+        int num = 42;
+        if (*(char *)&num == 42)
+        {
+                uint32_t high_part = htonl((uint32_t)(value >> 32));
+                uint32_t low_part = htonl((uint32_t)(value & 0xFFFFFFFFLL));
+                return (((uint64_t)low_part) << 32) | high_part;
+        }
+        else
+        {
+                return value;
+        }
+}
+
 bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info,
                                           std::vector<uint8_t> *dest)
 {
-    assert(dest);
-    std::vector<uint8_t> data;
-    std::istringstream iss(card_info.first);
+        Auth::WiegandCard wc(card_info.first, card_info.second);
 
-    int nb_zero = card_info.second % 32;
-    if (nb_zero != 0)
-        nb_zero = 32 - nb_zero;
-    unsigned int card_value = 0;
+        auto num = wc.to_raw_int();
+        // This will go over the network. So we have to convert to network byte order.
+        num = htonll(num);
 
-    while (!iss.eof())
-    {
-        unsigned int byte = 0;
-        iss >> std::hex >> byte;
-        if (byte > 255)
-            return false;
-
-        card_value <<= 8;
-        card_value |= (byte & 0xFF);
-
-        // drop the colon delimiter or fail.
-        if (!iss.eof())
-        {
-            char trash = 0;
-            iss >> trash;
-            if (trash != ':')
-                return false;
-        }
-    }
-    card_value >>= nb_zero;
-    for (int i = 0; i < 4; ++i)
-    {
-        data.push_back((card_value >> ((3 - i) * 8)) & 0xFF);
-    }
-    *dest = std::move(data);
-    return true;
+        dest->resize(sizeof(num));
+        std::memcpy(&(*dest)[0], &num, sizeof(num));
+        return true;
 }
 
 RplethPacket RplethModule::get_dhcp_state()
