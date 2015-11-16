@@ -30,17 +30,16 @@
 
 using namespace Leosac::Module::Rpleth;
 
-RplethModule::RplethModule(zmqpp::context &ctx,
-                           zmqpp::socket *pipe,
+RplethModule::RplethModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                            const boost::property_tree::ptree &cfg,
-                           CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils),
-        ctx_(ctx),
-        server_(ctx, zmqpp::socket_type::stream),
-        bus_sub_(ctx, zmqpp::socket_type::sub),
-        core_(ctx, zmqpp::socket_type::req),
-        reader_(nullptr),
-        stream_mode_(false)
+                           CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
+    , ctx_(ctx)
+    , server_(ctx, zmqpp::socket_type::stream)
+    , bus_sub_(ctx, zmqpp::socket_type::sub)
+    , core_(ctx, zmqpp::socket_type::req)
+    , reader_(nullptr)
+    , stream_mode_(false)
 {
     core_.connect("inproc://leosac-kernel");
     process_config();
@@ -58,15 +57,15 @@ void RplethModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
 
-    uint16_t port = module_config.get<uint16_t>("port", 4242);
+    uint16_t port           = module_config.get<uint16_t>("port", 4242);
     std::string reader_name = module_config.get_child("reader").data();
-    stream_mode_ = module_config.get<bool>("stream_mode", true);
+    stream_mode_            = module_config.get<bool>("stream_mode", true);
 
-    INFO("Rpleth module will bind to " << port <<
-         " and will control the device nammed " << reader_name
+    INFO("Rpleth module will bind to "
+         << port << " and will control the device nammed " << reader_name
          << "Stream mode = " << stream_mode_);
     reader_ = std::unique_ptr<Hardware::FWiegandReader>(
-            new Hardware::FWiegandReader(ctx_, reader_name));
+        new Hardware::FWiegandReader(ctx_, reader_name));
     server_.bind("tcp://*:" + std::to_string(port));
 }
 
@@ -88,9 +87,9 @@ void RplethModule::handle_socket()
             INFO("client disconnected");
             clients_.erase(identity);
             if (client_failed(identity))
-                failed_clients_
-                        .erase(std::remove(failed_clients_.begin(), failed_clients_.end(),
-                                           identity), failed_clients_.end());
+                failed_clients_.erase(std::remove(failed_clients_.begin(),
+                                                  failed_clients_.end(), identity),
+                                      failed_clients_.end());
         }
         else
         {
@@ -102,8 +101,8 @@ void RplethModule::handle_socket()
     if (client_failed(identity))
         return;
     assert(clients_.count(identity) && !client_failed(identity));
-    clients_[identity]
-            .write(reinterpret_cast<const uint8_t *> (content.c_str()), content.size());
+    clients_[identity].write(reinterpret_cast<const uint8_t *>(content.c_str()),
+                             content.size());
     if (handle_client_msg(identity, clients_[identity]) == false)
         failed_clients_.push_back(identity);
 }
@@ -123,8 +122,8 @@ bool RplethModule::handle_client_msg(const std::string &client_identity,
         if (response.command == RplethProtocol::HIDCommands::Greenled ||
             response.command == RplethProtocol::HIDCommands::Beep)
             continue;
-        std::size_t size = RplethProtocol::encodeCommand(response, &buffer[0],
-                                                         buffer_size);
+        std::size_t size =
+            RplethProtocol::encodeCommand(response, &buffer[0], buffer_size);
 
         zmqpp::message msg;
         msg << client_identity;
@@ -134,8 +133,7 @@ bool RplethModule::handle_client_msg(const std::string &client_identity,
             // would block: peer is probably disconnected already.
             return false;
         }
-    }
-    while (packet.isGood && buf.toRead());
+    } while (packet.isGood && buf.toRead());
     return true;
 }
 
@@ -208,8 +206,8 @@ void RplethModule::handle_wiegand_event()
     assert(type == Leosac::Auth::SourceType::SIMPLE_WIEGAND);
     msg >> card_id >> nb_bit_read;
 
-    DEBUG("Rpleth module registered card with id " << card_id << " and "
-          << nb_bit_read << " significants bits");
+    DEBUG("Rpleth module registered card with id "
+          << card_id << " and " << nb_bit_read << " significants bits");
 
     if (stream_mode_)
         cards_read_stream_.push_back(std::make_pair(card_id, nb_bit_read));
@@ -226,7 +224,7 @@ void RplethModule::handle_wiegand_event()
 
 void RplethModule::rpleth_send_cards(const RplethPacket &packet)
 {
-    auto itr_start = packet.data.begin();
+    auto itr_start                             = packet.data.begin();
     std::vector<Byte>::const_iterator my_start = itr_start;
     std::vector<Byte>::const_iterator it;
 
@@ -274,10 +272,11 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
     {
         DEBUG("Absent list");
         // send absent list
-        to_send = cards_pushed_;
+        to_send     = cards_pushed_;
         auto lambda = [this](const std::string &str) -> bool
         {
-            // if entry is not in cards_read_ means user was absent, do not remove him
+            // if entry is not in cards_read_ means user was absent, do not remove
+            // him
             bool found = std::find(cards_read_.begin(), cards_read_.end(), str) !=
                          cards_read_.end();
             return found;
@@ -285,7 +284,8 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
         to_send.erase(std::remove_if(to_send.begin(), to_send.end(), lambda),
                       to_send.end());
     }
-    // we reserve approximately what we need, just to avoid useless memory allocations.
+    // we reserve approximately what we need, just to avoid useless memory
+    // allocations.
     std::vector<Byte> data;
     data.reserve(to_send.size() * 8);
     for (auto &card : to_send)
@@ -295,7 +295,7 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
         data.insert(data.end(), card.begin(), card.end());
         data.push_back('|');
     }
-    response.data = data;
+    response.data    = data;
     response.dataLen = data.size();
     return response;
 }
@@ -353,8 +353,8 @@ void RplethModule::rpleth_publish_card()
             msg << client.first;
             if (!card_convert_from_text(card_pair, &packet.data))
                 continue;
-            packet.status = RplethProtocol::Success;
-            packet.type = RplethProtocol::HID;
+            packet.status  = RplethProtocol::Success;
+            packet.type    = RplethProtocol::HID;
             packet.command = RplethProtocol::Badge;
             packet.dataLen = packet.data.size();
 
@@ -371,31 +371,31 @@ void RplethModule::rpleth_publish_card()
 
 static uint64_t htonll(uint64_t value)
 {
-        int num = 42;
-        if (*(char *)&num == 42)
-        {
-                uint32_t high_part = htonl((uint32_t)(value >> 32));
-                uint32_t low_part = htonl((uint32_t)(value & 0xFFFFFFFFLL));
-                return (((uint64_t)low_part) << 32) | high_part;
-        }
-        else
-        {
-                return value;
-        }
+    int num = 42;
+    if (*(char *)&num == 42)
+    {
+        uint32_t high_part = htonl((uint32_t)(value >> 32));
+        uint32_t low_part = htonl((uint32_t)(value & 0xFFFFFFFFLL));
+        return (((uint64_t)low_part) << 32) | high_part;
+    }
+    else
+    {
+        return value;
+    }
 }
 
 bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info,
                                           std::vector<uint8_t> *dest)
 {
-        Auth::WiegandCard wc(card_info.first, card_info.second);
+    Auth::WiegandCard wc(card_info.first, card_info.second);
 
-        auto num = wc.to_raw_int();
-        // This will go over the network. So we have to convert to network byte order.
-        num = htonll(num);
+    auto num = wc.to_raw_int();
+    // This will go over the network. So we have to convert to network byte order.
+    num = htonll(num);
 
-        dest->resize(sizeof(num));
-        std::memcpy(&(*dest)[0], &num, sizeof(num));
-        return true;
+    dest->resize(sizeof(num));
+    std::memcpy(&(*dest)[0], &num, sizeof(num));
+    return true;
 }
 
 RplethPacket RplethModule::get_dhcp_state()
@@ -403,15 +403,16 @@ RplethPacket RplethModule::get_dhcp_state()
     auto network_cfg = get_network_config();
     RplethPacket response(RplethPacket::Sender::Server);
 
-    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.type    = RplethProtocol::TypeCode::Rpleth;
     response.command = RplethProtocol::RplethCommands::DHCPState;
     try
     {
         if (network_cfg.get<bool>("enabled"))
         {
             response.status = RplethProtocol::Success;
-            response.data = network_cfg.get<bool>("dhcp") ? std::vector<uint8_t>({1})
-                                                          : std::vector<uint8_t>({0});
+            response.data = network_cfg.get<bool>("dhcp")
+                                ? std::vector<uint8_t>({1})
+                                : std::vector<uint8_t>({0});
             response.dataLen = 1;
         }
         else // network not handled by leosac. return failure.
@@ -431,8 +432,8 @@ RplethPacket RplethModule::set_dhcp_state(const RplethPacket &p)
     auto network_cfg = get_network_config();
     RplethPacket response(RplethPacket::Sender::Server);
 
-    response.status = RplethProtocol::Failed;
-    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.status  = RplethProtocol::Failed;
+    response.type    = RplethProtocol::TypeCode::Rpleth;
     response.command = RplethProtocol::RplethCommands::SetDHCP;
 
     if (p.dataLen < 1)
@@ -456,8 +457,8 @@ RplethPacket RplethModule::set_reader_ip(const RplethPacket &p)
     auto network_cfg = get_network_config();
     RplethPacket response(RplethPacket::Sender::Server);
 
-    response.status = RplethProtocol::Failed;
-    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.status  = RplethProtocol::Failed;
+    response.type    = RplethProtocol::TypeCode::Rpleth;
     response.command = RplethProtocol::RplethCommands::SetIP;
 
     if (p.dataLen < 4)
@@ -489,8 +490,8 @@ RplethPacket RplethModule::set_reader_netmask(const RplethPacket &p)
     auto network_cfg = get_network_config();
     RplethPacket response(RplethPacket::Sender::Server);
 
-    response.status = RplethProtocol::Failed;
-    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.status  = RplethProtocol::Failed;
+    response.type    = RplethProtocol::TypeCode::Rpleth;
     response.command = RplethProtocol::RplethCommands::SetSubnet;
 
     if (p.dataLen < 4)
@@ -521,8 +522,8 @@ RplethPacket RplethModule::set_reader_gw(const RplethPacket &p)
     auto network_cfg = get_network_config();
     RplethPacket response(RplethPacket::Sender::Server);
 
-    response.status = RplethProtocol::Failed;
-    response.type = RplethProtocol::TypeCode::Rpleth;
+    response.status  = RplethProtocol::Failed;
+    response.type    = RplethProtocol::TypeCode::Rpleth;
     response.command = RplethProtocol::RplethCommands::SetGateway;
 
     if (p.dataLen < 4)
