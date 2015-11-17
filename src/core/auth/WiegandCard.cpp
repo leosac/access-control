@@ -81,7 +81,7 @@ uint64_t WiegandCard::to_int() const
     case 26:
         return to_wiegand_26();
     default:
-        INFO("Not using format to convert WiegandCard to integer because not format "
+        INFO("Not using format to convert WiegandCard to integer because no format "
              "match.");
         return to_raw_int();
     }

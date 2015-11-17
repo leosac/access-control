@@ -50,3 +50,12 @@ As an example here is `logrotate` config for `rsyslog`:
         endscript
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+When using Jessie which provide `journald` as a logging backend, editing
+`/etc/systemd/journald.conf` and setting `MaxSystemUse` should prevent log to grow
+too fat.
+
+
+Disable `ifplugd`. If Leosac is configured to manage the network, `ifplugd` can
+cause trouble by reconfiguring the network on its own.

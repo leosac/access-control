@@ -351,8 +351,7 @@ void RplethModule::rpleth_publish_card()
             RplethPacket packet(RplethPacket::Sender::Server);
 
             msg << client.first;
-            if (!card_convert_from_text(card_pair, &packet.data))
-                continue;
+            packet.data    = card_convert_from_text(card_pair);
             packet.status  = RplethProtocol::Success;
             packet.type    = RplethProtocol::HID;
             packet.command = RplethProtocol::Badge;
@@ -384,18 +383,19 @@ static uint64_t htonll(uint64_t value)
     }
 }
 
-bool RplethModule::card_convert_from_text(std::pair<std::string, int> card_info,
-                                          std::vector<uint8_t> *dest)
+std::vector<uint8_t>
+RplethModule::card_convert_from_text(const std::pair<std::string, int> &card_info)
 {
     Auth::WiegandCard wc(card_info.first, card_info.second);
+    std::vector<uint8_t> ret;
 
     auto num = wc.to_raw_int();
     // This will go over the network. So we have to convert to network byte order.
     num = htonll(num);
 
-    dest->resize(sizeof(num));
-    std::memcpy(&(*dest)[0], &num, sizeof(num));
-    return true;
+    ret.resize(sizeof(num));
+    std::memcpy(&ret[0], &num, sizeof(num));
+    return ret;
 }
 
 RplethPacket RplethModule::get_dhcp_state()

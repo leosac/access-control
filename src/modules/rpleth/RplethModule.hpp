@@ -55,17 +55,15 @@ namespace Leosac
                 RplethModule &operator=(const RplethModule &) = delete;
 
                 /**
-                * Convert a card number from text to binary and store the result
-                * into dest.
-                * The result is a vector of 8bytes containing the Card Serial Number
-                * in MSB order.
-                *
-                * @param card_info pair (string, int) with hex representation and number of bit.
-                * @param dest destination vector for binary version (cannot be null)
-                * @returns true if conversion went well. false otherwise
-                */
-                static bool card_convert_from_text(std::pair<std::string, int> card_info,
-                                                   std::vector<uint8_t> *dest);
+                 * Convert a card number from textual hexadecimal representation to a
+                 * 8 bytes byte-vector in Network Byte Order.
+                 *
+                 * The format (Wiegand 26, 32, ...) is ingored. The whole frame will be
+                 * used to compute the card serial number returned in the vector.
+                 *
+                 * @param card_info pair (string, int) with hex representation and number of bit.
+                 */
+                static std::vector<uint8_t> card_convert_from_text(const std::pair<std::string, int> &card_info);
 
             private:
                 void process_config();
