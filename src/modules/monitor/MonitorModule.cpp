@@ -172,8 +172,7 @@ void MonitorModule::process_config()
                                          .get<std::string>("system_ok", "");
     if (!system_led_name.empty())
     {
-        system_led_ = std::unique_ptr<Leosac::Hardware::FLED>(
-                new Leosac::Hardware::FLED(ctx_, system_led_name));
+        system_led_ = std::make_unique<Leosac::Hardware::FLED>(ctx_, system_led_name);
     }
 
     process_network_config();
@@ -187,9 +186,7 @@ void MonitorModule::process_network_config()
     {
         addr_to_ping_ = ping_node->get<std::string>("ip");
         std::string network_led_name = ping_node->get<std::string>("led");
-        network_led_ =
-        decltype(network_led_) (
-        new Leosac::Hardware::FLED(ctx_, network_led_name));
+        network_led_ = std::make_unique<Leosac::Hardware::FLED>(ctx_, network_led_name);
     }
 }
 
@@ -201,7 +198,6 @@ void MonitorModule::process_reader_config()
         reader_to_watch_ = reader_node->get<std::string>("name");
         bus_.subscribe("S_" + reader_to_watch_);
         std::string reader_led_name = reader_node->get<std::string>("led");
-        reader_led_ = std::unique_ptr<Leosac::Hardware::FLED>(
-                new Leosac::Hardware::FLED(ctx_, reader_led_name));
+        reader_led_ = std::make_unique<Leosac::Hardware::FLED>(ctx_, reader_led_name);
     }
 }

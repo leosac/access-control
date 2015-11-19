@@ -19,7 +19,7 @@ of notifier.
 
 This allows the module to act as a client to some servers
 using some protocol P1, to some other servers using protocol P2 and
-be itself a server from client using protocol P3.
+be itself a server for clients using protocol P3.
 
 Protocols are built into this module.
 
@@ -34,7 +34,9 @@ This protocol is a simple as possible.
 It consists of fixed-size packet, and there is only 1 packet type.
 
 The size of a packet is 8 bytes: those are the card's serial number.
-They are sent in Network Byte Order (big endian).
+They are sent in Network Byte Order (big endian). They honor the format: this means
+that if the card is read as Wiegand 26, the 16 bits card number will be extracted
+from those 26 bits.
 
 In C, the corresponding type would be `uint64_t`.
 
