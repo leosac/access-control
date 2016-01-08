@@ -24,57 +24,68 @@
 
 namespace Leosac
 {
-  namespace Module
-  {
-    namespace WSNotifier
+namespace Module
+{
+namespace WSNotifier
+{
+class WebServiceNotifier : public BaseModule
+{
+  public:
+    WebServiceNotifier(zmqpp::context &ctx, zmqpp::socket *pipe,
+                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+
+    ~WebServiceNotifier();
+
+  private:
+    /**
+     * Process a message that was read on the bus.
+     */
+    void handle_msg_bus();
+
+    /**
+     * Process the configuration file.
+     */
+    void process_config();
+
+    /**
+     * Send an HTTP request to the remote webservice
+     * to let it know a card was read.
+     */
+    void send_card_info_to_remote(const std::string &card, int nb_bits);
+
+
+    /**
+     * Read internal message bus.
+     */
+    zmqpp::socket bus_sub_;
+
+    /**
+     * Some information for each webservice target.
+     */
+    struct TargetInfo
     {
-      class WebServiceNotifier : public BaseModule
-      {
-      public:
-        WebServiceNotifier(zmqpp::context &ctx, zmqpp::socket *pipe,
-                           const boost::property_tree::ptree &cfg,
-                           CoreUtilsPtr utils);
-
-        ~WebServiceNotifier();
-
-      private:
+        std::string url_;
+        int connect_timeout_;
+        int request_timeout_;
         /**
-         * Process a message that was read on the bus.
+         * If SSL is enabled, do we perform certificate hostname validation ?
          */
-        void handle_msg_bus();
-
+        bool verify_host_;
         /**
-         * Process the configuration file.
+         * If SSL is enabled, do we perform certificate validation ?
          */
-        void process_config();
-
+        bool verify_peer_;
         /**
-         * Send an HTTP request to the remote webservice
-         * to let it know a card was read.
+         * Path to a CA bundle file.
          */
-        void send_card_info_to_remote(const std::string &card, int nb_bits);
+        std::string CA_info_file_;
+    };
 
+    std::vector<TargetInfo> targets_;
 
-        /**
-         * Read internal message bus.
-         */
-        zmqpp::socket bus_sub_;
-
-        /**
-         * Some information for each webservice target.
-         */
-        struct TargetInfo
-        {
-          std::string url_;
-          int connect_timeout_;
-          int request_timeout_;
-        };
-
-        std::vector<TargetInfo> targets_;
-
-        void send_to_target(void *curl, const Auth::WiegandCard &card,
-                            const TargetInfo &target) noexcept;
-      };
-    }
-  }
+    void send_to_target(void *curl, const Auth::WiegandCard &card,
+                        const TargetInfo &target) noexcept;
+};
+}
+}
 }

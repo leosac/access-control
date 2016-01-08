@@ -16,13 +16,14 @@ handled, all the other are simply ignored.
 
 The card information is sent in an HTTP POST request.
 
-The POST field is `card_id` and is the card id in decimal.
+The POST field is `card_id` and represents the card id, in decimal.
 
 Configuration Options {#mod_ws-notifier_user_config}
 ====================================================
 
-Options        | Options  | URL             | Description                                                    | Mandatory
+Options        | Options  | Options         | Description                                                    | Mandatory
 ---------------|----------|-----------------|----------------------------------------------------------------|-----------
+want_ssl       |          |                 | Do we enable the SSL engine ?                                  | NO (defaults to `true`)
 sources        |          |                 | Multiples message source (wiegand reader)                      | NO
 --->           | source   |                 | Name of one reader to watch for event                          | YES
 targets        |          |                 | Remote webservice to send information to                       | NO
@@ -30,9 +31,16 @@ targets        |          |                 | Remote webservice to send informat
 --->           | --->     | url             | A complete URL that will be used as the request's destination. | YES
 --->           | --->     | connect_timeout | The timeout (in milliseconds) for the connection phase. See `CURLOPT_CONNECTTIMEOUT_MS` for more information | NO
 --->           | --->     | request_timeout | The timeout for the request, in milliseconds. See `CURLOPT_TIMEOUT_MS`. | NO
+--->           | ---->    | ca_file         | Path to a PEM encoded CA file used to validate certificate. | NO
+--->           | --->     | verify_host     | If SSL is enabled, do we verify the host name in the SSL certificate ? | NO (defaults to `true`)   
+--->           | --->     | verify_peer     | If SSL is enabled, do we verify the SSL certificate ? | NO (defaults to `true`)   
 
-@note:
+@note
 The `connect_timeout` and `request_timeout` defaults to 7000 milliseconds.
+
+@note
+`want_ssl` defaults to true, meaning you'll be able to contact webservice over HTTPS. 
+You can prevent the module from loading the SSL engine by setting this to `false`.
 
 Example {#mod_ws-notifier_example}
 ----------------------------------
@@ -43,6 +51,7 @@ Example {#mod_ws-notifier_example}
   <file>libws-notifier.so</file>
   <level>142</level>
   <module_config>
+              <want_ssl>true</want_ssl>
               <sources>
                 <source>MY_WIEGAND_1</source>
               </sources>
@@ -51,6 +60,9 @@ Example {#mod_ws-notifier_example}
                   <url>http://10.2.3.100/card</url>
                   <connect_timeout>10000</connect_timeout>
                   <request_timeout>10000</request_timeout>
+                  <verify_host>true</verify_host>
+                  <verify_peer>true</verify_peer>
+                  <ca_file>/opt/server.pem</ca_file>
                 </target>
               </targets>
   </module_config>

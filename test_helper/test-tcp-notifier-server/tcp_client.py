@@ -25,10 +25,10 @@ def receive_card_event(loop):
     writer.close()
 
 loop = asyncio.get_event_loop()
-server = loop.run_until_complete(receive_card_event(loop))
+client = loop.run_until_complete(receive_card_event(loop))
 loop.run_forever()
 
 # Close the server
 server.close()
-loop.run_until_complete(server.wait_closed())
+loop.run_until_complete(client.wait_closed())
 loop.close()

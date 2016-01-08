@@ -25,7 +25,7 @@ using namespace Leosac::Module::WSNotifier;
 extern "C" {
 const char *get_module_name()
 {
-  return "WS_NOTIFIER";
+    return "WS_NOTIFIER";
 }
 }
 
@@ -36,6 +36,6 @@ extern "C" __attribute__((visibility("default"))) bool
 start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
              zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-  return Leosac::Module::start_module_helper<WebServiceNotifier>(
-      pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<WebServiceNotifier>(pipe, cfg,
+                                                                   zmq_ctx, utils);
 }
