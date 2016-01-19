@@ -52,6 +52,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config,
         module_manager_(ctx_, *this),
         network_config_(nullptr),
         remote_controller_(nullptr),
+        send_sighup_(false),
         autosave_(false)
 {
     configure_logger();
@@ -116,6 +117,11 @@ bool Kernel::run()
         this->is_running_ = false;
     });
 
+    SignalHandler::registerCallback(Signal::SigHup, [this](Signal)
+    {
+        this->send_sighup_ = true;
+    });
+
     // At this point all module should have properly initialized.
     bus_push_.send(zmqpp::message() << "KERNEL" << "SYSTEM_READY");
 
@@ -127,9 +133,11 @@ bool Kernel::run()
     {
         reactor_.poll(25); // this is good enough. May be improved later tho.
         utils_->scheduler().update(TargetThread::MAIN);
-
-//        if (remote_controller_)
-  //          remote_controller_->update();
+        if (send_sighup_)
+        {
+            bus_push_.send(zmqpp::message() << "KERNEL" << "SIGHUP");
+            send_sighup_ = false;
+        }
     }
 
     if (autosave_)

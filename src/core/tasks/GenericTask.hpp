@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "Task.hpp"
 
 namespace Leosac
@@ -34,6 +35,12 @@ namespace Leosac
         {
         public:
             GenericTask(const std::function<bool (void)> &fct);
+
+             template<typename Callable>
+             static TaskPtr build(const Callable &callable)
+             {
+                 return std::make_shared<Tasks::GenericTask>(callable);
+             }
 
         private:
             virtual bool do_run();

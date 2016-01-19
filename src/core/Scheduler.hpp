@@ -64,8 +64,7 @@ namespace Leosac
         typename std::enable_if<!std::is_convertible<Callable, std::shared_ptr<Tasks::Task>>::value, void>::type
         enqueue(const Callable &call, TargetThread policy)
         {
-            auto t = std::make_shared<Tasks::GenericTask>(call);
-            enqueue(t, policy);
+            enqueue(Tasks::GenericTask::build(call), policy);
         }
 
         /**

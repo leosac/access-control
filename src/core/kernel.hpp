@@ -38,7 +38,7 @@ namespace Leosac
     * The kernel binds a REP socket at "inproc://leosac-kernel".
     *
     * ### Supported commands
-    * Leosac kernel support a few commands. Those commands can be send by modules.
+    * Leosac kernel support a few commands. Those commands can be sent by modules.
     *
     * Command (Frame 1)        | Frame 2             | Frame 3          | Description
     * -------------------------|---------------------|------------------|--------------
@@ -49,8 +49,13 @@ namespace Leosac
     * SCRIPTS_DIR              |                     |                  | Ask the path to scripts directory
     * FACTORY_CONFIG_DIR       |                     |                  | Ask the path to factory config directory
     *
-    * @note Leosac kernel will publish on the message bus a `SYSTEM_READY` message when all modules are
-    * initialized. This message's topic is "KERNEL".
+    *
+    * ### Notifications
+    * Leosac core occasionally broadcast notification for other subsystem. The message's topic
+    * is "KERNEL" for all notification coming from Leosac's core.
+    *     + `SYSTEM_READY` message when all modules are initialized.
+    *     + `SIGHUP` to tell module to reload their configuration (if they support hot-reload).
+    *     `SIGHUP` is sent upon receiving the operating system level SIGHUP signal.
     */
     class Kernel
     {
@@ -254,10 +259,20 @@ namespace Leosac
         std::map<EnvironVar, std::string> environ_;
 
         /**
+        * Should we broadcast "SIGHUP" in the next main loop iteration ?
+        */
+        bool send_sighup_;
+
+        /**
         * Autosave configuration on shutdown.
         */
         bool autosave_;
 
+        /**
+        * The name of the Leosac instance.
+        *
+        * This is configured in the core configuration file.
+        */
         std::string instance_name_;
 
     };
