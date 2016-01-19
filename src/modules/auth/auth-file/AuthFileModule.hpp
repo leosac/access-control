@@ -24,6 +24,7 @@
 #include <vector>
 #include <modules/BaseModule.hpp>
 #include "AuthFileInstance.hpp"
+#include "tools/ToolsFwd.hpp"
 
 namespace Leosac
 {
@@ -31,7 +32,6 @@ namespace Leosac
     {
         namespace Auth
         {
-
             class AuthFileInstance;
 
             /**

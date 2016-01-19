@@ -21,6 +21,8 @@
 
 #include <zmqpp/zmqpp.hpp>
 #include <fstream>
+#include "core/tasks/Task.hpp"
+#include "LeosacFwd.hpp"
 #include "FileAuthSourceMapper.hpp"
 
 namespace Leosac
@@ -37,7 +39,7 @@ namespace Leosac
             * An instance of an authentication handler that use files to check whether or not access is granted or denied.
             * This class is for INTERNAL use only (by AuthFileModule).
             */
-            class AuthFileInstance
+            class AuthFileInstance : public std::enable_shared_from_this<AuthFileInstance>
             {
             public:
                 /**
@@ -47,12 +49,14 @@ namespace Leosac
                 * @param auth_sources_names names of the sources devices we watch (ie wiegand reader).
                 * @param auth_target_name name of the target (ie door) we auth against.
                 * @param input_file path to file contain auth configuration
+                * @param core_utils Core utilities
                 */
                 AuthFileInstance(zmqpp::context &ctx,
                         const std::string &auth_ctx_name,
                         const std::list<std::string> &auth_sources_names,
                         const std::string &auth_target_name,
-                        const std::string &input_file);
+                        const std::string &input_file,
+                        CoreUtilsPtr core_utils);
 
                 ~AuthFileInstance();
 
@@ -90,11 +94,23 @@ namespace Leosac
                 std::string auth_file_content() const;
 
             private:
+                /**
+                 * Schedule an asynchronous reload of the module configuration file.
+                 */
+                void reload_auth_config();
+
+                /**
+                 * A mutex used only internally.
+                 *
+                 * It's needed in order to safely replace the mapper_ when
+                 * reloading the configuration.
+                 */
+                std::mutex mutex_;
 
                 /**
                 * Authentication config file parser.
                 */
-                FileAuthSourceMapper mapper_;
+                FileAuthSourceMapperPtr mapper_;
 
                 /**
                 * Socket to write to the bus.
@@ -120,6 +136,8 @@ namespace Leosac
                 * Path to the auth data file.
                 */
                 std::string file_path_;
+
+                CoreUtilsPtr core_utils_;
             };
         }
     }

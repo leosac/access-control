@@ -21,6 +21,7 @@
 #include "core/CoreUtils.hpp"
 #include "core/kernel.hpp"
 
+using namespace Leosac;
 using namespace Leosac::Module::Auth;
 
 AuthFileModule::AuthFileModule(zmqpp::context &ctx,
@@ -68,7 +69,8 @@ void AuthFileModule::process_config()
                 auth_ctx_name,
                 auth_sources_names,
                 auth_target_name,
-                config_file)));
+                config_file,
+                utils_)));
     }
 }
 

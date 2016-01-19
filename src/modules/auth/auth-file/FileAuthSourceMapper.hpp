@@ -184,6 +184,7 @@ namespace Leosac
 
                 Tools::XmlScheduleLoader xml_schedules_;
             };
+        using FileAuthSourceMapperPtr = std::shared_ptr<FileAuthSourceMapper>;
         }
     }
 }

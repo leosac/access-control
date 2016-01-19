@@ -20,6 +20,8 @@
 #include <core/auth/WiegandCard.hpp>
 #include <core/auth/AuthSourceBuilder.hpp>
 #include <core/auth/Auth.hpp>
+#include <core/CoreUtils.hpp>
+#include <core/Scheduler.hpp>
 #include <exception/ExceptionsTools.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include "AuthFileInstance.hpp"
@@ -33,16 +35,20 @@ AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
         std::string const &auth_ctx_name,
         const std::list<std::string> &auth_sources_names,
         std::string const &auth_target_name,
-        std::string const &input_file) :
-        mapper_(input_file),
+        std::string const &input_file,
+        CoreUtilsPtr core_utils) :
+        mapper_(std::make_shared<FileAuthSourceMapper>(input_file)),
         bus_push_(ctx, zmqpp::socket_type::push),
         bus_sub_(ctx, zmqpp::socket_type::sub),
         name_(auth_ctx_name),
         target_name_(auth_target_name),
-        file_path_(input_file)
+        file_path_(input_file),
+        core_utils_(core_utils)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
+
+    bus_sub_.subscribe("KERNEL");
 
     INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << boost::algorithm::join(auth_sources_names, ", "));
     for (const auto &auth_source : auth_sources_names)
@@ -60,6 +66,21 @@ void AuthFileInstance::handle_bus_msg()
     zmqpp::message auth_result_msg;
 
     bus_sub_.receive(auth_msg);
+    auto cp = auth_msg.copy();
+    std::string s1;
+    cp >> s1;
+
+    if (s1 == "KERNEL")
+    {
+        DEBUG("LEOSAC KERNEL MSG !");
+        cp >> s1;
+        if (s1 == "SIGHUP")
+        {
+            reload_auth_config();
+        }
+        return;
+    }
+
 
     auth_result_msg << ("S_" + name_);
     if (handle_auth(&auth_msg))
@@ -84,14 +105,16 @@ bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
 {
     try
     {
+        std::lock_guard<std::mutex> guard(mutex_);
+
         AuthSourceBuilder build;
         IAuthenticationSourcePtr ptr = build.create(msg);
         DEBUG("Auth source OK... will map");
-        mapper_.mapToUser(ptr);
+        mapper_->mapToUser(ptr);
         DEBUG("Mapping done");
         assert(ptr);
         INFO("Using AuthSource: " << ptr->to_string());
-        auto profile = mapper_.buildProfile(ptr);
+        auto profile = mapper_->buildProfile(ptr);
         if (!profile)
         {
             NOTICE("No profile was created from this auth source message.");
@@ -127,4 +150,35 @@ std::string AuthFileInstance::auth_file_content() const
 const std::string &AuthFileInstance::auth_file_name() const
 {
     return file_path_;
+}
+
+void AuthFileInstance::reload_auth_config()
+{
+    // The idea is to build a new mapper in an other thread
+    // and swap it with the current mapper once it is built.
+    // This is because building a new mapper can take a while.
+
+    // We keep a shared_ptr to "this" in order to avoid dangling pointer to
+    // a non-existent instance (for example if the module was shutdown between
+    // the scheduling of the task and its execution.
+    auto self = shared_from_this();
+    auto file_path = file_path_;
+    auto task = Tasks::GenericTask::build([self, file_path] () {
+        try
+        {
+            auto mapper = std::make_shared<FileAuthSourceMapper>(file_path);
+            {
+                std::lock_guard<std::mutex> guard(self->mutex_);
+                self->mapper_ = mapper;
+                INFO("AuthFileInstance config reloaded.");
+            }
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            WARN("Problem when reloading AuthFileInstance configuration");
+            return false;
+        }
+    });
+    core_utils_->scheduler().enqueue(task, TargetThread::POOL);
 }
