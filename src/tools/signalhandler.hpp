@@ -50,6 +50,8 @@ namespace Leosac
             SigStop = SIGSTOP
         };
 
+        static constexpr int num_signals = _NSIG;
+
         class SignalHandler
         {
             SignalHandler() = delete;

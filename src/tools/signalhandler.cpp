@@ -23,6 +23,7 @@
  * \brief signal handler to provide a C++ interface for UNIX sigaction()
  */
 
+#include <assert.h>
 #include "signalhandler.hpp"
 
 extern "C" {
@@ -34,12 +35,13 @@ extern "C" {
 
 using namespace Leosac::Tools;
 
-static std::function<void (Signal)> sigCallback;
+static std::array<std::function<void (Signal)>, Leosac::Tools::num_signals> sigCallback;
 
 static void fesser_e(int signal)
 {
-    if (sigCallback)
-        sigCallback(static_cast<Signal>(signal));
+    assert(signal > 0 &&signal < Leosac::Tools::num_signals);
+    if (sigCallback[signal])
+        sigCallback[signal](static_cast<Signal>(signal));
 }
 
 void SignalHandler::registerCallback(Signal signal, std::function<void (Signal)> callback)
@@ -52,5 +54,6 @@ void SignalHandler::registerCallback(Signal signal, std::function<void (Signal)>
     act.sa_flags = SA_RESTART;
     if (sigaction(static_cast<int>(signal), &act, 0) < 0)
         throw (SignalException(UnixSyscall::getErrorString("sigaction", errno)));
-    sigCallback = callback;
+    assert(static_cast<int>(signal) > 0 && static_cast<int>(signal) < Leosac::Tools::num_signals);
+    sigCallback[static_cast<int>(signal)] = callback;
 }
