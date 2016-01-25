@@ -95,6 +95,14 @@ namespace Leosac
 
             private:
                 /**
+                 * Handle the message if its from Leosac's kernel, or
+                 * does nothing.
+                 *
+                 * Returns `true` if the message was handled.
+                 */
+                bool handle_kernel_message(const zmqpp::message &msg);
+
+                /**
                  * Schedule an asynchronous reload of the module configuration file.
                  */
                 void reload_auth_config();

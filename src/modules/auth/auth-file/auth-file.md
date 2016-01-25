@@ -42,6 +42,15 @@ configuration in the permission file and simply sync everything, the name of the
 adapt based on the instance name. Assuming `instance_name` being `rpi-1` and `target` being
 `door1` the matching name in the permission file shall be `rpi-1.door1`.
 
+
+Configuration reload {#mod_auth_cfg_reload}
+============================================
+
+If you made modification to the module's configuration file it is possible
+to request reloading of this config without having to restart Leosac.
+Sending `SIGHUP` to the Leosac process will trigger an asynchronous
+reload of the configuration.
+
 Users {#mod_auth_user}
 ======================
 

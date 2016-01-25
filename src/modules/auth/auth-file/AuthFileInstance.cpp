@@ -62,28 +62,15 @@ AuthFileInstance::~AuthFileInstance()
 
 void AuthFileInstance::handle_bus_msg()
 {
-    zmqpp::message auth_msg;
+    zmqpp::message msg;
     zmqpp::message auth_result_msg;
 
-    bus_sub_.receive(auth_msg);
-    auto cp = auth_msg.copy();
-    std::string s1;
-    cp >> s1;
-
-    if (s1 == "KERNEL")
-    {
-        DEBUG("LEOSAC KERNEL MSG !");
-        cp >> s1;
-        if (s1 == "SIGHUP")
-        {
-            reload_auth_config();
-        }
+    bus_sub_.receive(msg);
+    if (handle_kernel_message(msg))
         return;
-    }
-
 
     auth_result_msg << ("S_" + name_);
-    if (handle_auth(&auth_msg))
+    if (handle_auth(&msg))
     {
         auth_result_msg << Leosac::Auth::AccessStatus::GRANTED;
         INFO(name_ << " GRANTED access to target " << target_name_ << " for someone");
@@ -181,4 +168,22 @@ void AuthFileInstance::reload_auth_config()
         }
     });
     core_utils_->scheduler().enqueue(task, TargetThread::POOL);
+}
+
+bool AuthFileInstance::handle_kernel_message(const zmqpp::message &msg)
+{
+    auto cp = msg.copy();
+    std::string tmp;
+    cp >> tmp;
+
+    if (tmp == "KERNEL")
+    {
+        cp >> tmp;
+        if (tmp == "SIGHUP")
+        {
+            reload_auth_config();
+        }
+        return true;
+    }
+    return false;
 }
