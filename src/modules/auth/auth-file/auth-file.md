@@ -46,10 +46,11 @@ adapt based on the instance name. Assuming `instance_name` being `rpi-1` and `ta
 Configuration reload {#mod_auth_cfg_reload}
 ============================================
 
-If you made modification to the module's configuration file it is possible
+If you made modification to the **module's configuration file** it is possible
 to request reloading of this config without having to restart Leosac.
 Sending `SIGHUP` to the Leosac process will trigger an asynchronous
-reload of the configuration.
+reload of the configuration: during the time it takes to load the new
+configuration, the old configuration is still used.
 
 Users {#mod_auth_user}
 ======================

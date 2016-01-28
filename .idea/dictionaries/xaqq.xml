@@ -10,6 +10,7 @@
       <w>gpios</w>
       <w>greenled</w>
       <w>informations</w>
+      <w>inotify</w>
       <w>inproc</w>
       <w>leds</w>
       <w>leosac</w>

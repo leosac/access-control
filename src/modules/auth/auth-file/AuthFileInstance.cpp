@@ -147,7 +147,7 @@ void AuthFileInstance::reload_auth_config()
 
     // We keep a shared_ptr to "this" in order to avoid dangling pointer to
     // a non-existent instance (for example if the module was shutdown between
-    // the scheduling of the task and its execution.
+    // the scheduling of the task and its execution).
     auto self = shared_from_this();
     auto file_path = file_path_;
     auto task = Tasks::GenericTask::build([self, file_path] () {
@@ -163,7 +163,7 @@ void AuthFileInstance::reload_auth_config()
         }
         catch (const std::exception &e)
         {
-            WARN("Problem when reloading AuthFileInstance configuration");
+            WARN("Problem when reloading AuthFileInstance configuration: " << e.what());
             return false;
         }
     });
