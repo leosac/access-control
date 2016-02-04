@@ -13,3 +13,9 @@
 [submodule "libzmq"]
 	path = libzmq
 	url = https://github.com/zeromq/libzmq.git
+[submodule "websocketpp"]
+	path = websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "json"]
+	path = json
+	url = https://github.com/nlohmann/json.git

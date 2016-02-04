@@ -23,6 +23,7 @@
       <w>sysfs</w>
       <w>sysfsgpio</w>
       <w>unexport</w>
+      <w>websocket</w>
       <w>wiegand</w>
       <w>zmqpp</w>
     </words>

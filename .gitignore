@@ -17,3 +17,7 @@ doc/html
 
 ## IDE stuff
 .idea/dictionaries/*
+
+
+## More IDE stuff
+web/.idea/*

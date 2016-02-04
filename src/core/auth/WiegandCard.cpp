@@ -56,7 +56,8 @@ std::string WiegandCard::to_string() const
        << "WiegandCard" << std::endl
        << "\t\t";
     ss << "Number of bits: " << nb_bits_ << std::endl << "\t\t";
-    ss << "Card id: " << card_id();
+    ss << "Card id: " << card_id() << std::endl << "\t\t";
+    ss << "Card number in decimal (after format extraction): " << to_int();
     return ss.str();
 }
 

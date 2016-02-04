@@ -20,9 +20,9 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.41.0 REQUIRED serialization regex)
+find_package(Boost 1.55.0 REQUIRED system serialization regex)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O0")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)

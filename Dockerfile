@@ -1,9 +1,11 @@
 FROM debian:jessie
 
 RUN apt-get update
+RUN apt-get update
 RUN apt-get install emacs24-nox -y
 RUN apt-get install libboost-serialization-dev -y
 RUN apt-get install libboost-regex-dev -y
+RUN apt-get install libboost-system-dev -y
 RUN apt-get install build-essential git libtool-bin -y
 
 RUN apt-get install libtclap-dev cmake -y
@@ -21,7 +23,7 @@ RUN pip3 install pyzmq
 
 RUN git clone git://github.com/zeromq/libzmq.git; \
 cd libzmq; \
-git checkout e9b9860752ffac1a561fdb64f5f72bbfc5515b34; \
+git checkout 511d701de35377ff64d2fde9b594afc8800589ca; \
 ./autogen.sh; \
 ./configure --with-libsodium; \
 make check || echo ${Red}"Warning: ZeroMQ tests failed. The build will continue but may fail."${RCol}; \
@@ -51,6 +53,8 @@ ADD spdlog /leosac_src/spdlog/
 ADD test /leosac_src/test/
 ADD tools /leosac_src/tools/
 ADD zmqpp /leosac_src/zmqpp/
+ADD json /leosac_src/json/
+ADD websocketpp /leosac_src/websocketpp/
 ADD cmake /leosac_src/cmake/
 ADD src /leosac_src/src/
 ADD CMakeLists.txt /leosac_src/

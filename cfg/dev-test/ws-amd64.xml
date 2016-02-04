@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<kernel>
+    <instance_name>fixe</instance_name>
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <modules>
+        <module>
+            <name>WEBSOCK_API</name>
+            <file>libwebsock-api.so</file>
+            <level>1</level>
+
+            <module_config>
+                <port>8888</port>
+            </module_config>
+        </module>
+    </modules>
+</kernel>
