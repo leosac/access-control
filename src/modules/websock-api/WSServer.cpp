@@ -76,6 +76,10 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         {
             api_rep = api_handle->get_auth_token(req.at("content"));
         }
+        else if (command == "authenticate_with_token")
+        {
+            api_rep = api_handle->authenticate_with_token(req.at("content"));
+        }
         else if (command == "get_users")
         {
             api_rep =

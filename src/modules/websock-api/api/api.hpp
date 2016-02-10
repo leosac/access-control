@@ -21,6 +21,7 @@
 
 #include <memory>
 #include <json.hpp>
+#include <sys/epoll.h>
 
 namespace Leosac
 {
@@ -41,7 +42,18 @@ class API {
       public:
         using json = nlohmann::json;
 
+        /**
+         * Enumeration describing the authentication status of a client.
+         */
+        enum class AuthStatus
+        {
+                NONE,
+                LOGGED_IN
+        };
+
         API(WSServer &server);
+        API(const API &) = delete;
+        API(API &&) = delete;
 
         /**
          * Retrieve the current version number of Leosac.
@@ -49,17 +61,23 @@ class API {
         json get_leosac_version() const;
 
         /**
-         * Generate an authentication token.
+         * Generate an authentication token and log the user in.
          *
          * The request is excepted to contain credential.
          */
         json get_auth_token(const json &req);
+
+        /**
+         * Attempt to authenticate with an authentication token.
+         */
+        json authenticate_with_token(const json &req);
 
       private:
         /**
          * The API server.
          */
         WSServer &server_;
+        AuthStatus auth_status_;
 };
 
 using APIPtr = std::shared_ptr<API>;
