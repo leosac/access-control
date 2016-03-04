@@ -37,6 +37,7 @@ WSServer::WSServer()
     srv_.set_open_handler(std::bind(&WSServer::on_open, this, _1));
     srv_.set_close_handler(std::bind(&WSServer::on_close, this, _1));
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
+    srv_.set_reuse_addr(true);
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
