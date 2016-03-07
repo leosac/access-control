@@ -58,6 +58,12 @@ class APIAuth
          */
         bool authenticate(const std::string &token, std::string &user_id) const;
 
+        /**
+         * Marks the `token` has invalid, effectively removing it
+         * from the list of valid tokens.
+         */
+        void invalidate_token(const std::string &token);
+
       private:
         /**
          * Map a token to a username

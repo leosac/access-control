@@ -85,6 +85,7 @@ API::json API::authenticate_with_token(const API::json &req)
             rep["status"] = 0;
             rep["user_id"] = user_id;
             auth_status_ = AuthStatus::LOGGED_IN;
+            current_auth_token_ = req.at("token");
         }
         else
         {
@@ -92,4 +93,11 @@ API::json API::authenticate_with_token(const API::json &req)
         }
     }
     return rep;
+}
+
+API::json API::logout(const API::json &)
+{
+    auth_status_ = AuthStatus::NONE;
+    current_auth_token_ = "";
+    return {};
 }

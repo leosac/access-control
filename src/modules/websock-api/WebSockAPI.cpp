@@ -45,3 +45,10 @@ void WebSockAPIModule::run()
     srv.start_shutdown();
     thread.join();
 }
+
+void APIAuth::invalidate_token(const std::string &token)
+{
+    auto itr = tokens_.find(token);
+    if (itr != tokens_.end())
+        tokens_.erase(itr);
+}

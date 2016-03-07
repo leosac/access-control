@@ -42,6 +42,7 @@ WSServer::WSServer()
     handlers_["get_leosac_version"] = &API::get_leosac_version;
     handlers_["create_auth_token"] = &API::create_auth_token;
     handlers_["authenticate_with_token"] = &API::authenticate_with_token;
+    handlers_["logout"] = &API::logout;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)

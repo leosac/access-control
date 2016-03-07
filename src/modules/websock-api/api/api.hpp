@@ -72,12 +72,22 @@ class API {
          */
         json authenticate_with_token(const json &req);
 
+        /**
+         * Log an user out.
+         */
+        json logout(const json &req);
+
       private:
         /**
          * The API server.
          */
         WSServer &server_;
         AuthStatus auth_status_;
+
+        /**
+         * The token we are authenticated with.
+         */
+        std::string current_auth_token_;
 };
 
 using APIPtr = std::shared_ptr<API>;
