@@ -53,6 +53,7 @@ class WSServer {
         void start_shutdown();
 
       private:
+        using json = nlohmann::json;
 
         void on_open(websocketpp::connection_hdl hdl);
 
@@ -60,8 +61,19 @@ class WSServer {
 
         void on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg);
 
-        ConnectionAPIMap connection_api_;
+        /**
+         * Process a request from a client.
+         * The proper implementation method of WebSockAPI::API is called.
+         */
+        json dispatch_request(APIPtr api_handle, json &in);
 
+        ConnectionAPIMap connection_api_;
+        APIAuth auth_;
+
+        /**
+         * This maps (string) command name to API method.
+         */
+        std::map<std::string, json (API::*)(const json &)> handlers_;
 };
 }
 }

@@ -32,7 +32,7 @@ API::API(WSServer &server) :
 
 }
 
-API::json API::get_leosac_version() const
+API::json API::get_leosac_version(const json &)
 {
     json ret = {"version", Leosac::getVersionString()};
 

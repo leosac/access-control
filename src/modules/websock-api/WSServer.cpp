@@ -38,6 +38,10 @@ WSServer::WSServer()
     srv_.set_close_handler(std::bind(&WSServer::on_close, this, _1));
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
     srv_.set_reuse_addr(true);
+
+    handlers_["get_leosac_version"] = &API::get_leosac_version;
+    handlers_["create_auth_token"] = &API::create_auth_token;
+    handlers_["authenticate_with_token"] = &API::authenticate_with_token;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -65,43 +69,9 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     try
     {
         json rep;
-        json api_rep;
 
-        auto command = req.at("cmd");
-        INFO("BLAH IS " << command);
-        if (command == "get_leosac_version")
-        {
-            api_rep = api_handle->get_leosac_version();
-        }
-        else if (command == "get_auth_token")
-        {
-            api_rep = api_handle->get_auth_token(req.at("content"));
-        }
-        else if (command == "authenticate_with_token")
-        {
-            api_rep = api_handle->authenticate_with_token(req.at("content"));
-        }
-        else if (command == "get_users")
-        {
-            api_rep =
-                {
-                    {"data",
-                        {
-                            {"id", 42},
-                            {"type", "user"},
-                            {"attributes",
-                                {
-                                    {"username", "xaqq"},
-                                    {"firstname", "arnaud"}
-                                }
-                            }
-                        }
-                    }
-                };
-        }
-
+        rep["content"] = dispatch_request(api_handle, req);
         rep["uuid"] = req["uuid"];
-        rep["content"] = api_rep;
         srv_.send(hdl, rep.dump(4), websocketpp::frame::opcode::text);
     }
     catch (const std::exception &e)
@@ -124,5 +94,37 @@ void WSServer::start_shutdown()
     for (auto con_api : connection_api_)
     {
         srv_.close(con_api.first, 0, "bye");
+    }
+}
+
+APIAuth &WSServer::auth()
+{
+    return auth_;
+}
+
+json WSServer::dispatch_request(APIPtr api_handle, json &in)
+{
+    auto command = in.at("cmd");
+    auto handler_method = handlers_.find(command);
+    json content;
+
+    try
+    {
+        content = in.at("content");
+    }
+    catch (const std::exception &)
+    {
+        // ignore, as no content may be valid.
+    }
+
+    if (handler_method != handlers_.end())
+    {
+        auto method_ptr = handler_method->second;
+        return ((*api_handle).*method_ptr)(content);
+    }
+    else
+    {
+        INFO("Ignore invalid WebSocketAPI command: " << command);
+        return {};
     }
 }

@@ -58,7 +58,7 @@ class API {
         /**
          * Retrieve the current version number of Leosac.
          */
-        json get_leosac_version() const;
+        json get_leosac_version(const json &);
 
         /**
          * Generate an authentication token and log the user in.
