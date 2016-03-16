@@ -17,36 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "user.hpp"
 
-#include <db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
 
-namespace Leosac
+DB::User::User(const std::string &username, const std::string &password) :
+    username_(username),
+    password_(password)
 {
-namespace Module
-{
-namespace WebSockAPI
-{
-class WebSockAPIModule : public BaseModule  {
-      public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-        ~WebSockAPIModule() = default;
-
-        virtual void run() override;
-
-      private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
-
-        void init_database();
-        DBPtr database_;
-};
 
 }
+
+const std::string &DB::User::username() const
+{
+    return username_;
 }
+
+const std::string &DB::User::password() const
+{
+    return password_;
 }

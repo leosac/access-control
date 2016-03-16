@@ -21,15 +21,17 @@
 #include "tools/log.hpp"
 #include "WSServer.hpp"
 
-
 using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
 using json = nlohmann::json;
 
-WSServer::WSServer()
+WSServer::WSServer(DBPtr database) :
+    auth_(*this),
+    db_(database)
 {
+    assert(db_);
     using websocketpp::lib::placeholders::_1;
     using websocketpp::lib::placeholders::_2;
     srv_.init_asio();
@@ -128,4 +130,9 @@ json WSServer::dispatch_request(APIPtr api_handle, json &in)
         INFO("Ignore invalid WebSocketAPI command: " << command);
         return {};
     }
+}
+
+DBPtr WSServer::db()
+{
+    return db_;
 }

@@ -19,34 +19,14 @@
 
 #pragma once
 
-#include <db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
+#include <memory>
+
+namespace odb
+{
+class database;
+}
 
 namespace Leosac
 {
-namespace Module
-{
-namespace WebSockAPI
-{
-class WebSockAPIModule : public BaseModule  {
-      public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-        ~WebSockAPIModule() = default;
-
-        virtual void run() override;
-
-      private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
-
-        void init_database();
-        DBPtr database_;
-};
-
-}
-}
+using DBPtr = std::shared_ptr<odb::database>;
 }

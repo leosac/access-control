@@ -98,6 +98,7 @@ API::json API::authenticate_with_token(const API::json &req)
 API::json API::logout(const API::json &)
 {
     auth_status_ = AuthStatus::NONE;
+    server_.auth().invalidate_token(current_auth_token_);
     current_auth_token_ = "";
     return {};
 }

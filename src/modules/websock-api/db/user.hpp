@@ -19,8 +19,10 @@
 
 #pragma once
 
-#include <db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
+#include <string>
+#include <map>
+#include <vector>
+#include <odb/core.hxx>
 
 namespace Leosac
 {
@@ -28,24 +30,38 @@ namespace Module
 {
 namespace WebSockAPI
 {
-class WebSockAPIModule : public BaseModule  {
+namespace DB
+{
+/**
+ * A user of the Websocket API.
+ *
+ * Instance of this class are persisted in database.
+ */
+#pragma db object
+class User
+{
       public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+        User(const std::string& username,
+              const std::string& password);
+        User() = default;
 
-        ~WebSockAPIModule() = default;
-
-        virtual void run() override;
+        const std::string &username() const;
+        const std::string &password() const;
 
       private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
+        friend class odb::access;
 
-        void init_database();
-        DBPtr database_;
+#pragma db id auto
+        unsigned long id_;
+
+#pragma db unique
+#pragma db not_null
+        std::string username_;
+
+#pragma db not_null
+        std::string password_;
 };
+}
 
 }
 }

@@ -23,6 +23,7 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 #include "api/api.hpp"
+#include "db/db_fwd.hpp"
 
 namespace Leosac
 {
@@ -33,7 +34,11 @@ namespace WebSockAPI
 class WSServer {
       public:
 
-        WSServer();
+        /**
+         * @param database A (non-null) pointer to the
+         * database.
+         */
+        WSServer(DBPtr database);
 
         using Server = websocketpp::server<websocketpp::config::asio>;
         using ConnectionAPIMap = std::map<websocketpp::connection_hdl,
@@ -51,6 +56,16 @@ class WSServer {
          * attempt to close existing one.
          */
         void start_shutdown();
+
+        /**
+         * Retrieve the authentication helper.
+         */
+        APIAuth &auth();
+
+        /**
+         * Retrieve database handle
+         */
+        DBPtr db();
 
       private:
         using json = nlohmann::json;
@@ -74,6 +89,11 @@ class WSServer {
          * This maps (string) command name to API method.
          */
         std::map<std::string, json (API::*)(const json &)> handlers_;
+
+        /**
+         * Handler to the database.
+         */
+        DBPtr db_;
 };
 }
 }

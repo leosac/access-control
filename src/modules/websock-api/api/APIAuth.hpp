@@ -29,6 +29,7 @@ namespace Module
 {
 namespace WebSockAPI
 {
+class WSServer;
 /**
  * This class is responsible for providing an API to manage
  * authentication for Websocket client.
@@ -38,6 +39,9 @@ namespace WebSockAPI
 class APIAuth
 {
       public:
+
+        APIAuth(WSServer &srv);
+
         /**
          * Attempt to authenticate with username/password credential
          * and generate an authentication token.
@@ -70,6 +74,13 @@ class APIAuth
          */
         using TokenMap = std::map<std::string, std::string>;
         TokenMap tokens_;
+
+        /**
+         * Reference to the Websocket server.
+         * The websocket server is guaranteed to
+         * outlive the APIAuth object.
+         */
+        WSServer &server_;
 };
 
 }

@@ -19,6 +19,7 @@
 
 #include "WebSockAPI.hpp"
 #include "WSServer.hpp"
+#include <db/database.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -30,11 +31,12 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     BaseModule(ctx, pipe, cfg, utils)
 {
     port_ = cfg.get<uint16_t>("module_config.port", 8976);
+    init_database();
 }
 
 void WebSockAPIModule::run()
 {
-    WSServer srv;
+    WSServer srv(database_);
     std::thread thread(std::bind(&WSServer::run, &srv, port_));
 
     while (is_running_)
@@ -46,9 +48,28 @@ void WebSockAPIModule::run()
     thread.join();
 }
 
-void APIAuth::invalidate_token(const std::string &token)
+void WebSockAPIModule::init_database()
 {
-    auto itr = tokens_.find(token);
-    if (itr != tokens_.end())
-        tokens_.erase(itr);
+    // initialise database;
+    INFO("WebSocketAPI module is initialising database.");
+
+    auto db_path = config_.get<std::string>("db_path", "wsapi.sqlite");
+
+    database_ = std::make_shared<odb::sqlite::database>(db_path,
+                                                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+
+    // The following code generates database schema.
+    // It also overrides any data stored in database.
+
+/*    {
+        odb::connection_ptr c(database_->connection());
+
+        c->execute("PRAGMA foreign_keys=OFF");
+
+        odb::transaction t(c->begin());
+        odb::schema_catalog::create_schema(*database_);
+        t.commit();
+
+        c->execute("PRAGMA foreign_keys=ON");
+    }*/
 }

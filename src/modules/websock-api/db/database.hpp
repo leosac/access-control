@@ -19,34 +19,14 @@
 
 #pragma once
 
-#include <db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
+#include <odb/database.hxx>
+#include <odb/transaction.hxx>
 
-namespace Leosac
-{
-namespace Module
-{
-namespace WebSockAPI
-{
-class WebSockAPIModule : public BaseModule  {
-      public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-        ~WebSockAPIModule() = default;
-
-        virtual void run() override;
-
-      private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
-
-        void init_database();
-        DBPtr database_;
-};
-
-}
-}
-}
+#if defined(DATABASE_SQLITE)
+#  include <odb/connection.hxx>
+#  include <odb/transaction.hxx>
+#  include <odb/schema-catalog.hxx>
+#  include <odb/sqlite/database.hxx>
+#elif defined(DATABASE_MYSQL)
+#  include <odb/mysql/database.hxx>
+#endif
