@@ -120,8 +120,6 @@ namespace Leosac
         */
         std::string factory_config_directory() const;
 
-
-
         /**
          * Returns a reference to the module manager object (const version).
          */
@@ -267,13 +265,5 @@ namespace Leosac
         * Autosave configuration on shutdown.
         */
         bool autosave_;
-
-        /**
-        * The name of the Leosac instance.
-        *
-        * This is configured in the core configuration file.
-        */
-        std::string instance_name_;
-
     };
 }

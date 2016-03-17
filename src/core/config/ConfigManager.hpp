@@ -36,7 +36,7 @@ namespace Leosac
     * That class helps manage the configuration for the application and its module.
     * It's goal is to help saving the configuration to be used to maintain each module configuration.
     *
-    * The `load_config()` and `store_config()` are used to retrive or update module config.
+    * The `load_config()` and `store_config()` are used to retrieve or update module config.
     * For example, when remote control is doing a SYNC_FROM, it pushes the new config
     * to the ConfigManager using `store_config()`.
     */

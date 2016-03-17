@@ -37,6 +37,12 @@ class WebSockAPIModule : public BaseModule  {
 
         virtual void run() override;
 
+        /**
+         * This module explicity expose CoreUtils to other
+         * object in the module.
+         */
+        CoreUtilsPtr core_utils();
+
       private:
         /**
          * Port to bind the websocket endpoint.

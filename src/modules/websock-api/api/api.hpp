@@ -21,7 +21,6 @@
 
 #include <memory>
 #include <json.hpp>
-#include <sys/epoll.h>
 
 namespace Leosac
 {
@@ -57,25 +56,70 @@ class API {
 
         /**
          * Retrieve the current version number of Leosac.
+         *
+         * Request:
+         *     + No parameter.
+         *
+         * Response:
+         *     + `version`: An alphanumeric string representing the
+         *     version of the Leosac daemon.
          */
         json get_leosac_version(const json &);
 
         /**
-         * Generate an authentication token and log the user in.
+         * Generate an authentication token using the user crendetial,
+         * and logs the user in on success.
          *
-         * The request is excepted to contain credential.
+         * Request:
+         *     + `username`: Username of the user attempting to log-in.
+         *     + `password`: Clear text password.
+         *
+         * Response:
+         *     + `status`: An integer.
+         *         + `0` means success.
+         *         + `-1` means invalid username/password.
+         *         + `-2` means already logged in.
+         *     + `message`: An optional text message describing the status.
          */
         json get_auth_token(const json &req);
 
         /**
-         * Attempt to authenticate with an authentication token.
+         * Attempt to authenticate with a (previously generated) authentication token.
+         *
+         * Request:
+         *     + `token`: The authentication token
+         *
+         * Response:
+         *     + `user_id`: On success, the user-id of the newly authenticated user.
+         *     + `status`: See [create_auth_token](@ref create_auth_token) status.
+         *     + `message`: An optional text message describing the status.
+         *
+         * @note The auth token can be created using
+         * the [create_auth_token](@ref create_auth_token) API call.
          */
         json authenticate_with_token(const json &req);
 
         /**
          * Log an user out.
+         *
+         * Request:
+         *     + No parameter.
+         *
+         * Response:
+         *     + No content.
          */
         json logout(const json &req);
+
+        /**
+         * Presents an overview of the system to the end user.
+         *
+         * Request:
+         *     + No parameter
+         *
+         * Response:
+         *     + ...
+         */
+        json system_overview(const json &req);
 
       private:
         /**

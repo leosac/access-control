@@ -32,9 +32,10 @@ General fully public API {#mod_websock-api_public}
 This parts of the API is fully public, meaning that it doesn't require
 authentication in order to issue requests.
 
+   + [get_leosac_version](@ref Leosac::Module::WebSockAPI::API::get_leosac_version)
+
 
 Authentication {#mod_websock-api_authentication}
 ------------------------------------------------
 
 To do pretty much anything against Leosac you need to authenticate.
-

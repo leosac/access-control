@@ -17,9 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <core/tasks/GetLocalConfigVersion.hpp>
 #include "tools/leosac.hpp"
 #include "api.hpp"
 #include "../WSServer.hpp"
+#include "core/CoreUtils.hpp"
+#include "core/kernel.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -101,4 +104,20 @@ API::json API::logout(const API::json &)
     server_.auth().invalidate_token(current_auth_token_);
     current_auth_token_ = "";
     return {};
+}
+
+API::json API::system_overview(const API::json &req)
+{
+    json rep;
+
+    rep["instance_name"] = server_.core_utils()->kernel().config_manager().instance_name();
+
+    auto t = std::make_shared<Tasks::GetLocalConfigVersion>
+        (server_.core_utils()->kernel());
+    server_.core_utils()->scheduler().enqueue(t, TargetThread::MAIN);
+    t->wait();
+    assert(t->succeed());
+    rep["config_version"] = t->config_version_;
+
+    return rep;
 }

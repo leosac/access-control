@@ -36,7 +36,7 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 
 void WebSockAPIModule::run()
 {
-    WSServer srv(database_);
+    WSServer srv(*this, database_);
     std::thread thread(std::bind(&WSServer::run, &srv, port_));
 
     while (is_running_)
@@ -72,4 +72,9 @@ void WebSockAPIModule::init_database()
 
         c->execute("PRAGMA foreign_keys=ON");
     }*/
+}
+
+CoreUtilsPtr WebSockAPIModule::core_utils()
+{
+    return utils_;
 }
