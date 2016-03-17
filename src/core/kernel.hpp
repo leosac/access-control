@@ -157,6 +157,11 @@ namespace Leosac
         */
         void restart_later();
 
+        /**
+         * Return the time point at which Leosac started.
+         */
+        const std::chrono::steady_clock::time_point start_time() const;
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -188,6 +193,8 @@ namespace Leosac
         void extract_environ();
 
         void configure_logger();
+
+        void shutdown();
 
         /**
         * Query all modules and retrieve the full application configuration.
@@ -265,5 +272,10 @@ namespace Leosac
         * Autosave configuration on shutdown.
         */
         bool autosave_;
+
+        /**
+         * Time-point when Leosac started to run.
+         */
+        const std::chrono::steady_clock::time_point start_time_;
     };
 }

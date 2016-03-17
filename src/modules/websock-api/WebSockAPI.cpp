@@ -43,7 +43,7 @@ void WebSockAPIModule::run()
     {
         reactor_.poll();
     }
-
+    INFO("WEBSOCK WILL START STOPPING...");
     srv.start_shutdown();
     thread.join();
 }

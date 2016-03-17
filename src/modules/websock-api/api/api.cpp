@@ -109,15 +109,11 @@ API::json API::logout(const API::json &)
 API::json API::system_overview(const API::json &req)
 {
     json rep;
+    auto core_api = server_.core_utils()->core_api();
 
-    rep["instance_name"] = server_.core_utils()->kernel().config_manager().instance_name();
-
-    auto t = std::make_shared<Tasks::GetLocalConfigVersion>
-        (server_.core_utils()->kernel());
-    server_.core_utils()->scheduler().enqueue(t, TargetThread::MAIN);
-    t->wait();
-    assert(t->succeed());
-    rep["config_version"] = t->config_version_;
+    rep["instance_name"] = core_api.instance_name();
+    rep["config_version"] = core_api.config_version();
+    rep["uptime"] = core_api.uptime();
 
     return rep;
 }

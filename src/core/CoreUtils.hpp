@@ -20,6 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
+#include "CoreAPI.hpp"
 
 namespace Leosac
 {
@@ -51,6 +52,11 @@ namespace Leosac
         Scheduler       &scheduler();
         ConfigChecker   &config_checker();
         Kernel          &kernel();
+
+        /**
+         * Instantiate a new, ready to use, CoreAPI object.
+         */
+        CoreAPI         core_api();
 
         /**
          * Are we running in strict mode ?

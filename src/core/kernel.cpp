@@ -23,6 +23,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <tools/ElapsedTimeCounter.hpp>
 #include "kernel.hpp"
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
@@ -53,7 +54,8 @@ Kernel::Kernel(const boost::property_tree::ptree &config,
         network_config_(nullptr),
         remote_controller_(nullptr),
         send_sighup_(false),
-        autosave_(false)
+        autosave_(false),
+        start_time_(std::chrono::steady_clock::now())
 {
     configure_logger();
     extract_environ();
@@ -139,6 +141,9 @@ bool Kernel::run()
             send_sighup_ = false;
         }
     }
+
+    INFO("KERNEL JUST EXITED MAIN LOOP");
+    shutdown();
 
     if (autosave_)
         save_config();
@@ -384,4 +389,28 @@ void Kernel::restart_later()
 CoreUtilsPtr Kernel::core_utils()
 {
     return utils_;
+}
+
+const std::chrono::steady_clock::time_point Kernel::start_time() const
+{
+    return start_time_;
+}
+
+void Kernel::shutdown()
+{
+    // Request modules shutdown.
+    module_manager().stopModules(true);
+
+    INFO("DONE SOFT STOP");
+
+    // Still process tasks and message for 5s.
+    // Note that this a workaround. The shutdown process
+    // should be improved. This may require important changes
+    // to the module subsystem.
+    Tools::ElapsedTimeCounter etc;
+    while (etc.elapsed() < 5000)
+    {
+        reactor_.poll(25);
+        utils_->scheduler().update(TargetThread::MAIN);
+    }
 }

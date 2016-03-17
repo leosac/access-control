@@ -7,6 +7,7 @@ set(LEOSAC_SRCS
 
 set(LEOSAC_LIB_SRCS
     core/kernel.cpp
+    core/CoreAPI.cpp
     core/config/ConfigManager.cpp
     core/config/RemoteConfigCollector.cpp
     core/config/ConfigChecker.cpp
@@ -51,6 +52,7 @@ set(LEOSAC_LIB_SRCS
     tools/GenGuid.cpp
     tools/PropertyTreeExtractor.cpp
     tools/log.cpp
+    tools/ElapsedTimeCounter.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp

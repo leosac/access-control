@@ -125,7 +125,7 @@ public:
     * Opposite of init module. this stop all modules thread and perform cleanup.
     * @note Dynamic libraries handlers are NOT released.
     */
-    void stopModules();
+    void stopModules(bool soft = false);
 
     /**
     * Add a directory to a path. If the path already exist, it is ignored.
@@ -184,7 +184,7 @@ private:
     *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
     * @warning OUTDATED
     */
-    void stopModule(ModuleInfo *modinfo);
+    void stopModule(ModuleInfo *modinfo, bool soft = false);
 
 
     ModuleInfo *find_module_by_name(const std::string &name) const;

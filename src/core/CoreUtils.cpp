@@ -60,3 +60,8 @@ Leosac::Kernel &Leosac::CoreUtils::kernel()
     ASSERT_LOG(kptr_, "Kernel pointer is NULL in CoreUtils");
     return *kptr_;
 }
+
+Leosac::CoreAPI Leosac::CoreUtils::core_api()
+{
+    return Leosac::CoreAPI(kernel());
+}

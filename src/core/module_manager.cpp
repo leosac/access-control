@@ -186,29 +186,39 @@ std::shared_ptr<DynamicLibrary> ModuleManager::load_library_file(const std::stri
     return lib;
 }
 
-void ModuleManager::stopModules()
+void ModuleManager::stopModules(bool soft)
 {
     for (std::set<ModuleInfo>::const_reverse_iterator itr = modules_.rbegin();
          itr != modules_.rend();
          ++itr)
     {
-        stopModule(const_cast<ModuleInfo *>(&(*itr)));
+        stopModule(const_cast<ModuleInfo *>(&(*itr)), soft);
     }
-    modules_.clear();
-    assert(modules_.size() == 0);
+    if (!soft)
+    {
+        modules_.clear();
+        assert(modules_.size() == 0);
+    }
 }
 
-void ModuleManager::stopModule(ModuleInfo *modinfo)
+void ModuleManager::stopModule(ModuleInfo *modinfo, bool soft)
 {
     assert(modinfo);
 
     // make sure the module is running.
     if (modinfo->actor_)
     {
-        INFO("Will now stop module " << modinfo->name_);
+        INFO("Will now stop module " << modinfo->name_ << " (Soft Stop: " << soft << ")");
         // fixme i believe we may have a potential deadlock here.
-        modinfo->actor_->stop(true);
-        modinfo->actor_ = nullptr;
+        if (soft)
+        {
+            modinfo->actor_->stop(false);
+        }
+        else
+        {
+            modinfo->actor_->stop(true);
+            modinfo->actor_ = nullptr;
+        }
         //modules_.erase(*modinfo);
         //config_manager_.remove_config(modinfo->name_);
     }
