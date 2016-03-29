@@ -20,7 +20,7 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.55.0 REQUIRED system serialization regex)
+find_package(Boost 1.55.0 REQUIRED system serialization regex filesystem)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O0")
 

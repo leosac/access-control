@@ -20,6 +20,7 @@
 #include "WebSockAPI.hpp"
 #include "WSServer.hpp"
 #include <db/database.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -54,24 +55,41 @@ void WebSockAPIModule::init_database()
     INFO("WebSocketAPI module is initialising database.");
 
     auto db_path = config_.get<std::string>("db_path", "wsapi.sqlite");
+    boost::filesystem::path path(db_path);
 
-    database_ = std::make_shared<odb::sqlite::database>(db_path,
-                                                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+    if (path.is_relative())
+    {
+        path = boost::filesystem::current_path() /= path;
+    }
 
-    // The following code generates database schema.
-    // It also overrides any data stored in database.
+    INFO("Absolute dabatase path: " << path.string());
+    // Try to open the database, assuming it already exists.
+    database_ = std::make_shared<odb::sqlite::database>(path.string(),
+                                                        SQLITE_OPEN_READWRITE);
+    try
+    {
+        // Will throw if database doesn't exist.
+        database_->connection();
+    }
+    catch (const odb::database_exception &e)
+    {
+        // Create the database.
+        INFO("Database doesn't seem to exist. Will create it.");
+        database_ = std::make_shared<odb::sqlite::database>(path.string(),
+                                                            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+        // Create database structure.
+        {
+            odb::connection_ptr c(database_->connection());
 
-/*    {
-        odb::connection_ptr c(database_->connection());
+            c->execute("PRAGMA foreign_keys=OFF");
 
-        c->execute("PRAGMA foreign_keys=OFF");
+            odb::transaction t(c->begin());
+            odb::schema_catalog::create_schema(*database_);
+            t.commit();
 
-        odb::transaction t(c->begin());
-        odb::schema_catalog::create_schema(*database_);
-        t.commit();
-
-        c->execute("PRAGMA foreign_keys=ON");
-    }*/
+            c->execute("PRAGMA foreign_keys=ON");
+        }
+    }
 }
 
 CoreUtilsPtr WebSockAPIModule::core_utils()
