@@ -58,7 +58,7 @@ uint64_t CoreAPI::uptime() const
 std::string CoreAPI::instance_name() const
 {
     std::string out;
-     auto task = Tasks::GenericTask::build([&] () {
+    auto task = Tasks::GenericTask::build([&] () {
              out = kernel_.config_manager().instance_name();
              return true;
     });

@@ -28,14 +28,14 @@
 
 enum LogLevel
 {
-  EMERG  = spdlog::level::EMERG,
-  ALERT  = spdlog::level::ALERT,
-  CRIT   = spdlog::level::CRITICAL,
-  ERROR  = spdlog::level::ERR,
-  WARN   = spdlog::level::WARN,
-  NOTICE = spdlog::level::NOTICE,
-  INFO   = spdlog::level::INFO,
-  DEBUG  = spdlog::level::DEBUG,
+  EMERG  = spdlog::level::emerg,
+  ALERT  = spdlog::level::alert,
+  CRIT   = spdlog::level::critical,
+  ERROR  = spdlog::level::err,
+  WARN   = spdlog::level::warn,
+  NOTICE = spdlog::level::notice,
+  INFO   = spdlog::level::info,
+  DEBUG  = spdlog::level::debug,
 };
 
 namespace LogHelper

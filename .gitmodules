@@ -9,7 +9,7 @@
 	url = https://github.com/zeromq/zmqpp.git
 [submodule "spdlog"]
 	path = spdlog
-	url = https://github.com/xaqq/spdlog.git
+	url = https://github.com/gabime/spdlog.git
 [submodule "libzmq"]
 	path = libzmq
 	url = https://github.com/zeromq/libzmq.git

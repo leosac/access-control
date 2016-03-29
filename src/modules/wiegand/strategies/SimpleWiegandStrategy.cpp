@@ -17,6 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iomanip>
 #include <tools/log.hpp>
 #include "SimpleWiegandStrategy.hpp"
 #include "modules/wiegand/WiegandReaderImpl.hpp"
@@ -45,7 +46,8 @@ void SimpleWiegandStrategy::timeout()
 
     for (std::size_t i = 0; i < size; ++i)
     {
-        card_hex << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(reader_->buffer()[i]);
+        card_hex << std::hex << std::setfill('0') << std::setw(2)
+            << static_cast<int>(reader_->buffer()[i]);
         if (i + 1 < size)
             card_hex << ":";
     }

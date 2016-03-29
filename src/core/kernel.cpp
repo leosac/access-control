@@ -343,7 +343,7 @@ void Kernel::configure_logger()
         syslog->set_level(static_cast<spdlog::level::level_enum>(LogHelper::log_level_from_string(syslog_min_level)));
     }
     auto console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
-    console->set_level(spdlog::level::DEBUG);
+    console->set_level(spdlog::level::debug);
 }
 
 const ModuleManager &Kernel::module_manager() const
