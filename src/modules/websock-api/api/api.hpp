@@ -121,6 +121,8 @@ class API {
          */
         json system_overview(const json &req);
 
+        json get_logs(const json &req);
+
       private:
         /**
          * The API server.

@@ -29,6 +29,7 @@ using namespace Leosac::Tools;
 
 SQLiteLogSink::SQLiteLogSink(const std::string &db_path)
 {
+    std::cout << "ENABLING SQLITE LOGGER!" << std::endl;
     // Generate a "run id"
     run_id_ = Leosac::gen_uuid();
 

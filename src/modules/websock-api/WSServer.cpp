@@ -27,10 +27,10 @@ using namespace Leosac::Module::WebSockAPI;
 
 using json = nlohmann::json;
 
-WSServer::WSServer(WebSockAPIModule &module,
-                   DBPtr database) :
+WSServer::WSServer(WebSockAPIModule &module, DBPtr database, DBPtr log_database) :
     auth_(*this),
     db_(database),
+    log_db_(log_database),
     module_(module)
 {
     assert(db_);
@@ -48,6 +48,7 @@ WSServer::WSServer(WebSockAPIModule &module,
     handlers_["authenticate_with_token"] = &API::authenticate_with_token;
     handlers_["logout"] = &API::logout;
     handlers_["system_overview"] = &API::system_overview;
+    handlers_["get_logs"] = &API::get_logs;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -143,4 +144,9 @@ DBPtr WSServer::db()
 CoreUtilsPtr WSServer::core_utils()
 {
     return module_.core_utils();
+}
+
+DBPtr WSServer::log_db()
+{
+    return log_db_;
 }

@@ -17,12 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/tasks/GetLocalConfigVersion.hpp>
+#include <tools/db/LogEntry.hpp>
 #include "tools/leosac.hpp"
 #include "api.hpp"
 #include "../WSServer.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/kernel.hpp"
+#include "tools/db/database.hpp"
+#include "odb_gen/LogEntry_odb.h"
+#include <boost/date_time/posix_time/conversion.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -114,6 +117,50 @@ API::json API::system_overview(const API::json &req)
     rep["instance_name"] = core_api.instance_name();
     rep["config_version"] = core_api.config_version();
     rep["uptime"] = core_api.uptime();
+
+    return rep;
+}
+
+API::json API::get_logs(const json &req)
+{
+    json rep;
+
+    using query = odb::query<Tools::LogEntry>;
+    using result = odb::result<Tools::LogEntry>;
+    DBPtr db = server_.log_db();
+    if (db)
+    {
+        rep["data"] = {};
+        odb::transaction t(db->begin());
+
+        auto n = req["n"].get<int>();
+
+        query q("ORDER BY" + query::id + "DESC " + "LIMIT" + query::_val(n));
+        result r(db->query<Tools::LogEntry>(q));
+        auto count = 0;
+        for (Tools::LogEntry &entry : r)
+        {
+            auto timestamp = boost::posix_time::to_time_t(entry.timestamp_);
+            rep["data"].push_back({{"id", entry.id_},
+                                      {"type", "log-entry"},
+                                      {
+                                          "attributes",
+                                              {
+                                                  {"message",   entry.msg_},
+                                                  {"timestamp", timestamp}
+                                              }
+                                      }
+                                  });
+            count++;
+        }
+
+        rep["meta"] = {{"total", count}};
+        rep["status"] = 0;
+    }
+    else
+    {
+        rep["status"] = -1;
+    }
 
     return rep;
 }

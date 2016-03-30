@@ -331,7 +331,7 @@ std::string Kernel::factory_config_directory() const
 void Kernel::configure_logger()
 {
     bool use_syslog                 = true;
-    bool use_sqlite                 = true;
+    bool use_sqlite                 = false;
     std::string syslog_min_level    = "WARNING";
     std::string sqlite_db_path;
     std::shared_ptr<spdlog::logger> console;

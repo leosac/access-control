@@ -48,6 +48,11 @@ target_include_directories(${WEBSOCK_API_BIN}
         # ODB generated code use a simple #include, so it needs to be able
         # to find our header file.
         ${CMAKE_CURRENT_SOURCE_DIR}/db
+
+        # To access the odb_gen of Leosac's core.
+        ${CMAKE_BINARY_DIR}
+        # And for Generated ODB code to access our headeres
+        ${CMAKE_SOURCE_DIR}/src/tools/db
         )
 
 target_compile_definitions(${WEBSOCK_API_BIN}

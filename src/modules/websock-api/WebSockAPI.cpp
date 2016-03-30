@@ -32,12 +32,12 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     BaseModule(ctx, pipe, cfg, utils)
 {
     port_ = cfg.get<uint16_t>("module_config.port", 8976);
-    init_database();
+    init_databases();
 }
 
 void WebSockAPIModule::run()
 {
-    WSServer srv(*this, database_);
+    WSServer srv(*this, database_, log_database_);
     std::thread thread(std::bind(&WSServer::run, &srv, port_));
 
     while (is_running_)
@@ -47,6 +47,29 @@ void WebSockAPIModule::run()
     INFO("WEBSOCK WILL START STOPPING...");
     srv.start_shutdown();
     thread.join();
+}
+
+void WebSockAPIModule::init_databases()
+{
+    init_database();
+    init_log_database();
+}
+
+void WebSockAPIModule::init_log_database()
+{
+    // todo get correct path
+    log_database_ = std::make_shared<odb::sqlite::database>("/tmp/leosac_log.db",
+                                                            SQLITE_OPEN_READONLY);
+    try
+    {
+        // Will throw if database doesn't exist.
+        log_database_->connection();
+    }
+    catch (const odb::database_exception &e)
+    {
+        log_database_ = nullptr;
+        WARN("WebSocket module doesn't have access to SQLite logs database.");
+    }
 }
 
 void WebSockAPIModule::init_database()
