@@ -164,3 +164,12 @@ API::json API::get_logs(const json &req)
 
     return rep;
 }
+
+bool API::allowed(const std::string &cmd)
+{
+    if (cmd == "get_leosac_version" ||
+        cmd == "create_auth_token" ||
+        cmd == "authenticate_with_token")
+        return true;
+    return auth_status_ == AuthStatus::LOGGED_IN;
+}

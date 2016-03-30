@@ -126,8 +126,15 @@ json WSServer::dispatch_request(APIPtr api_handle, json &in)
 
     if (handler_method != handlers_.end())
     {
-        auto method_ptr = handler_method->second;
-        return ((*api_handle).*method_ptr)(content);
+        if (api_handle->allowed(command))
+        {
+            auto method_ptr = handler_method->second;
+            return ((*api_handle).*method_ptr)(content);
+        }
+        else
+        {
+            return {{"status", -2}};
+        }
     }
     else
     {

@@ -55,6 +55,11 @@ class API {
         API(API &&) = delete;
 
         /**
+         * Is this API client allowed to perform the request `cmd` ?
+         */
+        bool allowed(const std::string &cmd);
+
+        /**
          * Retrieve the current version number of Leosac.
          *
          * Request:
