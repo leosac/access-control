@@ -52,6 +52,7 @@ set(LEOSAC_LIB_SRCS
     tools/GenGuid.cpp
     tools/PropertyTreeExtractor.cpp
     tools/log.cpp
+    tools/SQLiteLogSink.cpp
     tools/ElapsedTimeCounter.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
@@ -60,13 +61,37 @@ set(LEOSAC_LIB_SRCS
     core/tasks/RemoteControlAsyncResponse.cpp
 )
 
+
+# ODB stuff -- for class that needs to be database-aware.
+set(OdbCMake_ODB_HEADERS
+        tools/db/LogEntry.hpp)
+set(OdbCMake_SOURCES "")
+odb_compile(OdbCMake_SOURCES FILES
+        ${OdbCMake_ODB_HEADERS} DB
+        sqlite
+        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
+        PROFILE "boost/date-time"
+        )
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(cotire)
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 
-add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
+add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS} ${OdbCMake_SOURCES})
+target_include_directories(${LEOSAC_LIB}
+        PUBLIC
+        ${ODB_INCLUDE_DIRS}
+        ${ODB_COMPILE_OUTPUT_DIR}
 
-set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+        # ODB generated code use a simple #include, so it needs to be able
+        # to find our header file.
+        ${CMAKE_CURRENT_SOURCE_DIR}/tools/db
+        )
+target_compile_definitions(${LEOSAC_LIB}
+        PRIVATE
+        DATABASE_SQLITE
+        )
+set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-unknown-pragmas")
 
 #Add GProf compile flag
 if(LEOSAC_GPROF)
@@ -103,7 +128,8 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
     COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
-target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES})
+target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
+        ${ODB_LIBRARIES} odb-boost)
 
 set_target_properties(${LEOSAC_LIB} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
 cotire(${LEOSAC_LIB})

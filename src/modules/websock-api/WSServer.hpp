@@ -23,7 +23,7 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 #include "api/api.hpp"
-#include "db/db_fwd.hpp"
+#include "tools/db/db_fwd.hpp"
 #include "WebSockAPI.hpp"
 
 namespace Leosac

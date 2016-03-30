@@ -19,40 +19,34 @@
 
 #pragma once
 
+#include <spdlog/sinks/sink.h>
 #include <tools/db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
 
 namespace Leosac
 {
-namespace Module
+namespace Tools
 {
-namespace WebSockAPI
+/**
+ * A custom sink that write LogEntry object
+ * to a SQLite database.
+ */
+class SQLiteLogSink : public spdlog::sinks::sink
 {
-class WebSockAPIModule : public BaseModule  {
       public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-        ~WebSockAPIModule() = default;
+      SQLiteLogSink(const std::string &database_path);
 
-        virtual void run() override;
+        virtual void log(const spdlog::details::log_msg &msg) override;
 
-        /**
-         * This module explicity expose CoreUtils to other
-         * object in the module.
-         */
-        CoreUtilsPtr core_utils();
+        virtual void flush() override
+        {
+            // Noop as writing to a SQL database is transactional.
+        }
 
-      private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
-
-        void init_database();
+        private:
         DBPtr database_;
-};
+        std::string run_id_;
 
-}
+};
 }
 }

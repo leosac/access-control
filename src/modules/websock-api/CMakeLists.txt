@@ -30,7 +30,7 @@ add_library(${WEBSOCK_API_BIN} SHARED ${WEBSOCK_API_SRCS} ${OdbCMake_SOURCES}
         ${OdbCMake_ODB_HEADERS})
 
 set_target_properties(${WEBSOCK_API_BIN} PROPERTIES
-        COMPILE_FLAGS "-std=c++11 -Wno-unknown-pragmas -Wl,-z,now"
+        COMPILE_FLAGS "-std=c++11 -Wno-unknown-pragmas"
         )
 
 target_link_libraries(${WEBSOCK_API_BIN}

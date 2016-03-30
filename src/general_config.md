@@ -60,6 +60,8 @@ a level >= `WARNING` will be written to syslog.
 Options       | Options  | Options | Description                                      | Mandatory
 --------------|----------|---------|--------------------------------------------------|-----------
 enable_syslog |          |         | Enable logging to syslog                         | NO (default to `true`)
+enable_sqlite |          |         | Enable logging to a SQLite database              | NO (default to `false`)
+log_database  |          |         | Path to the SQLite database for logs.            | NO
 min_syslog    |          |         | Minimal log entry level to write to syslog       | NO (default to `WARNING`)
 
 Here is a list of the various log level available:

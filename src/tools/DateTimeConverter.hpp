@@ -19,40 +19,22 @@
 
 #pragma once
 
-#include <tools/db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
+#include <chrono>
+#include "boost/date_time/posix_time/posix_time.hpp"
 
-namespace Leosac
+template<typename Duration>
+boost::posix_time::ptime time_point_ptime(const std::chrono::time_point <std::chrono::system_clock, Duration> &from)
 {
-namespace Module
-{
-namespace WebSockAPI
-{
-class WebSockAPIModule : public BaseModule  {
-      public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-        ~WebSockAPIModule() = default;
-
-        virtual void run() override;
-
-        /**
-         * This module explicity expose CoreUtils to other
-         * object in the module.
-         */
-        CoreUtilsPtr core_utils();
-
-      private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
-
-        void init_database();
-        DBPtr database_;
-};
-
-}
-}
+    typedef std::chrono::nanoseconds duration_t;
+    typedef duration_t::rep rep_t;
+    rep_t d = std::chrono::duration_cast<duration_t>(from.time_since_epoch()).count();
+    rep_t sec = d / 1000000000;
+    rep_t nsec = d % 1000000000;
+    return boost::posix_time::from_time_t(0) +
+        boost::posix_time::seconds(static_cast<long>(sec)) +
+#ifdef BOOST_DATE_TIME_HAS_NANOSECONDS
+        boost::posix_time::nanoseconds(nsec);
+#else
+        boost::posix_time::microseconds((nsec + 500) / 1000);
+#endif
 }

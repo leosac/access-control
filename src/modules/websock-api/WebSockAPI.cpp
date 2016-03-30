@@ -19,7 +19,7 @@
 
 #include "WebSockAPI.hpp"
 #include "WSServer.hpp"
-#include <db/database.hpp>
+#include <tools/db/database.hpp>
 #include <boost/filesystem.hpp>
 
 using namespace Leosac;

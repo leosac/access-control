@@ -19,40 +19,48 @@
 
 #pragma once
 
-#include <tools/db/db_fwd.hpp>
-#include "modules/BaseModule.hpp"
+#include "boost/date_time/posix_time/posix_time.hpp"
+#include <odb/core.hxx>
 
 namespace Leosac
 {
-namespace Module
+namespace Tools
 {
-namespace WebSockAPI
+/**
+ * A log entry.
+ *
+ * This class is decorated to be ODB friendly. Object of this
+ * type will be stored in a sqlite database for logging.
+ */
+#pragma db object
+class LogEntry
 {
-class WebSockAPIModule : public BaseModule  {
       public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+#pragma db id auto
+        unsigned long id_;
 
-        ~WebSockAPIModule() = default;
+#pragma db not_null
+        boost::posix_time::ptime timestamp_;
 
-        virtual void run() override;
+#pragma db not_null
+        std::string msg_;
 
         /**
-         * This module explicity expose CoreUtils to other
-         * object in the module.
+         * The run_id is generated when Leosac starts, and it is used
+         * to identify "runs" (ie if Leosac restarts) in order
+         * to better tracks logs.
          */
-        CoreUtilsPtr core_utils();
+#pragma db not_null
+        std::string run_id_;
+
+#pragma db not_null
+        int level_;
+
+#pragma db not_null
+        size_t thread_id_;
 
       private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
-
-        void init_database();
-        DBPtr database_;
+        friend class odb::access;
 };
-
-}
 }
 }

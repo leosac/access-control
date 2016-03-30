@@ -24,6 +24,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <tools/ElapsedTimeCounter.hpp>
+#include <tools/SQLiteLogSink.hpp>
 #include "kernel.hpp"
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
@@ -330,19 +331,30 @@ std::string Kernel::factory_config_directory() const
 void Kernel::configure_logger()
 {
     bool use_syslog                 = true;
+    bool use_sqlite                 = true;
     std::string syslog_min_level    = "WARNING";
+    std::string sqlite_db_path;
+    std::shared_ptr<spdlog::logger> console;
 
     if (config_manager_.kconfig().get_child_optional("log"))
     {
         use_syslog          = config_manager_.kconfig().get_child("log").get<bool>("enable_syslog", true);
+        use_sqlite          = config_manager_.kconfig().get_child("log").get<bool>("enable_sqlite", false);
         syslog_min_level    = config_manager_.kconfig().get_child("log").get<std::string>("min_syslog", "WARNING");
+        sqlite_db_path      = config_manager_.kconfig().get_child("log").get<std::string>("log_database", "/tmp/leosac_log.db");
     }
     if (use_syslog)
     {
         auto syslog = spdlog::create("syslog", {std::make_shared<spdlog::sinks::syslog_sink>()});
         syslog->set_level(static_cast<spdlog::level::level_enum>(LogHelper::log_level_from_string(syslog_min_level)));
     }
-    auto console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
+    if (use_sqlite)
+    {
+        console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>(),
+            std::make_shared<Tools::SQLiteLogSink>(sqlite_db_path)});
+    }
+    else
+        console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
     console->set_level(spdlog::level::debug);
 }
 
