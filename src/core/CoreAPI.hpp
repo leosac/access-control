@@ -60,6 +60,11 @@ class CoreAPI
          */
         uint64_t uptime() const;
 
+        /**
+         * Retrieve the names of all enabled modules.
+         */
+        std::vector<std::string> modules_names() const;
+
       private:
         Kernel &kernel_;
 };

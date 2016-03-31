@@ -117,6 +117,7 @@ API::json API::system_overview(const API::json &req)
     rep["instance_name"] = core_api.instance_name();
     rep["config_version"] = core_api.config_version();
     rep["uptime"] = core_api.uptime();
+    rep["modules"] = core_api.modules_names();
 
     return rep;
 }
@@ -133,7 +134,15 @@ API::json API::get_logs(const json &req)
         rep["data"] = {};
         odb::transaction t(db->begin());
 
-        auto n = req["n"].get<int>();
+        int n;
+        try
+        {
+            n = req["n"].get<int>();
+        }
+        catch (const std::exception &)
+        {
+            n = 42;
+        }
 
         query q("ORDER BY" + query::id + "DESC " + "LIMIT" + query::_val(n));
         result r(db->query<Tools::LogEntry>(q));

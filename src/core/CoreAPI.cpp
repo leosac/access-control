@@ -68,3 +68,17 @@ std::string CoreAPI::instance_name() const
 
     return out;
 }
+
+std::vector<std::string> CoreAPI::modules_names() const
+{
+    std::vector<std::string> out;
+    auto task = Tasks::GenericTask::build([&] () {
+            out = kernel_.module_manager().modules_names();
+            return true;
+    });
+    kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
+    task->wait();
+    assert(task->succeed());
+
+    return out;
+}
