@@ -81,6 +81,8 @@ uint64_t WiegandCard::to_int() const
     {
     case 26:
         return to_wiegand_26();
+    case 34:
+        return to_wiegand_34();
     default:
         INFO("Not using format to convert WiegandCard to integer because no format "
              "match.");
@@ -98,5 +100,18 @@ uint64_t WiegandCard::to_wiegand_26() const
     tmp >>= 1;
     // keep 16 bits
     tmp &= 0xFFFF;
+    return tmp;
+}
+
+uint64_t WiegandCard::to_wiegand_34() const
+{
+    assert(nb_bits_ == 34);
+    assert(card_id_.size() == 2 * 5 + 4);
+
+    uint64_t tmp = to_raw_int();
+    // Drop the last bit (parity) from the raw frame.
+    tmp >>= 1;
+    // keep 24 bits
+    tmp &= 0xFFFFFF;
     return tmp;
 }

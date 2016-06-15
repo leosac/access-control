@@ -82,6 +82,11 @@ namespace Leosac
             uint64_t to_wiegand_26() const;
 
             /**
+             * Extract the card ID, assuming the format to be Wiegand34.
+             */
+            uint64_t to_wiegand_34() const;
+
+            /**
             * Card id
             */
             std::string card_id_;
