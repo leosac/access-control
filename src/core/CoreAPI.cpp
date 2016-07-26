@@ -17,17 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/tasks/GetLocalConfigVersion.hpp>
 #include "CoreAPI.hpp"
-#include "kernel.hpp"
 #include "Scheduler.hpp"
+#include "kernel.hpp"
+#include <core/tasks/GetLocalConfigVersion.hpp>
 
 using namespace Leosac;
 
-CoreAPI::CoreAPI(Kernel &k) :
-    kernel_(k)
+CoreAPI::CoreAPI(Kernel &k)
+    : kernel_(k)
 {
-
 }
 
 uint64_t CoreAPI::config_version() const
@@ -39,14 +38,28 @@ uint64_t CoreAPI::config_version() const
     return t->config_version_;
 }
 
+boost::property_tree::ptree CoreAPI::kernel_config() const
+{
+    boost::property_tree::ptree out;
+    auto task = Tasks::GenericTask::build([&]() {
+        out = kernel_.config_manager().kconfig();
+        return true;
+    });
+    kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
+    task->wait();
+    assert(task->succeed());
+
+    return out;
+}
+
 uint64_t CoreAPI::uptime() const
 {
     using namespace std::chrono;
     uint64_t out;
-    auto task = Tasks::GenericTask::build([&] () {
-            auto now = steady_clock::now();
-            out = duration_cast<seconds>(now - kernel_.start_time()).count();
-            return true;
+    auto task = Tasks::GenericTask::build([&]() {
+        auto now = steady_clock::now();
+        out      = duration_cast<seconds>(now - kernel_.start_time()).count();
+        return true;
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
@@ -58,9 +71,9 @@ uint64_t CoreAPI::uptime() const
 std::string CoreAPI::instance_name() const
 {
     std::string out;
-    auto task = Tasks::GenericTask::build([&] () {
-             out = kernel_.config_manager().instance_name();
-             return true;
+    auto task = Tasks::GenericTask::build([&]() {
+        out = kernel_.config_manager().instance_name();
+        return true;
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
@@ -72,9 +85,9 @@ std::string CoreAPI::instance_name() const
 std::vector<std::string> CoreAPI::modules_names() const
 {
     std::vector<std::string> out;
-    auto task = Tasks::GenericTask::build([&] () {
-            out = kernel_.module_manager().modules_names();
-            return true;
+    auto task = Tasks::GenericTask::build([&]() {
+        out = kernel_.module_manager().modules_names();
+        return true;
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();

@@ -196,11 +196,6 @@ namespace Leosac
 
         void shutdown();
 
-        /**
-        * Query all modules and retrieve the full application configuration.
-        */
-        std::string get_full_config();
-
         CoreUtilsPtr utils_;
 
         ConfigManager config_manager_;

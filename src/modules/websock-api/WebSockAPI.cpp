@@ -19,8 +19,11 @@
 
 #include "WebSockAPI.hpp"
 #include "WSServer.hpp"
+#include "core/CoreAPI.hpp"
+#include "core/CoreUtils.hpp"
 #include <tools/db/database.hpp>
 #include <boost/filesystem.hpp>
+#include <tools/XmlPropertyTree.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -32,11 +35,11 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     BaseModule(ctx, pipe, cfg, utils)
 {
     port_ = cfg.get<uint16_t>("module_config.port", 8976);
-    init_databases();
 }
 
 void WebSockAPIModule::run()
 {
+    init_databases();
     WSServer srv(*this, database_, log_database_);
     std::thread thread(std::bind(&WSServer::run, &srv, port_));
 
@@ -57,18 +60,35 @@ void WebSockAPIModule::init_databases()
 
 void WebSockAPIModule::init_log_database()
 {
-    // todo get correct path
-    log_database_ = std::make_shared<odb::sqlite::database>("/tmp/leosac_log.db",
-                                                            SQLITE_OPEN_READONLY);
-    try
+    // It is possible the "log_database" config entry doesn't exist.
+    // In this case, logs aren't stored in a SQLite database.
+    std::string db_path;
+    bool sqlite_enabled = false;
+    auto config = core_utils()->core_api().kernel_config();
+    if (config.get_child_optional("log"))
     {
-        // Will throw if database doesn't exist.
-        log_database_->connection();
+        sqlite_enabled = config.get_child("log").get<bool>("enable_sqlite");
+        db_path = config.get_child("log").get<std::string>("log_database");
     }
-    catch (const odb::database_exception &e)
+
+    if (sqlite_enabled && !db_path.empty())
     {
-        log_database_ = nullptr;
-        WARN("WebSocket module doesn't have access to SQLite logs database.");
+        log_database_ = std::make_shared<odb::sqlite::database>(db_path,
+                                                                SQLITE_OPEN_READONLY);
+        try
+        {
+            // Will throw if database doesn't exist.
+            log_database_->connection();
+        }
+        catch (const odb::database_exception &e)
+        {
+            log_database_ = nullptr;
+            ERROR("WebSocket module doesn't have access to SQLite logs database.");
+        }
+    }
+    else
+    {
+        INFO("WebSocket module not accessing SQLite log database.");
     }
 }
 

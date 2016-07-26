@@ -20,6 +20,8 @@
 #pragma once
 
 #include <cstdint>
+#include <boost/property_tree/ptree.hpp>
+#include <string>
 
 namespace Leosac
 {
@@ -49,6 +51,12 @@ class CoreAPI
          * Retrieve the local configuration version.
          */
         uint64_t config_version() const;
+
+        /**
+         * Retrieve the property tree describing the Leosac's kernel
+         * configuration.
+         */
+        boost::property_tree::ptree kernel_config() const;
 
         /**
          * Returns the `instance_name` of Leosac.
