@@ -25,20 +25,16 @@
 
 std::string Leosac::gen_uuid()
 {
-    int ret;
+    ssize_t ret;
     int fd;
-    char *uuid;
     fd = open("/proc/sys/kernel/random/uuid", 0);
     ASSERT_LOG(fd != 1, "Cannot open /proc/sys/kernel/random/uuid");
 
-    uuid = static_cast<char *>(malloc(37));
-    ASSERT_LOG(uuid, "Cannot allocate memory for UUID");
-
-    ret = read(fd, uuid, 36);
-    uuid[36] = 0;
+    std::array<char, 360> uuid;
+    ret = read(fd, uuid.data(), 36);
+    close(fd);
     ASSERT_LOG(ret == 36, "Cannot read UUID from /proc/sys/kernel/random/uuid");
 
-    std::string uuid_str(uuid);
-    free(uuid);
+    std::string uuid_str(uuid.data(), 36);
     return uuid_str;
 }

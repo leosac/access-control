@@ -122,10 +122,23 @@ class API {
          *     + No parameter
          *
          * Response:
-         *     + ...
+         *     + `instance_name`: General config `instance_name` value.
+         *     + `config_version`: The current version number of the configuration.
+         *     + `uptime`: Number of seconds since Leosac started to run.
+         *     + `modules`: List of name of the currently running modules.
          */
         json system_overview(const json &req);
 
+        /**
+         * Retrieve (part of) the logs generated Leosac. In order for this call
+         * to work, SQLite logging must be enabled.
+         *
+         * Request:
+         *     + `n`: The number of log entries to retrieve. Optional, default to 42.
+         *
+         * Response:
+         *     + ...
+         */
         json get_logs(const json &req);
 
       private:
