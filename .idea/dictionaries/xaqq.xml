@@ -19,6 +19,7 @@
       <w>ptree</w>
       <w>realtime</w>
       <w>rpleth</w>
+      <w>sqlite</w>
       <w>syscall</w>
       <w>sysfs</w>
       <w>sysfsgpio</w>

@@ -62,5 +62,15 @@ class LogEntry
       private:
         friend class odb::access;
 };
+
+/**
+ * SQL view over the LogEntry table.
+ */
+#pragma db view object(LogEntry)
+struct LogView
+{
+#pragma db column("count(" + LogEntry::id_ + ")")
+        size_t count;
+};
 }
 }

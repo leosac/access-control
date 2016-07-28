@@ -42,7 +42,7 @@ namespace Leosac
      * It currently support running a task on the main thread, or in some
      * random thread.
      *
-     * The schedule is fully thread-safe.
+     * The scheduler is fully thread-safe.
      */
     class Scheduler
     {

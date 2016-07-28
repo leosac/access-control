@@ -26,7 +26,7 @@ find_package(Boost 1.55.0 REQUIRED date_time system serialization regex filesyst
 find_package(ODB REQUIRED COMPONENTS sqlite)
 include(${ODB_USE_FILE})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O2")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)

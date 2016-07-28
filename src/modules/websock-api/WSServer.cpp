@@ -42,6 +42,8 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database, DBPtr log_database)
     srv_.set_close_handler(std::bind(&WSServer::on_close, this, _1));
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
     srv_.set_reuse_addr(true);
+    // clear all logs.
+    srv_.clear_access_channels(websocketpp::log::alevel::all);
 
     handlers_["get_leosac_version"] = &API::get_leosac_version;
     handlers_["create_auth_token"] = &API::create_auth_token;

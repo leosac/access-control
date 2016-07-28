@@ -9,6 +9,11 @@
         <enabled>false</enabled>
     </network>
 
+    <log>
+      <enable_sqlite>true</enable_sqlite>
+      <log_database>/tmp/lama.log</log_database>
+    </log>
+
     <modules>
         <module>
             <name>WEBSOCK_API</name>

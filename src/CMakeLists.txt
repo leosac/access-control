@@ -64,11 +64,13 @@ set(LEOSAC_LIB_SRCS
 
 # ODB stuff -- for class that needs to be database-aware.
 set(OdbCMake_ODB_HEADERS
-        tools/db/LogEntry.hpp)
+        tools/db/LogEntry.hpp
+        )
 set(OdbCMake_SOURCES "")
 odb_compile(OdbCMake_SOURCES FILES
         ${OdbCMake_ODB_HEADERS} DB
         sqlite
+        STANDARD c++11
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         PROFILE "boost/date-time"
         )
