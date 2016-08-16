@@ -497,6 +497,19 @@ namespace Leosac
             ASSERT_FALSE(profile->isAccessGranted(date_wednesday_23_42, doorA_));
             ASSERT_FALSE(profile->isAccessGranted(date_thursday_14_00, nullptr));
         }
+
+        /**
+         * UserID `UNKNOWN_USER` is reserved to prevent confusion in the log file.
+         * Test that the mapper refuse to build when such a user is defined.
+         */
+        TEST_F(AuthFileMapperTest, TestReservedUserID)
+        {
+            ASSERT_THROW(
+                {
+                    std::unique_ptr<IAuthSourceMapper> faulty_mapper(new FileAuthSourceMapper(gl_data_path + "AuthFile-9.xml"));
+                }, ModuleException);
+            // Nested exception. The original type is a ConfigException.
+        }
     }
 }
 

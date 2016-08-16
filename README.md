@@ -1,4 +1,4 @@
-The **complete documentation** for both end user and developpers be found [here](http://islog.github.io/leosac/doc_output/develop/html/).
+The **complete documentation** for both end user and developpers can be found [here](http://islog.github.io/leosac/doc_output/develop/html/).
 
 # Leosac
 

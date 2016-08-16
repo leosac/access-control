@@ -23,6 +23,7 @@
 #include <fstream>
 #include "core/tasks/Task.hpp"
 #include "LeosacFwd.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "FileAuthSourceMapper.hpp"
 
 namespace Leosac
@@ -34,6 +35,31 @@ namespace Leosac
 
             class AuthFileInstance;
             using AuthFileInstancePtr = std::shared_ptr<AuthFileInstance>;
+
+            struct AuthResult
+            {
+                AuthResult(bool s, ::Leosac::Auth::IAccessProfilePtr p,
+                ::Leosac::Auth::IUserPtr u) : success(s),
+                    profile(p),
+                    user(u)
+                {}
+
+                /**
+                 * Wether access shall be granted, or not.
+                 */
+                bool success;
+                /**
+                 * Profile used to grant or deny access. May be null if no
+                 * corresponding to the auth source were found.
+                 */
+                ::Leosac::Auth::IAccessProfilePtr profile;
+
+                /**
+                 * A user object representing the user who made the authentication
+                 * attempt.
+                 */
+                ::Leosac::Auth::IUserPtr user;
+            };
 
             /**
             * An instance of an authentication handler that use files to check whether or not access is granted or denied.
@@ -70,14 +96,6 @@ namespace Leosac
                 void handle_bus_msg();
 
                 /**
-                * Prepare auth source object, map them to profile and check if access is granted.
-                *
-                * @note This is a `noexcept` method. Will return false in case something went wrong.
-                * @return true is access shall be granted, false otherwise.
-                */
-                bool handle_auth(zmqpp::message *msg) noexcept;
-
-                /**
                 * Returns the socket subscribed to the message bus.
                 */
                 zmqpp::socket &bus_sub();
@@ -106,6 +124,17 @@ namespace Leosac
                  * Schedule an asynchronous reload of the module configuration file.
                  */
                 void reload_auth_config();
+
+                /**
+                * Prepare auth source object, map them to profile and check if access is granted.
+                *
+                * @note This is a `noexcept` method. Will return false in case something went wrong.
+                * @return A pair of boolean and profile. A `true` value for the boolean
+                * means access shall be granted, otherwise it shall not.
+                * The IAccessProfilePtr points to the profile used to resolve the authentication
+                * request: it may be null.
+                */
+                AuthResult handle_auth(zmqpp::message *msg) noexcept;
 
                 /**
                  * A mutex used only internally.

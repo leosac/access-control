@@ -191,8 +191,8 @@ void FileAuthSourceMapper::load_groups(const boost::property_tree::ptree &group_
             IUserPtr user = users_[user_name];
             if (!user)
             {
-                ERROR("Unkown user " << user_name);
-                throw ConfigException(config_file_, "Unkown user " + user_name);
+                ERROR("Unknown user " << user_name);
+                throw ConfigException(config_file_, "Unknown user " + user_name);
             }
             grp->member_add(user);
         }
@@ -258,6 +258,8 @@ void FileAuthSourceMapper::load_credentials(const boost::property_tree::ptree &c
 
         std::string user_id = node.get<std::string>("user");
         IUserPtr user       = users_[user_id];
+        if (!user)
+            throw ConfigException(config_file_, "Credentials defined for undefined user " + user_id);
         assert(user);
 
         IAuthenticationSourcePtr credential;
@@ -398,6 +400,9 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
         std::string firstname   = node.get<std::string>("firstname", "");
         std::string lastname    = node.get<std::string>("lastname", "");
         std::string email       = node.get<std::string>("email", "");
+
+        if (name == "UNKNOWN_USER") // reserved name
+            throw ConfigException(config_file_, "'UNKNOWN_USER' is a reserved name. Do not use.");
 
         IUserPtr uptr(new IUser(name));
         uptr->firstname(firstname);

@@ -24,6 +24,7 @@
 #include <core/Scheduler.hpp>
 #include <exception/ExceptionsTools.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <tools/Colorize.hpp>
 #include "AuthFileInstance.hpp"
 #include "tools/log.hpp"
 #include "FileAuthSourceMapper.hpp"
@@ -62,6 +63,7 @@ AuthFileInstance::~AuthFileInstance()
 
 void AuthFileInstance::handle_bus_msg()
 {
+    using namespace Colorize;
     zmqpp::message msg;
     zmqpp::message auth_result_msg;
 
@@ -70,15 +72,30 @@ void AuthFileInstance::handle_bus_msg()
         return;
 
     auth_result_msg << ("S_" + name_);
-    if (handle_auth(&msg))
+    auto auth_result = handle_auth(&msg);
+
+    std::string log_user;
+    // output user id if available.
+    if (auth_result.user)
+        log_user = Colorize::green(auth_result.user->id());
+    else
+        log_user = Colorize::red("UNKNOWN_USER");
+
+    if (auth_result.success)
     {
         auth_result_msg << Leosac::Auth::AccessStatus::GRANTED;
-        INFO(name_ << " GRANTED access to target " << target_name_ << " for someone");
+        INFO(Colorize::bold(name_) << " " <<
+                                   Colorize::green("GRANTED") <<
+                                   " access to target " << Colorize::underline(target_name_) <<
+                                   " for " << log_user);
     }
     else
     {
         auth_result_msg << Leosac::Auth::AccessStatus::DENIED;
-        INFO(name_ << " DENIED access to target " << target_name_ << " for someone");
+        INFO(Colorize::bold(name_) << " " <<
+                                   Colorize::red("DENIED") <<
+                                   " access to target " << Colorize::underline(target_name_) <<
+                                   " for " << log_user);
     }
     bus_push_.send(auth_result_msg);
 }
@@ -88,41 +105,45 @@ zmqpp::socket &AuthFileInstance::bus_sub()
     return bus_sub_;
 }
 
-bool AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
+AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
 {
     try
     {
         std::lock_guard<std::mutex> guard(mutex_);
 
         AuthSourceBuilder build;
-        IAuthenticationSourcePtr ptr = build.create(msg);
+        IAuthenticationSourcePtr auth_source = build.create(msg);
         DEBUG("Auth source OK... will map");
-        mapper_->mapToUser(ptr);
+        mapper_->mapToUser(auth_source);
         DEBUG("Mapping done");
-        assert(ptr);
-        INFO("Using AuthSource: " << ptr->to_string());
-        auto profile = mapper_->buildProfile(ptr);
+        assert(auth_source);
+        INFO("Using AuthSource: " << auth_source->to_string());
+        auto profile = mapper_->buildProfile(auth_source);
+
         if (!profile)
         {
             NOTICE("No profile was created from this auth source message.");
-            return false;
+            assert(auth_source->owner() == nullptr);
+            return {false, nullptr, nullptr};
         }
         if (target_name_.empty())
         {
             // check against default target
-            return profile->isAccessGranted(std::chrono::system_clock::now(), nullptr);
+            return {profile->isAccessGranted(std::chrono::system_clock::now(), nullptr),
+                profile, auth_source->owner()};
         }
         else
         {
             AuthTargetPtr t(new AuthTarget(target_name_));
-            return profile->isAccessGranted(std::chrono::system_clock::now(), t);
+            return {profile->isAccessGranted(std::chrono::system_clock::now(), t),
+                profile, auth_source->owner()};
         }
     }
     catch (std::exception &e)
     {
         log_exception(e);
     }
-    return false;
+    return {false, nullptr, nullptr};
 }
 
 std::string AuthFileInstance::auth_file_content() const
