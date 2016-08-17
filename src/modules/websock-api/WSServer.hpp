@@ -25,6 +25,7 @@
 #include "api/api.hpp"
 #include "tools/db/db_fwd.hpp"
 #include "WebSockAPI.hpp"
+#include "api/APIAuth.hpp"
 
 namespace Leosac
 {

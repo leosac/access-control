@@ -40,12 +40,12 @@ API::API(WSServer &server) :
 
 API::json API::get_leosac_version(const json &)
 {
-    json ret = {"version", Leosac::getVersionString()};
-
+    json ret;
+    ret["version"] = getVersionString();
     return ret;
 }
 
-API::json API::get_auth_token(const API::json &req)
+API::json API::create_auth_token(const API::json &req)
 {
     json rep;
 

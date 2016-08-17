@@ -86,7 +86,7 @@ class API {
          *         + `-2` means already logged in.
          *     + `message`: An optional text message describing the status.
          */
-        json get_auth_token(const json &req);
+        json create_auth_token(const json &req);
 
         /**
          * Attempt to authenticate with a (previously generated) authentication token.
