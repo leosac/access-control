@@ -19,8 +19,9 @@ function(odb_compile outvar)
     HEADER_PROLOGUE INLINE_PROLOGUE SOURCE_PROLOGUE
     HEADER_EPILOGUE INLINE_EPILOGUE SOURCE_EPILOGUE
     MULTI_DATABASE
-    PROFILE)
-  set(multiValueParams FILES INCLUDE DB)
+    PROFILE
+    INCLUDE_PREFIX)
+  set(multiValueParams FILES INCLUDE DB INCLUDE_REGEX)
 
   cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
 
@@ -107,6 +108,10 @@ function(odb_compile outvar)
     list(APPEND ODB_ARGS --profile "${PARAM_PROFILE}")
   endif()
 
+  if(PARAM_INCLUDE_PREFIX)
+    list(APPEND ODB_ARGS --include-prefix "${PARAM_INCLUDE_PREFIX}")
+  endif()
+
   list(APPEND ODB_ARGS --output-dir "${ODB_COMPILE_OUTPUT_DIR}")
   list(APPEND ODB_ARGS --hxx-suffix "${ODB_COMPILE_HEADER_SUFFIX}")
   list(APPEND ODB_ARGS --ixx-suffix "${ODB_COMPILE_INLINE_SUFFIX}")
@@ -123,6 +128,10 @@ function(odb_compile outvar)
       endif()
     endforeach()
   endif()
+
+  foreach(reg ${PARAM_INCLUDE_REGEX})
+      list(APPEND ODB_ARGS --include-regex "${reg}")
+  endforeach()
 
   foreach(sfx ${ODB_COMPILE_FILE_SUFFIX})
     list(APPEND ODB_ARGS --odb-file-suffix "${sfx}")

@@ -20,8 +20,10 @@
 #pragma once
 
 #include <memory>
-#include <core/auth/CredentialValidity.hpp>
+#include "core/auth/CredentialValidity.hpp"
 #include "IAccessProfile.hpp"
+#include "tools/db/database.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
@@ -33,21 +35,30 @@ namespace Leosac
         /**
         * Represent a user
         */
+        #pragma db object pointer(std::shared_ptr)
         class IUser
         {
         public:
-            IUser(const std::string &user_id);
+            IUser(const std::string &username);
+            IUser() = default;
             virtual ~IUser() = default;
 
             /**
-            * Get the current id/name.
+            * Get the username of this user.
             */
-            const std::string &id() const noexcept;
+            const std::string &username() const noexcept;
+
+            unsigned long id() const noexcept;
 
             /**
-            * Set a new id.
+             * Retrieve password
+             */
+            const std::string &password() const noexcept ;
+
+            /**
+            * Set a new username.
             */
-            void id(const std::string &id_new);
+            void username(const std::string &username);
 
             IAccessProfilePtr profile() const noexcept;
 
@@ -69,10 +80,19 @@ namespace Leosac
             bool is_valid()const;
 
         protected:
+#pragma db id auto
+            UserId id_;
+
             /**
             * This is an (unique) identifier for the user.
             */
-            std::string id_;
+#pragma db unique
+#pragma db not_null
+#pragma db type("VARCHAR(128)")
+            std::string username_;
+
+#pragma db not_null
+            std::string password_;
 
             std::string firstname_;
             std::string lastname_;
@@ -81,8 +101,13 @@ namespace Leosac
             /**
             * A user can have the same validity than credentials.
             */
+#pragma db transient
             CredentialValidity validity_;
+#pragma db transient
             IAccessProfilePtr profile_;
+
+      private:
+        friend class odb::access;
         };
 
     }

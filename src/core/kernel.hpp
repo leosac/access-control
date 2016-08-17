@@ -30,6 +30,7 @@
 #include "RemoteControl.hpp"
 #include "Scheduler.hpp"
 #include "CoreUtils.hpp"
+#include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {
@@ -162,6 +163,11 @@ namespace Leosac
          */
         const std::chrono::steady_clock::time_point start_time() const;
 
+        /**
+         * Retrieve a pointer to the database, if any.
+         */
+        DBPtr database();
+
     private:
         /**
         * Init the module manager by feeding it paths to library file, loading module, etc.
@@ -191,6 +197,8 @@ namespace Leosac
         void set_netconfig(zmqpp::message *msg);
 
         void extract_environ();
+
+        void configure_database();
 
         void configure_logger();
 
@@ -272,5 +280,10 @@ namespace Leosac
          * Time-point when Leosac started to run.
          */
         const std::chrono::steady_clock::time_point start_time_;
+
+        /**
+         * A pointer to the database used by Leosac, if any.
+         */
+        DBPtr database_;
     };
 }

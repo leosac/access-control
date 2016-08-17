@@ -84,6 +84,7 @@ class API {
          *         + `0` means success.
          *         + `-1` means invalid username/password.
          *         + `-2` means already logged in.
+         *     + `user_id`: On success, the identifier of the logged in user.
          *     + `message`: An optional text message describing the status.
          */
         json create_auth_token(const json &req);
@@ -96,6 +97,7 @@ class API {
          *
          * Response:
          *     + `user_id`: On success, the user-id of the newly authenticated user.
+         *     + `username`: On success, the username authenticated user.
          *     + `status`: See [create_auth_token](@ref create_auth_token) status.
          *     + `message`: An optional text message describing the status.
          *

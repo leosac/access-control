@@ -39,10 +39,8 @@ class WSServer {
         /**
          * @param database A (non-null) pointer to the
          * database.
-         * @param log_database A pointer to the log database. This is used to
-         * report Leosac log to the web interface
          */
-        WSServer(WebSockAPIModule &module, DBPtr database, DBPtr log_database);
+        WSServer(WebSockAPIModule &module, DBPtr database);
 
         using Server = websocketpp::server<websocketpp::config::asio>;
         using ConnectionAPIMap = std::map<websocketpp::connection_hdl,
@@ -70,11 +68,6 @@ class WSServer {
          * Retrieve database handle
          */
         DBPtr db();
-
-        /**
-         * Retrieve handle to log database.
-         */
-        DBPtr log_db();
 
         /**
          * Retrieve the CoreUtils pointer.
@@ -108,11 +101,6 @@ class WSServer {
          * Handler to the database.
          */
         DBPtr db_;
-
-        /**
-         * Handler to the log database.
-         */
-        DBPtr log_db_;
 
         /**
          * A reference to the module.

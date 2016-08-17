@@ -20,6 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
+#include "tools/db/db_fwd.hpp"
 #include "CoreAPI.hpp"
 
 namespace Leosac
@@ -52,6 +53,7 @@ namespace Leosac
         Scheduler       &scheduler();
         ConfigChecker   &config_checker();
         Kernel          &kernel();
+        DBPtr           database();
 
         /**
          * Instantiate a new, ready to use, CoreAPI object.

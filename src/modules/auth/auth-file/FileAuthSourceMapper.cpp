@@ -155,7 +155,7 @@ IAccessProfilePtr FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr au
 
     if (!auth_source->owner()->is_valid())
     {
-        NOTICE("The user (" << auth_source->owner()->id() << ") is disabled or out of its validity period.");
+        NOTICE("The user (" << auth_source->owner()->username() << ") is disabled or out of its validity period.");
         return nullptr;
     }
 
@@ -217,7 +217,7 @@ std::vector<GroupPtr> FileAuthSourceMapper::get_user_groups(Leosac::Auth::IUserP
     std::vector<GroupPtr> grps;
     auto lambda_cmp = [&](IUserPtr user) -> bool
             {
-                return user->id() == u->id();
+                return user->username() == u->username();
             };
 
     for (const auto &grp_map : groups_)
@@ -396,15 +396,15 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
 
         enforce_xml_node_name("user", node_name);
 
-        std::string name        = node.get<std::string>("name");
+        std::string username    = node.get<std::string>("name");
         std::string firstname   = node.get<std::string>("firstname", "");
         std::string lastname    = node.get<std::string>("lastname", "");
         std::string email       = node.get<std::string>("email", "");
 
-        if (name == "UNKNOWN_USER") // reserved name
+        if (username == "UNKNOWN_USER") // reserved username
             throw ConfigException(config_file_, "'UNKNOWN_USER' is a reserved name. Do not use.");
 
-        IUserPtr uptr(new IUser(name));
+        IUserPtr uptr(new IUser(username));
         uptr->firstname(firstname);
         uptr->lastname(lastname);
         uptr->email(email);
@@ -413,11 +413,11 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
         // create an empty profile
         uptr->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
 
-        if (users_.count(name))
+        if (users_.count(username))
         {
-            NOTICE("User " << name << " was already defined. Will overwrite.");
+            NOTICE("User " << username << " was already defined. Will overwrite.");
         }
-        users_[name] = uptr;
+        users_[username] = uptr;
     }
 }
 

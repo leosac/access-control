@@ -26,6 +26,11 @@
 #include "tools/db/database.hpp"
 #include "odb_gen/LogEntry_odb.h"
 #include <boost/date_time/posix_time/conversion.hpp>
+#include <odb/sqlite/database.hxx>
+#include <odb/mysql/database.hxx>
+#include "odb_gen/LogEntry_odb_sqlite.h"
+#include "odb_gen/LogEntry_odb_mysql.h"
+#include "core/auth/AuthFwd.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -59,10 +64,12 @@ API::json API::create_auth_token(const API::json &req)
         std::string username = req.at("username");
         std::string password = req.at("password");
 
-        auto token = server_.auth().generate_token(username, password);
+        ::Leosac::Auth::UserId uid;
+        auto token = server_.auth().generate_token(username, password, uid);
         if (!token.empty())
         {
             rep["status"] = 0;
+            rep["user_id"] = uid;
             rep["token"] = token;
             auth_status_ = AuthStatus::LOGGED_IN;
         }
@@ -90,6 +97,7 @@ API::json API::authenticate_with_token(const API::json &req)
         {
             rep["status"] = 0;
             rep["user_id"] = user_id;
+            rep["username"] = "lama"; // todo fix
             auth_status_ = AuthStatus::LOGGED_IN;
             current_auth_token_ = req.at("token");
         }
@@ -127,8 +135,10 @@ API::json API::get_logs(const json &req)
     json rep;
 
     using query = odb::query<Tools::LogEntry>;
+    using sl_query = odb::sqlite::query<Tools::LogEntry>;
+    using my_query = odb::mysql::query<Tools::LogEntry>;
     using result = odb::result<Tools::LogEntry>;
-    DBPtr db = server_.log_db();
+    DBPtr db = server_.core_utils()->database();
     if (db)
     {
         rep["data"] = {};
@@ -141,13 +151,29 @@ API::json API::get_logs(const json &req)
         int offset = p * ps;
         std::string sort = extract_with_default(req, "sort", "desc");
         std::string order_by = sort == "asc" ? "ASC" : "DESC";
+        query base_query;
+        result base_result;
 
-        query q("ORDER BY" + query::id + order_by + "LIMIT" + query::_val(ps) +
-                    "OFFSET" + query::_val(offset));
-        result r(db->query<Tools::LogEntry>(q));
+        // LIMIT needs to be database specific.
+        if (db->id() == odb::database_id::id_sqlite)
+        {
+            auto sl_db =  std::static_pointer_cast<odb::sqlite::database>(db);
+            odb::sqlite::query<Tools::LogEntry> sl_q("ORDER BY" + query::id + order_by +
+                                                         "LIMIT" + sl_query::_val(ps) +
+                                                         "OFFSET" + sl_query::_val(offset));
+            base_result = sl_db->query<Tools::LogEntry>(sl_q);
+        }
+        else if (db->id() == odb::database_id::id_mysql)
+        {
+            auto my_db =  std::static_pointer_cast<odb::mysql::database>(db);
+            odb::mysql::query<Tools::LogEntry> my_q("ORDER BY" + query::id + order_by +
+                                                        "LIMIT" + my_query::_val(ps) +
+                                                        "OFFSET" + my_query::_val(offset));
+            base_result = my_db->query<Tools::LogEntry>(my_q);
+        }
         Tools::LogView view(db->query_value<Tools::LogView>());
 
-        for (Tools::LogEntry &entry : r)
+        for (Tools::LogEntry &entry : base_result)
         {
             auto timestamp = boost::posix_time::to_time_t(entry.timestamp_);
             rep["data"].push_back({{"id", entry.id_},
@@ -172,7 +198,6 @@ API::json API::get_logs(const json &req)
     {
         rep["status"] = -1;
     }
-
     return rep;
 }
 

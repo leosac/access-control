@@ -77,7 +77,7 @@ void AuthFileInstance::handle_bus_msg()
     std::string log_user;
     // output user id if available.
     if (auth_result.user)
-        log_user = Colorize::green(auth_result.user->id());
+        log_user = Colorize::green(auth_result.user->username());
     else
         log_user = Colorize::red("UNKNOWN_USER");
 

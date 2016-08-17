@@ -8,6 +8,7 @@ namespace Leosac
     {
         class IUser;
         using IUserPtr = std::shared_ptr<IUser>;
+        using UserId = unsigned long;
 
         class IAccessProfile;
         using IAccessProfilePtr = std::shared_ptr<IAccessProfile>;

@@ -19,14 +19,17 @@
 
 #pragma once
 
+#include "db_fwd.hpp"
+
 #include <odb/database.hxx>
 #include <odb/transaction.hxx>
 
-#if defined(DATABASE_SQLITE)
-#  include <odb/connection.hxx>
-#  include <odb/transaction.hxx>
-#  include <odb/schema-catalog.hxx>
-#  include <odb/sqlite/database.hxx>
-#elif defined(DATABASE_MYSQL)
-#  include <odb/mysql/database.hxx>
+// Define the database model version.
+// This is required in order to use ODB schema/data migration capabilities.
+#ifdef ODB_COMPILER
+#  pragma db model version(1, 1, open)
 #endif
+
+#include <odb/connection.hxx>
+#include <odb/transaction.hxx>
+#include <odb/schema-catalog.hxx>

@@ -134,7 +134,7 @@ namespace Leosac
             {
                 auto search_lambda = [&](IUserPtr u) -> bool
                 {
-                    return u->id() == user_name;
+                    return u->username() == user_name;
                 };
 
                 for (const auto &group : mapper->groups())
@@ -183,18 +183,18 @@ namespace Leosac
             ASSERT_FALSE(my_card_->owner().get());
             mapper_->mapToUser(my_card_);
             ASSERT_TRUE(my_card_->owner().get());
-            ASSERT_EQ("MY_USER", my_card_->owner()->id());
+            ASSERT_EQ("MY_USER", my_card_->owner()->username());
 
             // MY_USER with a PIN Code.
             ASSERT_FALSE(my_pin_->owner().get());
             mapper_->mapToUser(my_pin_);
             ASSERT_TRUE(my_pin_->owner().get());
-            ASSERT_EQ("MY_USER", my_pin_->owner()->id());
+            ASSERT_EQ("MY_USER", my_pin_->owner()->username());
 
             ASSERT_FALSE(my_card2_->owner().get());
             mapper_->mapToUser(my_card2_);
             ASSERT_TRUE(my_card2_->owner().get());
-            ASSERT_EQ("Toto", my_card2_->owner()->id());
+            ASSERT_EQ("Toto", my_card2_->owner()->username());
         }
 
         /**

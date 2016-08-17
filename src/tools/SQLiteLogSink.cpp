@@ -27,37 +27,13 @@
 using namespace Leosac;
 using namespace Leosac::Tools;
 
-SQLiteLogSink::SQLiteLogSink(const std::string &db_path)
+SQLiteLogSink::SQLiteLogSink(DBPtr database) :
+    database_(database)
 {
     std::cout << "ENABLING SQLITE LOGGER!" << std::endl;
+    assert(database_);
     // Generate a "run id"
     run_id_ = Leosac::gen_uuid();
-
-    database_ = std::make_shared<odb::sqlite::database>(
-        db_path, SQLITE_OPEN_READWRITE);
-    try
-    {
-        // Will throw if database doesn't exist.
-        database_->connection();
-    }
-    catch (const odb::database_exception &e)
-    {
-        // Create the database.
-        database_ = std::make_shared<odb::sqlite::database>(db_path,
-                                                            SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
-        // Create database structure.
-        {
-            odb::connection_ptr c(database_->connection());
-
-            c->execute("PRAGMA foreign_keys=OFF");
-
-            odb::transaction t(c->begin());
-            odb::schema_catalog::create_schema(*database_);
-            t.commit();
-
-            c->execute("PRAGMA foreign_keys=ON");
-        }
-    }
 }
 
 void SQLiteLogSink::log(const spdlog::details::log_msg &msg)

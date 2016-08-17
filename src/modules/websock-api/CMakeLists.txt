@@ -6,28 +6,11 @@ set(WEBSOCK_API_SRCS
         WSServer.cpp
         api/api.cpp
         api/APIAuth.cpp
-        db/user.cpp
         )
 
-find_package(ODB REQUIRED COMPONENTS sqlite)
-include(${ODB_USE_FILE})
-
-set(OdbCMake_SOURCES
-        ""
+add_library(${WEBSOCK_API_BIN} SHARED
+        ${WEBSOCK_API_SRCS}
         )
-
-set(OdbCMake_ODB_HEADERS
-        db/user.hpp)
-
-## ODB database support code generation
-odb_compile(OdbCMake_SOURCES FILES
-        ${OdbCMake_ODB_HEADERS} DB
-        sqlite
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        )
-
-add_library(${WEBSOCK_API_BIN} SHARED ${WEBSOCK_API_SRCS} ${OdbCMake_SOURCES}
-        ${OdbCMake_ODB_HEADERS})
 
 set_target_properties(${WEBSOCK_API_BIN} PROPERTIES
         COMPILE_FLAGS "-std=c++11 -Wno-unknown-pragmas"
@@ -35,7 +18,6 @@ set_target_properties(${WEBSOCK_API_BIN} PROPERTIES
 
 target_link_libraries(${WEBSOCK_API_BIN}
         ${Boost_LIBRARIES}
-        ${ODB_LIBRARIES}
         )
 
 target_include_directories(${WEBSOCK_API_BIN}
@@ -57,7 +39,7 @@ target_include_directories(${WEBSOCK_API_BIN}
 
 target_compile_definitions(${WEBSOCK_API_BIN}
         PRIVATE
-        DATABASE_SQLITE
+        DATABASE_MYSQL
         )
 
 install(TARGETS ${WEBSOCK_API_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})

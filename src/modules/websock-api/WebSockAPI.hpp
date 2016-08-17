@@ -48,13 +48,6 @@ class WebSockAPIModule : public BaseModule  {
          * Port to bind the websocket endpoint.
          */
         uint16_t port_;
-
-        void init_databases();
-        void init_database();
-        void init_log_database();
-
-        DBPtr database_;
-        DBPtr log_database_;
 };
 
 }

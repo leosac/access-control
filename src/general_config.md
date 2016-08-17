@@ -28,7 +28,7 @@ Leosac has to know 2 important paths:
 
 
 Instance Name {#general_instance_name}
---------------------------------------
+==========================================
 
 Each unit is given an `instance_name` to help identify it when running in a environment
 with multiple Leosac system. This field is mandatory.
@@ -36,6 +36,46 @@ with multiple Leosac system. This field is mandatory.
    2. It is used to automatically prefix some configuration option: for example
    the `target` (door) in the auth file module. This allows easier config synchronization.
 
+
+Database {#general_database}
+============================
+
+Leosac can work with a SQLite database. The database in mandatory to provide
+support for some features. For example, the WebSocket API needs access to the
+database to store users, permissions, etc.
+
+The `database` tag holds various information about the database.
+
+Options       | Options  | Description                                            | Mandatory
+--------------|----------|--------------------------------------------------------|-----------
+type          |          | Underlying database type. Either "sqlite" or "mysql".  | YES
+path          |          | **SQLite only**: Path to the database file.            | YES if SQLite
+username      |          | **MySQL only**: Database username.                     | YES if MySQL
+password      |          | **MySQL only**: Password for the database user.        | YES if MySQL
+dbname        |          | **MySQL only**: Database name to use.                  | YES if MySQL
+host          |          | **MySQL only**: Database hostname / IP.                | NO
+port          |          | **MySQL only**: Port the database listens to           | NO
+
+Example {#database_example}
+--------------------------
+Below is an example for SQLite.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<database>
+    <type>SQLite</type>
+    <path>leosac.sqlite</path>
+</database>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An one for MySQL / MariaDB.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<database>
+      <type>mysql</type>
+      <username>root</username>
+	  <password></password>
+      <dbname>leosac</dbname>
+</database>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Automatic Configuration Saving {#general_config_save}
 =====================================================
@@ -61,7 +101,6 @@ Options       | Options  | Options | Description                                
 --------------|----------|---------|--------------------------------------------------|-----------
 enable_syslog |          |         | Enable logging to syslog                         | NO (default to `true`)
 enable_sqlite |          |         | Enable logging to a SQLite database              | NO (default to `false`)
-log_database  |          |         | Path to the SQLite database for logs.            | NO
 min_syslog    |          |         | Minimal log entry level to write to syslog       | NO (default to `WARNING`)
 
 Here is a list of the various log level available:

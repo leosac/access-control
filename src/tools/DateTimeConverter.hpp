@@ -23,7 +23,8 @@
 #include "boost/date_time/posix_time/posix_time.hpp"
 
 template<typename Duration>
-boost::posix_time::ptime time_point_ptime(const std::chrono::time_point <std::chrono::system_clock, Duration> &from)
+boost::posix_time::ptime time_point_ptime(const std::chrono::time_point <std::chrono::system_clock,
+    Duration> &from)
 {
     typedef std::chrono::nanoseconds duration_t;
     typedef duration_t::rep rep_t;

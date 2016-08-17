@@ -17,8 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
+#include "tools/log.hpp"
+#include "tools/db/db_fwd.hpp"
 #include "CoreUtils.hpp"
+#include "kernel.hpp"
 
 Leosac::CoreUtils::CoreUtils(Leosac::Kernel *kptr,
                              Leosac::SchedulerPtr sched,
@@ -48,6 +50,12 @@ Leosac::ConfigChecker &Leosac::CoreUtils::config_checker()
 {
     ASSERT_LOG(config_checker_, "No ConfigChecker object in CoreUtils.");
     return *config_checker_;
+}
+
+Leosac::DBPtr Leosac::CoreUtils::database()
+{
+    ASSERT_LOG(kptr_, "Kernel pointer is NULL in CoreUtils.");
+    return kptr_->database();
 }
 
 bool Leosac::CoreUtils::is_strict() const

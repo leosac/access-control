@@ -34,7 +34,11 @@ class SQLiteLogSink : public spdlog::sinks::sink
 {
       public:
 
-      SQLiteLogSink(const std::string &database_path);
+        /**
+         * Construct a SQLite backed log sink.
+         * @param database A non null pointer to a ODB database object.
+         */
+      SQLiteLogSink(DBPtr database);
 
         virtual void log(const spdlog::details::log_msg &msg) override;
 

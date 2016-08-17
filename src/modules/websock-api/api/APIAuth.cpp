@@ -20,8 +20,8 @@
 #include <algorithm>
 #include <odb/object-result.hxx>
 #include <odb/session.hxx>
-#include "db/user.hpp"
-#include "odb_gen/user_odb.h"
+#include "core/auth/Interfaces/IUser.hpp"
+#include "odb_gen/IUser_odb.h"
 #include "APIAuth.hpp"
 #include "tools/GenGuid.h"
 #include "WSServer.hpp"
@@ -36,27 +36,24 @@ APIAuth::APIAuth(WSServer &srv) :
 {
 }
 
-std::string APIAuth::generate_token(const std::string &username, const std::string &password)
+std::string APIAuth::generate_token(const std::string &username, const std::string &password,
+                                    Auth::UserId &user_id) // todo fix me by creating a proper token struct
 {
     using namespace odb;
     using namespace odb::core;
-    using query = odb::query<DB::User>;
-    using result = odb::result<DB::User>;
+    using query = odb::query<Auth::IUser>;
+    using result = odb::result<Auth::IUser>;
     {
         auto db = server_.db();
         transaction t(db->begin());
 
-        result r(db->query<DB::User>(query::username == username));
-        for (DB::User &user : r)
+        Auth::IUserPtr user = db->query_one<Auth::IUser>(query::username == username);
+        if (user && user->password() == password)
         {
-            // We should have at most one entry.
-            if (user.username() == username && user.password() == password)
-            {
-                auto token = gen_uuid();
-                tokens_[token] = username;
-                return token;
-            }
-            break;
+            auto token = gen_uuid();
+            tokens_[token] = user->id();
+            user_id = user->id();
+            return token;
         }
     }
     return "";

@@ -27,10 +27,9 @@ using namespace Leosac::Module::WebSockAPI;
 
 using json = nlohmann::json;
 
-WSServer::WSServer(WebSockAPIModule &module, DBPtr database, DBPtr log_database) :
+WSServer::WSServer(WebSockAPIModule &module, DBPtr database) :
     auth_(*this),
     db_(database),
-    log_db_(log_database),
     module_(module)
 {
     assert(db_);
@@ -153,9 +152,4 @@ DBPtr WSServer::db()
 CoreUtilsPtr WSServer::core_utils()
 {
     return module_.core_utils();
-}
-
-DBPtr WSServer::log_db()
-{
-    return log_db_;
 }

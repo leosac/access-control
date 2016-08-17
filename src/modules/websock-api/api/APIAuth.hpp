@@ -22,6 +22,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
@@ -51,7 +52,8 @@ class APIAuth
          * On error returns an empty string.
          */
         std::string generate_token(const std::string &username,
-                                   const std::string &password);
+                                   const std::string &password,
+                                   Leosac::Auth::UserId &user_id);
 
         /**
          * Attempt to authenticate with an authentication token.
@@ -70,9 +72,9 @@ class APIAuth
 
       private:
         /**
-         * Map a token to a username
+         * Map a token to a user identifier.
          */
-        using TokenMap = std::map<std::string, std::string>;
+        using TokenMap = std::map<std::string, ::Leosac::Auth::UserId>;
         TokenMap tokens_;
 
         /**

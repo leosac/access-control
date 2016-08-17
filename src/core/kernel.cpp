@@ -26,12 +26,16 @@
 #include <tools/ElapsedTimeCounter.hpp>
 #include <tools/SQLiteLogSink.hpp>
 #include "kernel.hpp"
+#include "tools/db/database.hpp"
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixshellscript.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/unixfs.hpp"
+
+#  include <odb/sqlite/database.hxx>
+#  include <odb/mysql/database.hxx>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -58,6 +62,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config,
         autosave_(false),
         start_time_(std::chrono::steady_clock::now())
 {
+    configure_database();
     configure_logger();
     extract_environ();
 
@@ -333,7 +338,6 @@ void Kernel::configure_logger()
     bool use_syslog                 = true;
     bool use_sqlite                 = false;
     std::string syslog_min_level    = "WARNING";
-    std::string sqlite_db_path;
     std::shared_ptr<spdlog::logger> console;
 
     // Drop existing logger, if any. (This is for the case of a "in process" restart)
@@ -345,7 +349,6 @@ void Kernel::configure_logger()
         use_syslog          = config_manager_.kconfig().get_child("log").get<bool>("enable_syslog", true);
         use_sqlite          = config_manager_.kconfig().get_child("log").get<bool>("enable_sqlite", false);
         syslog_min_level    = config_manager_.kconfig().get_child("log").get<std::string>("min_syslog", "WARNING");
-        sqlite_db_path      = config_manager_.kconfig().get_child("log").get<std::string>("log_database", "/tmp/leosac_log.db");
     }
     if (use_syslog)
     {
@@ -355,7 +358,7 @@ void Kernel::configure_logger()
     if (use_sqlite)
     {
         console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>(),
-            std::make_shared<Tools::SQLiteLogSink>(sqlite_db_path)});
+            std::make_shared<Tools::SQLiteLogSink>(database_)});
     }
     else
         console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
@@ -429,4 +432,62 @@ void Kernel::shutdown()
         reactor_.poll(25);
         utils_->scheduler().update(TargetThread::MAIN);
     }
+}
+
+void Kernel::configure_database()
+{
+    auto db_cfg_node = config_manager_.kconfig().get_child_optional("database");
+    if (db_cfg_node)
+    {
+        std::string db_type = db_cfg_node->get<std::string>("type", "");
+        if (db_type == "sqlite")
+        {
+            std::string db_path = db_cfg_node->get<std::string>("path");
+            database_ = std::make_shared<odb::sqlite::database>(
+                db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+        }
+        else if (db_type == "mysql")
+        {
+            std::string db_user = db_cfg_node->get<std::string>("username");
+            std::string db_pw = db_cfg_node->get<std::string>("password");
+            std::string db_dbname = db_cfg_node->get<std::string>("dbname");
+            std::string db_host = db_cfg_node->get<std::string>("host", "");
+            uint16_t db_port = db_cfg_node->get<uint16_t>("port", 0);
+            database_ = std::make_shared<odb::mysql::database>(db_user, db_pw, db_dbname, db_host, db_port);
+        }
+        else
+        {
+            throw ConfigException(config_manager_.kconfig().get<std::string>("kernel-cfg"),
+                                  "Unsupported database type: " + Colorize::underline(
+                                      db_type));
+        }
+
+        // Create or update database.
+        // Very simple, for now. No migration.
+        {
+            using namespace odb;
+            using namespace odb::core;
+
+            schema_version v(database_->schema_version("tools"));
+            if (v == 0)
+            {
+                // Create schema
+                transaction t(database_->begin());
+                schema_catalog::create_schema(*database_, "tools");
+                t.commit();
+            }
+            v = database_->schema_version("auth");
+            if (v == 0)
+            {
+                transaction t(database_->begin());
+                schema_catalog::create_schema(*database_, "auth");
+                t.commit();
+            }
+        }
+    }
+}
+
+DBPtr Kernel::database()
+{
+    return database_;
 }

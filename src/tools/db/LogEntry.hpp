@@ -21,6 +21,7 @@
 
 #include "boost/date_time/posix_time/posix_time.hpp"
 #include <odb/core.hxx>
+#include "database.hpp"
 
 namespace Leosac
 {

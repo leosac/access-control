@@ -21,20 +21,20 @@
 
 using namespace Leosac::Auth;
 
-IUser::IUser(const std::string &user_id) :
-        id_(user_id)
+IUser::IUser(const std::string &username) :
+        username_(username)
 {
 
 }
 
-const std::string &IUser::id() const noexcept
+const std::string &IUser::username() const noexcept
 {
-    return id_;
+    return username_;
 }
 
-void IUser::id(const std::string &id_new)
+void IUser::username(const std::string &username)
 {
-    id_ = id_new;
+    username_ = username;
 }
 
 IAccessProfilePtr IUser::profile() const noexcept
@@ -90,4 +90,14 @@ void IUser::validity(const CredentialValidity &c)
 bool IUser::is_valid() const
 {
     return validity_.is_valid();
+}
+
+const std::string &IUser::password() const noexcept
+{
+    return password_;
+}
+
+unsigned long IUser::id() const noexcept
+{
+    return id_;
 }
