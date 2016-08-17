@@ -37,7 +37,10 @@ class LeosacRunner(subprocess.Popen):
         ret = self.run_for(timer)
         if not ret:
             self.interrupt()
-            self.wait_abort(3)
+            # We give 10 seconds here because Leosac itself takes at
+            # least 5 seconds to shut down. (Due to "soft shutdown" to
+            # prevent potential deadlock
+            self.wait_abort(10)
             out, err = super().communicate()
             self.append_output(out, err)
         return True

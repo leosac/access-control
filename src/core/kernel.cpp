@@ -336,6 +336,10 @@ void Kernel::configure_logger()
     std::string sqlite_db_path;
     std::shared_ptr<spdlog::logger> console;
 
+    // Drop existing logger, if any. (This is for the case of a "in process" restart)
+    spdlog::drop("syslog");
+    spdlog::drop("console");
+
     if (config_manager_.kconfig().get_child_optional("log"))
     {
         use_syslog          = config_manager_.kconfig().get_child("log").get<bool>("enable_syslog", true);

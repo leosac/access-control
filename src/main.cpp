@@ -98,7 +98,7 @@ int main(int argc, const char **argv)
         }
         catch (...)
         {
-            std::cerr << "Unkown exception in main" << std::endl;
+            std::cerr << "Unknown exception in main" << std::endl;
             return 1;
         }
     }

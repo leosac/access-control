@@ -41,12 +41,14 @@ def insert_card_and_get_output(process):
 
 
 def check_access_granted(log):
-    ret = re.search("^.* \[info\] AUTH_CONTEXT_1 GRANTED .*$", log, re.MULTILINE)
+    # We add .* before and after (AUTH_CONTEXT and GRANTED) because the output is colored.
+    ret = re.search("^.* \[info\] .*AUTH_CONTEXT_1.* .*GRANTED.* .*$", log, re.MULTILINE)
     test_assert(ret, "Access was not granted.")
 
 
 def check_access_denied(log):
-    ret = re.search("^.* \[info\] AUTH_CONTEXT_1 DENIED .*$", log, re.MULTILINE)
+    # We add .* before and after (AUTH_CONTEXT and DENIED) because the output is colored.
+    ret = re.search("^.* \[info\] .*AUTH_CONTEXT_1.* .*DENIED.* .*$", log, re.MULTILINE)
     test_assert(ret, "Access was not denied.")
 
 
