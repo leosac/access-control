@@ -24,7 +24,7 @@
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <tools/ElapsedTimeCounter.hpp>
-#include <tools/SQLiteLogSink.hpp>
+#include <tools/DatabaseLogSink.hpp>
 #include "kernel.hpp"
 #include "tools/db/database.hpp"
 #include "tools/log.hpp"
@@ -336,7 +336,7 @@ std::string Kernel::factory_config_directory() const
 void Kernel::configure_logger()
 {
     bool use_syslog                 = true;
-    bool use_sqlite                 = false;
+    bool use_database               = false;
     std::string syslog_min_level    = "WARNING";
     std::shared_ptr<spdlog::logger> console;
 
@@ -344,21 +344,22 @@ void Kernel::configure_logger()
     spdlog::drop("syslog");
     spdlog::drop("console");
 
-    if (config_manager_.kconfig().get_child_optional("log"))
+    auto log_cfg_node = config_manager_.kconfig().get_child_optional("log");
+    if (log_cfg_node)
     {
-        use_syslog          = config_manager_.kconfig().get_child("log").get<bool>("enable_syslog", true);
-        use_sqlite          = config_manager_.kconfig().get_child("log").get<bool>("enable_sqlite", false);
-        syslog_min_level    = config_manager_.kconfig().get_child("log").get<std::string>("min_syslog", "WARNING");
+        use_syslog          = log_cfg_node->get<bool>("enable_syslog", true);
+        use_database        = log_cfg_node->get<bool>("enable_database", false);
+        syslog_min_level    = log_cfg_node->get<std::string>("min_syslog", "WARNING");
     }
     if (use_syslog)
     {
         auto syslog = spdlog::create("syslog", {std::make_shared<spdlog::sinks::syslog_sink>()});
         syslog->set_level(static_cast<spdlog::level::level_enum>(LogHelper::log_level_from_string(syslog_min_level)));
     }
-    if (use_sqlite)
+    if (use_database)
     {
         console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>(),
-            std::make_shared<Tools::SQLiteLogSink>(database_)});
+            std::make_shared<Tools::DatabaseLogSink>(database_)});
     }
     else
         console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});

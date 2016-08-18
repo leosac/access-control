@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "boost/date_time/posix_time/posix_time.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <odb/core.hxx>
 #include "database.hpp"
 
@@ -55,7 +55,7 @@ class LogEntry
         std::string run_id_;
 
 #pragma db not_null
-        int level_;
+        uint8_t level_;
 
 #pragma db not_null
         size_t thread_id_;

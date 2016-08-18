@@ -52,7 +52,7 @@ set(LEOSAC_LIB_SRCS
     tools/GenGuid.cpp
     tools/PropertyTreeExtractor.cpp
     tools/log.cpp
-    tools/SQLiteLogSink.cpp
+    tools/DatabaseLogSink.cpp
     tools/ElapsedTimeCounter.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp

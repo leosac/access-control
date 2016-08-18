@@ -20,7 +20,7 @@
 #pragma once
 
 #include <spdlog/sinks/sink.h>
-#include <tools/db/db_fwd.hpp>
+#include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {
@@ -30,7 +30,7 @@ namespace Tools
  * A custom sink that write LogEntry object
  * to a SQLite database.
  */
-class SQLiteLogSink : public spdlog::sinks::sink
+class DatabaseLogSink : public spdlog::sinks::sink
 {
       public:
 
@@ -38,7 +38,7 @@ class SQLiteLogSink : public spdlog::sinks::sink
          * Construct a SQLite backed log sink.
          * @param database A non null pointer to a ODB database object.
          */
-      SQLiteLogSink(DBPtr database);
+        DatabaseLogSink(DBPtr database);
 
         virtual void log(const spdlog::details::log_msg &msg) override;
 

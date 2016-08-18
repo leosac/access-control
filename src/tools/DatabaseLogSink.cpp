@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SQLiteLogSink.hpp"
+#include "DatabaseLogSink.hpp"
 #include <tools/db/database.hpp>
 #include <tools/db/LogEntry.hpp>
 #include <tools/DateTimeConverter.hpp>
@@ -27,7 +27,7 @@
 using namespace Leosac;
 using namespace Leosac::Tools;
 
-SQLiteLogSink::SQLiteLogSink(DBPtr database) :
+DatabaseLogSink::DatabaseLogSink(DBPtr database) :
     database_(database)
 {
     std::cout << "ENABLING SQLITE LOGGER!" << std::endl;
@@ -36,7 +36,7 @@ SQLiteLogSink::SQLiteLogSink(DBPtr database) :
     run_id_ = Leosac::gen_uuid();
 }
 
-void SQLiteLogSink::log(const spdlog::details::log_msg &msg)
+void DatabaseLogSink::log(const spdlog::details::log_msg &msg)
 {
     LogEntry entry;
 

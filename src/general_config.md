@@ -13,6 +13,7 @@ configuration options. Those are defined in the main configuration file,
 outside of the `<modules>` and `</modules>` tags.
 
 Here is an overview of what we call "general configuration":
+  + Database configuration
   + Logger configuration
   + Network configuration
   + Remote control configuration.
@@ -97,11 +98,11 @@ Configuration Options {#logger_user_config}
 Default configuration will log everything to `stdout`. Entry with 
 a level >= `WARNING` will be written to syslog.
 
-Options       | Options  | Options | Description                                      | Mandatory
---------------|----------|---------|--------------------------------------------------|-----------
-enable_syslog |          |         | Enable logging to syslog                         | NO (default to `true`)
-enable_sqlite |          |         | Enable logging to a SQLite database              | NO (default to `false`)
-min_syslog    |          |         | Minimal log entry level to write to syslog       | NO (default to `WARNING`)
+Options        | Description                                        | Mandatory
+---------------|----------------------------------------------------|-----------
+enable_syslog  | Enable logging to syslog                           | NO (default to `true`)
+enable_database| Enable logging to the configured (if any) database.| NO (default to `false`)
+min_syslog     | Minimal log entry level to write to syslog         | NO (default to `WARNING`)
 
 Here is a list of the various log level available:
    + `DEBUG`
