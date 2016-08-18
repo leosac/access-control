@@ -27,50 +27,47 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        namespace Auth
-        {
-            class AuthFileInstance;
+namespace Module
+{
+namespace Auth
+{
+class AuthFileInstance;
 
-            /**
-            * This implements a authentication module that use files to store access permissions.
-            *
-            * This module conforms to @ref auth_specc.
-            * @see @ref mod_auth_file_user_config for end user doc
-            */
-            class AuthFileModule : public BaseModule
-            {
-            public:
-                AuthFileModule(zmqpp::context &ctx,
-                               zmqpp::socket *pipe,
-                               const boost::property_tree::ptree &cfg,
-                               CoreUtilsPtr  utils);
+/**
+* This implements a authentication module that use files to store access permissions.
+*
+* This module conforms to @ref auth_specc.
+* @see @ref mod_auth_file_user_config for end user doc
+*/
+class AuthFileModule : public BaseModule
+{
+  public:
+    AuthFileModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                   const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-                AuthFileModule(const AuthFileModule &) = delete;
+    AuthFileModule(const AuthFileModule &) = delete;
 
-                ~AuthFileModule();
+    ~AuthFileModule();
 
-            protected:
-                /**
-                * We have one config file per authenticator object.
-                */
-                virtual void dump_additional_config(zmqpp::message *out) const override;
+  protected:
+    /**
+    * We have one config file per authenticator object.
+    */
+    virtual void dump_additional_config(zmqpp::message *out) const override;
 
-            private:
+  private:
+    /**
+    * Processing the configuration tree, spawning AuthFileInstance object as
+    * described in the
+    * configuration file.
+    */
+    void process_config();
 
-                /**
-                * Processing the configuration tree, spawning AuthFileInstance object as described in the
-                * configuration file.
-                */
-                void process_config();
-
-                /**
-                * Authenticator instance.
-                */
-                std::vector<AuthFileInstancePtr> authenticators_;
-            };
-
-        }
-    }
+    /**
+    * Authenticator instance.
+    */
+    std::vector<AuthFileInstancePtr> authenticators_;
+};
+}
+}
 }

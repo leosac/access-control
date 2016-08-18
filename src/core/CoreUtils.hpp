@@ -25,56 +25,54 @@
 
 namespace Leosac
 {
-    /**
-     * This class is part of Leosac::Kernel, but it only exposes thread-safe
-     * functionalities that may be used by every modules.
-     *
-     * It currently exposes the scheduler and the configuration checker object along
-     * with some command line parameter value.
-     *
-     * A pointer to this object is passed to modules when they are created.
-     */
-    class CoreUtils
+/**
+ * This class is part of Leosac::Kernel, but it only exposes thread-safe
+ * functionalities that may be used by every modules.
+ *
+ * It currently exposes the scheduler and the configuration checker object along
+ * with some command line parameter value.
+ *
+ * A pointer to this object is passed to modules when they are created.
+ */
+class CoreUtils
+{
+  public:
+    CoreUtils();
+    CoreUtils(Kernel *kptr, SchedulerPtr sched, ConfigCheckerPtr cfgcheck,
+              bool strict_mode);
+
+    CoreUtils(const CoreUtils &) = delete;
+    CoreUtils(CoreUtils &&)      = delete;
+    CoreUtils &operator=(const CoreUtils &) = delete;
+    CoreUtils &operator=(CoreUtils &&) = delete;
+    virtual ~CoreUtils()
     {
-    public:
+    }
 
-        CoreUtils();
-        CoreUtils(Kernel *kptr,
-                  SchedulerPtr sched,
-                  ConfigCheckerPtr cfgcheck,
-                  bool strict_mode);
+    Scheduler &scheduler();
+    ConfigChecker &config_checker();
+    Kernel &kernel();
+    DBPtr database();
 
-        CoreUtils(const CoreUtils &)            = delete;
-        CoreUtils(CoreUtils &&)                 = delete;
-        CoreUtils &operator=(const CoreUtils &) = delete;
-        CoreUtils &operator=(CoreUtils &&)      = delete;
-        virtual ~CoreUtils() {}
+    /**
+     * Instantiate a new, ready to use, CoreAPI object.
+     */
+    CoreAPI core_api();
 
-        Scheduler       &scheduler();
-        ConfigChecker   &config_checker();
-        Kernel          &kernel();
-        DBPtr           database();
+    /**
+     * Are we running in strict mode ?
+     */
+    bool is_strict() const;
 
-        /**
-         * Instantiate a new, ready to use, CoreAPI object.
-         */
-        CoreAPI         core_api();
+  private:
+    Kernel *kptr_;
+    SchedulerPtr scheduler_;
+    ConfigCheckerPtr config_checker_;
+    bool strict_mode_;
 
-        /**
-         * Are we running in strict mode ?
-         */
-        bool            is_strict() const;
-
-    private:
-        Kernel              *kptr_;
-        SchedulerPtr        scheduler_;
-        ConfigCheckerPtr    config_checker_;
-        bool                strict_mode_;
-
-        /**
-         * Gives the `Kernel` class full control.
-         */
-        friend class Kernel;
-    };
-
+    /**
+     * Gives the `Kernel` class full control.
+     */
+    friend class Kernel;
+};
 }

@@ -24,9 +24,9 @@
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
-WiegandPinBuffered::WiegandPinBuffered(WiegandReaderImpl *reader) :
-        PinReading(reader),
-        ready_(false)
+WiegandPinBuffered::WiegandPinBuffered(WiegandReaderImpl *reader)
+    : PinReading(reader)
+    , ready_(false)
 {
 }
 
@@ -39,7 +39,8 @@ void WiegandPinBuffered::timeout()
     }
     if (reader_->counter() != 26)
     {
-        WARN("Expected number of bits invalid. (" << reader_->counter() << " but we expected 26)");
+        WARN("Expected number of bits invalid. (" << reader_->counter()
+                                                  << " but we expected 26)");
         reset();
         return;
     }
@@ -58,7 +59,7 @@ void WiegandPinBuffered::timeout()
         WARN("Invalid Pin Code");
         return;
     }
-    pin_ = std::to_string(n);
+    pin_   = std::to_string(n);
     ready_ = true;
 }
 
@@ -67,7 +68,7 @@ bool WiegandPinBuffered::completed() const
     return ready_;
 }
 
-void WiegandPinBuffered::signal(zmqpp::socket & sock)
+void WiegandPinBuffered::signal(zmqpp::socket &sock)
 {
     assert(ready_);
     assert(pin_.length());
@@ -87,5 +88,5 @@ void WiegandPinBuffered::reset()
 {
     reader_->read_reset();
     ready_ = false;
-    pin_ = "";
+    pin_   = "";
 }

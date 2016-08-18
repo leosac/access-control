@@ -29,14 +29,14 @@
 using namespace Leosac::Tools;
 static std::string vstring = std::string();
 
-std::string& Leosac::getVersionString()
+std::string &Leosac::getVersionString()
 {
     if (vstring.empty())
         vstring = Version::buildVersionString(Major, Minor, Patch);
     return (vstring);
 }
 
-int Leosac::versionCompare(const std::string& v)
+int Leosac::versionCompare(const std::string &v)
 {
     return (Version::versionCompare(v, getVersionString()));
 }

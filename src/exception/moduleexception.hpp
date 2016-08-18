@@ -32,9 +32,14 @@
 
 class ModuleException : public LEOSACException
 {
-public:
-    ModuleException(const std::string& message) : LEOSACException("Module::" + message) {}
-    virtual ~ModuleException() {}
+  public:
+    ModuleException(const std::string &message)
+        : LEOSACException("Module::" + message)
+    {
+    }
+    virtual ~ModuleException()
+    {
+    }
 };
 
 #endif // MODULEEXCEPTION_HPP

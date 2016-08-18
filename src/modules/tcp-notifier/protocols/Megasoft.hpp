@@ -23,31 +23,30 @@
 
 namespace Leosac
 {
-  namespace Module
-  {
-    namespace TCPNotifier
-    {
-      class MegasoftProtocol : public ProtocolHandler
-      {
-      public:
-        virtual ByteVector
-        build_cred_msg(const Auth::WiegandCard &card) override;
+namespace Module
+{
+namespace TCPNotifier
+{
+class MegasoftProtocol : public ProtocolHandler
+{
+  public:
+    virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) override;
 
-      private:
-        /**
-         * Build a protocol frame ready to send over the network.
-         */
-        ByteVector build_protocol_frame(uint32_t card_id);
+  private:
+    /**
+     * Build a protocol frame ready to send over the network.
+     */
+    ByteVector build_protocol_frame(uint32_t card_id);
 
 
-        /**
-         * Perform some check on the card representation, making sure it is
-         * suitable for use by this protocol.
-         *
-         * If validation fails, this function will throw ProtocolException.
-         */
-        void validate(const Auth::WiegandCard &card);
-      };
-    }
-  }
+    /**
+     * Perform some check on the card representation, making sure it is
+     * suitable for use by this protocol.
+     *
+     * If validation fails, this function will throw ProtocolException.
+     */
+    void validate(const Auth::WiegandCard &card);
+};
+}
+}
 }

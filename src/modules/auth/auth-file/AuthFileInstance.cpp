@@ -33,25 +33,26 @@ using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
 
 AuthFileInstance::AuthFileInstance(zmqpp::context &ctx,
-        std::string const &auth_ctx_name,
-        const std::list<std::string> &auth_sources_names,
-        std::string const &auth_target_name,
-        std::string const &input_file,
-        CoreUtilsPtr core_utils) :
-        mapper_(std::make_shared<FileAuthSourceMapper>(input_file)),
-        bus_push_(ctx, zmqpp::socket_type::push),
-        bus_sub_(ctx, zmqpp::socket_type::sub),
-        name_(auth_ctx_name),
-        target_name_(auth_target_name),
-        file_path_(input_file),
-        core_utils_(core_utils)
+                                   std::string const &auth_ctx_name,
+                                   const std::list<std::string> &auth_sources_names,
+                                   std::string const &auth_target_name,
+                                   std::string const &input_file,
+                                   CoreUtilsPtr core_utils)
+    : mapper_(std::make_shared<FileAuthSourceMapper>(input_file))
+    , bus_push_(ctx, zmqpp::socket_type::push)
+    , bus_sub_(ctx, zmqpp::socket_type::sub)
+    , name_(auth_ctx_name)
+    , target_name_(auth_target_name)
+    , file_path_(input_file)
+    , core_utils_(core_utils)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
 
     bus_sub_.subscribe("KERNEL");
 
-    INFO("Auth instance (" << auth_ctx_name << ") subscribe to " << boost::algorithm::join(auth_sources_names, ", "));
+    INFO("Auth instance (" << auth_ctx_name << ") subscribe to "
+                           << boost::algorithm::join(auth_sources_names, ", "));
     for (const auto &auth_source : auth_sources_names)
         bus_sub_.subscribe("S_" + auth_source);
 }
@@ -84,18 +85,16 @@ void AuthFileInstance::handle_bus_msg()
     if (auth_result.success)
     {
         auth_result_msg << Leosac::Auth::AccessStatus::GRANTED;
-        INFO(Colorize::bold(name_) << " " <<
-                                   Colorize::green("GRANTED") <<
-                                   " access to target " << Colorize::underline(target_name_) <<
-                                   " for " << log_user);
+        INFO(Colorize::bold(name_)
+             << " " << Colorize::green("GRANTED") << " access to target "
+             << Colorize::underline(target_name_) << " for " << log_user);
     }
     else
     {
         auth_result_msg << Leosac::Auth::AccessStatus::DENIED;
-        INFO(Colorize::bold(name_) << " " <<
-                                   Colorize::red("DENIED") <<
-                                   " access to target " << Colorize::underline(target_name_) <<
-                                   " for " << log_user);
+        INFO(Colorize::bold(name_)
+             << " " << Colorize::red("DENIED") << " access to target "
+             << Colorize::underline(target_name_) << " for " << log_user);
     }
     bus_push_.send(auth_result_msg);
 }
@@ -129,14 +128,15 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         if (target_name_.empty())
         {
             // check against default target
-            return {profile->isAccessGranted(std::chrono::system_clock::now(), nullptr),
+            return {
+                profile->isAccessGranted(std::chrono::system_clock::now(), nullptr),
                 profile, auth_source->owner()};
         }
         else
         {
             AuthTargetPtr t(new AuthTarget(target_name_));
             return {profile->isAccessGranted(std::chrono::system_clock::now(), t),
-                profile, auth_source->owner()};
+                    profile, auth_source->owner()};
         }
     }
     catch (std::exception &e)
@@ -169,9 +169,9 @@ void AuthFileInstance::reload_auth_config()
     // We keep a shared_ptr to "this" in order to avoid dangling pointer to
     // a non-existent instance (for example if the module was shutdown between
     // the scheduling of the task and its execution).
-    auto self = shared_from_this();
+    auto self      = shared_from_this();
     auto file_path = file_path_;
-    auto task = Tasks::GenericTask::build([self, file_path] () {
+    auto task      = Tasks::GenericTask::build([self, file_path]() {
         try
         {
             auto mapper = std::make_shared<FileAuthSourceMapper>(file_path);
@@ -184,7 +184,8 @@ void AuthFileInstance::reload_auth_config()
         }
         catch (const std::exception &e)
         {
-            WARN("Problem when reloading AuthFileInstance configuration: " << e.what());
+            WARN("Problem when reloading AuthFileInstance configuration: "
+                 << e.what());
             return false;
         }
     });

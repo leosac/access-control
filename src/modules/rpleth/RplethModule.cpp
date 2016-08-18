@@ -273,8 +273,7 @@ RplethPacket RplethModule::rpleth_receive_cards(const RplethPacket &packet)
         DEBUG("Absent list");
         // send absent list
         to_send     = cards_pushed_;
-        auto lambda = [this](const std::string &str) -> bool
-        {
+        auto lambda = [this](const std::string &str) -> bool {
             // if entry is not in cards_read_ means user was absent, do not remove
             // him
             bool found = std::find(cards_read_.begin(), cards_read_.end(), str) !=
@@ -374,7 +373,7 @@ static uint64_t htonll(uint64_t value)
     if (*(char *)&num == 42)
     {
         uint32_t high_part = htonl((uint32_t)(value >> 32));
-        uint32_t low_part = htonl((uint32_t)(value & 0xFFFFFFFFLL));
+        uint32_t low_part  = htonl((uint32_t)(value & 0xFFFFFFFFLL));
         return (((uint64_t)low_part) << 32) | high_part;
     }
     else
@@ -410,7 +409,7 @@ RplethPacket RplethModule::get_dhcp_state()
         if (network_cfg.get<bool>("enabled"))
         {
             response.status = RplethProtocol::Success;
-            response.data = network_cfg.get<bool>("dhcp")
+            response.data   = network_cfg.get<bool>("dhcp")
                                 ? std::vector<uint8_t>({1})
                                 : std::vector<uint8_t>({0});
             response.dataLen = 1;

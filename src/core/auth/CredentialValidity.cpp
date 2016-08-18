@@ -24,12 +24,11 @@
 
 using namespace Leosac::Auth;
 
-CredentialValidity::CredentialValidity() :
-        validity_start_(std::chrono::system_clock::time_point::min()),
-        validity_end_(std::chrono::system_clock::time_point::max()),
-        enabled_(true)
+CredentialValidity::CredentialValidity()
+    : validity_start_(std::chrono::system_clock::time_point::min())
+    , validity_end_(std::chrono::system_clock::time_point::max())
+    , enabled_(true)
 {
-
 }
 
 bool CredentialValidity::is_valid() const

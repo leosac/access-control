@@ -24,77 +24,77 @@
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        class WiegandCard;
-        using WiegandCardPtr = std::shared_ptr<WiegandCard>;
+namespace Auth
+{
+class WiegandCard;
+using WiegandCardPtr = std::shared_ptr<WiegandCard>;
 
-        /**
-        * A wiegand card.
-        */
-        class WiegandCard : public BaseAuthSource
-        {
-        public:
-            /**
-            * Create a WiegandCard object.
-            *
-            * @param cardid the id of the card in hexadecimal text format
-            * @param bits number of bits (wiegand 26, wiegand32 ...)
-            */
-            WiegandCard(const std::string &cardid, int bits);
+/**
+* A wiegand card.
+*/
+class WiegandCard : public BaseAuthSource
+{
+  public:
+    /**
+    * Create a WiegandCard object.
+    *
+    * @param cardid the id of the card in hexadecimal text format
+    * @param bits number of bits (wiegand 26, wiegand32 ...)
+    */
+    WiegandCard(const std::string &cardid, int bits);
 
-            virtual void accept(Tools::IVisitor *visitor) override;
+    virtual void accept(Tools::IVisitor *visitor) override;
 
-            /**
-            * Returns the id of the card, as a hexadecimal string.
-            */
-            const std::string &card_id() const;
+    /**
+    * Returns the id of the card, as a hexadecimal string.
+    */
+    const std::string &card_id() const;
 
-            int nb_bits() const;
+    int nb_bits() const;
 
-            /**
-             * Formats a pretty printed string containing information
-             * regarding this card.
-             */
-            virtual std::string to_string() const override;
+    /**
+     * Formats a pretty printed string containing information
+     * regarding this card.
+     */
+    virtual std::string to_string() const override;
 
-            /**
-             * Returns the integer representation of the
-             * card ID.
-             *
-             * The format (Wiegand 26, 32, ....) is used to build the
-             * card number. If no format is recognized, fallback to `to_raw_int()`
-             */
-            uint64_t to_int() const;
+    /**
+     * Returns the integer representation of the
+     * card ID.
+     *
+     * The format (Wiegand 26, 32, ....) is used to build the
+     * card number. If no format is recognized, fallback to `to_raw_int()`
+     */
+    uint64_t to_int() const;
 
-            /**
-             * Convert the bits of the card to an integer.
-             *
-             * This format (Wiegand26, 32, ...) is ignored: all bits are used
-             * to build the number.
-             */
-            uint64_t to_raw_int() const;
+    /**
+     * Convert the bits of the card to an integer.
+     *
+     * This format (Wiegand26, 32, ...) is ignored: all bits are used
+     * to build the number.
+     */
+    uint64_t to_raw_int() const;
 
-        protected:
-            /**
-             * Extract the card ID, assuming the format to be Wiegand26.
-             */
-            uint64_t to_wiegand_26() const;
+  protected:
+    /**
+     * Extract the card ID, assuming the format to be Wiegand26.
+     */
+    uint64_t to_wiegand_26() const;
 
-            /**
-             * Extract the card ID, assuming the format to be Wiegand34.
-             */
-            uint64_t to_wiegand_34() const;
+    /**
+     * Extract the card ID, assuming the format to be Wiegand34.
+     */
+    uint64_t to_wiegand_34() const;
 
-            /**
-            * Card id
-            */
-            std::string card_id_;
+    /**
+    * Card id
+    */
+    std::string card_id_;
 
-            /**
-            * Number of meaningful bit
-            */
-            int nb_bits_;
-        };
-    }
+    /**
+    * Number of meaningful bit
+    */
+    int nb_bits_;
+};
+}
 }

@@ -28,14 +28,14 @@
 
 using namespace Leosac;
 
-ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg) :
-        kernel_config_(cfg),
-        version_(0)
+ConfigManager::ConfigManager(const boost::property_tree::ptree &cfg)
+    : kernel_config_(cfg)
+    , version_(0)
 {
     Tools::PropertyTreeExtractor extractor(cfg, "General Config");
 
-    version_        = extractor.get<uint64_t>("version", 0);
-    instance_name_  = extractor.get<std::string>("instance_name");
+    version_       = extractor.get<uint64_t>("version", 0);
+    instance_name_ = extractor.get<std::string>("instance_name");
 }
 
 boost::property_tree::ptree ConfigManager::get_application_config()
@@ -60,8 +60,9 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
 {
     boost::property_tree::ptree general_cfg;
 
-    for (const std::string &cfg_name : {"remote", "plugin_directories", "log", "network",
-                                        "autosave", "sync_dest", "no_import", "instance_name"})
+    for (const std::string &cfg_name :
+         {"remote", "plugin_directories", "log", "network", "autosave", "sync_dest",
+          "no_import", "instance_name"})
     {
         auto child_opt = kernel_config_.get_child_optional(cfg_name);
         if (child_opt)
@@ -74,8 +75,8 @@ boost::property_tree::ptree ConfigManager::get_general_config() const
 
 boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
 {
-    auto general_cfg                = get_general_config();
-    auto child_opt                  = kernel_config_.get_child_optional("sync_source");
+    auto general_cfg = get_general_config();
+    auto child_opt   = kernel_config_.get_child_optional("sync_source");
     std::vector<std::string> exportable_config;
     boost::property_tree::ptree ret;
 
@@ -90,8 +91,9 @@ boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
     for (const auto &c : *child_opt)
     {
         ASSERT_LOG(c.first != "no_import" || c.first == "instance_name",
-                   "Cannot export the " << c.first << " tag. Check your"
-                                                              " `sync_source` configuration tag.");
+                   "Cannot export the " << c.first
+                                        << " tag. Check your"
+                                           " `sync_source` configuration tag.");
         if (c.first == "no_import" || c.first == "instance_name")
         {
             WARN("You cannot export the " << c.first << " tag.");
@@ -103,16 +105,17 @@ boost::property_tree::ptree ConfigManager::get_exportable_general_config() const
 
     for (const auto &child : general_cfg)
     {
-        if (std::find(exportable_config.begin(), exportable_config.end(), child.first) != exportable_config.end())
+        if (std::find(exportable_config.begin(), exportable_config.end(),
+                      child.first) != exportable_config.end())
         {
             ret.add_child(child.first, child.second);
         }
     }
-   return ret;
+    return ret;
 }
 
 bool ConfigManager::store_config(std::string const &module,
-        boost::property_tree::ptree const &cfg)
+                                 boost::property_tree::ptree const &cfg)
 {
     bool ret;
 
@@ -126,7 +129,8 @@ bool ConfigManager::store_config(std::string const &module,
     return ret;
 }
 
-const boost::property_tree::ptree &ConfigManager::load_config(const std::string &module) const
+const boost::property_tree::ptree &
+ConfigManager::load_config(const std::string &module) const
 {
     assert(modules_configs_.count(module));
     auto itr = modules_configs_.find(module);
@@ -135,20 +139,26 @@ const boost::property_tree::ptree &ConfigManager::load_config(const std::string 
     throw std::runtime_error("");
 }
 
-zmqpp::message &operator>>(zmqpp::message &msg, Leosac::ConfigManager::ConfigFormat &fmt)
+zmqpp::message &operator>>(zmqpp::message &msg,
+                           Leosac::ConfigManager::ConfigFormat &fmt)
 {
-    static_assert(std::is_same<std::underlying_type<Leosac::ConfigManager::ConfigFormat>::type, uint8_t>::value,
-            "Bad underlying type for enum");
+    static_assert(
+        std::is_same<std::underlying_type<Leosac::ConfigManager::ConfigFormat>::type,
+                     uint8_t>::value,
+        "Bad underlying type for enum");
     uint8_t tmp;
     msg >> tmp;
     fmt = static_cast<Leosac::ConfigManager::ConfigFormat>(tmp);
     return msg;
 }
 
-zmqpp::message &operator<<(zmqpp::message &msg, const Leosac::ConfigManager::ConfigFormat &fmt)
+zmqpp::message &operator<<(zmqpp::message &msg,
+                           const Leosac::ConfigManager::ConfigFormat &fmt)
 {
-    static_assert(std::is_same<std::underlying_type<Leosac::ConfigManager::ConfigFormat>::type, uint8_t>::value,
-            "Bad underlying type for enum");
+    static_assert(
+        std::is_same<std::underlying_type<Leosac::ConfigManager::ConfigFormat>::type,
+                     uint8_t>::value,
+        "Bad underlying type for enum");
     msg << static_cast<uint8_t>(fmt);
     return msg;
 }
@@ -178,7 +188,7 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
     INFO("Attempting to set kernel config. We need to somehow merge.");
     auto kernel_cfg_file = kernel_config_.get<std::string>("kernel-cfg");
 
-    auto child_opt                  = kernel_config_.get_child_optional("sync_dest");
+    auto child_opt = kernel_config_.get_child_optional("sync_dest");
     std::vector<std::string> exportable_config;
     boost::property_tree::ptree ret;
 
@@ -188,7 +198,7 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
         boost::property_tree::ptree cpy;
         if (no_import_child)
         {
-             cpy = *no_import_child;
+            cpy = *no_import_child;
         }
         // import all (except no_import tag)
         kernel_config_ = new_cfg;
@@ -208,7 +218,8 @@ void ConfigManager::set_kconfig(boost::property_tree::ptree const &new_cfg)
 
         for (const auto &child : new_cfg)
         {
-            if (std::find(exportable_config.begin(), exportable_config.end(), child.first) != exportable_config.end())
+            if (std::find(exportable_config.begin(), exportable_config.end(),
+                          child.first) != exportable_config.end())
             {
                 kernel_config_.put_child(child.first, child.second);
             }

@@ -22,10 +22,9 @@
 
 using namespace Leosac::Auth;
 
-BaseAuthSource::BaseAuthSource(const std::string &cred_id) :
-        id_(cred_id)
+BaseAuthSource::BaseAuthSource(const std::string &cred_id)
+    : id_(cred_id)
 {
-
 }
 
 void BaseAuthSource::addAuthSource(IAuthenticationSourcePtr source)

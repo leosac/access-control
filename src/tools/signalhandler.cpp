@@ -35,25 +35,28 @@ extern "C" {
 
 using namespace Leosac::Tools;
 
-static std::array<std::function<void (Signal)>, Leosac::Tools::num_signals> sigCallback;
+static std::array<std::function<void(Signal)>, Leosac::Tools::num_signals>
+    sigCallback;
 
 static void fesser_e(int signal)
 {
-    assert(signal > 0 &&signal < Leosac::Tools::num_signals);
+    assert(signal > 0 && signal < Leosac::Tools::num_signals);
     if (sigCallback[signal])
         sigCallback[signal](static_cast<Signal>(signal));
 }
 
-void SignalHandler::registerCallback(Signal signal, std::function<void (Signal)> callback)
+void SignalHandler::registerCallback(Signal signal,
+                                     std::function<void(Signal)> callback)
 {
-    struct sigaction    act;
+    struct sigaction act;
 
     act.sa_handler = &fesser_e;
     if (sigemptyset(&act.sa_mask) < 0)
-        throw (SignalException(UnixSyscall::getErrorString("sigemptyset", errno)));
+        throw(SignalException(UnixSyscall::getErrorString("sigemptyset", errno)));
     act.sa_flags = SA_RESTART;
     if (sigaction(static_cast<int>(signal), &act, 0) < 0)
-        throw (SignalException(UnixSyscall::getErrorString("sigaction", errno)));
-    assert(static_cast<int>(signal) > 0 && static_cast<int>(signal) < Leosac::Tools::num_signals);
+        throw(SignalException(UnixSyscall::getErrorString("sigaction", errno)));
+    assert(static_cast<int>(signal) > 0 &&
+           static_cast<int>(signal) < Leosac::Tools::num_signals);
     sigCallback[static_cast<int>(signal)] = callback;
 }

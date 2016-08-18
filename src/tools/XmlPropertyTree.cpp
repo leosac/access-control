@@ -35,14 +35,15 @@ using boost::property_tree::xml_parser::no_comments;
 using boost::property_tree::xml_parser::trim_whitespace;
 using boost::property_tree::ptree;
 
-boost::property_tree::ptree Leosac::Tools::propertyTreeFromXmlFile(const std::string &path)
+boost::property_tree::ptree
+Leosac::Tools::propertyTreeFromXmlFile(const std::string &path)
 {
     boost::property_tree::ptree cfg;
     std::string filename(path);
     std::ifstream cfg_stream(filename);
 
     if (!cfg_stream.good())
-        throw (ConfigException(filename, "Could not open file {" + path + "}"));
+        throw(ConfigException(filename, "Could not open file {" + path + "}"));
     try
     {
         read_xml(cfg_stream, cfg, trim_whitespace | no_comments);
@@ -55,7 +56,7 @@ boost::property_tree::ptree Leosac::Tools::propertyTreeFromXmlFile(const std::st
 }
 
 void Leosac::Tools::propertyTreeToXmlFile(const boost::property_tree::ptree &tree,
-        const std::string &path)
+                                          const std::string &path)
 {
     std::string filename(path);
     std::ofstream cfg_stream(filename);
@@ -68,10 +69,14 @@ std::string Leosac::Tools::propertyTreeToXml(const boost::property_tree::ptree &
     std::stringstream ss;
     try
     {
-#if ((BOOST_VERSION / 100000) == 1 && (BOOST_VERSION / 100 % 1000) >= 58) || (BOOST_VERSION / 100000) > 1
-        write_xml(ss, tree, boost::property_tree::xml_writer_make_settings<std::string>('\t', 1));
+#if ((BOOST_VERSION / 100000) == 1 && (BOOST_VERSION / 100 % 1000) >= 58) ||        \
+    (BOOST_VERSION / 100000) > 1
+        write_xml(
+            ss, tree,
+            boost::property_tree::xml_writer_make_settings<std::string>('\t', 1));
 #else
-        write_xml(ss, tree, boost::property_tree::xml_writer_make_settings<char>('\t', 1));
+        write_xml(ss, tree,
+                  boost::property_tree::xml_writer_make_settings<char>('\t', 1));
 #endif
     }
     catch (ptree_error &e)
@@ -81,7 +86,8 @@ std::string Leosac::Tools::propertyTreeToXml(const boost::property_tree::ptree &
     return ss.str();
 }
 
-bool Leosac::Tools::boost_text_archive_to_ptree(const std::string &data, boost::property_tree::ptree &tree) noexcept
+bool Leosac::Tools::boost_text_archive_to_ptree(
+    const std::string &data, boost::property_tree::ptree &tree) noexcept
 {
     boost::property_tree::ptree cfg;
     std::istringstream iss(data);
@@ -95,7 +101,9 @@ bool Leosac::Tools::boost_text_archive_to_ptree(const std::string &data, boost::
     }
     catch (std::exception &e)
     {
-        ERROR("Exception while extracting boost archive (as string) to property tree: " << e.what());
+        ERROR(
+            "Exception while extracting boost archive (as string) to property tree: "
+            << e.what());
         return false;
     }
 }

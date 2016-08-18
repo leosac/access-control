@@ -25,10 +25,10 @@
 using namespace Leosac;
 
 Tasks::GetRemoteConfigVersion::GetRemoteConfigVersion(const std::string &endpoint,
-                                                      const std::string &pubkey) :
-        config_version_(0),
-        endpoint_(endpoint),
-        pubkey_(pubkey)
+                                                      const std::string &pubkey)
+    : config_version_(0)
+    , endpoint_(endpoint)
+    , pubkey_(pubkey)
 {
     INFO("Creating GetRemoteConfigVersion task. Guid = " << get_guid());
 }

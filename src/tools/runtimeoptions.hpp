@@ -33,53 +33,53 @@
 
 namespace Leosac
 {
-    namespace Tools
+namespace Tools
+{
+/**
+* Holds informations about runtime options, such as "is this a verbose run" or path
+* to configurations files
+*/
+class RuntimeOptions
+{
+    static const std::string DefaultEmptyParam;
+
+  public:
+    enum Flag
     {
-        /**
-        * Holds informations about runtime options, such as "is this a verbose run" or path to configurations files
-        */
-        class RuntimeOptions
-        {
-            static const std::string DefaultEmptyParam;
+        Verbose = 0,
+        TestRun,
+        FlagCount
+    };
 
-        public:
-            enum Flag
-            {
-                Verbose = 0,
-                TestRun,
-                FlagCount
-            };
+  public:
+    explicit RuntimeOptions() = default;
 
-        public:
-            explicit RuntimeOptions() = default;
+    ~RuntimeOptions() = default;
 
-            ~RuntimeOptions() = default;
+    RuntimeOptions(const RuntimeOptions &other) = delete;
 
-            RuntimeOptions(const RuntimeOptions &other) = delete;
+    RuntimeOptions &operator=(const RuntimeOptions &other) = delete;
 
-            RuntimeOptions &operator=(const RuntimeOptions &other) = delete;
+  public:
+    void setFlag(Flag flag, bool value = true);
 
-        public:
-            void setFlag(Flag flag, bool value = true);
+    bool isSet(Flag flag) const;
 
-            bool isSet(Flag flag) const;
+    bool hasParam(const std::string &key) const;
 
-            bool hasParam(const std::string &key) const;
+    void setParam(const std::string &key, const std::string &value);
 
-            void setParam(const std::string &key, const std::string &value);
+    const std::string &getParam(const std::string &key) const;
 
-            const std::string &getParam(const std::string &key) const;
+    bool is_strict() const;
+    void set_strict(bool v);
 
-            bool is_strict() const;
-            void set_strict(bool v);
-
-        private:
-            std::bitset<FlagCount> _flags;
-            std::map<std::string, std::string> _params;
-            bool strict_;
-        };
-
-    }
+  private:
+    std::bitset<FlagCount> _flags;
+    std::map<std::string, std::string> _params;
+    bool strict_;
+};
+}
 }
 
 #endif // RUNTIMEOPTIONS_HPP

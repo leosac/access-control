@@ -25,15 +25,14 @@
 
 using namespace Leosac::Tools;
 
-PropertyTreeExtractor::PropertyTreeExtractor(
-        const boost::property_tree::ptree &tree, const std::string &config_for) :
-        tree_(tree),
-        text_(config_for)
+PropertyTreeExtractor::PropertyTreeExtractor(const boost::property_tree::ptree &tree,
+                                             const std::string &config_for)
+    : tree_(tree)
+    , text_(config_for)
 {
-
 }
 
-template<typename T>
+template <typename T>
 T PropertyTreeExtractor::get(const std::string &node_name)
 {
     using namespace Colorize;
@@ -55,9 +54,8 @@ T PropertyTreeExtractor::get(const std::string &node_name)
     }
 }
 
-template<typename T>
-T PropertyTreeExtractor::get(const std::string &node_name,
-                             const T &default_value)
+template <typename T>
+T PropertyTreeExtractor::get(const std::string &node_name, const T &default_value)
 {
     return tree_.get<T>(node_name, default_value);
 }
@@ -65,11 +63,13 @@ T PropertyTreeExtractor::get(const std::string &node_name,
 // Instantiate the template for a few basic types.
 
 template std::string PropertyTreeExtractor::get<std::string>(const std::string &);
-template int         PropertyTreeExtractor::get<int>(const std::string &);
-template uint64_t    PropertyTreeExtractor::get<uint64_t>(const std::string &);
+template int PropertyTreeExtractor::get<int>(const std::string &);
+template uint64_t PropertyTreeExtractor::get<uint64_t>(const std::string &);
 
 // Ditto, but for accessor with default value.
 
-template std::string PropertyTreeExtractor::get<std::string>(const std::string &, const std::string &);
-template int         PropertyTreeExtractor::get<int>(const std::string &, const int &);
-template uint64_t    PropertyTreeExtractor::get<uint64_t>(const std::string &, const uint64_t &);
+template std::string PropertyTreeExtractor::get<std::string>(const std::string &,
+                                                             const std::string &);
+template int PropertyTreeExtractor::get<int>(const std::string &, const int &);
+template uint64_t PropertyTreeExtractor::get<uint64_t>(const std::string &,
+                                                       const uint64_t &);

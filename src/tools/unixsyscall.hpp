@@ -30,16 +30,16 @@
 
 namespace Leosac
 {
-    namespace Tools
-    {
-        class UnixSyscall
-        {
-            UnixSyscall() = delete;
+namespace Tools
+{
+class UnixSyscall
+{
+    UnixSyscall() = delete;
 
-        public:
-            static std::string getErrorString(const std::string &func, int errNo);
-        };
-    }
+  public:
+    static std::string getErrorString(const std::string &func, int errNo);
+};
+}
 }
 
 #endif // UNIXSYSCALL_HPP

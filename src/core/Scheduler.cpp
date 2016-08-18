@@ -42,7 +42,7 @@ void Scheduler::update(TargetThread me) noexcept
 {
     mutex_.lock();
     auto &queue = queues_[me];
-    int run = queue.size();
+    int run     = queue.size();
     mutex_.unlock();
 
     while (run)
@@ -63,10 +63,9 @@ void Scheduler::register_thread(TargetThread me)
     queues_[me];
 }
 
-Scheduler::Scheduler(Kernel *kptr) :
-        kptr_(kptr)
+Scheduler::Scheduler(Kernel *kptr)
+    : kptr_(kptr)
 {
-
 }
 
 Kernel &Scheduler::kernel()

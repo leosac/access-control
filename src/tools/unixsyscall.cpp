@@ -29,7 +29,7 @@
 
 using namespace Leosac::Tools;
 
-std::string UnixSyscall::getErrorString(const std::string& func, int errNo)
+std::string UnixSyscall::getErrorString(const std::string &func, int errNo)
 {
     return (func + "() failed (" + std::string(strerror(errNo)) + ")");
 }

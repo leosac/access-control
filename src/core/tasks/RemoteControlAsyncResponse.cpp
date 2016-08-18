@@ -30,8 +30,8 @@ bool RemoteControlAsyncResponse::do_run()
 
 RemoteControlAsyncResponse::RemoteControlAsyncResponse(const std::string identity,
                                                        const zmqpp::message_t &msg,
-                                                       zmqpp::socket_t &socket) :
-        socket_(socket)
+                                                       zmqpp::socket_t &socket)
+    : socket_(socket)
 {
     INFO("Creating RemoteControlAsyncResponse task. Guid = " << get_guid());
     msg_ = msg.copy();

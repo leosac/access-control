@@ -38,31 +38,32 @@ extern "C" {
 
 using namespace Leosac::Tools;
 
-UnixShellScript::UnixShellScript(const std::string& script)
-:   _script(script)
-{}
-
-int UnixShellScript::run(const std::string& args)
+UnixShellScript::UnixShellScript(const std::string &script)
+    : _script(script)
 {
-    FILE*               stream;
-    std::ostringstream  oss;
-    char                buffer[BufferSize];
-    std::string         line = _script + ' ' + args;
-    int                 ret;
+}
+
+int UnixShellScript::run(const std::string &args)
+{
+    FILE *stream;
+    std::ostringstream oss;
+    char buffer[BufferSize];
+    std::string line = _script + ' ' + args;
+    int ret;
 
     INFO("CmdLine: " << line);
     if (!(stream = popen(line.c_str(), "r")))
-        throw (ScriptException(UnixSyscall::getErrorString("popen", errno) + " command: '" + line + '\''));
+        throw(ScriptException(UnixSyscall::getErrorString("popen", errno) +
+                              " command: '" + line + '\''));
     while (fgets(buffer, BufferSize, stream))
         oss << buffer;
     _output = oss.str();
     if ((ret = pclose(stream)) == -1 && errno)
-        throw (ScriptException(UnixSyscall::getErrorString("pclose", errno)));
+        throw(ScriptException(UnixSyscall::getErrorString("pclose", errno)));
     return (ret);
 }
 
-const std::string& UnixShellScript::getOutput() const
+const std::string &UnixShellScript::getOutput() const
 {
     return (_output);
 }
-

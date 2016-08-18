@@ -21,10 +21,9 @@
 
 using namespace Leosac::Auth;
 
-IUser::IUser(const std::string &username) :
-        username_(username)
+IUser::IUser(const std::string &username)
+    : username_(username)
 {
-
 }
 
 const std::string &IUser::username() const noexcept

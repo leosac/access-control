@@ -37,13 +37,13 @@ static std::string vstring = std::string();
 
 std::string Version::buildVersionString(int major, int minor, int patch)
 {
-    std::ostringstream  oss;
+    std::ostringstream oss;
 
     oss << major << '.' << minor << '.' << patch;
     return (oss.str());
 }
 
-static void cleanVersionString(std::string& v)
+static void cleanVersionString(std::string &v)
 {
     v = v.substr(0, v.find_first_of('-'));
     std::replace(v.begin(), v.end(), '.', ' ');
@@ -51,10 +51,10 @@ static void cleanVersionString(std::string& v)
 
 int Version::versionCompare(std::string a, std::string b)
 {
-    std::istringstream  issa;
-    std::istringstream  issb;
-    int                 va;
-    int                 vb;
+    std::istringstream issa;
+    std::istringstream issb;
+    int va;
+    int vb;
 
     cleanVersionString(a);
     cleanVersionString(b);
@@ -72,7 +72,7 @@ int Version::versionCompare(std::string a, std::string b)
     return (0);
 }
 
-bool Version::isVersionValid(const std::string& v)
+bool Version::isVersionValid(const std::string &v)
 {
     if (v.find_first_not_of(validChars) != std::string::npos)
         return (false);
@@ -80,7 +80,7 @@ bool Version::isVersionValid(const std::string& v)
         return (false);
     if (v.front() == '.' || v.back() == '.')
         return (false);
-    if (std::count_if(v.begin(), v.end(), [] (char a) { return (a == '.');} ) != 2)
+    if (std::count_if(v.begin(), v.end(), [](char a) { return (a == '.'); }) != 2)
         return (false);
     if (v.find_first_of('.') + 1 == v.find_last_of('.'))
         return (false);

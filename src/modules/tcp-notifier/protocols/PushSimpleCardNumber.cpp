@@ -22,13 +22,12 @@
 #include "PushSimpleCardNumber.hpp"
 #include "core/auth/WiegandCard.hpp"
 
-Leosac::ByteVector
-Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
+Leosac::ByteVector Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
     const Auth::WiegandCard &card)
 {
-  ByteVector data(8);
-  uint64_t network_card_id = zmqpp::htonll(card.to_int());
-  std::memcpy(&data[0], &network_card_id, 8);
+    ByteVector data(8);
+    uint64_t network_card_id = zmqpp::htonll(card.to_int());
+    std::memcpy(&data[0], &network_card_id, 8);
 
-  return data;
+    return data;
 }

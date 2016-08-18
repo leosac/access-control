@@ -23,20 +23,19 @@
 
 namespace Leosac
 {
-  namespace Module
-  {
-    namespace TCPNotifier
-    {
-      /**
-       * Simple protocol that sends the card number.
-       */
-      class PushSimpleCardNumber : public ProtocolHandler
-      {
+namespace Module
+{
+namespace TCPNotifier
+{
+/**
+ * Simple protocol that sends the card number.
+ */
+class PushSimpleCardNumber : public ProtocolHandler
+{
 
-      public:
-        virtual ByteVector
-        build_cred_msg(const Auth::WiegandCard &card) override;
-      };
-    }
-  }
+  public:
+    virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) override;
+};
+}
+}
 }

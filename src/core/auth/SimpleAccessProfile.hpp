@@ -30,42 +30,44 @@
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        class SimpleAccessProfile;
-        using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
+namespace Auth
+{
+class SimpleAccessProfile;
+using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
 
-        /**
-        * Concrete implementation of a simple access control class.
-        */
-        class SimpleAccessProfile : public IAccessProfile
-        {
-        public:
-            virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
-                     AuthTargetPtr target) override;
+/**
+* Concrete implementation of a simple access control class.
+*/
+class SimpleAccessProfile : public IAccessProfile
+{
+  public:
+    virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
+                                 AuthTargetPtr target) override;
 
-            /**
-            * Adds a schedule where access to a given target is allowed.
-            */
-            virtual void addAccessSchedule(AuthTargetPtr target, const Tools::Schedule &sched);
+    /**
+    * Adds a schedule where access to a given target is allowed.
+    */
+    virtual void addAccessSchedule(AuthTargetPtr target,
+                                   const Tools::Schedule &sched);
 
-            virtual const std::vector<Tools::Schedule> &defaultSchedules() const;
+    virtual const std::vector<Tools::Schedule> &defaultSchedules() const;
 
-            /**
-            * Returns the map of schedule for each target (except the default target)
-            */
-            virtual const std::map<std::string, std::vector<Tools::Schedule>> &schedules() const;
+    /**
+    * Returns the map of schedule for each target (except the default target)
+    */
+    virtual const std::map<std::string, std::vector<Tools::Schedule>> &
+    schedules() const;
 
-        protected:
-            /**
-            * Map target name to target's schedules.
-            */
-            std::map<std::string, std::vector<Tools::Schedule>> schedules_;
+  protected:
+    /**
+    * Map target name to target's schedules.
+    */
+    std::map<std::string, std::vector<Tools::Schedule>> schedules_;
 
-            /**
-            * Schedule for default target.
-            */
-            std::vector<Tools::Schedule> default_schedule_;
-        };
-    }
+    /**
+    * Schedule for default target.
+    */
+    std::vector<Tools::Schedule> default_schedule_;
+};
+}
 }

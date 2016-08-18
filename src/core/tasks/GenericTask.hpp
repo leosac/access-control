@@ -24,28 +24,28 @@
 
 namespace Leosac
 {
-    namespace Tasks
+namespace Tasks
+{
+/**
+ * This task type is used whenever a lambda is passed to the scheduler.
+ * The scheduler use std::function to type-erase the callable object so that
+ * it can fit into GenericTask.
+ */
+class GenericTask : public Task
+{
+  public:
+    GenericTask(const std::function<bool(void)> &fct);
+
+    template <typename Callable>
+    static TaskPtr build(const Callable &callable)
     {
-        /**
-         * This task type is used whenever a lambda is passed to the scheduler.
-         * The scheduler use std::function to type-erase the callable object so that
-         * it can fit into GenericTask.
-         */
-        class GenericTask : public Task
-        {
-        public:
-            GenericTask(const std::function<bool (void)> &fct);
-
-             template<typename Callable>
-             static TaskPtr build(const Callable &callable)
-             {
-                 return std::make_shared<Tasks::GenericTask>(callable);
-             }
-
-        private:
-            virtual bool do_run();
-
-            std::function<bool (void)> fct_;
-        };
+        return std::make_shared<Tasks::GenericTask>(callable);
     }
+
+  private:
+    virtual bool do_run();
+
+    std::function<bool(void)> fct_;
+};
+}
 }

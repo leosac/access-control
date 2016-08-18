@@ -28,84 +28,81 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        /**
-        * Namespace for the module that implements GPIO support using
-        * the Linux Kernel sysfs interface.
-        *
-        * @see @ref mod_sysfsgpio_main for end-user documentation.
-        */
-        namespace SysFsGpio
-        {
-            class SysFsGpioPin;
+namespace Module
+{
+/**
+* Namespace for the module that implements GPIO support using
+* the Linux Kernel sysfs interface.
+*
+* @see @ref mod_sysfsgpio_main for end-user documentation.
+*/
+namespace SysFsGpio
+{
+class SysFsGpioPin;
 
-            class SysFsGpioConfig;
+class SysFsGpioConfig;
 
-            /**
-            * Handle GPIO management over sysfs.
-            * @see @ref mod_sysfsgpio_user_config for configuration information.
-            */
-            class SysFsGpioModule : public BaseModule
-            {
-            public:
-                SysFsGpioModule(zmqpp::context &ctx,
-                                zmqpp::socket *module_manager_pipe,
-                                const boost::property_tree::ptree &config,
-                                CoreUtilsPtr  utils);
+/**
+* Handle GPIO management over sysfs.
+* @see @ref mod_sysfsgpio_user_config for configuration information.
+*/
+class SysFsGpioModule : public BaseModule
+{
+  public:
+    SysFsGpioModule(zmqpp::context &ctx, zmqpp::socket *module_manager_pipe,
+                    const boost::property_tree::ptree &config, CoreUtilsPtr utils);
 
-                ~SysFsGpioModule();
+    ~SysFsGpioModule();
 
-                SysFsGpioModule(const SysFsGpioModule &) = delete;
+    SysFsGpioModule(const SysFsGpioModule &) = delete;
 
-                SysFsGpioModule &operator=(SysFsGpioModule &&) = delete;
+    SysFsGpioModule &operator=(SysFsGpioModule &&) = delete;
 
-                /**
-                * Write the message eon the bus.
-                * This is intended for use by the SysFsGpioPin
-                */
-                void publish_on_bus(zmqpp::message &msg);
+    /**
+    * Write the message eon the bus.
+    * This is intended for use by the SysFsGpioPin
+    */
+    void publish_on_bus(zmqpp::message &msg);
 
-                /**
-                * Retrieve a reference to the config object.
-                */
-                const SysFsGpioConfig &general_config() const;
+    /**
+    * Retrieve a reference to the config object.
+    */
+    const SysFsGpioConfig &general_config() const;
 
-                virtual void run() override;
+    virtual void run() override;
 
 
+  private:
+    /**
+    * Process the configuration, preparing configured GPIO pin.
+    */
+    void process_config(const boost::property_tree::ptree &cfg);
 
-            private:
-                /**
-                * Process the configuration, preparing configured GPIO pin.
-                */
-                void process_config(const boost::property_tree::ptree &cfg);
+    /**
+    * General configuration (file paths, etc).
+    */
+    void process_general_config();
 
-                /**
-                * General configuration (file paths, etc).
-                */
-                void process_general_config();
+    /**
+    * Write to "gpio_export_path" so the kernel export the socket to sysfs.
+    */
+    void export_gpio(int gpio_no);
 
-                /**
-                * Write to "gpio_export_path" so the kernel export the socket to sysfs.
-                */
-                void export_gpio(int gpio_no);
+    /**
+    * Socket to write the bus.
+    */
+    zmqpp::socket bus_push_;
 
-                /**
-                * Socket to write the bus.
-                */
-                zmqpp::socket bus_push_;
+    /**
+    * Vector of underlying pin object
+    */
+    std::vector<SysFsGpioPin *> gpios_;
 
-                /**
-                * Vector of underlying pin object
-                */
-                std::vector<SysFsGpioPin *> gpios_;
-
-                /**
-                * General configuration for module
-                */
-                SysFsGpioConfig *general_cfg_;
-            };
-        }
-    }
+    /**
+    * General configuration for module
+    */
+    SysFsGpioConfig *general_cfg_;
+};
+}
+}
 }

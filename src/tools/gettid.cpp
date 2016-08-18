@@ -25,10 +25,8 @@
 
 namespace Leosac
 {
-    uint64_t gettid()
-    {
-        return static_cast<uint64_t>(syscall(SYS_gettid));
-    }
+uint64_t gettid()
+{
+    return static_cast<uint64_t>(syscall(SYS_gettid));
 }
-
-
+}

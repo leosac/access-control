@@ -39,7 +39,8 @@ using namespace Leosac;
 static int set_working_directory(RuntimeOptions &opts) noexcept
 {
     int ret = 0;
-    if (opts.hasParam("working_directory") && !opts.getParam("working_directory").empty())
+    if (opts.hasParam("working_directory") &&
+        !opts.getParam("working_directory").empty())
     {
         ret = chdir(opts.getParam("working_directory").c_str());
         if (ret != 0)
@@ -55,11 +56,17 @@ int main(int argc, const char **argv)
 
     try
     {
-        TCLAP::CmdLine cmd("Open Source Access Controller", ' ', Leosac::getVersionString());
+        TCLAP::CmdLine cmd("Open Source Access Controller", ' ',
+                           Leosac::getVersionString());
         TCLAP::SwitchArg verboseSwitch("v", "verbose", "Increase verbosity", false);
-        TCLAP::SwitchArg strict("s", "strict", "Be strict regarding configuration error", false); // assert on configuration error.
-        TCLAP::ValueArg<std::string> kernelFile("k", "kernel-cfg", "Kernel Configuration file", true, "", "config_file");
-        TCLAP::ValueArg<std::string> working_directory("d", "working-directory", "Leosac's working directory", false, "", "working_directory");
+        TCLAP::SwitchArg strict("s", "strict",
+                                "Be strict regarding configuration error",
+                                false); // assert on configuration error.
+        TCLAP::ValueArg<std::string> kernelFile(
+            "k", "kernel-cfg", "Kernel Configuration file", true, "", "config_file");
+        TCLAP::ValueArg<std::string> working_directory(
+            "d", "working-directory", "Leosac's working directory", false, "",
+            "working_directory");
 
         cmd.add(verboseSwitch);
         cmd.add(strict);
@@ -92,7 +99,8 @@ int main(int argc, const char **argv)
         }
         catch (const std::exception &e)
         {
-            std::cerr << "Exception propagated to main(). Will now exit." << std::endl;
+            std::cerr << "Exception propagated to main(). Will now exit."
+                      << std::endl;
             Leosac::print_exception(e);
             return 1;
         }

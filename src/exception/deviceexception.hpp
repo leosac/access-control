@@ -32,9 +32,14 @@
 
 class DeviceException : public LEOSACException
 {
-public:
-    DeviceException(const std::string& message) : LEOSACException("Device::" + message) {}
-    virtual ~DeviceException() {}
+  public:
+    DeviceException(const std::string &message)
+        : LEOSACException("Device::" + message)
+    {
+    }
+    virtual ~DeviceException()
+    {
+    }
 };
 
 #endif // DEVICEEXCEPTION_HPP

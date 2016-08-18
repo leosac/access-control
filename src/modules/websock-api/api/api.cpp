@@ -36,11 +36,10 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-API::API(WSServer &server) :
-    server_(server),
-    auth_status_(AuthStatus::NONE)
+API::API(WSServer &server)
+    : server_(server)
+    , auth_status_(AuthStatus::NONE)
 {
-
 }
 
 API::json API::get_leosac_version(const json &)
@@ -56,7 +55,7 @@ API::json API::create_auth_token(const API::json &req)
 
     if (auth_status_ != AuthStatus::NONE)
     {
-        rep["status"] = -2;
+        rep["status"]  = -2;
         rep["message"] = "Already logged in";
     }
     else
@@ -68,10 +67,10 @@ API::json API::create_auth_token(const API::json &req)
         auto token = server_.auth().generate_token(username, password, uid);
         if (!token.empty())
         {
-            rep["status"] = 0;
+            rep["status"]  = 0;
             rep["user_id"] = uid;
-            rep["token"] = token;
-            auth_status_ = AuthStatus::LOGGED_IN;
+            rep["token"]   = token;
+            auth_status_   = AuthStatus::LOGGED_IN;
         }
         else
         {
@@ -87,7 +86,7 @@ API::json API::authenticate_with_token(const API::json &req)
 
     if (auth_status_ != AuthStatus::NONE)
     {
-        rep["status"] = -2;
+        rep["status"]  = -2;
         rep["message"] = "Already logged in";
     }
     else
@@ -95,10 +94,10 @@ API::json API::authenticate_with_token(const API::json &req)
         std::string user_id;
         if (server_.auth().authenticate(req.at("token"), user_id))
         {
-            rep["status"] = 0;
-            rep["user_id"] = user_id;
-            rep["username"] = "lama"; // todo fix
-            auth_status_ = AuthStatus::LOGGED_IN;
+            rep["status"]       = 0;
+            rep["user_id"]      = user_id;
+            rep["username"]     = "lama"; // todo fix
+            auth_status_        = AuthStatus::LOGGED_IN;
             current_auth_token_ = req.at("token");
         }
         else
@@ -122,10 +121,10 @@ API::json API::system_overview(const API::json &req)
     json rep;
     auto core_api = server_.core_utils()->core_api();
 
-    rep["instance_name"] = core_api.instance_name();
+    rep["instance_name"]  = core_api.instance_name();
     rep["config_version"] = core_api.config_version();
-    rep["uptime"] = core_api.uptime();
-    rep["modules"] = core_api.modules_names();
+    rep["uptime"]         = core_api.uptime();
+    rep["modules"]        = core_api.modules_names();
 
     return rep;
 }
@@ -134,22 +133,22 @@ API::json API::get_logs(const json &req)
 {
     json rep;
 
-    using query = odb::query<Tools::LogEntry>;
+    using query    = odb::query<Tools::LogEntry>;
     using sl_query = odb::sqlite::query<Tools::LogEntry>;
     using my_query = odb::mysql::query<Tools::LogEntry>;
-    using result = odb::result<Tools::LogEntry>;
-    DBPtr db = server_.core_utils()->database();
+    using result   = odb::result<Tools::LogEntry>;
+    DBPtr db       = server_.core_utils()->database();
     if (db)
     {
         rep["data"] = {};
         odb::transaction t(db->begin());
 
-        int p = extract_with_default(req, "p", 0); // page
+        int p  = extract_with_default(req, "p", 0);   // page
         int ps = extract_with_default(req, "ps", 20); // page size
         if (ps <= 0)
-            ps = 1;
-        int offset = p * ps;
-        std::string sort = extract_with_default(req, "sort", "desc");
+            ps               = 1;
+        int offset           = p * ps;
+        std::string sort     = extract_with_default(req, "sort", "desc");
         std::string order_by = sort == "asc" ? "ASC" : "DESC";
         query base_query;
         result base_result;
@@ -157,18 +156,18 @@ API::json API::get_logs(const json &req)
         // LIMIT needs to be database specific.
         if (db->id() == odb::database_id::id_sqlite)
         {
-            auto sl_db =  std::static_pointer_cast<odb::sqlite::database>(db);
-            odb::sqlite::query<Tools::LogEntry> sl_q("ORDER BY" + query::id + order_by +
-                                                         "LIMIT" + sl_query::_val(ps) +
-                                                         "OFFSET" + sl_query::_val(offset));
+            auto sl_db = std::static_pointer_cast<odb::sqlite::database>(db);
+            odb::sqlite::query<Tools::LogEntry> sl_q(
+                "ORDER BY" + query::id + order_by + "LIMIT" + sl_query::_val(ps) +
+                "OFFSET" + sl_query::_val(offset));
             base_result = sl_db->query<Tools::LogEntry>(sl_q);
         }
         else if (db->id() == odb::database_id::id_mysql)
         {
-            auto my_db =  std::static_pointer_cast<odb::mysql::database>(db);
-            odb::mysql::query<Tools::LogEntry> my_q("ORDER BY" + query::id + order_by +
-                                                        "LIMIT" + my_query::_val(ps) +
-                                                        "OFFSET" + my_query::_val(offset));
+            auto my_db = std::static_pointer_cast<odb::mysql::database>(db);
+            odb::mysql::query<Tools::LogEntry> my_q(
+                "ORDER BY" + query::id + order_by + "LIMIT" + my_query::_val(ps) +
+                "OFFSET" + my_query::_val(offset));
             base_result = my_db->query<Tools::LogEntry>(my_q);
         }
         Tools::LogView view(db->query_value<Tools::LogView>());
@@ -176,21 +175,15 @@ API::json API::get_logs(const json &req)
         for (Tools::LogEntry &entry : base_result)
         {
             auto timestamp = boost::posix_time::to_time_t(entry.timestamp_);
-            rep["data"].push_back({{"id", entry.id_},
-                                      {"type", "log-message"},
-                                      {
-                                          "attributes",
-                                              {
-                                                  {"message",   entry.msg_},
-                                                  {"timestamp", timestamp}
-                                              }
-                                      }
-                                  });
+            rep["data"].push_back(
+                {{"id", entry.id_},
+                 {"type", "log-message"},
+                 {"attributes",
+                  {{"message", entry.msg_}, {"timestamp", timestamp}}}});
         }
 
-        rep["meta"] = {{"total", view.count},
-                       {"last", view.count / ps},
-                       {"first", 0},
+        rep["meta"] = {
+            {"total", view.count}, {"last", view.count / ps}, {"first", 0},
         };
         rep["status"] = 0;
     }
@@ -203,8 +196,7 @@ API::json API::get_logs(const json &req)
 
 bool API::allowed(const std::string &cmd)
 {
-    if (cmd == "get_leosac_version" ||
-        cmd == "create_auth_token" ||
+    if (cmd == "get_leosac_version" || cmd == "create_auth_token" ||
         cmd == "authenticate_with_token")
         return true;
     return auth_status_ == AuthStatus::LOGGED_IN;

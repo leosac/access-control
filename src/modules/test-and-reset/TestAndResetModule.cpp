@@ -28,17 +28,16 @@ TestAndResetModule::~TestAndResetModule()
 {
 }
 
-TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg,
-        CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils),
-        kernel_sock_(ctx, zmqpp::socket_type::req),
-        sub_(ctx, zmqpp::socket_type::sub),
-        test_led_(nullptr),
-        test_buzzer_(nullptr),
-        run_on_start_(true),
-        promisc_(false)
+TestAndResetModule::TestAndResetModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                                       const boost::property_tree::ptree &cfg,
+                                       CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
+    , kernel_sock_(ctx, zmqpp::socket_type::req)
+    , sub_(ctx, zmqpp::socket_type::sub)
+    , test_led_(nullptr)
+    , test_buzzer_(nullptr)
+    , run_on_start_(true)
+    , promisc_(false)
 {
     sub_.connect("inproc://zmq-bus-pub");
     kernel_sock_.connect("inproc://leosac-kernel");
@@ -51,12 +50,13 @@ TestAndResetModule::TestAndResetModule(zmqpp::context &ctx,
 
 void TestAndResetModule::process_config()
 {
-    boost::property_tree::ptree module_config   = config_.get_child("module_config");
-    std::string test_device_led                 = module_config.get<std::string>("test_led", "");
-    std::string test_device_buzzer              = module_config.get<std::string>("test_buzzer", "");
-    run_on_start_                               = module_config.get<bool>("run_on_start", true);
-    promisc_                                    = module_config.get<bool>("promisc", false);
-    const auto &devices                         = module_config.get_child_optional("devices");
+    boost::property_tree::ptree module_config = config_.get_child("module_config");
+    std::string test_device_led = module_config.get<std::string>("test_led", "");
+    std::string test_device_buzzer =
+        module_config.get<std::string>("test_buzzer", "");
+    run_on_start_       = module_config.get<bool>("run_on_start", true);
+    promisc_            = module_config.get<bool>("promisc", false);
+    const auto &devices = module_config.get_child_optional("devices");
 
     if (!test_device_led.empty())
         test_led_ = std::unique_ptr<FLED>(new FLED(ctx_, test_device_led));
@@ -72,7 +72,7 @@ void TestAndResetModule::process_config()
             std::string device_name = device_cfg.get_child("name").data();
             config_check(device_name);
             std::string reset_card = device_cfg.get<std::string>("reset_card", "");
-            std::string test_card = device_cfg.get<std::string>("test_card", "");
+            std::string test_card  = device_cfg.get<std::string>("test_card", "");
 
             sub_.subscribe("S_" + device_name);
             if (!reset_card.empty())
@@ -150,9 +150,8 @@ void TestAndResetModule::run_test_sequence()
 
 bool TestAndResetModule::has_reset_card(const std::string &card_id) const
 {
-    return std::find_if(device_reset_card_.begin(),
-            device_reset_card_.end(),
-            [&](std::pair<std::string, std::string> p) -> bool {
-                return p.second == card_id;
-            }) != device_reset_card_.end();
+    return std::find_if(device_reset_card_.begin(), device_reset_card_.end(),
+                        [&](std::pair<std::string, std::string> p) -> bool {
+                            return p.second == card_id;
+                        }) != device_reset_card_.end();
 }

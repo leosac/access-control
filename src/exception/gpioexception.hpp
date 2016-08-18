@@ -31,9 +31,14 @@
 
 class GpioException : public LEOSACException
 {
-public:
-    GpioException(const std::string& message) : LEOSACException("Gpio::" + message) {}
-    virtual ~GpioException() {}
+  public:
+    GpioException(const std::string &message)
+        : LEOSACException("Gpio::" + message)
+    {
+    }
+    virtual ~GpioException()
+    {
+    }
 };
 
 #endif // GPIOEXCEPTION_HPP

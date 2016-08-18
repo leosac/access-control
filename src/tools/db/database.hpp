@@ -27,7 +27,7 @@
 // Define the database model version.
 // This is required in order to use ODB schema/data migration capabilities.
 #ifdef ODB_COMPILER
-#  pragma db model version(1, 1, open)
+#pragma db model version(1, 1, open)
 #endif
 
 #include <odb/connection.hxx>

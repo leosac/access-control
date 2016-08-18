@@ -23,69 +23,69 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                /**
-                * Strategy for ready PIN only.
-                 * The number of bits sent by the reader per key pressed
-                 * is NbBits.
-                */
-                template<unsigned int NbBits>
-                class WiegandPinNBitsOnly : public PinReading
-                {
-                public:
-                    /**
-                    * Create a strategy that read N bits-per-key PIN code.
-                    *
-                    * @param reader         the reader object we provide the strategy for.
-                    * @param pin_timeout    nb of msec before flushing user input to the system
-                    * @param pin_end_key    key ('1', '*', '5') that will trigger user input flushing.
-                    */
-                    WiegandPinNBitsOnly(WiegandReaderImpl *reader,
-                            std::chrono::milliseconds pin_timeout,
-                            char pin_end_key);
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+/**
+* Strategy for ready PIN only.
+ * The number of bits sent by the reader per key pressed
+ * is NbBits.
+*/
+template <unsigned int NbBits>
+class WiegandPinNBitsOnly : public PinReading
+{
+  public:
+    /**
+    * Create a strategy that read N bits-per-key PIN code.
+    *
+    * @param reader         the reader object we provide the strategy for.
+    * @param pin_timeout    nb of msec before flushing user input to the system
+    * @param pin_end_key    key ('1', '*', '5') that will trigger user input
+    * flushing.
+    */
+    WiegandPinNBitsOnly(WiegandReaderImpl *reader,
+                        std::chrono::milliseconds pin_timeout, char pin_end_key);
 
-                    // we reset the counter_ and buffer_ for each key.
-                    virtual void timeout() override;
+    // we reset the counter_ and buffer_ for each key.
+    virtual void timeout() override;
 
-                    virtual bool completed() const override;
+    virtual bool completed() const override;
 
-                    virtual void signal(zmqpp::socket &sock) override;
+    virtual void signal(zmqpp::socket &sock) override;
 
-                    virtual const std::string &get_pin() const override;
+    virtual const std::string &get_pin() const override;
 
-                    virtual void reset() override;
+    virtual void reset() override;
 
-                private:
-                    /**
-                     * Extract the character that was pressed from
-                     * raw data.
-                     */
-                    char extract_from_raw(uint8_t input) const;
+  private:
+    /**
+     * Extract the character that was pressed from
+     * raw data.
+     */
+    char extract_from_raw(uint8_t input) const;
 
-                    /**
-                    * Timeout or pin_end_key read. If we have meaningful data,
-                    * set ready to true.
-                    */
-                    void end_of_input();
+    /**
+    * Timeout or pin_end_key read. If we have meaningful data,
+    * set ready to true.
+    */
+    void end_of_input();
 
-                    std::string inputs_;
-                    std::chrono::milliseconds pin_timeout_;
-                    char pin_end_key_;
+    std::string inputs_;
+    std::chrono::milliseconds pin_timeout_;
+    char pin_end_key_;
 
-                    using TimePoint = std::chrono::system_clock::time_point;
-                    TimePoint last_update_;
+    using TimePoint = std::chrono::system_clock::time_point;
+    TimePoint last_update_;
 
-                    /**
-                    * Are we ready to submit the PIN code ?
-                    */
-                    bool ready_;
-                };
-            }
-        }
-    }
+    /**
+    * Are we ready to submit the PIN code ?
+    */
+    bool ready_;
+};
+}
+}
+}
 }

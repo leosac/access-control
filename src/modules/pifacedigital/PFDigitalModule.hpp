@@ -27,67 +27,64 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        /**
-        * Provide support for the piface digital device.
-        *
-        * @see @ref mod_piface_main for documentation
-        */
-        namespace Piface
-        {
-            /**
-            * Main class for the piface digital module.
-            */
-            class PFDigitalModule : public BaseModule
-            {
-            public:
-                PFDigitalModule(zmqpp::context &ctx,
-                                zmqpp::socket *module_manager_pipe,
-                                const boost::property_tree::ptree &config,
-                                CoreUtilsPtr  utils);
+namespace Module
+{
+/**
+* Provide support for the piface digital device.
+*
+* @see @ref mod_piface_main for documentation
+*/
+namespace Piface
+{
+/**
+* Main class for the piface digital module.
+*/
+class PFDigitalModule : public BaseModule
+{
+  public:
+    PFDigitalModule(zmqpp::context &ctx, zmqpp::socket *module_manager_pipe,
+                    const boost::property_tree::ptree &config, CoreUtilsPtr utils);
 
-                /**
-                * Module's main loop.
-                */
-                virtual void run() override;
+    /**
+    * Module's main loop.
+    */
+    virtual void run() override;
 
-            private:
+  private:
+    /**
+    * An interrupt was triggered. Lets handle it.
+    */
+    void handle_interrupt();
 
-                /**
-                * An interrupt was triggered. Lets handle it.
-                */
-                void handle_interrupt();
+    /**
+    * Process the configuration, preparing configured GPIO pin.
+    */
+    void process_config(const boost::property_tree::ptree &cfg);
 
-                /**
-                * Process the configuration, preparing configured GPIO pin.
-                */
-                void process_config(const boost::property_tree::ptree &cfg);
+    /**
+    * Socket to push event to the bus.
+    */
+    zmqpp::socket bus_push_;
 
-                /**
-                * Socket to push event to the bus.
-                */
-                zmqpp::socket bus_push_;
+    /**
+    * GPIO vector
+    */
+    std::vector<PFDigitalPin> gpios_;
 
-                /**
-                * GPIO vector
-                */
-                std::vector<PFDigitalPin> gpios_;
+    /**
+    * Should be removed someday...
+    * store the name of the input pin with id = idx in dest.
+    *
+    * returns true if it was succesful (pin exists), false otherwise.
+    */
+    bool get_input_pin_name(std::string &dest, int idx);
 
-                /**
-                * Should be removed someday...
-                * store the name of the input pin with id = idx in dest.
-                *
-                * returns true if it was succesful (pin exists), false otherwise.
-                */
-                bool get_input_pin_name(std::string &dest, int idx);
-
-                /**
-                * File descriptor of the PIN that triggers interrupts. This is card and will not change.
-                */
-                int interrupt_fd_;
-            };
-
-        }
-    }
+    /**
+    * File descriptor of the PIN that triggers interrupts. This is card and will not
+    * change.
+    */
+    int interrupt_fd_;
+};
+}
+}
 }

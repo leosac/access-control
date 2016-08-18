@@ -24,8 +24,7 @@
 
 using namespace Leosac::Module::LedBuzzer;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "LED_BUZZER";
@@ -35,11 +34,10 @@ const char *get_module_name()
 /**
 * Entry point of the LEDBuzzer management module.
 */
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<LEDBuzzerModule>(pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<LEDBuzzerModule>(pipe, cfg, zmq_ctx,
+                                                                utils);
 }

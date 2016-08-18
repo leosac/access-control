@@ -32,9 +32,14 @@
 
 class DynLibException : public LEOSACException
 {
-public:
-    DynLibException(const std::string& message) : LEOSACException("DynLib::" + message) {}
-    virtual ~DynLibException() {}
+  public:
+    DynLibException(const std::string &message)
+        : LEOSACException("DynLib::" + message)
+    {
+    }
+    virtual ~DynLibException()
+    {
+    }
 };
 
 #endif // DYNLIBEXCEPTION_HPP

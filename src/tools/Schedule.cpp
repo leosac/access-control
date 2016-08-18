@@ -21,10 +21,9 @@
 
 using namespace Leosac::Tools;
 
-Schedule::Schedule(const std::string &sched_name) :
-        name_(sched_name)
+Schedule::Schedule(const std::string &sched_name)
+    : name_(sched_name)
 {
-
 }
 
 bool Schedule::is_in_schedule(const std::chrono::system_clock::time_point &tp) const

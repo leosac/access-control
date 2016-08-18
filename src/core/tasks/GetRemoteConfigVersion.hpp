@@ -24,28 +24,27 @@
 
 namespace Leosac
 {
-    namespace Tasks
-    {
-        /**
-         * Fetch the configuration version of the master server.
-         *
-         * This tasks should be scheduled in a pool thread.
-         */
-        class GetRemoteConfigVersion : public Task
-        {
-        public:
-            GetRemoteConfigVersion(const std::string &endpoint,
-                                   const std::string &pubkey);
+namespace Tasks
+{
+/**
+ * Fetch the configuration version of the master server.
+ *
+ * This tasks should be scheduled in a pool thread.
+ */
+class GetRemoteConfigVersion : public Task
+{
+  public:
+    GetRemoteConfigVersion(const std::string &endpoint, const std::string &pubkey);
 
-            uint64_t config_version_;
+    uint64_t config_version_;
 
-            static constexpr const int timeout = 5000;
+    static constexpr const int timeout = 5000;
 
-        private:
-            virtual bool do_run() override;
+  private:
+    virtual bool do_run() override;
 
-            std::string endpoint_;
-            std::string pubkey_;
-        };
-    }
+    std::string endpoint_;
+    std::string pubkey_;
+};
+}
 }

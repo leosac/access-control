@@ -19,13 +19,14 @@
 
 #include "MessageBus.hpp"
 
-MessageBus::MessageBus(zmqpp::context &ctx) :
-        ctx_(ctx),
-        pub_(nullptr),
-        pull_(nullptr),
-        running_(true)
+MessageBus::MessageBus(zmqpp::context &ctx)
+    : ctx_(ctx)
+    , pub_(nullptr)
+    , pull_(nullptr)
+    , running_(true)
 {
-    actor_ = new zmqpp::actor(std::bind(&MessageBus::run, this, std::placeholders::_1));
+    actor_ =
+        new zmqpp::actor(std::bind(&MessageBus::run, this, std::placeholders::_1));
 }
 
 MessageBus::~MessageBus()

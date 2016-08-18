@@ -28,28 +28,28 @@ namespace Module
 {
 namespace WebSockAPI
 {
-class WebSockAPIModule : public BaseModule  {
-      public:
-        WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                       const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+class WebSockAPIModule : public BaseModule
+{
+  public:
+    WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-        ~WebSockAPIModule() = default;
+    ~WebSockAPIModule() = default;
 
-        virtual void run() override;
+    virtual void run() override;
 
-        /**
-         * This module explicity expose CoreUtils to other
-         * object in the module.
-         */
-        CoreUtilsPtr core_utils();
+    /**
+     * This module explicity expose CoreUtils to other
+     * object in the module.
+     */
+    CoreUtilsPtr core_utils();
 
-      private:
-        /**
-         * Port to bind the websocket endpoint.
-         */
-        uint16_t port_;
+  private:
+    /**
+     * Port to bind the websocket endpoint.
+     */
+    uint16_t port_;
 };
-
 }
 }
 }

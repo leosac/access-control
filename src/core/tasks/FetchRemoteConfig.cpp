@@ -24,9 +24,9 @@ using namespace Leosac;
 using namespace Leosac::Tasks;
 
 FetchRemoteConfig::FetchRemoteConfig(const std::string &endpoint,
-                                     const std::string &pubkey) :
-        ctx_(),
-        collector_(ctx_, endpoint, pubkey)
+                                     const std::string &pubkey)
+    : ctx_()
+    , collector_(ctx_, endpoint, pubkey)
 {
     INFO("Creating FetchRemoteConfig task. Guid = " << get_guid());
 }

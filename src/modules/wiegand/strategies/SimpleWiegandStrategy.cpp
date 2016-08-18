@@ -26,12 +26,11 @@ using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
 
-SimpleWiegandStrategy::SimpleWiegandStrategy(WiegandReaderImpl *reader) :
-        CardReading(reader),
-        ready_(false),
-        nb_bits_(0)
+SimpleWiegandStrategy::SimpleWiegandStrategy(WiegandReaderImpl *reader)
+    : CardReading(reader)
+    , ready_(false)
+    , nb_bits_(0)
 {
-
 }
 
 void SimpleWiegandStrategy::timeout()
@@ -47,12 +46,12 @@ void SimpleWiegandStrategy::timeout()
     for (std::size_t i = 0; i < size; ++i)
     {
         card_hex << std::hex << std::setfill('0') << std::setw(2)
-            << static_cast<int>(reader_->buffer()[i]);
+                 << static_cast<int>(reader_->buffer()[i]);
         if (i + 1 < size)
             card_hex << ":";
     }
 
-    ready_ = true;
+    ready_   = true;
     nb_bits_ = reader_->counter();
     card_id_ = card_hex.str();
 }
@@ -68,7 +67,8 @@ void SimpleWiegandStrategy::signal(zmqpp::socket &sock)
     assert(card_id_.length());
 
     zmqpp::message msg;
-    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND << card_id_ << nb_bits_;
+    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::SIMPLE_WIEGAND
+        << card_id_ << nb_bits_;
     sock.send(msg);
 }
 
@@ -84,7 +84,7 @@ int SimpleWiegandStrategy::get_nb_bits() const
 
 void SimpleWiegandStrategy::reset()
 {
-    ready_ = false;
+    ready_   = false;
     card_id_ = "";
     nb_bits_ = 0;
     reader_->read_reset();

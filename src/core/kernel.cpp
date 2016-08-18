@@ -34,33 +34,30 @@
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/unixfs.hpp"
 
-#  include <odb/sqlite/database.hxx>
-#  include <odb/mysql/database.hxx>
+#include <odb/sqlite/database.hxx>
+#include <odb/mysql/database.hxx>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
 using namespace Leosac::Tools;
 using namespace Leosac;
 
-Kernel::Kernel(const boost::property_tree::ptree &config,
-               bool strict) :
-        utils_(std::make_shared<CoreUtils>(this,
-                       std::make_shared<Scheduler>(this),
-                       std::make_shared<ConfigChecker>(),
-                                           strict)),
-        config_manager_(config),
-        ctx_(),
-        bus_(ctx_),
-        control_(ctx_, zmqpp::socket_type::rep),
-        bus_push_(ctx_, zmqpp::socket_type::push),
-        is_running_(true),
-        want_restart_(false),
-        module_manager_(ctx_, *this),
-        network_config_(nullptr),
-        remote_controller_(nullptr),
-        send_sighup_(false),
-        autosave_(false),
-        start_time_(std::chrono::steady_clock::now())
+Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
+    : utils_(std::make_shared<CoreUtils>(this, std::make_shared<Scheduler>(this),
+                                         std::make_shared<ConfigChecker>(), strict))
+    , config_manager_(config)
+    , ctx_()
+    , bus_(ctx_)
+    , control_(ctx_, zmqpp::socket_type::rep)
+    , bus_push_(ctx_, zmqpp::socket_type::push)
+    , is_running_(true)
+    , want_restart_(false)
+    , module_manager_(ctx_, *this)
+    , network_config_(nullptr)
+    , remote_controller_(nullptr)
+    , send_sighup_(false)
+    , autosave_(false)
+    , start_time_(std::chrono::steady_clock::now())
 {
     configure_database();
     configure_logger();
@@ -68,16 +65,19 @@ Kernel::Kernel(const boost::property_tree::ptree &config,
 
     if (config.get_child_optional("network"))
     {
-        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(*this, config.get_child("network")));
+        network_config_ = std::unique_ptr<NetworkConfig>(
+            new NetworkConfig(*this, config.get_child("network")));
     }
     else
     {
-        network_config_ = std::unique_ptr<NetworkConfig>(new NetworkConfig(*this, boost::property_tree::ptree()));
+        network_config_ = std::unique_ptr<NetworkConfig>(
+            new NetworkConfig(*this, boost::property_tree::ptree()));
     }
 
     if (config.get_child_optional("remote"))
     {
-        remote_controller_ = std::unique_ptr<RemoteControl>(new RemoteControl(ctx_, *this, config.get_child("remote")));
+        remote_controller_ = std::unique_ptr<RemoteControl>(
+            new RemoteControl(ctx_, *this, config.get_child("remote")));
     }
 
     if (auto child = config.get_child_optional("autosave"))
@@ -96,7 +96,8 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
     std::string filename = opt.getParam("kernel-cfg");
 
     if (filename.empty())
-        throw CoreException("Invalid command line parameter. No kernel configuration file specified.");
+        throw CoreException("Invalid command line parameter. No kernel "
+                            "configuration file specified.");
 
     try
     {
@@ -107,7 +108,8 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
     }
     catch (ptree_error &e)
     {
-        std::throw_with_nested(ConfigException(filename, "Invalid main configuration"));
+        std::throw_with_nested(
+            ConfigException(filename, "Invalid main configuration"));
     }
 }
 
@@ -115,27 +117,24 @@ bool Kernel::run()
 {
     module_manager_init();
 
-    SignalHandler::registerCallback(Signal::SigInt, [this](Signal)
-    {
-        this->is_running_ = false;
-    });
+    SignalHandler::registerCallback(Signal::SigInt,
+                                    [this](Signal) { this->is_running_ = false; });
 
-    SignalHandler::registerCallback(Signal::SigTerm, [this](Signal)
-    {
-        this->is_running_ = false;
-    });
+    SignalHandler::registerCallback(Signal::SigTerm,
+                                    [this](Signal) { this->is_running_ = false; });
 
-    SignalHandler::registerCallback(Signal::SigHup, [this](Signal)
-    {
-        this->send_sighup_ = true;
-    });
+    SignalHandler::registerCallback(Signal::SigHup,
+                                    [this](Signal) { this->send_sighup_ = true; });
 
     // At this point all module should have properly initialized.
-    bus_push_.send(zmqpp::message() << "KERNEL" << "SYSTEM_READY");
+    bus_push_.send(zmqpp::message() << "KERNEL"
+                                    << "SYSTEM_READY");
 
     reactor_.add(control_, std::bind(&Kernel::handle_control_request, this));
     if (remote_controller_)
-        reactor_.add(remote_controller_->socket_, std::bind(&RemoteControl::handle_msg, remote_controller_.get()));
+        reactor_.add(
+            remote_controller_->socket_,
+            std::bind(&RemoteControl::handle_msg, remote_controller_.get()));
 
     while (is_running_)
     {
@@ -143,7 +142,8 @@ bool Kernel::run()
         utils_->scheduler().update(TargetThread::MAIN);
         if (send_sighup_)
         {
-            bus_push_.send(zmqpp::message() << "KERNEL" << "SIGHUP");
+            bus_push_.send(zmqpp::message() << "KERNEL"
+                                            << "SIGHUP");
             send_sighup_ = false;
         }
     }
@@ -160,11 +160,12 @@ void Kernel::module_manager_init()
 {
     try
     {
-        ptree plugin_dirs = config_manager_.kconfig().get_child("plugin_directories");
+        ptree plugin_dirs =
+            config_manager_.kconfig().get_child("plugin_directories");
 
         for (const auto &plugin_dir : plugin_dirs)
         {
-            std::string pname = plugin_dir.first;
+            std::string pname  = plugin_dir.first;
             std::string pvalue = plugin_dir.second.data();
 
             assert(pname == "plugindir");
@@ -177,19 +178,22 @@ void Kernel::module_manager_init()
             std::string pname = module.first;
             assert(pname == "module");
 
-            ptree module_conf = module.second;
+            ptree module_conf       = module.second;
             std::string module_file = module_conf.get_child("file").data();
             std::string module_name = module_conf.get_child("name").data();
 
-            // we store the conf in our ConfigManager object, the ModuleManager will use it later.
+            // we store the conf in our ConfigManager object, the ModuleManager will
+            // use it later.
             config_manager_.store_config(module_name, module_conf);
 
             if (!module_manager_.loadModule(module_name))
             {
                 std::string search_path;
 
-                search_path = boost::algorithm::join(module_manager().get_module_path(), "\n\t -> ");
-                throw LEOSACException("Cannot load modules. Search path was: \n\t -> " + search_path);
+                search_path = boost::algorithm::join(
+                    module_manager().get_module_path(), "\n\t -> ");
+                throw LEOSACException(
+                    "Cannot load modules. Search path was: \n\t -> " + search_path);
             }
         }
     }
@@ -212,13 +216,13 @@ void Kernel::handle_control_request()
 
     if (req == "RESTART")
     {
-        is_running_ = false;
+        is_running_   = false;
         want_restart_ = true;
         control_.send("OK");
     }
     else if (req == "RESET")
     {
-        is_running_ = false;
+        is_running_   = false;
         want_restart_ = true;
         factory_reset();
     }
@@ -250,12 +254,13 @@ void Kernel::factory_reset()
     // we need to restore factory config file.
     UnixShellScript script("cp -f");
 
-    std::string kernel_config_file = config_manager_.kconfig().get_child("kernel-cfg").data();
+    std::string kernel_config_file =
+        config_manager_.kconfig().get_child("kernel-cfg").data();
     INFO("Kernel config file path = " << kernel_config_file);
     INFO("RESTORING FACTORY CONFIG");
 
-    if (script.run(UnixShellScript::toCmdLine(factory_config_directory() + "/kernel.xml",
-            kernel_config_file)) != 0)
+    if (script.run(UnixShellScript::toCmdLine(
+            factory_config_directory() + "/kernel.xml", kernel_config_file)) != 0)
     {
         ERROR("Error restoring factory configuration...");
     }
@@ -294,7 +299,8 @@ void Kernel::set_netconfig(zmqpp::message *msg)
     to_save.get_child("kernel").erase("kernel-cfg");
     try
     {
-        Leosac::Tools::propertyTreeToXmlFile(to_save, config_manager_.kconfig().get_child("kernel-cfg").data());
+        Leosac::Tools::propertyTreeToXmlFile(
+            to_save, config_manager_.kconfig().get_child("kernel-cfg").data());
     }
     catch (std::exception &e)
     {
@@ -330,14 +336,14 @@ std::string Kernel::factory_config_directory() const
 {
     if (environ_.count(EnvironVar::FACTORY_CONFIG_DIR))
         return environ_.at(EnvironVar::FACTORY_CONFIG_DIR);
-   return Leosac::Tools::UnixFs::getCWD() + "/share/leosac/cfg/factory/";
+    return Leosac::Tools::UnixFs::getCWD() + "/share/leosac/cfg/factory/";
 }
 
 void Kernel::configure_logger()
 {
-    bool use_syslog                 = true;
-    bool use_database               = false;
-    std::string syslog_min_level    = "WARNING";
+    bool use_syslog              = true;
+    bool use_database            = false;
+    std::string syslog_min_level = "WARNING";
     std::shared_ptr<spdlog::logger> console;
 
     // Drop existing logger, if any. (This is for the case of a "in process" restart)
@@ -347,22 +353,26 @@ void Kernel::configure_logger()
     auto log_cfg_node = config_manager_.kconfig().get_child_optional("log");
     if (log_cfg_node)
     {
-        use_syslog          = log_cfg_node->get<bool>("enable_syslog", true);
-        use_database        = log_cfg_node->get<bool>("enable_database", false);
-        syslog_min_level    = log_cfg_node->get<std::string>("min_syslog", "WARNING");
+        use_syslog       = log_cfg_node->get<bool>("enable_syslog", true);
+        use_database     = log_cfg_node->get<bool>("enable_database", false);
+        syslog_min_level = log_cfg_node->get<std::string>("min_syslog", "WARNING");
     }
     if (use_syslog)
     {
-        auto syslog = spdlog::create("syslog", {std::make_shared<spdlog::sinks::syslog_sink>()});
-        syslog->set_level(static_cast<spdlog::level::level_enum>(LogHelper::log_level_from_string(syslog_min_level)));
+        auto syslog = spdlog::create(
+            "syslog", {std::make_shared<spdlog::sinks::syslog_sink>()});
+        syslog->set_level(static_cast<spdlog::level::level_enum>(
+            LogHelper::log_level_from_string(syslog_min_level)));
     }
     if (use_database)
     {
-        console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>(),
-            std::make_shared<Tools::DatabaseLogSink>(database_)});
+        console = spdlog::create(
+            "console", {std::make_shared<spdlog::sinks::stdout_sink_mt>(),
+                        std::make_shared<Tools::DatabaseLogSink>(database_)});
     }
     else
-        console = spdlog::create("console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
+        console = spdlog::create(
+            "console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
     console->set_level(spdlog::level::debug);
 }
 
@@ -379,8 +389,10 @@ ModuleManager &Kernel::module_manager()
 bool Kernel::save_config()
 {
     INFO("Saving current configuration to disk.");
-    std::string full_config = Tools::propertyTreeToXml(config_manager_.get_application_config());
-    std::string cfg_file_path = config_manager_.kconfig().get<std::string>("kernel-cfg");
+    std::string full_config =
+        Tools::propertyTreeToXml(config_manager_.get_application_config());
+    std::string cfg_file_path =
+        config_manager_.kconfig().get<std::string>("kernel-cfg");
 
     DEBUG("Will overwrite " << cfg_file_path << " in order to save configuration.");
     std::ofstream cfg_file(cfg_file_path);
@@ -403,7 +415,7 @@ ConfigManager &Kernel::config_manager()
 void Kernel::restart_later()
 {
     want_restart_ = true;
-    is_running_ = false;
+    is_running_   = false;
 }
 
 CoreUtilsPtr Kernel::core_utils()
@@ -444,23 +456,24 @@ void Kernel::configure_database()
         if (db_type == "sqlite")
         {
             std::string db_path = db_cfg_node->get<std::string>("path");
-            database_ = std::make_shared<odb::sqlite::database>(
+            database_           = std::make_shared<odb::sqlite::database>(
                 db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
         }
         else if (db_type == "mysql")
         {
-            std::string db_user = db_cfg_node->get<std::string>("username");
-            std::string db_pw = db_cfg_node->get<std::string>("password");
+            std::string db_user   = db_cfg_node->get<std::string>("username");
+            std::string db_pw     = db_cfg_node->get<std::string>("password");
             std::string db_dbname = db_cfg_node->get<std::string>("dbname");
-            std::string db_host = db_cfg_node->get<std::string>("host", "");
-            uint16_t db_port = db_cfg_node->get<uint16_t>("port", 0);
-            database_ = std::make_shared<odb::mysql::database>(db_user, db_pw, db_dbname, db_host, db_port);
+            std::string db_host   = db_cfg_node->get<std::string>("host", "");
+            uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
+            database_             = std::make_shared<odb::mysql::database>(
+                db_user, db_pw, db_dbname, db_host, db_port);
         }
         else
         {
-            throw ConfigException(config_manager_.kconfig().get<std::string>("kernel-cfg"),
-                                  "Unsupported database type: " + Colorize::underline(
-                                      db_type));
+            throw ConfigException(
+                config_manager_.kconfig().get<std::string>("kernel-cfg"),
+                "Unsupported database type: " + Colorize::underline(db_type));
         }
 
         // Create or update database.

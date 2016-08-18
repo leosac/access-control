@@ -32,9 +32,14 @@
 
 class FsException : public LEOSACException
 {
-public:
-    FsException(const std::string& message) : LEOSACException("Fs::" + message) {}
-    virtual ~FsException() {}
+  public:
+    FsException(const std::string &message)
+        : LEOSACException("Fs::" + message)
+    {
+    }
+    virtual ~FsException()
+    {
+    }
 };
 
 #endif // FSEXCEPTION_HPP

@@ -32,24 +32,28 @@
 
 namespace Leosac
 {
-    class ConfigManager;
+class ConfigManager;
 }
 
 /**
-* A second module manager that loads "ZMQ aware" module -- modules that talks to the application through message passing.
+* A second module manager that loads "ZMQ aware" module -- modules that talks to the
+* application through message passing.
 * A second loader is necessary because the procedure of loading a module differs.
-* No reference to an object is returned when loading a module. The module will lives in its own thread and other components
+* No reference to an object is returned when loading a module. The module will lives
+* in its own thread and other components
 * can talk to it.
 *
-* @note: Only the ModuleManager object has "direct access" to the module object. It is zmqpp::actor that launches the module
+* @note: Only the ModuleManager object has "direct access" to the module object. It
+* is zmqpp::actor that launches the module
 * in its own thread.
 *
 * @note: Use the "level" property to define module initialization order.
-* This initialization order is mandatory, and the lower the value is, the sooner the module is loaded.
+* This initialization order is mandatory, and the lower the value is, the sooner the
+* module is loaded.
 */
 class ModuleManager
 {
-public:
+  public:
     /**
     * Construct the module manager.
     * @param ctx the zeroMQ context to pass around to module.
@@ -98,21 +102,23 @@ public:
 
         bool operator<(const ModuleInfo &o) const;
 
-    private:
+      private:
         const Leosac::ConfigManager &cfg_;
     };
 
     /**
     * Actually call the init_module() function of each library we loaded.
     * The module initialization order is honored because the modules_ set is ordered.
-    * @throws: may throw ModuleException if init_module() fails for a library (or actor init exception).
+    * @throws: may throw ModuleException if init_module() fails for a library (or
+    * actor init exception).
     */
     void initModules();
 
     /**
     * Attempt to find a module using its name, then load it.
     * @return false if a module with this name cannot be found. True otherwise.
-    * @note Even if the module is found, loading it could fail. In that case, an exception would be thrown.
+    * @note Even if the module is found, loading it could fail. In that case, an
+    * exception would be thrown.
     */
     bool initModule(const std::string &name);
 
@@ -134,7 +140,8 @@ public:
 
     /**
     * Search the path and load a module based on a property tree for this module.
-    * Mandatory data are the module "name" and the "file" location (the name of the .so to load).
+    * Mandatory data are the module "name" and the "file" location (the name of the
+    * .so to load).
     *
     * The first file to match (looping over the path array) will be loaded.
     */
@@ -149,7 +156,8 @@ public:
     * Do we have some informations about the module "name".
     *
     * It returns true if we have it in our modules_ list. Returning true here means
-    * that we have a shared library handler, thus meaning the module is loaded (maybe not
+    * that we have a shared library handler, thus meaning the module is loaded (maybe
+    * not
     * initialized).
     */
     bool has_module(const std::string &name) const;
@@ -159,7 +167,7 @@ public:
     */
     const std::vector<std::string> &get_module_path() const;
 
-private:
+  private:
     /**
     * Close library handler.
     *
@@ -170,8 +178,10 @@ private:
     /**
     * Stop a module by name and remove its config info from the config manager.
     * @note This does not unload the underlying shared library.
-    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
-    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
+    * @note Stopping individual module must be done carefully. Be careful wrt
+    * dependencies between modules.
+    *       It's recommended to also stop modules that depends on the module you
+    * initially wanted to stop.
     * @return false if a module with this name cannot be found. True otherwise.
     * @warning OUTDATED
     */
@@ -180,8 +190,10 @@ private:
     /**
     * Stop a specific module and remove its config info from the config manager.
     * @note This does not unload the underlying shared library.
-    * @note Stopping individual module must be done carefully. Be careful wrt dependencies between modules.
-    *       It's recommended to also stop modules that depends on the module you initially wanted to stop.
+    * @note Stopping individual module must be done carefully. Be careful wrt
+    * dependencies between modules.
+    *       It's recommended to also stop modules that depends on the module you
+    * initially wanted to stop.
     * @warning OUTDATED
     */
     void stopModule(ModuleInfo *modinfo, bool soft = false);
@@ -190,8 +202,10 @@ private:
     ModuleInfo *find_module_by_name(const std::string &name) const;
 
     /**
-    * This will load (actually calling dlopen()) the library file located at full_path.
-    * It returns a DynamicLibrary pointer that can be used to retrieve symbol from the shared object.
+    * This will load (actually calling dlopen()) the library file located at
+    * full_path.
+    * It returns a DynamicLibrary pointer that can be used to retrieve symbol from
+    * the shared object.
     * It it failed, returns nullptr.
     */
     std::shared_ptr<DynamicLibrary> load_library_file(const std::string &full_path);
@@ -201,5 +215,5 @@ private:
 
     zmqpp::context &ctx_;
     Leosac::ConfigManager &config_manager_;
-    Leosac::CoreUtilsPtr  core_utils_;
+    Leosac::CoreUtilsPtr core_utils_;
 };

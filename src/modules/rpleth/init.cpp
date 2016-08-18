@@ -29,8 +29,7 @@
 
 using namespace Leosac::Module::Rpleth;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "RPLETH";
@@ -40,11 +39,10 @@ const char *get_module_name()
 /**
 * This function is the entry point of the Rpleth module.
 */
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx,
+                                                             utils);
 }

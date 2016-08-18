@@ -24,7 +24,8 @@
 using namespace Leosac::Auth;
 using SingleTimeFrame = Leosac::Tools::SingleTimeFrame;
 
-bool SimpleAccessProfile::isAccessGranted(const std::chrono::system_clock::time_point &date, AuthTargetPtr target)
+bool SimpleAccessProfile::isAccessGranted(
+    const std::chrono::system_clock::time_point &date, AuthTargetPtr target)
 {
     // check "general" permissions that apply to all target
     for (const auto &sched : default_schedule_)
@@ -51,7 +52,8 @@ bool SimpleAccessProfile::isAccessGranted(const std::chrono::system_clock::time_
     return false;
 }
 
-void SimpleAccessProfile::addAccessSchedule(AuthTargetPtr target, Leosac::Tools::Schedule const &sched)
+void SimpleAccessProfile::addAccessSchedule(AuthTargetPtr target,
+                                            Leosac::Tools::Schedule const &sched)
 {
     if (target)
         schedules_[target->name()].push_back(sched);
@@ -59,12 +61,14 @@ void SimpleAccessProfile::addAccessSchedule(AuthTargetPtr target, Leosac::Tools:
         default_schedule_.push_back(sched);
 }
 
-std::map<std::string, std::vector<Leosac::Tools::Schedule>> const &SimpleAccessProfile::schedules() const
+std::map<std::string, std::vector<Leosac::Tools::Schedule>> const &
+SimpleAccessProfile::schedules() const
 {
     return schedules_;
 }
 
-std::vector<Leosac::Tools::Schedule> const &SimpleAccessProfile::defaultSchedules() const
+std::vector<Leosac::Tools::Schedule> const &
+SimpleAccessProfile::defaultSchedules() const
 {
     return default_schedule_;
 }

@@ -23,18 +23,21 @@
 using namespace Leosac::Module::Instrumentation;
 
 InstrumentationModule::InstrumentationModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg,
-        CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils),
-        bus_push_(ctx, zmqpp::socket_type::push),
-        controller_(ctx, zmqpp::socket_type::router)
+                                             zmqpp::socket *pipe,
+                                             const boost::property_tree::ptree &cfg,
+                                             CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
+    , bus_push_(ctx, zmqpp::socket_type::push)
+    , controller_(ctx, zmqpp::socket_type::router)
 {
-    std::string bind_str = "ipc://" + config_.get_child("module_config").get<std::string>("ipc_endpoint");
+    std::string bind_str =
+        "ipc://" +
+        config_.get_child("module_config").get<std::string>("ipc_endpoint");
     controller_.bind(bind_str);
     INFO("Binding to: " << bind_str);
     bus_push_.connect("inproc://zmq-bus-pull");
-    reactor_.add(controller_, std::bind(&InstrumentationModule::handle_command, this));
+    reactor_.add(controller_,
+                 std::bind(&InstrumentationModule::handle_command, this));
 }
 
 void InstrumentationModule::handle_command()

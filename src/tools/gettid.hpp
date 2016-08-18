@@ -23,8 +23,8 @@
 
 namespace Leosac
 {
-    /**
-     * Return the Linux thread ID.
-     */
-    uint64_t gettid();
+/**
+ * Return the Linux thread ID.
+ */
+uint64_t gettid();
 }

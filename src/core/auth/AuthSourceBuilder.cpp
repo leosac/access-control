@@ -37,8 +37,9 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     if (!extract_source_name(source_name, &source_name))
     {
         // invalid message.
-        ERROR("Failed to extract source name: cannot construct the AuthSource object. " <<
-                "Source name was {" << source_name << "}");
+        ERROR(
+            "Failed to extract source name: cannot construct the AuthSource object. "
+            << "Source name was {" << source_name << "}");
         raise(SIGABRT);
     }
     if (type == SourceType::SIMPLE_WIEGAND)
@@ -51,7 +52,8 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     exit(-1);
 }
 
-bool AuthSourceBuilder::extract_source_name(const std::string &input, std::string *output) const
+bool AuthSourceBuilder::extract_source_name(const std::string &input,
+                                            std::string *output) const
 {
     assert(output);
     if (input.size() > 2 && input.substr(0, 2) == "S_")
@@ -62,9 +64,9 @@ bool AuthSourceBuilder::extract_source_name(const std::string &input, std::strin
     return false;
 }
 
-IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
-        const std::string &name,
-        zmqpp::message *msg)
+IAuthenticationSourcePtr
+AuthSourceBuilder::create_simple_wiegand(const std::string &name,
+                                         zmqpp::message *msg)
 {
     // card id and number of bit shall be left.
     assert(msg && msg->remaining() == 2);
@@ -74,15 +76,17 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_simple_wiegand(
 
     *msg >> card_id >> bits;
 
-    INFO("Building an AuthSource object (WiegandCard): " << card_id << " with " <<
-            bits << " significants bits. Source name = " << name);
+    INFO("Building an AuthSource object (WiegandCard): "
+         << card_id << " with " << bits
+         << " significants bits. Source name = " << name);
     BaseAuthSourcePtr auth_source(new WiegandCard(card_id, bits));
     auth_source->name(name);
 
     return auth_source;
 }
 
-IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin(const std::string &name, zmqpp::message *msg)
+IAuthenticationSourcePtr
+AuthSourceBuilder::create_wiegand_pin(const std::string &name, zmqpp::message *msg)
 {
     // pin code only
     assert(msg && msg->remaining() == 1);
@@ -90,14 +94,17 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_pin(const std::string
     std::string pin;
     *msg >> pin;
 
-    INFO("Building an AuthSource object (PINCode): " << pin << ". Source name = " << name);
+    INFO("Building an AuthSource object (PINCode): " << pin
+                                                     << ". Source name = " << name);
     BaseAuthSourcePtr auth_source(new PINCode(pin));
     auth_source->name(name);
 
     return auth_source;
 }
 
-IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_card_pin(const std::string &name, zmqpp::message *msg)
+IAuthenticationSourcePtr
+AuthSourceBuilder::create_wiegand_card_pin(const std::string &name,
+                                           zmqpp::message *msg)
 {
     // card id; nb bits; pin
     assert(msg && msg->remaining() == 3);
@@ -107,8 +114,8 @@ IAuthenticationSourcePtr AuthSourceBuilder::create_wiegand_card_pin(const std::s
     std::string pin_code;
 
     *msg >> card_id >> bits >> pin_code;
-    INFO("Building an AuthSource object (Wiegand Card + Pin):" << card_id
-            << ", " << pin_code << ". Source name = " << name);
+    INFO("Building an AuthSource object (Wiegand Card + Pin):"
+         << card_id << ", " << pin_code << ". Source name = " << name);
     BaseAuthSourcePtr auth_source(new WiegandCardPin(card_id, bits, pin_code));
     auth_source->name(name);
 

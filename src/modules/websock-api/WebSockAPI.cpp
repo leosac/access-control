@@ -30,9 +30,9 @@ using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
 WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                                               const boost::property_tree::ptree &cfg,
-                                               CoreUtilsPtr utils) :
-    BaseModule(ctx, pipe, cfg, utils)
+                                   const boost::property_tree::ptree &cfg,
+                                   CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
 {
     port_ = cfg.get<uint16_t>("module_config.port", 8976);
 }

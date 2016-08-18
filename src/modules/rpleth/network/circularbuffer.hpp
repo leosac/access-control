@@ -33,47 +33,47 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        namespace Rpleth
-        {
-            /**
-            * Implementation of a ring buffer.
-            */
-            class CircularBuffer
-            {
-                static const std::size_t DefaultSize = 8192;
+namespace Module
+{
+namespace Rpleth
+{
+/**
+* Implementation of a ring buffer.
+*/
+class CircularBuffer
+{
+    static const std::size_t DefaultSize = 8192;
 
-            public:
-                CircularBuffer(std::size_t size = DefaultSize);
+  public:
+    CircularBuffer(std::size_t size = DefaultSize);
 
-                ~CircularBuffer() = default;
+    ~CircularBuffer() = default;
 
-            public:
-                std::size_t read(Byte *data, std::size_t size);
+  public:
+    std::size_t read(Byte *data, std::size_t size);
 
-                std::size_t write(const Byte *data, std::size_t size);
+    std::size_t write(const Byte *data, std::size_t size);
 
-                Byte        operator[](int idx) const;
+    Byte operator[](int idx) const;
 
-                void fastForward(std::size_t offset);
+    void fastForward(std::size_t offset);
 
-                void reset();
+    void reset();
 
-                std::size_t getSize() const;
+    std::size_t getSize() const;
 
-                std::size_t toRead() const;
+    std::size_t toRead() const;
 
-                bool isEmpty() const;
+    bool isEmpty() const;
 
-            private:
-                std::vector<Byte> _buffer;
-                std::size_t _size;
-                std::size_t _rIdx;
-                std::size_t _wIdx;
-                std::size_t _toRead;
-            };
-        }
-    }
+  private:
+    std::vector<Byte> _buffer;
+    std::size_t _size;
+    std::size_t _rIdx;
+    std::size_t _wIdx;
+    std::size_t _toRead;
+};
+}
+}
 }
 #endif // CIRCULARBUFFER_HPP

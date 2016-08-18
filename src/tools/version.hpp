@@ -30,38 +30,38 @@
 
 namespace Leosac
 {
-    namespace Tools
-    {
-        class Version
-        {
-            Version() = delete;
+namespace Tools
+{
+class Version
+{
+    Version() = delete;
 
-        public:
-            /**
-            * return semver compatible version string formatted this way: MAJOR.MINOR.PATCH
-            * @see getVersionString()
-            * @return version string
-            */
-            static std::string buildVersionString(int major, int minor, int patch);
+  public:
+    /**
+    * return semver compatible version string formatted this way: MAJOR.MINOR.PATCH
+    * @see getVersionString()
+    * @return version string
+    */
+    static std::string buildVersionString(int major, int minor, int patch);
 
-            /**
-            * compare two version strings using semver v2.0.0
-            * @see getVersionString()
-            * @return 0 on match, -1 if a older than b, 1 if a is newer than b
-            */
-            static int versionCompare(std::string a, std::string b);
+    /**
+    * compare two version strings using semver v2.0.0
+    * @see getVersionString()
+    * @return 0 on match, -1 if a older than b, 1 if a is newer than b
+    */
+    static int versionCompare(std::string a, std::string b);
 
-            /**
-            * check validity of a semver version string
-            * @see getVersionString()
-            * @return true if the version is valid
-            */
-            static bool isVersionValid(const std::string &v);
+    /**
+    * check validity of a semver version string
+    * @see getVersionString()
+    * @return true if the version is valid
+    */
+    static bool isVersionValid(const std::string &v);
 
-        private:
-            static const std::string validChars;
-        };
-    }
+  private:
+    static const std::string validChars;
+};
+}
 }
 
 #endif // VERSION_HPP

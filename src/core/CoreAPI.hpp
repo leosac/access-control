@@ -44,36 +44,36 @@ class Kernel;
  */
 class CoreAPI
 {
-      public:
-        explicit CoreAPI(Kernel &k);
+  public:
+    explicit CoreAPI(Kernel &k);
 
-        /**
-         * Retrieve the local configuration version.
-         */
-        uint64_t config_version() const;
+    /**
+     * Retrieve the local configuration version.
+     */
+    uint64_t config_version() const;
 
-        /**
-         * Retrieve the property tree describing the Leosac's kernel
-         * configuration.
-         */
-        boost::property_tree::ptree kernel_config() const;
+    /**
+     * Retrieve the property tree describing the Leosac's kernel
+     * configuration.
+     */
+    boost::property_tree::ptree kernel_config() const;
 
-        /**
-         * Returns the `instance_name` of Leosac.
-         */
-        std::string instance_name() const;
+    /**
+     * Returns the `instance_name` of Leosac.
+     */
+    std::string instance_name() const;
 
-        /**
-         * Returns the uptime, in seconds.
-         */
-        uint64_t uptime() const;
+    /**
+     * Returns the uptime, in seconds.
+     */
+    uint64_t uptime() const;
 
-        /**
-         * Retrieve the names of all enabled modules.
-         */
-        std::vector<std::string> modules_names() const;
+    /**
+     * Retrieve the names of all enabled modules.
+     */
+    std::vector<std::string> modules_names() const;
 
-      private:
-        Kernel &kernel_;
+  private:
+    Kernel &kernel_;
 };
 }

@@ -6,7 +6,7 @@ StdinControllerModule::StdinControllerModule(zmqpp::context &ctx,
                                              zmqpp::socket *pipe,
                                              boost::property_tree::ptree const &cfg,
                                              CoreUtilsPtr utils)
-        : BaseModule(ctx, pipe, cfg, utils)
+    : BaseModule(ctx, pipe, cfg, utils)
 {
     reactor_.add(0, std::bind(&StdinControllerModule::handleStdin, this));
 }
@@ -30,7 +30,7 @@ void StdinControllerModule::handleStdin()
         if (endpoints_.count(target) == 0)
         {
             endpoints_[target] = std::shared_ptr<zmqpp::socket>(
-                    new zmqpp::socket(ctx_, zmqpp::socket_type::req));
+                new zmqpp::socket(ctx_, zmqpp::socket_type::req));
             endpoints_[target]->connect("inproc://" + target);
         }
 
@@ -43,10 +43,11 @@ void StdinControllerModule::handleStdin()
     }
 }
 
-static bool is_number(const std::string& s)
+static bool is_number(const std::string &s)
 {
-    return !s.empty() && std::find_if(s.begin(),
-        s.end(), [](char c) { return !std::isdigit(c); }) == s.end();
+    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) {
+                             return !std::isdigit(c);
+                         }) == s.end();
 }
 
 bool StdinControllerModule::send_request(std::shared_ptr<zmqpp::socket> target,

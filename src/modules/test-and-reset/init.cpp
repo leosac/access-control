@@ -24,8 +24,7 @@
 
 using namespace Leosac::Module::TestAndReset;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "TEST_AND_RESET";
@@ -35,12 +34,10 @@ const char *get_module_name()
 /**
 * This function is the entry point of the Test And Reset module.
 */
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<TestAndResetModule>(pipe, cfg, zmq_ctx,
-                                                                   utils);
+    return Leosac::Module::start_module_helper<TestAndResetModule>(pipe, cfg,
+                                                                   zmq_ctx, utils);
 }

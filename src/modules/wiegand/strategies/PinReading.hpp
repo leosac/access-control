@@ -23,33 +23,33 @@
 
 namespace Leosac
 {
-    namespace Module
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+class PinReading;
+
+using PinReadingUPtr = std::unique_ptr<PinReading>;
+
+/**
+* Interface for a strategy that read a PIN code.
+*/
+class PinReading : public WiegandStrategy
+{
+  public:
+    PinReading(WiegandReaderImpl *reader)
+        : WiegandStrategy(reader)
     {
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                class PinReading;
-
-                using PinReadingUPtr = std::unique_ptr<PinReading>;
-
-                /**
-                * Interface for a strategy that read a PIN code.
-                */
-                class PinReading : public WiegandStrategy
-                {
-                public:
-                    PinReading(WiegandReaderImpl *reader) :
-                            WiegandStrategy(reader)
-                    {
-                    }
-
-                    /**
-                    * Retrieve the pin code that was read from the reader.
-                    */
-                    virtual const std::string &get_pin() const = 0;
-                };
-            }
-        }
     }
+
+    /**
+    * Retrieve the pin code that was read from the reader.
+    */
+    virtual const std::string &get_pin() const = 0;
+};
+}
+}
+}
 }

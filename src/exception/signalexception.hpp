@@ -32,9 +32,14 @@
 
 class SignalException : public LEOSACException
 {
-public:
-    SignalException(const std::string& message) : LEOSACException("Signal::" + message) {}
-    virtual ~SignalException() {}
+  public:
+    SignalException(const std::string &message)
+        : LEOSACException("Signal::" + message)
+    {
+    }
+    virtual ~SignalException()
+    {
+    }
 };
 
 #endif // SIGNALEXCEPTION_HPP

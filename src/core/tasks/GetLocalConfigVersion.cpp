@@ -22,8 +22,8 @@
 #include "GetLocalConfigVersion.hpp"
 #include "core/kernel.hpp"
 
-Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k) :
-        kernel_(k)
+Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k)
+    : kernel_(k)
 {
     INFO("Creating GetLocalConfigVersion task. Guid = " << get_guid());
 }

@@ -24,35 +24,33 @@
 
 namespace Leosac
 {
-    namespace Tasks
-    {
-        /**
-         * Sync the configuration using the configuration fetched from the master
-         * server.
-         *
-         * @note This tasks needs to run on the main thread.
-         * @note The configuration must have been already fetched.
-         */
-        class SyncConfig : public Task
-        {
-        public:
-            SyncConfig(Kernel &kref,
-                       FetchRemoteConfigPtr fetch_task,
-                       bool sync_general_config,
-                       bool autocommit);
+namespace Tasks
+{
+/**
+ * Sync the configuration using the configuration fetched from the master
+ * server.
+ *
+ * @note This tasks needs to run on the main thread.
+ * @note The configuration must have been already fetched.
+ */
+class SyncConfig : public Task
+{
+  public:
+    SyncConfig(Kernel &kref, FetchRemoteConfigPtr fetch_task,
+               bool sync_general_config, bool autocommit);
 
-        private:
-            virtual bool do_run();
-            void sync_config();
+  private:
+    virtual bool do_run();
+    void sync_config();
 
-            Kernel &kernel_;
-            /**
-             * The task that fetch the data.
-             */
-            FetchRemoteConfigPtr fetch_task_;
+    Kernel &kernel_;
+    /**
+     * The task that fetch the data.
+     */
+    FetchRemoteConfigPtr fetch_task_;
 
-            bool sync_general_config_;
-            bool autocommit_;
-        };
-    }
+    bool sync_general_config_;
+    bool autocommit_;
+};
+}
 }

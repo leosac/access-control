@@ -25,40 +25,39 @@
 
 namespace Leosac
 {
-    namespace Tools
-    {
-        /**
-        * Load a list of schedules from a boost::property_tree.
-        *
-        * The format is defined [here](@ref mod_auth_sched_declare).
-        * This class was introduced to avoid code duplication.
-        */
-        class XmlScheduleLoader
-        {
-        public:
-            /**
-            * Load all schedules from a tree and stores them in the map.
-            */
-            bool load(const boost::property_tree::ptree &t);
+namespace Tools
+{
+/**
+* Load a list of schedules from a boost::property_tree.
+*
+* The format is defined [here](@ref mod_auth_sched_declare).
+* This class was introduced to avoid code duplication.
+*/
+class XmlScheduleLoader
+{
+  public:
+    /**
+    * Load all schedules from a tree and stores them in the map.
+    */
+    bool load(const boost::property_tree::ptree &t);
 
-            /**
-            * Helper function.
-            */
-            static int week_day_to_int(const std::string &day);
+    /**
+    * Helper function.
+    */
+    static int week_day_to_int(const std::string &day);
 
-            /**
-            * Access the map of stored schedules.
-            */
-            const std::map<std::string, Schedule> &schedules() const;
+    /**
+    * Access the map of stored schedules.
+    */
+    const std::map<std::string, Schedule> &schedules() const;
 
-        private:
-            /**
-            * Adds a new schedule to the map.
-            */
-            bool extract_one(const boost::property_tree::ptree &node);
+  private:
+    /**
+    * Adds a new schedule to the map.
+    */
+    bool extract_one(const boost::property_tree::ptree &node);
 
-            std::map<std::string, Schedule> schedules_;
-        };
-
-    }
+    std::map<std::string, Schedule> schedules_;
+};
+}
 }

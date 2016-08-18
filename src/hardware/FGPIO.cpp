@@ -23,9 +23,9 @@
 
 using namespace Leosac::Hardware;
 
-FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name) :
-        gpio_name_(gpio_name),
-        backend_(ctx, zmqpp::socket_type::req)
+FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name)
+    : gpio_name_(gpio_name)
+    , backend_(ctx, zmqpp::socket_type::req)
 {
     backend_.connect("inproc://" + gpio_name);
     poller_.add(backend_);

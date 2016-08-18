@@ -25,11 +25,14 @@ using namespace Leosac::Auth;
 
 using SingleTimeFrame = Leosac::Tools::SingleTimeFrame;
 
-IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1, std::shared_ptr<const IAccessProfile> p2)
+IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1,
+                                       std::shared_ptr<const IAccessProfile> p2)
 {
     assert(p1 && p2);
-    const SimpleAccessProfile *t_p1 = dynamic_cast<const SimpleAccessProfile *>(p1.get());
-    const SimpleAccessProfile *t_p2 = dynamic_cast<const SimpleAccessProfile *>(p2.get());
+    const SimpleAccessProfile *t_p1 =
+        dynamic_cast<const SimpleAccessProfile *>(p1.get());
+    const SimpleAccessProfile *t_p2 =
+        dynamic_cast<const SimpleAccessProfile *>(p2.get());
     assert(t_p1 && t_p2);
 
     SimpleAccessProfilePtr result(new SimpleAccessProfile());

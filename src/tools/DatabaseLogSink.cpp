@@ -27,8 +27,8 @@
 using namespace Leosac;
 using namespace Leosac::Tools;
 
-DatabaseLogSink::DatabaseLogSink(DBPtr database) :
-    database_(database)
+DatabaseLogSink::DatabaseLogSink(DBPtr database)
+    : database_(database)
 {
     std::cout << "ENABLING SQLITE LOGGER!" << std::endl;
     assert(database_);
@@ -40,11 +40,11 @@ void DatabaseLogSink::log(const spdlog::details::log_msg &msg)
 {
     LogEntry entry;
 
-    entry.level_ = msg.level;
-    entry.msg_ = msg.formatted.str();
+    entry.level_     = msg.level;
+    entry.msg_       = msg.formatted.str();
     entry.thread_id_ = msg.thread_id;
     entry.timestamp_ = time_point_ptime(msg.time);
-    entry.run_id_ = run_id_;
+    entry.run_id_    = run_id_;
 
     {
         using namespace odb;

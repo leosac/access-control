@@ -38,17 +38,18 @@ bool RuntimeOptions::isSet(Flag flag) const
     return (_flags.test(flag));
 }
 
-void RuntimeOptions::setParam(const std::string& key, const std::string& value)
+void RuntimeOptions::setParam(const std::string &key, const std::string &value)
 {
     _params[key] = value;
 }
 
-const std::string& RuntimeOptions::getParam(const std::string& key) const
+const std::string &RuntimeOptions::getParam(const std::string &key) const
 {
     if (_params.count(key) > 0)
         return (_params.at(key));
     else
-        throw std::runtime_error("RuntimeOptions::getParam [key = " + key + "] [value = " + DefaultEmptyParam + "]");
+        throw std::runtime_error("RuntimeOptions::getParam [key = " + key +
+                                 "] [value = " + DefaultEmptyParam + "]");
 }
 
 bool RuntimeOptions::hasParam(const std::string &key) const

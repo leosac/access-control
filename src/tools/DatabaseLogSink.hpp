@@ -32,25 +32,23 @@ namespace Tools
  */
 class DatabaseLogSink : public spdlog::sinks::sink
 {
-      public:
+  public:
+    /**
+     * Construct a SQLite backed log sink.
+     * @param database A non null pointer to a ODB database object.
+     */
+    DatabaseLogSink(DBPtr database);
 
-        /**
-         * Construct a SQLite backed log sink.
-         * @param database A non null pointer to a ODB database object.
-         */
-        DatabaseLogSink(DBPtr database);
+    virtual void log(const spdlog::details::log_msg &msg) override;
 
-        virtual void log(const spdlog::details::log_msg &msg) override;
+    virtual void flush() override
+    {
+        // Noop as writing to a SQL database is transactional.
+    }
 
-        virtual void flush() override
-        {
-            // Noop as writing to a SQL database is transactional.
-        }
-
-        private:
-        DBPtr database_;
-        std::string run_id_;
-
+  private:
+    DBPtr database_;
+    std::string run_id_;
 };
 }
 }

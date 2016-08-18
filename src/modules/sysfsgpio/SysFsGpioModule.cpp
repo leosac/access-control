@@ -38,9 +38,9 @@ SysFsGpioModule::SysFsGpioModule(zmqpp::context &ctx,
                                  zmqpp::socket *module_manager_pipe,
                                  const boost::property_tree::ptree &config,
                                  CoreUtilsPtr utils)
-        : BaseModule(ctx, module_manager_pipe, config, utils),
-          bus_push_(ctx_, zmqpp::socket_type::push),
-          general_cfg_(nullptr)
+    : BaseModule(ctx, module_manager_pipe, config, utils)
+    , bus_push_(ctx_, zmqpp::socket_type::push)
+    , general_cfg_(nullptr)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     process_config(config);
@@ -82,28 +82,28 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
         int gpio_no;
         bool gpio_initial_value;
 
-        gpio_name = gpio_cfg.get_child("name").data();
-        gpio_no = std::stoi(gpio_cfg.get_child("no").data());
-        gpio_direction = gpio_cfg.get_child("direction").data();
-        gpio_interrupt = gpio_cfg.get<std::string>("interrupt_mode", "none");
+        gpio_name          = gpio_cfg.get_child("name").data();
+        gpio_no            = std::stoi(gpio_cfg.get_child("no").data());
+        gpio_direction     = gpio_cfg.get_child("direction").data();
+        gpio_interrupt     = gpio_cfg.get<std::string>("interrupt_mode", "none");
         gpio_initial_value = gpio_cfg.get<bool>("value", false);
 
         using namespace Colorize;
         INFO("Creating GPIO " << green(underline(gpio_name)) << ", with no "
-                     << green(underline(gpio_no)) <<
-                     ". direction = " << green(underline(gpio_direction)));
+                              << green(underline(gpio_no)) << ". direction = "
+                              << green(underline(gpio_direction)));
 
         export_gpio(gpio_no);
         interrupt_mode = gpio_interrupt_from_string(gpio_interrupt);
 
         direction = (gpio_direction == "in" ? SysFsGpioPin::Direction::In
                                             : SysFsGpioPin::Direction::Out);
-        gpios_.push_back(
-                new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction, interrupt_mode,
-                                 gpio_initial_value, *this));
+        gpios_.push_back(new SysFsGpioPin(ctx_, gpio_name, gpio_no, direction,
+                                          interrupt_mode, gpio_initial_value,
+                                          *this));
 
-        utils_->config_checker().register_object(gpio_name, ConfigChecker::ObjectType::GPIO);
-
+        utils_->config_checker().register_object(gpio_name,
+                                                 ConfigChecker::ObjectType::GPIO);
     }
 }
 
@@ -137,15 +137,16 @@ const SysFsGpioConfig &SysFsGpioModule::general_config() const
 
 void SysFsGpioModule::run()
 {
-     while (is_running_)
+    while (is_running_)
     {
-        auto itr_transform = [] (const SysFsGpioPin *p) -> std::chrono::system_clock::time_point
-        {
+        auto itr_transform =
+            [](const SysFsGpioPin *p) -> std::chrono::system_clock::time_point {
             return p->next_update();
         };
 
-        auto timeout = Tools::compute_timeout(boost::make_transform_iterator(gpios_.begin(), itr_transform),
-                                              boost::make_transform_iterator(gpios_.end(), itr_transform));
+        auto timeout = Tools::compute_timeout(
+            boost::make_transform_iterator(gpios_.begin(), itr_transform),
+            boost::make_transform_iterator(gpios_.end(), itr_transform));
         reactor_.poll(timeout);
         for (auto &gpio_pin : gpios_)
         {

@@ -24,24 +24,23 @@
 
 namespace Leosac
 {
-    namespace Tasks
-    {
-        /**
-         * Run in the main thread and retrieve the current configuration version.
-         *
-         * This is done by querying the kernel's configuration manager.
-         */
-        class GetLocalConfigVersion : public Task
-        {
-        public:
-            GetLocalConfigVersion(Kernel &k);
-            uint64_t config_version_;
+namespace Tasks
+{
+/**
+ * Run in the main thread and retrieve the current configuration version.
+ *
+ * This is done by querying the kernel's configuration manager.
+ */
+class GetLocalConfigVersion : public Task
+{
+  public:
+    GetLocalConfigVersion(Kernel &k);
+    uint64_t config_version_;
 
-        private:
-            virtual bool do_run() override;
+  private:
+    virtual bool do_run() override;
 
-            Kernel &kernel_;
-        };
-    }
+    Kernel &kernel_;
+};
 }
-
+}

@@ -33,81 +33,80 @@ namespace Module
 {
 namespace WebSockAPI
 {
-class WSServer {
-      public:
+class WSServer
+{
+  public:
+    /**
+     * @param database A (non-null) pointer to the
+     * database.
+     */
+    WSServer(WebSockAPIModule &module, DBPtr database);
 
-        /**
-         * @param database A (non-null) pointer to the
-         * database.
-         */
-        WSServer(WebSockAPIModule &module, DBPtr database);
+    using Server           = websocketpp::server<websocketpp::config::asio>;
+    using ConnectionAPIMap = std::map<websocketpp::connection_hdl, APIPtr,
+                                      std::owner_less<websocketpp::connection_hdl>>;
 
-        using Server = websocketpp::server<websocketpp::config::asio>;
-        using ConnectionAPIMap = std::map<websocketpp::connection_hdl,
-            APIPtr,
-            std::owner_less<websocketpp::connection_hdl>>;
+    void run(uint16_t port);
 
-        void run(uint16_t port);
+    Server srv_;
 
-        Server srv_;
+    /**
+     * Start the process of shutting down the server.
+     *
+     * The server will stop listening for new connection and will
+     * attempt to close existing one.
+     */
+    void start_shutdown();
 
-        /**
-         * Start the process of shutting down the server.
-         *
-         * The server will stop listening for new connection and will
-         * attempt to close existing one.
-         */
-        void start_shutdown();
+    /**
+     * Retrieve the authentication helper.
+     */
+    APIAuth &auth();
 
-        /**
-         * Retrieve the authentication helper.
-         */
-        APIAuth &auth();
+    /**
+     * Retrieve database handle
+     */
+    DBPtr db();
 
-        /**
-         * Retrieve database handle
-         */
-        DBPtr db();
+    /**
+     * Retrieve the CoreUtils pointer.
+     */
+    CoreUtilsPtr core_utils();
 
-        /**
-         * Retrieve the CoreUtils pointer.
-         */
-        CoreUtilsPtr core_utils();
+  private:
+    using json = nlohmann::json;
 
-      private:
-        using json = nlohmann::json;
+    void on_open(websocketpp::connection_hdl hdl);
 
-        void on_open(websocketpp::connection_hdl hdl);
+    void on_close(websocketpp::connection_hdl hdl);
 
-        void on_close(websocketpp::connection_hdl hdl);
+    void on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg);
 
-        void on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg);
+    /**
+     * Process a request from a client.
+     * The proper implementation method of WebSockAPI::API is called.
+     */
+    json dispatch_request(APIPtr api_handle, json &in);
 
-        /**
-         * Process a request from a client.
-         * The proper implementation method of WebSockAPI::API is called.
-         */
-        json dispatch_request(APIPtr api_handle, json &in);
+    ConnectionAPIMap connection_api_;
+    APIAuth auth_;
 
-        ConnectionAPIMap connection_api_;
-        APIAuth auth_;
+    /**
+     * This maps (string) command name to API method.
+     */
+    std::map<std::string, json (API::*)(const json &)> handlers_;
 
-        /**
-         * This maps (string) command name to API method.
-         */
-        std::map<std::string, json (API::*)(const json &)> handlers_;
+    /**
+     * Handler to the database.
+     */
+    DBPtr db_;
 
-        /**
-         * Handler to the database.
-         */
-        DBPtr db_;
-
-        /**
-         * A reference to the module.
-         *
-         * The module is guaranteed to outlive the WSServer.
-         */
-        WebSockAPIModule &module_;
+    /**
+     * A reference to the module.
+     *
+     * The module is guaranteed to outlive the WSServer.
+     */
+    WebSockAPIModule &module_;
 };
 }
 }

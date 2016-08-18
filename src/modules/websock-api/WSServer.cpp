@@ -27,10 +27,10 @@ using namespace Leosac::Module::WebSockAPI;
 
 using json = nlohmann::json;
 
-WSServer::WSServer(WebSockAPIModule &module, DBPtr database) :
-    auth_(*this),
-    db_(database),
-    module_(module)
+WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
+    : auth_(*this)
+    , db_(database)
+    , module_(module)
 {
     assert(db_);
     using websocketpp::lib::placeholders::_1;
@@ -44,19 +44,18 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database) :
     // clear all logs.
     srv_.clear_access_channels(websocketpp::log::alevel::all);
 
-    handlers_["get_leosac_version"] = &API::get_leosac_version;
-    handlers_["create_auth_token"] = &API::create_auth_token;
+    handlers_["get_leosac_version"]      = &API::get_leosac_version;
+    handlers_["create_auth_token"]       = &API::create_auth_token;
     handlers_["authenticate_with_token"] = &API::authenticate_with_token;
-    handlers_["logout"] = &API::logout;
-    handlers_["system_overview"] = &API::system_overview;
-    handlers_["get_logs"] = &API::get_logs;
+    handlers_["logout"]                  = &API::logout;
+    handlers_["system_overview"]         = &API::system_overview;
+    handlers_["get_logs"]                = &API::get_logs;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
 {
     INFO("New WebSocket connection !");
-    connection_api_.insert(std::make_pair(hdl,
-                                          std::make_shared<API>(*this)));
+    connection_api_.insert(std::make_pair(hdl, std::make_shared<API>(*this)));
 }
 
 void WSServer::on_close(websocketpp::connection_hdl hdl)
@@ -79,7 +78,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         json rep;
 
         rep["content"] = dispatch_request(api_handle, req);
-        rep["uuid"] = req["uuid"];
+        rep["uuid"]    = req["uuid"];
         srv_.send(hdl, rep.dump(4), websocketpp::frame::opcode::text);
     }
     catch (const std::exception &e)
@@ -112,7 +111,7 @@ APIAuth &WSServer::auth()
 
 json WSServer::dispatch_request(APIPtr api_handle, json &in)
 {
-    auto command = in.at("cmd");
+    auto command        = in.at("cmd");
     auto handler_method = handlers_.find(command);
     json content;
 

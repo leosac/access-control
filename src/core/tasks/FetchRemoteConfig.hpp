@@ -25,28 +25,27 @@
 
 namespace Leosac
 {
-    namespace Tasks
-    {
-        /**
-         * Fetch the configuration from master server.
-         *
-         * This tasks should be scheduled in a pool thread.
-         */
-        class FetchRemoteConfig : public Task
-        {
-        public:
-            FetchRemoteConfig(const std::string &endpoint,
-                              const std::string &pubkey);
+namespace Tasks
+{
+/**
+ * Fetch the configuration from master server.
+ *
+ * This tasks should be scheduled in a pool thread.
+ */
+class FetchRemoteConfig : public Task
+{
+  public:
+    FetchRemoteConfig(const std::string &endpoint, const std::string &pubkey);
 
-            static constexpr const int timeout = 2000;
+    static constexpr const int timeout = 2000;
 
-            const RemoteConfigCollector &collector() const;
+    const RemoteConfigCollector &collector() const;
 
-        private:
-            virtual bool do_run() override;
+  private:
+    virtual bool do_run() override;
 
-            zmqpp::context ctx_;
-            RemoteConfigCollector collector_;
-        };
-    }
+    zmqpp::context ctx_;
+    RemoteConfigCollector collector_;
+};
+}
 }

@@ -36,14 +36,13 @@
 
 using namespace Leosac;
 
-RemoteControl::RemoteControl(zmqpp::context &ctx,
-                             Kernel &kernel,
-                             const boost::property_tree::ptree &cfg) :
-        kernel_(kernel),
-        socket_(ctx, zmqpp::socket_type::router),
-        auth_(ctx),
-        context_(ctx),
-        security_(cfg)
+RemoteControl::RemoteControl(zmqpp::context &ctx, Kernel &kernel,
+                             const boost::property_tree::ptree &cfg)
+    : kernel_(kernel)
+    , socket_(ctx, zmqpp::socket_type::router)
+    , auth_(ctx)
+    , context_(ctx)
+    , security_(cfg)
 {
     auth_.configure_curve("CURVE_ALLOW_ANY");
     process_config(cfg);
@@ -57,33 +56,34 @@ void RemoteControl::process_config(const boost::property_tree::ptree &cfg)
     public_key_ = cfg.get<std::string>("public_key");
 
     INFO("Enabling Remote Control:"
-         << "\n\t " << "Port: " << port
-         << "\n\t " << "Public Key: " << public_key_
-         << "\n\t " << "Private Key: " << secret_key_);
+         << "\n\t "
+         << "Port: " << port << "\n\t "
+         << "Public Key: " << public_key_ << "\n\t "
+         << "Private Key: " << secret_key_);
 
-    command_handlers_["MODULE_CONFIG"] = std::bind(&RemoteControl::handle_module_config,
-                                                   this, std::placeholders::_1,
-                                                   std::placeholders::_2);
+    command_handlers_["MODULE_CONFIG"] =
+        std::bind(&RemoteControl::handle_module_config, this, std::placeholders::_1,
+                  std::placeholders::_2);
 
-    command_handlers_["MODULE_LIST"] = std::bind(&RemoteControl::handle_module_list, this,
-                                                 std::placeholders::_1,
-                                                 std::placeholders::_2);
+    command_handlers_["MODULE_LIST"] =
+        std::bind(&RemoteControl::handle_module_list, this, std::placeholders::_1,
+                  std::placeholders::_2);
 
-    command_handlers_["SYNC_FROM"] = std::bind(&RemoteControl::handle_sync_from, this,
-                                               std::placeholders::_1,
-                                               std::placeholders::_2);
+    command_handlers_["SYNC_FROM"] =
+        std::bind(&RemoteControl::handle_sync_from, this, std::placeholders::_1,
+                  std::placeholders::_2);
 
-    command_handlers_["SAVE"] = std::bind(&RemoteControl::handle_save, this,
-                                          std::placeholders::_1,
-                                          std::placeholders::_2);
+    command_handlers_["SAVE"] =
+        std::bind(&RemoteControl::handle_save, this, std::placeholders::_1,
+                  std::placeholders::_2);
 
-    command_handlers_["GENERAL_CONFIG"] = std::bind(&RemoteControl::handle_general_config,
-                                                    this, std::placeholders::_1,
-                                                    std::placeholders::_2);
+    command_handlers_["GENERAL_CONFIG"] =
+        std::bind(&RemoteControl::handle_general_config, this, std::placeholders::_1,
+                  std::placeholders::_2);
 
-    command_handlers_["CONFIG_VERSION"] = std::bind(&RemoteControl::handle_config_version,
-                                                    this, std::placeholders::_1,
-                                                    std::placeholders::_2);
+    command_handlers_["CONFIG_VERSION"] =
+        std::bind(&RemoteControl::handle_config_version, this, std::placeholders::_1,
+                  std::placeholders::_2);
 
     socket_.set(zmqpp::socket_option::curve_server, true);
     socket_.set(zmqpp::socket_option::curve_secret_key, secret_key_);
@@ -102,11 +102,12 @@ void RemoteControl::handle_msg()
     msg >> current_client_idt_;
     rep << current_client_idt_;
 
-    msg.pop_front();          // otherwise getting the "User-Id" property
-    msg.reset_read_cursor();  // wont work.
+    msg.pop_front();         // otherwise getting the "User-Id" property
+    msg.reset_read_cursor(); // wont work.
 
     msg >> frame1;
-    DEBUG("Remote Control command: " << frame1 << " with " << msg.parts() << " parts");
+    DEBUG("Remote Control command: " << frame1 << " with " << msg.parts()
+                                     << " parts");
 
     std::string user_pubkey;
     bool ret = msg.get_property("User-Id", user_pubkey);
@@ -125,21 +126,25 @@ void RemoteControl::handle_msg()
                 // if the handler fails, that means the source message was incorrect.
                 // therefore, the response shall be empty (except for the zmq id)
                 assert(rep.parts() == 1);
-                rep << "KO" << "Malformed message: " << frame1;
-                WARN("Received malformed message on Remote Control Interface. Message type was " <<
-                     frame1);
+                rep << "KO"
+                    << "Malformed message: " << frame1;
+                WARN("Received malformed message on Remote Control Interface. "
+                     "Message type was "
+                     << frame1);
             }
         }
         else
         {
-            WARN("Request denied. Insuficient permission for user " << user_pubkey <<
-                 ". Command was: " << frame1);
-            rep << "KO" << "Insuficient permission";
+            WARN("Request denied. Insuficient permission for user "
+                 << user_pubkey << ". Command was: " << frame1);
+            rep << "KO"
+                << "Insuficient permission";
         }
     }
     else
     {
-        rep << "KO" << "UNKOWN MESSAGE";
+        rep << "KO"
+            << "UNKOWN MESSAGE";
         WARN("Unknown message on Remote Control interface");
     }
 
@@ -162,7 +167,8 @@ void RemoteControl::module_config(const std::string &module,
     assert(message_out);
 
     // we need to make sure the module's name exist.
-    std::vector<std::string> modules_names = kernel_.module_manager().modules_names();
+    std::vector<std::string> modules_names =
+        kernel_.module_manager().modules_names();
     if (std::find(modules_names.begin(), modules_names.end(), module) !=
         modules_names.end())
     {
@@ -190,10 +196,11 @@ void RemoteControl::module_config(const std::string &module,
     else
     {
         // if module with this name is not found
-        ERROR("RemoteControl: Cannot retrieve local module configuration for {" <<
-              module << "}" <<
-              "The module appears to not be loaded.");
-        *message_out << "KO" << "Module not loaded, so config not available";
+        ERROR("RemoteControl: Cannot retrieve local module configuration for {"
+              << module << "}"
+              << "The module appears to not be loaded.");
+        *message_out << "KO"
+                     << "Module not loaded, so config not available";
     }
 }
 
@@ -219,7 +226,8 @@ void RemoteControl::general_config(ConfigManager::ConfigFormat cfg_format,
     }
 }
 
-bool RemoteControl::handle_module_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_module_config(zmqpp::message *msg_in,
+                                         zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -235,7 +243,8 @@ bool RemoteControl::handle_module_config(zmqpp::message *msg_in, zmqpp::message 
     return false;
 }
 
-bool RemoteControl::handle_module_list(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_module_list(zmqpp::message *msg_in,
+                                       zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -267,49 +276,45 @@ bool RemoteControl::handle_sync_from(zmqpp::message *msg_in, zmqpp::message *msg
         *msg_in >> sync_general_config;
 
 
-        auto fetch_task = std::make_shared<Tasks::FetchRemoteConfig>(endpoint,
-                                                                     remote_server_pubkey);
+        auto fetch_task = std::make_shared<Tasks::FetchRemoteConfig>(
+            endpoint, remote_server_pubkey);
 
-        auto sync_task = std::make_shared<Tasks::SyncConfig>(kernel_, fetch_task,
-                                                             sync_general_config,
-                                                             autocommit);
+        auto sync_task = std::make_shared<Tasks::SyncConfig>(
+            kernel_, fetch_task, sync_general_config, autocommit);
         auto *sched = &kernel_.core_utils()->scheduler();
 
-        auto success_response_task = std::make_shared<Tasks::RemoteControlAsyncResponse>
-                (current_client_idt_,
-                 zmqpp::message() << "Success" << sync_task->get_guid(), socket_);
+        auto success_response_task =
+            std::make_shared<Tasks::RemoteControlAsyncResponse>(
+                current_client_idt_,
+                zmqpp::message() << "Success" << sync_task->get_guid(), socket_);
 
-        auto failure_response_task = std::make_shared<Tasks::RemoteControlAsyncResponse>
-                (current_client_idt_,
-                 zmqpp::message() << "Failed" << sync_task->get_guid(), socket_);
+        auto failure_response_task =
+            std::make_shared<Tasks::RemoteControlAsyncResponse>(
+                current_client_idt_,
+                zmqpp::message() << "Failed" << sync_task->get_guid(), socket_);
 
-        auto abort_response_task = std::make_shared<Tasks::RemoteControlAsyncResponse>
-                (current_client_idt_,
-                 zmqpp::message() << "Aborted" << sync_task->get_guid(), socket_);
+        auto abort_response_task =
+            std::make_shared<Tasks::RemoteControlAsyncResponse>(
+                current_client_idt_,
+                zmqpp::message() << "Aborted" << sync_task->get_guid(), socket_);
 
-        sync_task->set_on_success([=]()
-                                  {
-                                      success_response_task->run();
-                                      ASSERT_LOG(success_response_task->succeed(),
-                                                 "TASK FAILED");
-                                  });
-        sync_task->set_on_failure([=]()
-                                  {
-                                      failure_response_task->run();
-                                      ASSERT_LOG(failure_response_task->succeed(),
-                                                 "TASK FAILED");
-                                  });
-        fetch_task->set_on_failure([=]()
-                                   {
-                                       // not run on main thread, need to be queued.
-                                       sched->enqueue(abort_response_task, TargetThread::MAIN);
-                                   });
+        sync_task->set_on_success([=]() {
+            success_response_task->run();
+            ASSERT_LOG(success_response_task->succeed(), "TASK FAILED");
+        });
+        sync_task->set_on_failure([=]() {
+            failure_response_task->run();
+            ASSERT_LOG(failure_response_task->succeed(), "TASK FAILED");
+        });
+        fetch_task->set_on_failure([=]() {
+            // not run on main thread, need to be queued.
+            sched->enqueue(abort_response_task, TargetThread::MAIN);
+        });
 
-        fetch_task->set_on_success([=]()
-                                   {
-                                       DEBUG("FETCH TASK COMPLETE. WILL QUEUE SYNC_CONFIG");
-                                       sched->enqueue(sync_task, TargetThread::MAIN);
-                                   });
+        fetch_task->set_on_success([=]() {
+            DEBUG("FETCH TASK COMPLETE. WILL QUEUE SYNC_CONFIG");
+            sched->enqueue(sync_task, TargetThread::MAIN);
+        });
 
         kernel_.core_utils()->scheduler().enqueue(fetch_task, TargetThread::POOL);
 
@@ -329,14 +334,16 @@ bool RemoteControl::handle_save(zmqpp::message *msg_in, zmqpp::message *msg_out)
         if (kernel_.save_config())
             *msg_out << "OK";
         else
-            *msg_out << "KO" << "Saving config failed for some unkown reason.";
+            *msg_out << "KO"
+                     << "Saving config failed for some unkown reason.";
 
         return true;
     }
     return false;
 }
 
-bool RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_general_config(zmqpp::message *msg_in,
+                                          zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -351,7 +358,8 @@ bool RemoteControl::handle_general_config(zmqpp::message *msg_in, zmqpp::message
     return false;
 }
 
-bool RemoteControl::handle_config_version(zmqpp::message *msg_in, zmqpp::message *msg_out)
+bool RemoteControl::handle_config_version(zmqpp::message *msg_in,
+                                          zmqpp::message *msg_out)
 {
     assert(msg_in);
     assert(msg_out);
@@ -366,5 +374,4 @@ bool RemoteControl::handle_config_version(zmqpp::message *msg_in, zmqpp::message
 
 void RemoteControl::update()
 {
-
 }

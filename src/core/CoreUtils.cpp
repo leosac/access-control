@@ -22,21 +22,18 @@
 #include "CoreUtils.hpp"
 #include "kernel.hpp"
 
-Leosac::CoreUtils::CoreUtils(Leosac::Kernel *kptr,
-                             Leosac::SchedulerPtr sched,
-                             Leosac::ConfigCheckerPtr cfgcheck,
-                             bool strict_mode) :
-        kptr_(kptr),
-        scheduler_(sched),
-        config_checker_(cfgcheck),
-        strict_mode_(strict_mode)
+Leosac::CoreUtils::CoreUtils(Leosac::Kernel *kptr, Leosac::SchedulerPtr sched,
+                             Leosac::ConfigCheckerPtr cfgcheck, bool strict_mode)
+    : kptr_(kptr)
+    , scheduler_(sched)
+    , config_checker_(cfgcheck)
+    , strict_mode_(strict_mode)
 {
-
 }
 
-Leosac::CoreUtils::CoreUtils() :
-        kptr_(nullptr),
-        strict_mode_(false)
+Leosac::CoreUtils::CoreUtils()
+    : kptr_(nullptr)
+    , strict_mode_(false)
 {
 }
 

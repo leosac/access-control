@@ -32,9 +32,14 @@
 
 class CoreException : public LEOSACException
 {
-public:
-    CoreException(const std::string& message) : LEOSACException("Core::" + message) {}
-    virtual ~CoreException() {}
+  public:
+    CoreException(const std::string &message)
+        : LEOSACException("Core::" + message)
+    {
+    }
+    virtual ~CoreException()
+    {
+    }
 };
 
 #endif // COREEXCEPTION_HPP

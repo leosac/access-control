@@ -22,14 +22,14 @@
 
 namespace
 {
-  /**
-   * Remove the ascii formatting (underline, color, ...) from a string.
-   *
-   * This is required because writing ascii escape code to log-files
-   * is not good.
-   */
-  std::string remove_ascii_format(const std::string &in)
-  {
+/**
+ * Remove the ascii formatting (underline, color, ...) from a string.
+ *
+ * This is required because writing ascii escape code to log-files
+ * is not good.
+ */
+std::string remove_ascii_format(const std::string &in)
+{
     boost::regex regex;
     regex.assign("\033\\[.+m(.*)\033\\[0m");
     std::ostringstream t(std::ios::out | std::ios::binary);
@@ -37,94 +37,94 @@ namespace
     boost::regex_replace(oi, in.begin(), in.end(), regex, "\\1",
                          boost::match_default | boost::format_sed);
     return t.str();
-  }
+}
 }
 
 namespace LogHelper
 {
 
-  void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
-           const char * /*fileName*/, LogLevel level)
-  {
+void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
+         const char * /*fileName*/, LogLevel level)
+{
     auto console = spdlog::get("console");
-    auto syslog = spdlog::get("syslog");
+    auto syslog  = spdlog::get("syslog");
     if (!console && !syslog)
     {
-      std::cerr << "Logger not set-up yet ! Will display log message as is."
-                << std::endl;
-      std::cerr << log_msg << std::endl;
-      return;
+        std::cerr << "Logger not set-up yet ! Will display log message as is."
+                  << std::endl;
+        std::cerr << log_msg << std::endl;
+        return;
     }
 
     switch (level)
     {
     case LogLevel::DEBUG:
-      if (console)
-        console->debug(log_msg);
-      if (syslog)
-        syslog->debug(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->debug(log_msg);
+        if (syslog)
+            syslog->debug(remove_ascii_format(log_msg));
+        break;
     case LogLevel::INFO:
-      if (console)
-        console->info(log_msg);
-      if (syslog)
-        syslog->info(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->info(log_msg);
+        if (syslog)
+            syslog->info(remove_ascii_format(log_msg));
+        break;
     case LogLevel::NOTICE:
-      if (console)
-        console->notice(log_msg);
-      if (syslog)
-        syslog->notice(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->notice(log_msg);
+        if (syslog)
+            syslog->notice(remove_ascii_format(log_msg));
+        break;
     case LogLevel::WARN:
-      if (console)
-        console->warn(log_msg);
-      if (syslog)
-        syslog->warn(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->warn(log_msg);
+        if (syslog)
+            syslog->warn(remove_ascii_format(log_msg));
+        break;
     case LogLevel::ERROR:
-      if (console)
-        console->error(log_msg);
-      if (syslog)
-        syslog->error(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->error(log_msg);
+        if (syslog)
+            syslog->error(remove_ascii_format(log_msg));
+        break;
     case LogLevel::CRIT:
-      if (console)
-        console->critical(log_msg);
-      if (syslog)
-        syslog->critical(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->critical(log_msg);
+        if (syslog)
+            syslog->critical(remove_ascii_format(log_msg));
+        break;
     case LogLevel::ALERT:
-      if (console)
-        console->alert(log_msg);
-      if (syslog)
-        syslog->alert(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->alert(log_msg);
+        if (syslog)
+            syslog->alert(remove_ascii_format(log_msg));
+        break;
     case LogLevel::EMERG:
-      if (console)
-        console->emerg(log_msg);
-      if (syslog)
-        syslog->emerg(remove_ascii_format(log_msg));
-      break;
+        if (console)
+            console->emerg(log_msg);
+        if (syslog)
+            syslog->emerg(remove_ascii_format(log_msg));
+        break;
     }
-  }
+}
 
-  LogLevel log_level_from_string(const std::string &level)
-  {
+LogLevel log_level_from_string(const std::string &level)
+{
     if (level == "DEBUG")
-      return LogLevel::DEBUG;
+        return LogLevel::DEBUG;
     else if (level == "INFO")
-      return LogLevel::INFO;
+        return LogLevel::INFO;
     else if (level == "NOTICE")
-      return LogLevel::NOTICE;
+        return LogLevel::NOTICE;
     else if (level == "WARNING")
-      return LogLevel::WARN;
+        return LogLevel::WARN;
     else if (level == "ERROR")
-      return LogLevel::ERROR;
+        return LogLevel::ERROR;
     else if (level == "ALERT")
-      return LogLevel::ALERT;
+        return LogLevel::ALERT;
     else if (level == "EMERGENCY")
-      return LogLevel::EMERG;
+        return LogLevel::EMERG;
     throw std::runtime_error("Invalid log level: " + level);
-  }
+}
 }

@@ -23,42 +23,42 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                class SimpleWiegandStrategy;
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+class SimpleWiegandStrategy;
 
-                using SimpleWiegandStrategyUPtr = std::unique_ptr<SimpleWiegandStrategy>;
+using SimpleWiegandStrategyUPtr = std::unique_ptr<SimpleWiegandStrategy>;
 
-                /**
-                * Implementation of a wiegand card only strategy.
-                */
-                class SimpleWiegandStrategy : public CardReading
-                {
-                public:
-                    SimpleWiegandStrategy(WiegandReaderImpl *reader);
+/**
+* Implementation of a wiegand card only strategy.
+*/
+class SimpleWiegandStrategy : public CardReading
+{
+  public:
+    SimpleWiegandStrategy(WiegandReaderImpl *reader);
 
-                    virtual void timeout() override;
+    virtual void timeout() override;
 
-                    virtual bool completed() const override;
+    virtual bool completed() const override;
 
-                    virtual void signal(zmqpp::socket &sock) override;
+    virtual void signal(zmqpp::socket &sock) override;
 
-                    virtual const std::string &get_card_id() const override;
+    virtual const std::string &get_card_id() const override;
 
-                    virtual int get_nb_bits() const override;
+    virtual int get_nb_bits() const override;
 
-                    virtual void reset() override;
+    virtual void reset() override;
 
-                private:
-                    bool ready_;
-                    int nb_bits_;
-                    std::string card_id_;
-                };
-            }
-        }
-    }
+  private:
+    bool ready_;
+    int nb_bits_;
+    std::string card_id_;
+};
+}
+}
+}
 }

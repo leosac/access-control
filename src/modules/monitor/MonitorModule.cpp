@@ -33,15 +33,14 @@ static std::string z85_pad(const std::string &in, char pad_char)
     return out;
 }
 
-MonitorModule::MonitorModule(zmqpp::context &ctx,
-                             zmqpp::socket *pipe,
+MonitorModule::MonitorModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                              const boost::property_tree::ptree &cfg,
-                             CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils),
-        bus_(ctx, zmqpp::socket_type::sub),
-        verbose_(false),
-        last_ping_(TimePoint::max()),
-        kernel_(ctx, zmqpp::socket_type::req)
+                             CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
+    , bus_(ctx, zmqpp::socket_type::sub)
+    , verbose_(false)
+    , last_ping_(TimePoint::max())
+    , kernel_(ctx, zmqpp::socket_type::req)
 {
     kernel_.connect("inproc://leosac-kernel");
     reactor_.add(bus_, std::bind(&MonitorModule::log_system_bus, this));
@@ -57,7 +56,8 @@ void MonitorModule::run()
         reactor_.poll(1000);
         if (last_ping_ == TimePoint::max() ||
             std::chrono::duration_cast<std::chrono::seconds>(
-                    std::chrono::system_clock::now() - last_ping_).count() > 3)
+                std::chrono::system_clock::now() - last_ping_)
+                    .count() > 3)
         {
             test_ping();
             last_ping_ = std::chrono::system_clock::now();
@@ -83,9 +83,8 @@ void MonitorModule::log_system_bus()
         {
             src = buf;
         }
-        if (std::find_if(buf.begin(), buf.end(), [](char c)
-        { return !isprint(c); })
-            != buf.end())
+        if (std::find_if(buf.begin(), buf.end(),
+                         [](char c) { return !isprint(c); }) != buf.end())
         {
             // encode frame in z85 since it contains non printable char
             buf = zmqpp::z85::encode(z85_pad(buf, 0));
@@ -126,13 +125,14 @@ void MonitorModule::test_ping()
     int ret = script.run(addr_to_ping_);
     if (ret == 0)
     {
-        INFO("Ping against " << addr_to_ping_ <<
-             " was successful. Looks like network is up.");
+        INFO("Ping against " << addr_to_ping_
+                             << " was successful. Looks like network is up.");
         network_led_->turnOn();
     }
     else
     {
-        INFO("Ping against " << addr_to_ping_ << " failed. Network is probably down.");
+        INFO("Ping against " << addr_to_ping_
+                             << " failed. Network is probably down.");
         network_led_->turnOff();
     }
 }
@@ -154,8 +154,8 @@ std::string MonitorModule::req_scripts_dir()
 
 void MonitorModule::process_config()
 {
-    std::string system_bus_log_file = config_.get_child("module_config")
-                                             .get<std::string>("file-bus", "");
+    std::string system_bus_log_file =
+        config_.get_child("module_config").get<std::string>("file-bus", "");
     if (!system_bus_log_file.empty())
     {
         bus_.subscribe("");
@@ -168,11 +168,12 @@ void MonitorModule::process_config()
         spdlog::stdout_logger_mt("monitor_stdout");
     }
 
-    std::string system_led_name = config_.get_child("module_config")
-                                         .get<std::string>("system_ok", "");
+    std::string system_led_name =
+        config_.get_child("module_config").get<std::string>("system_ok", "");
     if (!system_led_name.empty())
     {
-        system_led_ = std::make_unique<Leosac::Hardware::FLED>(ctx_, system_led_name);
+        system_led_ =
+            std::make_unique<Leosac::Hardware::FLED>(ctx_, system_led_name);
     }
 
     process_network_config();
@@ -184,20 +185,23 @@ void MonitorModule::process_network_config()
     auto ping_node = config_.get_child("module_config").get_child_optional("ping");
     if (ping_node)
     {
-        addr_to_ping_ = ping_node->get<std::string>("ip");
+        addr_to_ping_                = ping_node->get<std::string>("ip");
         std::string network_led_name = ping_node->get<std::string>("led");
-        network_led_ = std::make_unique<Leosac::Hardware::FLED>(ctx_, network_led_name);
+        network_led_ =
+            std::make_unique<Leosac::Hardware::FLED>(ctx_, network_led_name);
     }
 }
 
 void MonitorModule::process_reader_config()
 {
-    auto reader_node = config_.get_child("module_config").get_child_optional("reader");
+    auto reader_node =
+        config_.get_child("module_config").get_child_optional("reader");
     if (reader_node)
     {
         reader_to_watch_ = reader_node->get<std::string>("name");
         bus_.subscribe("S_" + reader_to_watch_);
         std::string reader_led_name = reader_node->get<std::string>("led");
-        reader_led_ = std::make_unique<Leosac::Hardware::FLED>(ctx_, reader_led_name);
+        reader_led_ =
+            std::make_unique<Leosac::Hardware::FLED>(ctx_, reader_led_name);
     }
 }

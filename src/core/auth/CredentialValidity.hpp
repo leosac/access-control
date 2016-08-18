@@ -24,69 +24,72 @@
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        /**
-        * A simple class that stores (and can be queried for) the validity of some credentials.
-        * Validity means 3 simple thing:
-        *      + Is is enabled ?
-        *      + The validity start date.
-        *      + The validity end date.
-        *
-        * You can set validity_start to time::min(), and validity_end to time::max
-        * if there is no validity date.
-        */
-        class CredentialValidity
-        {
-        public:
-            /**
-            * Default credential is enabled and no time-base limitation.
-            */
-            CredentialValidity();
+namespace Auth
+{
+/**
+* A simple class that stores (and can be queried for) the validity of some
+* credentials.
+* Validity means 3 simple thing:
+*      + Is is enabled ?
+*      + The validity start date.
+*      + The validity end date.
+*
+* You can set validity_start to time::min(), and validity_end to time::max
+* if there is no validity date.
+*/
+class CredentialValidity
+{
+  public:
+    /**
+    * Default credential is enabled and no time-base limitation.
+    */
+    CredentialValidity();
 
-            CredentialValidity(const CredentialValidity &) = default;
+    CredentialValidity(const CredentialValidity &) = default;
 
-            /**
-            * Check that the current date is between
-            * validity start and end and make sure its
-            * enabled too.
-            */
-            bool is_valid() const;
+    /**
+    * Check that the current date is between
+    * validity start and end and make sure its
+    * enabled too.
+    */
+    bool is_valid() const;
 
-            /**
-            * Is the credential enabled ?
-            */
-            bool is_enabled() const;
+    /**
+    * Is the credential enabled ?
+    */
+    bool is_enabled() const;
 
-            /**
-            * Are we currently is the validity range of the credential ?
-            */
-            bool is_in_range() const;
+    /**
+    * Are we currently is the validity range of the credential ?
+    */
+    bool is_in_range() const;
 
-            /**
-            * Set the start validity date.
-            * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
-            *
-             This method accept an empty string, if that case it will set the end_date to `time_point::min()`.
-            */
-            void set_start_date(const std::string &s);
+    /**
+    * Set the start validity date.
+    * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
+    *
+     This method accept an empty string, if that case it will set the end_date to
+    `time_point::min()`.
+    */
+    void set_start_date(const std::string &s);
 
-            /**
-            * Set the end validity date.
-            * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
-            *
-            * This method accept an empty string, if that case it will set the end_date to `time_point::max()`.
-            */
-            void set_end_date(const std::string &s);
+    /**
+    * Set the end validity date.
+    * We receive the date as a string. The expected format is this: `%d/%m/%Y %H:%M`
+    *
+    * This method accept an empty string, if that case it will set the end_date to
+    * `time_point::max()`.
+    */
+    void set_end_date(const std::string &s);
 
-            void set_enabled(bool v);
+    void set_enabled(bool v);
 
-        private:
-            using TimePoint = std::chrono::system_clock::time_point;
+  private:
+    using TimePoint = std::chrono::system_clock::time_point;
 
-            TimePoint validity_start_;
-            TimePoint validity_end_;
-            bool enabled_;
-        };
-    }
+    TimePoint validity_start_;
+    TimePoint validity_end_;
+    bool enabled_;
+};
+}
 }

@@ -26,8 +26,7 @@
 
 using namespace Leosac::Module::SysFsGpio;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "SYSFS_GPIO";
@@ -39,16 +38,16 @@ const char *get_module_name()
 * Entry point of the SysFsGpio module.
 * It provides a way to control GPIO through the sysfs kernel interface.
 */
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
-        zmqpp::context &zmq_ctx,
-        Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
     // this thread need realtime priority so it doesn't miss interrupt.
     struct sched_param p;
     p.sched_priority = 90;
-    int ret = pthread_setschedparam(pthread_self(), SCHED_FIFO, &p);
+    int ret          = pthread_setschedparam(pthread_self(), SCHED_FIFO, &p);
     if (ret != 0)
         WARN("Cannot set realtime priority for SysFsGPIO module.");
-    return Leosac::Module::start_module_helper<SysFsGpioModule>(pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<SysFsGpioModule>(pipe, cfg, zmq_ctx,
+                                                                utils);
 }

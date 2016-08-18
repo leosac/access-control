@@ -31,28 +31,30 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-APIAuth::APIAuth(WSServer &srv) :
-    server_(srv)
+APIAuth::APIAuth(WSServer &srv)
+    : server_(srv)
 {
 }
 
-std::string APIAuth::generate_token(const std::string &username, const std::string &password,
-                                    Auth::UserId &user_id) // todo fix me by creating a proper token struct
+std::string APIAuth::generate_token(
+    const std::string &username, const std::string &password,
+    Auth::UserId &user_id) // todo fix me by creating a proper token struct
 {
     using namespace odb;
     using namespace odb::core;
-    using query = odb::query<Auth::IUser>;
+    using query  = odb::query<Auth::IUser>;
     using result = odb::result<Auth::IUser>;
     {
         auto db = server_.db();
         transaction t(db->begin());
 
-        Auth::IUserPtr user = db->query_one<Auth::IUser>(query::username == username);
+        Auth::IUserPtr user =
+            db->query_one<Auth::IUser>(query::username == username);
         if (user && user->password() == password)
         {
-            auto token = gen_uuid();
+            auto token     = gen_uuid();
             tokens_[token] = user->id();
-            user_id = user->id();
+            user_id        = user->id();
             return token;
         }
     }

@@ -27,14 +27,14 @@ using namespace Leosac::Module::TCPNotifier;
 
 ProtocolHandlerUPtr ProtocolHandler::create(int protocol_id)
 {
-  switch (protocol_id)
-  {
-  case SIMPLE_CARD_NUMBER:
-    return std::make_unique<PushSimpleCardNumber>();
-  case MEGASOFT:
-    return std::make_unique<MegasoftProtocol>();
-  default:
+    switch (protocol_id)
+    {
+    case SIMPLE_CARD_NUMBER:
+        return std::make_unique<PushSimpleCardNumber>();
+    case MEGASOFT:
+        return std::make_unique<MegasoftProtocol>();
+    default:
+        return nullptr;
+    }
     return nullptr;
-  }
-  return nullptr;
 }

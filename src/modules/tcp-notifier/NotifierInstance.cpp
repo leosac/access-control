@@ -110,8 +110,7 @@ void NotifierInstance::handle_one(zmqpp::message &msg)
             else
             {
                 targets_.erase(std::remove_if(targets_.begin(), targets_.end(),
-                                              [&](const TargetInfo &info)
-                                              {
+                                              [&](const TargetInfo &info) {
                                                   return info.zmq_identity_ ==
                                                          routing_id;
                                               }),
@@ -144,11 +143,10 @@ void NotifierInstance::handle_tcp_msg()
 NotifierInstance::TargetInfo *
 NotifierInstance::find_target(const std::string &routing_id)
 {
-    auto itr =
-        std::find_if(targets_.begin(), targets_.end(), [&](const TargetInfo &target)
-                     {
-                         return target.zmq_identity_ == routing_id;
-                     });
+    auto itr = std::find_if(targets_.begin(), targets_.end(),
+                            [&](const TargetInfo &target) {
+                                return target.zmq_identity_ == routing_id;
+                            });
     if (itr != targets_.end())
         return &(*itr);
     return nullptr;

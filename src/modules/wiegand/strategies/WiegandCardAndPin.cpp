@@ -25,15 +25,15 @@ using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
 WiegandCardAndPin::WiegandCardAndPin(WiegandReaderImpl *reader,
-        CardReadingUPtr read_card,
-        PinReadingUPtr read_pin,
-        std::chrono::milliseconds delay) :
-        WiegandStrategy(reader),
-        read_card_strategy_(std::move(read_card)),
-        read_pin_strategy_(std::move(read_pin)),
-        delay_(delay),
-        reading_card_(true),
-        ready_(false)
+                                     CardReadingUPtr read_card,
+                                     PinReadingUPtr read_pin,
+                                     std::chrono::milliseconds delay)
+    : WiegandStrategy(reader)
+    , read_card_strategy_(std::move(read_card))
+    , read_pin_strategy_(std::move(read_pin))
+    , delay_(delay)
+    , reading_card_(true)
+    , ready_(false)
 {
     time_card_read_ = std::chrono::system_clock::now();
 }
@@ -41,15 +41,17 @@ WiegandCardAndPin::WiegandCardAndPin(WiegandReaderImpl *reader,
 void WiegandCardAndPin::timeout()
 {
     using namespace std::chrono;
-    auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - time_card_read_);
+    auto elapsed_ms =
+        duration_cast<milliseconds>(system_clock::now() - time_card_read_);
 
     if (reading_card_)
     {
         read_card_strategy_->timeout();
         if (read_card_strategy_->completed())
         {
-            DEBUG("Switch to PIN. Current card id = " << read_card_strategy_->get_card_id());
-            reading_card_ = false;
+            DEBUG("Switch to PIN. Current card id = "
+                  << read_card_strategy_->get_card_id());
+            reading_card_   = false;
             time_card_read_ = std::chrono::system_clock::now();
             reader_->read_reset();
         }
@@ -83,11 +85,9 @@ void WiegandCardAndPin::signal(zmqpp::socket &sock)
     DEBUG("Pin = " << read_pin_strategy_->get_pin());
 
     zmqpp::message msg;
-    msg << ("S_" + reader_->name()) <<
-            Auth::SourceType::WIEGAND_CARD_PIN <<
-            read_card_strategy_->get_card_id() <<
-            read_card_strategy_->get_nb_bits() <<
-            read_pin_strategy_->get_pin();
+    msg << ("S_" + reader_->name()) << Auth::SourceType::WIEGAND_CARD_PIN
+        << read_card_strategy_->get_card_id() << read_card_strategy_->get_nb_bits()
+        << read_pin_strategy_->get_pin();
     sock.send(msg);
     reset();
 }
@@ -101,7 +101,7 @@ void WiegandCardAndPin::set_reader(WiegandReaderImpl *new_ptr)
 
 void WiegandCardAndPin::reset()
 {
-    ready_ = false;
+    ready_        = false;
     reading_card_ = true;
     reader_->read_reset();
 

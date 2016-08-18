@@ -23,8 +23,8 @@
 
 using namespace Leosac::Hardware;
 
-FLED::FLED(zmqpp::context &ctx, const std::string &led_name) :
-        backend_(ctx, zmqpp::socket_type::req)
+FLED::FLED(zmqpp::context &ctx, const std::string &led_name)
+    : backend_(ctx, zmqpp::socket_type::req)
 {
     backend_.connect("inproc://" + led_name);
     poller_.add(backend_);
@@ -121,7 +121,8 @@ bool FLED::blink(std::chrono::milliseconds duration, std::chrono::milliseconds s
 
 bool FLED::blink(int duration, int speed)
 {
-    return blink(std::chrono::milliseconds(duration), std::chrono::milliseconds(speed));
+    return blink(std::chrono::milliseconds(duration),
+                 std::chrono::milliseconds(speed));
 }
 
 bool FLED::isOn()
@@ -167,7 +168,7 @@ FLED::State FLED::state()
         // duration
         rep >> led_state.duration;
 
-        //speed
+        // speed
         rep >> led_state.speed;
 
         // value
@@ -183,7 +184,7 @@ FLED::State FLED::state()
         else if (status_str == "OFF")
             led_state.st = State::OFF;
         else
-            assert (0);
+            assert(0);
     }
     return led_state;
 }
