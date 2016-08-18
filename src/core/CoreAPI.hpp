@@ -22,6 +22,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace Leosac
 {

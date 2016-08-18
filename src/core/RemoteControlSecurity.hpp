@@ -21,6 +21,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace Leosac
 {

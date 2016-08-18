@@ -77,6 +77,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         SCHEMA_FORMAT embedded
         SCHEMA_NAME tools
         PROFILE "boost/date-time"
+        INCLUDE ${CMAKE_SOURCE_DIR}/zmqpp/src/
         INCLUDE_PREFIX tools/db
         INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
                       %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
@@ -97,7 +98,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         SCHEMA_FORMAT embedded
         SCHEMA_NAME auth
         PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src
+        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/zmqpp/src/
         INCLUDE_PREFIX core/auth/Interfaces
         INCLUDE_REGEX %core/auth/Interfaces/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
                       %core/auth/Interfaces/\(.+\)_odb\(.*\).h%$1_odb$2.h%
