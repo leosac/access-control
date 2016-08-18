@@ -149,11 +149,11 @@ if (CMAKE_BUILD_TYPE MATCHES "Release")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-${CMAKE_SOURCE_DIR}/libpifacedigital/src/
-${CMAKE_SOURCE_DIR}/libmcp23s17/src/
-${CMAKE_SOURCE_DIR}/zmqpp/src/
-${CMAKE_SOURCE_DIR}/libzmq/include
-${CMAKE_SOURCE_DIR}/spdlog/include
+${CMAKE_SOURCE_DIR}/deps/libpifacedigital/src/
+${CMAKE_SOURCE_DIR}/deps/libmcp23s17/src/
+${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
+${CMAKE_SOURCE_DIR}/deps/libzmq/include
+${CMAKE_SOURCE_DIR}/deps/spdlog/include
 )
 
 #Set compilation flags for current target

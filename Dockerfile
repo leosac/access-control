@@ -67,16 +67,9 @@ RUN mkdir -p /leosac_src/{cmake,cfg,docker_scripts,libmcp23s17,libpifacedigital,
 
 ADD cfg /leosac_src/cfg/
 ADD docker_scripts /leosac_src/docker_scripts/
-ADD libmcp23s17 /leosac_src/libmcp23s17/
-ADD libpifacedigital /leosac_src/libpifacedigital/
-ADD libzmq /leosac_src/libzmq/
 ADD scripts /leosac_src/scripts/
-ADD spdlog /leosac_src/spdlog/
 ADD test /leosac_src/test/
-ADD tools /leosac_src/tools/
-ADD zmqpp /leosac_src/zmqpp/
-ADD json /leosac_src/json/
-ADD websocketpp /leosac_src/websocketpp/
+ADD deps /leosac_src/deps/
 ADD cmake /leosac_src/cmake/
 ADD src /leosac_src/src/
 ADD CMakeLists.txt /leosac_src/
