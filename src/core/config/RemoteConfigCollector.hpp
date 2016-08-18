@@ -19,12 +19,12 @@
 
 #pragma once
 
+#include <boost/property_tree/ptree.hpp>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree.hpp>
 
 namespace Leosac
 {

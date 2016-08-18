@@ -18,8 +18,8 @@
 */
 
 #include "FGPIO.hpp"
+#include "tools/log.hpp"
 #include <zmqpp/message.hpp>
-#include <tools/log.hpp>
 
 using namespace Leosac::Hardware;
 

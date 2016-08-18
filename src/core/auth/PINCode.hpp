@@ -20,8 +20,8 @@
 #pragma once
 
 #include "core/auth/BaseAuthSource.hpp"
-#include <string>
 #include <sstream>
+#include <string>
 #include <tools/IVisitor.hpp>
 
 namespace Leosac

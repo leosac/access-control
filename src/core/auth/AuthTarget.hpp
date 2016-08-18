@@ -19,10 +19,10 @@
 
 #pragma once
 
+#include "hardware/FGPIO.hpp"
+#include "tools/Schedule.hpp"
 #include <memory>
 #include <string>
-#include <hardware/FGPIO.hpp>
-#include <tools/Schedule.hpp>
 
 namespace Leosac
 {

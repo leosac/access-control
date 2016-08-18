@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <memory>
-#include "core/auth/CredentialValidity.hpp"
 #include "IAccessProfile.hpp"
-#include "tools/db/database.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "core/auth/CredentialValidity.hpp"
+#include "tools/db/database.hpp"
+#include <memory>
 
 namespace Leosac
 {

@@ -23,11 +23,11 @@
  * \brief NetworkConfig class implementation
  */
 
-#include <boost/property_tree/ptree_fwd.hpp>
 #include "networkconfig.hpp"
 #include "core/kernel.hpp"
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
+#include <boost/property_tree/ptree_fwd.hpp>
 
 using namespace Leosac::Tools;
 using namespace Leosac;

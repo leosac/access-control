@@ -26,8 +26,8 @@
 #ifndef UNIXSHELLSCRIPT_HPP
 #define UNIXSHELLSCRIPT_HPP
 
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace Leosac
 {

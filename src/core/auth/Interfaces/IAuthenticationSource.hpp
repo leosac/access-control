@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <memory>
 #include "core/auth/AuthFwd.hpp"
 #include "tools/IVisitable.hpp"
+#include <memory>
 
 namespace Leosac
 {

@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
 #include "core/CoreUtils.hpp"
+#include "modules/BaseModule.hpp"
 
 namespace Leosac
 {

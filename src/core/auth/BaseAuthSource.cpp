@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/IVisitor.hpp>
 #include "BaseAuthSource.hpp"
+#include "tools/IVisitor.hpp"
 
 using namespace Leosac::Auth;
 

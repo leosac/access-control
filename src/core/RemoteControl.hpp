@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree_fwd.hpp>
-#include "core/config/ConfigManager.hpp"
 #include "RemoteControlSecurity.hpp"
+#include "core/config/ConfigManager.hpp"
+#include <boost/property_tree/ptree_fwd.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {

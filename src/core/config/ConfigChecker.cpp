@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "ConfigChecker.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 
@@ -34,7 +34,7 @@ void ConfigChecker::register_object(const std::string &name,
 bool ConfigChecker::has_object(const std::string &name) const
 {
     std::lock_guard<std::mutex> lg(mutex_);
-    return objects_.count(name);
+    return objects_.count(name) != 0;
 }
 
 bool ConfigChecker::has_object(const std::string &name,
@@ -42,9 +42,7 @@ bool ConfigChecker::has_object(const std::string &name,
 {
     std::lock_guard<std::mutex> lg(mutex_);
     const auto itr = objects_.find(name);
-    if (itr != objects_.end() && type == itr->second)
-        return true;
-    return false;
+    return itr != objects_.end() && type == itr->second;
 }
 
 void ConfigChecker::clear()

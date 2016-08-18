@@ -25,13 +25,13 @@
 
 #include <iostream>
 // NOTE TCLAP is easily replacable by boost::program_options
-#include <tclap/CmdLine.h>
-#include <unistd.h>
 #include "core/kernel.hpp"
 #include "exception/ExceptionsTools.hpp"
-#include "tools/log.hpp"
 #include "tools/leosac.hpp"
+#include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
+#include <tclap/CmdLine.h>
+#include <unistd.h>
 
 using namespace Leosac::Tools;
 using namespace Leosac;

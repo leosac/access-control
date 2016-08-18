@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ExceptionsTools.hpp"
+#include "tools/log.hpp"
 #include <exception>
 #include <iostream>
-#include <tools/log.hpp>
-#include "ExceptionsTools.hpp"
 
 namespace
 {

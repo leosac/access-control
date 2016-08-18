@@ -17,14 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/property_tree/ptree_serialization.hpp>
-#include <tools/XmlPropertyTree.hpp>
-#include <tools/PropertyTreeExtractor.hpp>
 #include "ConfigManager.hpp"
 #include "core/kernel.hpp"
+#include "tools/PropertyTreeExtractor.hpp"
+#include "tools/XmlPropertyTree.hpp"
 #include "tools/log.hpp"
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
 
 using namespace Leosac;
 

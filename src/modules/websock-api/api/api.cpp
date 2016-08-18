@@ -17,20 +17,20 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/db/LogEntry.hpp>
-#include "tools/leosac.hpp"
 #include "api.hpp"
 #include "../WSServer.hpp"
 #include "core/CoreUtils.hpp"
-#include "core/kernel.hpp"
-#include "tools/db/database.hpp"
-#include "odb_gen/LogEntry_odb.h"
-#include <boost/date_time/posix_time/conversion.hpp>
-#include <odb/sqlite/database.hxx>
-#include <odb/mysql/database.hxx>
-#include "odb_gen/LogEntry_odb_sqlite.h"
-#include "odb_gen/LogEntry_odb_mysql.h"
 #include "core/auth/AuthFwd.hpp"
+#include "core/kernel.hpp"
+#include "odb_gen/LogEntry_odb.h"
+#include "odb_gen/LogEntry_odb_mysql.h"
+#include "odb_gen/LogEntry_odb_sqlite.h"
+#include "tools/db/database.hpp"
+#include "tools/leosac.hpp"
+#include <boost/date_time/posix_time/conversion.hpp>
+#include <odb/mysql/database.hxx>
+#include <odb/sqlite/database.hxx>
+#include <tools/db/LogEntry.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;

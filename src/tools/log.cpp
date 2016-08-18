@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/regex.hpp>
 #include "log.hpp"
+#include <boost/regex.hpp>
 
 namespace
 {

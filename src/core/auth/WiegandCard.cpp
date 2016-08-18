@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "WiegandCard.hpp"
+#include "tools/IVisitor.hpp"
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <tools/log.hpp>
-#include "tools/IVisitor.hpp"
-#include "WiegandCard.hpp"
 
 using namespace Leosac::Auth;
 

@@ -26,8 +26,8 @@
 #ifndef RPLETHPROTOCOL_HPP
 #define RPLETHPROTOCOL_HPP
 
-#include "rplethpacket.hpp"
 #include "network/circularbuffer.hpp"
+#include "rplethpacket.hpp"
 
 #include <queue>
 

@@ -19,8 +19,8 @@
 
 #include "SingleTimeFrame.hpp"
 #include <chrono>
-#include <vector>
 #include <string>
+#include <vector>
 
 #pragma once
 

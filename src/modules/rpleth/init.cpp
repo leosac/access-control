@@ -23,9 +23,9 @@
 * \brief init function for returning a module class to the core
 */
 
-#include <zmqpp/zmqpp.hpp>
 #include "RplethModule.hpp"
-#include <tools/log.hpp>
+#include "tools/log.hpp"
+#include <zmqpp/zmqpp.hpp>
 
 using namespace Leosac::Module::Rpleth;
 

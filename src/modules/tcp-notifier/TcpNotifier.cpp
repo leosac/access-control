@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "TcpNotifier.hpp"
+#include "core/auth/WiegandCard.hpp"
 #include <core/auth/Auth.hpp>
 #include <tools/PropertyTreeExtractor.hpp>
-#include "core/auth/WiegandCard.hpp"
-#include "TcpNotifier.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;

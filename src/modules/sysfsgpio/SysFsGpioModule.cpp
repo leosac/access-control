@@ -17,17 +17,17 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <zmqpp/message.hpp>
-#include <zmqpp/context.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/iterator/transform_iterator.hpp>
-#include "tools/timeout.hpp"
 #include "SysFsGpioModule.hpp"
 #include "SysFsGpioConfig.hpp"
 #include "core/kernel.hpp"
-#include "tools/unixfs.hpp"
 #include "tools/log.hpp"
+#include "tools/timeout.hpp"
+#include "tools/unixfs.hpp"
+#include <boost/iterator/transform_iterator.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <memory>
+#include <zmqpp/context.hpp>
+#include <zmqpp/message.hpp>
 
 
 using namespace Leosac::Module::SysFsGpio;

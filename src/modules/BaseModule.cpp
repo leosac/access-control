@@ -17,14 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "BaseModule.hpp"
+#include "core/CoreUtils.hpp"
+#include "core/config/ConfigManager.hpp"
+#include "tools/XmlPropertyTree.hpp"
+#include "tools/log.hpp"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
-#include <tools/log.hpp>
-#include <core/config/ConfigManager.hpp>
 #include <signal.h>
-#include "BaseModule.hpp"
-#include "tools/XmlPropertyTree.hpp"
-#include "core/CoreUtils.hpp"
 
 using namespace Leosac::Module;
 using namespace Leosac::Tools;

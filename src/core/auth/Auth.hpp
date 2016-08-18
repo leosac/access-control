@@ -18,8 +18,8 @@
 */
 
 #pragma once
-#include <zmqpp/message.hpp>
 #include "AuthFwd.hpp"
+#include <zmqpp/message.hpp>
 
 namespace Leosac
 {

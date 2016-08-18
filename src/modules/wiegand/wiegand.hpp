@@ -19,11 +19,11 @@
 
 #pragma once
 
+#include "WiegandReaderImpl.hpp"
 #include "zmqpp/zmqpp.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <modules/BaseModule.hpp>
 #include <modules/wiegand/strategies/WiegandStrategy.hpp>
-#include "WiegandReaderImpl.hpp"
 
 namespace Leosac
 {

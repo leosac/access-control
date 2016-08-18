@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "GetRemoteConfigVersion.hpp"
 #include "core/kernel.hpp"
+#include "tools/log.hpp"
 #include <zmqpp/curve.hpp>
 
 using namespace Leosac;

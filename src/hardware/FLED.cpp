@@ -18,8 +18,8 @@
 */
 
 #include "FLED.hpp"
-#include <zmqpp/message.hpp>
 #include <tools/log.hpp>
+#include <zmqpp/message.hpp>
 
 using namespace Leosac::Hardware;
 

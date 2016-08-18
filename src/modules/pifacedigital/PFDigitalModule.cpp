@@ -17,15 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <fcntl.h>
-#include <boost/iterator/transform_iterator.hpp>
 #include "PFDigitalModule.hpp"
+#include "core/CoreUtils.hpp"
+#include "exception/gpioexception.hpp"
 #include "mcp23s17.h"
 #include "pifacedigital.h"
-#include "exception/gpioexception.hpp"
 #include "tools/log.hpp"
 #include "tools/timeout.hpp"
-#include "core/CoreUtils.hpp"
+#include <boost/iterator/transform_iterator.hpp>
+#include <fcntl.h>
 
 using namespace Leosac;
 using namespace Leosac::Module;

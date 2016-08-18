@@ -17,16 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/curve.hpp>
-#include <exception/ExceptionsTools.hpp>
-#include <tools/log.hpp>
-#include <tools/XmlPropertyTree.hpp>
-#include <core/tasks/FetchRemoteConfig.hpp>
-#include <core/tasks/GetRemoteConfigVersion.hpp>
 #include "core/config/RemoteConfigCollector.hpp"
 #include "core/config/ConfigManager.hpp"
 #include "core/tasks/FetchRemoteConfig.hpp"
+#include "core/tasks/FetchRemoteConfig.hpp"
+#include "core/tasks/GetRemoteConfigVersion.hpp"
+#include "exception/ExceptionsTools.hpp"
 #include "tools/BuildString.hpp"
+#include "tools/XmlPropertyTree.hpp"
+#include "tools/log.hpp"
+#include <zmqpp/curve.hpp>
 
 using namespace Leosac;
 

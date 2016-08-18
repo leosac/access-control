@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "Task.hpp"
 #include "LeosacFwd.hpp"
+#include "Task.hpp"
 
 namespace Leosac
 {

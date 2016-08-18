@@ -20,11 +20,11 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
+#include "core/config/ConfigChecker.hpp"
 #include "core/config/ConfigManager.hpp"
+#include "tools/gettid.hpp"
 #include "tools/log.hpp"
 #include <boost/property_tree/ptree.hpp>
-#include <core/config/ConfigChecker.hpp>
-#include <tools/gettid.hpp>
 #include <zmqpp/zmqpp.hpp>
 
 extern "C" {

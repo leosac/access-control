@@ -17,13 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <zmqpp/message.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
-#include <zmqpp/context.hpp>
-#include "zmqpp/zmqpp.hpp"
 #include "hardware/FGPIO.hpp"
+#include "tools/log.hpp"
+#include "zmqpp/zmqpp.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <memory>
+#include <zmqpp/context.hpp>
+#include <zmqpp/message.hpp>
 
 /**
 * Send the request to the target and handle the response.

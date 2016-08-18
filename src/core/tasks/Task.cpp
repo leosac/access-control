@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/GenGuid.h>
-#include "exception/ExceptionsTools.hpp"
-#include "tools/log.hpp"
 #include "Task.hpp"
+#include "exception/ExceptionsTools.hpp"
+#include "tools/GenGuid.h"
+#include "tools/log.hpp"
 
 using namespace Leosac::Tasks;
 

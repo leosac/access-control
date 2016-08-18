@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "core/auth/AuthTarget.hpp"
 #include <chrono>
 #include <memory>
-#include "core/auth/AuthTarget.hpp"
 
 namespace Leosac
 {

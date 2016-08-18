@@ -21,9 +21,9 @@
 #include "WSServer.hpp"
 #include "core/CoreAPI.hpp"
 #include "core/CoreUtils.hpp"
-#include <tools/db/database.hpp>
 #include <boost/filesystem.hpp>
 #include <tools/XmlPropertyTree.hpp>
+#include <tools/db/database.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;

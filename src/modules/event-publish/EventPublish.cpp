@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/auth/Auth.hpp>
 #include "EventPublish.h"
+#include <core/auth/Auth.hpp>
 
 using namespace Leosac::Module::EventPublish;
 

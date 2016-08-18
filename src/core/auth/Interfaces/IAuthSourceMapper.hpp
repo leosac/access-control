@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "tools/IVisitor.hpp"
-#include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/Group.hpp"
+#include "core/auth/Interfaces/IAuthenticationSource.hpp"
+#include "tools/IVisitor.hpp"
 
 namespace Leosac
 {

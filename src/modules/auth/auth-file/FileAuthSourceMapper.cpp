@@ -17,15 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/algorithm/string.hpp>
-
-#include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "FileAuthSourceMapper.hpp"
-#include "tools/XmlPropertyTree.hpp"
-#include "tools/log.hpp"
+#include "core/auth/Auth.hpp"
+#include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/ProfileMerger.hpp"
 #include "exception/moduleexception.hpp"
-#include "core/auth/Auth.hpp"
+#include "tools/XmlPropertyTree.hpp"
+#include "tools/log.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;

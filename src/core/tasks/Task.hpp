@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <memory>
 #include <atomic>
 #include <condition_variable>
+#include <memory>
 
 namespace Leosac
 {

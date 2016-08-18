@@ -17,13 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
-#include <fstream>
-#include "tools/log.hpp"
-#include "core/config/ConfigManager.hpp"
 #include "SyncConfig.hpp"
 #include "FetchRemoteConfig.hpp"
+#include "core/config/ConfigManager.hpp"
 #include "core/kernel.hpp"
+#include "tools/log.hpp"
+#include <cassert>
+#include <fstream>
 
 using namespace Leosac;
 using namespace Leosac::Tasks;

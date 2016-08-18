@@ -18,11 +18,11 @@
 */
 
 #include "XmlScheduleLoader.hpp"
-#include "log.hpp"
 #include "exception/configexception.hpp"
-#include <cassert>
+#include "log.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <cassert>
 
 using namespace Leosac::Tools;
 

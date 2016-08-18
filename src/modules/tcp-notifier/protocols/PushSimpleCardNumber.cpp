@@ -17,10 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/zmqpp.hpp>
-#include <zmqpp/inet.hpp>
 #include "PushSimpleCardNumber.hpp"
 #include "core/auth/WiegandCard.hpp"
+
+// fixme zmqpp include problem
+#include <cstring>
+
+#include <zmqpp/inet.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 Leosac::ByteVector Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
     const Auth::WiegandCard &card)

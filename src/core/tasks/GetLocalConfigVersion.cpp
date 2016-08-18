@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <tools/gettid.hpp>
 #include "GetLocalConfigVersion.hpp"
 #include "core/kernel.hpp"
+#include "tools/gettid.hpp"
+#include "tools/log.hpp"
 
 Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k)
     : kernel_(k)

@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <string>
 #include <sstream>
+#include <string>
 
 namespace Leosac
 {

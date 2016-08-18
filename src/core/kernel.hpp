@@ -19,18 +19,18 @@
 
 #pragma once
 
-#include <boost/property_tree/ptree.hpp>
-#include <zmqpp/context.hpp>
-#include <core/config/ConfigManager.hpp>
-#include <core/config/ConfigChecker.hpp>
-#include "tools/runtimeoptions.hpp"
-#include "core/netconfig/networkconfig.hpp"
-#include "module_manager.hpp"
+#include "CoreUtils.hpp"
 #include "MessageBus.hpp"
 #include "RemoteControl.hpp"
 #include "Scheduler.hpp"
-#include "CoreUtils.hpp"
+#include "core/config/ConfigChecker.hpp"
+#include "core/config/ConfigManager.hpp"
+#include "core/netconfig/networkconfig.hpp"
+#include "module_manager.hpp"
 #include "tools/db/db_fwd.hpp"
+#include "tools/runtimeoptions.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <zmqpp/context.hpp>
 
 namespace Leosac
 {

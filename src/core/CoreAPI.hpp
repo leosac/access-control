@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <cstdint>
 #include <boost/property_tree/ptree.hpp>
+#include <cstdint>
 #include <string>
 
 namespace Leosac

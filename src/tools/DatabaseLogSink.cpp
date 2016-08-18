@@ -18,11 +18,11 @@
 */
 
 #include "DatabaseLogSink.hpp"
-#include <tools/db/database.hpp>
-#include <tools/db/LogEntry.hpp>
-#include <tools/DateTimeConverter.hpp>
-#include "LogEntry_odb.h"
 #include "GenGuid.h"
+#include "LogEntry_odb.h"
+#include <tools/DateTimeConverter.hpp>
+#include <tools/db/LogEntry.hpp>
+#include <tools/db/database.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Tools;

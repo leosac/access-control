@@ -17,14 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/property_tree/ptree_serialization.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/version.hpp>
-#include "exception/configexception.hpp"
 #include "XmlPropertyTree.hpp"
+#include "exception/configexception.hpp"
 #include "log.hpp"
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/version.hpp>
 
 using boost::property_tree::xml_parser::read_xml;
 using boost::property_tree::xml_parser::write_xml;

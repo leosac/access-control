@@ -17,25 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <fstream>
-#include <boost/property_tree/ptree_serialization.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <tools/ElapsedTimeCounter.hpp>
-#include <tools/DatabaseLogSink.hpp>
 #include "kernel.hpp"
+#include "exception/ExceptionsTools.hpp"
+#include "tools/DatabaseLogSink.hpp"
+#include "tools/ElapsedTimeCounter.hpp"
+#include "tools/XmlPropertyTree.hpp"
 #include "tools/db/database.hpp"
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
-#include "tools/unixshellscript.hpp"
-#include "exception/ExceptionsTools.hpp"
-#include "tools/XmlPropertyTree.hpp"
 #include "tools/unixfs.hpp"
+#include "tools/unixshellscript.hpp"
+#include <boost/algorithm/string/join.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <fstream>
 
-#include <odb/sqlite/database.hxx>
 #include <odb/mysql/database.hxx>
+#include <odb/sqlite/database.hxx>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "StrategiesFwd.hpp"
 #include "WiegandStrategy.hpp"
 
 namespace Leosac
@@ -29,9 +30,6 @@ namespace Wiegand
 {
 namespace Strategy
 {
-class PinReading;
-
-using PinReadingUPtr = std::unique_ptr<PinReading>;
 
 /**
 * Interface for a strategy that read a PIN code.

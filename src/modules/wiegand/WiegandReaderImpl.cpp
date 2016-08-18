@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iomanip>
-#include <core/auth/Auth.hpp>
 #include "WiegandReaderImpl.hpp"
-#include "tools/log.hpp"
 #include "strategies/WiegandStrategy.hpp"
+#include "tools/log.hpp"
+#include <core/auth/Auth.hpp>
+#include <iomanip>
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;

@@ -20,11 +20,11 @@
 #pragma once
 
 #include <cassert>
-#include <string>
-#include <iostream>
-#include <sstream>
 #include <csignal>
-#include "spdlog/spdlog.h"
+#include <iostream>
+#include <spdlog/spdlog.h>
+#include <sstream>
+#include <string>
 
 enum LogLevel
 {

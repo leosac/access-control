@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <fcntl.h>
-#include <unistd.h>
-#include "tools/unixfs.hpp"
 #include "SysFSGPIOPin.hpp"
+#include "tools/unixfs.hpp"
+#include <fcntl.h>
+#include <tools/log.hpp>
+#include <unistd.h>
 
 using namespace Leosac::Module::SysFsGpio;
 using Leosac::Tools::UnixFs;

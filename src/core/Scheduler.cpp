@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <future>
-#include <core/tasks/Task.hpp>
 #include "Scheduler.hpp"
+#include <assert.h>
+#include <core/tasks/Task.hpp>
+#include <future>
 
 using namespace Leosac;
 using namespace Leosac::Tasks;

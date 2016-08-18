@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "core/auth/Interfaces/IUser.hpp"
 #include <string>
 #include <vector>
-#include "core/auth/Interfaces/IUser.hpp"
 
 namespace Leosac
 {

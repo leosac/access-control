@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include <string>
-#include <chrono>
+#include "core/auth/Auth.hpp"
+#include "hardware/FBuzzer.hpp"
+#include "hardware/FLED.hpp"
 #include "modules/wiegand/strategies/WiegandStrategy.hpp"
 #include "zmqpp/zmqpp.hpp"
-#include "hardware/FLED.hpp"
-#include "hardware/FBuzzer.hpp"
-#include "core/auth/Auth.hpp"
+#include <chrono>
+#include <string>
 
 namespace Leosac
 {

@@ -17,15 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/log.hpp"
-#include "hardware/FWiegandReader.hpp"
 #include "RplethModule.hpp"
+#include "core/auth/Auth.hpp"
+#include "core/auth/WiegandCard.hpp"
+#include "hardware/FWiegandReader.hpp"
 #include "rplethprotocol.hpp"
-#include <boost/property_tree/ptree_serialization.hpp>
+#include "tools/log.hpp"
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
-#include <core/auth/Auth.hpp>
-#include <core/auth/WiegandCard.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
 #include <netinet/in.h>
 
 using namespace Leosac::Module::Rpleth;

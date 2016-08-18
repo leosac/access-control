@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
 #include "PFDigitalModule.hpp"
+#include "tools/log.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 extern "C" {
 const char *get_module_name()

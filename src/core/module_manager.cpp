@@ -18,10 +18,10 @@
 */
 
 #include "module_manager.hpp"
-#include "tools/unixfs.hpp"
-#include "tools/log.hpp"
-#include "exception/ExceptionsTools.hpp"
 #include "core/kernel.hpp"
+#include "exception/ExceptionsTools.hpp"
+#include "tools/log.hpp"
+#include "tools/unixfs.hpp"
 
 using Leosac::Tools::UnixFs;
 using namespace Leosac;

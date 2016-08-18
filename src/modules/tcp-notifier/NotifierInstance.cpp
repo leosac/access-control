@@ -17,12 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/message.hpp>
-#include <tools/log.hpp>
-#include <core/auth/Auth.hpp>
-#include <tools/Colorize.hpp>
 #include "NotifierInstance.hpp"
 #include "core/auth/WiegandCard.hpp"
+#include <core/auth/Auth.hpp>
+#include <tools/Colorize.hpp>
+#include <tools/log.hpp>
+#include <zmqpp/message.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;

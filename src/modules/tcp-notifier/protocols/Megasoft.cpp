@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "Megasoft.hpp"
+#include "core/auth/WiegandCard.hpp"
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <tools/log.hpp>
-#include "Megasoft.hpp"
-#include "core/auth/WiegandCard.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;

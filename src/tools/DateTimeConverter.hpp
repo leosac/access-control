@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <chrono>
 #include "boost/date_time/posix_time/posix_time.hpp"
+#include <chrono>
 
 template <typename Duration>
 boost::posix_time::ptime time_point_ptime(

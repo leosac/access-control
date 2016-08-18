@@ -25,9 +25,9 @@
 
 #include "version.hpp"
 
+#include <algorithm>
 #include <sstream>
 #include <string>
-#include <algorithm>
 
 using namespace Leosac::Tools;
 

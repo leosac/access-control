@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
+#include "core/auth/AuthTarget.hpp"
+#include "hardware/FGPIO.hpp"
+#include "modules/BaseModule.hpp"
+#include "tools/XmlScheduleLoader.hpp"
 #include <boost/property_tree/ptree.hpp>
-#include <vector>
 #include <memory>
-#include <modules/BaseModule.hpp>
-#include <hardware/FGPIO.hpp>
-#include <tools/XmlScheduleLoader.hpp>
-#include <core/auth/AuthTarget.hpp>
+#include <vector>
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {

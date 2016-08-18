@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <string>
 #include "leosacexception.hpp"
 #include "tools/Colorize.hpp"
+#include <string>
 
 namespace Leosac
 {

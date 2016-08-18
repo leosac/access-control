@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <vector>
-#include <modules/BaseModule.hpp>
 #include "AuthFileInstance.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <modules/BaseModule.hpp>
+#include <vector>
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {

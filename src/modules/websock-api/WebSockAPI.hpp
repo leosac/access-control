@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <tools/db/db_fwd.hpp>
 #include "modules/BaseModule.hpp"
+#include <tools/db/db_fwd.hpp>
 
 namespace Leosac
 {

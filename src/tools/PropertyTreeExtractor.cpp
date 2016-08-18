@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/property_tree/ptree.hpp>
 #include "PropertyTreeExtractor.hpp"
 #include "Colorize.hpp"
-#include "log.hpp"
 #include "exception/configexception.hpp"
+#include "log.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 using namespace Leosac::Tools;
 

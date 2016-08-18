@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
-#include "core/auth/AuthFwd.hpp"
-#include "protocols/PushSimpleCardNumber.hpp"
 #include "NotifierInstance.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include "modules/BaseModule.hpp"
+#include "protocols/PushSimpleCardNumber.hpp"
 
 namespace Leosac
 {

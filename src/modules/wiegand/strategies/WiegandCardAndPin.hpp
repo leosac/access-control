@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Strategies.hpp"
+#include "StrategiesFwd.hpp"
 
 namespace Leosac
 {

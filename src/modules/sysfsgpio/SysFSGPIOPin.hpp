@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
 #include "SysFsGpioModule.hpp"
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {

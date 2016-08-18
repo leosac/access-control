@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <string>
-#include <map>
-#include <vector>
 #include "core/auth/AuthFwd.hpp"
+#include <map>
+#include <string>
+#include <vector>
 
 namespace Leosac
 {

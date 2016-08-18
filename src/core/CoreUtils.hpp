@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "CoreAPI.hpp"
 #include "LeosacFwd.hpp"
 #include "tools/db/db_fwd.hpp"
-#include "CoreAPI.hpp"
 
 namespace Leosac
 {

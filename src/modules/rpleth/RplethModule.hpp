@@ -19,12 +19,12 @@
 
 #pragma once
 
+#include "hardware/FWiegandReader.hpp"
+#include "modules/BaseModule.hpp"
+#include "modules/rpleth/network/circularbuffer.hpp"
+#include "rplethpacket.hpp"
 #include <memory>
 #include <vector>
-#include "modules/BaseModule.hpp"
-#include "hardware/FWiegandReader.hpp"
-#include "rplethpacket.hpp"
-#include "modules/rpleth/network/circularbuffer.hpp"
 
 namespace Leosac
 {

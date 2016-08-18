@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include <string>
 #include <chrono>
-#include <zmqpp/socket.hpp>
+#include <string>
 #include <zmqpp/poller.hpp>
+#include <zmqpp/socket.hpp>
 
 namespace Leosac
 {

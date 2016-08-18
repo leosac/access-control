@@ -19,13 +19,13 @@
 
 #pragma once
 
+#include "WebSockAPI.hpp"
+#include "api/APIAuth.hpp"
+#include "api/api.hpp"
+#include "tools/db/db_fwd.hpp"
 #include <set>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include "api/api.hpp"
-#include "tools/db/db_fwd.hpp"
-#include "WebSockAPI.hpp"
-#include "api/APIAuth.hpp"
 
 namespace Leosac
 {

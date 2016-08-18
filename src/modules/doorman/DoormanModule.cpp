@@ -17,12 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/auth/Auth.hpp>
 #include "DoormanModule.hpp"
 #include "DoormanInstance.hpp"
-#include "tools/log.hpp"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
+#include "tools/log.hpp"
+#include <core/auth/Auth.hpp>
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;

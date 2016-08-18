@@ -17,17 +17,17 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/auth/WiegandCard.hpp>
-#include <core/auth/AuthSourceBuilder.hpp>
-#include <core/auth/Auth.hpp>
-#include <core/CoreUtils.hpp>
-#include <core/Scheduler.hpp>
-#include <exception/ExceptionsTools.hpp>
-#include <boost/algorithm/string/join.hpp>
-#include <tools/Colorize.hpp>
 #include "AuthFileInstance.hpp"
-#include "tools/log.hpp"
 #include "FileAuthSourceMapper.hpp"
+#include "core/CoreUtils.hpp"
+#include "core/Scheduler.hpp"
+#include "core/auth/Auth.hpp"
+#include "core/auth/AuthSourceBuilder.hpp"
+#include "core/auth/WiegandCard.hpp"
+#include "exception/ExceptionsTools.hpp"
+#include "tools/Colorize.hpp"
+#include "tools/log.hpp"
+#include <boost/algorithm/string/join.hpp>
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;

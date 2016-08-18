@@ -26,9 +26,9 @@
 #ifndef UNIXFS_HPP
 #define UNIXFS_HPP
 
-#include <string>
-#include <list>
 #include <fstream>
+#include <list>
+#include <string>
 
 #include "exception/fsexception.hpp"
 

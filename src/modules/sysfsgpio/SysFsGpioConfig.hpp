@@ -20,6 +20,9 @@
 #pragma once
 
 #include "SysFSGPIOPin.hpp"
+#include <boost/property_tree/ptree_fwd.hpp>
+#include <map>
+#include <string>
 
 namespace Leosac
 {

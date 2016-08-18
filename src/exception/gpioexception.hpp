@@ -26,8 +26,8 @@
 #ifndef GPIOEXCEPTION_HPP
 #define GPIOEXCEPTION_HPP
 
-#include <string>
 #include "leosacexception.hpp"
+#include <string>
 
 class GpioException : public LEOSACException
 {

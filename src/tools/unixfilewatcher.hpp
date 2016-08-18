@@ -26,10 +26,10 @@
 #ifndef UNIXFILEWATCHER_HPP
 #define UNIXFILEWATCHER_HPP
 
-#include <string>
-#include <thread>
 #include <atomic>
 #include <map>
+#include <string>
+#include <thread>
 
 namespace Leosac
 {

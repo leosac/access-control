@@ -18,21 +18,21 @@
 */
 
 #include "RemoteControl.hpp"
-#include "tools/log.hpp"
-#include "kernel.hpp"
-#include "tools/XmlPropertyTree.hpp"
+#include "core/CoreUtils.hpp"
 #include "core/config/RemoteConfigCollector.hpp"
 #include "core/tasks/FetchRemoteConfig.hpp"
-#include "core/tasks/SyncConfig.hpp"
 #include "core/tasks/RemoteControlAsyncResponse.hpp"
+#include "core/tasks/SyncConfig.hpp"
+#include "kernel.hpp"
+#include "tools/XmlPropertyTree.hpp"
+#include "tools/log.hpp"
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/regex.hpp>
 #include <cassert>
 #include <zmqpp/curve.hpp>
-#include <boost/regex.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/property_tree/ptree_serialization.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include "core/CoreUtils.hpp"
 
 using namespace Leosac;
 

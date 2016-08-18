@@ -17,15 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <zmqpp/message.hpp>
-#include <zmqpp/context.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <modules/wiegand/strategies/Autodetect.hpp>
-#include "tools/log.hpp"
 #include "wiegand.hpp"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
+#include "tools/log.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <memory>
+#include <modules/wiegand/strategies/Autodetect.hpp>
+#include <zmqpp/context.hpp>
+#include <zmqpp/message.hpp>
 
 using namespace Leosac::Module::Wiegand;
 

@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <spdlog/sinks/sink.h>
 #include "tools/db/db_fwd.hpp"
+#include <spdlog/sinks/sink.h>
 
 namespace Leosac
 {

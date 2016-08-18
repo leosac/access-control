@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
-#include <fstream>
-#include "core/tasks/Task.hpp"
+#include "FileAuthSourceMapper.hpp"
 #include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "FileAuthSourceMapper.hpp"
+#include "core/tasks/Task.hpp"
+#include <fstream>
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {

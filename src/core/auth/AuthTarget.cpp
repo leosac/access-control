@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "AuthTarget.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Auth;
 

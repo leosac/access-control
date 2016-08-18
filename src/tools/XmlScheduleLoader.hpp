@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/property_tree/ptree_fwd.hpp>
 #include "Schedule.hpp"
+#include <boost/property_tree/ptree_fwd.hpp>
 #include <map>
 
 #pragma once

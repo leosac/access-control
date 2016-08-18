@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <tools/unixshellscript.hpp>
-#include <zmqpp/z85.hpp>
 #include "MonitorModule.hpp"
+#include "tools/log.hpp"
+#include "tools/unixshellscript.hpp"
+#include <zmqpp/z85.hpp>
 
 using namespace Leosac::Module::Monitor;
 

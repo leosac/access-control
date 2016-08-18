@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <core/config/RemoteConfigCollector.hpp>
-#include "Task.hpp"
 #include "LeosacFwd.hpp"
+#include "Task.hpp"
+#include "core/config/RemoteConfigCollector.hpp"
 
 namespace Leosac
 {

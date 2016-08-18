@@ -23,8 +23,8 @@
  * \brief signal handler to provide a C++ interface for UNIX sigaction()
  */
 
-#include <assert.h>
 #include "signalhandler.hpp"
+#include <assert.h>
 
 extern "C" {
 #include <unistd.h>

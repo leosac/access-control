@@ -17,10 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "hardware/FGPIO.hpp"
+#include "hardware/FLED.hpp"
+#include "tools/log.hpp"
 #include <boost/msm/back/state_machine.hpp>
-#include <boost/msm/front/state_machine_def.hpp>
 #include <boost/msm/front/functor_row.hpp>
-#include <hardware/FLED.hpp>
+#include <boost/msm/front/state_machine_def.hpp>
 
 namespace Leosac
 {

@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <zmqpp/socket.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <zmqpp/reactor.hpp>
-#include <modules/BaseModule.hpp>
 #include "SysFSGPIOPin.hpp"
 #include "SysFsGpioConfig.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <modules/BaseModule.hpp>
+#include <zmqpp/reactor.hpp>
+#include <zmqpp/socket.hpp>
 
 namespace Leosac
 {

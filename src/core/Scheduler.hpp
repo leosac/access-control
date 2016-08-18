@@ -19,12 +19,12 @@
 
 #pragma once
 
-#include <queue>
-#include <map>
-#include <thread>
-#include <mutex>
-#include <core/tasks/GenericTask.hpp>
 #include "LeosacFwd.hpp"
+#include "core/tasks/GenericTask.hpp"
+#include <map>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 namespace Leosac
 {

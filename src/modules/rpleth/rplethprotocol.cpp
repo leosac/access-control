@@ -24,8 +24,8 @@
 */
 
 #include "rplethprotocol.hpp"
-#include <vector>
 #include <tools/log.hpp>
+#include <vector>
 
 using namespace Leosac::Module::Rpleth;
 

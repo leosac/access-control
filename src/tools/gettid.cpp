@@ -18,10 +18,10 @@
 */
 
 #include "gettid.hpp"
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 namespace Leosac
 {

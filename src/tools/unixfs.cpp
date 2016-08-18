@@ -26,12 +26,12 @@
 #include "unixfs.hpp"
 
 extern "C" {
-#include <unistd.h>
 #include <dirent.h>
+#include <unistd.h>
 }
 
-#include <cerrno>
 #include <algorithm>
+#include <cerrno>
 
 #include "unixsyscall.hpp"
 

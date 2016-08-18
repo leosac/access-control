@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "Autodetect.hpp"
 #include "modules/wiegand/WiegandReaderImpl.hpp"
+#include <tools/log.hpp>
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;

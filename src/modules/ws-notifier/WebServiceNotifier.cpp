@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <curl/curl.h>
-#include "core/auth/WiegandCard.hpp"
 #include "WebServiceNotifier.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/WiegandCard.hpp"
+#include <curl/curl.h>
 
 using namespace Leosac;
 using namespace Leosac::Module;

@@ -17,15 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "APIAuth.hpp"
+#include "WSServer.hpp"
+#include "core/auth/Interfaces/IUser.hpp"
+#include "odb_gen/IUser_odb.h"
+#include "tools/GenGuid.h"
+#include "tools/db/database.hpp"
 #include <algorithm>
 #include <odb/object-result.hxx>
 #include <odb/session.hxx>
-#include "core/auth/Interfaces/IUser.hpp"
-#include "odb_gen/IUser_odb.h"
-#include "APIAuth.hpp"
-#include "tools/GenGuid.h"
-#include "WSServer.hpp"
-#include "tools/db/database.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;

@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/iterator/transform_iterator.hpp>
+#include "LEDBuzzerModule.hpp"
 #include "core/kernel.hpp"
 #include "tools/timeout.hpp"
-#include "LEDBuzzerModule.hpp"
+#include <boost/iterator/transform_iterator.hpp>
 
 using namespace Leosac::Module::LedBuzzer;
 

@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include "DoormanModule.hpp"
 #include "DoormanInstance.hpp"
+#include "DoormanModule.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Module::Doorman;
 

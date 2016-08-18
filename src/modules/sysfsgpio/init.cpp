@@ -17,12 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <zmqpp/message.hpp>
+#include "SysFsGpioModule.hpp"
 #include <boost/property_tree/ptree.hpp>
+#include <memory>
 #include <tools/log.hpp>
 #include <zmqpp/context.hpp>
-#include "SysFsGpioModule.hpp"
+#include <zmqpp/message.hpp>
 
 using namespace Leosac::Module::SysFsGpio;
 

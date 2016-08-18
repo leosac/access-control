@@ -31,8 +31,8 @@ extern "C" {
 }
 
 #include "exception/fsexception.hpp"
-#include "tools/unixsyscall.hpp"
 #include "tools/log.hpp"
+#include "tools/unixsyscall.hpp"
 
 using namespace Leosac::Tools;
 

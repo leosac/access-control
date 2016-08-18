@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdexcept>
-#include <cassert>
-#include <tools/log.hpp>
 #include "core/auth/CredentialValidity.hpp"
+#include <cassert>
+#include <stdexcept>
+#include <tools/log.hpp>
 
 using namespace Leosac::Auth;
 

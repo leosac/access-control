@@ -26,8 +26,8 @@
 #ifndef CIRCULARBUFFER_HPP
 #define CIRCULARBUFFER_HPP
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "tools/bufferutils.hpp"
 

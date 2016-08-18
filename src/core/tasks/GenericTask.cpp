@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "GenericTask.hpp"
+#include "tools/log.hpp"
 
 Leosac::Tasks::GenericTask::GenericTask(const std::function<bool(void)> &fct)
     : fct_(fct)

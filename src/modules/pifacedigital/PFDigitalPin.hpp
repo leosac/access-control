@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
-#include <string>
 #include <chrono>
+#include <string>
+#include <zmqpp/zmqpp.hpp>
 
 /**
 * This is a implementation class. It's not exposed to the user and is for this

@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include <chrono>
-#include <memory>
-#include <map>
-#include <vector>
-#include <tools/Schedule.hpp>
-#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/AuthTarget.hpp"
+#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "tools/SingleTimeFrame.hpp"
+#include <chrono>
+#include <map>
+#include <memory>
+#include <tools/Schedule.hpp>
+#include <vector>
 
 namespace Leosac
 {

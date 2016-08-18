@@ -17,14 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <zmqpp/message.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
-#include <zmqpp/context.hpp>
-#include <zmqpp/poller.hpp>
-#include "zmqpp/actor.hpp"
 #include "MonitorModule.hpp"
+#include "tools/log.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <memory>
+#include <zmqpp/actor.hpp>
+#include <zmqpp/context.hpp>
+#include <zmqpp/message.hpp>
+#include <zmqpp/poller.hpp>
 
 using namespace Leosac::Module::Monitor;
 

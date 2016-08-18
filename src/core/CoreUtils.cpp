@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/log.hpp"
-#include "tools/db/db_fwd.hpp"
 #include "CoreUtils.hpp"
 #include "kernel.hpp"
+#include "tools/db/db_fwd.hpp"
+#include "tools/log.hpp"
 
 Leosac::CoreUtils::CoreUtils(Leosac::Kernel *kptr, Leosac::SchedulerPtr sched,
                              Leosac::ConfigCheckerPtr cfgcheck, bool strict_mode)

@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
 #include "LedBuzzerImpl.hpp"
+#include "modules/BaseModule.hpp"
 #include <memory>
 #include <vector>
 

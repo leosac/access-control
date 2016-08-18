@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "SimpleAccessProfile.hpp"
 #include <assert.h>
 #include <tools/log.hpp>
-#include "SimpleAccessProfile.hpp"
 
 using namespace Leosac::Auth;
 using SingleTimeFrame = Leosac::Tools::SingleTimeFrame;

@@ -19,28 +19,22 @@
 
 #pragma once
 
-#include "core/tasks/Task.hpp"
-#include <zmqpp/zmqpp.hpp>
+#include <memory>
 
 namespace Leosac
 {
-namespace Tasks
+namespace Module
 {
-/**
- * This task represent an asynchronous response that shall
- * be sent over the Remote Control router socket.
- */
-class RemoteControlAsyncResponse : public Task
+namespace Wiegand
 {
-  public:
-    RemoteControlAsyncResponse(const std::string identity,
-                               const zmqpp::message_t &msg, zmqpp::socket_t &socket);
+namespace Strategy
+{
+class PinReading;
+using PinReadingUPtr = std::unique_ptr<PinReading>;
 
-  private:
-    virtual bool do_run();
-
-    zmqpp::message_t msg_;
-    zmqpp::socket_t &socket_;
-};
+class SimpleWiegandStrategy;
+using SimpleWiegandStrategyUPtr = std::unique_ptr<SimpleWiegandStrategy>;
+}
+}
 }
 }

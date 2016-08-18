@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include "ReplicationModule.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 using namespace Leosac::Module::Replication;
 

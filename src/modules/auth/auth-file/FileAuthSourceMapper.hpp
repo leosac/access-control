@@ -19,20 +19,20 @@
 
 #pragma once
 
-#include <string>
-#include <map>
-#include <boost/property_tree/ptree.hpp>
-#include <core/auth/WiegandCardPin.hpp>
-#include <unordered_map>
-#include <utility>
-#include <tools/XmlScheduleLoader.hpp>
-#include "core/auth/SimpleAccessProfile.hpp"
 #include "core/auth/Group.hpp"
-#include "core/auth/WiegandCard.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
-#include "tools/SingleTimeFrame.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"
+#include "core/auth/SimpleAccessProfile.hpp"
+#include "core/auth/WiegandCard.hpp"
+#include "core/auth/WiegandCardPin.hpp"
+#include "tools/SingleTimeFrame.hpp"
+#include "tools/XmlScheduleLoader.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <map>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
 namespace Leosac
 {

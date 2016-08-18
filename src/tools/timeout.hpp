@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <chrono>
 #include "log.hpp"
+#include <chrono>
 
 namespace Leosac
 {

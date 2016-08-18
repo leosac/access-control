@@ -20,10 +20,10 @@
 #pragma once
 
 #include "core/auth/BaseAuthSource.hpp"
+#include "core/auth/PINCode.hpp"
+#include "core/auth/WiegandCard.hpp"
 #include <string>
 #include <tools/IVisitor.hpp>
-#include "core/auth/WiegandCard.hpp"
-#include "core/auth/PINCode.hpp"
 
 namespace Leosac
 {

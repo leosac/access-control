@@ -28,8 +28,8 @@
 
 #include <bitset>
 #include <cstdint>
-#include <string>
 #include <map>
+#include <string>
 
 namespace Leosac
 {

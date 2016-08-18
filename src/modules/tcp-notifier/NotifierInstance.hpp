@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <zmqpp/socket.hpp>
-#include <zmqpp/reactor.hpp>
 #include "LeosacFwd.hpp"
-#include "core/auth/AuthFwd.hpp"
 #include "ProtocolHandler.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include <zmqpp/reactor.hpp>
+#include <zmqpp/socket.hpp>
 
 namespace Leosac
 {

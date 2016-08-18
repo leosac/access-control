@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
-#include <zmqpp/zmqpp.hpp>
 #include "LEDBuzzerModule.hpp"
+#include "tools/log.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 using namespace Leosac::Module::LedBuzzer;
 

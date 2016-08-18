@@ -20,9 +20,9 @@
 #pragma once
 
 #include "SimpleWiegandStrategy.hpp"
-#include "WiegandPinNBitsOnly.hpp"
-#include "WiegandPinBuffered.hpp"
 #include "WiegandCardAndPin.hpp"
+#include "WiegandPinBuffered.hpp"
+#include "WiegandPinNBitsOnly.hpp"
 
 #include "CardReading.hpp"
 #include "PinReading.hpp"

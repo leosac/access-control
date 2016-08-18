@@ -17,14 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/tasks/GetRemoteConfigVersion.hpp>
-#include "tools/log.hpp"
-#include "core/tasks/GetLocalConfigVersion.hpp"
 #include "ReplicationModule.hpp"
-#include "core/Scheduler.hpp"
 #include "core/CoreUtils.hpp"
-#include "core/tasks/SyncConfig.hpp"
+#include "core/Scheduler.hpp"
 #include "core/tasks/FetchRemoteConfig.hpp"
+#include "core/tasks/GetLocalConfigVersion.hpp"
+#include "core/tasks/GetRemoteConfigVersion.hpp"
+#include "core/tasks/SyncConfig.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Module::Replication;
 

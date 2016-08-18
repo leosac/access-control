@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <stdexcept>
 #include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include <stdexcept>
 
 namespace Leosac
 {

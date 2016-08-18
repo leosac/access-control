@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <memory>
 #include <json.hpp>
+#include <memory>
 
 namespace Leosac
 {

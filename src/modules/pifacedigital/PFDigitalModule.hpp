@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <zmqpp/socket.hpp>
+#include "PFDigitalPin.hpp"
+#include "modules/BaseModule.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/reactor.hpp>
-#include <modules/BaseModule.hpp>
-#include "PFDigitalPin.hpp"
+#include <zmqpp/socket.hpp>
 
 namespace Leosac
 {

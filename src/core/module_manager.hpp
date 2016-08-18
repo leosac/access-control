@@ -19,16 +19,16 @@
 
 #pragma once
 
-#include <list>
-#include <map>
-#include <string>
-#include <vector>
-#include <set>
-#include <zmqpp/actor.hpp>
-#include "dynlib/dynamiclibrary.hpp"
+#include "LeosacFwd.hpp"
 #include "boost/property_tree/ptree.hpp"
 #include "core/config/ConfigManager.hpp"
-#include "LeosacFwd.hpp"
+#include "dynlib/dynamiclibrary.hpp"
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+#include <zmqpp/actor.hpp>
 
 namespace Leosac
 {

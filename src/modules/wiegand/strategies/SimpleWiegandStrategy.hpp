@@ -29,10 +29,6 @@ namespace Wiegand
 {
 namespace Strategy
 {
-class SimpleWiegandStrategy;
-
-using SimpleWiegandStrategyUPtr = std::unique_ptr<SimpleWiegandStrategy>;
-
 /**
 * Implementation of a wiegand card only strategy.
 */

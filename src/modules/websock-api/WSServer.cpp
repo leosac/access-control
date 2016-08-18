@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <json.hpp>
-#include "tools/log.hpp"
 #include "WSServer.hpp"
+#include "tools/log.hpp"
+#include <json.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;

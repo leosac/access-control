@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include <string>
-#include <chrono>
-#include <boost/any.hpp>
-#include "zmqpp/zmqpp.hpp"
 #include "core/auth/Auth.hpp"
+#include "zmqpp/zmqpp.hpp"
+#include <boost/any.hpp>
+#include <chrono>
+#include <string>
 
 namespace Leosac
 {

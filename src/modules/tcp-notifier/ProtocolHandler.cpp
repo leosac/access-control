@@ -18,8 +18,8 @@
 */
 
 #include "ProtocolHandler.hpp"
-#include "protocols/PushSimpleCardNumber.hpp"
 #include "protocols/Megasoft.hpp"
+#include "protocols/PushSimpleCardNumber.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
