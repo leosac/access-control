@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,51 +17,48 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gtest/gtest.h"
 #include "core/auth/WiegandCard.hpp"
 #include "modules/tcp-notifier/protocols/Megasoft.hpp"
+#include "gtest/gtest.h"
 
 using namespace Leosac::Auth;
 
 namespace Leosac
 {
-    namespace Test
-    {
-        TEST(TestTcpNotifierProtocol, Megasoft0)
-        {
-            Module::TCPNotifier::MegasoftProtocol proto;
-            WiegandCard c1("ff:ff:ff:ff", 32);
+namespace Test
+{
+TEST(TestTcpNotifierProtocol, Megasoft0)
+{
+    Module::TCPNotifier::MegasoftProtocol proto;
+    WiegandCard c1("ff:ff:ff:ff", 32);
 
-            auto protocol_bytes = proto.build_cred_msg(c1);
-            auto protocol_str = std::string(protocol_bytes.begin(), protocol_bytes.end());
-            ASSERT_EQ("check_card: data: <'4294967295\r'> <<type 'str'>>",
-                      protocol_str);
-            std::cout << "Hexadecimal representation: ";
-            for (auto &byte : protocol_bytes)
-                std::cout << std::hex << +byte << ", ";
-            std::cout << std::endl;
-        }
+    auto protocol_bytes = proto.build_cred_msg(c1);
+    auto protocol_str   = std::string(protocol_bytes.begin(), protocol_bytes.end());
+    ASSERT_EQ("check_card: data: <'4294967295\r'> <<type 'str'>>", protocol_str);
+    std::cout << "Hexadecimal representation: ";
+    for (auto &byte : protocol_bytes)
+        std::cout << std::hex << +byte << ", ";
+    std::cout << std::endl;
+}
 
-        TEST(TestTcpNotifierProtocol, Megasoft1)
-        {
-            Module::TCPNotifier::MegasoftProtocol proto;
-            WiegandCard c1("00:00:00:00", 32);
+TEST(TestTcpNotifierProtocol, Megasoft1)
+{
+    Module::TCPNotifier::MegasoftProtocol proto;
+    WiegandCard c1("00:00:00:00", 32);
 
-            auto protocol_bytes = proto.build_cred_msg(c1);
-            auto protocol_str = std::string(protocol_bytes.begin(), protocol_bytes.end());
-            ASSERT_EQ("check_card: data: <'0\r'> <<type 'str'>>",
-                      protocol_str);
-        }
+    auto protocol_bytes = proto.build_cred_msg(c1);
+    auto protocol_str   = std::string(protocol_bytes.begin(), protocol_bytes.end());
+    ASSERT_EQ("check_card: data: <'0\r'> <<type 'str'>>", protocol_str);
+}
 
-        TEST(TestTcpNotifierProtocol, Megasoft3)
-        {
-            Module::TCPNotifier::MegasoftProtocol proto;
-            WiegandCard c1("53:5E:4D:4F", 32);
+TEST(TestTcpNotifierProtocol, Megasoft3)
+{
+    Module::TCPNotifier::MegasoftProtocol proto;
+    WiegandCard c1("53:5E:4D:4F", 32);
 
-            auto protocol_bytes = proto.build_cred_msg(c1);
-            auto protocol_str = std::string(protocol_bytes.begin(), protocol_bytes.end());
-            ASSERT_EQ("check_card: data: <'1330470483\r'> <<type 'str'>>",
-                      protocol_str);
-        }
-    }
+    auto protocol_bytes = proto.build_cred_msg(c1);
+    auto protocol_str   = std::string(protocol_bytes.begin(), protocol_bytes.end());
+    ASSERT_EQ("check_card: data: <'1330470483\r'> <<type 'str'>>", protocol_str);
+}
+}
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -21,13 +21,12 @@
 
 using namespace Leosac::Test::Helper;
 
-FakeGPIO::FakeGPIO(zmqpp::context &ctx,
-        const std::string &name) :
-ctx_(ctx),
-name_(name),
-push_(ctx, zmqpp::socket_type::push),
-rep_(ctx, zmqpp::socket_type::rep),
-value_(false)
+FakeGPIO::FakeGPIO(zmqpp::context &ctx, const std::string &name)
+    : ctx_(ctx)
+    , name_(name)
+    , push_(ctx, zmqpp::socket_type::push)
+    , rep_(ctx, zmqpp::socket_type::rep)
+    , value_(false)
 {
     push_.connect("inproc://zmq-bus-pull");
     rep_.bind("inproc://" + name);

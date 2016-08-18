@@ -1,0 +1,32 @@
+## General Configuration
+Language: Cpp
+Standard: Cpp11
+BreakBeforeBraces: Allman
+Cpp11BracedListStyle: true
+ColumnLimit: 85
+IndentWidth: 4
+UseTab: Never
+# Misc
+AlignConsecutiveAssignments: true
+PointerAlignment: Right
+AlignTrailingComments: true
+MaxEmptyLinesToKeep: 2
+# Force break most of the time.
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: false
+AlwaysBreakTemplateDeclarations: true
+BinPackArguments: true
+BinPackParameters: true
+# Constructor
+BreakConstructorInitializersBeforeComma: true
+ConstructorInitializerIndentWidth: 4
+# Class / Namespace
+AccessModifierOffset: -2
+NamespaceIndentation: None
+# Spaces
+SpaceBeforeParens: ControlStatements
+SortIncludes: true
