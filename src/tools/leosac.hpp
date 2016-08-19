@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -30,24 +30,24 @@
 
 namespace Leosac
 {
-    static const int Major = LEOSAC_VERSION_MAJOR;
-    static const int Minor = LEOSAC_VERSION_MINOR;
-    static const int Patch = LEOSAC_VERSION_PATCH;
+static const int Major = LEOSAC_VERSION_MAJOR;
+static const int Minor = LEOSAC_VERSION_MINOR;
+static const int Patch = LEOSAC_VERSION_PATCH;
 
-    /**
-     * return LEOSAC version string formatted this way: MAJOR.MINOR.PATCH
-     * @return version string
-     * @see versionCompare()
-     */
-    std::string&    getVersionString();
+/**
+ * return LEOSAC version string formatted this way: MAJOR.MINOR.PATCH
+ * @return version string
+ * @see versionCompare()
+ */
+std::string &getVersionString();
 
-    /**
-     * compare version string against current LEOSAC version
-     * @param v to compare against LEOSAC
-     * @return 0 on match, -1 if v older than LEOSAC, 1 if v is newer than LEOSAC
-     * @see getVersionString()
-     */
-    int             versionCompare(const std::string& v);
+/**
+ * compare version string against current LEOSAC version
+ * @param v to compare against LEOSAC
+ * @return 0 on match, -1 if v older than LEOSAC, 1 if v is newer than LEOSAC
+ * @see getVersionString()
+ */
+int versionCompare(const std::string &v);
 };
 
 #endif // LEOSAC_HPP

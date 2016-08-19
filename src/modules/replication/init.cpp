@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,14 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/zmqpp.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include "ReplicationModule.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 using namespace Leosac::Module::Replication;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "REPLICATION";
@@ -34,11 +33,9 @@ const char *get_module_name()
 /**
 * This is the entry point of the Monitor module.
 */
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
     return Leosac::Module::start_module_helper<ReplicationModule>(pipe, cfg, zmq_ctx,
                                                                   utils);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -34,34 +34,33 @@ extern "C" {
 
 namespace Leosac
 {
-    namespace Tools
-    {
-        enum class Signal : int
-        {
-            SigHup = SIGHUP,
-            SigInt = SIGINT,
-            SigQuit = SIGQUIT,
-            SigKill = SIGKILL,
-            SigSegv = SIGSEGV,
-            SigPipe = SIGPIPE,
-            SigTerm = SIGTERM,
-            SigUsr1 = SIGUSR1,
-            SigUsr2 = SIGUSR2,
-            SigStop = SIGSTOP
-        };
+namespace Tools
+{
+enum class Signal : int
+{
+    SigHup  = SIGHUP,
+    SigInt  = SIGINT,
+    SigQuit = SIGQUIT,
+    SigKill = SIGKILL,
+    SigSegv = SIGSEGV,
+    SigPipe = SIGPIPE,
+    SigTerm = SIGTERM,
+    SigUsr1 = SIGUSR1,
+    SigUsr2 = SIGUSR2,
+    SigStop = SIGSTOP
+};
 
-        static constexpr int num_signals = _NSIG;
+static constexpr int num_signals = _NSIG;
 
-        class SignalHandler
-        {
-            SignalHandler() = delete;
+class SignalHandler
+{
+    SignalHandler() = delete;
 
-        public:
-            static void registerCallback(Signal signal, std::function<void(Signal)> callback);
-        };
-
-    }
+  public:
+    static void registerCallback(Signal signal,
+                                 std::function<void(Signal)> callback);
+};
+}
 }
 
 #endif // SIGNALHANDLER_HPP
-

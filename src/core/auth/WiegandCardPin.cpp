@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,16 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <sstream>
 #include "WiegandCardPin.hpp"
+#include <sstream>
 
 using namespace Leosac::Auth;
 
-WiegandCardPin::WiegandCardPin(const std::string &card_id, int nb_bits, const std::string &pin_code) :
-        card_(card_id, nb_bits),
-        pin_(pin_code)
+WiegandCardPin::WiegandCardPin(const std::string &card_id, int nb_bits,
+                               const std::string &pin_code)
+    : card_(card_id, nb_bits)
+    , pin_(pin_code)
 {
-
 }
 
 const WiegandCard &WiegandCardPin::card() const
@@ -45,7 +45,9 @@ std::string WiegandCardPin::to_string() const
 
     ss << "Text representation of auth source:" << std::endl << "\t\t";
     ss << "Source Name: " << source_name_ << std::endl << "\t\t";
-    ss << "Source Type: " << "WiegandCard + Pin Code" << std::endl << "\t\t";
+    ss << "Source Type: "
+       << "WiegandCard + Pin Code" << std::endl
+       << "\t\t";
     ss << "Number of bits: " << card_.nb_bits() << std::endl << "\t\t";
     ss << "Card id: " << card_.card_id() << std::endl << "\t\t";
     ss << "Pin Code: " << pin_.pin_code();

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,71 +19,95 @@
 
 #pragma once
 
-#include <memory>
-#include <core/auth/CredentialValidity.hpp>
 #include "IAccessProfile.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include "core/auth/CredentialValidity.hpp"
+#include "tools/db/database.hpp"
+#include <memory>
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        class IUser;
-        using IUserPtr = std::shared_ptr<IUser>;
+namespace Auth
+{
+class IUser;
+using IUserPtr = std::shared_ptr<IUser>;
 
-        /**
-        * Represent a user
-        */
-        class IUser
-        {
-        public:
-            IUser(const std::string &user_id);
-            virtual ~IUser() = default;
+/**
+* Represent a user
+*/
+#pragma db object pointer(std::shared_ptr)
+class IUser
+{
+  public:
+    IUser(const std::string &username);
+    IUser()          = default;
+    virtual ~IUser() = default;
 
-            /**
-            * Get the current id/name.
-            */
-            const std::string &id() const noexcept;
+    /**
+    * Get the username of this user.
+    */
+    const std::string &username() const noexcept;
 
-            /**
-            * Set a new id.
-            */
-            void id(const std::string &id_new);
+    unsigned long id() const noexcept;
 
-            IAccessProfilePtr profile() const noexcept;
+    /**
+     * Retrieve password
+     */
+    const std::string &password() const noexcept;
 
-            void profile(IAccessProfilePtr user_profile);
+    /**
+    * Set a new username.
+    */
+    void username(const std::string &username);
 
-            const std::string &firstname() const;
-            const std::string &lastname() const;
-            const std::string &email() const;
-            const CredentialValidity &validity() const;
+    IAccessProfilePtr profile() const noexcept;
 
-            void firstname(const std::string &);
-            void lastname(const std::string &);
-            void email(const std::string &);
-            void validity(const CredentialValidity &c);
+    void profile(IAccessProfilePtr user_profile);
 
-            /**
-            * Check the credentials validity object.
-            */
-            bool is_valid()const;
+    const std::string &firstname() const;
+    const std::string &lastname() const;
+    const std::string &email() const;
+    const CredentialValidity &validity() const;
 
-        protected:
-            /**
-            * This is an (unique) identifier for the user.
-            */
-            std::string id_;
+    void firstname(const std::string &);
+    void lastname(const std::string &);
+    void email(const std::string &);
+    void validity(const CredentialValidity &c);
 
-            std::string firstname_;
-            std::string lastname_;
-            std::string email_;
+    /**
+    * Check the credentials validity object.
+    */
+    bool is_valid() const;
 
-            /**
-            * A user can have the same validity than credentials.
-            */
-            CredentialValidity validity_;
-            IAccessProfilePtr profile_;
-        };
+  protected:
+#pragma db id auto
+    UserId id_;
 
-    }
+/**
+* This is an (unique) identifier for the user.
+*/
+#pragma db unique
+#pragma db not_null
+#pragma db type("VARCHAR(128)")
+    std::string username_;
+
+#pragma db not_null
+    std::string password_;
+
+    std::string firstname_;
+    std::string lastname_;
+    std::string email_;
+
+/**
+* A user can have the same validity than credentials.
+*/
+#pragma db transient
+    CredentialValidity validity_;
+#pragma db transient
+    IAccessProfilePtr profile_;
+
+  private:
+    friend class odb::access;
+};
+}
 }

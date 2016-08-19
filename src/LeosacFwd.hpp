@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -24,27 +24,27 @@
 
 namespace Leosac
 {
-    class Kernel;
-    class Scheduler;
-    class ConfigChecker;
+class Kernel;
+class Scheduler;
+class ConfigChecker;
 
-    using SchedulerPtr = std::shared_ptr<Scheduler>;
-    using ConfigCheckerPtr = std::shared_ptr<ConfigChecker>;
+using SchedulerPtr     = std::shared_ptr<Scheduler>;
+using ConfigCheckerPtr = std::shared_ptr<ConfigChecker>;
 
-    class CoreUtils;
-    using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
+class CoreUtils;
+using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
 
-    using ByteVector = std::vector<uint8_t>;
+using ByteVector = std::vector<uint8_t>;
 
-    namespace Tasks
-    {
-        class Task;
-        using TaskPtr = std::shared_ptr<Task>;
+namespace Tasks
+{
+class Task;
+using TaskPtr = std::shared_ptr<Task>;
 
-        class SyncConfig;
-        using SyncConfigPtr = std::shared_ptr<SyncConfig>;
+class SyncConfig;
+using SyncConfigPtr = std::shared_ptr<SyncConfig>;
 
-        class FetchRemoteConfig;
-        using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
-    }
+class FetchRemoteConfig;
+using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
+}
 }

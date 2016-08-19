@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <future>
-#include <core/tasks/Task.hpp>
 #include "Scheduler.hpp"
+#include <assert.h>
+#include <core/tasks/Task.hpp>
+#include <future>
 
 using namespace Leosac;
 using namespace Leosac::Tasks;
@@ -42,7 +42,7 @@ void Scheduler::update(TargetThread me) noexcept
 {
     mutex_.lock();
     auto &queue = queues_[me];
-    int run = queue.size();
+    int run     = queue.size();
     mutex_.unlock();
 
     while (run)
@@ -63,10 +63,9 @@ void Scheduler::register_thread(TargetThread me)
     queues_[me];
 }
 
-Scheduler::Scheduler(Kernel *kptr) :
-        kptr_(kptr)
+Scheduler::Scheduler(Kernel *kptr)
+    : kptr_(kptr)
 {
-
 }
 
 Kernel &Scheduler::kernel()

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
-#include <string>
 #include <chrono>
+#include <string>
+#include <zmqpp/zmqpp.hpp>
 
 /**
 * This is a implementation class. It's not exposed to the user and is for this
@@ -31,7 +31,8 @@
 */
 struct PFDigitalPin
 {
-    enum class Direction {
+    enum class Direction
+    {
         In = 0,
         Out
     };
@@ -43,13 +44,11 @@ struct PFDigitalPin
     * @param name the name we defined for the PIN
     * @param gpio_no The number of this GPIO
     * @param direction Whether this an input or output pin.
-    * @param value the initial value of the pin. This only make sense if the pin is an output pin.
+    * @param value the initial value of the pin. This only make sense if the pin is
+    * an output pin.
     */
-    PFDigitalPin(zmqpp::context &ctx,
-            const std::string &name,
-            int gpio_no,
-            Direction direction,
-            bool value);
+    PFDigitalPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
+                 Direction direction, bool value);
 
     ~PFDigitalPin();
 
@@ -65,20 +64,24 @@ struct PFDigitalPin
     * Let the GPIO pin perform internal task.
     * This is called by the PFDigitalModule in the main loop.
     *
-    * @note For example we use this to perform "auto turn off" after receiving a "ON" command with a `duration` parameter.
-    * @note the previous example is the only use case for now, so we lack code determining what to do on update.
+    * @note For example we use this to perform "auto turn off" after receiving a "ON"
+    * command with a `duration` parameter.
+    * @note the previous example is the only use case for now, so we lack code
+    * determining what to do on update.
     */
     void update();
 
     /**
     * This method shall returns the time point at which we want to be updated.
-    * If you do not want to be updated, return time_point::max() basically making sure we wont be called.
+    * If you do not want to be updated, return time_point::max() basically making
+    * sure we wont be called.
     */
     std::chrono::system_clock::time_point next_update() const;
 
     /**
     * Write to PFDigital to turn the gpio on.
-    * @param msg optional pointer to the source message. We can extract optional parameter, if any
+    * @param msg optional pointer to the source message. We can extract optional
+    * parameter, if any
     */
     bool turn_on(zmqpp::message *msg = nullptr);
 

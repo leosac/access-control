@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -21,10 +21,9 @@
 
 using namespace Leosac::Hardware;
 
-FWiegandReader::FWiegandReader(zmqpp::context &ctx,
-        std::string const &reader_name) :
-        backend_(ctx, zmqpp::socket_type::req),
-        name_(reader_name)
+FWiegandReader::FWiegandReader(zmqpp::context &ctx, std::string const &reader_name)
+    : backend_(ctx, zmqpp::socket_type::req)
+    , name_(reader_name)
 {
     backend_.connect("inproc://" + reader_name);
 }
@@ -32,7 +31,8 @@ FWiegandReader::FWiegandReader(zmqpp::context &ctx,
 bool FWiegandReader::greenLedOn()
 {
     zmqpp::message msg;
-    msg << "GREEN_LED" << "ON";
+    msg << "GREEN_LED"
+        << "ON";
 
     return send_to_backend(msg);
 }
@@ -40,7 +40,8 @@ bool FWiegandReader::greenLedOn()
 bool FWiegandReader::greenLedOff()
 {
     zmqpp::message msg;
-    msg << "GREEN_LED" << "OFF";
+    msg << "GREEN_LED"
+        << "OFF";
 
     return send_to_backend(msg);
 }
@@ -48,7 +49,8 @@ bool FWiegandReader::greenLedOff()
 bool FWiegandReader::greenLedBlink(int64_t duration, int64_t speed)
 {
     zmqpp::message msg;
-    msg << "GREEN_LED" << "BLINK" << duration << speed;
+    msg << "GREEN_LED"
+        << "BLINK" << duration << speed;
 
     return send_to_backend(msg);
 }

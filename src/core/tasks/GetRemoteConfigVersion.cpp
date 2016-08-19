@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,18 +17,18 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "GetRemoteConfigVersion.hpp"
 #include "core/kernel.hpp"
+#include "tools/log.hpp"
 #include <zmqpp/curve.hpp>
 
 using namespace Leosac;
 
 Tasks::GetRemoteConfigVersion::GetRemoteConfigVersion(const std::string &endpoint,
-                                                      const std::string &pubkey) :
-        config_version_(0),
-        endpoint_(endpoint),
-        pubkey_(pubkey)
+                                                      const std::string &pubkey)
+    : config_version_(0)
+    , endpoint_(endpoint)
+    , pubkey_(pubkey)
 {
     INFO("Creating GetRemoteConfigVersion task. Guid = " << get_guid());
 }

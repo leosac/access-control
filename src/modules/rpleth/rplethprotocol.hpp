@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -26,89 +26,92 @@
 #ifndef RPLETHPROTOCOL_HPP
 #define RPLETHPROTOCOL_HPP
 
-#include "rplethpacket.hpp"
 #include "network/circularbuffer.hpp"
+#include "rplethpacket.hpp"
 
 #include <queue>
 
 namespace Leosac
 {
-    namespace Module
+namespace Module
+{
+namespace Rpleth
+{
+
+class RplethProtocol
+{
+    static const std::size_t TypeByteIdx    = 0;
+    static const std::size_t CommandByteIdx = 1;
+    static const std::size_t SizeByteIdx    = 2;
+    static const std::size_t PacketMinSize  = 4;
+
+    RplethProtocol() = delete;
+
+  public:
+    enum TypeCode
     {
-        namespace Rpleth
-        {
+        Rpleth = 0x00,
+        HID    = 0x01,
+        LCD    = 0x02,
+        MaxType
+    };
+    enum RplethCommands
+    {
+        DHCPState  = 0x01,
+        SetDHCP    = 0x02,
+        SetMAC     = 0x03,
+        SetIP      = 0x04,
+        SetSubnet  = 0x05,
+        SetGateway = 0x06,
+        SetPort    = 0x07,
+        Message    = 0x08, // NOTE not documented
+        Reset      = 0x09, // This will actually trigger a restart, not a reset.
+        Ping       = 0x0a
+    };
 
-            class RplethProtocol
-            {
-                static const std::size_t TypeByteIdx = 0;
-                static const std::size_t CommandByteIdx = 1;
-                static const std::size_t SizeByteIdx = 2;
-                static const std::size_t PacketMinSize = 4;
+    enum HIDCommands
+    {
+        Beep               = 0x00,
+        Greenled           = 0x01,
+        Redled             = 0x02,
+        Nop                = 0x03,
+        Badge              = 0x04,
+        Com                = 0x05,
+        Wait_insertion     = 0x06,
+        Wait_removal       = 0x07,
+        Connect            = 0x08,
+        Disconnect         = 0x09,
+        GetReaderType      = 0x0a,
+        GetCSN             = 0x0b,
+        SetCardType        = 0x0c,
+        SendCards          = 0x0d, // text, separated by a pipe
+        ReceiveCardsWaited = 0x0e
+    };
 
-                RplethProtocol() = delete;
+    enum StatusCode
+    {
+        Success     = 0x00,
+        Failed      = 0x01,
+        BadChecksum = 0x02,
+        Timeout     = 0x03,
+        BadSize     = 0x04,
+        BadType     = 0x05,
+        MaxStatus
+    };
 
-            public:
-                enum TypeCode
-                {
-                    Rpleth = 0x00,
-                    HID = 0x01,
-                    LCD = 0x02,
-                    MaxType
-                };
-                enum RplethCommands
-                {
-                    DHCPState = 0x01,
-                    SetDHCP = 0x02,
-                    SetMAC = 0x03,
-                    SetIP = 0x04,
-                    SetSubnet = 0x05,
-                    SetGateway = 0x06,
-                    SetPort = 0x07,
-                    Message = 0x08, // NOTE not documented
-                    Reset = 0x09, // This will actually trigger a restart, not a reset.
-                    Ping = 0x0a
-                };
+  public:
+    /**
+    * Decode a packet from a circular buffer object.
+    * If `from_server` is true that means the packet comes from a Rpleth server: this
+    * is used by unit testing code.
+    */
+    static RplethPacket decodeCommand(CircularBuffer &buffer,
+                                      bool from_server = false);
 
-                enum HIDCommands
-                {
-                    Beep = 0x00,
-                    Greenled = 0x01,
-                    Redled = 0x02,
-                    Nop = 0x03,
-                    Badge = 0x04,
-                    Com = 0x05,
-                    Wait_insertion = 0x06,
-                    Wait_removal = 0x07,
-                    Connect = 0x08,
-                    Disconnect = 0x09,
-                    GetReaderType = 0x0a,
-                    GetCSN = 0x0b,
-                    SetCardType = 0x0c,
-                    SendCards = 0x0d, // text, separated by a pipe
-                    ReceiveCardsWaited = 0x0e
-                };
-
-                enum StatusCode
-                {
-                    Success = 0x00,
-                    Failed = 0x01,
-                    BadChecksum = 0x02,
-                    Timeout = 0x03,
-                    BadSize = 0x04,
-                    BadType = 0x05,
-                    MaxStatus
-                };
-
-            public:
-                /**
-                * Decode a packet from a circular buffer object.
-                * If `from_server` is true that means the packet comes from a Rpleth server: this is used by unit testing code.
-                */
-                static RplethPacket decodeCommand(CircularBuffer &buffer, bool from_server = false);
-
-                static std::size_t encodeCommand(const RplethPacket &packet, Byte *buffer, std::size_t size);
-            };
-        }
-    }
+    static std::size_t encodeCommand(const RplethPacket &packet, Byte *buffer,
+                                     std::size_t size);
+};
+}
+}
 }
 #endif // RPLETHPROTOCOL_HPP

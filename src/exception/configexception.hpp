@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,83 +19,79 @@
 
 #pragma once
 
-#include <string>
 #include "leosacexception.hpp"
 #include "tools/Colorize.hpp"
+#include <string>
 
 namespace Leosac
 {
-  namespace Ex
-  {
+namespace Ex
+{
+/**
+ * An exception related to configuration.
+ */
+class Config : public LEOSACException
+{
+  public:
     /**
-     * An exception related to configuration.
+     * Construct a config exception for when we failed to load a property.
+     *
+     * @param config_target The subsystem that tried to use / load the
+     *                      configuration.
+     * @param config_entry The key (property) that is the source of the
+     *                      exception.
+     * @param not_found Is the exception due to not finding the key, or
+     *                  invalid entry.
      */
-    class Config : public LEOSACException
+    Config(const std::string &config_target, const std::string &config_entry,
+           bool not_found)
+        : LEOSACException(build_message(config_target, config_entry, not_found))
     {
-    public:
-      /**
-       * Construct a config exception for when we failed to load a property.
-       *
-       * @param config_target The subsystem that tried to use / load the
-       *                      configuration.
-       * @param config_entry The key (property) that is the source of the
-       *                      exception.
-       * @param not_found Is the exception due to not finding the key, or
-       *                  invalid entry.
-       */
-      Config(const std::string &config_target, const std::string &config_entry,
-             bool not_found)
-          : LEOSACException(
-                build_message(config_target, config_entry, not_found))
-      {
-      }
+    }
 
-      /**
-       * Create a config exception when we failed to parse a
-       * configuration file.
-       */
-      Config(const std::string &filename)
-          : LEOSACException(build_message(filename))
-      {
-      }
+    /**
+     * Create a config exception when we failed to parse a
+     * configuration file.
+     */
+    Config(const std::string &filename)
+        : LEOSACException(build_message(filename))
+    {
+    }
 
-    private:
-      static std::string build_message(const std::string &config_target,
-                                       const std::string &config_entry,
-                                       bool not_found)
-      {
+  private:
+    static std::string build_message(const std::string &config_target,
+                                     const std::string &config_entry, bool not_found)
+    {
         using namespace Colorize;
         if (not_found)
         {
-          return "Missing configuration entry for " + green(config_target) +
-                 ": " + underline(red(config_entry));
+            return "Missing configuration entry for " + green(config_target) + ": " +
+                   underline(red(config_entry));
         }
         else
         {
-          return "Invalid configuration entry for " + green(config_target) +
-                 ": " + underline(red(config_entry));
+            return "Invalid configuration entry for " + green(config_target) + ": " +
+                   underline(red(config_entry));
         }
-      }
+    }
 
-      static std::string build_message(const std::string &filename)
-      {
+    static std::string build_message(const std::string &filename)
+    {
         using namespace Colorize;
-        return "Failed to parse configuration file " +
-               underline(green(filename));
-      }
-    };
-  }
+        return "Failed to parse configuration file " + underline(green(filename));
+    }
+};
+}
 }
 
 class ConfigException : public LEOSACException
 {
-public:
-  ConfigException(const std::string &file, const std::string &message)
-      : LEOSACException("Configuration error in file {" + file + "}: " +
-                        message)
-  {
-  }
-  virtual ~ConfigException()
-  {
-  }
+  public:
+    ConfigException(const std::string &file, const std::string &message)
+        : LEOSACException("Configuration error in file {" + file + "}: " + message)
+    {
+    }
+    virtual ~ConfigException()
+    {
+    }
 };

@@ -33,4 +33,3 @@ A copy of the license can be found in the root folder.
 
 ![alt text][logo]
 [logo]: https://raw.githubusercontent.com/islog/leosac/master/rc/AGPLv3.png  "AGPL Logo"
-

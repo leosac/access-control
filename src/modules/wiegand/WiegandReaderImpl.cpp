@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iomanip>
-#include <core/auth/Auth.hpp>
 #include "WiegandReaderImpl.hpp"
-#include "tools/log.hpp"
 #include "strategies/WiegandStrategy.hpp"
+#include "tools/log.hpp"
+#include <core/auth/Auth.hpp>
+#include <iomanip>
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
@@ -29,20 +29,20 @@ using namespace Leosac::Hardware;
 using namespace Leosac::Auth;
 
 WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
-        const std::string &reader_name,
-        const std::string &data_high_pin,
-        const std::string &data_low_pin,
-        const std::string &green_led_name,
-        const std::string &buzzer_name,
-        std::unique_ptr<WiegandStrategy> strategy) :
-        bus_sub_(ctx, zmqpp::socket_type::sub),
-        sock_(ctx, zmqpp::socket_type::rep),
-        bus_push_(ctx, zmqpp::socket_type::push),
-        counter_(0),
-        name_(reader_name),
-        green_led_(nullptr),
-        buzzer_(nullptr),
-        strategy_(std::move(strategy))
+                                     const std::string &reader_name,
+                                     const std::string &data_high_pin,
+                                     const std::string &data_low_pin,
+                                     const std::string &green_led_name,
+                                     const std::string &buzzer_name,
+                                     std::unique_ptr<WiegandStrategy> strategy)
+    : bus_sub_(ctx, zmqpp::socket_type::sub)
+    , sock_(ctx, zmqpp::socket_type::rep)
+    , bus_push_(ctx, zmqpp::socket_type::push)
+    , counter_(0)
+    , name_(reader_name)
+    , green_led_(nullptr)
+    , buzzer_(nullptr)
+    , strategy_(std::move(strategy))
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     bus_push_.connect("inproc://zmq-bus-pull");
@@ -50,7 +50,7 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
     sock_.bind("inproc://" + name_);
 
     topic_high_ = "S_INT:" + data_high_pin;
-    topic_low_ = "S_INT:" + data_low_pin;
+    topic_low_  = "S_INT:" + data_low_pin;
 
     bus_sub_.subscribe(topic_high_);
     bus_sub_.subscribe(topic_low_);
@@ -68,21 +68,21 @@ WiegandReaderImpl::~WiegandReaderImpl()
 {
 }
 
-WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o) :
-        bus_sub_(std::move(o.bus_sub_)),
-        sock_(std::move(o.sock_)),
-        bus_push_(std::move(o.bus_push_)),
-        name_(std::move(o.name_)),
-        strategy_(std::move(o.strategy_))
+WiegandReaderImpl::WiegandReaderImpl(WiegandReaderImpl &&o)
+    : bus_sub_(std::move(o.bus_sub_))
+    , sock_(std::move(o.sock_))
+    , bus_push_(std::move(o.bus_push_))
+    , name_(std::move(o.name_))
+    , strategy_(std::move(o.strategy_))
 {
     topic_high_ = o.topic_high_;
-    topic_low_ = o.topic_low_;
+    topic_low_  = o.topic_low_;
 
-    buffer_ = o.buffer_;
+    buffer_  = o.buffer_;
     counter_ = o.counter_;
 
     green_led_ = std::move(o.green_led_);
-    buzzer_ = std::move(o.buzzer_);
+    buzzer_    = std::move(o.buzzer_);
 
     // when we are moved, we must update our strategy's pointer back to the "new" us.
     strategy_->set_reader(this);
@@ -135,7 +135,8 @@ void WiegandReaderImpl::handle_request()
     sock_.receive(msg);
 
     msg >> str;
-    assert(str == "GREEN_LED" || str == "BEEP" || str == "BEEP_ON" || str == "BEEP_OFF");
+    assert(str == "GREEN_LED" || str == "BEEP" || str == "BEEP_ON" ||
+           str == "BEEP_OFF");
     if (str == "GREEN_LED")
     {
         msg.pop_front();
@@ -152,7 +153,7 @@ void WiegandReaderImpl::handle_request()
     }
     else if (str == "BEEP")
     {
-        assert (msg.parts() == 2);
+        assert(msg.parts() == 2);
         int64_t duration;
         msg >> duration;
         if (!buzzer_)

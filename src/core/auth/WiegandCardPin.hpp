@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -20,44 +20,45 @@
 #pragma once
 
 #include "core/auth/BaseAuthSource.hpp"
+#include "core/auth/PINCode.hpp"
+#include "core/auth/WiegandCard.hpp"
 #include <string>
 #include <tools/IVisitor.hpp>
-#include "core/auth/WiegandCard.hpp"
-#include "core/auth/PINCode.hpp"
 
 namespace Leosac
 {
-    namespace Auth
+namespace Auth
+{
+class WiegandCardPin;
+using WiegandCardPinPtr = std::shared_ptr<WiegandCardPin>;
+
+/**
+* Credentials composed of a Wiegand card and a PIN code.
+*/
+class WiegandCardPin : public BaseAuthSource
+{
+  public:
+    /**
+    * Create a WiegandCardPin object.
+    *
+    * @param pin the code in string format.
+    */
+    WiegandCardPin(const std::string &card_id, int nb_bits,
+                   const std::string &pin_code);
+
+    virtual void accept(Tools::IVisitor *visitor) override
     {
-        class WiegandCardPin;
-        using WiegandCardPinPtr = std::shared_ptr<WiegandCardPin>;
-
-        /**
-        * Credentials composed of a Wiegand card and a PIN code.
-        */
-        class WiegandCardPin : public BaseAuthSource
-        {
-        public:
-            /**
-            * Create a WiegandCardPin object.
-            *
-            * @param pin the code in string format.
-            */
-            WiegandCardPin(const std::string &card_id, int nb_bits, const std::string &pin_code);
-
-            virtual void accept(Tools::IVisitor *visitor) override
-            {
-                visitor->visit(this);
-            }
-
-            const WiegandCard &card() const;
-            const PINCode &pin() const;
-
-            virtual std::string to_string() const override;
-
-        protected:
-            WiegandCard card_;
-            PINCode pin_;
-        };
+        visitor->visit(this);
     }
+
+    const WiegandCard &card() const;
+    const PINCode &pin() const;
+
+    virtual std::string to_string() const override;
+
+  protected:
+    WiegandCard card_;
+    PINCode pin_;
+};
+}
 }

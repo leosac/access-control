@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,85 +19,83 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
 #include "core/CoreUtils.hpp"
+#include "modules/BaseModule.hpp"
 
 namespace Leosac
 {
-    namespace Module
-    {
-        /**
-        * This module handles the master/slave replication process, from the slave
-        * point of view.
-        *
-        * @see @ref mod_replication_main for documentation
-        */
-        namespace Replication
-        {
-            /**
-            * Main class for the replication module.
-            */
-            class ReplicationModule : public BaseModule
-            {
-            public:
-                ReplicationModule(zmqpp::context &ctx,
-                        zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg,
-                        CoreUtilsPtr utils);
+namespace Module
+{
+/**
+* This module handles the master/slave replication process, from the slave
+* point of view.
+*
+* @see @ref mod_replication_main for documentation
+*/
+namespace Replication
+{
+/**
+* Main class for the replication module.
+*/
+class ReplicationModule : public BaseModule
+{
+  public:
+    ReplicationModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                      const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-                ReplicationModule(const ReplicationModule &)            = delete;
-                ReplicationModule(ReplicationModule &&)                 = delete;
-                ReplicationModule &operator=(const ReplicationModule &) = delete;
-                ReplicationModule &operator=(ReplicationModule &&)      = delete;
+    ReplicationModule(const ReplicationModule &) = delete;
+    ReplicationModule(ReplicationModule &&)      = delete;
+    ReplicationModule &operator=(const ReplicationModule &) = delete;
+    ReplicationModule &operator=(ReplicationModule &&) = delete;
 
-                virtual void run() override;
+    virtual void run() override;
 
-            private:
-                using TimePoint = std::chrono::system_clock::time_point;
-                void process_config();
+  private:
+    using TimePoint = std::chrono::system_clock::time_point;
+    void process_config();
 
-                /**
-                 * Start the replication process.
-                 *
-                 * It first checks if it needs to sync, and if it doesn't, it stops
-                 * here.
-                 */
-                void replicate();
+    /**
+     * Start the replication process.
+     *
+     * It first checks if it needs to sync, and if it doesn't, it stops
+     * here.
+     */
+    void replicate();
 
-                /**
-                 * Launch the tasks so that the synchronisation may take place.
-                 */
-                void start_sync();
+    /**
+     * Launch the tasks so that the synchronisation may take place.
+     */
+    void start_sync();
 
-                /**
-                 * Fetch the local configuration version by running
-                 * a task in the main thread.
-                 */
-                bool fetch_local_version(uint64_t &local);
+    /**
+     * Fetch the local configuration version by running
+     * a task in the main thread.
+     */
+    bool fetch_local_version(uint64_t &local);
 
-                /**
-                 * Fetch the remote configuration version by running a task
-                 * in a pool, and sending the CONFIG_VERSION message.
-                 */
-                bool fetch_remote_version(uint64_t &remote);
+    /**
+     * Fetch the remote configuration version by running a task
+     * in a pool, and sending the CONFIG_VERSION message.
+     */
+    bool fetch_remote_version(uint64_t &remote);
 
-                /**
-                 * Delay between 2 replications attempt.
-                 */
-                int delay_;
+    /**
+     * Delay between 2 replications attempt.
+     */
+    int delay_;
 
-                /**
-                 * Target master server
-                 */
-                std::string endpoint_;
+    /**
+     * Target master server
+     */
+    std::string endpoint_;
 
-                /**
-                 * Master server's public key.
-                 */
-                std::string pubkey_;
+    /**
+     * Master server's public key.
+     */
+    std::string pubkey_;
 
-                TimePoint last_sync_;
-            };
-        }
-    }
+    TimePoint last_sync_;
+};
+}
+}
 }

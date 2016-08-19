@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class ModuleException : public LEOSACException
 {
-public:
-    ModuleException(const std::string& message) : LEOSACException("Module::" + message) {}
-    virtual ~ModuleException() {}
+  public:
+    ModuleException(const std::string &message)
+        : LEOSACException("Module::" + message)
+    {
+    }
+    virtual ~ModuleException()
+    {
+    }
 };
 
 #endif // MODULEEXCEPTION_HPP

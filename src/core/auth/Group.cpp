@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,10 +19,9 @@
 
 #include "Group.hpp"
 
-Leosac::Auth::Group::Group(const std::string &group_name) :
-        name_(group_name)
+Leosac::Auth::Group::Group(const std::string &group_name)
+    : name_(group_name)
 {
-
 }
 
 const std::string &Leosac::Auth::Group::name() const

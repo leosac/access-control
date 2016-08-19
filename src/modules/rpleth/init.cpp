@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,14 +23,13 @@
 * \brief init function for returning a module class to the core
 */
 
-#include <zmqpp/zmqpp.hpp>
 #include "RplethModule.hpp"
-#include <tools/log.hpp>
+#include "tools/log.hpp"
+#include <zmqpp/zmqpp.hpp>
 
 using namespace Leosac::Module::Rpleth;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "RPLETH";
@@ -40,11 +39,10 @@ const char *get_module_name()
 /**
 * This function is the entry point of the Rpleth module.
 */
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<RplethModule>(pipe, cfg, zmq_ctx,
+                                                             utils);
 }

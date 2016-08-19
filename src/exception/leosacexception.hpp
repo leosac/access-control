@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -31,13 +31,21 @@
 
 class LEOSACException : public std::exception
 {
-public:
-    explicit LEOSACException(const std::string& message) : _message(message) {}
-    virtual ~LEOSACException() {}
-    virtual const char* what() const noexcept final { return (_message.c_str()); }
+  public:
+    explicit LEOSACException(const std::string &message)
+        : _message(message)
+    {
+    }
+    virtual ~LEOSACException()
+    {
+    }
+    virtual const char *what() const noexcept final
+    {
+        return (_message.c_str());
+    }
 
-private:
-    const std::string   _message;
+  private:
+    const std::string _message;
 };
 
 #include "configexception.hpp"

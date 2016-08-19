@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -21,8 +21,8 @@
 
 using namespace Leosac::Test::Helper;
 
-FakeWiegandReader::FakeWiegandReader(zmqpp::context &ctx, const std::string &name) :
-rep_(ctx, zmqpp::socket_type::rep)
+FakeWiegandReader::FakeWiegandReader(zmqpp::context &ctx, const std::string &name)
+    : rep_(ctx, zmqpp::socket_type::rep)
 {
     rep_.bind("inproc://" + name);
 }

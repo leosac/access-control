@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,37 +19,36 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
-#include "core/auth/AuthFwd.hpp"
-#include "protocols/PushSimpleCardNumber.hpp"
 #include "NotifierInstance.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include "modules/BaseModule.hpp"
+#include "protocols/PushSimpleCardNumber.hpp"
 
 namespace Leosac
 {
-  namespace Module
-  {
-    namespace TCPNotifier
-    {
-      class ProtocolHandler;
-      using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
+namespace Module
+{
+namespace TCPNotifier
+{
+class ProtocolHandler;
+using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
 
-      class TCPNotifierModule : public BaseModule
-      {
-      public:
-        TCPNotifierModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                          const boost::property_tree::ptree &cfg,
-                          CoreUtilsPtr utils);
+class TCPNotifierModule : public BaseModule
+{
+  public:
+    TCPNotifierModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                      const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-        ~TCPNotifierModule();
+    ~TCPNotifierModule();
 
-      private:
-        /**
-         * Process the configuration file.
-         */
-        void process_config();
+  private:
+    /**
+     * Process the configuration file.
+     */
+    void process_config();
 
-        std::vector<NotifierInstanceUPtr> instances_;
-      };
-    }
-  }
+    std::vector<NotifierInstanceUPtr> instances_;
+};
+}
+}
 }

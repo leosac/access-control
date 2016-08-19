@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,80 +19,80 @@
 
 #pragma once
 
+#include "core/auth/CredentialValidity.hpp"
+#include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include <memory>
 #include <vector>
-#include "core/auth/Interfaces/IAuthenticationSource.hpp"
-#include "core/auth/CredentialValidity.hpp"
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        class BaseAuthSource;
-        using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
+namespace Auth
+{
+class BaseAuthSource;
+using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
 
-        class BaseAuthSource : public IAuthenticationSource
-        {
-        public:
-            BaseAuthSource(const std::string &id = "");
-            virtual ~BaseAuthSource() = default;
-            virtual void addAuthSource(IAuthenticationSourcePtr source) override;
+class BaseAuthSource : public IAuthenticationSource
+{
+  public:
+    BaseAuthSource(const std::string &id = "");
+    virtual ~BaseAuthSource()            = default;
+    virtual void addAuthSource(IAuthenticationSourcePtr source) override;
 
-            virtual void accept(Tools::IVisitor *visitor) override;
+    virtual void accept(Tools::IVisitor *visitor) override;
 
-            virtual void owner(IUserPtr user) override;
+    virtual void owner(IUserPtr user) override;
 
-            virtual IUserPtr owner() const override;
+    virtual IUserPtr owner() const override;
 
-            /**
-            * This implementation simply return the profile associated with
-            * the credential, or null if not available.
-            */
-            virtual IAccessProfilePtr profile() const override;
+    /**
+    * This implementation simply return the profile associated with
+    * the credential, or null if not available.
+    */
+    virtual IAccessProfilePtr profile() const override;
 
-            virtual void profile(IAccessProfilePtr p) override;
+    virtual void profile(IAccessProfilePtr p) override;
 
-            virtual const std::string &name() const override;
+    virtual const std::string &name() const override;
 
-            /**
-            * Set a name for this auth source
-            */
-            void name(const std::string &n);
+    /**
+    * Set a name for this auth source
+    */
+    void name(const std::string &n);
 
-            virtual std::string to_string() const override;
+    virtual std::string to_string() const override;
 
-            virtual const std::string &id() const override;
+    virtual const std::string &id() const override;
 
-            void id(const std::string &cred_id) override;
+    void id(const std::string &cred_id) override;
 
-            virtual const CredentialValidity &validity() const override;
+    virtual const CredentialValidity &validity() const override;
 
-            virtual void validity(const CredentialValidity &c) override;
+    virtual void validity(const CredentialValidity &c) override;
 
-        protected:
-            /**
-            * Which user this auth source maps to. May be null
-            */
-            IUserPtr owner_;
+  protected:
+    /**
+    * Which user this auth source maps to. May be null
+    */
+    IUserPtr owner_;
 
-            /**
-            * Underlying auth source.
-            */
-            std::vector<IAuthenticationSourcePtr> subsources_;
+    /**
+    * Underlying auth source.
+    */
+    std::vector<IAuthenticationSourcePtr> subsources_;
 
-            /**
-            * Name of the source (generally the module / device that sent it)
-            */
-            std::string source_name_;
+    /**
+    * Name of the source (generally the module / device that sent it)
+    */
+    std::string source_name_;
 
-            /**
-            * Credentials ID.
-            */
-            std::string id_;
+    /**
+    * Credentials ID.
+    */
+    std::string id_;
 
-            CredentialValidity validity_;
+    CredentialValidity validity_;
 
-            IAccessProfilePtr profile_;
-        };
-    }
+    IAccessProfilePtr profile_;
+};
+}
 }

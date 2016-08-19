@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,13 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <memory>
-#include <zmqpp/message.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <tools/log.hpp>
-#include <zmqpp/context.hpp>
-#include "zmqpp/zmqpp.hpp"
 #include "hardware/FGPIO.hpp"
+#include "tools/log.hpp"
+#include "zmqpp/zmqpp.hpp"
+#include <boost/property_tree/ptree.hpp>
+#include <memory>
+#include <zmqpp/context.hpp>
+#include <zmqpp/message.hpp>
 
 /**
 * Send the request to the target and handle the response.
@@ -57,20 +57,22 @@ bool send_request(std::shared_ptr<zmqpp::socket> target, const std::string &cmd1
 *
 * do signaling when ready
 */
-extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socket *pipe,
-        boost::property_tree::ptree cfg,
-        zmqpp::context &zmq_ctx)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx)
 {
     INFO("Bench-Toggle will start");
-    std::string endpoint_to_bench = cfg.get_child("module_config").get_child("target").data();
-    int itr = cfg.get_child("module_config").get<int>("iterations");
+    std::string endpoint_to_bench =
+        cfg.get_child("module_config").get_child("target").data();
+    int itr      = cfg.get_child("module_config").get<int>("iterations");
     int wait_for = cfg.get_child("module_config").get<int>("pause");
     pipe->send(zmqpp::signal::ok);
 
     // fixme since module order initialization is not defined we need to wait.
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
-    std::shared_ptr<zmqpp::socket> sock(new zmqpp::socket(zmq_ctx, zmqpp::socket_type::req));
+    std::shared_ptr<zmqpp::socket> sock(
+        new zmqpp::socket(zmq_ctx, zmqpp::socket_type::req));
 
     sock->connect("inproc://" + endpoint_to_bench);
     INFO("should take about " << itr * wait_for << "ms to run");
@@ -82,7 +84,8 @@ extern "C" __attribute__((visibility("default"))) bool start_module(zmqpp::socke
         my_gpio.toggle();
         std::this_thread::sleep_for(std::chrono::milliseconds(wait_for));
     }
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clock);
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now() - clock);
     DEBUG("TOOK " << elapsed.count() << "ms");
 
     INFO("Module Bench-Toggle shutting down");

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,16 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "FetchRemoteConfig.hpp"
+#include <tools/log.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Tasks;
 
 FetchRemoteConfig::FetchRemoteConfig(const std::string &endpoint,
-                                     const std::string &pubkey) :
-        ctx_(),
-        collector_(ctx_, endpoint, pubkey)
+                                     const std::string &pubkey)
+    : ctx_()
+    , collector_(ctx_, endpoint, pubkey)
 {
     INFO("Creating FetchRemoteConfig task. Guid = " << get_guid());
 }

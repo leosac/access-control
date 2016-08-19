@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,20 +23,19 @@
 
 namespace Leosac
 {
-  namespace Module
-  {
-    namespace TCPNotifier
-    {
-      /**
-       * Simple protocol that sends the card number.
-       */
-      class PushSimpleCardNumber : public ProtocolHandler
-      {
+namespace Module
+{
+namespace TCPNotifier
+{
+/**
+ * Simple protocol that sends the card number.
+ */
+class PushSimpleCardNumber : public ProtocolHandler
+{
 
-      public:
-        virtual ByteVector
-        build_cred_msg(const Auth::WiegandCard &card) override;
-      };
-    }
-  }
+  public:
+    virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) override;
+};
+}
+}
 }

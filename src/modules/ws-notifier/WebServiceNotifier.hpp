@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "modules/BaseModule.hpp"
 
 namespace Leosac
 {

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,90 +19,90 @@
 
 #pragma once
 
-#include <memory>
 #include "core/auth/AuthFwd.hpp"
 #include "tools/IVisitable.hpp"
+#include <memory>
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        class IAuthenticationSource;
+namespace Auth
+{
+class IAuthenticationSource;
 
-        using IAuthenticationSourcePtr = std::shared_ptr<IAuthenticationSource>;
+using IAuthenticationSourcePtr = std::shared_ptr<IAuthenticationSource>;
 
-        /**
-        * An Auth source is a card id, a pin code, a fingerprint, etc...
-        *
-        * Those sources can be combined to provide strong authentication mechanism.
-        * This class handle this.
-        */
-        class IAuthenticationSource : public Tools::IVisitable
-        {
-        public:
-            virtual ~IAuthenticationSource() = default;
+/**
+* An Auth source is a card id, a pin code, a fingerprint, etc...
+*
+* Those sources can be combined to provide strong authentication mechanism.
+* This class handle this.
+*/
+class IAuthenticationSource : public Tools::IVisitable
+{
+  public:
+    virtual ~IAuthenticationSource() = default;
 
-            virtual void accept(Tools::IVisitor *visitor) override = 0;
+    virtual void accept(Tools::IVisitor *visitor) override = 0;
 
-            /**
-            * Adds a new authentication sources as a subsource of this one.
-            */
-            virtual void addAuthSource(IAuthenticationSourcePtr source) = 0;
+    /**
+    * Adds a new authentication sources as a subsource of this one.
+    */
+    virtual void addAuthSource(IAuthenticationSourcePtr source) = 0;
 
-            /**
-            * Set the user that map to this source,
-            */
-            virtual void owner(IUserPtr user) = 0;
+    /**
+    * Set the user that map to this source,
+    */
+    virtual void owner(IUserPtr user) = 0;
 
-            /**
-            * Retrieve the user that map to this source.
-            */
-            virtual IUserPtr owner() const = 0;
+    /**
+    * Retrieve the user that map to this source.
+    */
+    virtual IUserPtr owner() const = 0;
 
-            /**
-            * Return (or generate) an Access Profile that make sense
-            * based on the data available in this AuthenticationSource object.
-            *
-            * In addition to the user's profile, this profile will later be used
-            * to chose between granting and denying access to an end user.
-            */
-            virtual IAccessProfilePtr profile() const = 0;
+    /**
+    * Return (or generate) an Access Profile that make sense
+    * based on the data available in this AuthenticationSource object.
+    *
+    * In addition to the user's profile, this profile will later be used
+    * to chose between granting and denying access to an end user.
+    */
+    virtual IAccessProfilePtr profile() const = 0;
 
-            /**
-            * Set an access profile for this credentials.
-            * This profile will be added to the user's profile
-            * when granting/denying acccess.
-            */
-            virtual void profile(IAccessProfilePtr p) = 0;
+    /**
+    * Set an access profile for this credentials.
+    * This profile will be added to the user's profile
+    * when granting/denying acccess.
+    */
+    virtual void profile(IAccessProfilePtr p) = 0;
 
-            /**
-            * Return the name of the source. This could be the name of the name of the module
-            * or device that sent the message that lead to this object's creation.
-            */
-            virtual const std::string &name() const = 0;
+    /**
+    * Return the name of the source. This could be the name of the name of the module
+    * or device that sent the message that lead to this object's creation.
+    */
+    virtual const std::string &name() const = 0;
 
-            /**
-            * Returns a string representation of the authentication source content.
-            */
-            virtual std::string to_string() const = 0;
+    /**
+    * Returns a string representation of the authentication source content.
+    */
+    virtual std::string to_string() const = 0;
 
-            /**
-            * Returns the ID of the credentials.
-            * It is possible that this ID be empty.
-            */
-            virtual const std::string &id() const = 0;
+    /**
+    * Returns the ID of the credentials.
+    * It is possible that this ID be empty.
+    */
+    virtual const std::string &id() const = 0;
 
-            virtual void id(const std::string &new_id) = 0;
+    virtual void id(const std::string &new_id) = 0;
 
-            /**
-            * Get the object that store info about the credential's validity
-            */
-            virtual const CredentialValidity &validity() const = 0;
+    /**
+    * Get the object that store info about the credential's validity
+    */
+    virtual const CredentialValidity &validity() const = 0;
 
-            /**
-            * Update the validity of the credential.
-            */
-            virtual void validity(const CredentialValidity &c) = 0;
-        };
-    }
+    /**
+    * Update the validity of the credential.
+    */
+    virtual void validity(const CredentialValidity &c) = 0;
+};
+}
 }

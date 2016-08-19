@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,26 +17,26 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "Autodetect.hpp"
 #include "modules/wiegand/WiegandReaderImpl.hpp"
+#include <tools/log.hpp>
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
-Autodetect::Autodetect(WiegandReaderImpl *reader,
-        std::chrono::milliseconds delay,
-        char pin_key_end) :
-        WiegandStrategy(reader),
-        delay_(delay),
-        reading_pin_(false),
-        reading_card_(true),
-        ready_(false),
-        pin_key_end_(pin_key_end)
+Autodetect::Autodetect(WiegandReaderImpl *reader, std::chrono::milliseconds delay,
+                       char pin_key_end)
+    : WiegandStrategy(reader)
+    , delay_(delay)
+    , reading_pin_(false)
+    , reading_card_(true)
+    , ready_(false)
+    , pin_key_end_(pin_key_end)
 {
     time_card_read_ = std::chrono::system_clock::now();
-    last_pin_read_ =  std::chrono::system_clock::now();
-    read_card_strategy_ = std::unique_ptr<CardReading>(new SimpleWiegandStrategy(reader));
+    last_pin_read_  = std::chrono::system_clock::now();
+    read_card_strategy_ =
+        std::unique_ptr<CardReading>(new SimpleWiegandStrategy(reader));
 }
 
 void Autodetect::timeout()
@@ -44,7 +44,8 @@ void Autodetect::timeout()
     using namespace std::chrono;
 
     // When finishing reading a PIN code we mark as ready.
-    // This is because we have a choice between: PIN / Card / Card + PIN, so if PIN is presents,
+    // This is because we have a choice between: PIN / Card / Card + PIN, so if PIN
+    // is presents,
     // it is always last.
 
     if (reader_->counter() == 4 || reader_->counter() == 8)
@@ -60,7 +61,7 @@ void Autodetect::timeout()
         if (read_pin_strategy_->completed())
         {
             DEBUG("Read PIN = " << read_pin_strategy_->get_pin());
-            ready_ = true;
+            ready_       = true;
             reading_pin_ = false;
             reader_->read_reset();
         }
@@ -87,11 +88,15 @@ void Autodetect::check_timeout()
     using namespace std::chrono;
 
     // Nothing was read, this is an inactivity timeout() tick.
-    // We do 2 things here: If we were reading a PIN code, check timeout and finish if timeout
-    // Check inactivity timeout for card + pin, to timeout and send a Card only credentials.
+    // We do 2 things here: If we were reading a PIN code, check timeout and finish
+    // if timeout
+    // Check inactivity timeout for card + pin, to timeout and send a Card only
+    // credentials.
 
-    auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - time_card_read_);
-    auto elapsed_ms_pin = duration_cast<milliseconds>(system_clock::now() - last_pin_read_);
+    auto elapsed_ms =
+        duration_cast<milliseconds>(system_clock::now() - time_card_read_);
+    auto elapsed_ms_pin =
+        duration_cast<milliseconds>(system_clock::now() - last_pin_read_);
 
     if (reading_pin_)
     {
@@ -102,7 +107,7 @@ void Autodetect::check_timeout()
             if (read_pin_strategy_->completed())
             {
                 DEBUG("Read PIN = " << read_pin_strategy_->get_pin());
-                ready_ = true;
+                ready_       = true;
                 reading_pin_ = false;
                 reader_->read_reset();
             }
@@ -127,8 +132,8 @@ bool Autodetect::completed() const
 
 void Autodetect::signal(zmqpp::socket &sock)
 {
-    bool with_card  = read_card_strategy_->get_nb_bits();
-    bool with_pin   = read_pin_strategy_ && read_pin_strategy_->get_pin().length();
+    bool with_card = read_card_strategy_->get_nb_bits();
+    bool with_pin  = read_pin_strategy_ && read_pin_strategy_->get_pin().length();
 
     zmqpp::message msg;
     msg << ("S_" + reader_->name());
@@ -140,7 +145,8 @@ void Autodetect::signal(zmqpp::socket &sock)
         msg << Auth::SourceType::WIEGAND_PIN;
 
     if (with_card)
-        msg << read_card_strategy_->get_card_id() << read_card_strategy_->get_nb_bits();
+        msg << read_card_strategy_->get_card_id()
+            << read_card_strategy_->get_nb_bits();
     if (with_pin)
         msg << read_pin_strategy_->get_pin();
 
@@ -158,7 +164,7 @@ void Autodetect::set_reader(WiegandReaderImpl *new_ptr)
 
 void Autodetect::reset()
 {
-    ready_ = false;
+    ready_        = false;
     reading_card_ = true;
     reader_->read_reset();
     read_card_strategy_->reset();
@@ -173,13 +179,13 @@ PinReadingUPtr Autodetect::build_strategy(int bits)
     assert(bits == 4 || bits == 8);
     if (bits == 4)
     {
-        return std::unique_ptr<PinReading>(new WiegandPinNBitsOnly<4>(reader_,
-                delay_, pin_key_end_));
+        return std::unique_ptr<PinReading>(
+            new WiegandPinNBitsOnly<4>(reader_, delay_, pin_key_end_));
     }
     else if (bits == 8)
     {
-        return std::unique_ptr<PinReading>(new WiegandPinNBitsOnly<8>(reader_,
-                delay_, pin_key_end_));
+        return std::unique_ptr<PinReading>(
+            new WiegandPinNBitsOnly<8>(reader_, delay_, pin_key_end_));
     }
     return nullptr;
 }

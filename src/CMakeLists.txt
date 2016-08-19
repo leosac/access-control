@@ -7,6 +7,7 @@ set(LEOSAC_SRCS
 
 set(LEOSAC_LIB_SRCS
     core/kernel.cpp
+    core/CoreAPI.cpp
     core/config/ConfigManager.cpp
     core/config/RemoteConfigCollector.cpp
     core/config/ConfigChecker.cpp
@@ -51,6 +52,8 @@ set(LEOSAC_LIB_SRCS
     tools/GenGuid.cpp
     tools/PropertyTreeExtractor.cpp
     tools/log.cpp
+    tools/DatabaseLogSink.cpp
+    tools/ElapsedTimeCounter.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -58,13 +61,73 @@ set(LEOSAC_LIB_SRCS
     core/tasks/RemoteControlAsyncResponse.cpp
 )
 
+
+# ODB configuration for tools/db (LogEntry).
+set(OdbCMake_ODB_HEADERS
+        tools/db/LogEntry.hpp
+        )
+
+set(OdbCMake_SOURCES_TOOLS "")
+odb_compile(OdbCMake_SOURCES_TOOLS
+        FILES ${OdbCMake_ODB_HEADERS}
+        MULTI_DATABASE dynamic
+        DB mysql sqlite
+        STANDARD "c++11"
+        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
+        SCHEMA_FORMAT embedded
+        SCHEMA_NAME tools
+        PROFILE "boost/date-time"
+        INCLUDE ${CMAKE_SOURCE_DIR}/zmqpp/src/
+        INCLUDE_PREFIX tools/db
+        INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+                      %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        )
+
+# ODB configuration for auth stuff (User)
+set(OdbCMake_ODB_HEADERS
+        core/auth/Interfaces/IUser.hpp
+        )
+
+set(OdbCMake_SOURCES_AUTH "")
+odb_compile(OdbCMake_SOURCES_AUTH
+        FILES ${OdbCMake_ODB_HEADERS}
+        MULTI_DATABASE dynamic
+        DB mysql sqlite
+        STANDARD "c++11"
+        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
+        SCHEMA_FORMAT embedded
+        SCHEMA_NAME auth
+        PROFILE "boost/date-time"
+        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/zmqpp/src/
+        INCLUDE_PREFIX core/auth/Interfaces
+        INCLUDE_REGEX %core/auth/Interfaces/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+                      %core/auth/Interfaces/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        )
+
+## END ODB CONFIGURATION
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-include(cotire)
+#include(cotire)
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 
-add_library(${LEOSAC_LIB} SHARED ${LEOSAC_LIB_SRCS})
+add_library(${LEOSAC_LIB} SHARED
+        ${LEOSAC_LIB_SRCS}
+        ${OdbCMake_SOURCES_TOOLS}
+        ${OdbCMake_SOURCES_AUTH}
+        )
 
-set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+target_include_directories(${LEOSAC_LIB}
+        PUBLIC
+        ${ODB_INCLUDE_DIRS}
+        ${ODB_COMPILE_OUTPUT_DIR}
+        )
+
+target_compile_definitions(${LEOSAC_LIB}
+        PRIVATE
+        DATABASE_MYSQL
+        )
+
+set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-unknown-pragmas")
 
 #Add GProf compile flag
 if(LEOSAC_GPROF)
@@ -74,23 +137,23 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -g")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -g -Wl,-z,now")
     endif()
 endif()
 
 ## Add optimization flags
 if (CMAKE_BUILD_TYPE MATCHES "Release")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2 -Wl,-z,now")
     endif()
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
-${CMAKE_SOURCE_DIR}/libpifacedigital/src/
-${CMAKE_SOURCE_DIR}/libmcp23s17/src/
-${CMAKE_SOURCE_DIR}/zmqpp/src/
-${CMAKE_SOURCE_DIR}/libzmq/include
-${CMAKE_SOURCE_DIR}/spdlog/include
+${CMAKE_SOURCE_DIR}/deps/libpifacedigital/src/
+${CMAKE_SOURCE_DIR}/deps/libmcp23s17/src/
+${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
+${CMAKE_SOURCE_DIR}/deps/libzmq/include
+${CMAKE_SOURCE_DIR}/deps/spdlog/include
 )
 
 #Set compilation flags for current target
@@ -101,12 +164,13 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
     COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
-target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES})
+target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
+        ${ODB_LIBRARIES} odb-boost odb-mysql)
 
-set_target_properties(${LEOSAC_LIB} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
-cotire(${LEOSAC_LIB})
-set_target_properties(${LEOSAC_BIN} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
-cotire(${LEOSAC_BIN})
+#set_target_properties(${LEOSAC_LIB} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
+#cotire(${LEOSAC_LIB})
+#set_target_properties(${LEOSAC_BIN} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
+#cotire(${LEOSAC_BIN})
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

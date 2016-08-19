@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,160 +19,156 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
 #include "SysFsGpioModule.hpp"
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {
-    namespace Module
+namespace Module
+{
+namespace SysFsGpio
+{
+class SysFsGpioModule;
+class SysFsGpioConfig;
+
+/**
+* This is a implementation class. It's not exposed to the user and is for this
+* module internal code only.
+*
+* It abstract a GPIO pin.
+*/
+class SysFsGpioPin
+{
+  public:
+    enum class Direction
     {
-        namespace SysFsGpio
-        {
-            class SysFsGpioModule;
-            class SysFsGpioConfig;
+        In = 0,
+        Out
+    };
 
-            /**
-            * This is a implementation class. It's not exposed to the user and is for this
-            * module internal code only.
-            *
-            * It abstract a GPIO pin.
-            */
-            class SysFsGpioPin
-            {
-            public:
-                enum class Direction
-                {
-                    In = 0,
-                    Out
-                };
+    enum class InterruptMode
+    {
+        None,
+        Rising,
+        Falling,
+        Both,
+    };
 
-                enum class InterruptMode
-                {
-                    None,
-                    Rising,
-                    Falling,
-                    Both,
-                };
+    SysFsGpioPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
+                 Direction direction, InterruptMode interrupt_mode,
+                 bool initial_value, SysFsGpioModule &module);
 
-                SysFsGpioPin(zmqpp::context &ctx,
-                        const std::string &name,
-                        int gpio_no,
-                        Direction direction,
-                        InterruptMode interrupt_mode,
-                        bool initial_value,
-                        SysFsGpioModule &module);
+    ~SysFsGpioPin();
 
-                ~SysFsGpioPin();
+    SysFsGpioPin(const SysFsGpioPin &) = delete;
 
-                SysFsGpioPin(const SysFsGpioPin &) = delete;
+    SysFsGpioPin &operator=(const SysFsGpioPin &) = delete;
 
-                SysFsGpioPin &operator=(const SysFsGpioPin &) = delete;
+    SysFsGpioPin &operator=(SysFsGpioPin &&) = delete;
 
-                SysFsGpioPin &operator=(SysFsGpioPin &&) = delete;
+    SysFsGpioPin(SysFsGpioPin &&o) = delete;
 
-                SysFsGpioPin(SysFsGpioPin &&o) = delete;
+    /**
+    * Register own socket to the module's reactor.
+    * @param reactor Reactor object owned by the module.
+    */
+    void register_sockets(zmqpp::reactor *reactor);
 
-                /**
-                * Register own socket to the module's reactor.
-                * @param reactor Reactor object owned by the module.
-                */
-                void register_sockets(zmqpp::reactor *reactor);
+    /**
+    * This method shall returns the time point at which we want to be updated.
+    */
+    std::chrono::system_clock::time_point next_update() const;
 
-                /**
-                * This method shall returns the time point at which we want to be updated.
-                */
-                std::chrono::system_clock::time_point next_update() const;
+    /**
+     * Update the PIN.
+     *
+     * The update will simply turn the PIN off (as a timeout for `ON` command).
+     *
+     * @note This is similar to PFDigitalPin.
+     */
+    void update();
 
-                /**
-                 * Update the PIN.
-                 *
-                 * The update will simply turn the PIN off (as a timeout for `ON` command).
-                 *
-                 * @note This is similar to PFDigitalPin.
-                 */
-                void update();
+  private:
+    /**
+    * Interrupt happened for this GPIO ping.
+    */
+    void handle_interrupt();
 
-            private:
-                /**
-                * Interrupt happened for this GPIO ping.
-                */
-                void handle_interrupt();
+    /**
+    * Read value from filesystem.
+    */
+    bool read_value();
 
-                /**
-                * Read value from filesystem.
-                */
-                bool read_value();
+    /**
+    * Write to sysfs to turn the gpio on.
+    */
+    bool turn_on(zmqpp::message *msg = nullptr);
 
-                /**
-                * Write to sysfs to turn the gpio on.
-                */
-                bool turn_on(zmqpp::message *msg = nullptr);
+    /**
+    * Write to sysfs to turn the gpio on.
+    */
+    bool turn_off();
 
-                /**
-                * Write to sysfs to turn the gpio on.
-                */
-                bool turn_off();
+    /**
+    * Read to sysfs and then write the opposite value
+    */
+    bool toggle();
 
-                /**
-                * Read to sysfs and then write the opposite value
-                */
-                bool toggle();
+    /**
+    * The SysFsGpioModule will register this method so its called when a message
+    * is ready on the pin socket.
+    */
+    void handle_message();
 
-                /**
-                * The SysFsGpioModule will register this method so its called when a message
-                * is ready on the pin socket.
-                */
-                void handle_message();
+    /**
+    * Write direction to the `direction` file.
+    */
+    void set_direction(Direction dir);
 
-                /**
-                * Write direction to the `direction` file.
-                */
-                void set_direction(Direction dir);
+    /**
+    * Write interrupt mode to the `edge` file.
+    */
+    void set_interrupt(InterruptMode mode);
 
-                /**
-                * Write interrupt mode to the `edge` file.
-                */
-                void set_interrupt(InterruptMode mode);
+    /**
+    * File descriptor of the GPIO in sysfs.
+    */
+    int file_fd_;
 
-                /**
-                * File descriptor of the GPIO in sysfs.
-                */
-                int file_fd_;
+    /**
+    * Number of the GPIO.
+    */
+    int gpio_no_;
 
-                /**
-                * Number of the GPIO.
-                */
-                int gpio_no_;
+    /**
+    * listen to command from other component.
+    */
+    zmqpp::socket sock_;
 
-                /**
-                * listen to command from other component.
-                */
-                zmqpp::socket sock_;
+    std::string name_;
 
-                std::string name_;
+    /**
+    * Direction of the PIN.
+    */
+    const Direction direction_;
 
-                /**
-                * Direction of the PIN.
-                */
-                const Direction direction_;
+    /**
+    * Initial value of the PIN. We set the pin's value to this on module shutdown.
+    */
+    const bool initial_value_;
 
-                /**
-                * Initial value of the PIN. We set the pin's value to this on module shutdown.
-                */
-                const bool initial_value_;
+    /**
+    * Reference to the module. We use this to publish on the bus.
+    */
+    SysFsGpioModule &module_;
 
-                /**
-                * Reference to the module. We use this to publish on the bus.
-                */
-                SysFsGpioModule &module_;
+    const SysFsGpioConfig &path_cfg_;
 
-                const SysFsGpioConfig &path_cfg_;
-
-                /**
-                * Time point of next wished update. (Used for timeout on `ON`)
-                */
-                std::chrono::system_clock::time_point next_update_time_;
-            };
-        }
-    }
+    /**
+    * Time point of next wished update. (Used for timeout on `ON`)
+    */
+    std::chrono::system_clock::time_point next_update_time_;
+};
+}
+}
 }

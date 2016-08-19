@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,21 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "WiegandPinNBitsOnly.hpp"
 #include "modules/wiegand/WiegandReaderImpl.hpp"
+#include <tools/log.hpp>
 
 using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
 template <unsigned int NbBits>
-WiegandPinNBitsOnly<NbBits>::WiegandPinNBitsOnly(WiegandReaderImpl *reader,
-        std::chrono::milliseconds pin_timeout,
-        char pin_end_key) :
-        PinReading(reader),
-        pin_timeout_(pin_timeout),
-        pin_end_key_(pin_end_key),
-        ready_(false)
+WiegandPinNBitsOnly<NbBits>::WiegandPinNBitsOnly(
+    WiegandReaderImpl *reader, std::chrono::milliseconds pin_timeout,
+    char pin_end_key)
+    : PinReading(reader)
+    , pin_timeout_(pin_timeout)
+    , pin_end_key_(pin_end_key)
+    , ready_(false)
 {
     last_update_ = std::chrono::system_clock::now();
 }
@@ -47,7 +47,7 @@ char WiegandPinNBitsOnly<NbBits>::extract_from_raw(uint8_t input) const
     // buffer[0] = 1010 0101
     //        ~bits^^^^ ^^^^ key value
     // If this example, the key pressed is '5'.
-    DEBUG("Buffer value = " << (unsigned int) input);
+    DEBUG("Buffer value = " << (unsigned int)input);
     unsigned int n = 0;
     for (int i = 0; i < 4; ++i)
     {
@@ -73,7 +73,8 @@ void WiegandPinNBitsOnly<NbBits>::timeout()
     static_assert(NbBits == 4 || NbBits == 8,
                   "Must either be 4 or 8 bits per key pressed");
     using namespace std::chrono;
-    auto elapsed_ms = duration_cast<milliseconds>(system_clock::now() - last_update_);
+    auto elapsed_ms =
+        duration_cast<milliseconds>(system_clock::now() - last_update_);
 
     if (!reader_->counter())
     {
@@ -84,14 +85,14 @@ void WiegandPinNBitsOnly<NbBits>::timeout()
 
     if (reader_->counter() != NbBits)
     {
-        WARN("Expected number of bits invalid. (" << reader_->counter() <<
-                     " but we expected " << NbBits << ")");
+        WARN("Expected number of bits invalid. ("
+             << reader_->counter() << " but we expected " << NbBits << ")");
         reset();
         return;
     }
 
     last_update_ = system_clock::now();
-    char c = extract_from_raw(reader_->buffer()[0]);
+    char c       = extract_from_raw(reader_->buffer()[0]);
     if (c == pin_end_key_)
     {
         end_of_input();
@@ -123,7 +124,8 @@ void WiegandPinNBitsOnly<NbBits>::signal(zmqpp::socket &sock)
     assert(inputs_.length());
     DEBUG("Sending PIN Code: " << inputs_);
     zmqpp::message msg;
-    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN << inputs_;
+    msg << ("S_" + reader_->name()) << Leosac::Auth::SourceType::WIEGAND_PIN
+        << inputs_;
     sock.send(msg);
     reset();
 }
@@ -138,12 +140,22 @@ template <unsigned int NbBits>
 void WiegandPinNBitsOnly<NbBits>::reset()
 {
     reader_->read_reset();
-    ready_ = false;
-    inputs_ = "";
+    ready_       = false;
+    inputs_      = "";
     last_update_ = std::chrono::system_clock::now();
 }
 
-namespace Leosac { namespace Module { namespace  Wiegand { namespace Strategy {
-                template class WiegandPinNBitsOnly<4>;
-                template class WiegandPinNBitsOnly<8>;
-            }}}}
+namespace Leosac
+{
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+template class WiegandPinNBitsOnly<4>;
+template class WiegandPinNBitsOnly<8>;
+}
+}
+}
+}

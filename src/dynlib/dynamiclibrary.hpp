@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -37,52 +37,53 @@ extern "C" {
 */
 class DynamicLibrary
 {
-public:
-    enum class RelocationMode : int {
-        Lazy    = RTLD_LAZY,
-        Now     = RTLD_NOW
+  public:
+    enum class RelocationMode : int
+    {
+        Lazy = RTLD_LAZY,
+        Now  = RTLD_NOW
     };
 
-public:
+  public:
     /**
     * Construct a dynamic library wrapper for the shared object referenced by name.
     * @param file is the path to the dynamic library file.
     */
-    explicit DynamicLibrary(const std::string& file);
+    explicit DynamicLibrary(const std::string &file);
     ~DynamicLibrary() = default;
 
-    DynamicLibrary(const DynamicLibrary& other) = delete;
-    DynamicLibrary& operator=(const DynamicLibrary& other) = delete;
+    DynamicLibrary(const DynamicLibrary &other) = delete;
+    DynamicLibrary &operator=(const DynamicLibrary &other) = delete;
 
-public:
+  public:
     /**
     * Attempts to open the shared library file so that we can access its symbols.
     * You must call open() before calling getSymbol().
     * @throws DynLibException if something went wrong.
     */
-    void    open(RelocationMode mode = RelocationMode::Lazy);
+    void open(RelocationMode mode = RelocationMode::Lazy);
 
     /**
     * Close the already opened library handler.
     * @throws DynLibException if something went wrong.
     */
-    void    close();
+    void close();
 
     /**
     * Lookup a symbol by name and return a pointer to it.
     * You need to open() the library first.
     * @throws DynLibException if we cannot access the symbol.
     */
-    void*   getSymbol(const std::string& symbol);
+    void *getSymbol(const std::string &symbol);
 
     /**
     * Returns the full path from which the library was loaded.
     */
     const std::string &getFilePath() const;
 
-private:
+  private:
     std::string _file;
-    void*       _handle;
+    void *_handle;
 };
 
 #endif // DYNAMICLIBRARY_HPP

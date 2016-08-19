@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,8 +23,8 @@
 
 namespace Leosac
 {
-    /**
-     * Return the Linux thread ID.
-     */
-    uint64_t gettid();
+/**
+ * Return the Linux thread ID.
+ */
+uint64_t gettid();
 }

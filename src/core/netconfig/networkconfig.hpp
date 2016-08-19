@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -30,52 +30,51 @@
 
 namespace Leosac
 {
-    class Kernel;
+class Kernel;
 
+/**
+* Class that helps configuring the network.
+*
+* @see @ref general_config_network for end-user documentation.
+*/
+class NetworkConfig
+{
+    static constexpr const char *NetCfgFile = "interfaces";
+
+  public:
+    explicit NetworkConfig(const Kernel &k, const boost::property_tree::ptree &cfg);
+
+    ~NetworkConfig() = default;
+
+    NetworkConfig(const NetworkConfig &other) = delete;
+
+    NetworkConfig &operator=(const NetworkConfig &other) = delete;
+
+  public:
+    void reload();
+
+    void setEnabled(bool state);
+
+    void setDHCP(bool enabled);
+
+    void setCustomIP(bool enabled);
+
+  private:
     /**
-    * Class that helps configuring the network.
-    *
-    * @see @ref general_config_network for end-user documentation.
+    * Network configuration
     */
-    class NetworkConfig
-    {
-        static constexpr const char * NetCfgFile = "interfaces";
+    boost::property_tree::ptree config_;
 
-    public:
-        explicit NetworkConfig(const Kernel &k,
-                const boost::property_tree::ptree &cfg);
+    bool _enabled;
+    std::string _interface;
+    bool _dhcpEnabled;
+    std::string _netmask;
+    std::string _ip;
+    std::string _defaultIp;
+    std::string _gateway;
 
-        ~NetworkConfig() = default;
-
-        NetworkConfig(const NetworkConfig &other) = delete;
-
-        NetworkConfig &operator=(const NetworkConfig &other) = delete;
-
-    public:
-        void reload();
-
-        void setEnabled(bool state);
-
-        void setDHCP(bool enabled);
-
-        void setCustomIP(bool enabled);
-
-    private:
-        /**
-        * Network configuration
-        */
-        boost::property_tree::ptree config_;
-
-        bool _enabled;
-        std::string _interface;
-        bool _dhcpEnabled;
-        std::string _netmask;
-        std::string _ip;
-        std::string _defaultIp;
-        std::string _gateway;
-
-        const Kernel &kernel_;
-    };
+    const Kernel &kernel_;
+};
 }
 
 #endif // NETWORKCONFIG_HPP

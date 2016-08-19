@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,17 +17,17 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/auth/Auth.hpp>
 #include "EventPublish.h"
+#include <core/auth/Auth.hpp>
 
 using namespace Leosac::Module::EventPublish;
 
 EventPublish::EventPublish(zmqpp::context &ctx, zmqpp::socket *pipe,
                            const boost::property_tree::ptree &cfg,
-                           CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils),
-        bus_sub_(ctx, zmqpp::socket_type::sub),
-        network_pub_(ctx, zmqpp::socket_type::pub)
+                           CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
+    , bus_sub_(ctx, zmqpp::socket_type::sub)
+    , network_pub_(ctx, zmqpp::socket_type::pub)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     process_config();
@@ -57,7 +57,8 @@ void EventPublish::handle_msg_bus()
 
     // Hack Alert! Hack Alert!
     // For this use case, we read 35bits wiegand frame CP1000 encoded.
-    // We want to extract the identifier: the 20 second-to-last bits (14 first bit ignored).
+    // We want to extract the identifier: the 20 second-to-last bits (14 first bit
+    // ignored).
     // In case this is not a 35 bits tram, do nothing
     if (bits == 35)
     {
@@ -96,7 +97,7 @@ void EventPublish::process_config()
     network_pub_.bind("tcp://*:" + std::to_string(port));
     publish_source_ = config_.get<bool>("module_config.publish_source", false);
 
-    for (auto && itr : config_.get_child("module_config.sources"))
+    for (auto &&itr : config_.get_child("module_config.sources"))
     {
         auto name = itr.second.get<std::string>("");
         bus_sub_.subscribe("S_" + name);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,53 +19,55 @@
 
 #pragma once
 
-#include <chrono>
-#include <memory>
-#include <map>
-#include <vector>
-#include <tools/Schedule.hpp>
-#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/AuthTarget.hpp"
+#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "tools/SingleTimeFrame.hpp"
+#include <chrono>
+#include <map>
+#include <memory>
+#include <tools/Schedule.hpp>
+#include <vector>
 
 namespace Leosac
 {
-    namespace Auth
-    {
-        class SimpleAccessProfile;
-        using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
+namespace Auth
+{
+class SimpleAccessProfile;
+using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
 
-        /**
-        * Concrete implementation of a simple access control class.
-        */
-        class SimpleAccessProfile : public IAccessProfile
-        {
-        public:
-            virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
-                     AuthTargetPtr target) override;
+/**
+* Concrete implementation of a simple access control class.
+*/
+class SimpleAccessProfile : public IAccessProfile
+{
+  public:
+    virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
+                                 AuthTargetPtr target) override;
 
-            /**
-            * Adds a schedule where access to a given target is allowed.
-            */
-            virtual void addAccessSchedule(AuthTargetPtr target, const Tools::Schedule &sched);
+    /**
+    * Adds a schedule where access to a given target is allowed.
+    */
+    virtual void addAccessSchedule(AuthTargetPtr target,
+                                   const Tools::Schedule &sched);
 
-            virtual const std::vector<Tools::Schedule> &defaultSchedules() const;
+    virtual const std::vector<Tools::Schedule> &defaultSchedules() const;
 
-            /**
-            * Returns the map of schedule for each target (except the default target)
-            */
-            virtual const std::map<std::string, std::vector<Tools::Schedule>> &schedules() const;
+    /**
+    * Returns the map of schedule for each target (except the default target)
+    */
+    virtual const std::map<std::string, std::vector<Tools::Schedule>> &
+    schedules() const;
 
-        protected:
-            /**
-            * Map target name to target's schedules.
-            */
-            std::map<std::string, std::vector<Tools::Schedule>> schedules_;
+  protected:
+    /**
+    * Map target name to target's schedules.
+    */
+    std::map<std::string, std::vector<Tools::Schedule>> schedules_;
 
-            /**
-            * Schedule for default target.
-            */
-            std::vector<Tools::Schedule> default_schedule_;
-        };
-    }
+    /**
+    * Schedule for default target.
+    */
+    std::vector<Tools::Schedule> default_schedule_;
+};
+}
 }

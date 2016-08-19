@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,94 +19,95 @@
 
 #pragma once
 
-#include <queue>
-#include <map>
-#include <thread>
-#include <mutex>
-#include <core/tasks/GenericTask.hpp>
 #include "LeosacFwd.hpp"
+#include "core/tasks/GenericTask.hpp"
+#include <map>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 namespace Leosac
 {
 
-    enum class TargetThread
+enum class TargetThread
+{
+    MAIN,
+    POOL,
+};
+
+/**
+ * This is a scheduler that is used internally to schedule asynchronous / long
+ * running tasks.
+ *
+ * It currently support running a task on the main thread, or in some
+ * random thread.
+ *
+ * The scheduler is fully thread-safe.
+ */
+class Scheduler
+{
+  public:
+    /**
+     * Construct a scheduler object (generally 1 per application).
+     * The `kptr` pointer should never be null, except when writing test cases.
+     *
+     * @note We use a pointer here to ease testing
+     */
+    Scheduler(Kernel *kptr);
+
+    Scheduler(const Scheduler &) = delete;
+    Scheduler(Scheduler &&)      = delete;
+    Scheduler &operator=(const Scheduler &) = delete;
+    Scheduler &operator=(Scheduler &&) = delete;
+
+    template <typename Callable>
+    typename std::enable_if<
+        !std::is_convertible<Callable, std::shared_ptr<Tasks::Task>>::value,
+        void>::type
+    enqueue(const Callable &call, TargetThread policy)
     {
-        MAIN,
-        POOL,
-    };
+        enqueue(Tasks::GenericTask::build(call), policy);
+    }
 
     /**
-     * This is a scheduler that is used internally to schedule asynchronous / long
-     * running tasks.
-     *
-     * It currently support running a task on the main thread, or in some
-     * random thread.
-     *
-     * The schedule is fully thread-safe.
+     * Enqueue a task, a schedule to run on thread `policy`.
      */
-    class Scheduler
-    {
-    public:
-        /**
-         * Construct a scheduler object (generally 1 per application).
-         * The `kptr` pointer should never be null, except when writing test cases.
-         *
-         * @note We use a pointer here to ease testing
-         */
-        Scheduler(Kernel *kptr);
+    void enqueue(Tasks::TaskPtr t, TargetThread policy);
 
-        Scheduler(const Scheduler &)            = delete;
-        Scheduler(Scheduler &&)                 = delete;
-        Scheduler &operator=(const Scheduler &) = delete;
-        Scheduler &operator=(Scheduler &&)      = delete;
+    /**
+     * This will run queued tasks that are scheduled to run on thread
+     * `me`.
+     *
+     * @warning It is **important** to call this function with the correct
+     * parameter.
+     */
+    void update(TargetThread me) noexcept;
 
-        template<typename Callable>
-        typename std::enable_if<!std::is_convertible<Callable, std::shared_ptr<Tasks::Task>>::value, void>::type
-        enqueue(const Callable &call, TargetThread policy)
-        {
-            enqueue(Tasks::GenericTask::build(call), policy);
-        }
+    /**
+     * This is currently useless.
+     */
+    void register_thread(TargetThread me);
 
-        /**
-         * Enqueue a task, a schedule to run on thread `policy`.
-         */
-        void enqueue(Tasks::TaskPtr t, TargetThread policy);
+    /**
+     * Retrieve the kernel reference associated with the scheduler.
+     * This function will crash the application if the kernel pointer is null.
+     */
+    Kernel &kernel();
 
-        /**
-         * This will run queued tasks that are scheduled to run on thread
-         * `me`.
-         *
-         * @warning It is **important** to call this function with the correct
-         * parameter.
-         */
-        void update(TargetThread me) noexcept;
+  private:
+    using TaskQueue    = std::queue<Tasks::TaskPtr>;
+    using TaskQueueMap = std::map<TargetThread, TaskQueue>;
 
-        /**
-         * This is currently useless.
-         */
-        void register_thread(TargetThread me);
+    /**
+     * The internal queues of tasks.
+     *
+     * Each target thread has its own queue. Tasks scheduled to run
+     * on `POOL` are not queued here, since they run on some detached thread
+     * we don't care about.
+     */
+    TaskQueueMap queues_;
 
-        /**
-         * Retrieve the kernel reference associated with the scheduler.
-         * This function will crash the application if the kernel pointer is null.
-         */
-        Kernel &kernel();
-
-    private:
-        using TaskQueue     = std::queue<Tasks::TaskPtr>;
-        using TaskQueueMap  = std::map<TargetThread, TaskQueue>;
-
-        /**
-         * The internal queues of tasks.
-         *
-         * Each target thread has its own queue. Tasks scheduled to run
-         * on `POOL` are not queued here, since they run on some detached thread
-         * we don't care about.
-         */
-        TaskQueueMap queues_;
-
-        Kernel *kptr_;
-        mutable std::mutex mutex_;
-    };
-
+    Kernel *kptr_;
+    mutable std::mutex mutex_;
+};
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,42 +19,42 @@
 
 #include "SingleTimeFrame.hpp"
 #include <chrono>
-#include <vector>
 #include <string>
+#include <vector>
 
 #pragma once
 
 namespace Leosac
 {
-    namespace Tools
-    {
-        /**
-        * A schedule is simply a list of time frame (SingleTimeFrame) with
-        * a name.
-        */
-        class Schedule
-        {
-        public:
-            Schedule(const std::string &sched_name = "");
+namespace Tools
+{
+/**
+* A schedule is simply a list of time frame (SingleTimeFrame) with
+* a name.
+*/
+class Schedule
+{
+  public:
+    Schedule(const std::string &sched_name = "");
 
-            /**
-            * Retrieve the name of the schedule.
-            */
-            const std::string &name() const;
+    /**
+    * Retrieve the name of the schedule.
+    */
+    const std::string &name() const;
 
-            /**
-            * Check whether or not the given time point can be found in the schedule.
-            */
-            bool is_in_schedule(const std::chrono::system_clock::time_point &tp) const;
+    /**
+    * Check whether or not the given time point can be found in the schedule.
+    */
+    bool is_in_schedule(const std::chrono::system_clock::time_point &tp) const;
 
-            /**
-            * Add the given timeframe to this schedule;
-            */
-            void add_timeframe(const SingleTimeFrame &tf);
+    /**
+    * Add the given timeframe to this schedule;
+    */
+    void add_timeframe(const SingleTimeFrame &tf);
 
-        private:
-            std::vector<SingleTimeFrame> timeframes_;
-            std::string name_;
-        };
-    }
+  private:
+    std::vector<SingleTimeFrame> timeframes_;
+    std::string name_;
+};
+}
 }

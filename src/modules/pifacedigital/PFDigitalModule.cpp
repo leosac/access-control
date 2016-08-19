@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,15 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <fcntl.h>
-#include <boost/iterator/transform_iterator.hpp>
 #include "PFDigitalModule.hpp"
+#include "core/CoreUtils.hpp"
+#include "exception/gpioexception.hpp"
 #include "mcp23s17.h"
 #include "pifacedigital.h"
-#include "exception/gpioexception.hpp"
 #include "tools/log.hpp"
 #include "tools/timeout.hpp"
-#include "core/CoreUtils.hpp"
+#include <boost/iterator/transform_iterator.hpp>
+#include <fcntl.h>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -35,13 +35,14 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
                                  zmqpp::socket *module_manager_pipe,
                                  const boost::property_tree::ptree &config,
                                  CoreUtilsPtr utils)
-        : BaseModule(ctx, module_manager_pipe, config, utils),
-          bus_push_(ctx_, zmqpp::socket_type::push)
+    : BaseModule(ctx, module_manager_pipe, config, utils)
+    , bus_push_(ctx_, zmqpp::socket_type::push)
 {
     if (pifacedigital_open(0) == -1)
     {
         ERROR("Cannot open PifaceDigital device");
-        throw LEOSACException("Cannot open PifaceDigital device (is SPI module enabled ?)");
+        throw LEOSACException(
+            "Cannot open PifaceDigital device (is SPI module enabled ?)");
     }
     int ret = pifacedigital_enable_interrupts();
     ASSERT_LOG(ret == 0, "Failed to enable interrupt on piface board");
@@ -53,24 +54,27 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
         reactor_.add(gpio.sock_, std::bind(&PFDigitalPin::handle_message, &gpio));
     }
 
-    std::string path_to_gpio = "/sys/class/gpio/gpio" + std::to_string(GPIO_INTERRUPT_PIN) + "/value";
+    std::string path_to_gpio =
+        "/sys/class/gpio/gpio" + std::to_string(GPIO_INTERRUPT_PIN) + "/value";
     interrupt_fd_ = open(path_to_gpio.c_str(), O_RDONLY | O_NONBLOCK);
     ASSERT_LOG(interrupt_fd_, "Failed to open GPIO file");
-    pifacedigital_read_reg(0x11, 0);//flush
-    reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this), zmqpp::poller::poll_pri);
+    pifacedigital_read_reg(0x11, 0); // flush
+    reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this),
+                 zmqpp::poller::poll_pri);
 }
 
 void PFDigitalModule::run()
 {
     while (is_running_)
     {
-        auto itr_transform = [] (const PFDigitalPin& p) -> std::chrono::system_clock::time_point
-        {
+        auto itr_transform =
+            [](const PFDigitalPin &p) -> std::chrono::system_clock::time_point {
             return p.next_update();
         };
 
-        auto timeout = Tools::compute_timeout(boost::make_transform_iterator(gpios_.begin(), itr_transform),
-                                              boost::make_transform_iterator(gpios_.end(), itr_transform));
+        auto timeout = Tools::compute_timeout(
+            boost::make_transform_iterator(gpios_.begin(), itr_transform),
+            boost::make_transform_iterator(gpios_.end(), itr_transform));
         reactor_.poll(timeout);
         for (auto &gpio_pin : gpios_)
         {
@@ -87,9 +91,11 @@ void PFDigitalModule::handle_interrupt()
     ssize_t ret;
 
     ret = ::read(interrupt_fd_, &buffer[0], buffer.size());
-    ASSERT_LOG(ret >= 0, "Reading on interrupt_fd gave unexpected return value: " << ret);
+    ASSERT_LOG(ret >= 0,
+               "Reading on interrupt_fd gave unexpected return value: " << ret);
     ret = ::lseek(interrupt_fd_, 0, SEEK_SET);
-    ASSERT_LOG(ret >= 0, "Lseeking on interrupt_fd gave unexpected return value: " << ret);
+    ASSERT_LOG(ret >= 0,
+               "Lseeking on interrupt_fd gave unexpected return value: " << ret);
 
     uint8_t states = pifacedigital_read_reg(0x11, 0);
     for (int i = 0; i < 8; ++i)
@@ -100,7 +106,8 @@ void PFDigitalModule::handle_interrupt()
             std::string gpio_name;
             if (get_input_pin_name(gpio_name, i))
             {
-                bus_push_.send(zmqpp::message() << std::string("S_INT:" + gpio_name));
+                bus_push_.send(zmqpp::message()
+                               << std::string("S_INT:" + gpio_name));
             }
         }
     }
@@ -127,22 +134,23 @@ void PFDigitalModule::process_config(const boost::property_tree::ptree &cfg)
     {
         boost::property_tree::ptree gpio_cfg = node.second;
 
-        std::string gpio_name       = gpio_cfg.get_child("name").data();
-        int gpio_no                 = std::stoi(gpio_cfg.get_child("no").data());
-        std::string gpio_direction  = gpio_cfg.get_child("direction").data();
-        bool gpio_value             = gpio_cfg.get<bool>("value", false);
+        std::string gpio_name      = gpio_cfg.get_child("name").data();
+        int gpio_no                = std::stoi(gpio_cfg.get_child("no").data());
+        std::string gpio_direction = gpio_cfg.get_child("direction").data();
+        bool gpio_value            = gpio_cfg.get<bool>("value", false);
 
-        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no << ". direction = " << gpio_direction);
+        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no
+                              << ". direction = " << gpio_direction);
 
-        PFDigitalPin pin(ctx_,
-                gpio_name,
-                gpio_no,
-                gpio_direction == "in" ? PFDigitalPin::Direction::In : PFDigitalPin::Direction::Out,
-                gpio_value);
+        PFDigitalPin pin(ctx_, gpio_name, gpio_no,
+                         gpio_direction == "in" ? PFDigitalPin::Direction::In
+                                                : PFDigitalPin::Direction::Out,
+                         gpio_value);
 
         if (gpio_direction != "in" && gpio_direction != "out")
             throw GpioException("Direction (" + gpio_direction + ") is invalid");
         gpios_.push_back(std::move(pin));
-        utils_->config_checker().register_object(gpio_name, ConfigChecker::ObjectType::GPIO);
+        utils_->config_checker().register_object(gpio_name,
+                                                 ConfigChecker::ObjectType::GPIO);
     }
 }

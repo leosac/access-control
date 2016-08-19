@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -20,9 +20,9 @@
 #pragma once
 
 #include "SimpleWiegandStrategy.hpp"
-#include "WiegandPinNBitsOnly.hpp"
-#include "WiegandPinBuffered.hpp"
 #include "WiegandCardAndPin.hpp"
+#include "WiegandPinBuffered.hpp"
+#include "WiegandPinNBitsOnly.hpp"
 
 #include "CardReading.hpp"
 #include "PinReading.hpp"

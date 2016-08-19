@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -21,10 +21,9 @@
 
 using namespace Leosac::Tools;
 
-Schedule::Schedule(const std::string &sched_name) :
-        name_(sched_name)
+Schedule::Schedule(const std::string &sched_name)
+    : name_(sched_name)
 {
-
 }
 
 bool Schedule::is_in_schedule(const std::chrono::system_clock::time_point &tp) const

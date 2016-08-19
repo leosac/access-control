@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,12 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/message.hpp>
-#include <tools/log.hpp>
-#include <core/auth/Auth.hpp>
-#include <tools/Colorize.hpp>
 #include "NotifierInstance.hpp"
 #include "core/auth/WiegandCard.hpp"
+#include <core/auth/Auth.hpp>
+#include <tools/Colorize.hpp>
+#include <tools/log.hpp>
+#include <zmqpp/message.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -110,8 +110,7 @@ void NotifierInstance::handle_one(zmqpp::message &msg)
             else
             {
                 targets_.erase(std::remove_if(targets_.begin(), targets_.end(),
-                                              [&](const TargetInfo &info)
-                                              {
+                                              [&](const TargetInfo &info) {
                                                   return info.zmq_identity_ ==
                                                          routing_id;
                                               }),
@@ -144,11 +143,10 @@ void NotifierInstance::handle_tcp_msg()
 NotifierInstance::TargetInfo *
 NotifierInstance::find_target(const std::string &routing_id)
 {
-    auto itr =
-        std::find_if(targets_.begin(), targets_.end(), [&](const TargetInfo &target)
-                     {
-                         return target.zmq_identity_ == routing_id;
-                     });
+    auto itr = std::find_if(targets_.begin(), targets_.end(),
+                            [&](const TargetInfo &target) {
+                                return target.zmq_identity_ == routing_id;
+                            });
     if (itr != targets_.end())
         return &(*itr);
     return nullptr;

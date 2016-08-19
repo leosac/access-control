@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,57 +19,58 @@
 
 #pragma once
 
+#include "WiegandReaderImpl.hpp"
 #include "zmqpp/zmqpp.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <modules/BaseModule.hpp>
 #include <modules/wiegand/strategies/WiegandStrategy.hpp>
-#include "WiegandReaderImpl.hpp"
 
 namespace Leosac
 {
-    namespace Module
-    {
+namespace Module
+{
 
-        /**
-        * Provide support for Wiegand devices.
-        *
-        * @see @ref mod_wiegand_main for more information
-        */
-        namespace Wiegand
-        {
-            /**
-            * This simply is the main class for the Wiegand module.
-            */
-            class WiegandReaderModule : public BaseModule
-            {
-            public:
-                WiegandReaderModule(zmqpp::context &ctx,
-                        zmqpp::socket *pipe,
-                        const boost::property_tree::ptree &cfg,
-                                    CoreUtilsPtr  utils);
+/**
+* Provide support for Wiegand devices.
+*
+* @see @ref mod_wiegand_main for more information
+*/
+namespace Wiegand
+{
+/**
+* This simply is the main class for the Wiegand module.
+*/
+class WiegandReaderModule : public BaseModule
+{
+  public:
+    WiegandReaderModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                        const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-                /**
-                * Module's main loop. Will exit upon reception of signal::stop from module manager
-                */
-                virtual void run() override;
+    /**
+    * Module's main loop. Will exit upon reception of signal::stop from module
+    * manager
+    */
+    virtual void run() override;
 
-            private:
-                /**
-                * Create wiegand reader instances based on configuration.
-                */
-                void process_config();
+  private:
+    /**
+    * Create wiegand reader instances based on configuration.
+    */
+    void process_config();
 
-                /**
-                * Internal factory that build a strategy object based upon a reader configuration.
-                */
-                Strategy::WiegandStrategyUPtr create_strategy(const boost::property_tree::ptree &reader_config,
-                        WiegandReaderImpl *reader);
+    /**
+    * Internal factory that build a strategy object based upon a reader
+    * configuration.
+    */
+    Strategy::WiegandStrategyUPtr
+    create_strategy(const boost::property_tree::ptree &reader_config,
+                    WiegandReaderImpl *reader);
 
-                /**
-                * Vector of wiegand reader managed by this module.
-                */
-                std::vector<WiegandReaderImpl> readers_;
-            };
-        }
-    }
+    /**
+    * Vector of wiegand reader managed by this module.
+    */
+    std::vector<WiegandReaderImpl> readers_;
+};
+}
+}
 }

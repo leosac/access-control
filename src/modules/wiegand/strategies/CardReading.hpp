@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,38 +23,38 @@
 
 namespace Leosac
 {
-    namespace Module
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+class CardReading;
+
+using CardReadingUPtr = std::unique_ptr<CardReading>;
+
+/**
+* Interface for a strategy that read a card number.
+*/
+class CardReading : public WiegandStrategy
+{
+  public:
+    CardReading(WiegandReaderImpl *reader)
+        : WiegandStrategy(reader)
     {
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                class CardReading;
-
-                using CardReadingUPtr = std::unique_ptr<CardReading>;
-
-                /**
-                * Interface for a strategy that read a card number.
-                */
-                class CardReading : public WiegandStrategy
-                {
-                public:
-                    CardReading(WiegandReaderImpl *reader) :
-                            WiegandStrategy(reader)
-                    {
-                    }
-
-                    /**
-                    * Returns the card id that was read.
-                    */
-                    virtual const std::string &get_card_id() const = 0;
-
-                    /**
-                    * Returns the number of bits in the card.
-                    */
-                    virtual int get_nb_bits() const = 0;
-                };
-            }
-        }
     }
+
+    /**
+    * Returns the card id that was read.
+    */
+    virtual const std::string &get_card_id() const = 0;
+
+    /**
+    * Returns the number of bits in the card.
+    */
+    virtual int get_nb_bits() const = 0;
+};
+}
+}
+}
 }

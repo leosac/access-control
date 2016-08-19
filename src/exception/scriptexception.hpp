@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class ScriptException : public LEOSACException
 {
-public:
-    ScriptException(const std::string& message) : LEOSACException("Script::" + message) {}
-    virtual ~ScriptException() {}
+  public:
+    ScriptException(const std::string &message)
+        : LEOSACException("Script::" + message)
+    {
+    }
+    virtual ~ScriptException()
+    {
+    }
 };
 
 #endif // SCRIPTEXCEPTION_HPP

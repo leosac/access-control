@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,29 +19,28 @@
 
 #pragma once
 
-#include "Task.hpp"
 #include "LeosacFwd.hpp"
+#include "Task.hpp"
 
 namespace Leosac
 {
-    namespace Tasks
-    {
-        /**
-         * Run in the main thread and retrieve the current configuration version.
-         *
-         * This is done by querying the kernel's configuration manager.
-         */
-        class GetLocalConfigVersion : public Task
-        {
-        public:
-            GetLocalConfigVersion(Kernel &k);
-            uint64_t config_version_;
+namespace Tasks
+{
+/**
+ * Run in the main thread and retrieve the current configuration version.
+ *
+ * This is done by querying the kernel's configuration manager.
+ */
+class GetLocalConfigVersion : public Task
+{
+  public:
+    GetLocalConfigVersion(Kernel &k);
+    uint64_t config_version_;
 
-        private:
-            virtual bool do_run() override;
+  private:
+    virtual bool do_run() override;
 
-            Kernel &kernel_;
-        };
-    }
+    Kernel &kernel_;
+};
 }
-
+}

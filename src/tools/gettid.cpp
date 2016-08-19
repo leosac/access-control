@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -18,17 +18,15 @@
 */
 
 #include "gettid.hpp"
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/syscall.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 namespace Leosac
 {
-    uint64_t gettid()
-    {
-        return static_cast<uint64_t>(syscall(SYS_gettid));
-    }
+uint64_t gettid()
+{
+    return static_cast<uint64_t>(syscall(SYS_gettid));
 }
-
-
+}

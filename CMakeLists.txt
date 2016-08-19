@@ -20,7 +20,11 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.41.0 REQUIRED serialization regex)
+find_package(Boost 1.55.0 REQUIRED date_time system serialization regex filesystem)
+
+# ODB stuff
+find_package(ODB REQUIRED COMPONENTS sqlite)
+include(${ODB_USE_FILE})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O2")
 
@@ -43,9 +47,9 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LEOSAC_BINARY_DIR})
 set(CMAKE_INSTALL_RPATH \$ORIGIN/../lib)
 
 if (LEOSAC_BUILD_CMAKE_ZMQ)
-add_subdirectory(libzmq)
+add_subdirectory(deps/libzmq)
 endif()
-add_subdirectory(zmqpp)
+add_subdirectory(deps/zmqpp)
 add_subdirectory(src)
 add_subdirectory(cfg)
 

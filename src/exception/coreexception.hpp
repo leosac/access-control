@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class CoreException : public LEOSACException
 {
-public:
-    CoreException(const std::string& message) : LEOSACException("Core::" + message) {}
-    virtual ~CoreException() {}
+  public:
+    CoreException(const std::string &message)
+        : LEOSACException("Core::" + message)
+    {
+    }
+    virtual ~CoreException()
+    {
+    }
 };
 
 #endif // COREEXCEPTION_HPP

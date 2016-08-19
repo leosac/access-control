@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -26,14 +26,19 @@
 #ifndef GPIOEXCEPTION_HPP
 #define GPIOEXCEPTION_HPP
 
-#include <string>
 #include "leosacexception.hpp"
+#include <string>
 
 class GpioException : public LEOSACException
 {
-public:
-    GpioException(const std::string& message) : LEOSACException("Gpio::" + message) {}
-    virtual ~GpioException() {}
+  public:
+    GpioException(const std::string &message)
+        : LEOSACException("Gpio::" + message)
+    {
+    }
+    virtual ~GpioException()
+    {
+    }
 };
 
 #endif // GPIOEXCEPTION_HPP

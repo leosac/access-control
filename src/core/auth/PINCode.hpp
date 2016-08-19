@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -20,57 +20,59 @@
 #pragma once
 
 #include "core/auth/BaseAuthSource.hpp"
-#include <string>
 #include <sstream>
+#include <string>
 #include <tools/IVisitor.hpp>
 
 namespace Leosac
 {
-    namespace Auth
+namespace Auth
+{
+class PINCode;
+
+using PINCodePtr = std::shared_ptr<PINCode>;
+
+/**
+* A wiegand PIN code
+*/
+class PINCode : public BaseAuthSource
+{
+  public:
+    /**
+    * Create a PINCode object.
+    *
+    * @param pin the code in string format.
+    */
+    PINCode(const std::string &pin)
+        : pin_code_(pin)
     {
-        class PINCode;
-
-        using PINCodePtr = std::shared_ptr<PINCode>;
-
-        /**
-        * A wiegand PIN code
-        */
-        class PINCode : public BaseAuthSource
-        {
-        public:
-            /**
-            * Create a PINCode object.
-            *
-            * @param pin the code in string format.
-            */
-            PINCode(const std::string &pin) :
-                    pin_code_(pin)
-            {
-            }
-
-            virtual void accept(Tools::IVisitor *visitor) override
-            {
-                visitor->visit(this);
-            }
-
-            const std::string &pin_code() const
-            {
-                return pin_code_;
-            }
-
-            virtual std::string to_string() const override
-            {
-                std::stringstream ss;
-
-                ss << "Text representation of auth source:" << std::endl << "\t\t";
-                ss << "Source Name: " << source_name_ << std::endl << "\t\t";
-                ss << "Source Type: " << "PIN Code" << std::endl << "\t\t";
-                ss << "Pin Code: " << pin_code_;
-                return ss.str();
-            }
-
-        protected:
-            std::string pin_code_;
-        };
     }
+
+    virtual void accept(Tools::IVisitor *visitor) override
+    {
+        visitor->visit(this);
+    }
+
+    const std::string &pin_code() const
+    {
+        return pin_code_;
+    }
+
+    virtual std::string to_string() const override
+    {
+        std::stringstream ss;
+
+        ss << "Text representation of auth source:" << std::endl << "\t\t";
+        ss << "Source Name: " << source_name_ << std::endl << "\t\t";
+        ss << "Source Type: "
+           << "PIN Code" << std::endl
+           << "\t\t";
+        ss << "Pin Code: " << pin_code_;
+        return ss.str();
+    }
+
+  protected:
+    std::string pin_code_;
+};
+}
 }

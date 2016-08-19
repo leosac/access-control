@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -30,11 +30,11 @@
 using namespace Leosac::Module::Rpleth;
 
 CircularBuffer::CircularBuffer(std::size_t size)
-        : _buffer(size),
-          _size(size),
-          _rIdx(0),
-          _wIdx(0),
-          _toRead(0)
+    : _buffer(size)
+    , _size(size)
+    , _rIdx(0)
+    , _wIdx(0)
+    , _toRead(0)
 {
 }
 
@@ -47,7 +47,7 @@ std::size_t CircularBuffer::read(Byte *data, std::size_t size)
     if (!_toRead)
         return (0);
     size = std::min(size, _toRead);
-    for (readIdx = 0; readIdx < size; ++readIdx)
+    for (readIdx      = 0; readIdx < size; ++readIdx)
         data[readIdx] = _buffer[(_rIdx + readIdx) % _size];
     if (readIdx == size)
         return (0);
@@ -62,7 +62,7 @@ std::size_t CircularBuffer::write(const Byte *data, std::size_t size)
 {
     if (!size || size > _size)
         return (0);
-    for (std::size_t i = 0; i < size; ++i)
+    for (std::size_t i                 = 0; i < size; ++i)
         _buffer[((_wIdx + i) % _size)] = data[i];
     _wIdx += size;
     _wIdx %= _size;
@@ -82,14 +82,14 @@ void CircularBuffer::fastForward(std::size_t offset)
 {
     if (offset > _toRead)
         offset = _toRead;
-    _rIdx = (_rIdx + offset) % _size;
+    _rIdx      = (_rIdx + offset) % _size;
     _toRead -= offset;
 }
 
 void CircularBuffer::reset()
 {
-    _rIdx = 0;
-    _wIdx = 0;
+    _rIdx   = 0;
+    _wIdx   = 0;
     _toRead = 0;
 }
 

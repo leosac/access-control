@@ -1,6 +1,5 @@
-#pragma once
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -24,33 +23,33 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        class StdinControllerModule : public BaseModule
-        {
+namespace Module
+{
+class StdinControllerModule : public BaseModule
+{
 
-        public:
-            StdinControllerModule(zmqpp::context &ctx,
-                                  zmqpp::socket *pipe,
-                                  boost::property_tree::ptree const &cfg,
-                                  CoreUtilsPtr  utils);
+  public:
+    StdinControllerModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                          boost::property_tree::ptree const &cfg,
+                          CoreUtilsPtr utils);
 
-            /**
-            * We can read from standard input;
-            */
-            void handleStdin(void);
+    /**
+    * We can read from standard input;
+    */
+    void handleStdin(void);
 
 
-            /**
-            * Send the request to the target and handle the response.
-            * Return false if no response in 1s.
-            */
-            bool send_request(std::shared_ptr<zmqpp::socket> target,
-                              const std::vector<std::string> &cmds);
+    /**
+    * Send the request to the target and handle the response.
+    * Return false if no response in 1s.
+    */
+    bool send_request(std::shared_ptr<zmqpp::socket> target,
+                      const std::vector<std::string> &cmds);
 
-        private:
-            // map a device name or anything that can be a target for a command to socket that are connected to it.
-            std::map<std::string, std::shared_ptr<zmqpp::socket>> endpoints_;
-        };
-    }
+  private:
+    // map a device name or anything that can be a target for a command to socket
+    // that are connected to it.
+    std::map<std::string, std::shared_ptr<zmqpp::socket>> endpoints_;
+};
+}
 }

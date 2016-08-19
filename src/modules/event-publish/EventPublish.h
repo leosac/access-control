@@ -23,10 +23,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
 #include <memory>
-#include <modules/BaseModule.hpp>
-#include <hardware/FGPIO.hpp>
-#include <tools/XmlScheduleLoader.hpp>
-#include <core/auth/AuthTarget.hpp>
+#include "modules/BaseModule.hpp"
+#include "hardware/FGPIO.hpp"
+#include "tools/XmlScheduleLoader.hpp"
+#include "core/auth/AuthTarget.hpp"
 
 namespace Leosac
 {

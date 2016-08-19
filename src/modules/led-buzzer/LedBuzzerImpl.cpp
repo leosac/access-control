@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -22,18 +22,16 @@
 
 using namespace Leosac::Module::LedBuzzer;
 
-LedBuzzerImpl::LedBuzzerImpl(zmqpp::context &ctx,
-                             std::string const &led_name,
-                             std::string const &gpio_name,
-                             int blink_duration,
-                             int blink_speed) :
-        ctx_(ctx),
-        frontend_(ctx, zmqpp::socket_type::rep),
-        backend_(ctx, zmqpp::socket_type::req),
-        gpio_(ctx, gpio_name),
-        default_blink_duration_(blink_duration),
-        default_blink_speed_(blink_speed),
-        stmachine_(std::ref(gpio_))
+LedBuzzerImpl::LedBuzzerImpl(zmqpp::context &ctx, std::string const &led_name,
+                             std::string const &gpio_name, int blink_duration,
+                             int blink_speed)
+    : ctx_(ctx)
+    , frontend_(ctx, zmqpp::socket_type::rep)
+    , backend_(ctx, zmqpp::socket_type::req)
+    , gpio_(ctx, gpio_name)
+    , default_blink_duration_(blink_duration)
+    , default_blink_speed_(blink_speed)
+    , stmachine_(std::ref(gpio_))
 {
     frontend_.bind("inproc://" + led_name);
     backend_.connect("inproc://" + gpio_name);
@@ -73,9 +71,7 @@ void LedBuzzerImpl::handle_message()
         ok = true;
         SM::EventPlayingPattern e;
         e.pattern = {
-                {5000, 1000},
-                {2100, 700},
-                {1000, 100},
+            {5000, 1000}, {2100, 700}, {1000, 100},
         };
         stmachine_.process_event(e);
     }
@@ -109,7 +105,7 @@ bool LedBuzzerImpl::start_blink(zmqpp::message *msg)
     std::string tmp;
     SM::EventBlink event_blink;
     event_blink.duration = default_blink_duration_;
-    event_blink.speed = default_blink_speed_;
+    event_blink.speed    = default_blink_speed_;
 
     if (msg->parts() > 1)
     {

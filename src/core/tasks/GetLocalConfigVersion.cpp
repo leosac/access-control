@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,13 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
-#include <tools/gettid.hpp>
 #include "GetLocalConfigVersion.hpp"
 #include "core/kernel.hpp"
+#include "tools/gettid.hpp"
+#include "tools/log.hpp"
 
-Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k) :
-        kernel_(k)
+Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k)
+    : kernel_(k)
 {
     INFO("Creating GetLocalConfigVersion task. Guid = " << get_guid());
 }

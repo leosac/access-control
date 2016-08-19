@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,158 +19,164 @@
 
 #pragma once
 
-#include <string>
 #include <chrono>
-#include <zmqpp/socket.hpp>
+#include <string>
 #include <zmqpp/poller.hpp>
+#include <zmqpp/socket.hpp>
 
 namespace Leosac
 {
-    namespace Hardware
+namespace Hardware
+{
+
+/**
+* A Facade to a LED object.
+*
+* This object require a valid GPIO object to work. It abstract a LED, and add a
+* simple command on top of GPIO.
+* It requires a module that implements the behavior to work properly. However, unlike
+* GPIO modules, we are unlikely
+* to have multiple implementation of a LED module.
+*
+* @note This class implements the client code to [theses specifications](@ref
+* hardware_spec_led).
+*/
+class FLED
+{
+  public:
+    struct State
     {
+        State()
+            : st(UNKNOWN)
+            , duration(0)
+            , speed(0)
+            , value(false)
+        {
+        }
 
         /**
-        * A Facade to a LED object.
-        *
-        * This object require a valid GPIO object to work. It abstract a LED, and add a simple command on top of GPIO.
-        * It requires a module that implements the behavior to work properly. However, unlike GPIO modules, we are unlikely
-        * to have multiple implementation of a LED module.
-        *
-        * @note This class implements the client code to [theses specifications](@ref hardware_spec_led).
+        * Internal state of the LED.
         */
-        class FLED
+        enum
         {
-        public:
+            ON,
+            OFF,
+            BLINKING,
+            UNKNOWN,
+        } st;
 
-            struct State
-            {
-                State() :
-                        st(UNKNOWN),
-                        duration(0),
-                        speed(0),
-                        value(false)
-                {
-                }
+        /**
+        * Set only if `st` is `BLINKING`, it represents the total duration of
+        * blinking.
+        */
+        int64_t duration;
 
-                /**
-                * Internal state of the LED.
-                */
-                enum
-                {
-                    ON,
-                    OFF,
-                    BLINKING,
-                    UNKNOWN,
-                } st;
+        /**
+        * Set only if `st` is `BLINKING`, it represents the speed of blinking.
+        */
+        int64_t speed;
 
-                /**
-                * Set only if `st` is `BLINKING`, it represents the total duration of blinking.
-                */
-                int64_t duration;
+        /**
+        * Set only if `st` is `BLINKING` : value of the LED (true if ON, false
+        * otherwise).
+        */
+        bool value;
+    };
 
-                /**
-                * Set only if `st` is `BLINKING`, it represents the speed of blinking.
-                */
-                int64_t speed;
+    FLED(zmqpp::context &ctx, const std::string &led_name);
 
-                /**
-                * Set only if `st` is `BLINKING` : value of the LED (true if ON, false otherwise).
-                */
-                bool value;
-            };
+    /**
+    * Disabled copy-constructor.
+    * Manually create a new facade using the LED's name instead.
+    */
+    FLED(const FLED &) = delete;
 
-            FLED(zmqpp::context &ctx, const std::string &led_name);
+    /**
+    * Default destructor
+    */
+    ~FLED() = default;
 
-            /**
-            * Disabled copy-constructor.
-            * Manually create a new facade using the LED's name instead.
-            */
-            FLED(const FLED &) = delete;
+    /**
+    * Turn the LED ON and turn it OFF duration milliseconds later.
+    */
+    bool turnOn(int duration);
 
-            /**
-            * Default destructor
-            */
-            ~FLED() = default;
+    /**
+    * Turn the LED ON and turn it OFF duration milliseconds later.
+    */
+    bool turnOn(std::chrono::milliseconds duration);
 
-            /**
-            * Turn the LED ON and turn it OFF duration milliseconds later.
-            */
-            bool turnOn(int duration);
+    /**
+    * Turn the LED ON by sending a message to the backend LED impl.
+    */
+    bool turnOn();
 
-            /**
-            * Turn the LED ON and turn it OFF duration milliseconds later.
-            */
-            bool turnOn(std::chrono::milliseconds duration);
+    /**
+    * Turn the LED OFF by sending a message to the backend LED impl.
+    */
+    bool turnOff();
 
-            /**
-            * Turn the LED ON by sending a message to the backend LED impl.
-            */
-            bool turnOn();
+    /**
+    * Toggle the LED value by sending a message to the backend LED impl.
+    */
+    bool toggle();
 
-            /**
-            * Turn the LED OFF by sending a message to the backend LED impl.
-            */
-            bool turnOff();
+    /**
+    * Make the LED blink. No optional parameter so the module shall use the default
+    * for the device.
+    */
+    bool blink();
 
-            /**
-            * Toggle the LED value by sending a message to the backend LED impl.
-            */
-            bool toggle();
+    /**
+    * Blink with a duration and a speed.
+    */
+    bool blink(std::chrono::milliseconds duration, std::chrono::milliseconds speed);
 
-            /**
-            * Make the LED blink. No optional parameter so the module shall use the default for the device.
-            */
-            bool blink();
+    bool blink(int duration, int speed);
 
-            /**
-            * Blink with a duration and a speed.
-            */
-            bool blink(std::chrono::milliseconds duration, std::chrono::milliseconds speed);
+    /**
+    * Query the value of the GPIO and returns true if the LED is ON.
+    * It returns false otherwise.
+    *
+    * If the GPIO is blinking, but currently ON, this returns true.
+    */
+    bool isOn();
 
-            bool blink(int duration, int speed);
+    /**
+    * Similar to `isOn()`.
+    *
+    * If the GPIO is blinking, but currently OFF, this returns true.
+    */
+    bool isOff();
 
-            /**
-            * Query the value of the GPIO and returns true if the LED is ON.
-            * It returns false otherwise.
-            *
-            * If the GPIO is blinking, but currently ON, this returns true.
-            */
-            bool isOn();
+    /**
+    * Returns true is the LED is currently blinking.
+    */
+    bool isBlinking();
 
-            /**
-            * Similar to `isOn()`.
-            *
-            * If the GPIO is blinking, but currently OFF, this returns true.
-            */
-            bool isOff();
+    /**
+    * Return the state of the device.
+    * See FLED::State for more infos.
+    */
+    State state();
 
-            /**
-            * Returns true is the LED is currently blinking.
-            */
-            bool isBlinking();
+    /**
+    * Access the backend socket (which is connect to the LED device) to send command
+    * directly.
+    * Use carefully !
+    */
+    zmqpp::socket &backend();
 
-            /**
-            * Return the state of the device.
-            * See FLED::State for more infos.
-            */
-            State state();
+  private:
+    /**
+    * A socket to talk to the backend LED.
+    */
+    zmqpp::socket backend_;
 
-            /**
-            * Access the backend socket (which is connect to the LED device) to send command directly.
-            * Use carefully !
-            */
-            zmqpp::socket &backend();
-
-        private:
-            /**
-            * A socket to talk to the backend LED.
-            */
-            zmqpp::socket backend_;
-
-            /**
-             * A poller to not wait for infinity in case something went wrong.
-             */
-            zmqpp::poller poller_;
-        };
-    }
+    /**
+     * A poller to not wait for infinity in case something went wrong.
+     */
+    zmqpp::poller poller_;
+};
+}
 }

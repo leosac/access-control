@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,28 +17,26 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "BaseModule.hpp"
+#include "core/CoreUtils.hpp"
+#include "core/config/ConfigManager.hpp"
+#include "tools/XmlPropertyTree.hpp"
+#include "tools/log.hpp"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
-#include <tools/log.hpp>
-#include <core/config/ConfigManager.hpp>
 #include <signal.h>
-#include "BaseModule.hpp"
-#include "tools/XmlPropertyTree.hpp"
-#include "core/CoreUtils.hpp"
 
 using namespace Leosac::Module;
 using namespace Leosac::Tools;
 
-BaseModule::BaseModule(zmqpp::context &ctx,
-                       zmqpp::socket *pipe,
-                       boost::property_tree::ptree const &cfg,
-                       CoreUtilsPtr utils) :
-        ctx_(ctx),
-        pipe_(*pipe),
-        config_(cfg),
-        utils_(utils),
-        is_running_(true),
-        control_(ctx, zmqpp::socket_type::rep)
+BaseModule::BaseModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                       boost::property_tree::ptree const &cfg, CoreUtilsPtr utils)
+    : ctx_(ctx)
+    , pipe_(*pipe)
+    , config_(cfg)
+    , utils_(utils)
+    , is_running_(true)
+    , control_(ctx, zmqpp::socket_type::rep)
 {
     name_ = cfg.get<std::string>("name");
     control_.bind("inproc://module-" + name_);
@@ -67,10 +65,11 @@ void BaseModule::handle_pipe()
         is_running_ = false;
     else
     {
-        ERROR("Module receive a message on its pipe that wasn't a signal. Aborting.");
+        ERROR(
+            "Module receive a message on its pipe that wasn't a signal. Aborting.");
         assert(0);
         throw std::runtime_error(
-                "Module receive a message on its pipe that wasn't a signal. Aborting.");
+            "Module receive a message on its pipe that wasn't a signal. Aborting.");
     }
 }
 
@@ -127,7 +126,6 @@ void BaseModule::handle_control()
 
 void BaseModule::dump_additional_config(zmqpp::message *) const
 {
-
 }
 
 void BaseModule::config_check(const std::string &obj_name)
@@ -135,8 +133,7 @@ void BaseModule::config_check(const std::string &obj_name)
     if (utils_->config_checker().has_object(obj_name))
         return;
 
-    std::string prefix = "Configuration Error (module "
-                         + name_ + ") ";
+    std::string prefix = "Configuration Error (module " + name_ + ") ";
     ERROR(prefix << "Object " << obj_name << " cannot be found.");
 
     if (utils_->is_strict())
@@ -151,28 +148,27 @@ void BaseModule::config_check(const std::string &obj_name,
     if (res)
         return;
 
-    std::string prefix = "Configuration Error (module "
-                         + name_ + ") ";
+    std::string prefix = "Configuration Error (module " + name_ + ") ";
 
     switch (type)
     {
-        case ConfigChecker::ObjectType::GPIO:
-            ERROR(prefix << "GPIO " << obj_name << " doesn't exist.");
-            break;
-        case ConfigChecker::ObjectType::LED:
-            ERROR(prefix << "LED " << obj_name << " doesn't exist.");
-            break;
-        case ConfigChecker::ObjectType::BUZZER:
-            ERROR(prefix << "BUZZER " << obj_name << " doesn't exists.");
-            break;
-        case ConfigChecker::ObjectType::READER:
-            ERROR(prefix << "READER " << obj_name << " doesn't exists.");
-            break;
-        default:
-            ASSERT_LOG(false, prefix << "Missing case in switch: value "
-                              << static_cast<int>(type) << " Need code fix.");
-            raise(SIGABRT);
-            break;
+    case ConfigChecker::ObjectType::GPIO:
+        ERROR(prefix << "GPIO " << obj_name << " doesn't exist.");
+        break;
+    case ConfigChecker::ObjectType::LED:
+        ERROR(prefix << "LED " << obj_name << " doesn't exist.");
+        break;
+    case ConfigChecker::ObjectType::BUZZER:
+        ERROR(prefix << "BUZZER " << obj_name << " doesn't exists.");
+        break;
+    case ConfigChecker::ObjectType::READER:
+        ERROR(prefix << "READER " << obj_name << " doesn't exists.");
+        break;
+    default:
+        ASSERT_LOG(false, prefix << "Missing case in switch: value "
+                                 << static_cast<int>(type) << " Need code fix.");
+        raise(SIGABRT);
+        break;
     }
     if (utils_->is_strict())
         raise(SIGABRT); // lets suicide.

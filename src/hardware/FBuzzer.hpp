@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,14 +23,14 @@
 
 namespace Leosac
 {
-    namespace Hardware
-    {
-        /**
-        * A Facade to a Buzzer object that you can turn on or off.
-        * The interface is exactly the same as a LED, so this class is simply an alias.
-        *
-        * @see @ref Leosac::Hardware::FLED for details about this object behavior.
-        */
-        using FBuzzer = FLED;
-    }
+namespace Hardware
+{
+/**
+* A Facade to a Buzzer object that you can turn on or off.
+* The interface is exactly the same as a LED, so this class is simply an alias.
+*
+* @see @ref Leosac::Hardware::FLED for details about this object behavior.
+*/
+using FBuzzer = FLED;
+}
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,73 +19,73 @@
 
 #pragma once
 
-#include <stdexcept>
 #include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include <stdexcept>
 
 namespace Leosac
 {
-  namespace Module
-  {
-    namespace TCPNotifier
+namespace Module
+{
+namespace TCPNotifier
+{
+enum Protocol
+{
+    SIMPLE_CARD_NUMBER,
+    MEGASOFT
+};
+
+class ProtocolHandler;
+using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
+
+
+/**
+ * An specialized exception that ProtocolHandler can
+ * throw when converting the credential to a
+ * message failed.
+ */
+class ProtocolException : public ::std::runtime_error
+{
+  public:
+    ProtocolException(const std::string &msg)
+        : runtime_error(msg)
     {
-      enum Protocol
-      {
-        SIMPLE_CARD_NUMBER,
-        MEGASOFT
-      };
-
-      class ProtocolHandler;
-      using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
-
-
-      /**
-       * An specialized exception that ProtocolHandler can
-       * throw when converting the credential to a
-       * message failed.
-       */
-      class ProtocolException : public ::std::runtime_error
-      {
-      public:
-        ProtocolException(const std::string &msg)
-            : runtime_error(msg)
-        {
-        }
-      };
-
-      /**
-       * Implements a given (TCP) protocol for notifying
-       * clients.
-       *
-       * The ProtocolHandler is supposed
-       * to format on-the-wire data to notify a client of
-       * a credential read.
-       *
-       * One instance of protocol handler is created by client.
-       */
-      class ProtocolHandler
-      {
-      protected:
-        /**
-         * ProtocolHandler shall not be created directly.
-         * Call `create()` instead.
-         */
-        ProtocolHandler(){};
-
-      public:
-        /**
-         * Returns a binary buffer containing the data
-         * that shall be sent over the network to notify
-         * the client.
-         */
-        virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) = 0;
-
-        /**
-         * Create an instance of a protocol handler depending
-         * on the requested protocol id.
-         */
-        static ProtocolHandlerUPtr create(int protocol_id);
-      };
     }
-  }
+};
+
+/**
+ * Implements a given (TCP) protocol for notifying
+ * clients.
+ *
+ * The ProtocolHandler is supposed
+ * to format on-the-wire data to notify a client of
+ * a credential read.
+ *
+ * One instance of protocol handler is created by client.
+ */
+class ProtocolHandler
+{
+  protected:
+    /**
+     * ProtocolHandler shall not be created directly.
+     * Call `create()` instead.
+     */
+    ProtocolHandler(){};
+
+  public:
+    /**
+     * Returns a binary buffer containing the data
+     * that shall be sent over the network to notify
+     * the client.
+     */
+    virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) = 0;
+
+    /**
+     * Create an instance of a protocol handler depending
+     * on the requested protocol id.
+     */
+    static ProtocolHandlerUPtr create(int protocol_id);
+};
+}
+}
 }

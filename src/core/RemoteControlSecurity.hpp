@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -21,60 +21,61 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
+#include <vector>
 
 namespace Leosac
 {
 
-    class Kernel;
+class Kernel;
+
+/**
+* Provide some kind of security framework to the Remote Control service.
+*
+* This allows relatively fine-grained permissions and allows user
+* to chose who has access to the remote control, and how much permission they got.
+*
+* Remote user are identified using the curve private key they use to connect.
+*
+* Implementation Notes:
+*     We store a map of z85-encoded-pubkey <--> list (command name);
+*     The meaning of this map depends on the default permission for user.
+*
+*     If the user is by default granted permission, then the map holds a list command
+*     the user isn't allowed to perform. Otherwise, we store a list of allowed
+* command.
+*
+*/
+class RemoteControlSecurity
+{
+  public:
+    /**
+    * The config tree is the same tree that the RemoteControl object has.
+    */
+    RemoteControlSecurity(const boost::property_tree::ptree &cfg);
+
+    bool allow_request(const std::string &user_pubkey, const std::string &req);
 
     /**
-    * Provide some kind of security framework to the Remote Control service.
-    *
-    * This allows relatively fine-grained permissions and allows user
-    * to chose who has access to the remote control, and how much permission they got.
-    *
-    * Remote user are identified using the curve private key they use to connect.
-    *
-    * Implementation Notes:
-    *     We store a map of z85-encoded-pubkey <--> list (command name);
-    *     The meaning of this map depends on the default permission for user.
-    *
-    *     If the user is by default granted permission, then the map holds a list command
-    *     the user isn't allowed to perform. Otherwise, we store a list of allowed command.
-    *
+    * Map user public key to a set of command
     */
-    class RemoteControlSecurity
-    {
-    public:
-        /**
-        * The config tree is the same tree that the RemoteControl object has.
-        */
-        RemoteControlSecurity(const boost::property_tree::ptree &cfg);
+    using KeyCommandsMap = std::unordered_map<std::string, std::vector<std::string>>;
 
-        bool allow_request(const std::string &user_pubkey, const std::string &req);
+  private:
+    void process_config();
 
-        /**
-        * Map user public key to a set of command
-        */
-        using KeyCommandsMap = std::unordered_map<std::string, std::vector<std::string>>;
+    /**
+    * Process one `<map>` entry.
+    */
+    void process_security_entry(const boost::property_tree::ptree &);
 
-    private:
-        void process_config();
+    boost::property_tree::ptree cfg_;
 
-        /**
-        * Process one `<map>` entry.
-        */
-        void process_security_entry(const boost::property_tree::ptree &);
+    std::unordered_map<std::string, bool> default_permissions_;
+    KeyCommandsMap permissions_;
 
-        boost::property_tree::ptree cfg_;
-
-        std::unordered_map<std::string, bool> default_permissions_;
-        KeyCommandsMap permissions_;
-
-        /**
-        * If everyone has access to everything.
-        */
-        bool unrestricted_;
-    };
+    /**
+    * If everyone has access to everything.
+    */
+    bool unrestricted_;
+};
 }
-

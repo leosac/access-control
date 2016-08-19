@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "WiegandCard.hpp"
+#include "tools/IVisitor.hpp"
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <tools/log.hpp>
-#include "tools/IVisitor.hpp"
-#include "WiegandCard.hpp"
 
 using namespace Leosac::Auth;
 
@@ -56,7 +56,8 @@ std::string WiegandCard::to_string() const
        << "WiegandCard" << std::endl
        << "\t\t";
     ss << "Number of bits: " << nb_bits_ << std::endl << "\t\t";
-    ss << "Card id: " << card_id();
+    ss << "Card id: " << card_id() << std::endl << "\t\t";
+    ss << "Card number in decimal (after format extraction): " << to_int();
     return ss.str();
 }
 
@@ -80,6 +81,8 @@ uint64_t WiegandCard::to_int() const
     {
     case 26:
         return to_wiegand_26();
+    case 34:
+        return to_wiegand_34();
     default:
         INFO("Not using format to convert WiegandCard to integer because no format "
              "match.");
@@ -97,5 +100,18 @@ uint64_t WiegandCard::to_wiegand_26() const
     tmp >>= 1;
     // keep 16 bits
     tmp &= 0xFFFF;
+    return tmp;
+}
+
+uint64_t WiegandCard::to_wiegand_34() const
+{
+    assert(nb_bits_ == 34);
+    assert(card_id_.size() == 2 * 5 + 4);
+
+    uint64_t tmp = to_raw_int();
+    // Drop the last bit (parity) from the raw frame.
+    tmp >>= 1;
+    // keep 24 bits
+    tmp &= 0xFFFFFF;
     return tmp;
 }

@@ -24,7 +24,7 @@ source_cfg_file="$TMP_DIR/this_test/source_cfg.xml"
 
 sleep 10s
 kill $(cat pid-file)
-sleep 5s
+sleep 10s
 
 SUM=$(md5sum $config_file)
 

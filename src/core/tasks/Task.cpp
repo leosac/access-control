@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,23 +17,22 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/GenGuid.h>
-#include "exception/ExceptionsTools.hpp"
-#include "tools/log.hpp"
 #include "Task.hpp"
+#include "exception/ExceptionsTools.hpp"
+#include "tools/GenGuid.h"
+#include "tools/log.hpp"
 
 using namespace Leosac::Tasks;
 
-Task::Task() :
-        on_completion_([] () {}),
-        on_success_([] () {}),
-        on_failure_([] () {}),
-        success_(false),
-        eptr_(nullptr),
-        complete_(false),
-        guid_(Leosac::gen_uuid())
+Task::Task()
+    : on_completion_([]() {})
+    , on_success_([]() {})
+    , on_failure_([]() {})
+    , success_(false)
+    , eptr_(nullptr)
+    , complete_(false)
+    , guid_(Leosac::gen_uuid())
 {
-
 }
 
 bool Task::is_complete() const
@@ -49,8 +48,9 @@ void Task::run()
     }
     catch (std::exception &e)
     {
-        WARN("Task throwed an exception. It'll be swallowed but will still be stored "
-                     "in `eptr_`");
+        WARN(
+            "Task throwed an exception. It'll be swallowed but will still be stored "
+            "in `eptr_`");
         Leosac::print_exception(e);
         eptr_ = std::current_exception();
     }
@@ -63,9 +63,9 @@ void Task::run()
     // Re-initialize the lambdas to an empty lambda.
     // This is important because it destroys copied parameter, including potential
     // shared_ptr that would otherwise cause cyclic references.
-    on_success_ = [] () {};
-    on_failure_ = [] () {};
-    on_completion_ = [] () {};
+    on_success_    = []() {};
+    on_failure_    = []() {};
+    on_completion_ = []() {};
 
     {
         mutex_.lock();
@@ -73,13 +73,16 @@ void Task::run()
         mutex_.unlock();
         cv_.notify_all();
     }
-    INFO("Task ~" << guid_ << "~ completed " << (success_ ? "successfully" : "with error."));
+    INFO("Task ~" << guid_ << "~ completed "
+                  << (success_ ? "successfully" : "with error."));
 }
 
 void Task::wait()
 {
     std::unique_lock<std::mutex> ul(mutex_);
-    cv_.wait(ul, [&] () { return complete_.load(std::memory_order::memory_order_acquire) ; });
+    cv_.wait(ul, [&]() {
+        return complete_.load(std::memory_order::memory_order_acquire);
+    });
 }
 
 bool Task::succeed() const

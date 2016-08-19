@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -27,12 +27,12 @@
 * PUB socket to publish everything it received (available at `inproc://zmq-bus-pub`)
 */
 class MessageBus
-    {
-public:
+{
+  public:
     MessageBus(zmqpp::context &ctx);
     ~MessageBus();
 
-private:
+  private:
     zmqpp::actor *actor_;
 
     /**
@@ -51,4 +51,4 @@ private:
     void handle_pull();
 
     bool running_;
-    };
+};

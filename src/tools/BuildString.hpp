@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -20,8 +20,8 @@
 #pragma once
 
 
-template<typename T>
-static void add_one(const T & arg, std::stringstream &ss)
+template <typename T>
+static void add_one(const T &arg, std::stringstream &ss)
 {
     ss << arg;
 }
@@ -30,8 +30,8 @@ static void print_more(std::stringstream &)
 {
 }
 
-template<typename T, typename ...Args>
-static void print_more(std::stringstream &ss, const T&arg, Args ...args)
+template <typename T, typename... Args>
+static void print_more(std::stringstream &ss, const T &arg, Args... args)
 {
     add_one(arg, ss);
     print_more(ss, args...);
@@ -40,7 +40,7 @@ static void print_more(std::stringstream &ss, const T&arg, Args ...args)
 /**
  * Use a stringstream to build a string that combine all arguments.
  */
-template<typename ...Args>
+template <typename... Args>
 std::string build_str(Args... args)
 {
     std::stringstream ss;

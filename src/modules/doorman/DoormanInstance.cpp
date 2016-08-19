@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,22 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/auth/Auth.hpp>
 #include "DoormanInstance.hpp"
-#include "tools/log.hpp"
 #include "DoormanModule.hpp"
+#include "core/auth/Auth.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Module::Doorman;
 
-DoormanInstance::DoormanInstance(DoormanModule &module,
-        zmqpp::context &ctx,
-        std::string const &name,
-        const std::vector<std::string> &auth_contexts,
-        const std::vector<DoormanAction> &actions) :
-        module_(module),
-        name_(name),
-        actions_(actions),
-        bus_sub_(ctx, zmqpp::socket_type::sub)
+DoormanInstance::DoormanInstance(DoormanModule &module, zmqpp::context &ctx,
+                                 std::string const &name,
+                                 const std::vector<std::string> &auth_contexts,
+                                 const std::vector<DoormanAction> &actions)
+    : module_(module)
+    , name_(name)
+    , actions_(actions)
+    , bus_sub_(ctx, zmqpp::socket_type::sub)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     for (auto &endpoint : auth_contexts)
@@ -75,9 +74,10 @@ void DoormanInstance::handle_bus_msg()
         zmqpp::message msg;
         for (auto &frame : action.cmd_)
         {
-            // we try to convert argument to int. if it works we send as int64_t, otherwise as string
+            // we try to convert argument to int. if it works we send as int64_t,
+            // otherwise as string
             bool err = false;
-            int v = 0;
+            int v    = 0;
             try
             {
                 v = std::stoi(frame);
@@ -96,7 +96,8 @@ void DoormanInstance::handle_bus_msg()
     }
 }
 
-void DoormanInstance::command_send_recv(std::string const &target_name, zmqpp::message msg)
+void DoormanInstance::command_send_recv(std::string const &target_name,
+                                        zmqpp::message msg)
 {
     zmqpp::socket &target_socket = targets_.at(target_name);
     zmqpp::message response;
@@ -113,7 +114,8 @@ void DoormanInstance::command_send_recv(std::string const &target_name, zmqpp::m
     }
 }
 
-Leosac::Auth::AuthTargetPtr DoormanInstance::find_target(const std::string &name) const
+Leosac::Auth::AuthTargetPtr
+DoormanInstance::find_target(const std::string &name) const
 {
     for (const auto &d : module_.doors())
     {
@@ -123,16 +125,19 @@ Leosac::Auth::AuthTargetPtr DoormanInstance::find_target(const std::string &name
     return nullptr;
 }
 
-bool DoormanInstance::ignore_action(const DoormanAction &action, Leosac::Auth::AccessStatus status) const
+bool DoormanInstance::ignore_action(const DoormanAction &action,
+                                    Leosac::Auth::AccessStatus status) const
 {
     if (action.on_ != status)
         return true;
 
     auto target = find_target(action.target_);
     if (target && (target->is_always_closed(std::chrono::system_clock::now()) ||
-            target->is_always_open(std::chrono::system_clock::now())))
+                   target->is_always_open(std::chrono::system_clock::now())))
     {
-        NOTICE("Door " << target->name() << " is in immutable state (always open, or always closed) so we ignore this action against it");
+        NOTICE("Door " << target->name() << " is in immutable state (always open, "
+                                            "or always closed) so we ignore this "
+                                            "action against it");
         return true;
     }
     return false;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,19 +17,18 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdexcept>
-#include <cassert>
-#include <tools/log.hpp>
 #include "core/auth/CredentialValidity.hpp"
+#include <cassert>
+#include <stdexcept>
+#include <tools/log.hpp>
 
 using namespace Leosac::Auth;
 
-CredentialValidity::CredentialValidity() :
-        validity_start_(std::chrono::system_clock::time_point::min()),
-        validity_end_(std::chrono::system_clock::time_point::max()),
-        enabled_(true)
+CredentialValidity::CredentialValidity()
+    : validity_start_(std::chrono::system_clock::time_point::min())
+    , validity_end_(std::chrono::system_clock::time_point::max())
+    , enabled_(true)
 {
-
 }
 
 bool CredentialValidity::is_valid() const

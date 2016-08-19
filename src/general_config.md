@@ -13,6 +13,7 @@ configuration options. Those are defined in the main configuration file,
 outside of the `<modules>` and `</modules>` tags.
 
 Here is an overview of what we call "general configuration":
+  + Database configuration
   + Logger configuration
   + Network configuration
   + Remote control configuration.
@@ -28,7 +29,7 @@ Leosac has to know 2 important paths:
 
 
 Instance Name {#general_instance_name}
---------------------------------------
+==========================================
 
 Each unit is given an `instance_name` to help identify it when running in a environment
 with multiple Leosac system. This field is mandatory.
@@ -36,6 +37,46 @@ with multiple Leosac system. This field is mandatory.
    2. It is used to automatically prefix some configuration option: for example
    the `target` (door) in the auth file module. This allows easier config synchronization.
 
+
+Database {#general_database}
+============================
+
+Leosac can work with a SQLite database. The database in mandatory to provide
+support for some features. For example, the WebSocket API needs access to the
+database to store users, permissions, etc.
+
+The `database` tag holds various information about the database.
+
+Options       | Options  | Description                                            | Mandatory
+--------------|----------|--------------------------------------------------------|-----------
+type          |          | Underlying database type. Either "sqlite" or "mysql".  | YES
+path          |          | **SQLite only**: Path to the database file.            | YES if SQLite
+username      |          | **MySQL only**: Database username.                     | YES if MySQL
+password      |          | **MySQL only**: Password for the database user.        | YES if MySQL
+dbname        |          | **MySQL only**: Database name to use.                  | YES if MySQL
+host          |          | **MySQL only**: Database hostname / IP.                | NO
+port          |          | **MySQL only**: Port the database listens to           | NO
+
+Example {#database_example}
+--------------------------
+Below is an example for SQLite.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<database>
+    <type>SQLite</type>
+    <path>leosac.sqlite</path>
+</database>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An one for MySQL / MariaDB.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
+<database>
+      <type>mysql</type>
+      <username>root</username>
+	  <password></password>
+      <dbname>leosac</dbname>
+</database>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Automatic Configuration Saving {#general_config_save}
 =====================================================
@@ -57,10 +98,11 @@ Configuration Options {#logger_user_config}
 Default configuration will log everything to `stdout`. Entry with 
 a level >= `WARNING` will be written to syslog.
 
-Options       | Options  | Options | Description                                      | Mandatory
---------------|----------|---------|--------------------------------------------------|-----------
-enable_syslog |          |         | Enable logging to syslog                         | NO (default to `true`)
-min_syslog    |          |         | Minimal log entry level to write to syslog       | NO (default to `WARNING`)
+Options        | Description                                        | Mandatory
+---------------|----------------------------------------------------|-----------
+enable_syslog  | Enable logging to syslog                           | NO (default to `true`)
+enable_database| Enable logging to the configured (if any) database.| NO (default to `false`)
+min_syslog     | Minimal log entry level to write to syslog         | NO (default to `WARNING`)
 
 Here is a list of the various log level available:
    + `DEBUG`

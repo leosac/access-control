@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,92 +19,97 @@
 
 #pragma once
 
-#include <string>
-#include <chrono>
-#include <boost/any.hpp>
-#include "zmqpp/zmqpp.hpp"
 #include "core/auth/Auth.hpp"
+#include "zmqpp/zmqpp.hpp"
+#include <boost/any.hpp>
+#include <chrono>
+#include <string>
 
 namespace Leosac
 {
-    namespace Module
+namespace Module
+{
+namespace Wiegand
+{
+class WiegandReaderImpl;
+namespace Strategy
+{
+class WiegandStrategy;
+using WiegandStrategyUPtr = std::unique_ptr<WiegandStrategy>;
+
+/**
+* The multiple modes available to wiegand reader are implemented through the
+* strategy pattern.
+*
+* This class defines the interface.
+*
+* @note: Currently the strategy is only to handle wiegand timeout (2ms) not the
+* reception
+* of each GPIO tick.
+*/
+class WiegandStrategy
+{
+  public:
+    WiegandStrategy(WiegandReaderImpl *reader)
+        : reader_(reader)
     {
-        namespace Wiegand
-        {
-            class WiegandReaderImpl;
-            namespace Strategy
-            {
-            class WiegandStrategy;
-            using WiegandStrategyUPtr = std::unique_ptr<WiegandStrategy>;
-
-            /**
-            * The multiple modes available to wiegand reader are implemented through the
-            * strategy pattern.
-            *
-            * This class defines the interface.
-            *
-            * @note: Currently the strategy is only to handle wiegand timeout (2ms) not the reception
-            * of each GPIO tick.
-            */
-            class WiegandStrategy
-            {
-            public:
-                WiegandStrategy(WiegandReaderImpl *reader) : reader_(reader)
-                {}
-
-                virtual ~WiegandStrategy() = default;
-
-                /**
-                * This is called when the module detect a timeout. (2 ms of inactivity).
-                */
-                virtual void timeout() = 0;
-
-                /**
-                * Did the strategy gather needed data?
-                * If this function returns true, that means that the strategy implementation
-                * successfully retrieve data from wiegand bits.
-                *
-                * It successfully build a card_id, or a PIN code, etc.
-                * The reader implementation will call `signal()` if `completed()` returns true.
-                *
-                */
-                virtual bool completed() const = 0;
-
-                /**
-                * Tells the strategy implementation to send a message to the application
-                * containing the received credentials.
-                *
-                * It is up to the strategy to format a correct message. This is required because
-                * only the strategy knows what kind of credential it can generate.
-                *
-                * @param sock the socket where we write the message containing credentials.
-                */
-                virtual void signal(zmqpp::socket &sock) = 0;
-
-                /**
-                * Reset the strategy, meaning that the next time timeout() is called
-                * the behavior should be the same than the first time.
-                *
-                * Basically, implementation should wipe its state (parts of PIN code read, card ID, etc).
-                */
-                virtual void reset() = 0;
-
-                /**
-                * Update the pointer that points back to the associated reader.
-                */
-                virtual void set_reader(WiegandReaderImpl *new_ptr)
-                {
-                    reader_ = new_ptr;
-                }
-
-                // we may add the handle_msg here, because some mode may want to
-                // have "lower-level" access to gpio event.
-
-                friend class WiegandReaderImpl;
-            protected:
-                WiegandReaderImpl *reader_;
-            };
-        }
-        }
     }
+
+    virtual ~WiegandStrategy() = default;
+
+    /**
+    * This is called when the module detect a timeout. (2 ms of inactivity).
+    */
+    virtual void timeout() = 0;
+
+    /**
+    * Did the strategy gather needed data?
+    * If this function returns true, that means that the strategy implementation
+    * successfully retrieve data from wiegand bits.
+    *
+    * It successfully build a card_id, or a PIN code, etc.
+    * The reader implementation will call `signal()` if `completed()` returns true.
+    *
+    */
+    virtual bool completed() const = 0;
+
+    /**
+    * Tells the strategy implementation to send a message to the application
+    * containing the received credentials.
+    *
+    * It is up to the strategy to format a correct message. This is required because
+    * only the strategy knows what kind of credential it can generate.
+    *
+    * @param sock the socket where we write the message containing credentials.
+    */
+    virtual void signal(zmqpp::socket &sock) = 0;
+
+    /**
+    * Reset the strategy, meaning that the next time timeout() is called
+    * the behavior should be the same than the first time.
+    *
+    * Basically, implementation should wipe its state (parts of PIN code read, card
+    * ID, etc).
+    */
+    virtual void reset() = 0;
+
+    /**
+    * Update the pointer that points back to the associated reader.
+    */
+    virtual void set_reader(WiegandReaderImpl *new_ptr)
+    {
+        reader_ = new_ptr;
+    }
+
+    // we may add the handle_msg here, because some mode may want to
+    // have "lower-level" access to gpio event.
+
+    friend class WiegandReaderImpl;
+
+  protected:
+    WiegandReaderImpl *reader_;
+};
+}
+}
+}
 }

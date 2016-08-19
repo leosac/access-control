@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -18,20 +18,19 @@
 */
 
 #include "module_manager.hpp"
-#include "tools/unixfs.hpp"
-#include "tools/log.hpp"
-#include "exception/ExceptionsTools.hpp"
 #include "core/kernel.hpp"
+#include "exception/ExceptionsTools.hpp"
+#include "tools/log.hpp"
+#include "tools/unixfs.hpp"
 
 using Leosac::Tools::UnixFs;
 using namespace Leosac;
 
-ModuleManager::ModuleManager(zmqpp::context &ctx, Leosac::Kernel &k) :
-        ctx_(ctx),
-        config_manager_(k.config_manager()),
-        core_utils_(k.core_utils())
+ModuleManager::ModuleManager(zmqpp::context &ctx, Leosac::Kernel &k)
+    : ctx_(ctx)
+    , config_manager_(k.config_manager())
+    , core_utils_(k.core_utils())
 {
-
 }
 
 ModuleManager::~ModuleManager()
@@ -71,7 +70,7 @@ void ModuleManager::initModules()
 {
     for (const ModuleInfo &module_info : modules_)
     {
-        //fixme ... that cast.
+        // fixme ... that cast.
         initModule(const_cast<ModuleInfo *>(&module_info));
     }
 }
@@ -86,15 +85,17 @@ void ModuleManager::initModule(ModuleInfo *modinfo)
 
     try
     {
-        char *(*module_name_fct)(void) = (char *(*)(void)) modinfo->lib_->getSymbol("get_module_name");
+        char *(*module_name_fct)(void) =
+            (char *(*)(void))modinfo->lib_->getSymbol("get_module_name");
         assert(module_name_fct);
         std::string module_exported_name(module_name_fct());
 
         if (modinfo->name_ != module_exported_name)
         {
             std::stringstream error;
-            error << "Missconfiguration: Configured module name doesn't match the name exported by the module. " <<
-                    "(" << modinfo->name_ << " != " << module_exported_name << ")";
+            error << "Missconfiguration: Configured module name doesn't match the "
+                     "name exported by the module. "
+                  << "(" << modinfo->name_ << " != " << module_exported_name << ")";
             ERROR(error.str());
             throw ConfigException("main configuration file", error.str());
         }
@@ -102,24 +103,30 @@ void ModuleManager::initModule(ModuleInfo *modinfo)
         void *symptr = modinfo->lib_->getSymbol("start_module");
         assert(symptr);
         // take the module init function and make a std::function out of it.
-        std::function<bool(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, CoreUtilsPtr)> actor_fun =
-                ((bool (*)(zmqpp::socket *, boost::property_tree::ptree, zmqpp::context &, CoreUtilsPtr)) symptr);
+        std::function<bool(zmqpp::socket *, boost::property_tree::ptree,
+                           zmqpp::context &, CoreUtilsPtr)>
+            actor_fun = ((bool (*)(zmqpp::socket *, boost::property_tree::ptree,
+                                   zmqpp::context &, CoreUtilsPtr))symptr);
 
-        auto new_module = std::unique_ptr<zmqpp::actor>(new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
-                config_manager_.load_config(modinfo->name_),
-                std::ref(ctx_),
-                core_utils_)));
+        auto new_module = std::unique_ptr<zmqpp::actor>(
+            new zmqpp::actor(std::bind(actor_fun, std::placeholders::_1,
+                                       config_manager_.load_config(modinfo->name_),
+                                       std::ref(ctx_), core_utils_)));
         modinfo->actor_ = std::move(new_module);
 
-        INFO("Module " << green(modinfo->name_) << " initialized. (level = " <<
-                config_manager_.load_config(modinfo->name_).get<int>("level", 100) << ")");
+        INFO("Module "
+             << green(modinfo->name_) << " initialized. (level = "
+             << config_manager_.load_config(modinfo->name_).get<int>("level", 100)
+             << ")");
     }
     catch (std::exception &e)
     {
-        ERROR("Unable to init module " << red(modinfo->name_) << ". See below for "
-                "exception information.");
+        ERROR("Unable to init module " << red(modinfo->name_)
+                                       << ". See below for "
+                                          "exception information.");
         log_exception(e);
-        std::throw_with_nested(ModuleException("Unable to init module " + red(modinfo->name_) + ": " + e.what()));
+        std::throw_with_nested(ModuleException(
+            "Unable to init module " + red(modinfo->name_) + ": " + e.what()));
     }
 }
 
@@ -146,10 +153,11 @@ void ModuleManager::addToPath(const std::string &dir)
 
 bool ModuleManager::loadModule(const std::string &module_name)
 {
-    const auto &cfg = config_manager_.load_config(module_name);
+    const auto &cfg      = config_manager_.load_config(module_name);
     std::string filename = cfg.get_child("file").data();
 
-    INFO("Attempting to load module nammed " << module_name << " (shared lib file = " << filename << ")");
+    INFO("Attempting to load module nammed "
+         << module_name << " (shared lib file = " << filename << ")");
     for (const std::string &path_entry : path_)
     {
         // fixme not clean enough.
@@ -170,7 +178,8 @@ bool ModuleManager::loadModule(const std::string &module_name)
     return false;
 }
 
-std::shared_ptr<DynamicLibrary> ModuleManager::load_library_file(const std::string &full_path)
+std::shared_ptr<DynamicLibrary>
+ModuleManager::load_library_file(const std::string &full_path)
 {
     INFO("Loading library at: " << full_path);
     std::shared_ptr<DynamicLibrary> lib(new DynamicLibrary(full_path));
@@ -186,35 +195,46 @@ std::shared_ptr<DynamicLibrary> ModuleManager::load_library_file(const std::stri
     return lib;
 }
 
-void ModuleManager::stopModules()
+void ModuleManager::stopModules(bool soft)
 {
     for (std::set<ModuleInfo>::const_reverse_iterator itr = modules_.rbegin();
-         itr != modules_.rend();
-         ++itr)
+         itr != modules_.rend(); ++itr)
     {
-        stopModule(const_cast<ModuleInfo *>(&(*itr)));
+        stopModule(const_cast<ModuleInfo *>(&(*itr)), soft);
     }
-    modules_.clear();
-    assert(modules_.size() == 0);
+    if (!soft)
+    {
+        modules_.clear();
+        assert(modules_.size() == 0);
+    }
 }
 
-void ModuleManager::stopModule(ModuleInfo *modinfo)
+void ModuleManager::stopModule(ModuleInfo *modinfo, bool soft)
 {
     assert(modinfo);
 
     // make sure the module is running.
     if (modinfo->actor_)
     {
-        INFO("Will now stop module " << modinfo->name_);
+        INFO("Will now stop module " << modinfo->name_ << " (Soft Stop: " << soft
+                                     << ")");
         // fixme i believe we may have a potential deadlock here.
-        modinfo->actor_->stop(true);
-        modinfo->actor_ = nullptr;
-        //modules_.erase(*modinfo);
-        //config_manager_.remove_config(modinfo->name_);
+        if (soft)
+        {
+            modinfo->actor_->stop(false);
+        }
+        else
+        {
+            modinfo->actor_->stop(true);
+            modinfo->actor_ = nullptr;
+        }
+        // modules_.erase(*modinfo);
+        // config_manager_.remove_config(modinfo->name_);
     }
     else
     {
-        NOTICE("Not stopping module " << modinfo->name_  << " as it doesn't seem to run.");
+        NOTICE("Not stopping module " << modinfo->name_
+                                      << " as it doesn't seem to run.");
     }
 }
 
@@ -223,7 +243,7 @@ bool ModuleManager::stopModule(const std::string &name)
     if (ModuleInfo *ptr = find_module_by_name(name))
     {
         stopModule(ptr);
-        //config_manager_.remove_config(name);
+        // config_manager_.remove_config(name);
         return true;
     }
     else
@@ -236,26 +256,24 @@ bool ModuleManager::stopModule(const std::string &name)
 
 ModuleManager::ModuleInfo::~ModuleInfo()
 {
-
 }
 
-ModuleManager::ModuleInfo::ModuleInfo(const Leosac::ConfigManager &cfg) :
-        lib_(nullptr),
-        actor_(nullptr),
-        cfg_(cfg)
+ModuleManager::ModuleInfo::ModuleInfo(const Leosac::ConfigManager &cfg)
+    : lib_(nullptr)
+    , actor_(nullptr)
+    , cfg_(cfg)
 {
-
 }
 
-ModuleManager::ModuleInfo::ModuleInfo(ModuleManager::ModuleInfo &&o) :
-        cfg_(o.cfg_)
+ModuleManager::ModuleInfo::ModuleInfo(ModuleManager::ModuleInfo &&o)
+    : cfg_(o.cfg_)
 {
     actor_ = std::move(o.actor_);
-    lib_ = o.lib_;
-    name_ = o.name_;
+    lib_   = o.lib_;
+    name_  = o.name_;
 
     o.actor_ = nullptr;
-    o.lib_ = nullptr;
+    o.lib_   = nullptr;
 }
 
 std::vector<std::string> ModuleManager::modules_names() const
@@ -270,12 +288,11 @@ std::vector<std::string> ModuleManager::modules_names() const
     return ret;
 }
 
-ModuleManager::ModuleInfo *ModuleManager::find_module_by_name(const std::string &name) const
+ModuleManager::ModuleInfo *
+ModuleManager::find_module_by_name(const std::string &name) const
 {
-   auto itr = std::find_if(modules_.begin(), modules_.end(), [&](const ModuleInfo &m)
-    {
-        return m.name_ == name;
-    });
+    auto itr = std::find_if(modules_.begin(), modules_.end(),
+                            [&](const ModuleInfo &m) { return m.name_ == name; });
 
     if (itr != modules_.end())
         return const_cast<ModuleInfo *>(&(*itr));
@@ -295,7 +312,7 @@ std::vector<std::string> const &ModuleManager::get_module_path() const
 bool ModuleManager::ModuleInfo::operator<(const ModuleInfo &o) const
 {
     int level_me = cfg_.load_config(name_).get<int>("level", 100);
-    int level_o = cfg_.load_config(o.name_).get<int>("level", 100);
+    int level_o  = cfg_.load_config(o.name_).get<int>("level", 100);
 
     return level_me < level_o;
 }

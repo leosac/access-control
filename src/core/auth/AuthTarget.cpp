@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "AuthTarget.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Auth;
 
@@ -33,10 +33,9 @@ void AuthTarget::name(std::string const &param)
     name_ = param;
 }
 
-AuthTarget::AuthTarget(const std::string target_name) :
-        name_(target_name)
+AuthTarget::AuthTarget(const std::string target_name)
+    : name_(target_name)
 {
-
 }
 
 void AuthTarget::add_always_open_sched(Leosac::Tools::Schedule const &sched)
@@ -46,7 +45,7 @@ void AuthTarget::add_always_open_sched(Leosac::Tools::Schedule const &sched)
 
 void AuthTarget::add_always_close_sched(Leosac::Tools::Schedule const &sched)
 {
-always_close_.push_back(sched);
+    always_close_.push_back(sched);
 }
 
 Leosac::Hardware::FGPIO *AuthTarget::gpio()
@@ -59,7 +58,8 @@ void AuthTarget::gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
     gpio_ = std::move(new_gpio);
 }
 
-bool AuthTarget::is_always_open(const std::chrono::system_clock::time_point &tp) const
+bool AuthTarget::is_always_open(
+    const std::chrono::system_clock::time_point &tp) const
 {
     for (const auto &sched : always_open_)
     {
@@ -69,7 +69,8 @@ bool AuthTarget::is_always_open(const std::chrono::system_clock::time_point &tp)
     return false;
 }
 
-bool AuthTarget::is_always_closed(const std::chrono::system_clock::time_point &tp) const
+bool AuthTarget::is_always_closed(
+    const std::chrono::system_clock::time_point &tp) const
 {
     for (const auto &sched : always_close_)
     {

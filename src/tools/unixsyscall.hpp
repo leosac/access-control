@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -30,16 +30,16 @@
 
 namespace Leosac
 {
-    namespace Tools
-    {
-        class UnixSyscall
-        {
-            UnixSyscall() = delete;
+namespace Tools
+{
+class UnixSyscall
+{
+    UnixSyscall() = delete;
 
-        public:
-            static std::string getErrorString(const std::string &func, int errNo);
-        };
-    }
+  public:
+    static std::string getErrorString(const std::string &func, int errNo);
+};
+}
 }
 
 #endif // UNIXSYSCALL_HPP

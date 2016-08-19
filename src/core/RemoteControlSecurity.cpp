@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,9 +23,9 @@
 
 using namespace Leosac;
 
-RemoteControlSecurity::RemoteControlSecurity(const boost::property_tree::ptree &cfg) :
-        cfg_(cfg),
-        unrestricted_(false)
+RemoteControlSecurity::RemoteControlSecurity(const boost::property_tree::ptree &cfg)
+    : cfg_(cfg)
+    , unrestricted_(false)
 {
     process_config();
 }
@@ -46,14 +46,18 @@ void RemoteControlSecurity::process_config()
         unrestricted_ = true;
 }
 
-bool RemoteControlSecurity::allow_request(const std::string &user_pubkey, const std::string &req)
+bool RemoteControlSecurity::allow_request(const std::string &user_pubkey,
+                                          const std::string &req)
 {
     if (unrestricted_)
         return true;
 
-    if (default_permissions_.count(user_pubkey) == 0 || permissions_.count(user_pubkey) == 0)
+    if (default_permissions_.count(user_pubkey) == 0 ||
+        permissions_.count(user_pubkey) == 0)
     {
-        WARN("Received command from " << user_pubkey << " but no permission information for this user. Denying.");
+        WARN("Received command from "
+             << user_pubkey
+             << " but no permission information for this user. Denying.");
         return false;
     }
 
@@ -64,7 +68,8 @@ bool RemoteControlSecurity::allow_request(const std::string &user_pubkey, const 
         return std::find(cmds.begin(), cmds.end(), req) != cmds.end();
 }
 
-void RemoteControlSecurity::process_security_entry(const boost::property_tree::ptree &entry)
+void RemoteControlSecurity::process_security_entry(
+    const boost::property_tree::ptree &entry)
 {
     const std::string &pk = entry.get<std::string>("pk");
     bool default_access   = entry.get<bool>("default", false);
@@ -76,7 +81,7 @@ void RemoteControlSecurity::process_security_entry(const boost::property_tree::p
         if (c.first == "pk" || c.first == "default")
             continue;
         std::string cmd_name = c.first;
-        bool allowed = c.second.get_value<bool>();
+        bool allowed         = c.second.get_value<bool>();
 
         // if user has default access granted, and this command is granted too,
         // we do not store it, because we store only denied command.
@@ -85,8 +90,8 @@ void RemoteControlSecurity::process_security_entry(const boost::property_tree::p
     }
 
     INFO("Processed configuration for remote user. \n\t "
-            << "Public key: " << pk << "\n\t "
-            << "Default permission: " << default_access << "\n\t "
-            << (default_access ? "Disabled command: " : "Enabled commands: ")
-            << boost::algorithm::join(permissions_[pk], ", "));
+         << "Public key: " << pk << "\n\t "
+         << "Default permission: " << default_access << "\n\t "
+         << (default_access ? "Disabled command: " : "Enabled commands: ")
+         << boost::algorithm::join(permissions_[pk], ", "));
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -24,18 +24,17 @@
 using namespace Leosac;
 using namespace Leosac::Module::Auth;
 
-AuthFileModule::AuthFileModule(zmqpp::context &ctx,
-        zmqpp::socket *pipe,
-        const boost::property_tree::ptree &cfg,
-        CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils)
+AuthFileModule::AuthFileModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                               const boost::property_tree::ptree &cfg,
+                               CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
 {
     process_config();
 
     for (auto authenticator : authenticators_)
     {
         reactor_.add(authenticator->bus_sub(),
-                std::bind(&AuthFileInstance::handle_bus_msg, authenticator));
+                     std::bind(&AuthFileInstance::handle_bus_msg, authenticator));
     }
 }
 
@@ -49,10 +48,11 @@ void AuthFileModule::process_config()
 
     for (auto &node : module_config.get_child("instances"))
     {
-        boost::property_tree::ptree auth_instance_cfg   = node.second;
-        std::string auth_ctx_name                       = auth_instance_cfg.get_child("name").data();
-        std::string config_file                         = auth_instance_cfg.get_child("config_file").data();
-        std::string auth_target_name                    = auth_instance_cfg.get<std::string>("target", "");
+        boost::property_tree::ptree auth_instance_cfg = node.second;
+        std::string auth_ctx_name = auth_instance_cfg.get_child("name").data();
+        std::string config_file = auth_instance_cfg.get_child("config_file").data();
+        std::string auth_target_name =
+            auth_instance_cfg.get<std::string>("target", "");
         std::list<std::string> auth_sources_names;
 
         for (const auto &subnode : auth_instance_cfg)
@@ -62,15 +62,14 @@ void AuthFileModule::process_config()
         }
 
         if (!auth_target_name.empty())
-            auth_target_name = utils_->kernel().config_manager().instance_name() + '.' + auth_target_name;
+            auth_target_name = utils_->kernel().config_manager().instance_name() +
+                               '.' + auth_target_name;
 
-        INFO("Creating AuthFile instance " << auth_ctx_name << ". Target door = " << auth_target_name);
-        authenticators_.push_back(AuthFileInstancePtr(new AuthFileInstance(ctx_,
-                auth_ctx_name,
-                auth_sources_names,
-                auth_target_name,
-                config_file,
-                utils_)));
+        INFO("Creating AuthFile instance "
+             << auth_ctx_name << ". Target door = " << auth_target_name);
+        authenticators_.push_back(AuthFileInstancePtr(
+            new AuthFileInstance(ctx_, auth_ctx_name, auth_sources_names,
+                                 auth_target_name, config_file, utils_)));
     }
 }
 

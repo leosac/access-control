@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class DynLibException : public LEOSACException
 {
-public:
-    DynLibException(const std::string& message) : LEOSACException("DynLib::" + message) {}
-    virtual ~DynLibException() {}
+  public:
+    DynLibException(const std::string &message)
+        : LEOSACException("DynLib::" + message)
+    {
+    }
+    virtual ~DynLibException()
+    {
+    }
 };
 
 #endif // DYNLIBEXCEPTION_HPP

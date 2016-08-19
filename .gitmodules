@@ -1,15 +1,21 @@
 [submodule "libmcp23s17"]
-	path = libmcp23s17
+	path = deps/libmcp23s17
 	url = https://github.com/piface/libmcp23s17.git
 [submodule "libpifacedigital"]
-	path = libpifacedigital
+	path = deps/libpifacedigital
 	url = https://github.com/xaqq/libpifacedigital.git
 [submodule "zmqpp"]
-	path = zmqpp
+	path = deps/zmqpp
 	url = https://github.com/zeromq/zmqpp.git
 [submodule "spdlog"]
-	path = spdlog
-	url = https://github.com/xaqq/spdlog.git
+	path = deps/spdlog
+	url = https://github.com/gabime/spdlog.git
 [submodule "libzmq"]
-	path = libzmq
+	path = deps/libzmq
 	url = https://github.com/zeromq/libzmq.git
+[submodule "websocketpp"]
+	path = deps/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "json"]
+	path = deps/json
+	url = https://github.com/nlohmann/json.git

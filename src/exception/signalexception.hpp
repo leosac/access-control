@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class SignalException : public LEOSACException
 {
-public:
-    SignalException(const std::string& message) : LEOSACException("Signal::" + message) {}
-    virtual ~SignalException() {}
+  public:
+    SignalException(const std::string &message)
+        : LEOSACException("Signal::" + message)
+    {
+    }
+    virtual ~SignalException()
+    {
+    }
 };
 
 #endif // SIGNALEXCEPTION_HPP

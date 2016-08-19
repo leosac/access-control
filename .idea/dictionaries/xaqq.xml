@@ -19,10 +19,13 @@
       <w>ptree</w>
       <w>realtime</w>
       <w>rpleth</w>
+      <w>sqlite</w>
       <w>syscall</w>
       <w>sysfs</w>
       <w>sysfsgpio</w>
       <w>unexport</w>
+      <w>uptime</w>
+      <w>websocket</w>
       <w>wiegand</w>
       <w>zmqpp</w>
     </words>

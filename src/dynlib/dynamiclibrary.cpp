@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -26,42 +26,43 @@
 #include "dynamiclibrary.hpp"
 #include "exception/dynlibexception.hpp"
 
-DynamicLibrary::DynamicLibrary(const std::string& file)
-:   _file(file),
-    _handle(nullptr)
-{}
+DynamicLibrary::DynamicLibrary(const std::string &file)
+    : _file(file)
+    , _handle(nullptr)
+{
+}
 
 void DynamicLibrary::open(RelocationMode mode)
 {
-    char*   err;
+    char *err;
 
     if (!(_handle = dlopen(_file.c_str(), static_cast<int>(mode) | RTLD_NODELETE)))
     {
         if ((err = dlerror()))
-            throw (DynLibException(std::string("dlopen(): ") + err));
+            throw(DynLibException(std::string("dlopen(): ") + err));
         else
-            throw (DynLibException("dlopen(): Unknown error"));
+            throw(DynLibException("dlopen(): Unknown error"));
     }
 }
 
 void DynamicLibrary::close()
 {
     if (dlclose(_handle))
-        throw (DynLibException(std::string("dlclose(): ") + dlerror()));
+        throw(DynLibException(std::string("dlclose(): ") + dlerror()));
 }
 
-void* DynamicLibrary::getSymbol(const std::string& symbol)
+void *DynamicLibrary::getSymbol(const std::string &symbol)
 {
-    void*   sym;
-    char*   err;
+    void *sym;
+    char *err;
 
     sym = dlsym(_handle, symbol.c_str());
     if ((err = dlerror()))
-        throw (DynLibException(std::string("dlsym(): ") + err));
+        throw(DynLibException(std::string("dlsym(): ") + err));
     return (sym);
 }
 
 const std::string &DynamicLibrary::getFilePath() const
-    {
+{
     return _file;
-    }
+}

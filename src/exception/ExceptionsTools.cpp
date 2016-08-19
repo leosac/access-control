@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,34 +17,35 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "ExceptionsTools.hpp"
+#include "tools/log.hpp"
 #include <exception>
 #include <iostream>
-#include <tools/log.hpp>
-#include "ExceptionsTools.hpp"
 
 namespace
 {
-    /**
-     * Create a string to prepend to the exception message, for
-     * pretty printing.
-     */
-    std::string build_prepend_identation(int level)
-    {
-        std::string prepend;
-        if (level)
-            prepend = '|';
-        for (int i = 0 ; i < level; ++i)
-            prepend += "--";
-        if (level)
-            prepend += "> ";
+/**
+ * Create a string to prepend to the exception message, for
+ * pretty printing.
+ */
+std::string build_prepend_identation(int level)
+{
+    std::string prepend;
+    if (level)
+        prepend = '|';
+    for (int i = 0; i < level; ++i)
+        prepend += "--";
+    if (level)
+        prepend += "> ";
 
-        return prepend;
-    }
+    return prepend;
+}
 }
 
 void Leosac::print_exception(const std::exception &e, int level /* = 0 */)
 {
-    std::cerr << build_prepend_identation(level) << "exception: " << e.what() << '\n';
+    std::cerr << build_prepend_identation(level) << "exception: " << e.what()
+              << '\n';
     try
     {
         std::rethrow_if_nested(e);
@@ -75,4 +76,3 @@ void Leosac::log_exception(const std::exception &e, int level /* = 0 */)
         ERROR("unkown exception type");
     }
 }
-

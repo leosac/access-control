@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -18,14 +18,14 @@
 */
 
 #include "FGPIO.hpp"
+#include "tools/log.hpp"
 #include <zmqpp/message.hpp>
-#include <tools/log.hpp>
 
 using namespace Leosac::Hardware;
 
-FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name) :
-        gpio_name_(gpio_name),
-        backend_(ctx, zmqpp::socket_type::req)
+FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name)
+    : gpio_name_(gpio_name)
+    , backend_(ctx, zmqpp::socket_type::req)
 {
     backend_.connect("inproc://" + gpio_name);
     poller_.add(backend_);

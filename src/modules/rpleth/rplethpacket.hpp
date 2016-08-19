@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,43 +32,43 @@
 
 namespace Leosac
 {
-    namespace Module
+namespace Module
+{
+namespace Rpleth
+{
+class RplethPacket
+{
+  public:
+    enum class Sender
     {
-        namespace Rpleth
-        {
-            class RplethPacket
-            {
-            public:
-                enum class Sender
-                {
-                    Client = 0,
-                    Server
-                };
+        Client = 0,
+        Server
+    };
 
-            public:
-                RplethPacket(Sender packetSender);
+  public:
+    RplethPacket(Sender packetSender);
 
-                RplethPacket(const RplethPacket &other);
+    RplethPacket(const RplethPacket &other);
 
-                ~RplethPacket() = default;
+    ~RplethPacket() = default;
 
-                RplethPacket &operator=(const RplethPacket &other);
+    RplethPacket &operator=(const RplethPacket &other);
 
-            public:
-                Byte checksum() const;
+  public:
+    Byte checksum() const;
 
-            public:
-                Byte status;
-                Byte type;
-                Byte command;
-                Byte dataLen;
-                std::vector<Byte> data;
-                Byte sum;
-                bool isGood;
-                Sender sender;
-            };
-        }
-    }
+  public:
+    Byte status;
+    Byte type;
+    Byte command;
+    Byte dataLen;
+    std::vector<Byte> data;
+    Byte sum;
+    bool isGood;
+    Sender sender;
+};
+}
+}
 }
 
 #endif // RPLETHPACKET_HPP

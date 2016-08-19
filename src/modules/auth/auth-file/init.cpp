@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,13 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "AuthFileModule.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Module::Auth;
 
-extern "C"
-{
+extern "C" {
 const char *get_module_name()
 {
     return "AUTH_FILE";
@@ -33,11 +32,10 @@ const char *get_module_name()
 /**
 * Entry point for the auth-file module.
 */
-extern "C" __attribute__((visibility("default")))
-bool start_module(zmqpp::socket *pipe,
-                  boost::property_tree::ptree cfg,
-                  zmqpp::context &zmq_ctx,
-                  Leosac::CoreUtilsPtr utils)
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<AuthFileModule>(pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<AuthFileModule>(pipe, cfg, zmq_ctx,
+                                                               utils);
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -20,64 +20,63 @@
 #pragma once
 
 #include "Strategies.hpp"
+#include "StrategiesFwd.hpp"
 
 namespace Leosac
 {
-    namespace Module
-    {
+namespace Module
+{
 
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                /**
-                * Strategy for reading a card then a PIN code.
-                * We reuse existing strategy.
-                */
-                class WiegandCardAndPin : public WiegandStrategy
-                {
-                public:
-                    /**
-                    * Create a strategy that read card and PIN code.
-                    *
-                    * @param reader         the reader object we provide the strategy for.
-                    * @param read_card      strategy object that will read a card number.
-                    * @param read_pin       strategy object that will read a PIN code.
-                    * @param delay          max nb of msec between reading the card and receiving pin code data.
-                    */
-                    WiegandCardAndPin(WiegandReaderImpl *reader,
-                            CardReadingUPtr read_card,
-                            PinReadingUPtr read_pin,
-                            std::chrono::milliseconds delay);
+namespace Wiegand
+{
+namespace Strategy
+{
+/**
+* Strategy for reading a card then a PIN code.
+* We reuse existing strategy.
+*/
+class WiegandCardAndPin : public WiegandStrategy
+{
+  public:
+    /**
+    * Create a strategy that read card and PIN code.
+    *
+    * @param reader         the reader object we provide the strategy for.
+    * @param read_card      strategy object that will read a card number.
+    * @param read_pin       strategy object that will read a PIN code.
+    * @param delay          max nb of msec between reading the card and receiving pin
+    * code data.
+    */
+    WiegandCardAndPin(WiegandReaderImpl *reader, CardReadingUPtr read_card,
+                      PinReadingUPtr read_pin, std::chrono::milliseconds delay);
 
-                    virtual void timeout() override;
+    virtual void timeout() override;
 
-                    virtual bool completed() const override;
+    virtual bool completed() const override;
 
-                    virtual void signal(zmqpp::socket &sock) override;
+    virtual void signal(zmqpp::socket &sock) override;
 
-                    virtual void set_reader(WiegandReaderImpl *new_ptr) override;
+    virtual void set_reader(WiegandReaderImpl *new_ptr) override;
 
-                private:
+  private:
+    /**
+    * Reset self.
+    * We create new strategy instance, reset the boolean flag to defaults and
+    * reset the underlying reader buffer.
+    */
+    void reset() override;
 
-                    /**
-                    * Reset self.
-                    * We create new strategy instance, reset the boolean flag to defaults and
-                    * reset the underlying reader buffer.
-                    */
-                    void reset() override;
+    CardReadingUPtr read_card_strategy_;
+    PinReadingUPtr read_pin_strategy_;
 
-                    CardReadingUPtr read_card_strategy_;
-                    PinReadingUPtr read_pin_strategy_;
+    std::chrono::milliseconds delay_;
+    using TimePoint = std::chrono::system_clock::time_point;
+    TimePoint time_card_read_;
 
-                    std::chrono::milliseconds delay_;
-                    using TimePoint = std::chrono::system_clock::time_point;
-                    TimePoint time_card_read_;
-
-                    bool reading_card_;
-                    bool ready_;
-                };
-            }
-        }
-    }
+    bool reading_card_;
+    bool ready_;
+};
+}
+}
+}
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -29,7 +29,7 @@
 
 using namespace Leosac::Tools;
 
-std::string UnixSyscall::getErrorString(const std::string& func, int errNo)
+std::string UnixSyscall::getErrorString(const std::string &func, int errNo)
 {
     return (func + "() failed (" + std::string(strerror(errNo)) + ")");
 }

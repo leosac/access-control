@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,29 +19,28 @@
 
 #pragma once
 
-#include <zmqpp/zmqpp.hpp>
 #include "core/tasks/Task.hpp"
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {
 namespace Tasks
 {
-    /**
-     * This task represent an asynchronous response that shall
-     * be sent over the Remote Control router socket.
-     */
-    class RemoteControlAsyncResponse : public Task
-    {
-    public:
-        RemoteControlAsyncResponse(const std::string identity,
-                                   const zmqpp::message_t &msg,
-                                   zmqpp::socket_t &socket);
+/**
+ * This task represent an asynchronous response that shall
+ * be sent over the Remote Control router socket.
+ */
+class RemoteControlAsyncResponse : public Task
+{
+  public:
+    RemoteControlAsyncResponse(const std::string identity,
+                               const zmqpp::message_t &msg, zmqpp::socket_t &socket);
 
-    private:
-        virtual bool do_run();
+  private:
+    virtual bool do_run();
 
-        zmqpp::message_t msg_;
-        zmqpp::socket_t &socket_;
-    };
+    zmqpp::message_t msg_;
+    zmqpp::socket_t &socket_;
+};
 }
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class FsException : public LEOSACException
 {
-public:
-    FsException(const std::string& message) : LEOSACException("Fs::" + message) {}
-    virtual ~FsException() {}
+  public:
+    FsException(const std::string &message)
+        : LEOSACException("Fs::" + message)
+    {
+    }
+    virtual ~FsException()
+    {
+    }
 };
 
 #endif // FSEXCEPTION_HPP

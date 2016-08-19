@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -26,61 +26,61 @@
 #ifndef UNIXFILEWATCHER_HPP
 #define UNIXFILEWATCHER_HPP
 
-#include <string>
-#include <thread>
 #include <atomic>
 #include <map>
+#include <string>
+#include <thread>
 
 namespace Leosac
 {
-    namespace Tools
+namespace Tools
+{
+
+class UnixFileWatcher
+{
+    using UnixFd = int;
+    struct WatchParams
     {
+        std::string path;
+        int mask;
+    };
+    using Watches = std::map<UnixFd, WatchParams>;
 
-        class UnixFileWatcher
-        {
-            using UnixFd = int;
-            struct WatchParams
-            {
-                std::string path;
-                int mask;
-            };
-            using Watches = std::map<UnixFd, WatchParams>;
+    static const long DefaultTimeoutMs = 2000;
 
-            static const long DefaultTimeoutMs = 2000;
+  public:
+    explicit UnixFileWatcher();
 
-        public:
-            explicit UnixFileWatcher();
+    ~UnixFileWatcher();
 
-            ~UnixFileWatcher();
+    UnixFileWatcher(const UnixFileWatcher &other) = delete;
 
-            UnixFileWatcher(const UnixFileWatcher &other) = delete;
+    UnixFileWatcher &operator=(const UnixFileWatcher &other) = delete;
 
-            UnixFileWatcher &operator=(const UnixFileWatcher &other) = delete;
+  public:
+    void start();
 
-        public:
-            void start();
+    void stop();
 
-            void stop();
+  public:
+    void watchFile(const std::string &path);
 
-        public:
-            void watchFile(const std::string &path);
+    bool fileHasChanged(const std::string &path) const;
 
-            bool fileHasChanged(const std::string &path) const;
+    void fileReset(const std::string &path);
 
-            void fileReset(const std::string &path);
+    std::size_t size() const;
 
-            std::size_t size() const;
+  private:
+    void run();
 
-        private:
-            void run();
-
-        private:
-            std::thread _thread;
-            std::atomic<bool> _isRunning;
-            UnixFd _inotifyFd;
-            Watches _watches;
-        };
-    }
+  private:
+    std::thread _thread;
+    std::atomic<bool> _isRunning;
+    UnixFd _inotifyFd;
+    Watches _watches;
+};
+}
 }
 
 #endif // UNIXFILEWATCHER_HPP

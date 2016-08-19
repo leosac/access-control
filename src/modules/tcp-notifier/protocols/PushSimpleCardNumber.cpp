@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,18 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <zmqpp/zmqpp.hpp>
-#include <zmqpp/inet.hpp>
 #include "PushSimpleCardNumber.hpp"
 #include "core/auth/WiegandCard.hpp"
 
-Leosac::ByteVector
-Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
+// fixme zmqpp include problem
+#include <cstring>
+
+#include <zmqpp/inet.hpp>
+#include <zmqpp/zmqpp.hpp>
+
+Leosac::ByteVector Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
     const Auth::WiegandCard &card)
 {
-  ByteVector data(8);
-  uint64_t network_card_id = zmqpp::htonll(card.to_int());
-  std::memcpy(&data[0], &network_card_id, 8);
+    ByteVector data(8);
+    uint64_t network_card_id = zmqpp::htonll(card.to_int());
+    std::memcpy(&data[0], &network_card_id, 8);
 
-  return data;
+    return data;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,25 +17,23 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cassert>
-#include <fstream>
-#include "tools/log.hpp"
-#include "core/config/ConfigManager.hpp"
 #include "SyncConfig.hpp"
 #include "FetchRemoteConfig.hpp"
+#include "core/config/ConfigManager.hpp"
 #include "core/kernel.hpp"
+#include "tools/log.hpp"
+#include <cassert>
+#include <fstream>
 
 using namespace Leosac;
 using namespace Leosac::Tasks;
 
-SyncConfig::SyncConfig(Kernel &kref,
-                       FetchRemoteConfigPtr fetch_task,
-                       bool sync_general_config,
-                       bool autocommit) :
-        kernel_(kref),
-        fetch_task_(fetch_task),
-        sync_general_config_(sync_general_config),
-        autocommit_(autocommit)
+SyncConfig::SyncConfig(Kernel &kref, FetchRemoteConfigPtr fetch_task,
+                       bool sync_general_config, bool autocommit)
+    : kernel_(kref)
+    , fetch_task_(fetch_task)
+    , sync_general_config_(sync_general_config)
+    , autocommit_(autocommit)
 {
     INFO("Creating SyncConfig task. Guid = " << get_guid());
 }
@@ -66,7 +64,7 @@ bool SyncConfig::do_run()
 void SyncConfig::sync_config()
 {
     const RemoteConfigCollector &collector = fetch_task_->collector();
-    ConfigManager backup = kernel_.config_manager();
+    ConfigManager backup                   = kernel_.config_manager();
 
     if (sync_general_config_)
     {
@@ -83,10 +81,11 @@ void SyncConfig::sync_config()
         if (kernel_.config_manager().is_module_importable(name))
         {
             INFO("Updating config for {" << name << "}");
-            kernel_.config_manager().store_config(name, collector.module_config(name));
+            kernel_.config_manager().store_config(name,
+                                                  collector.module_config(name));
             // write additional file.
-            for (const std::pair<std::string, std::string> &file_info : collector
-                    .additional_files(name))
+            for (const std::pair<std::string, std::string> &file_info :
+                 collector.additional_files(name))
             {
                 INFO("Writing additional config file " << file_info.first);
                 std::ofstream of(file_info.first);
@@ -94,14 +93,16 @@ void SyncConfig::sync_config()
             }
         }
         else
-        {   // If the module is immutable (aka conf not synchronized)
+        { // If the module is immutable (aka conf not synchronized)
             // we simply load its config from backup.
-            DEBUG("Apparently {" << name << "} is immutable (declared in <no_import>)");
+            DEBUG("Apparently {" << name
+                                 << "} is immutable (declared in <no_import>)");
             if (backup.has_config(name))
             {
                 // if we prevent the import of a non-loaded module, we can't
                 // load from backup
-                kernel_.config_manager().store_config(name, backup.load_config(name));
+                kernel_.config_manager().store_config(name,
+                                                      backup.load_config(name));
             }
         }
     }
@@ -122,11 +123,13 @@ void SyncConfig::sync_config()
         }
     }
 
-    assert(kernel_.module_manager().modules_names().empty()); // we should have 0 module loaded.
+    assert(kernel_.module_manager()
+               .modules_names()
+               .empty()); // we should have 0 module loaded.
     for (const auto &name : collector.modules_list())
     {
         if (kernel_.config_manager().has_config(name))
-        {   // load new module.
+        { // load new module.
             bool ret = kernel_.module_manager().loadModule(name);
             if (!ret)
                 ERROR("Cannot load module " << name << "after synchronisation.");

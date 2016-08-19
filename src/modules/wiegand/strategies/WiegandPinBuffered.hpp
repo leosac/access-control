@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,41 +23,41 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                /**
-                * Strategy for PIN only, when up to 5 keys are buffered and sent
-                * as 26 bits. See HID documentation about keypad buffered mode.
-                */
-                class WiegandPinBuffered : public PinReading
-                {
-                public:
-                    /**
-                    * Create a strategy that read 4bits-per-key PIN code.
-                    *
-                    * @param reader the reader object we provide the strategy for.
-                    */
-                    WiegandPinBuffered(WiegandReaderImpl *reader);
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+/**
+* Strategy for PIN only, when up to 5 keys are buffered and sent
+* as 26 bits. See HID documentation about keypad buffered mode.
+*/
+class WiegandPinBuffered : public PinReading
+{
+  public:
+    /**
+    * Create a strategy that read 4bits-per-key PIN code.
+    *
+    * @param reader the reader object we provide the strategy for.
+    */
+    WiegandPinBuffered(WiegandReaderImpl *reader);
 
-                    virtual void timeout() override;
+    virtual void timeout() override;
 
-                    virtual bool completed() const override;
+    virtual bool completed() const override;
 
-                    virtual void signal(zmqpp::socket &sock) override;
+    virtual void signal(zmqpp::socket &sock) override;
 
-                    virtual const std::string &get_pin() const override;
+    virtual const std::string &get_pin() const override;
 
-                    virtual void reset() override;
+    virtual void reset() override;
 
-                private:
-                    bool ready_;
-                    std::string pin_;
-                };
-            }
-        }
-    }
+  private:
+    bool ready_;
+    std::string pin_;
+};
+}
+}
+}
 }

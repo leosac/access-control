@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,24 +17,23 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "CoreUtils.hpp"
+#include "kernel.hpp"
+#include "tools/db/db_fwd.hpp"
+#include "tools/log.hpp"
 
-Leosac::CoreUtils::CoreUtils(Leosac::Kernel *kptr,
-                             Leosac::SchedulerPtr sched,
-                             Leosac::ConfigCheckerPtr cfgcheck,
-                             bool strict_mode) :
-        kptr_(kptr),
-        scheduler_(sched),
-        config_checker_(cfgcheck),
-        strict_mode_(strict_mode)
+Leosac::CoreUtils::CoreUtils(Leosac::Kernel *kptr, Leosac::SchedulerPtr sched,
+                             Leosac::ConfigCheckerPtr cfgcheck, bool strict_mode)
+    : kptr_(kptr)
+    , scheduler_(sched)
+    , config_checker_(cfgcheck)
+    , strict_mode_(strict_mode)
 {
-
 }
 
-Leosac::CoreUtils::CoreUtils() :
-        kptr_(nullptr),
-        strict_mode_(false)
+Leosac::CoreUtils::CoreUtils()
+    : kptr_(nullptr)
+    , strict_mode_(false)
 {
 }
 
@@ -50,6 +49,12 @@ Leosac::ConfigChecker &Leosac::CoreUtils::config_checker()
     return *config_checker_;
 }
 
+Leosac::DBPtr Leosac::CoreUtils::database()
+{
+    ASSERT_LOG(kptr_, "Kernel pointer is NULL in CoreUtils.");
+    return kptr_->database();
+}
+
 bool Leosac::CoreUtils::is_strict() const
 {
     return strict_mode_;
@@ -59,4 +64,9 @@ Leosac::Kernel &Leosac::CoreUtils::kernel()
 {
     ASSERT_LOG(kptr_, "Kernel pointer is NULL in CoreUtils");
     return *kptr_;
+}
+
+Leosac::CoreAPI Leosac::CoreUtils::core_api()
+{
+    return Leosac::CoreAPI(kernel());
 }

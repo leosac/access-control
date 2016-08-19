@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <tools/log.hpp>
 #include "RemoteControlAsyncResponse.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Tasks;
@@ -30,8 +30,8 @@ bool RemoteControlAsyncResponse::do_run()
 
 RemoteControlAsyncResponse::RemoteControlAsyncResponse(const std::string identity,
                                                        const zmqpp::message_t &msg,
-                                                       zmqpp::socket_t &socket) :
-        socket_(socket)
+                                                       zmqpp::socket_t &socket)
+    : socket_(socket)
 {
     INFO("Creating RemoteControlAsyncResponse task. Guid = " << get_guid());
     msg_ = msg.copy();

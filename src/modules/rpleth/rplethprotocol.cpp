@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -24,12 +24,13 @@
 */
 
 #include "rplethprotocol.hpp"
-#include <vector>
 #include <tools/log.hpp>
+#include <vector>
 
 using namespace Leosac::Module::Rpleth;
 
-RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer, bool from_server /* = false */)
+RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer,
+                                           bool from_server /* = false */)
 {
     RplethPacket packet(RplethPacket::Sender::Client);
     if (from_server)
@@ -52,13 +53,15 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer, bool from_ser
     {
         packet.data = std::vector<Byte>(packet.dataLen);
         for (unsigned int i = 0; i < packet.dataLen; ++i)
-            packet.data[i] = buffer[SizeByteIdx + 1 + i];
+            packet.data[i]  = buffer[SizeByteIdx + 1 + i];
     }
-    packet.type = buffer[TypeByteIdx];
+    packet.type    = buffer[TypeByteIdx];
     packet.command = buffer[CommandByteIdx];
-    packet.sum = buffer[SizeByteIdx + packet.dataLen + 1];
-    packet.isGood = true; // The packet has enough information to be interpreted by the protocol
-    buffer.fastForward(4 + packet.dataLen); // Circular buffer was actually read but indexes were not updated
+    packet.sum     = buffer[SizeByteIdx + packet.dataLen + 1];
+    packet.isGood =
+        true; // The packet has enough information to be interpreted by the protocol
+    buffer.fastForward(4 + packet.dataLen); // Circular buffer was actually read but
+                                            // indexes were not updated
     if (packet.type >= MaxType)
         packet.status = BadType;
     else if (packet.sum != packet.checksum())
@@ -66,7 +69,8 @@ RplethPacket RplethProtocol::decodeCommand(CircularBuffer &buffer, bool from_ser
     return (packet);
 }
 
-std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buffer, std::size_t size)
+std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buffer,
+                                          std::size_t size)
 {
     if (size < packet.dataLen + 5U) // Buffer is too small
         return (0);
@@ -75,11 +79,11 @@ std::size_t RplethProtocol::encodeCommand(const RplethPacket &packet, Byte *buff
         buffer[0] = packet.status;
         ++buffer;
     }
-    buffer[TypeByteIdx] = packet.type;
+    buffer[TypeByteIdx]    = packet.type;
     buffer[CommandByteIdx] = packet.command;
-    buffer[SizeByteIdx] = packet.dataLen;
-    for (int i = 0; i < packet.dataLen; ++i)
-        buffer[SizeByteIdx + i + 1] = packet.data[i];
+    buffer[SizeByteIdx]    = packet.dataLen;
+    for (int i                               = 0; i < packet.dataLen; ++i)
+        buffer[SizeByteIdx + i + 1]          = packet.data[i];
     buffer[SizeByteIdx + packet.dataLen + 1] = packet.checksum();
 
     if (packet.sender == RplethPacket::Sender::Server)

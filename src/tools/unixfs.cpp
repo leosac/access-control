@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -26,12 +26,12 @@
 #include "unixfs.hpp"
 
 extern "C" {
-#include <unistd.h>
 #include <dirent.h>
+#include <unistd.h>
 }
 
-#include <cerrno>
 #include <algorithm>
+#include <cerrno>
 
 #include "unixsyscall.hpp"
 
@@ -39,7 +39,7 @@ using namespace Leosac::Tools;
 
 std::string UnixFs::getCWD()
 {
-    char*       str = getcwd(nullptr, 0);
+    char *str = getcwd(nullptr, 0);
     std::string path;
 
     if (str)
@@ -52,22 +52,23 @@ std::string UnixFs::getCWD()
         return (".");
 }
 
-UnixFs::FileList UnixFs::listFiles(const std::string& folder, const std::string& extension)
+UnixFs::FileList UnixFs::listFiles(const std::string &folder,
+                                   const std::string &extension)
 {
-    FileList        l;
-    DIR*            dir;
-    struct dirent*  entry;
-    std::string     filename;
-    std::string     path = folder;
+    FileList l;
+    DIR *dir;
+    struct dirent *entry;
+    std::string filename;
+    std::string path = folder;
 
     if (path.empty())
-        throw (FsException("empty folder"));
+        throw(FsException("empty folder"));
     if (*path.rbegin() != '/')
         path.append("/");
     if ((dir = opendir(path.c_str())) == nullptr)
-        throw (FsException(UnixSyscall::getErrorString("opendir", errno)));
+        throw(FsException(UnixSyscall::getErrorString("opendir", errno)));
     errno = 0;
-    while((entry = readdir(dir)) != nullptr)
+    while ((entry = readdir(dir)) != nullptr)
     {
         if (entry->d_type != DT_REG)
             continue;
@@ -78,13 +79,13 @@ UnixFs::FileList UnixFs::listFiles(const std::string& folder, const std::string&
             l.push_back(path + filename);
     }
     if (errno)
-        throw (FsException(UnixSyscall::getErrorString("readdir", errno)));
+        throw(FsException(UnixSyscall::getErrorString("readdir", errno)));
     if (closedir(dir) == -1)
-        throw (FsException(UnixSyscall::getErrorString("closedir", errno)));
+        throw(FsException(UnixSyscall::getErrorString("closedir", errno)));
     return (l);
 }
 
-std::string UnixFs::stripPath(const std::string& filename)
+std::string UnixFs::stripPath(const std::string &filename)
 {
     std::size_t pos;
 
@@ -94,22 +95,24 @@ std::string UnixFs::stripPath(const std::string& filename)
         return (filename.substr(pos + 1));
 }
 
-std::string UnixFs::readAll(const std::string& path)
+std::string UnixFs::readAll(const std::string &path)
 {
-    std::ifstream   file(path);
+    std::ifstream file(path);
 
     if (!file.good())
-        throw (FsException("could not open " + path + '\''));
-    return (std::string(std::istreambuf_iterator<char>(static_cast<std::istream&>(file)), std::istreambuf_iterator<char>()));
+        throw(FsException("could not open " + path + '\''));
+    return (std::string(
+        std::istreambuf_iterator<char>(static_cast<std::istream &>(file)),
+        std::istreambuf_iterator<char>()));
 }
 
-bool UnixFs::fileExists(const std::string& path)
+bool UnixFs::fileExists(const std::string &path)
 {
     if (access(path.c_str(), F_OK) == -1)
     {
         if (errno == ENOENT)
             return (false);
-        throw (FsException(UnixSyscall::getErrorString("access", errno)));
+        throw(FsException(UnixSyscall::getErrorString("access", errno)));
     }
     else
         return (true);

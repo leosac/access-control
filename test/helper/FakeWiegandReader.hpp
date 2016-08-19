@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,31 +23,31 @@
 
 namespace Leosac
 {
-    namespace Test
-    {
-        namespace Helper
-        {
-            /**
-            * A test helper that fake a WiegandReader (it read command on a socket and send OK)
-            */
-            class FakeWiegandReader
-            {
-            public:
-                FakeWiegandReader(zmqpp::context &ctx, const std::string &name);
+namespace Test
+{
+namespace Helper
+{
+/**
+* A test helper that fake a WiegandReader (it read command on a socket and send OK)
+*/
+class FakeWiegandReader
+{
+  public:
+    FakeWiegandReader(zmqpp::context &ctx, const std::string &name);
 
-                FakeWiegandReader(const FakeWiegandReader &) = delete;
+    FakeWiegandReader(const FakeWiegandReader &) = delete;
 
-                /**
-                * Runs the dummy ready in a thread.
-                */
-                bool run(zmqpp::socket *pipe);
+    /**
+    * Runs the dummy ready in a thread.
+    */
+    bool run(zmqpp::socket *pipe);
 
-            private:
-                /**
-                * Receive command here.
-                */
-                zmqpp::socket rep_;
-            };
-        }
-    }
+  private:
+    /**
+    * Receive command here.
+    */
+    zmqpp::socket rep_;
+};
+}
+}
 }

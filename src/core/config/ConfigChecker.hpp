@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -24,60 +24,60 @@
 
 namespace Leosac
 {
-    /**
-     * This class is here to help check the validity of the configuration.
-     *
-     * Leosac configuration being text-based, various object (LED, Reader, GPIO)
-     * are referenced by name. This is practical because it gives the configuration
-     * maintainer some flexibility (especially regarding the Doorman module).
-     * However, it is also difficult to detect misconfiguration before running
-     * into trouble at runtime.
-     *
-     * How does this class help?
-     *
-     * The idea is for module declaring object to register them with this class, and
-     * for module using (aka talking-to) objects, to check here first.
-     *
-     * As a result, this class shall be fully thread safe.
-     *
-     * @note The current behavior is to assert when registering an object twice.
-     */
-    class ConfigChecker
+/**
+ * This class is here to help check the validity of the configuration.
+ *
+ * Leosac configuration being text-based, various object (LED, Reader, GPIO)
+ * are referenced by name. This is practical because it gives the configuration
+ * maintainer some flexibility (especially regarding the Doorman module).
+ * However, it is also difficult to detect misconfiguration before running
+ * into trouble at runtime.
+ *
+ * How does this class help?
+ *
+ * The idea is for module declaring object to register them with this class, and
+ * for module using (aka talking-to) objects, to check here first.
+ *
+ * As a result, this class shall be fully thread safe.
+ *
+ * @note The current behavior is to assert when registering an object twice.
+ */
+class ConfigChecker
+{
+  public:
+    enum class ObjectType
     {
-    public:
-        enum class ObjectType
-        {
-            GPIO        = 0,
-            LED         = 1,
-            READER      = 2,
-            BUZZER      = 3
-        };
-
-        /**
-         * Declare an object on the registry.
-         */
-        void register_object(const std::string &name, const ObjectType& type);
-
-        /**
-         * Check whether or not an object with name `name` is declared
-         * in the registry, no matter its type.
-         */
-        bool has_object(const std::string &name) const;
-
-        /**
-         * Check whether or not an object with name `name` is declared
-         * in the registry and if check that its type is `type`.
-         */
-        bool has_object(const std::string &name, const ObjectType &type) const;
-
-        /**
-         * Clear all informations.
-         * This is useful when synchronizing with remote.
-         */
-        void clear();
-
-    private:
-        std::map<std::string, ObjectType> objects_;
-        mutable std::mutex mutex_;
+        GPIO   = 0,
+        LED    = 1,
+        READER = 2,
+        BUZZER = 3
     };
+
+    /**
+     * Declare an object on the registry.
+     */
+    void register_object(const std::string &name, const ObjectType &type);
+
+    /**
+     * Check whether or not an object with name `name` is declared
+     * in the registry, no matter its type.
+     */
+    bool has_object(const std::string &name) const;
+
+    /**
+     * Check whether or not an object with name `name` is declared
+     * in the registry and if check that its type is `type`.
+     */
+    bool has_object(const std::string &name, const ObjectType &type) const;
+
+    /**
+     * Clear all informations.
+     * This is useful when synchronizing with remote.
+     */
+    void clear();
+
+  private:
+    std::map<std::string, ObjectType> objects_;
+    mutable std::mutex mutex_;
+};
 }

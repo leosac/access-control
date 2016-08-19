@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -32,9 +32,14 @@
 
 class DeviceException : public LEOSACException
 {
-public:
-    DeviceException(const std::string& message) : LEOSACException("Device::" + message) {}
-    virtual ~DeviceException() {}
+  public:
+    DeviceException(const std::string &message)
+        : LEOSACException("Device::" + message)
+    {
+    }
+    virtual ~DeviceException()
+    {
+    }
 };
 
 #endif // DEVICEEXCEPTION_HPP

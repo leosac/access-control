@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<kernel>
+    <instance_name>fixe</instance_name>
+    <database>
+      <type>mysql</type>
+      <username>root</username>
+      <password></password>
+      <dbname>leosac</dbname>
+    </database>
+
+    <plugin_directories>
+        <plugindir>.</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <log>
+        <enable_sqlite>true</enable_sqlite>
+    </log>
+
+    <modules>
+        <module>
+            <name>WEBSOCK_API</name>
+            <file>libwebsock-api.so</file>
+            <level>1</level>
+
+            <module_config>
+                <port>8888</port>
+            </module_config>
+        </module>
+    </modules>
+</kernel>

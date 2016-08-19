@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,23 +17,22 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <core/tasks/GetRemoteConfigVersion.hpp>
-#include "tools/log.hpp"
-#include "core/tasks/GetLocalConfigVersion.hpp"
 #include "ReplicationModule.hpp"
-#include "core/Scheduler.hpp"
 #include "core/CoreUtils.hpp"
-#include "core/tasks/SyncConfig.hpp"
+#include "core/Scheduler.hpp"
 #include "core/tasks/FetchRemoteConfig.hpp"
+#include "core/tasks/GetLocalConfigVersion.hpp"
+#include "core/tasks/GetRemoteConfigVersion.hpp"
+#include "core/tasks/SyncConfig.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Module::Replication;
 
-ReplicationModule::ReplicationModule(zmqpp::context &ctx,
-                                     zmqpp::socket *pipe,
+ReplicationModule::ReplicationModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                                      const boost::property_tree::ptree &cfg,
-                                     CoreUtilsPtr utils) :
-        BaseModule(ctx, pipe, cfg, utils),
-        last_sync_(TimePoint::max())
+                                     CoreUtilsPtr utils)
+    : BaseModule(ctx, pipe, cfg, utils)
+    , last_sync_(TimePoint::max())
 {
     process_config();
 }
@@ -43,9 +42,9 @@ void ReplicationModule::run()
     while (is_running_)
     {
         auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-                std::chrono::system_clock::now() - last_sync_).count();
-        if (last_sync_ == TimePoint::max() ||
-            elapsed > delay_)
+                           std::chrono::system_clock::now() - last_sync_)
+                           .count();
+        if (last_sync_ == TimePoint::max() || elapsed > delay_)
         {
             replicate();
             last_sync_ = std::chrono::system_clock::now();
@@ -56,9 +55,9 @@ void ReplicationModule::run()
 
 void ReplicationModule::process_config()
 {
-    delay_ = config_.get_child("module_config").get<int>("delay", 120);
+    delay_    = config_.get_child("module_config").get<int>("delay", 120);
     endpoint_ = config_.get_child("module_config").get<std::string>("endpoint");
-    pubkey_ = config_.get_child("module_config").get<std::string>("pubkey");
+    pubkey_   = config_.get_child("module_config").get<std::string>("pubkey");
 }
 
 void ReplicationModule::replicate()
@@ -84,8 +83,9 @@ void ReplicationModule::replicate()
     }
     else
     {
-        INFO("Local configuration version is either equal or greated than the remote's." <<
-             " Doing nothing.");
+        INFO("Local configuration version is either equal or greated than the "
+             "remote's."
+             << " Doing nothing.");
     }
 }
 
@@ -111,7 +111,9 @@ bool ReplicationModule::fetch_remote_version(uint64_t &remote)
         if (task->get_exception())
         {
             try
-            { std::rethrow_exception(task->get_exception()); }
+            {
+                std::rethrow_exception(task->get_exception());
+            }
             catch (const std::exception &e)
             {
                 ERROR("Fetching remote version failed: " << e.what());
@@ -129,22 +131,14 @@ void ReplicationModule::start_sync()
     INFO("Starting the synchronization process...");
     // two tasks queued. Fetch and Sync.
 
-    auto fetch_task = std::make_shared<Tasks::FetchRemoteConfig>(endpoint_,
-                                                                 pubkey_);
+    auto fetch_task = std::make_shared<Tasks::FetchRemoteConfig>(endpoint_, pubkey_);
 
     auto sync_task = std::make_shared<Tasks::SyncConfig>(utils_->kernel(),
-                                                         fetch_task,
-                                                         true,
-                                                         true);
-    sync_task->set_on_success([]()
-                              {
-                                  INFO("Synchronization complete.");
-                              });
+                                                         fetch_task, true, true);
+    sync_task->set_on_success([]() { INFO("Synchronization complete."); });
 
     auto *sched = &utils_->scheduler();
-    fetch_task->set_on_success([=]()
-                               {
-                                   sched->enqueue(sync_task, TargetThread::MAIN);
-                               });
+    fetch_task->set_on_success(
+        [=]() { sched->enqueue(sync_task, TargetThread::MAIN); });
     utils_->scheduler().enqueue(fetch_task, TargetThread::POOL);
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -23,42 +23,38 @@
 
 namespace Leosac
 {
-    namespace Module
-    {
-        namespace Wiegand
-        {
-            namespace Strategy
-            {
-                class SimpleWiegandStrategy;
+namespace Module
+{
+namespace Wiegand
+{
+namespace Strategy
+{
+/**
+* Implementation of a wiegand card only strategy.
+*/
+class SimpleWiegandStrategy : public CardReading
+{
+  public:
+    SimpleWiegandStrategy(WiegandReaderImpl *reader);
 
-                using SimpleWiegandStrategyUPtr = std::unique_ptr<SimpleWiegandStrategy>;
+    virtual void timeout() override;
 
-                /**
-                * Implementation of a wiegand card only strategy.
-                */
-                class SimpleWiegandStrategy : public CardReading
-                {
-                public:
-                    SimpleWiegandStrategy(WiegandReaderImpl *reader);
+    virtual bool completed() const override;
 
-                    virtual void timeout() override;
+    virtual void signal(zmqpp::socket &sock) override;
 
-                    virtual bool completed() const override;
+    virtual const std::string &get_card_id() const override;
 
-                    virtual void signal(zmqpp::socket &sock) override;
+    virtual int get_nb_bits() const override;
 
-                    virtual const std::string &get_card_id() const override;
+    virtual void reset() override;
 
-                    virtual int get_nb_bits() const override;
-
-                    virtual void reset() override;
-
-                private:
-                    bool ready_;
-                    int nb_bits_;
-                    std::string card_id_;
-                };
-            }
-        }
-    }
+  private:
+    bool ready_;
+    int nb_bits_;
+    std::string card_id_;
+};
+}
+}
+}
 }

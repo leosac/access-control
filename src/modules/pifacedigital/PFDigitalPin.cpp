@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2015 Islog
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -21,18 +21,15 @@
 #include "pifacedigital.h"
 #include "tools/log.hpp"
 
-PFDigitalPin::PFDigitalPin(zmqpp::context &ctx,
-        const std::string &name,
-        int gpio_no,
-        Direction direction,
-        bool value) :
-        gpio_no_(gpio_no),
-        sock_(ctx, zmqpp::socket_type::rep),
-        bus_push_(new zmqpp::socket(ctx, zmqpp::socket_type::push)),
-        name_(name),
-        direction_(direction),
-        default_value_(value),
-        want_update_(false)
+PFDigitalPin::PFDigitalPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
+                           Direction direction, bool value)
+    : gpio_no_(gpio_no)
+    , sock_(ctx, zmqpp::socket_type::rep)
+    , bus_push_(new zmqpp::socket(ctx, zmqpp::socket_type::push))
+    , name_(name)
+    , direction_(direction)
+    , default_value_(value)
+    , want_update_(false)
 {
     DEBUG("trying to bind to " << ("inproc://" + name));
     sock_.bind("inproc://" + name);
@@ -49,14 +46,14 @@ PFDigitalPin::~PFDigitalPin()
     delete bus_push_;
 }
 
-PFDigitalPin::PFDigitalPin(PFDigitalPin &&o) :
-        sock_(std::move(o.sock_)),
-        direction_(o.direction_),
-        default_value_(o.default_value_)
+PFDigitalPin::PFDigitalPin(PFDigitalPin &&o)
+    : sock_(std::move(o.sock_))
+    , direction_(o.direction_)
+    , default_value_(o.default_value_)
 {
-    this->gpio_no_ = o.gpio_no_;
-    this->name_ = o.name_;
-    this->bus_push_ = o.bus_push_;
+    this->gpio_no_     = o.gpio_no_;
+    this->name_        = o.name_;
+    this->bus_push_    = o.bus_push_;
     this->want_update_ = o.want_update_;
 
     o.bus_push_ = nullptr;
@@ -79,7 +76,8 @@ void PFDigitalPin::handle_message()
     else if (frame1 == "STATE")
         return send_state();
     else // invalid cmd
-        ERROR("Invalid command received (" << frame1 << "). Potential missconfiguration !");
+        ERROR("Invalid command received (" << frame1
+                                           << "). Potential missconfiguration !");
     sock_.send(ok ? "OK" : "KO");
 }
 
@@ -93,7 +91,8 @@ bool PFDigitalPin::turn_on(zmqpp::message *msg /* = nullptr */)
         // optional parameter is present
         int64_t duration;
         *msg >> duration;
-        next_update_time_ = std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
+        next_update_time_ =
+            std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
         want_update_ = true;
     }
     pifacedigital_digital_write(gpio_no_, 1);
@@ -131,7 +130,8 @@ bool PFDigitalPin::toggle()
 bool PFDigitalPin::read_value()
 {
     // pin's direction matter here (not read from same register).
-    return pifacedigital_read_bit(gpio_no_, direction_ == Direction::Out ? OUTPUT : INPUT, 0);
+    return pifacedigital_read_bit(gpio_no_,
+                                  direction_ == Direction::Out ? OUTPUT : INPUT, 0);
 }
 
 void PFDigitalPin::update()
@@ -151,7 +151,8 @@ std::chrono::system_clock::time_point PFDigitalPin::next_update() const
 void PFDigitalPin::publish_state()
 {
     if (bus_push_)
-        bus_push_->send(zmqpp::message() << ("S_" + name_) << (read_value() ? "ON" : "OFF"));
+        bus_push_->send(zmqpp::message() << ("S_" + name_)
+                                         << (read_value() ? "ON" : "OFF"));
 }
 
 void PFDigitalPin::send_state()
