@@ -44,14 +44,6 @@ class RuntimeOptions
     static const std::string DefaultEmptyParam;
 
   public:
-    enum Flag
-    {
-        Verbose = 0,
-        TestRun,
-        FlagCount
-    };
-
-  public:
     explicit RuntimeOptions() = default;
 
     ~RuntimeOptions() = default;
@@ -61,21 +53,16 @@ class RuntimeOptions
     RuntimeOptions &operator=(const RuntimeOptions &other) = delete;
 
   public:
-    void setFlag(Flag flag, bool value = true);
+    bool has_param(const std::string &key) const;
 
-    bool isSet(Flag flag) const;
+    void set_param(const std::string &key, const std::string &value);
 
-    bool hasParam(const std::string &key) const;
-
-    void setParam(const std::string &key, const std::string &value);
-
-    const std::string &getParam(const std::string &key) const;
+    const std::string &get_param(const std::string &key) const;
 
     bool is_strict() const;
     void set_strict(bool v);
 
   private:
-    std::bitset<FlagCount> _flags;
     std::map<std::string, std::string> _params;
     bool strict_;
 };

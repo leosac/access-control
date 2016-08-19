@@ -23,14 +23,13 @@
 * \brief standard main
 */
 
-#include <iostream>
-// NOTE TCLAP is easily replacable by boost::program_options
 #include "core/kernel.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/leosac.hpp"
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
-#include <tclap/CmdLine.h>
+#include <iostream>
+#include <tclap/CmdLine.h> // Could be replaced by boost::program_options
 #include <unistd.h>
 
 using namespace Leosac::Tools;
@@ -39,10 +38,10 @@ using namespace Leosac;
 static int set_working_directory(RuntimeOptions &opts) noexcept
 {
     int ret = 0;
-    if (opts.hasParam("working_directory") &&
-        !opts.getParam("working_directory").empty())
+    if (opts.has_param("working_directory") &&
+        !opts.get_param("working_directory").empty())
     {
-        ret = chdir(opts.getParam("working_directory").c_str());
+        ret = chdir(opts.get_param("working_directory").c_str());
         if (ret != 0)
             perror("Cannot change working directory");
     }
@@ -58,7 +57,6 @@ int main(int argc, const char **argv)
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ',
                            Leosac::getVersionString());
-        TCLAP::SwitchArg verboseSwitch("v", "verbose", "Increase verbosity", false);
         TCLAP::SwitchArg strict("s", "strict",
                                 "Be strict regarding configuration error",
                                 false); // assert on configuration error.
@@ -68,14 +66,12 @@ int main(int argc, const char **argv)
             "d", "working-directory", "Leosac's working directory", false, "",
             "working_directory");
 
-        cmd.add(verboseSwitch);
         cmd.add(strict);
         cmd.add(kernelFile);
         cmd.add(working_directory);
         cmd.parse(argc, argv);
-        options.setFlag(RuntimeOptions::Verbose, verboseSwitch.getValue());
-        options.setParam("kernel-cfg", kernelFile.getValue());
-        options.setParam("working_directory", working_directory.getValue());
+        options.set_param("kernel-cfg", kernelFile.getValue());
+        options.set_param("working_directory", working_directory.getValue());
         options.set_strict(strict.getValue());
     }
     catch (const TCLAP::ArgException &e)
@@ -89,8 +85,6 @@ int main(int argc, const char **argv)
 
     while (relaunch)
     {
-        UnixShellScript backup("cp -f");
-
         try
         {
             INFO("Creating Leosac Kernel...");

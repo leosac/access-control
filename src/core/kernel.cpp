@@ -93,7 +93,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
 {
     boost::property_tree::ptree cfg;
-    std::string filename = opt.getParam("kernel-cfg");
+    std::string filename = opt.get_param("kernel-cfg");
 
     if (filename.empty())
         throw CoreException("Invalid command line parameter. No kernel "
