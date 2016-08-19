@@ -27,6 +27,7 @@
 #include "core/auth/WiegandCard.hpp"
 #include "core/auth/WiegandCardPin.hpp"
 #include "tools/SingleTimeFrame.hpp"
+#include "tools/XmlNodeNameEnforcer.hpp"
 #include "tools/XmlScheduleLoader.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <map>
@@ -71,13 +72,6 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     std::vector<Leosac::Auth::GroupPtr> groups() const override;
 
   private:
-    /**
-     * Make sure the current tag name is what we expect, otherwise
-     * throw ConfigException.
-     */
-    void enforce_xml_node_name(const std::string &expected,
-                               const std::string &current);
-
     /**
     * Lookup a credentials by ID.
     */
@@ -188,6 +182,8 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
         id_to_cred_;
 
     Tools::XmlScheduleLoader xml_schedules_;
+
+    Tools::XmlNodeNameEnforcer xmlnne_;
 };
 using FileAuthSourceMapperPtr = std::shared_ptr<FileAuthSourceMapper>;
 }

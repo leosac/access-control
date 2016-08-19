@@ -27,6 +27,7 @@
 #include "core/config/ConfigManager.hpp"
 #include "core/netconfig/networkconfig.hpp"
 #include "module_manager.hpp"
+#include "tools/XmlNodeNameEnforcer.hpp"
 #include "tools/db/db_fwd.hpp"
 #include "tools/runtimeoptions.hpp"
 #include <boost/property_tree/ptree.hpp>
@@ -221,6 +222,12 @@ class Kernel
 
     void shutdown();
 
+    /**
+     * Return the path to the kernel configuration file.
+     * This is a simple helper function to throw ConfigException more easily.
+     */
+    std::string config_file_path() const;
+
     CoreUtilsPtr utils_;
 
     ConfigManager config_manager_;
@@ -303,5 +310,7 @@ class Kernel
      * A pointer to the database used by Leosac, if any.
      */
     DBPtr database_;
+
+    Tools::XmlNodeNameEnforcer xmlnne_;
 };
 }

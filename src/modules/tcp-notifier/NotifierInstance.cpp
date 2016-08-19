@@ -18,8 +18,8 @@
 */
 
 #include "NotifierInstance.hpp"
-#include "core/auth/WiegandCard.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/WiegandCard.hpp"
 #include "tools/Colorize.hpp"
 #include "tools/log.hpp"
 #include <zmqpp/message.hpp>

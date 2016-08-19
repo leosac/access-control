@@ -19,38 +19,38 @@
 
 #pragma once
 
-#include "NotifierInstance.hpp"
-#include "core/auth/AuthFwd.hpp"
-#include "modules/BaseModule.hpp"
-#include "protocols/PushSimpleCardNumber.hpp"
-#include "tools/XmlNodeNameEnforcer.hpp"
+#include <string>
 
 namespace Leosac
 {
-namespace Module
+namespace Tools
 {
-namespace TCPNotifier
-{
-class ProtocolHandler;
-using ProtocolHandlerUPtr = std::unique_ptr<ProtocolHandler>;
-
-class TCPNotifierModule : public BaseModule
+/**
+ * This class is a simple wrapper that throws a ConfigException
+ * message formated to report the user that a invalid xml node name
+ * has been encountered.
+ *
+ * The class expect the path to the xml file, in order to pass it
+ * to the ConfigException constructor.
+ */
+class XmlNodeNameEnforcer
 {
   public:
-    TCPNotifierModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                      const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+    XmlNodeNameEnforcer(const std::string &path);
 
-    ~TCPNotifierModule();
+    /**
+     * Check that actual is equal to expected, otherwise throws
+     * a ConfigException with a meaningful message.
+     */
+    void enforce(const std::string &expected, const std::string &actual) const;
+
+    /**
+     * Forward the call to `enforce()`.
+     */
+    void operator()(const std::string &expected, const std::string &actual) const;
 
   private:
-    /**
-     * Process the configuration file.
-     */
-    void process_config();
-
-    std::vector<NotifierInstanceUPtr> instances_;
-    Tools::XmlNodeNameEnforcer xmlnne_;
+    std::string path_;
 };
-}
 }
 }

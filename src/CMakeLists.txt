@@ -54,6 +54,7 @@ set(LEOSAC_LIB_SRCS
     tools/log.cpp
     tools/DatabaseLogSink.cpp
     tools/ElapsedTimeCounter.cpp
+    tools/XmlNodeNameEnforcer.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -77,7 +78,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         SCHEMA_FORMAT embedded
         SCHEMA_NAME tools
         PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/zmqpp/src/
+        INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         INCLUDE_PREFIX tools/db
         INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
                       %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
@@ -98,7 +99,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         SCHEMA_FORMAT embedded
         SCHEMA_NAME auth
         PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/zmqpp/src/
+        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         INCLUDE_PREFIX core/auth/Interfaces
         INCLUDE_REGEX %core/auth/Interfaces/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
                       %core/auth/Interfaces/\(.+\)_odb\(.*\).h%$1_odb$2.h%
@@ -107,7 +108,6 @@ odb_compile(OdbCMake_SOURCES_AUTH
 ## END ODB CONFIGURATION
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
-#include(cotire)
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 
 add_library(${LEOSAC_LIB} SHARED
@@ -166,11 +166,6 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
         ${ODB_LIBRARIES} odb-boost odb-mysql)
-
-#set_target_properties(${LEOSAC_LIB} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
-#cotire(${LEOSAC_LIB})
-#set_target_properties(${LEOSAC_BIN} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "my_pch.hpp")
-#cotire(${LEOSAC_BIN})
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

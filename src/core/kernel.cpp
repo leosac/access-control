@@ -58,6 +58,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
     , send_sighup_(false)
     , autosave_(false)
     , start_time_(std::chrono::steady_clock::now())
+    , xmlnne_(config_file_path())
 {
     configure_database();
     configure_logger();
@@ -168,7 +169,7 @@ void Kernel::module_manager_init()
             std::string pname  = plugin_dir.first;
             std::string pvalue = plugin_dir.second.data();
 
-            assert(pname == "plugindir");
+            xmlnne_("plugindir", pname);
             DEBUG("Adding {" << pvalue << "} in library path");
             module_manager_.addToPath(pvalue);
         }
@@ -176,7 +177,7 @@ void Kernel::module_manager_init()
         for (const auto &module : config_manager_.kconfig().get_child("modules"))
         {
             std::string pname = module.first;
-            assert(pname == "module");
+            xmlnne_("module", pname);
 
             ptree module_conf       = module.second;
             std::string module_file = module_conf.get_child("file").data();
@@ -244,8 +245,7 @@ void Kernel::handle_control_request()
     }
     else
     {
-        ERROR("Unsupported message: " << req);
-        assert(0);
+        ASSERT_LOG(0, "Unsupported message: " + req);
     }
 }
 
@@ -471,9 +471,9 @@ void Kernel::configure_database()
         }
         else
         {
-            throw ConfigException(
-                config_manager_.kconfig().get<std::string>("kernel-cfg"),
-                "Unsupported database type: " + Colorize::underline(db_type));
+            throw ConfigException(config_file_path(),
+                                  "Unsupported database type: " +
+                                      Colorize::underline(db_type));
         }
 
         // Create or update database.
@@ -504,4 +504,9 @@ void Kernel::configure_database()
 DBPtr Kernel::database()
 {
     return database_;
+}
+
+std::string Kernel::config_file_path() const
+{
+    return config_manager_.kconfig().get<std::string>("kernel-cfg");
 }

@@ -31,6 +31,7 @@ using namespace Leosac::Auth;
 
 FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file)
     : config_file_(auth_file)
+    , xmlnne_(config_file_)
 {
     try
     {
@@ -187,7 +188,7 @@ void FileAuthSourceMapper::load_groups(
         const boost::property_tree::ptree &node = group_info.second;
         const std::string &group_name           = node.get<std::string>("group");
 
-        enforce_xml_node_name("map", group_info.first);
+        xmlnne_("map", group_info.first);
 
         GroupPtr grp = groups_[group_name] = GroupPtr(new Group(group_name));
         grp->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
@@ -264,7 +265,7 @@ void FileAuthSourceMapper::load_credentials(
         const std::string &node_name            = mapping.first;
         const boost::property_tree::ptree &node = mapping.second;
 
-        enforce_xml_node_name("map", node_name);
+        xmlnne_("map", node_name);
 
         std::string user_id = node.get<std::string>("user");
         IUserPtr user       = users_[user_id];
@@ -328,7 +329,7 @@ void FileAuthSourceMapper::map_schedules(
         const std::string &node_name            = mapping_entry.first;
         const boost::property_tree::ptree &node = mapping_entry.second;
 
-        enforce_xml_node_name("map", node_name);
+        xmlnne_("map", node_name);
 
         // we can map multiple schedule at once.
         std::list<std::string> schedule_names;
@@ -412,7 +413,7 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
         const std::string &node_name            = user.first;
         const boost::property_tree::ptree &node = user.second;
 
-        enforce_xml_node_name("user", node_name);
+        xmlnne_("user", node_name);
 
         std::string username  = node.get<std::string>("name");
         std::string firstname = node.get<std::string>("firstname", "");
@@ -472,18 +473,5 @@ void FileAuthSourceMapper::add_cred_to_id_map(
                                               "will be overwritten.");
         }
         id_to_cred_[credential->id()] = credential;
-    }
-}
-
-void FileAuthSourceMapper::enforce_xml_node_name(const std::string &expected,
-                                                 const std::string &current)
-{
-    if (current != expected)
-    {
-        std::stringstream ss;
-        ss << "Invalid configuration file content. Expected xml tag "
-           << Colorize::green(expected) << " but has " << Colorize::green(current)
-           << " instead.";
-        throw ConfigException(config_file_, ss.str());
     }
 }

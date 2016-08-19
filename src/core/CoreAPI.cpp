@@ -34,7 +34,7 @@ uint64_t CoreAPI::config_version() const
     auto t = std::make_shared<Tasks::GetLocalConfigVersion>(kernel_);
     kernel_.core_utils()->scheduler().enqueue(t, TargetThread::MAIN);
     t->wait();
-    assert(t->succeed());
+    ASSERT_LOG(t->succeed(), "Tasks::GetLocalConfigVersion failed.");
     return t->config_version_;
 }
 
@@ -47,7 +47,8 @@ boost::property_tree::ptree CoreAPI::kernel_config() const
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
-    assert(task->succeed());
+    ASSERT_LOG(task->succeed(),
+               "Retrieving `kernel configuration` from CoreAPI failed.");
 
     return out;
 }
@@ -63,7 +64,7 @@ uint64_t CoreAPI::uptime() const
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
-    assert(task->succeed());
+    ASSERT_LOG(task->succeed(), "Retrieving `uptime` from CoreAPI failed.");
 
     return out;
 }
@@ -77,7 +78,7 @@ std::string CoreAPI::instance_name() const
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
-    assert(task->succeed());
+    ASSERT_LOG(task->succeed(), "Retrieving `instance_name` from CoreAPI failed.");
 
     return out;
 }
@@ -91,7 +92,7 @@ std::vector<std::string> CoreAPI::modules_names() const
     });
     kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
     task->wait();
-    assert(task->succeed());
+    ASSERT_LOG(task->succeed(), "Retrieving `modules names` from CoreAPI failed.");
 
     return out;
 }

@@ -1,8 +1,13 @@
 find_package(GTest REQUIRED)
 
-list(APPEND LEOSAC_TEST_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/zmqpp/src ${GTEST_INCLUDE_DIRS}
-${CMAKE_SOURCE_DIR}/spdlog/include ${CMAKE_SOURCE_DIR}/libzmq/include)
-list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES} )
+list(APPEND LEOSAC_TEST_INCLUDE_DIRECTORIES
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/zmqpp/src
+        ${GTEST_INCLUDE_DIRS}
+        ${CMAKE_SOURCE_DIR}/deps/spdlog/include
+        ${CMAKE_SOURCE_DIR}/deps/libzmq/include
+        )
+list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES})
 
 function(leosacCreateSingleSourceTest NAME)
 ## module we link against

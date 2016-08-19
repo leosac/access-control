@@ -30,6 +30,8 @@ TCPNotifierModule::TCPNotifierModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                                      const boost::property_tree::ptree &cfg,
                                      CoreUtilsPtr utils)
     : BaseModule(ctx, pipe, cfg, utils)
+    , xmlnne_("") // fixme maybe: we don't have access to kernel config path at this
+                  // point.
 {
     process_config();
 }
@@ -38,30 +40,18 @@ TCPNotifierModule::~TCPNotifierModule()
 {
 }
 
-void enforce_xml_node_name(const std::string &expected, const std::string &current)
-{
-    if (current != expected)
-    {
-        std::stringstream ss;
-        ss << "Invalid configuration file content. Expected xml tag "
-           << Colorize::green(expected) << " but has " << Colorize::green(current)
-           << " instead.";
-        throw ConfigException("", ss.str());
-    }
-}
-
 void TCPNotifierModule::process_config()
 {
     for (auto &&itr : config_.get_child("module_config"))
     {
-        enforce_xml_node_name("instance", itr.first);
+        xmlnne_("instance", itr.first);
         std::vector<std::string> auth_sources;
         std::vector<std::string> connects;
         std::vector<std::string> binds;
 
         for (auto &&srcs : itr.second.get_child("sources"))
         {
-            enforce_xml_node_name("source", srcs.first);
+            xmlnne_("source", srcs.first);
             auto name = srcs.second.get<std::string>("");
             auth_sources.push_back(name);
         }
@@ -70,7 +60,7 @@ void TCPNotifierModule::process_config()
         {
             for (auto &&srcs : itr.second.get_child("connect"))
             {
-                enforce_xml_node_name("endpoint", srcs.first);
+                xmlnne_("endpoint", srcs.first);
                 auto name = srcs.second.get<std::string>("");
                 connects.push_back(name);
             }
@@ -80,7 +70,7 @@ void TCPNotifierModule::process_config()
         {
             for (auto &&srcs : itr.second.get_child("bind"))
             {
-                enforce_xml_node_name("endpoint", srcs.first);
+                xmlnne_("endpoint", srcs.first);
                 auto name = srcs.second.get<std::string>("");
                 binds.push_back(name);
             }
