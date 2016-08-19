@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include "core/auth/Interfaces/IUser.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include "tools/db/database.hpp"
 #include <string>
 #include <vector>
 
@@ -28,11 +29,10 @@ namespace Leosac
 namespace Auth
 {
 
-class Group;
-using GroupPtr = std::shared_ptr<Group>;
 /**
 * A authentication group regroup users that share permissions.
 */
+#pragma db object pointer(std::shared_ptr)
 class Group
 {
   public:
@@ -48,9 +48,17 @@ class Group
 
     void profile(IAccessProfilePtr p);
 
+        GroupId id() const;
+
   private:
+        friend class odb::access;
+#pragma db id auto
+        GroupId id_;
+#pragma db transient
     std::vector<UserPtr> members_;
     std::string name_;
+
+#pragma db transient
     IAccessProfilePtr profile_;
 };
 }

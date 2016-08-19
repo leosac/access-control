@@ -84,7 +84,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
                       %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         )
 
-# ODB configuration for auth stuff (User)
+# ODB configuration for auth stuff (User/Group)
 set(OdbCMake_ODB_HEADERS
         core/auth/User.hpp
         #core/auth/Group.hpp

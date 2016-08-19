@@ -48,3 +48,8 @@ void Leosac::Auth::Group::profile(Leosac::Auth::IAccessProfilePtr p)
 {
     profile_ = p;
 }
+
+Leosac::Auth::GroupId Leosac::Auth::Group::id() const
+{
+    return id_;
+}

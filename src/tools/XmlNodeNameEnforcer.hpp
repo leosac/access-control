@@ -27,7 +27,7 @@ namespace Tools
 {
 /**
  * This class is a simple wrapper that throws a ConfigException
- * message formated to report the user that a invalid xml node name
+ * message formated to report the user that an invalid xml node name
  * has been encountered.
  *
  * The class expect the path to the xml file, in order to pass it

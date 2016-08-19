@@ -29,8 +29,6 @@ namespace Leosac
 {
 namespace Auth
 {
-class IUser;
-using IUserPtr = std::shared_ptr<IUser>;
 
 /**
 * Represent a user
@@ -48,7 +46,7 @@ class User
     */
     const std::string &username() const noexcept;
 
-    unsigned long id() const noexcept;
+    UserId id() const noexcept;
 
     /**
      * Retrieve password
