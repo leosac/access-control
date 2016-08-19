@@ -40,16 +40,16 @@ class Group
 
     const std::string &name() const;
 
-    const std::vector<IUserPtr> &members() const;
+    const std::vector<UserPtr> &members() const;
 
-    void member_add(IUserPtr m);
+    void member_add(UserPtr m);
 
     IAccessProfilePtr profile();
 
     void profile(IAccessProfilePtr p);
 
   private:
-    std::vector<IUserPtr> members_;
+    std::vector<UserPtr> members_;
     std::string name_;
     IAccessProfilePtr profile_;
 };

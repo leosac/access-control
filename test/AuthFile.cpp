@@ -25,7 +25,7 @@
 */
 
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
-#include "core/auth/Interfaces/IAuthSourceMapper.hpp"
+#include "core/auth/User.hpp"
 #include "core/auth/PINCode.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 #include "tools/unixshellscript.hpp"
@@ -132,7 +132,7 @@ class AuthFileMapperTest : public ::testing::Test
     bool is_in_group(const std::string &user_name, const std::string &group_name,
                      IAuthSourceMapper *mapper)
     {
-        auto search_lambda = [&](IUserPtr u) -> bool {
+        auto search_lambda = [&](UserPtr u) -> bool {
             return u->username() == user_name;
         };
 

@@ -52,12 +52,12 @@ class IAuthenticationSource : public Tools::IVisitable
     /**
     * Set the user that map to this source,
     */
-    virtual void owner(IUserPtr user) = 0;
+    virtual void owner(UserPtr user) = 0;
 
     /**
     * Retrieve the user that map to this source.
     */
-    virtual IUserPtr owner() const = 0;
+    virtual UserPtr owner() const = 0;
 
     /**
     * Return (or generate) an Access Profile that make sense

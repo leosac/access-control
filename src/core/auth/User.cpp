@@ -17,86 +17,86 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "IUser.hpp"
+#include "core/auth/User.hpp"
 
 using namespace Leosac::Auth;
 
-IUser::IUser(const std::string &username)
+User::User(const std::string &username)
     : username_(username)
 {
 }
 
-const std::string &IUser::username() const noexcept
+const std::string &User::username() const noexcept
 {
     return username_;
 }
 
-void IUser::username(const std::string &username)
+void User::username(const std::string &username)
 {
     username_ = username;
 }
 
-IAccessProfilePtr IUser::profile() const noexcept
+IAccessProfilePtr User::profile() const noexcept
 {
     return profile_;
 }
 
-void IUser::profile(IAccessProfilePtr user_profile)
+void User::profile(IAccessProfilePtr user_profile)
 {
     profile_ = user_profile;
 }
 
-const std::string &IUser::firstname() const
+const std::string &User::firstname() const
 {
     return firstname_;
 }
 
-const std::string &IUser::lastname() const
+const std::string &User::lastname() const
 {
     return lastname_;
 }
 
-const std::string &IUser::email() const
+const std::string &User::email() const
 {
     return email_;
 }
 
-void IUser::firstname(std::string const &f)
+void User::firstname(std::string const &f)
 {
     firstname_ = f;
 }
 
-void IUser::lastname(std::string const &l)
+void User::lastname(std::string const &l)
 {
     lastname_ = l;
 }
 
-void IUser::email(std::string const &e)
+void User::email(std::string const &e)
 {
     email_ = e;
 }
 
-const CredentialValidity &IUser::validity() const
+const CredentialValidity &User::validity() const
 {
     return validity_;
 }
 
-void IUser::validity(const CredentialValidity &c)
+void User::validity(const CredentialValidity &c)
 {
     validity_ = c;
 }
 
-bool IUser::is_valid() const
+bool User::is_valid() const
 {
     return validity_.is_valid();
 }
 
-const std::string &IUser::password() const noexcept
+const std::string &User::password() const noexcept
 {
     return password_;
 }
 
-unsigned long IUser::id() const noexcept
+unsigned long User::id() const noexcept
 {
     return id_;
 }

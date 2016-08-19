@@ -5,7 +5,7 @@ Authentication Documentation {#auth_main}
 
 [AccessProfile]: @ref Leosac::Auth::IAccessProfile "Access Profile"
 [Cards]: @ref Leosac::Auth::ICard "Card"
-[Users]: @ref Leosac::Auth::IUser "User"
+[Users]: @ref Leosac::Auth::User "User"
 
 @brief Explain how the authentication and authorization subsystem works.
 

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "IAccessProfile.hpp"
+#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/CredentialValidity.hpp"
 #include "tools/db/database.hpp"
@@ -36,12 +36,12 @@ using IUserPtr = std::shared_ptr<IUser>;
 * Represent a user
 */
 #pragma db object pointer(std::shared_ptr)
-class IUser
+class User
 {
   public:
-    IUser(const std::string &username);
-    IUser()          = default;
-    virtual ~IUser() = default;
+    User(const std::string &username);
+    User()          = default;
+    virtual ~User() = default;
 
     /**
     * Get the username of this user.

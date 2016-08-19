@@ -127,7 +127,7 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     * @param u a non-null pointer to user.
     * @return all group the user is a member of.
     */
-    std::vector<Leosac::Auth::GroupPtr> get_user_groups(Leosac::Auth::IUserPtr u);
+    std::vector<Leosac::Auth::GroupPtr> get_user_groups(Leosac::Auth::UserPtr u);
 
     /**
     * Merge a bunch of profiles together and returns a new profile.
@@ -146,7 +146,7 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     /**
     * Maps user id (or name) to object.
     */
-    std::map<std::string, Leosac::Auth::IUserPtr> users_;
+    std::map<std::string, Leosac::Auth::UserPtr> users_;
 
     /**
     * Maps group name to object.

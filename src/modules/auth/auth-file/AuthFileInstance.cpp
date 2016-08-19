@@ -24,6 +24,7 @@
 #include "core/auth/Auth.hpp"
 #include "core/auth/AuthSourceBuilder.hpp"
 #include "core/auth/WiegandCard.hpp"
+#include "core/auth/User.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/Colorize.hpp"
 #include "tools/log.hpp"

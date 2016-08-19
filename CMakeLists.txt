@@ -23,10 +23,10 @@ find_package(TCLAP REQUIRED)
 find_package(Boost 1.55.0 REQUIRED date_time system serialization regex filesystem)
 
 # ODB stuff
-find_package(ODB REQUIRED COMPONENTS sqlite)
+find_package(ODB REQUIRED COMPONENTS sqlite mysql)
 include(${ODB_USE_FILE})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O0 -Wno-unknown-pragmas")
 
 #Build Options
 option(LEOSAC_BUILD_MODULES "build-modules" ON)

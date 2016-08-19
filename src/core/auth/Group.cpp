@@ -29,12 +29,12 @@ const std::string &Leosac::Auth::Group::name() const
     return name_;
 }
 
-std::vector<Leosac::Auth::IUserPtr> const &Leosac::Auth::Group::members() const
+std::vector<Leosac::Auth::UserPtr> const &Leosac::Auth::Group::members() const
 {
     return members_;
 }
 
-void Leosac::Auth::Group::member_add(Leosac::Auth::IUserPtr m)
+void Leosac::Auth::Group::member_add(Leosac::Auth::UserPtr m)
 {
     members_.push_back(m);
 }

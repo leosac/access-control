@@ -39,7 +39,7 @@ using AuthFileInstancePtr = std::shared_ptr<AuthFileInstance>;
 struct AuthResult
 {
     AuthResult(bool s, ::Leosac::Auth::IAccessProfilePtr p,
-               ::Leosac::Auth::IUserPtr u)
+               ::Leosac::Auth::UserPtr u)
         : success(s)
         , profile(p)
         , user(u)
@@ -60,7 +60,7 @@ struct AuthResult
      * A user object representing the user who made the authentication
      * attempt.
      */
-    ::Leosac::Auth::IUserPtr user;
+    ::Leosac::Auth::UserPtr user;
 };
 
 /**

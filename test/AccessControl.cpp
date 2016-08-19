@@ -18,7 +18,7 @@
 */
 
 #include "core/auth/AuthTarget.hpp"
-#include "core/auth/Interfaces/IUser.hpp"
+#include "core/auth/User.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"
 #include "core/auth/WiegandCard.hpp"
 #include "tools/Schedule.hpp"
@@ -34,7 +34,7 @@ class AccessControlTest : public ::testing::Test
 {
   public:
     AccessControlTest()
-        : user(new IUser("my_uuid"))
+        : user(new User("my_uuid"))
         , profile(new SimpleAccessProfile())
         , auth_source_(new BaseAuthSource())
         , card(new WiegandCard("01:f2:fe:23", 32))
@@ -64,7 +64,7 @@ class AccessControlTest : public ::testing::Test
     {
     }
 
-    IUserPtr user;
+    UserPtr user;
     IAccessProfilePtr profile;
     IAuthenticationSourcePtr auth_source_;
     WiegandCardPtr card;

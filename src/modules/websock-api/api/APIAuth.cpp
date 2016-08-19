@@ -19,8 +19,8 @@
 
 #include "APIAuth.hpp"
 #include "WSServer.hpp"
-#include "core/auth/Interfaces/IUser.hpp"
-#include "odb_gen/IUser_odb.h"
+#include "core/auth/User.hpp"
+#include "odb_gen/User_odb.h"
 #include "tools/GenGuid.h"
 #include "tools/db/database.hpp"
 #include <algorithm>
@@ -42,14 +42,14 @@ std::string APIAuth::generate_token(
 {
     using namespace odb;
     using namespace odb::core;
-    using query  = odb::query<Auth::IUser>;
-    using result = odb::result<Auth::IUser>;
+    using query  = odb::query<Auth::User>;
+    using result = odb::result<Auth::User>;
     {
         auto db = server_.db();
         transaction t(db->begin());
 
-        Auth::IUserPtr user =
-            db->query_one<Auth::IUser>(query::username == username);
+        Auth::UserPtr user =
+            db->query_one<Auth::User>(query::username == username);
         if (user && user->password() == password)
         {
             auto token     = gen_uuid();

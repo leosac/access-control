@@ -18,6 +18,7 @@
 */
 
 #include "FileAuthSourceMapper.hpp"
+#include "core/auth/User.hpp"
 #include "core/auth/Auth.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/ProfileMerger.hpp"
@@ -198,7 +199,7 @@ void FileAuthSourceMapper::load_groups(
             if (membership.first != "user")
                 continue;
             std::string user_name = membership.second.data();
-            IUserPtr user         = users_[user_name];
+            UserPtr user         = users_[user_name];
             if (!user)
             {
                 ERROR("Unknown user " << user_name);
@@ -221,11 +222,11 @@ std::vector<GroupPtr> FileAuthSourceMapper::groups() const
     return ret;
 }
 
-std::vector<GroupPtr> FileAuthSourceMapper::get_user_groups(Leosac::Auth::IUserPtr u)
+std::vector<GroupPtr> FileAuthSourceMapper::get_user_groups(Leosac::Auth::UserPtr u)
 {
     assert(u);
     std::vector<GroupPtr> grps;
-    auto lambda_cmp = [&](IUserPtr user) -> bool {
+    auto lambda_cmp = [&](UserPtr user) -> bool {
         return user->username() == u->username();
     };
 
@@ -268,7 +269,7 @@ void FileAuthSourceMapper::load_credentials(
         xmlnne_("map", node_name);
 
         std::string user_id = node.get<std::string>("user");
-        IUserPtr user       = users_[user_id];
+        UserPtr user       = users_[user_id];
         if (!user)
             throw ConfigException(
                 config_file_, "Credentials defined for undefined user " + user_id);
@@ -359,7 +360,7 @@ void FileAuthSourceMapper::map_schedules(
         {
             for (const auto &user_name : user_names)
             {
-                IUserPtr user = users_[user_name];
+                UserPtr user = users_[user_name];
                 assert(user);
                 assert(user->profile());
                 SimpleAccessProfilePtr profile =
@@ -424,7 +425,7 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
             throw ConfigException(config_file_,
                                   "'UNKNOWN_USER' is a reserved name. Do not use.");
 
-        IUserPtr uptr(new IUser(username));
+        UserPtr uptr(new User(username));
         uptr->firstname(firstname);
         uptr->lastname(lastname);
         uptr->email(email);

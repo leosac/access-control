@@ -28,7 +28,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/SimpleAccessProfile.cpp
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp
-    core/auth/Interfaces/IUser.cpp
+    core/auth/User.cpp
     core/auth/AuthSourceBuilder.cpp
     core/auth/CredentialValidity.cpp
     dynlib/dynamiclibrary.cpp
@@ -86,7 +86,8 @@ odb_compile(OdbCMake_SOURCES_TOOLS
 
 # ODB configuration for auth stuff (User)
 set(OdbCMake_ODB_HEADERS
-        core/auth/Interfaces/IUser.hpp
+        core/auth/User.hpp
+        #core/auth/Group.hpp
         )
 
 set(OdbCMake_SOURCES_AUTH "")
@@ -100,9 +101,9 @@ odb_compile(OdbCMake_SOURCES_AUTH
         SCHEMA_NAME auth
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
-        INCLUDE_PREFIX core/auth/Interfaces
-        INCLUDE_REGEX %core/auth/Interfaces/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-                      %core/auth/Interfaces/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        INCLUDE_PREFIX core/auth/
+        INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+                      %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         )
 
 ## END ODB CONFIGURATION
@@ -127,7 +128,7 @@ target_compile_definitions(${LEOSAC_LIB}
         DATABASE_MYSQL
         )
 
-set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-unknown-pragmas")
+set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
 
 #Add GProf compile flag
 if(LEOSAC_GPROF)

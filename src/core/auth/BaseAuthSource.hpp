@@ -40,9 +40,9 @@ class BaseAuthSource : public IAuthenticationSource
 
     virtual void accept(Tools::IVisitor *visitor) override;
 
-    virtual void owner(IUserPtr user) override;
+    virtual void owner(UserPtr user) override;
 
-    virtual IUserPtr owner() const override;
+    virtual UserPtr owner() const override;
 
     /**
     * This implementation simply return the profile associated with
@@ -73,7 +73,7 @@ class BaseAuthSource : public IAuthenticationSource
     /**
     * Which user this auth source maps to. May be null
     */
-    IUserPtr owner_;
+    UserPtr owner_;
 
     /**
     * Underlying auth source.

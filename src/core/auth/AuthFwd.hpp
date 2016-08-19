@@ -25,8 +25,8 @@ namespace Leosac
 {
 namespace Auth
 {
-class IUser;
-using IUserPtr = std::shared_ptr<IUser>;
+class User;
+using UserPtr = std::shared_ptr<User>;
 using UserId   = unsigned long;
 
 class IAccessProfile;
