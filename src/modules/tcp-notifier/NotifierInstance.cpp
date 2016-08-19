@@ -19,9 +19,9 @@
 
 #include "NotifierInstance.hpp"
 #include "core/auth/WiegandCard.hpp"
-#include <core/auth/Auth.hpp>
-#include <tools/Colorize.hpp>
-#include <tools/log.hpp>
+#include "core/auth/Auth.hpp"
+#include "tools/Colorize.hpp"
+#include "tools/log.hpp"
 #include <zmqpp/message.hpp>
 
 using namespace Leosac;

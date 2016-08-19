@@ -17,7 +17,7 @@
     </network>
 
     <log>
-        <enable_sqlite>true</enable_sqlite>
+      <enable_database>true</enable_database>
     </log>
 
     <modules>
