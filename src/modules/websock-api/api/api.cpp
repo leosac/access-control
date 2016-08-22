@@ -133,48 +133,20 @@ API::json API::system_overview(const API::json &req)
 API::json API::get_logs(const json &req)
 {
     json rep;
-
-    // todo cleanup this.
-    using query    = odb::query<Tools::LogEntry>;
-    using sl_query = odb::sqlite::query<Tools::LogEntry>;
-    using my_query = odb::mysql::query<Tools::LogEntry>;
-    using result   = odb::result<Tools::LogEntry>;
-    DBPtr db       = server_.core_utils()->database();
+    DBPtr db = server_.core_utils()->database();
     if (db)
     {
-        rep["data"] = {};
-        odb::transaction t(db->begin());
+        using namespace Tools;
 
-        int p  = extract_with_default(req, "p", 0);   // page
-        int ps = extract_with_default(req, "ps", 20); // page size
+        rep["data"]      = {};
+        std::string sort = extract_with_default(req, "sort", "desc");
+        int p            = extract_with_default(req, "p", 0);   // page
+        int ps           = extract_with_default(req, "ps", 20); // page size
         if (ps <= 0)
-            ps               = 1;
-        int offset           = p * ps;
-        std::string sort     = extract_with_default(req, "sort", "desc");
-        std::string order_by = sort == "asc" ? "ASC" : "DESC";
-        query base_query;
-        result base_result;
+            ps = 1;
 
-        // LIMIT needs to be database specific.
-        if (db->id() == odb::database_id::id_sqlite)
-        {
-            auto sl_db = std::static_pointer_cast<odb::sqlite::database>(db);
-            odb::sqlite::query<Tools::LogEntry> sl_q(
-                "ORDER BY" + query::id + order_by + "LIMIT" + sl_query::_val(ps) +
-                "OFFSET" + sl_query::_val(offset));
-            base_result = sl_db->query<Tools::LogEntry>(sl_q);
-        }
-        else if (db->id() == odb::database_id::id_mysql)
-        {
-            auto my_db = std::static_pointer_cast<odb::mysql::database>(db);
-            odb::mysql::query<Tools::LogEntry> my_q(
-                "ORDER BY" + query::id + order_by + "LIMIT" + my_query::_val(ps) +
-                "OFFSET" + my_query::_val(offset));
-            base_result = my_db->query<Tools::LogEntry>(my_q);
-        }
-        Tools::LogView view(db->query_value<Tools::LogView>());
-
-        for (Tools::LogEntry &entry : base_result)
+        LogEntry::QueryResult result = LogEntry::retrieve(db, p, ps, sort == "asc");
+        for (Tools::LogEntry &entry : result.entries)
         {
             auto timestamp = boost::posix_time::to_time_t(entry.timestamp_);
             rep["data"].push_back(
@@ -185,8 +157,7 @@ API::json API::get_logs(const json &req)
         }
 
         rep["meta"] = {
-            {"total", view.count}, {"last", view.count / ps}, {"first", 0},
-        };
+            {"total", result.total}, {"last", result.last}, {"first", result.first}};
         rep["status"] = 0;
     }
     else

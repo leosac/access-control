@@ -55,6 +55,7 @@ set(LEOSAC_LIB_SRCS
     tools/DatabaseLogSink.cpp
     tools/ElapsedTimeCounter.cpp
     tools/XmlNodeNameEnforcer.cpp
+    tools/db/LogEntry.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -125,7 +126,6 @@ target_include_directories(${LEOSAC_LIB}
 
 target_compile_definitions(${LEOSAC_LIB}
         PRIVATE
-        DATABASE_MYSQL
         )
 
 set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")

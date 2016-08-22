@@ -31,7 +31,10 @@ namespace Tools
  * A log entry.
  *
  * This class is decorated to be ODB friendly. Object of this
- * type will be stored in a sqlite database for logging.
+ * type will be stored in a SQL database.
+ *
+ * The class also provide an API via static method to
+ * retrieve entries from an underlying database.
  */
 #pragma db object
 class LogEntry
@@ -59,6 +62,22 @@ class LogEntry
 
 #pragma db not_null
     size_t thread_id_;
+
+    /**
+     * Structure holding the result for a `retrieve()` call.
+     */
+    struct QueryResult
+    {
+        QueryResult() = default;
+        std::vector<LogEntry> entries;
+
+        // metadata
+        int total;
+        int last;
+        int first;
+    };
+    static QueryResult retrieve(DBPtr database, int page_number, int page_size,
+                                bool order_asc);
 
   private:
     friend class odb::access;
