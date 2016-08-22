@@ -37,6 +37,10 @@ class Group
 {
   public:
     explicit Group(const std::string &group_name);
+    /**
+     * Default constructor, required by ODB.
+     */
+    Group() = default;
 
     const std::string &name() const;
 
@@ -52,9 +56,19 @@ class Group
 
   private:
     friend class odb::access;
+
+/**
+ * The group identifier.
+ *
+ * This is a the primary key for the object.
+ */
 #pragma db id auto
     GroupId id_;
-#pragma db transient
+
+/**
+ * Group membership.
+ */
+#pragma db value_not_null
     std::vector<UserPtr> members_;
     std::string name_;
 
@@ -63,3 +77,7 @@ class Group
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "core/auth/User.hpp"
+#endif

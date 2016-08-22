@@ -60,7 +60,7 @@ std::string APIAuth::generate_token(
     return "";
 }
 
-bool APIAuth::authenticate(const std::string &token, std::string &user_id) const
+bool APIAuth::authenticate(const std::string &token, Auth::UserId &user_id) const
 {
     auto it = tokens_.find(token);
     if (it != tokens_.end())

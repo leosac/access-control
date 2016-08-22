@@ -97,6 +97,12 @@ class User
     std::string email_;
 
 /**
+ * Group member list.
+ */
+#pragma db value_not_null inverse(members_)
+    std::vector<GroupWPtr> groups_;
+
+/**
 * A user can have the same validity than credentials.
 */
 #pragma db transient
@@ -109,3 +115,7 @@ class User
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "core/auth/Group.hpp"
+#endif

@@ -25,6 +25,7 @@
 #include "odb_gen/LogEntry_odb.h"
 #include "odb_gen/LogEntry_odb_mysql.h"
 #include "odb_gen/LogEntry_odb_sqlite.h"
+#include "odb_gen/User_odb.h"
 #include "tools/db/database.hpp"
 #include "tools/leosac.hpp"
 #include <boost/date_time/posix_time/conversion.hpp>
@@ -91,7 +92,7 @@ API::json API::authenticate_with_token(const API::json &req)
     }
     else
     {
-        std::string user_id;
+        Auth::UserId user_id;
         if (server_.auth().authenticate(req.at("token"), user_id))
         {
             rep["status"]       = 0;
@@ -133,6 +134,7 @@ API::json API::get_logs(const json &req)
 {
     json rep;
 
+    // todo cleanup this.
     using query    = odb::query<Tools::LogEntry>;
     using sl_query = odb::sqlite::query<Tools::LogEntry>;
     using my_query = odb::mysql::query<Tools::LogEntry>;
@@ -200,4 +202,30 @@ bool API::allowed(const std::string &cmd)
         cmd == "authenticate_with_token")
         return true;
     return auth_status_ == AuthStatus::LOGGED_IN;
+}
+
+API::json API::user_get(const API::json &req)
+{
+    json rep;
+
+    // todo add security.
+
+    using query = odb::query<Auth::User>;
+    DBPtr db    = server_.core_utils()->database();
+    odb::transaction t(db->begin());
+    auto uid = req.at("user_id").get<Auth::UserId>();
+
+    auto user_ptr = db->query_one<Auth::User>(query::id == uid);
+    if (user_ptr)
+    {
+        rep["status"] = 0;
+        rep["data"]   = {{"id", user_ptr->id()},
+                       {"type", "user"},
+                       {"attributes",
+                        {{"username", user_ptr->username()},
+                         {"firstname", user_ptr->firstname()},
+                         {"lastname", user_ptr->lastname()}}}};
+    }
+    t.commit();
+    return rep;
 }

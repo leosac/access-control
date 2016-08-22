@@ -146,6 +146,18 @@ class API
      */
     json get_logs(const json &req);
 
+
+    /**
+     * Retrieve information about a given user.
+     *
+     * Request:
+     *     + `user_id`: The user_id of the user we want to fetch. Required.
+     *
+     * Response:
+     *     + ...
+     */
+    json user_get(const json &req);
+
   private:
     /**
      * Extract the value of a key from a json object.

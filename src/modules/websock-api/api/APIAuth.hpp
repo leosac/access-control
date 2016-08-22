@@ -61,7 +61,7 @@ class APIAuth
      * @param user_id [out] The user_id who owns the token.
      * Returns `true` on success, `false` on failure.
      */
-    bool authenticate(const std::string &token, std::string &user_id) const;
+    bool authenticate(const std::string &token, Auth::UserId &user_id) const;
 
     /**
      * Marks the `token` has invalid, effectively removing it
