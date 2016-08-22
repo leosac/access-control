@@ -48,8 +48,7 @@ std::string APIAuth::generate_token(
         auto db = server_.db();
         transaction t(db->begin());
 
-        Auth::UserPtr user =
-            db->query_one<Auth::User>(query::username == username);
+        Auth::UserPtr user = db->query_one<Auth::User>(query::username == username);
         if (user && user->password() == password)
         {
             auto token     = gen_uuid();

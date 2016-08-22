@@ -38,7 +38,7 @@ synchronizing configuration.
 Example {#mod_testandreset_example}
 -----------------------------------
 
-This is a example of Rpleth possible configuration for Rpleth module into Leosac:
+This is a example of a possible configuration for the `TEST_AND_RESET` module:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
     <module>

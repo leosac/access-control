@@ -27,11 +27,11 @@ namespace Auth
 {
 class User;
 using UserPtr = std::shared_ptr<User>;
-using UserId   = unsigned long;
+using UserId  = unsigned long;
 
 class Group;
 using GroupPtr = std::shared_ptr<Group>;
-using GroupId = unsigned long;
+using GroupId  = unsigned long;
 
 class IAccessProfile;
 using IAccessProfilePtr = std::shared_ptr<IAccessProfile>;

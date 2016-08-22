@@ -25,8 +25,8 @@
 */
 
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
-#include "core/auth/User.hpp"
 #include "core/auth/PINCode.hpp"
+#include "core/auth/User.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 #include "tools/unixshellscript.hpp"
 #include <chrono>

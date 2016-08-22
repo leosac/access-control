@@ -18,10 +18,10 @@
 */
 
 #include "FileAuthSourceMapper.hpp"
-#include "core/auth/User.hpp"
 #include "core/auth/Auth.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/ProfileMerger.hpp"
+#include "core/auth/User.hpp"
 #include "exception/moduleexception.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/log.hpp"
@@ -199,7 +199,7 @@ void FileAuthSourceMapper::load_groups(
             if (membership.first != "user")
                 continue;
             std::string user_name = membership.second.data();
-            UserPtr user         = users_[user_name];
+            UserPtr user          = users_[user_name];
             if (!user)
             {
                 ERROR("Unknown user " << user_name);
@@ -269,7 +269,7 @@ void FileAuthSourceMapper::load_credentials(
         xmlnne_("map", node_name);
 
         std::string user_id = node.get<std::string>("user");
-        UserPtr user       = users_[user_id];
+        UserPtr user        = users_[user_id];
         if (!user)
             throw ConfigException(
                 config_file_, "Credentials defined for undefined user " + user_id);

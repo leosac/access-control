@@ -18,8 +18,8 @@
 */
 
 #include "core/auth/AuthTarget.hpp"
-#include "core/auth/User.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"
+#include "core/auth/User.hpp"
 #include "core/auth/WiegandCard.hpp"
 #include "tools/Schedule.hpp"
 #include <chrono>

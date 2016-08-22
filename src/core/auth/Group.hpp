@@ -48,12 +48,12 @@ class Group
 
     void profile(IAccessProfilePtr p);
 
-        GroupId id() const;
+    GroupId id() const;
 
   private:
-        friend class odb::access;
+    friend class odb::access;
 #pragma db id auto
-        GroupId id_;
+    GroupId id_;
 #pragma db transient
     std::vector<UserPtr> members_;
     std::string name_;

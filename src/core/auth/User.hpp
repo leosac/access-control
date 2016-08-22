@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/CredentialValidity.hpp"
+#include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "tools/db/database.hpp"
 #include <memory>
 
