@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <core/auth/AuthFwd.hpp>
 #include <json.hpp>
 #include <memory>
 
@@ -158,6 +159,16 @@ class API
      */
     json user_get(const json &req);
 
+    /**
+     * A hook that is called before a request processing method
+     * will be invoked.
+     *
+     * Typically, this is used to:
+     *     + Check that the authentication is still valid.
+     *     + Extend the authentication duration.
+     */
+    void hook_before_request();
+
   private:
     /**
      * Extract the value of a key from a json object.
@@ -196,7 +207,7 @@ class API
     /**
      * The token we are authenticated with.
      */
-    std::string current_auth_token_;
+    Auth::TokenPtr current_auth_token;
 };
 
 using APIPtr = std::shared_ptr<API>;

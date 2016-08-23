@@ -52,6 +52,7 @@ class User
      * Retrieve password
      */
     const std::string &password() const noexcept;
+    void password(const std::string &pw);
 
     /**
     * Set a new username.

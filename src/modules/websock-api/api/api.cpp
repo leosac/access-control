@@ -19,16 +19,15 @@
 
 #include "api.hpp"
 #include "../WSServer.hpp"
+#include "Token_odb.h"
 #include "core/CoreUtils.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "core/auth/User.hpp"
 #include "core/kernel.hpp"
 #include "odb_gen/LogEntry_odb.h"
 #include "odb_gen/LogEntry_odb_mysql.h"
 #include "odb_gen/LogEntry_odb_sqlite.h"
 #include "odb_gen/User_odb.h"
-#include "tools/db/database.hpp"
 #include "tools/leosac.hpp"
-#include <boost/date_time/posix_time/conversion.hpp>
 #include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
 #include <tools/db/LogEntry.hpp>
@@ -64,14 +63,15 @@ API::json API::create_auth_token(const API::json &req)
         std::string username = req.at("username");
         std::string password = req.at("password");
 
-        ::Leosac::Auth::UserId uid;
-        auto token = server_.auth().generate_token(username, password, uid);
-        if (!token.empty())
+        auto token = server_.auth().authenticate_credentials(username, password);
+
+        if (token)
         {
-            rep["status"]  = 0;
-            rep["user_id"] = uid;
-            rep["token"]   = token;
-            auth_status_   = AuthStatus::LOGGED_IN;
+            rep["status"]      = 0;
+            rep["user_id"]     = token->owner()->id();
+            rep["token"]       = token->token();
+            auth_status_       = AuthStatus::LOGGED_IN;
+            current_auth_token = token;
         }
         else
         {
@@ -92,14 +92,14 @@ API::json API::authenticate_with_token(const API::json &req)
     }
     else
     {
-        Auth::UserId user_id;
-        if (server_.auth().authenticate(req.at("token"), user_id))
+        auto token = server_.auth().authenticate_token(req.at("token"));
+        if (token)
         {
-            rep["status"]       = 0;
-            rep["user_id"]      = user_id;
-            rep["username"]     = "lama"; // todo fix
-            auth_status_        = AuthStatus::LOGGED_IN;
-            current_auth_token_ = req.at("token");
+            rep["status"]      = 0;
+            rep["user_id"]     = token->owner()->id();
+            rep["username"]    = token->owner()->username();
+            auth_status_       = AuthStatus::LOGGED_IN;
+            current_auth_token = token;
         }
         else
         {
@@ -111,10 +111,16 @@ API::json API::authenticate_with_token(const API::json &req)
 
 API::json API::logout(const API::json &)
 {
-    auth_status_ = AuthStatus::NONE;
-    server_.auth().invalidate_token(current_auth_token_);
-    current_auth_token_ = "";
-    return {};
+    if (auth_status_ == AuthStatus::LOGGED_IN)
+    {
+        auth_status_ = AuthStatus::NONE;
+        ASSERT_LOG(current_auth_token,
+                   "Logout called, but user has no current token.");
+        server_.auth().invalidate_token(current_auth_token);
+        current_auth_token = nullptr;
+        return {{"status", 0}};
+    }
+    return {{"status", -1}};
 }
 
 API::json API::system_overview(const API::json &req)
@@ -199,4 +205,23 @@ API::json API::user_get(const API::json &req)
     }
     t.commit();
     return rep;
+}
+
+void API::hook_before_request()
+{
+    if (auth_status_ == AuthStatus::LOGGED_IN)
+    {
+        odb::core::transaction t(server_.db()->begin());
+        // Reload token
+        server_.db()->reload(current_auth_token);
+        // todo reload can throw object_not_persistent.
+
+        // todo change status to not logged if failed.
+        if (!current_auth_token->is_valid())
+            throw Auth::TokenExpired(current_auth_token);
+
+        current_auth_token->expire_in(std::chrono::minutes(20));
+        server_.db()->update(*current_auth_token);
+        t.commit();
+    }
 }

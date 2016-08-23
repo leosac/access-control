@@ -18,6 +18,8 @@
 */
 
 #include "kernel.hpp"
+#include "User_odb.h"
+#include "core/auth/User.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
@@ -33,7 +35,6 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <fstream>
-
 #include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
 
@@ -495,6 +496,12 @@ void Kernel::configure_database()
             {
                 transaction t(database_->begin());
                 schema_catalog::create_schema(*database_, "auth");
+                Auth::User admin;
+                admin.firstname("Admin");
+                admin.lastname("ADMIN");
+                admin.username("admin");
+                admin.password("admin");
+                database_->persist(admin);
                 t.commit();
             }
         }

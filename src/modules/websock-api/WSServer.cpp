@@ -32,7 +32,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     , db_(database)
     , module_(module)
 {
-    assert(db_);
+    ASSERT_LOG(db_, "No database object passed into WSServer.");
     using websocketpp::lib::placeholders::_1;
     using websocketpp::lib::placeholders::_2;
     srv_.init_asio();
@@ -82,6 +82,12 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         rep["uuid"]    = req["uuid"];
         srv_.send(hdl, rep.dump(4), websocketpp::frame::opcode::text);
     }
+    catch (const odb::exception &e)
+    {
+        // We let odb::exception kill the program, at least
+        // for now as it helps seeing what's wrong.
+        throw;
+    }
     catch (const std::exception &e)
     {
         WARN("Exception when parsing request: " << e.what());
@@ -129,6 +135,7 @@ json WSServer::dispatch_request(APIPtr api_handle, json &in)
     {
         if (api_handle->allowed(command))
         {
+            api_handle->hook_before_request();
             auto method_ptr = handler_method->second;
             return ((*api_handle).*method_ptr)(content);
         }

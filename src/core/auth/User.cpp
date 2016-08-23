@@ -100,3 +100,8 @@ unsigned long User::id() const noexcept
 {
     return id_;
 }
+
+void User::password(const std::string &pw)
+{
+    password_ = pw;
+}

@@ -72,9 +72,9 @@ class LogEntry
         std::vector<LogEntry> entries;
 
         // metadata
-        int total;
-        int last;
-        int first;
+        size_t total;
+        size_t last;
+        size_t first;
     };
     static QueryResult retrieve(DBPtr database, int page_number, int page_size,
                                 bool order_asc);

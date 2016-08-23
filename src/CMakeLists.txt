@@ -29,6 +29,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp
     core/auth/User.cpp
+    core/auth/Token.cpp
     core/auth/AuthSourceBuilder.cpp
     core/auth/CredentialValidity.cpp
     dynlib/dynamiclibrary.cpp
@@ -89,6 +90,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
 set(OdbCMake_ODB_HEADERS
         core/auth/User.hpp
         core/auth/Group.hpp
+        core/auth/Token.hpp
         )
 
 set(OdbCMake_SOURCES_AUTH "")

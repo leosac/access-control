@@ -17,40 +17,43 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "Token.hpp"
+#include "core/auth/User.hpp"
 
-#include <memory>
+using namespace Leosac;
+using namespace Leosac::Auth;
 
-namespace Leosac
+const std::string &Token::token() const
 {
-namespace Auth
-{
-class User;
-using UserPtr = std::shared_ptr<User>;
-using UserId  = unsigned long;
-
-class Group;
-using GroupPtr  = std::shared_ptr<Group>;
-using GroupWPtr = std::weak_ptr<Group>;
-using GroupId   = unsigned long;
-
-class Token;
-using TokenPtr = std::shared_ptr<Token>;
-
-class IAccessProfile;
-using IAccessProfilePtr = std::shared_ptr<IAccessProfile>;
-
-class CredentialValidity;
-
-class AuthTarget;
-using AuthTargetPtr = std::shared_ptr<AuthTarget>;
-
-class IAuthenticationSource;
-using IAuthenticationSourcePtr = std::shared_ptr<IAuthenticationSource>;
-
-class BaseAuthSource;
-using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
-
-class WiegandCard;
+    return token_;
 }
+
+bool Token::is_valid() const
+{
+    auto now = boost::posix_time::second_clock::local_time();
+    return expiration_ >= now;
+}
+
+UserPtr Token::owner() const
+{
+    return owner_;
+}
+
+boost::posix_time::ptime Token::expiration() const
+{
+    return expiration_;
+}
+
+TokenExpired::TokenExpired(TokenPtr token)
+    : LEOSACException(build_msg(token))
+{
+}
+
+std::string TokenExpired::build_msg(TokenPtr token)
+{
+    std::stringstream ss;
+    ss << "Token " << token->token() << ", owned by user " << token->owner()->id()
+       << " expired on " << token->expiration();
+
+    return ss.str();
 }

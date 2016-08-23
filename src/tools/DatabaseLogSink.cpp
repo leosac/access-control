@@ -20,6 +20,7 @@
 #include "DatabaseLogSink.hpp"
 #include "GenGuid.h"
 #include "LogEntry_odb.h"
+#include "log.hpp"
 #include <tools/DateTimeConverter.hpp>
 #include <tools/db/LogEntry.hpp>
 #include <tools/db/database.hpp>
@@ -30,8 +31,8 @@ using namespace Leosac::Tools;
 DatabaseLogSink::DatabaseLogSink(DBPtr database)
     : database_(database)
 {
-    std::cout << "ENABLING SQLITE LOGGER!" << std::endl;
-    assert(database_);
+    std::cout << "ENABLING SQL DATABASE LOGGER." << std::endl;
+    ASSERT_LOG(database_, "No database object.");
     // Generate a "run id"
     run_id_ = Leosac::gen_uuid();
 }

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "core/auth/Token.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -47,27 +48,29 @@ class APIAuth
      * and generate an authentication token.
      *
      * On success return a new authentication token that will
-     * be valid when calling `authenticate()`.
-     * On error returns an empty string.
+     * be valid when calling for further authentication.
+     * On error returns nullptr.
      */
-    std::string generate_token(const std::string &username,
-                               const std::string &password,
-                               Leosac::Auth::UserId &user_id);
+    Auth::TokenPtr authenticate_credentials(const std::string &username,
+                                            const std::string &password) const;
 
     /**
      * Attempt to authenticate with an authentication token.
      *
-     * @param token The token used to perform the authentication
-     * @param user_id [out] The user_id who owns the token.
-     * Returns `true` on success, `false` on failure.
+     * Authenticating with a valid token will update the expiration
+     * date of the token.
+     *
+     * @param token The token string used to perform the authentication.
+     * Returns the token object matching the token string on success, or nullptr
+     * on failure.
      */
-    bool authenticate(const std::string &token, Auth::UserId &user_id) const;
+    Auth::TokenPtr authenticate_token(const std::string &token_str) const;
 
     /**
      * Marks the `token` has invalid, effectively removing it
      * from the list of valid tokens.
      */
-    void invalidate_token(const std::string &token);
+    void invalidate_token(Auth::TokenPtr token) const;
 
   private:
     /**

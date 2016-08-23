@@ -18,6 +18,7 @@
 */
 
 #include "APIAuth.hpp"
+#include "Token_odb.h"
 #include "WSServer.hpp"
 #include "core/auth/User.hpp"
 #include "odb_gen/User_odb.h"
@@ -36,14 +37,41 @@ APIAuth::APIAuth(WSServer &srv)
 {
 }
 
-std::string APIAuth::generate_token(
-    const std::string &username, const std::string &password,
-    Auth::UserId &user_id) // todo fix me by creating a proper token struct
+void APIAuth::invalidate_token(Auth::TokenPtr token) const
 {
     using namespace odb;
     using namespace odb::core;
-    using query  = odb::query<Auth::User>;
-    using result = odb::result<Auth::User>;
+    transaction t(server_.db()->begin());
+    server_.db()->erase(token);
+    t.commit();
+}
+
+Auth::TokenPtr APIAuth::authenticate_token(const std::string &token_str) const
+{
+    using namespace odb;
+    using namespace odb::core;
+    using query = odb::query<Auth::Token>;
+
+    auto db = server_.db();
+    transaction t(db->begin());
+
+    Auth::TokenPtr token(db->query_one<Auth::Token>(query::token == token_str));
+    if (token && token->is_valid())
+    {
+        token->expire_in(std::chrono::minutes(20));
+        db->update(token);
+        t.commit();
+        return token;
+    }
+    return nullptr;
+}
+
+Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
+                                                 const std::string &password) const
+{
+    using namespace odb;
+    using namespace odb::core;
+    using query = odb::query<Auth::User>;
     {
         auto db = server_.db();
         transaction t(db->begin());
@@ -51,29 +79,14 @@ std::string APIAuth::generate_token(
         Auth::UserPtr user = db->query_one<Auth::User>(query::username == username);
         if (user && user->password() == password)
         {
-            auto token     = gen_uuid();
-            tokens_[token] = user->id();
-            user_id        = user->id();
+            // Create new token.
+            auto token = std::make_shared<Auth::Token>(gen_uuid(), user);
+            // Valid for 20m
+            token->expire_in(std::chrono::minutes(20));
+            db->persist(*token);
+            t.commit();
             return token;
         }
     }
-    return "";
-}
-
-bool APIAuth::authenticate(const std::string &token, Auth::UserId &user_id) const
-{
-    auto it = tokens_.find(token);
-    if (it != tokens_.end())
-    {
-        user_id = it->second;
-        return true;
-    }
-    return false;
-}
-
-void APIAuth::invalidate_token(const std::string &token)
-{
-    auto itr = tokens_.find(token);
-    if (itr != tokens_.end())
-        tokens_.erase(itr);
+    return nullptr;
 }

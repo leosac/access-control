@@ -26,6 +26,7 @@
 #ifndef LEOSACEXCEPTION_HPP
 #define LEOSACEXCEPTION_HPP
 
+#include <cstddef>
 #include <exception>
 #include <string>
 
