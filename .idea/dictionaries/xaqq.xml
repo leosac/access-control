@@ -4,6 +4,8 @@
       <w>concat</w>
       <w>deserialize</w>
       <w>dhcp</w>
+      <w>didn</w>
+      <w>doesn</w>
       <w>dont</w>
       <w>fgpio</w>
       <w>gpio</w>
@@ -25,6 +27,7 @@
       <w>sysfsgpio</w>
       <w>unexport</w>
       <w>uptime</w>
+      <w>websock</w>
       <w>websocket</w>
       <w>wiegand</w>
       <w>zmqpp</w>

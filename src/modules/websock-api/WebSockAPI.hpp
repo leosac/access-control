@@ -28,6 +28,67 @@ namespace Module
 {
 namespace WebSockAPI
 {
+
+/**
+ * Those are general status code that apply to all outgoing
+ * message.
+ */
+enum class StatusCode
+{
+    /**
+     * Indicate that the request's processing went well.
+     */
+    SUCCESS = 0x00,
+
+    /**
+     * A failure for an unknown reason.
+     */
+    GENERAL_FAILURE = 0x01,
+
+    /**
+     * The websocket connection is not allowed to make the
+     * requested API call.
+     */
+    PERMISSION_DENIED = 0x02,
+
+    /**
+     * The websocket connection is rate limited, and it already
+     * sent too many packets.
+     */
+    RATE_LIMITED = 0x03,
+
+    /**
+     * The source packet was malformed.
+     */
+    MALFORMED = 0x04,
+
+    /**
+     * The API method (ie, message's type) does not exist.
+     */
+    INVALID_CALL = 0x05,
+};
+
+class MalformedMessage : public LEOSACException
+{
+  public:
+    MalformedMessage()
+        : LEOSACException("Message is malformed."){};
+};
+
+class PermissionDenied : public LEOSACException
+{
+  public:
+    PermissionDenied()
+        : LEOSACException("Permission denied."){};
+};
+
+class InvalidCall : public LEOSACException
+{
+  public:
+    InvalidCall()
+        : LEOSACException("Unknown message type."){};
+};
+
 class WebSockAPIModule : public BaseModule
 {
   public:

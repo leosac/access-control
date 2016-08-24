@@ -75,31 +75,48 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
 
     INFO("Incoming payload: \n" << req.dump(4));
 
+    ServerMessage response;
+    response.status_code = StatusCode::SUCCESS;
+    response.content     = {};
     try
     {
-        json rep;
-        throw Auth::TokenExpired(std::make_shared<Auth::Token>());
-
-        rep["content"] = dispatch_request(api_handle, req);
-        rep["uuid"]    = req["uuid"];
-        srv_.send(hdl, rep.dump(4), websocketpp::frame::opcode::text);
+        ClientMessage input = parse_request(req);
+        response.uuid       = input.uuid;
+        response.type       = input.type;
+        response.content    = dispatch_request(api_handle, input);
+    }
+    catch (const InvalidCall &e)
+    {
+        response.status_code = StatusCode::INVALID_CALL;
+    }
+    catch (const PermissionDenied &e)
+    {
+        response.status_code = StatusCode::PERMISSION_DENIED;
+    }
+    catch (const MalformedMessage &e)
+    {
+        response.status_code = StatusCode::MALFORMED;
     }
     catch (const LEOSACException &e)
     {
         WARN("Leosac specific exception has been caught: " << e.what() << std::endl
                                                            << e.trace().str());
+        response.status_code   = StatusCode::GENERAL_FAILURE;
+        response.status_string = e.what(); // todo Maybe remove in production.
     }
     catch (const odb::exception &e)
     {
-        // We let odb::exception kill the program, at least
-        // for now as it helps seeing what's wrong.
-        throw;
+        ERROR("Database Error: " << e.what());
+        response.status_code   = StatusCode::GENERAL_FAILURE;
+        response.status_string = "Database Error: " + std::string(e.what());
     }
     catch (const std::exception &e)
     {
-        WARN("Exception when parsing request: " << e.what());
-        return;
+        WARN("Exception when processing request: " << e.what());
+        response.status_code   = StatusCode::GENERAL_FAILURE;
+        response.status_string = e.what();
     }
+    send_message(hdl, response);
 }
 
 void WSServer::run(uint16_t port)
@@ -123,39 +140,28 @@ APIAuth &WSServer::auth()
     return auth_;
 }
 
-json WSServer::dispatch_request(APIPtr api_handle, json &in)
+json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
 {
-    auto command        = in.at("cmd");
-    auto handler_method = handlers_.find(command);
-    json content;
+    auto handler_method = handlers_.find(in.type);
 
-    try
+    if (handler_method == handlers_.end())
     {
-        content = in.at("content");
-    }
-    catch (const std::exception &)
-    {
-        // ignore, as no content may be valid.
-    }
-
-    if (handler_method != handlers_.end())
-    {
-        if (api_handle->allowed(command))
-        {
-            api_handle->hook_before_request();
-            auto method_ptr = handler_method->second;
-            return ((*api_handle).*method_ptr)(content);
-        }
-        else
-        {
-            return {{"status", -2}};
-        }
+        throw InvalidCall();
     }
     else
     {
-        INFO("Ignore invalid WebSocketAPI command: " << command);
-        return {};
+        if (api_handle->allowed(in.type))
+        {
+            api_handle->hook_before_request();
+            auto method_ptr = handler_method->second;
+            return ((*api_handle).*method_ptr)(in.content);
+        }
+        else
+        {
+            throw PermissionDenied();
+        }
     }
+    return {};
 }
 
 DBPtr WSServer::db()
@@ -166,4 +172,40 @@ DBPtr WSServer::db()
 CoreUtilsPtr WSServer::core_utils()
 {
     return module_.core_utils();
+}
+
+void WSServer::send_message(websocketpp::connection_hdl hdl,
+                            const ServerMessage &msg)
+{
+    json json_message;
+
+    json_message["uuid"]          = msg.uuid;
+    json_message["type"]          = msg.type;
+    json_message["status_code"]   = static_cast<int64_t>(msg.status_code);
+    json_message["status_string"] = msg.status_string;
+    json_message["content"]       = msg.content;
+
+    srv_.send(hdl, json_message.dump(4), websocketpp::frame::opcode::text);
+}
+
+ClientMessage WSServer::parse_request(json &req)
+{
+    ClientMessage msg;
+
+    try
+    {
+        // Extract general message argument.
+        msg.uuid    = req.at("uuid");
+        msg.type    = req.at("type");
+        msg.content = req.at("content");
+    }
+    catch (const std::out_of_range &e)
+    {
+        throw MalformedMessage();
+    }
+    catch (const std::domain_error &e)
+    {
+        throw MalformedMessage();
+    }
+    return msg;
 }

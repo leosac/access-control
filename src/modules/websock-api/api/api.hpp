@@ -85,8 +85,8 @@ class API
      *     + `status`: An integer.
      *         + `0` means success.
      *         + `-1` means invalid username/password.
-     *         + `-2` means already logged in.
      *     + `user_id`: On success, the identifier of the logged in user.
+     *     + `token`: On success, value of the generated authentication token.
      *     + `message`: An optional text message describing the status.
      */
     json create_auth_token(const json &req);

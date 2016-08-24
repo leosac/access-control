@@ -52,75 +52,59 @@ API::json API::get_leosac_version(const json &)
 API::json API::create_auth_token(const API::json &req)
 {
     json rep;
+    ASSERT_LOG(auth_status_ == AuthStatus::NONE, "Invalid auth status.");
 
-    if (auth_status_ != AuthStatus::NONE)
+    std::string username = req.at("username");
+    std::string password = req.at("password");
+
+    auto token = server_.auth().authenticate_credentials(username, password);
+
+    if (token)
     {
-        rep["status"]  = -2;
-        rep["message"] = "Already logged in";
+        rep["status"]      = 0;
+        rep["user_id"]     = token->owner()->id();
+        rep["token"]       = token->token();
+        auth_status_       = AuthStatus::LOGGED_IN;
+        current_auth_token = token;
     }
     else
     {
-        std::string username = req.at("username");
-        std::string password = req.at("password");
-
-        auto token = server_.auth().authenticate_credentials(username, password);
-
-        if (token)
-        {
-            rep["status"]      = 0;
-            rep["user_id"]     = token->owner()->id();
-            rep["token"]       = token->token();
-            auth_status_       = AuthStatus::LOGGED_IN;
-            current_auth_token = token;
-        }
-        else
-        {
-            rep["status"] = -1;
-        }
+        rep["status"] = -1;
     }
+
     return rep;
 }
 
 API::json API::authenticate_with_token(const API::json &req)
 {
     json rep;
+    ASSERT_LOG(auth_status_ == AuthStatus::NONE, "Invalid auth status.");
 
-    if (auth_status_ != AuthStatus::NONE)
+    auto token = server_.auth().authenticate_token(req.at("token"));
+    if (token)
     {
-        rep["status"]  = -2;
-        rep["message"] = "Already logged in";
+        rep["status"]      = 0;
+        rep["user_id"]     = token->owner()->id();
+        rep["username"]    = token->owner()->username();
+        auth_status_       = AuthStatus::LOGGED_IN;
+        current_auth_token = token;
     }
     else
     {
-        auto token = server_.auth().authenticate_token(req.at("token"));
-        if (token)
-        {
-            rep["status"]      = 0;
-            rep["user_id"]     = token->owner()->id();
-            rep["username"]    = token->owner()->username();
-            auth_status_       = AuthStatus::LOGGED_IN;
-            current_auth_token = token;
-        }
-        else
-        {
-            rep["status"] = -1;
-        }
+        rep["status"] = -1;
     }
+
     return rep;
 }
 
 API::json API::logout(const API::json &)
 {
-    if (auth_status_ == AuthStatus::LOGGED_IN)
-    {
-        auth_status_ = AuthStatus::NONE;
-        ASSERT_LOG(current_auth_token,
-                   "Logout called, but user has no current token.");
-        server_.auth().invalidate_token(current_auth_token);
-        current_auth_token = nullptr;
-        return {{"status", 0}};
-    }
-    return {{"status", -1}};
+    ASSERT_LOG(auth_status_ == AuthStatus::LOGGED_IN, "Invalid auth status");
+    auth_status_ = AuthStatus::NONE;
+    ASSERT_LOG(current_auth_token, "Logout called, but user has no current token.");
+    server_.auth().invalidate_token(current_auth_token);
+    current_auth_token = nullptr;
+    return {};
 }
 
 API::json API::system_overview(const API::json &req)
@@ -175,9 +159,10 @@ API::json API::get_logs(const json &req)
 
 bool API::allowed(const std::string &cmd)
 {
-    if (cmd == "get_leosac_version" || cmd == "create_auth_token" ||
-        cmd == "authenticate_with_token")
+    if (cmd == "get_leosac_version")
         return true;
+    if (cmd == "create_auth_token" || cmd == "authenticate_with_token")
+        return auth_status_ != AuthStatus::LOGGED_IN;
     return auth_status_ == AuthStatus::LOGGED_IN;
 }
 

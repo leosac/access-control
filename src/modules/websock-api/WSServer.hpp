@@ -33,6 +33,30 @@ namespace Module
 {
 namespace WebSockAPI
 {
+using json = nlohmann::json;
+
+/**
+ * A message sent by the server to a client.
+ */
+struct ServerMessage
+{
+    StatusCode status_code;
+    std::string status_string;
+    std::string uuid;
+    std::string type;
+    json content;
+};
+
+/**
+ * A message sent by a client to Leosac.
+ */
+struct ClientMessage
+{
+    std::string uuid;
+    std::string type;
+    json content;
+};
+
 class WSServer
 {
   public:
@@ -74,19 +98,42 @@ class WSServer
     CoreUtilsPtr core_utils();
 
   private:
-    using json = nlohmann::json;
-
     void on_open(websocketpp::connection_hdl hdl);
 
     void on_close(websocketpp::connection_hdl hdl);
 
+    /**
+     * A websocket message has been received.
+     *
+     * At this point, all error handling happens through the use of exception.
+     * Non-exceptional event, such as:
+     *   + Malformed packet
+     *   + Unsuficient permission to perform a given API call
+     *   + ...
+     * are also reported through exceptions.
+     *
+     * While this may not be the best performance wise, it's
+     * unlikely to be a bottleneck, but it helps keep things clean.
+     */
     void on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg);
+
+    /**
+     * Create a ClientMessage object from a json request.
+     */
+    ClientMessage parse_request(json &in);
+
+    /**
+     * Send a message over a connection.
+     * @param hdl The connection
+     * @param msg The message.
+     */
+    void send_message(websocketpp::connection_hdl hdl, const ServerMessage &msg);
 
     /**
      * Process a request from a client.
      * The proper implementation method of WebSockAPI::API is called.
      */
-    json dispatch_request(APIPtr api_handle, json &in);
+    json dispatch_request(APIPtr api_handle, const ClientMessage &in);
 
     ConnectionAPIMap connection_api_;
     APIAuth auth_;
