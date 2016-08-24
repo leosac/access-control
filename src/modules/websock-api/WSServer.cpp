@@ -18,6 +18,7 @@
 */
 
 #include "WSServer.hpp"
+#include "exception/ExceptionsTools.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
 
@@ -77,10 +78,16 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     try
     {
         json rep;
+        throw Auth::TokenExpired(std::make_shared<Auth::Token>());
 
         rep["content"] = dispatch_request(api_handle, req);
         rep["uuid"]    = req["uuid"];
         srv_.send(hdl, rep.dump(4), websocketpp::frame::opcode::text);
+    }
+    catch (const LEOSACException &e)
+    {
+        WARN("Leosac specific exception has been caught: " << e.what() << std::endl
+                                                           << e.trace().str());
     }
     catch (const odb::exception &e)
     {

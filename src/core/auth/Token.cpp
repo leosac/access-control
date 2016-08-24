@@ -52,8 +52,12 @@ TokenExpired::TokenExpired(TokenPtr token)
 std::string TokenExpired::build_msg(TokenPtr token)
 {
     std::stringstream ss;
-    ss << "Token " << token->token() << ", owned by user " << token->owner()->id()
-       << " expired on " << token->expiration();
+    ss << "Token " << token->token();
 
+    if (token->owner())
+        ss << ", owned by user " << token->owner()->id();
+    else
+        ss << ", with no owner ";
+    ss << " expired on " << token->expiration();
     return ss.str();
 }

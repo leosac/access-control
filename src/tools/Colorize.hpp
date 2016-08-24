@@ -65,6 +65,7 @@ std::string underline(const T &in)
 {
     return detail::format("4", in);
 }
+
 template <typename T>
 std::string red(const T &in)
 {
@@ -72,9 +73,33 @@ std::string red(const T &in)
 }
 
 template <typename T>
+std::string bright_red(const T &in)
+{
+    return detail::format("31;1", in);
+}
+
+template <typename T>
 std::string green(const T &in)
 {
     return detail::format("32", in);
+}
+
+template <typename T>
+std::string bright_green(const T &in)
+{
+    return detail::format("32;2", in);
+}
+
+template <typename T>
+std::string cyan(const T &in)
+{
+    return detail::format("36", in);
+}
+
+template <typename T>
+std::string bright_cyan(const T &in)
+{
+    return detail::format("36;6", in);
 }
 }
 }

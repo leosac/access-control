@@ -56,6 +56,7 @@ set(LEOSAC_LIB_SRCS
     tools/DatabaseLogSink.cpp
     tools/ElapsedTimeCounter.cpp
     tools/XmlNodeNameEnforcer.cpp
+    tools/Stacktrace.cpp
     tools/db/LogEntry.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
@@ -140,7 +141,7 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -g -Wl,-z,now")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -g3 -Wl,-z,now")
     endif()
 endif()
 
@@ -166,9 +167,9 @@ set_target_properties(${LEOSAC_BIN} PROPERTIES
 set_target_properties(${LEOSAC_LIB} PROPERTIES
     COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
-target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
+target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
-        ${ODB_LIBRARIES} odb-boost odb-mysql)
+        ${ODB_LIBRARIES} odb-boost odb-mysql backtrace)
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

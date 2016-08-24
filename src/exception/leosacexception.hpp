@@ -26,15 +26,23 @@
 #ifndef LEOSACEXCEPTION_HPP
 #define LEOSACEXCEPTION_HPP
 
+#include "tools/Stacktrace.hpp"
 #include <cstddef>
 #include <exception>
 #include <string>
 
+/**
+ * A base class for Leosac specific expection.
+ *
+ * This exception class store a stacktrace of the program at the time it was
+ * instanciated (not at the time it was thrown).
+ */
 class LEOSACException : public std::exception
 {
   public:
     explicit LEOSACException(const std::string &message)
         : _message(message)
+        , trace_(2) // Skip 2 frames. The LeosacException ctor and Stacktrace ctor.
     {
     }
     virtual ~LEOSACException()
@@ -45,8 +53,17 @@ class LEOSACException : public std::exception
         return (_message.c_str());
     }
 
+    /**
+     * Get the stacktrace associated with this exception.
+     */
+    const Leosac::Tools::Stacktrace trace() const
+    {
+        return trace_;
+    }
+
   private:
     const std::string _message;
+    Leosac::Tools::Stacktrace trace_;
 };
 
 #include "configexception.hpp"

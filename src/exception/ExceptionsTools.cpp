@@ -18,9 +18,8 @@
 */
 
 #include "ExceptionsTools.hpp"
+#include "tools/Colorize.hpp"
 #include "tools/log.hpp"
-#include <exception>
-#include <iostream>
 
 namespace
 {
@@ -56,7 +55,7 @@ void Leosac::print_exception(const std::exception &e, int level /* = 0 */)
     }
     catch (...)
     {
-        std::cerr << "unkown exception type" << std::endl;
+        std::cerr << "Unknown exception type." << std::endl;
     }
 }
 
@@ -73,6 +72,6 @@ void Leosac::log_exception(const std::exception &e, int level /* = 0 */)
     }
     catch (...)
     {
-        ERROR("unkown exception type");
+        ERROR("Unknown exception type.");
     }
 }
