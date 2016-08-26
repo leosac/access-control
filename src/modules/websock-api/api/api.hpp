@@ -159,6 +159,30 @@ class API
      */
     json user_get(const json &req);
 
+
+    /**
+     * Retrieve information about a group.
+     *
+     * Request:
+     *     + `group_id`: Group we want information about. Required.
+     *
+     * Response:
+     *     + ...
+     */
+    json group_get(const json &req);
+
+
+    /**
+     * Retrieve information about a group.
+     *
+     * Request:
+     *     + `membership_id`: The id of the membership to look up. Required
+     *
+     * Response:
+     *     + ...
+     */
+    json membership_get(const json &req);
+
     /**
      * A hook that is called before a request processing method
      * will be invoked.

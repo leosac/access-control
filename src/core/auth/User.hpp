@@ -22,6 +22,7 @@
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/CredentialValidity.hpp"
 #include "core/auth/Interfaces/IAccessProfile.hpp"
+#include "core/auth/UserGroupMembership.hpp"
 #include "tools/db/database.hpp"
 #include <memory>
 
@@ -33,7 +34,7 @@ namespace Auth
 /**
 * Represent a user
 */
-#pragma db object pointer(std::shared_ptr)
+#pragma db object
 class User
 {
   public:
@@ -78,6 +79,15 @@ class User
     */
     bool is_valid() const;
 
+    /**
+     * Retrieve the UserGroupMembership that this user is
+     * involved with.
+     *
+     * While the set is always eagerly loaded, the `group()` and `user()`
+     * method in each Membership will return lazy weak pointer.
+     */
+    const UserGroupMembershipSet &group_memberships() const;
+
   protected:
 #pragma db id auto
     UserId id_;
@@ -97,11 +107,8 @@ class User
     std::string lastname_;
     std::string email_;
 
-/**
- * Group member list.
- */
-#pragma db value_not_null inverse(members_)
-    std::vector<GroupWPtr> groups_;
+#pragma db value_not_null inverse(user_)
+    UserGroupMembershipSet membership_;
 
 /**
 * A user can have the same validity than credentials.
@@ -119,4 +126,5 @@ class User
 
 #ifdef ODB_COMPILER
 #include "core/auth/Group.hpp"
+#include "core/auth/UserGroupMembership.hpp"
 #endif

@@ -17,7 +17,7 @@
     </network>
 
     <log>
-      <enable_database>true</enable_database>
+      <enable_database>false</enable_database>
     </log>
 
     <modules>

@@ -34,6 +34,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
+#include <core/auth/Group.hpp>
 #include <fstream>
 #include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
@@ -469,6 +470,7 @@ void Kernel::configure_database()
             uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
             database_             = std::make_shared<odb::mysql::database>(
                 db_user, db_pw, db_dbname, db_host, db_port);
+            database_->tracer(odb::stderr_tracer);
         }
         else
         {
@@ -496,12 +498,18 @@ void Kernel::configure_database()
             {
                 transaction t(database_->begin());
                 schema_catalog::create_schema(*database_, "auth");
-                Auth::User admin;
-                admin.firstname("Admin");
-                admin.lastname("ADMIN");
-                admin.username("admin");
-                admin.password("admin");
+
+                Auth::UserPtr admin = std::make_shared<Auth::User>();
+                admin->firstname("Admin");
+                admin->lastname("ADMIN");
+                admin->username("admin");
+                admin->password("admin");
                 database_->persist(admin);
+
+                Auth::GroupPtr grp = std::make_shared<Auth::Group>();
+                grp->name("Administrator");
+                grp->member_add(admin);
+                database_->persist(grp);
                 t.commit();
             }
         }

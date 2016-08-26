@@ -19,8 +19,11 @@
 
 #include "api.hpp"
 #include "../WSServer.hpp"
+#include "Group_odb.h"
 #include "Token_odb.h"
+#include "UserGroupMembership_odb.h"
 #include "core/CoreUtils.hpp"
+#include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/kernel.hpp"
 #include "odb_gen/LogEntry_odb.h"
@@ -29,6 +32,7 @@
 #include "odb_gen/User_odb.h"
 #include "tools/leosac.hpp"
 #include <odb/mysql/database.hxx>
+#include <odb/session.hxx>
 #include <odb/sqlite/database.hxx>
 #include <tools/db/LogEntry.hpp>
 
@@ -128,7 +132,7 @@ API::json API::get_logs(const json &req)
     {
         using namespace Tools;
 
-        rep["data"]      = {};
+        rep["data"]      = json::array();
         std::string sort = extract_with_default(req, "sort", "desc");
         int p            = extract_with_default(req, "p", 0);   // page
         int ps           = extract_with_default(req, "ps", 20); // page size
@@ -175,19 +179,89 @@ API::json API::user_get(const API::json &req)
     using query = odb::query<Auth::User>;
     DBPtr db    = server_.core_utils()->database();
     odb::transaction t(db->begin());
+    odb::session s;
     auto uid = req.at("user_id").get<Auth::UserId>();
 
-    auto user_ptr = db->query_one<Auth::User>(query::id == uid);
-    if (user_ptr)
+    Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
+    if (user)
     {
-        rep["status"] = 0;
-        rep["data"]   = {{"id", user_ptr->id()},
-                       {"type", "user"},
-                       {"attributes",
-                        {{"username", user_ptr->username()},
-                         {"firstname", user_ptr->firstname()},
-                         {"lastname", user_ptr->lastname()}}}};
+        json memberships = {};
+        for (const auto &membership : user->group_memberships())
+        {
+            json group_info = {{"id", membership->id()},
+                               {"type", "user-group-membership"}};
+            memberships.push_back(group_info);
+        }
+        rep["data"] = {
+            {"id", user->id()},
+            {"type", "user"},
+            {"attributes",
+             {{"username", user->username()},
+              {"firstname", user->firstname()},
+              {"lastname", user->lastname()}}},
+            {"relationships", {{"memberships", {{"data", memberships}}}}}};
     }
+    t.commit();
+    return rep;
+}
+
+json API::group_get(const json &req)
+{
+    json rep;
+
+    using query = odb::query<Auth::Group>;
+    DBPtr db    = server_.core_utils()->database();
+    odb::transaction t(db->begin());
+    odb::session s;
+    auto gid = req.at("group_id").get<Auth::GroupId>();
+
+    Auth::GroupPtr group = db->query_one<Auth::Group>(query::id == gid);
+    if (group)
+    {
+        json memberships = {};
+        for (const auto &membership : group->user_memberships())
+        {
+            json group_info = {{"id", membership->id()},
+                               {"type", "user-group-membership"}};
+            memberships.push_back(group_info);
+        }
+        rep["data"] = {{"id", group->id()},
+                       {"type", "group"},
+                       {"attributes",
+                        {
+                            {"name", group->name()},
+                        }},
+                       {"relationships", {{"members", {{"data", memberships}}}}}};
+    };
+    t.commit();
+    return rep;
+}
+
+json API::membership_get(const json &req)
+{
+    json rep;
+
+    using query = odb::query<Auth::UserGroupMembership>;
+    DBPtr db    = server_.core_utils()->database();
+    odb::transaction t(db->begin());
+    odb::session s;
+    auto gid = req.at("membership_id").get<Auth::UserGroupMembershipId>();
+
+    Auth::UserGroupMembershipPtr membership =
+        db->query_one<Auth::UserGroupMembership>(query::id == gid);
+    if (membership)
+    {
+        auto timestamp      = boost::posix_time::to_time_t(membership->timestamp());
+        rep["data"]         = {};
+        rep["data"]["id"]   = membership->id();
+        rep["data"]["type"] = "user-group-membership";
+        rep["data"]["attributes"] = {{"rank", static_cast<int>(membership->rank())},
+                                     {"timestamp", timestamp}};
+        rep["data"]["relationships"]["user"] = {
+            {"data", {{"id", membership->user().object_id()}, {"type", "user"}}}};
+        rep["data"]["relationships"]["group"] = {
+            {"data", {{"id", membership->group().object_id()}, {"type", "group"}}}};
+    };
     t.commit();
     return rep;
 }
@@ -197,6 +271,7 @@ void API::hook_before_request()
     if (auth_status_ == AuthStatus::LOGGED_IN)
     {
         odb::core::transaction t(server_.db()->begin());
+        odb::core::session s;
         // Reload token
         server_.db()->reload(current_auth_token);
         // todo reload can throw object_not_persistent.

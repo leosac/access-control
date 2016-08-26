@@ -47,6 +47,7 @@ void DatabaseLogSink::log(const spdlog::details::log_msg &msg)
     entry.timestamp_ = time_point_ptime(msg.time);
     entry.run_id_    = run_id_;
 
+    try
     {
         using namespace odb;
         using namespace odb::core;
@@ -54,5 +55,10 @@ void DatabaseLogSink::log(const spdlog::details::log_msg &msg)
 
         database_->persist(entry);
         t.commit();
+    }
+    catch (const odb::exception &e)
+    {
+        std::cerr << "DatabaseLogSink encountered odb::exception: " << e.what()
+                  << std::endl;
     }
 }

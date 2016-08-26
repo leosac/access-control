@@ -20,7 +20,9 @@ function(odb_compile outvar)
     HEADER_EPILOGUE INLINE_EPILOGUE SOURCE_EPILOGUE
     MULTI_DATABASE
     PROFILE
-    INCLUDE_PREFIX)
+    INCLUDE_PREFIX
+    DEFAULT_POINTER
+          )
   set(multiValueParams FILES INCLUDE DB INCLUDE_REGEX)
 
   cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
@@ -110,6 +112,10 @@ function(odb_compile outvar)
 
   if(PARAM_INCLUDE_PREFIX)
     list(APPEND ODB_ARGS --include-prefix "${PARAM_INCLUDE_PREFIX}")
+  endif()
+
+  if (PARAM_DEFAULT_POINTER)
+      list(APPEND ODB_ARGS --default-pointer "${PARAM_DEFAULT_POINTER}")
   endif()
 
   list(APPEND ODB_ARGS --output-dir "${ODB_COMPILE_OUTPUT_DIR}")

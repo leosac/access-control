@@ -40,6 +40,8 @@ namespace Tools
 class LogEntry
 {
   public:
+    LogEntry() = default;
+
 #pragma db id auto
     unsigned long id_;
 

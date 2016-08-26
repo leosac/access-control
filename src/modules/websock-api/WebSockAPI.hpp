@@ -66,6 +66,13 @@ enum class StatusCode
      * The API method (ie, message's type) does not exist.
      */
     INVALID_CALL = 0x05,
+
+    /**
+     * The request took too long to process.
+     * This is mostly here as a placeholder, as this status_code will mostly
+     * be used internaly by the Javascript web app to signal a lack of response.
+     */
+    TIMEOUT = 0x06,
 };
 
 class MalformedMessage : public LEOSACException

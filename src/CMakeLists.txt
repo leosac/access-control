@@ -30,6 +30,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/AuthTarget.cpp
     core/auth/User.cpp
     core/auth/Token.cpp
+    core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
     core/auth/CredentialValidity.cpp
     dynlib/dynamiclibrary.cpp
@@ -85,6 +86,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         INCLUDE_PREFIX tools/db
         INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
                       %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        DEFAULT_POINTER "std::shared_ptr"
         )
 
 # ODB configuration for auth stuff (User/Group)
@@ -92,6 +94,7 @@ set(OdbCMake_ODB_HEADERS
         core/auth/User.hpp
         core/auth/Group.hpp
         core/auth/Token.hpp
+        core/auth/UserGroupMembership.hpp
         )
 
 set(OdbCMake_SOURCES_AUTH "")
@@ -108,6 +111,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         INCLUDE_PREFIX core/auth/
         INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
                       %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        DEFAULT_POINTER "std::shared_ptr"
         )
 
 ## END ODB CONFIGURATION

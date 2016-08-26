@@ -21,6 +21,7 @@
 #include "Token_odb.h"
 #include "WSServer.hpp"
 #include "core/auth/User.hpp"
+#include "core/auth/UserGroupMembership.hpp"
 #include "odb_gen/User_odb.h"
 #include "tools/GenGuid.h"
 #include "tools/db/database.hpp"
@@ -54,6 +55,7 @@ Auth::TokenPtr APIAuth::authenticate_token(const std::string &token_str) const
 
     auto db = server_.db();
     transaction t(db->begin());
+    session s;
 
     Auth::TokenPtr token(db->query_one<Auth::Token>(query::token == token_str));
     if (token && token->is_valid())

@@ -21,6 +21,8 @@
 #include "exception/ExceptionsTools.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
+#include <odb/mysql/exceptions.hxx>
+#include <odb/sqlite/exceptions.hxx>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -52,6 +54,8 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["system_overview"]         = &API::system_overview;
     handlers_["get_logs"]                = &API::get_logs;
     handlers_["user_get"]                = &API::user_get;
+    handlers_["group_get"]               = &API::group_get;
+    handlers_["membership_get"]          = &API::membership_get;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)

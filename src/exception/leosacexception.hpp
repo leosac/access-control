@@ -56,7 +56,7 @@ class LEOSACException : public std::exception
     /**
      * Get the stacktrace associated with this exception.
      */
-    const Leosac::Tools::Stacktrace trace() const
+    const Leosac::Tools::Stacktrace &trace() const
     {
         return trace_;
     }

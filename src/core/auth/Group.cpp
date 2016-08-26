@@ -18,6 +18,10 @@
 */
 
 #include "Group.hpp"
+#include "Group_odb.h"
+#include "UserGroupMembership_odb.h"
+#include "core/auth/UserGroupMembership.hpp"
+#include "tools/log.hpp"
 
 Leosac::Auth::Group::Group(const std::string &group_name)
     : name_(group_name)
@@ -31,12 +35,24 @@ const std::string &Leosac::Auth::Group::name() const
 
 std::vector<Leosac::Auth::UserPtr> const &Leosac::Auth::Group::members() const
 {
-    return members_;
+    loaded_members_.clear();
+    for (const auto &membership : membership_)
+    {
+        if (membership->user().get_eager())
+            loaded_members_.push_back(membership->user().get_eager());
+    }
+    return loaded_members_;
 }
 
 void Leosac::Auth::Group::member_add(Leosac::Auth::UserPtr m)
 {
-    members_.push_back(m);
+    // members_.push_back(m);
+    // Create a new UserGroupMembership describing the relationship.
+    auto ugm = std::make_shared<UserGroupMembership>();
+    ugm->user(m);
+    ugm->group(shared_from_this());
+    membership_.insert(ugm);
+    ERROR("THERE IS " << membership_.size() << " items in set.");
 }
 
 Leosac::Auth::IAccessProfilePtr Leosac::Auth::Group::profile()
@@ -52,4 +68,43 @@ void Leosac::Auth::Group::profile(Leosac::Auth::IAccessProfilePtr p)
 Leosac::Auth::GroupId Leosac::Auth::Group::id() const
 {
     return id_;
+}
+
+std::vector<Leosac::Auth::UserLPtr> Leosac::Auth::Group::lazy_members() const
+{
+    std::vector<UserLPtr> members;
+    for (const auto &membership : membership_)
+    {
+        ASSERT_LOG(membership->group().object_id() == id_,
+                   "Membership doesn't point to self.");
+        members.push_back(membership->user());
+    }
+    return members;
+}
+
+void Leosac::Auth::Group::name(const std::string &name)
+{
+    name_ = name;
+}
+
+void Leosac::Auth::Group::odb_callback(odb::callback_event e,
+                                       odb::database &db) const
+{
+    if (e == odb::callback_event::post_update ||
+        e == odb::callback_event::post_persist)
+    {
+        for (auto &membership : membership_)
+        {
+            if (membership->id() == 0)
+                db.persist(membership);
+            else
+                db.update(membership);
+        }
+    }
+}
+
+const Leosac::Auth::UserGroupMembershipSet &
+Leosac::Auth::Group::user_memberships() const
+{
+    return membership_;
 }

@@ -18,6 +18,10 @@
 */
 
 #include "core/auth/User.hpp"
+#include "Group_odb.h"
+#include "User_odb.h"
+#include "core/auth/Group.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Auth;
 
@@ -104,4 +108,9 @@ unsigned long User::id() const noexcept
 void User::password(const std::string &pw)
 {
     password_ = pw;
+}
+
+const UserGroupMembershipSet &User::group_memberships() const
+{
+    return membership_;
 }

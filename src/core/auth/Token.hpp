@@ -38,8 +38,7 @@ namespace Auth
  *
  * One token maps to one user.
  */
-#pragma db object pointer(std::shared_ptr)
-
+#pragma db object
 class Token
 {
   public:

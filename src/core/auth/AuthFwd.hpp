@@ -20,19 +20,27 @@
 #pragma once
 
 #include <memory>
+#include <odb/lazy-ptr.hxx>
 
 namespace Leosac
 {
 namespace Auth
 {
 class User;
-using UserPtr = std::shared_ptr<User>;
-using UserId  = unsigned long;
+using UserPtr   = std::shared_ptr<User>;
+using UserLPtr  = odb::lazy_shared_ptr<User>;
+using UserLWPtr = odb::lazy_shared_ptr<User>;
+using UserId    = unsigned long;
 
 class Group;
-using GroupPtr  = std::shared_ptr<Group>;
-using GroupWPtr = std::weak_ptr<Group>;
-using GroupId   = unsigned long;
+using GroupPtr   = std::shared_ptr<Group>;
+using GroupWPtr  = std::weak_ptr<Group>;
+using GroupLWPtr = odb::lazy_weak_ptr<Group>;
+using GroupId    = unsigned long;
+
+
+class UserGroupMembership;
+using UserGroupMembershipPtr = std::shared_ptr<UserGroupMembership>;
 
 class Token;
 using TokenPtr = std::shared_ptr<Token>;
