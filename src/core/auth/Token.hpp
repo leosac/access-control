@@ -115,18 +115,6 @@ class Token
 #pragma db not_null
     ssize_t version_;
 };
-
-/**
- * The authentication token is not valid anymore.
- */
-class TokenExpired : public LEOSACException
-{
-  public:
-    TokenExpired(TokenPtr token);
-
-  private:
-    static std::string build_msg(TokenPtr token);
-};
 }
 }
 

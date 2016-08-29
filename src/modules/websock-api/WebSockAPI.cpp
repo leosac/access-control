@@ -21,6 +21,8 @@
 #include "WSServer.hpp"
 #include "core/CoreAPI.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/auth/Token.hpp"
+#include "core/auth/User.hpp"
 #include <boost/filesystem.hpp>
 #include <tools/XmlPropertyTree.hpp>
 #include <tools/db/database.hpp>
@@ -54,4 +56,33 @@ void WebSockAPIModule::run()
 CoreUtilsPtr WebSockAPIModule::core_utils()
 {
     return utils_;
+}
+
+SessionAborted::SessionAborted()
+    : LEOSACException("Websocket session has been aborted.")
+{
+}
+
+SessionAborted::SessionAborted(Auth::TokenPtr token)
+    : LEOSACException(build_msg(token))
+{
+}
+
+std::string SessionAborted::build_msg(Auth::TokenPtr token)
+{
+    std::stringstream ss;
+    ss << "Websocket session has been aborted.";
+
+    if (!token)
+        ss << "No associated token found.";
+    else
+    {
+        ss << " Token " << token->token();
+        if (token->owner())
+            ss << ", owned by user " << token->owner()->id();
+        else
+            ss << ", with no owner ";
+        ss << " expired on " << token->expiration();
+    }
+    return ss.str();
 }

@@ -91,15 +91,23 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     }
     catch (const InvalidCall &e)
     {
-        response.status_code = StatusCode::INVALID_CALL;
+        response.status_code   = StatusCode::INVALID_CALL;
+        response.status_string = e.what();
     }
     catch (const PermissionDenied &e)
     {
-        response.status_code = StatusCode::PERMISSION_DENIED;
+        response.status_code   = StatusCode::PERMISSION_DENIED;
+        response.status_string = e.what();
     }
     catch (const MalformedMessage &e)
     {
-        response.status_code = StatusCode::MALFORMED;
+        response.status_code   = StatusCode::MALFORMED;
+        response.status_string = e.what();
+    }
+    catch (const SessionAborted &e)
+    {
+        response.status_code   = StatusCode::SESSION_ABORTED;
+        response.status_string = e.what();
     }
     catch (const LEOSACException &e)
     {

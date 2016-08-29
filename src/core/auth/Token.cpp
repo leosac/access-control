@@ -43,21 +43,3 @@ boost::posix_time::ptime Token::expiration() const
 {
     return expiration_;
 }
-
-TokenExpired::TokenExpired(TokenPtr token)
-    : LEOSACException(build_msg(token))
-{
-}
-
-std::string TokenExpired::build_msg(TokenPtr token)
-{
-    std::stringstream ss;
-    ss << "Token " << token->token();
-
-    if (token->owner())
-        ss << ", owned by user " << token->owner()->id();
-    else
-        ss << ", with no owner ";
-    ss << " expired on " << token->expiration();
-    return ss.str();
-}

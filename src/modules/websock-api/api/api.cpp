@@ -65,11 +65,11 @@ API::json API::create_auth_token(const API::json &req)
 
     if (token)
     {
-        rep["status"]      = 0;
-        rep["user_id"]     = token->owner()->id();
-        rep["token"]       = token->token();
-        auth_status_       = AuthStatus::LOGGED_IN;
-        current_auth_token = token;
+        rep["status"]       = 0;
+        rep["user_id"]      = token->owner()->id();
+        rep["token"]        = token->token();
+        auth_status_        = AuthStatus::LOGGED_IN;
+        current_auth_token_ = token;
     }
     else
     {
@@ -87,11 +87,11 @@ API::json API::authenticate_with_token(const API::json &req)
     auto token = server_.auth().authenticate_token(req.at("token"));
     if (token)
     {
-        rep["status"]      = 0;
-        rep["user_id"]     = token->owner()->id();
-        rep["username"]    = token->owner()->username();
-        auth_status_       = AuthStatus::LOGGED_IN;
-        current_auth_token = token;
+        rep["status"]       = 0;
+        rep["user_id"]      = token->owner()->id();
+        rep["username"]     = token->owner()->username();
+        auth_status_        = AuthStatus::LOGGED_IN;
+        current_auth_token_ = token;
     }
     else
     {
@@ -105,9 +105,9 @@ API::json API::logout(const API::json &)
 {
     ASSERT_LOG(auth_status_ == AuthStatus::LOGGED_IN, "Invalid auth status");
     auth_status_ = AuthStatus::NONE;
-    ASSERT_LOG(current_auth_token, "Logout called, but user has no current token.");
-    server_.auth().invalidate_token(current_auth_token);
-    current_auth_token = nullptr;
+    ASSERT_LOG(current_auth_token_, "Logout called, but user has no current token.");
+    server_.auth().invalidate_token(current_auth_token_);
+    current_auth_token_ = nullptr;
     return {};
 }
 
@@ -273,15 +273,32 @@ void API::hook_before_request()
         odb::core::transaction t(server_.db()->begin());
         odb::core::session s;
         // Reload token
-        server_.db()->reload(current_auth_token);
-        // todo reload can throw object_not_persistent.
+        try
+        {
+            server_.db()->reload(current_auth_token_);
+        }
+        catch (const odb::object_not_persistent &e)
+        {
+            // Token doesn't exist anymore.
+            abort_session();
+            throw SessionAborted(nullptr);
+        }
 
         // todo change status to not logged if failed.
-        if (!current_auth_token->is_valid())
-            throw Auth::TokenExpired(current_auth_token);
+        if (!current_auth_token_->is_valid())
+        {
+            abort_session();
+            throw SessionAborted(current_auth_token_);
+        }
 
-        current_auth_token->expire_in(std::chrono::minutes(20));
-        server_.db()->update(*current_auth_token);
+        current_auth_token_->expire_in(std::chrono::minutes(20));
+        server_.db()->update(*current_auth_token_);
         t.commit();
     }
+}
+
+void API::abort_session()
+{
+    auth_status_        = AuthStatus::NONE;
+    current_auth_token_ = nullptr;
 }

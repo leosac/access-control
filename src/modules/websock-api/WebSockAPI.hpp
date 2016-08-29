@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/auth/AuthFwd.hpp"
 #include "modules/BaseModule.hpp"
 #include <tools/db/db_fwd.hpp>
 
@@ -73,6 +74,13 @@ enum class StatusCode
      * be used internaly by the Javascript web app to signal a lack of response.
      */
     TIMEOUT = 0x06,
+
+    /**
+     * The session has been aborted.
+     * This is likely due to the expiration of the token used to
+     * authenticate.
+     */
+    SESSION_ABORTED = 0x07,
 };
 
 class MalformedMessage : public LEOSACException
@@ -94,6 +102,26 @@ class InvalidCall : public LEOSACException
   public:
     InvalidCall()
         : LEOSACException("Unknown message type."){};
+};
+
+class SessionAborted : public LEOSACException
+{
+  public:
+    SessionAborted();
+
+    /**
+     * Aborted due to invalid/expired token.
+     * @param token
+     * @return
+     */
+    SessionAborted(Auth::TokenPtr token);
+
+  private:
+    /**
+     * Build an exception message for when the reason of the aborted
+     * session is an expired token.
+     */
+    std::string build_msg(Auth::TokenPtr token);
 };
 
 class WebSockAPIModule : public BaseModule

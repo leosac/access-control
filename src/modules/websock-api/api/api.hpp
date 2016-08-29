@@ -195,6 +195,13 @@ class API
 
   private:
     /**
+     * Abort the current websocket session.
+     *
+     * This means that we reset the authentication status.
+     */
+    void abort_session();
+
+    /**
      * Extract the value of a key from a json object.
      *
      * If the key cannot be found, this function returns the default
@@ -231,7 +238,7 @@ class API
     /**
      * The token we are authenticated with.
      */
-    Auth::TokenPtr current_auth_token;
+    Auth::TokenPtr current_auth_token_;
 };
 
 using APIPtr = std::shared_ptr<API>;
