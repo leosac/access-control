@@ -173,8 +173,14 @@ bool API::allowed(const std::string &cmd)
 API::json API::user_get(const API::json &req)
 {
     json rep;
-
     // todo add security.
+
+
+    // checker->add_condition([](const API::json &req){
+    //    return req["user_id"] == current_auth_token->owner_id();
+    // });
+
+    // checker->check(req);
 
     using query = odb::query<Auth::User>;
     DBPtr db    = server_.core_utils()->database();
@@ -201,6 +207,8 @@ API::json API::user_get(const API::json &req)
               {"lastname", user->lastname()}}},
             {"relationships", {{"memberships", {{"data", memberships}}}}}};
     }
+    else
+        throw EntityNotFound(uid, "user");
     t.commit();
     return rep;
 }
@@ -232,7 +240,7 @@ json API::group_get(const json &req)
                             {"name", group->name()},
                         }},
                        {"relationships", {{"members", {{"data", memberships}}}}}};
-    };
+    }
     t.commit();
     return rep;
 }
@@ -284,7 +292,6 @@ void API::hook_before_request()
             throw SessionAborted(nullptr);
         }
 
-        // todo change status to not logged if failed.
         if (!current_auth_token_->is_valid())
         {
             abort_session();

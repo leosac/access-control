@@ -109,6 +109,13 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         response.status_code   = StatusCode::SESSION_ABORTED;
         response.status_string = e.what();
     }
+    catch (const EntityNotFound &e)
+    {
+        response.status_code            = StatusCode::ENTITY_NOT_FOUND;
+        response.status_string          = e.what();
+        response.content["entity_id"]   = e.entity_id();
+        response.content["entity_type"] = e.entity_type();
+    }
     catch (const LEOSACException &e)
     {
         WARN("Leosac specific exception has been caught: " << e.what() << std::endl

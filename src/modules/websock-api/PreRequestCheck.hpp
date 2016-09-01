@@ -17,31 +17,32 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Token.hpp"
-#include "User_odb.h"
-#include "core/auth/User.hpp"
-#include "tools/log.hpp"
+#pragma once
 
-using namespace Leosac;
-using namespace Leosac::Auth;
+#include <vector>
 
-const std::string &Token::token() const
+namespace Leosac
 {
-    return token_;
+namespace Module
+{
+namespace WebSockAPI
+{
+
+template <typename ConditionParams...>
+class RequestCondition
+{
+  public:
+    virtual ~RequestCondition() = default;
+};
+
+class PreRequestCheck
+{
+  public:
+    void check(const API::json &req);
+
+  private:
+    std::vector<RequestCondition> conditions_;
+};
 }
-
-bool Token::is_valid() const
-{
-    auto now = boost::posix_time::second_clock::local_time();
-    return expiration_ >= now;
 }
-
-UserPtr Token::owner() const
-{
-    return owner_;
-}
-
-boost::posix_time::ptime Token::expiration() const
-{
-    return expiration_;
 }

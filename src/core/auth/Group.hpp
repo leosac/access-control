@@ -76,7 +76,6 @@ class Group : public std::enable_shared_from_this<Group>
      */
     const UserGroupMembershipSet &user_memberships() const;
 
-
   private:
     friend class odb::access;
 
@@ -94,9 +93,9 @@ class Group : public std::enable_shared_from_this<Group>
     UserGroupMembershipSet membership_;
 
 /**
- * This is a vector of loaded User object.
+ * This returns a vector of loaded User object.
  * When `members()` is called, this vector is populated by copying
- * some pointers from members_.
+ * some pointers from membership_.
  */
 #pragma db transient
     mutable std::vector<UserPtr> loaded_members_;
