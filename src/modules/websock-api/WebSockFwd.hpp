@@ -21,15 +21,25 @@
 
 #include <memory>
 
-namespace odb
-{
-class database;
-}
-
 namespace Leosac
 {
-using DBPtr = std::shared_ptr<odb::database>;
+namespace Module
+{
+namespace WebSockAPI
+{
+class APISession;
+using APIPtr = std::shared_ptr<APISession>;
 
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+class MethodHandler;
+using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
+
+class WSServer;
+
+namespace Conditions
+{
+class ConditionBase;
+using ConditionPtr = std::shared_ptr<ConditionBase>;
+}
+}
+}
 }

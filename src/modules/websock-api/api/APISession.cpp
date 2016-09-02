@@ -17,19 +17,17 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "api.hpp"
-#include "../WSServer.hpp"
+#include "APISession.hpp"
+#include "Exceptions.hpp"
 #include "Group_odb.h"
 #include "Token_odb.h"
 #include "UserGroupMembership_odb.h"
+#include "User_odb.h"
+#include "WSServer.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/kernel.hpp"
-#include "odb_gen/LogEntry_odb.h"
-#include "odb_gen/LogEntry_odb_mysql.h"
-#include "odb_gen/LogEntry_odb_sqlite.h"
-#include "odb_gen/User_odb.h"
 #include "tools/leosac.hpp"
 #include <odb/mysql/database.hxx>
 #include <odb/session.hxx>
@@ -40,20 +38,20 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-API::API(WSServer &server)
+APISession::APISession(WSServer &server)
     : server_(server)
     , auth_status_(AuthStatus::NONE)
 {
 }
 
-API::json API::get_leosac_version(const json &)
+APISession::json APISession::get_leosac_version(const json &)
 {
     json ret;
     ret["version"] = getVersionString();
     return ret;
 }
 
-API::json API::create_auth_token(const API::json &req)
+APISession::json APISession::create_auth_token(const APISession::json &req)
 {
     json rep;
     ASSERT_LOG(auth_status_ == AuthStatus::NONE, "Invalid auth status.");
@@ -79,7 +77,7 @@ API::json API::create_auth_token(const API::json &req)
     return rep;
 }
 
-API::json API::authenticate_with_token(const API::json &req)
+APISession::json APISession::authenticate_with_token(const APISession::json &req)
 {
     json rep;
     ASSERT_LOG(auth_status_ == AuthStatus::NONE, "Invalid auth status.");
@@ -101,7 +99,7 @@ API::json API::authenticate_with_token(const API::json &req)
     return rep;
 }
 
-API::json API::logout(const API::json &)
+APISession::json APISession::logout(const APISession::json &)
 {
     ASSERT_LOG(auth_status_ == AuthStatus::LOGGED_IN, "Invalid auth status");
     auth_status_ = AuthStatus::NONE;
@@ -111,7 +109,7 @@ API::json API::logout(const API::json &)
     return {};
 }
 
-API::json API::system_overview(const API::json &req)
+APISession::json APISession::system_overview(const APISession::json &)
 {
     json rep;
     auto core_api = server_.core_utils()->core_api();
@@ -124,44 +122,7 @@ API::json API::system_overview(const API::json &req)
     return rep;
 }
 
-API::json API::get_logs(const json &req)
-{
-    json rep;
-    DBPtr db = server_.core_utils()->database();
-    if (db)
-    {
-        using namespace Tools;
-
-        rep["data"]      = json::array();
-        std::string sort = extract_with_default(req, "sort", "desc");
-        int p            = extract_with_default(req, "p", 0);   // page
-        int ps           = extract_with_default(req, "ps", 20); // page size
-        if (ps <= 0)
-            ps = 1;
-
-        LogEntry::QueryResult result = LogEntry::retrieve(db, p, ps, sort == "asc");
-        for (Tools::LogEntry &entry : result.entries)
-        {
-            auto timestamp = boost::posix_time::to_time_t(entry.timestamp_);
-            rep["data"].push_back(
-                {{"id", entry.id_},
-                 {"type", "log-message"},
-                 {"attributes",
-                  {{"message", entry.msg_}, {"timestamp", timestamp}}}});
-        }
-
-        rep["meta"] = {
-            {"total", result.total}, {"last", result.last}, {"first", result.first}};
-        rep["status"] = 0;
-    }
-    else
-    {
-        rep["status"] = -1;
-    }
-    return rep;
-}
-
-bool API::allowed(const std::string &cmd)
+bool APISession::allowed(const std::string &cmd)
 {
     if (cmd == "get_leosac_version")
         return true;
@@ -170,50 +131,7 @@ bool API::allowed(const std::string &cmd)
     return auth_status_ == AuthStatus::LOGGED_IN;
 }
 
-API::json API::user_get(const API::json &req)
-{
-    json rep;
-    // todo add security.
-
-
-    // checker->add_condition([](const API::json &req){
-    //    return req["user_id"] == current_auth_token->owner_id();
-    // });
-
-    // checker->check(req);
-
-    using query = odb::query<Auth::User>;
-    DBPtr db    = server_.core_utils()->database();
-    odb::transaction t(db->begin());
-    odb::session s;
-    auto uid = req.at("user_id").get<Auth::UserId>();
-
-    Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
-    if (user)
-    {
-        json memberships = {};
-        for (const auto &membership : user->group_memberships())
-        {
-            json group_info = {{"id", membership->id()},
-                               {"type", "user-group-membership"}};
-            memberships.push_back(group_info);
-        }
-        rep["data"] = {
-            {"id", user->id()},
-            {"type", "user"},
-            {"attributes",
-             {{"username", user->username()},
-              {"firstname", user->firstname()},
-              {"lastname", user->lastname()}}},
-            {"relationships", {{"memberships", {{"data", memberships}}}}}};
-    }
-    else
-        throw EntityNotFound(uid, "user");
-    t.commit();
-    return rep;
-}
-
-json API::group_get(const json &req)
+json APISession::group_get(const json &req)
 {
     json rep;
 
@@ -245,7 +163,7 @@ json API::group_get(const json &req)
     return rep;
 }
 
-json API::membership_get(const json &req)
+json APISession::membership_get(const json &req)
 {
     json rep;
 
@@ -274,7 +192,7 @@ json API::membership_get(const json &req)
     return rep;
 }
 
-void API::hook_before_request()
+void APISession::hook_before_request()
 {
     if (auth_status_ == AuthStatus::LOGGED_IN)
     {
@@ -304,8 +222,22 @@ void API::hook_before_request()
     }
 }
 
-void API::abort_session()
+void APISession::abort_session()
 {
     auth_status_        = AuthStatus::NONE;
     current_auth_token_ = nullptr;
+}
+
+Auth::UserId APISession::current_user_id() const
+{
+    if (current_auth_token_)
+        return current_auth_token_->owner()->id();
+    return 0;
+}
+
+Auth::UserPtr APISession::current_user() const
+{
+    if (current_auth_token_)
+        return current_auth_token_->owner();
+    return nullptr;
 }

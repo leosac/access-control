@@ -17,19 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "ConditionBase.hpp"
+#include "tools/log.hpp"
 
-#include <memory>
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
+using namespace Leosac::Module::WebSockAPI::Conditions;
 
-namespace odb
+ConditionBase::ConditionBase(RequestContext rctx)
+    : ctx_(rctx)
 {
-class database;
-}
-
-namespace Leosac
-{
-using DBPtr = std::shared_ptr<odb::database>;
-
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
 }

@@ -21,7 +21,8 @@
 
 #include "WebSockAPI.hpp"
 #include "api/APIAuth.hpp"
-#include "api/api.hpp"
+#include "api/APISession.hpp"
+#include "api/MethodHandler.hpp"
 #include "tools/db/db_fwd.hpp"
 #include <set>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -141,7 +142,9 @@ class WSServer
     /**
      * This maps (string) command name to API method.
      */
-    std::map<std::string, json (API::*)(const json &)> handlers_;
+    std::map<std::string, json (APISession::*)(const json &)> handlers_;
+
+    std::map<std::string, MethodHandler::Factory> handlers2_;
 
     /**
      * Handler to the database.

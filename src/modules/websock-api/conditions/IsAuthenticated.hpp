@@ -19,17 +19,28 @@
 
 #pragma once
 
-#include <memory>
-
-namespace odb
-{
-class database;
-}
+#include "ConditionBase.hpp"
 
 namespace Leosac
 {
-using DBPtr = std::shared_ptr<odb::database>;
+namespace Module
+{
+namespace WebSockAPI
+{
+namespace Conditions
+{
+/**
+ * A `Condition` that will return true is authenticated against
+ * Leosac.
+ */
+class IsAuthenticated : public ConditionBase
+{
+  public:
+    IsAuthenticated(RequestContext ctx);
 
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+    bool operator()();
+};
+}
+}
+}
 }

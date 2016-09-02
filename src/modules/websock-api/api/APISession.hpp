@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <core/auth/AuthFwd.hpp>
+#include "core/auth/AuthFwd.hpp"
 #include <json.hpp>
 #include <memory>
 
@@ -38,7 +38,7 @@ class WSServer;
  *
  * One objected is instantiated per websocket client.
  */
-class API
+class APISession
 {
   public:
     using json = nlohmann::json;
@@ -52,9 +52,21 @@ class API
         LOGGED_IN
     };
 
-    API(WSServer &server);
-    API(const API &) = delete;
-    API(API &&)      = delete;
+    APISession(WSServer &server);
+    APISession(const APISession &) = delete;
+    APISession(APISession &&)      = delete;
+
+    /**
+     * Retrieve the UserId of the user associated with this API session.
+     * @return User Id or 0 if the session is not authenticated.
+     */
+    Auth::UserId current_user_id() const;
+
+    /**
+     * Retrieve the user associated with the session, or nullptr.
+     * @return Pointer to current user, or nullptr.
+     */
+    Auth::UserPtr current_user() const;
 
     /**
      * Is this API client allowed to perform the request `cmd` ?
@@ -74,7 +86,7 @@ class API
     json get_leosac_version(const json &);
 
     /**
-     * Generate an authentication token using the user crendetial,
+     * Generate an authentication token using the user credential,
      * and logs the user in on success.
      *
      * Request:
@@ -134,33 +146,6 @@ class API
     json system_overview(const json &req);
 
     /**
-     * Retrieve (part of) the logs generated Leosac. In order for this call
-     * to work, SQLite logging must be enabled.
-     *
-     * Request:
-     *     + `p`: The page number. Starts at 0.
-     *     + `ps`: Page size: the number of item per page. Default to 20.
-     *     + `sort`: Either 'asc' or 'desc'.
-     *
-     * Response:
-     *     + ...
-     */
-    json get_logs(const json &req);
-
-
-    /**
-     * Retrieve information about a given user.
-     *
-     * Request:
-     *     + `user_id`: The user_id of the user we want to fetch. Required.
-     *
-     * Response:
-     *     + ...
-     */
-    json user_get(const json &req);
-
-
-    /**
      * Retrieve information about a group.
      *
      * Request:
@@ -202,34 +187,6 @@ class API
     void abort_session();
 
     /**
-     * Extract the value of a key from a json object.
-     *
-     * If the key cannot be found, this function returns the default
-     * value instead.
-     */
-    template <typename T>
-    typename std::enable_if<!std::is_same<const char *, T>::value, T>::type
-    extract_with_default(const json &obj, const std::string &key, T default_value)
-    {
-        T ret = default_value;
-        try
-        {
-            ret = obj.at(key).get<T>();
-        }
-        catch (const std::out_of_range &e)
-        {
-        }
-        return ret;
-    }
-
-    template <typename T>
-    typename std::enable_if<std::is_same<const char *, T>::value, std::string>::type
-    extract_with_default(const json &obj, const std::string &key, T default_value)
-    {
-        return extract_with_default<std::string>(obj, key, default_value);
-    }
-
-    /**
      * The API server.
      */
     WSServer &server_;
@@ -240,8 +197,6 @@ class API
      */
     Auth::TokenPtr current_auth_token_;
 };
-
-using APIPtr = std::shared_ptr<API>;
 }
 }
 }

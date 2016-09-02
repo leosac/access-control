@@ -19,10 +19,10 @@
 
 #include "APIAuth.hpp"
 #include "Token_odb.h"
+#include "User_odb.h"
 #include "WSServer.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
-#include "odb_gen/User_odb.h"
 #include "tools/GenGuid.h"
 #include "tools/db/database.hpp"
 #include <algorithm>

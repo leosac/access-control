@@ -59,6 +59,7 @@ set(LEOSAC_LIB_SRCS
     tools/XmlNodeNameEnforcer.cpp
     tools/Stacktrace.cpp
     tools/db/LogEntry.cpp
+    tools/db/DBService.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -77,7 +78,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         FILES ${OdbCMake_ODB_HEADERS}
         MULTI_DATABASE dynamic
         DB mysql sqlite
-        STANDARD "c++11"
+        STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME tools
@@ -102,7 +103,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         FILES ${OdbCMake_ODB_HEADERS}
         MULTI_DATABASE dynamic
         DB mysql sqlite
-        STANDARD "c++11"
+        STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME auth

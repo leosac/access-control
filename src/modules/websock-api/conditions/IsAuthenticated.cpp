@@ -17,19 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "IsAuthenticated.hpp"
+#include "api/APISession.hpp"
+#include "core/auth/User.hpp"
 
-#include <memory>
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
+using namespace Leosac::Module::WebSockAPI::Conditions;
 
-namespace odb
+IsAuthenticated::IsAuthenticated(RequestContext ctx)
+    : ConditionBase(ctx)
 {
-class database;
 }
 
-namespace Leosac
+bool IsAuthenticated::operator()()
 {
-using DBPtr = std::shared_ptr<odb::database>;
-
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+    return !!ctx_.session->current_user();
 }

@@ -17,19 +17,22 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "api/MethodHandler.hpp"
 
-#include <memory>
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
 
-namespace odb
+json MethodHandler::process(const json &req)
 {
-class database;
-}
+    for (const auto &condition_group : conditions_)
+    {
+        bool success = false;
+        for (const auto &condition : condition_group.first)
+            success |= condition(req);
 
-namespace Leosac
-{
-using DBPtr = std::shared_ptr<odb::database>;
-
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+        if (!success)
+            condition_group.second();
+    }
+    return process_impl(req);
 }

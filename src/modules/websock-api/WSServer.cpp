@@ -18,7 +18,11 @@
 */
 
 #include "WSServer.hpp"
+#include "Exceptions.hpp"
+#include "api/LogGet.hpp"
+#include "api/UserGet.hpp"
 #include "exception/ExceptionsTools.hpp"
+#include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
 #include <odb/mysql/exceptions.hxx>
@@ -47,21 +51,22 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     // clear all logs.
     // srv_.clear_access_channels(websocketpp::log::alevel::all);
 
-    handlers_["get_leosac_version"]      = &API::get_leosac_version;
-    handlers_["create_auth_token"]       = &API::create_auth_token;
-    handlers_["authenticate_with_token"] = &API::authenticate_with_token;
-    handlers_["logout"]                  = &API::logout;
-    handlers_["system_overview"]         = &API::system_overview;
-    handlers_["get_logs"]                = &API::get_logs;
-    handlers_["user_get"]                = &API::user_get;
-    handlers_["group_get"]               = &API::group_get;
-    handlers_["membership_get"]          = &API::membership_get;
+    handlers_["get_leosac_version"]      = &APISession::get_leosac_version;
+    handlers_["create_auth_token"]       = &APISession::create_auth_token;
+    handlers_["authenticate_with_token"] = &APISession::authenticate_with_token;
+    handlers_["logout"]                  = &APISession::logout;
+    handlers_["system_overview"]         = &APISession::system_overview;
+    handlers_["group_get"]               = &APISession::group_get;
+    handlers_["membership_get"]          = &APISession::membership_get;
+
+    handlers2_["user_get"] = &UserGet::create;
+    handlers2_["get_logs"] = &LogGet::create;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
 {
     INFO("New WebSocket connection !");
-    connection_api_.insert(std::make_pair(hdl, std::make_shared<API>(*this)));
+    connection_api_.insert(std::make_pair(hdl, std::make_shared<APISession>(*this)));
 }
 
 void WSServer::on_close(websocketpp::connection_hdl hdl)
@@ -161,25 +166,47 @@ APIAuth &WSServer::auth()
 
 json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
 {
-    auto handler_method = handlers_.find(in.type);
+    bool notfound        = false;
+    auto handler_factory = handlers2_.find(in.type);
 
-    if (handler_method == handlers_.end())
+    if (handler_factory == handlers2_.end())
     {
-        throw InvalidCall();
+        notfound = true;
     }
     else
     {
-        if (api_handle->allowed(in.type))
+        RequestContext ctx{.session = api_handle,
+                           .dbsrv   = std::make_shared<DBService>(db_),
+                           .server  = *this};
+
+        MethodHandlerUPtr method_handler = handler_factory->second(ctx);
+        return method_handler->process(in.content);
+    }
+
+    if (notfound)
+    {
+        auto handler_method = handlers_.find(in.type);
+
+        if (handler_method == handlers_.end())
         {
-            api_handle->hook_before_request();
-            auto method_ptr = handler_method->second;
-            return ((*api_handle).*method_ptr)(in.content);
+            throw InvalidCall();
         }
         else
         {
-            throw PermissionDenied();
+            if (api_handle->allowed(in.type))
+            {
+                api_handle->hook_before_request();
+                auto method_ptr = handler_method->second;
+                return ((*api_handle).*method_ptr)(in.content);
+            }
+            else
+            {
+                throw PermissionDenied();
+            }
         }
     }
+    if (notfound)
+        throw InvalidCall();
     return {};
 }
 

@@ -19,17 +19,33 @@
 
 #pragma once
 
-#include <memory>
-
-namespace odb
-{
-class database;
-}
+#include "ConditionBase.hpp"
 
 namespace Leosac
 {
-using DBPtr = std::shared_ptr<odb::database>;
+namespace Module
+{
+namespace WebSockAPI
+{
+namespace Conditions
+{
+/**
+ * A `Condition` that will return true if the current user is
+ * a Leosac administrator.
+ *
+ * The current user is retrieved from the RequestContext object.
+ */
+class IsCurrentUserAdmin : public ConditionBase
+{
+  public:
+    IsCurrentUserAdmin(RequestContext ctx);
 
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+    /**
+     * Will return wether or not the current user is an administrator.
+     */
+    bool operator()();
+};
+}
+}
+}
 }

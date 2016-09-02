@@ -19,17 +19,38 @@
 
 #pragma once
 
-#include <memory>
-
-namespace odb
-{
-class database;
-}
+#include "MethodHandler.hpp"
 
 namespace Leosac
 {
-using DBPtr = std::shared_ptr<odb::database>;
+namespace Module
+{
+namespace WebSockAPI
+{
+using json = nlohmann::json;
 
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+/**
+ * Retrieve (part of) the logs generated Leosac. In order for this call
+ * to work, SQLite logging must be enabled.
+ *
+ * Request:
+ *     + `p`: The page number. Starts at 0.
+ *     + `ps`: Page size: the number of item per page. Default to 20.
+ *     + `sort`: Either 'asc' or 'desc'.
+ *
+ * Response:
+ *     + ...
+ */
+class LogGet : public MethodHandler
+{
+  public:
+    LogGet(RequestContext ctx);
+
+    static MethodHandlerUPtr create(RequestContext);
+
+  private:
+    virtual json process_impl(const json &req) override;
+};
+}
+}
 }

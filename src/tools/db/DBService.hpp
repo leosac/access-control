@@ -17,19 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include <memory>
-
-namespace odb
-{
-class database;
-}
+#include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {
-using DBPtr = std::shared_ptr<odb::database>;
+/**
+ * Provides various database-related services to consumer.
+ */
+class DBService
+{
+  public:
+    DBService(DBPtr db);
 
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+    DBPtr db() const;
+
+  private:
+    DBPtr database_;
+};
 }

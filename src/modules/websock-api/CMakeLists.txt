@@ -4,8 +4,15 @@ set(WEBSOCK_API_SRCS
         init.cpp
         WebSockAPI.cpp
         WSServer.cpp
-        api/api.cpp
+        Exceptions.cpp
+        api/APISession.cpp
+        api/MethodHandler.cpp
         api/APIAuth.cpp
+        api/UserGet.cpp
+        api/LogGet.cpp
+        conditions/ConditionBase.cpp
+        conditions/IsCurrentUserAdmin.cpp
+        conditions/IsAuthenticated.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED
@@ -13,7 +20,7 @@ add_library(${WEBSOCK_API_BIN} SHARED
         )
 
 set_target_properties(${WEBSOCK_API_BIN} PROPERTIES
-        COMPILE_FLAGS "-std=c++11 -Wno-unknown-pragmas"
+        COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
         )
 
 target_link_libraries(${WEBSOCK_API_BIN}
@@ -31,9 +38,7 @@ target_include_directories(${WEBSOCK_API_BIN}
         # to find our header file.
         ${CMAKE_CURRENT_SOURCE_DIR}/db
 
-        # To access the odb_gen of Leosac's core.
-        ${CMAKE_BINARY_DIR}
-        # And for Generated ODB code to access our headeres
+        # And for Generated ODB code to access our headers
         ${CMAKE_SOURCE_DIR}/src/tools/db
         )
 

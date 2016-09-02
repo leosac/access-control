@@ -21,11 +21,8 @@
 #include "WSServer.hpp"
 #include "core/CoreAPI.hpp"
 #include "core/CoreUtils.hpp"
-#include "core/auth/Token.hpp"
-#include "core/auth/User.hpp"
 #include <boost/filesystem.hpp>
 #include <tools/XmlPropertyTree.hpp>
-#include <tools/db/database.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -56,58 +53,4 @@ void WebSockAPIModule::run()
 CoreUtilsPtr WebSockAPIModule::core_utils()
 {
     return utils_;
-}
-
-SessionAborted::SessionAborted()
-    : LEOSACException("Websocket session has been aborted.")
-{
-}
-
-SessionAborted::SessionAborted(Auth::TokenPtr token)
-    : LEOSACException(build_msg(token))
-{
-}
-
-std::string SessionAborted::build_msg(Auth::TokenPtr token)
-{
-    std::stringstream ss;
-    ss << "Websocket session has been aborted.";
-
-    if (!token)
-        ss << "No associated token found.";
-    else
-    {
-        ss << " Token " << token->token();
-        if (token->owner())
-            ss << ", owned by user " << token->owner()->id();
-        else
-            ss << ", with no owner ";
-        ss << " expired on " << token->expiration();
-    }
-    return ss.str();
-}
-
-EntityNotFound::EntityNotFound(const std::string &id, const std::string &type)
-    : LEOSACException(build_msg(id, type))
-    , entity_id_(id)
-    , entity_type_(type)
-{
-}
-
-std::string EntityNotFound::build_msg(const std::string &id, const std::string &type)
-{
-    std::stringstream ss;
-    ss << "Cannot find `" << type << "` with id `" << id << "`.";
-
-    return ss.str();
-}
-
-const std::string &EntityNotFound::entity_id() const
-{
-    return entity_id_;
-}
-
-const std::string &EntityNotFound::entity_type() const
-{
-    return entity_type_;
 }

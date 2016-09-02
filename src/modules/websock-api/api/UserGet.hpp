@@ -19,17 +19,35 @@
 
 #pragma once
 
-#include <memory>
-
-namespace odb
-{
-class database;
-}
+#include "MethodHandler.hpp"
 
 namespace Leosac
 {
-using DBPtr = std::shared_ptr<odb::database>;
+namespace Module
+{
+namespace WebSockAPI
+{
+using json = nlohmann::json;
 
-class DBService;
-using DBServicePtr = std::shared_ptr<DBService>;
+/**
+ * Retrieve information about a given user.
+ *
+ * Request:
+ *     + `user_id`: The user_id of the user we want to fetch. Required.
+ *
+ * Response:
+ *     + ...
+ */
+class UserGet : public MethodHandler
+{
+  public:
+    UserGet(RequestContext ctx);
+
+    static MethodHandlerUPtr create(RequestContext);
+
+  private:
+    virtual json process_impl(const json &req) override;
+};
+}
+}
 }

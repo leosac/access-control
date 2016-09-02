@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include <vector>
+#include "WebSockFwd.hpp"
+#include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {
@@ -27,21 +28,14 @@ namespace Module
 {
 namespace WebSockAPI
 {
-
-template <typename ConditionParams...>
-class RequestCondition
+/**
+ * Holds valuable pointer to provide context to a request.
+ */
+struct RequestContext
 {
-  public:
-    virtual ~RequestCondition() = default;
-};
-
-class PreRequestCheck
-{
-  public:
-    void check(const API::json &req);
-
-  private:
-    std::vector<RequestCondition> conditions_;
+    APIPtr session;
+    DBServicePtr dbsrv;
+    WSServer &server;
 };
 }
 }
