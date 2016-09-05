@@ -19,21 +19,35 @@
 
 #pragma once
 
-#include "tools/db/db_fwd.hpp"
+#include "MethodHandler.hpp"
 
 namespace Leosac
 {
+namespace Module
+{
+namespace WebSockAPI
+{
+using json = nlohmann::json;
+
 /**
- * Provides various database-related services to consumer.
+ * Retrieve information about a group.
+ *
+ * Request:
+ *     + `group_id`: Group we want information about. Required.
+ *
+ * Response:
+ *     + ...
  */
-class DBService
+class GroupGet : public MethodHandler
 {
   public:
-    DBService(DBPtr db);
+    GroupGet(RequestContext ctx);
 
-    DBPtr db() const;
+    static MethodHandlerUPtr create(RequestContext);
 
   private:
-    DBPtr database_;
+    virtual json process_impl(const json &req) override;
 };
+}
+}
 }

@@ -17,23 +17,28 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "MultiplexedSession.hpp"
 
-#include "tools/db/db_fwd.hpp"
+using namespace Leosac;
+using namespace Leosac::db;
 
-namespace Leosac
+
+MultiplexedSession::MultiplexedSession()
+    : previous_(odb::session::current_pointer())
 {
-/**
- * Provides various database-related services to consumer.
- */
-class DBService
+    if (previous_)
+    {
+        odb::session::reset_current();
+    }
+    session_ = std::make_unique<odb::session>();
+}
+
+MultiplexedSession::~MultiplexedSession()
 {
-  public:
-    DBService(DBPtr db);
-
-    DBPtr db() const;
-
-  private:
-    DBPtr database_;
-};
+    session_.reset();
+    if (previous_)
+    {
+        // set back the session we found when we took over.
+        odb::session::current(*previous_);
+    }
 }

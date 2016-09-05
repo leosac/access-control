@@ -44,7 +44,7 @@ MethodHandlerUPtr LogGet::create(RequestContext ctx)
     instance->add_conditions_or(
         []() { throw PermissionDenied(); },
         Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)));
-    return instance;
+    return std::move(instance);
 }
 
 json LogGet::process_impl(const json &req)

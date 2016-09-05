@@ -20,20 +20,31 @@
 #pragma once
 
 #include "tools/db/db_fwd.hpp"
+#include <odb/session.hxx>
 
 namespace Leosac
 {
+namespace db
+{
 /**
- * Provides various database-related services to consumer.
+ * Acts like an odb::session, with the exception that it will
+ * save the current active session (if any) and restore it
+ * when this MultiplexedSession ends.
+ *
+ * This object is useful to create new session without having to worry
+ * about the currently active one.
+ *
+ * @see MultiplexedTransaction.
  */
-class DBService
+class MultiplexedSession
 {
   public:
-    DBService(DBPtr db);
-
-    DBPtr db() const;
+    MultiplexedSession();
+    ~MultiplexedSession();
 
   private:
-    DBPtr database_;
+    std::unique_ptr<odb::session> session_;
+    odb::session *previous_;
 };
+}
 }

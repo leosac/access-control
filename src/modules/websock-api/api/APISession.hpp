@@ -149,18 +149,6 @@ class APISession
      * Retrieve information about a group.
      *
      * Request:
-     *     + `group_id`: Group we want information about. Required.
-     *
-     * Response:
-     *     + ...
-     */
-    json group_get(const json &req);
-
-
-    /**
-     * Retrieve information about a group.
-     *
-     * Request:
      *     + `membership_id`: The id of the membership to look up. Required
      *
      * Response:

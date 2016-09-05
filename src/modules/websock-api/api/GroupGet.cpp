@@ -17,69 +17,68 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "UserGet.hpp"
+#include "GroupGet.hpp"
 #include "Exceptions.hpp"
-#include "User_odb.h"
+#include "Group_odb.h"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
+#include "conditions/IsInGroup.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-UserGet::UserGet(RequestContext ctx)
+GroupGet::GroupGet(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr UserGet::create(RequestContext ctx)
+MethodHandlerUPtr GroupGet::create(RequestContext ctx)
 {
-    auto instance = std::make_unique<UserGet>(ctx);
+    auto instance = std::make_unique<GroupGet>(ctx);
 
-    auto is_self = [ptr = instance.get()](const json &req)
+    auto is_in_group = [ ctx = ctx, ptr = instance.get() ](const json &req)
     {
-        auto uid = req.at("user_id").get<Auth::UserId>();
-        return ptr->ctx_.session->current_user_id() == uid;
+        using namespace Conditions;
+        auto gid = req.at("group_id").get<Auth::GroupId>();
+        return wrap(IsInGroup(ctx, gid))(req);
     };
 
     instance->add_conditions_or(
         []() { throw PermissionDenied(); },
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_self);
+        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_in_group);
     return std::move(instance);
 }
 
-json UserGet::process_impl(const json &req)
+json GroupGet::process_impl(const json &req)
 {
     json rep;
 
-    using query = odb::query<Auth::User>;
+    using query = odb::query<Auth::Group>;
     DBPtr db    = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
     odb::session s;
-    auto uid = req.at("user_id").get<Auth::UserId>();
+    auto gid = req.at("group_id").get<Auth::GroupId>();
 
-    Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
-    if (user)
+    Auth::GroupPtr group = db->query_one<Auth::Group>(query::id == gid);
+    if (group)
     {
         json memberships = {};
-        for (const auto &membership : user->group_memberships())
+        for (const auto &membership : group->user_memberships())
         {
             json group_info = {{"id", membership->id()},
                                {"type", "user-group-membership"}};
             memberships.push_back(group_info);
         }
-        rep["data"] = {
-            {"id", user->id()},
-            {"type", "user"},
-            {"attributes",
-             {{"username", user->username()},
-              {"firstname", user->firstname()},
-              {"lastname", user->lastname()}}},
-            {"relationships", {{"memberships", {{"data", memberships}}}}}};
+        rep["data"] = {{"id", group->id()},
+                       {"type", "group"},
+                       {"attributes",
+                        {
+                            {"name", group->name()},
+                        }},
+                       {"relationships", {{"members", {{"data", memberships}}}}}};
     }
-    else
-        throw EntityNotFound(uid, "user");
     t.commit();
     return rep;
 }

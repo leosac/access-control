@@ -10,9 +10,11 @@ set(WEBSOCK_API_SRCS
         api/APIAuth.cpp
         api/UserGet.cpp
         api/LogGet.cpp
+        api/GroupGet.cpp
         conditions/ConditionBase.cpp
         conditions/IsCurrentUserAdmin.cpp
         conditions/IsAuthenticated.cpp
+        conditions/IsInGroup.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED
@@ -25,6 +27,7 @@ set_target_properties(${WEBSOCK_API_BIN} PROPERTIES
 
 target_link_libraries(${WEBSOCK_API_BIN}
         ${Boost_LIBRARIES}
+        leosac_db
         )
 
 target_include_directories(${WEBSOCK_API_BIN}

@@ -19,21 +19,34 @@
 
 #pragma once
 
-#include "tools/db/db_fwd.hpp"
+#include "ConditionBase.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
+namespace Module
+{
+namespace WebSockAPI
+{
+namespace Conditions
+{
 /**
- * Provides various database-related services to consumer.
+ * A `Condition` that will return true if the current user is
+ * a member of a group.
+ *
+ * The current user is retrieved from the RequestContext object.
  */
-class DBService
+class IsInGroup : public ConditionBase
 {
   public:
-    DBService(DBPtr db);
+    IsInGroup(RequestContext ctx, Auth::GroupId group);
 
-    DBPtr db() const;
+    bool operator()();
 
   private:
-    DBPtr database_;
+    Auth::GroupId group_id_;
 };
+}
+}
+}
 }

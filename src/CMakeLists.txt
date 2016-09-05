@@ -60,6 +60,7 @@ set(LEOSAC_LIB_SRCS
     tools/Stacktrace.cpp
     tools/db/LogEntry.cpp
     tools/db/DBService.cpp
+    tools/db/MultiplexedSession.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -67,55 +68,9 @@ set(LEOSAC_LIB_SRCS
     core/tasks/RemoteControlAsyncResponse.cpp
 )
 
-
-# ODB configuration for tools/db (LogEntry).
-set(OdbCMake_ODB_HEADERS
-        tools/db/LogEntry.hpp
-        )
-
-set(OdbCMake_SOURCES_TOOLS "")
-odb_compile(OdbCMake_SOURCES_TOOLS
-        FILES ${OdbCMake_ODB_HEADERS}
-        MULTI_DATABASE dynamic
-        DB mysql sqlite
-        STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
-        SCHEMA_NAME tools
-        PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
-        INCLUDE_PREFIX tools/db
-        INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-                      %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        DEFAULT_POINTER "std::shared_ptr"
-        )
-
-# ODB configuration for auth stuff (User/Group)
-set(OdbCMake_ODB_HEADERS
-        core/auth/User.hpp
-        core/auth/Group.hpp
-        core/auth/Token.hpp
-        core/auth/UserGroupMembership.hpp
-        )
-
-set(OdbCMake_SOURCES_AUTH "")
-odb_compile(OdbCMake_SOURCES_AUTH
-        FILES ${OdbCMake_ODB_HEADERS}
-        MULTI_DATABASE dynamic
-        DB mysql sqlite
-        STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
-        SCHEMA_NAME auth
-        PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
-        INCLUDE_PREFIX core/auth/
-        INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-                      %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        DEFAULT_POINTER "std::shared_ptr"
-        )
-
-## END ODB CONFIGURATION
+# Rule for ODB code generation.
+# Build a shared library: leosac_db
+add_subdirectory(db)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
@@ -124,6 +79,10 @@ add_library(${LEOSAC_LIB} SHARED
         ${LEOSAC_LIB_SRCS}
         ${OdbCMake_SOURCES_TOOLS}
         ${OdbCMake_SOURCES_AUTH}
+        )
+
+target_link_libraries(${LEOSAC_LIB}
+        leosac_db
         )
 
 target_include_directories(${LEOSAC_LIB}

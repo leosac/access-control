@@ -131,38 +131,6 @@ bool APISession::allowed(const std::string &cmd)
     return auth_status_ == AuthStatus::LOGGED_IN;
 }
 
-json APISession::group_get(const json &req)
-{
-    json rep;
-
-    using query = odb::query<Auth::Group>;
-    DBPtr db    = server_.core_utils()->database();
-    odb::transaction t(db->begin());
-    odb::session s;
-    auto gid = req.at("group_id").get<Auth::GroupId>();
-
-    Auth::GroupPtr group = db->query_one<Auth::Group>(query::id == gid);
-    if (group)
-    {
-        json memberships = {};
-        for (const auto &membership : group->user_memberships())
-        {
-            json group_info = {{"id", membership->id()},
-                               {"type", "user-group-membership"}};
-            memberships.push_back(group_info);
-        }
-        rep["data"] = {{"id", group->id()},
-                       {"type", "group"},
-                       {"attributes",
-                        {
-                            {"name", group->name()},
-                        }},
-                       {"relationships", {{"members", {{"data", memberships}}}}}};
-    }
-    t.commit();
-    return rep;
-}
-
 json APISession::membership_get(const json &req)
 {
     json rep;

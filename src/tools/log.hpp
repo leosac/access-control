@@ -63,7 +63,7 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 * It is used to create an anonymous lambda to allow the logging macros parameter
 * to behave like a stringstream.
 */
-#define BUILD(param)                                                                \
+#define BUILD_STR(param)                                                            \
     [&](void) {                                                                     \
         std::stringstream logger_macro_ss__;                                        \
         logger_macro_ss__ << param;                                                 \
@@ -75,14 +75,14 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 * See "Internal macros documentation"
 */
 #define DEBUG_0(msg)                                                                \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::DEBUG)
 
 /**
 * See "Internal macros documentation"
 */
 #define DEBUG_1(msg, loggers)                                                       \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::DEBUG, loggers)
 
 /**
@@ -103,14 +103,14 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 * See "Internal macros documentation"
 */
 #define INFO_0(msg)                                                                 \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::INFO)
 
 /**
 * See "Internal macros documentation"
 */
 #define INFO_1(msg, loggers)                                                        \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::INFO, loggers)
 
 /**
@@ -131,14 +131,14 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 * See "Internal macros documentation"
 */
 #define NOTICE_0(msg)                                                               \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::NOTICE)
 
 /**
 * See "Internal macros documentation"
 */
 #define NOTICE_1(msg, loggers)                                                      \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::NOTICE, loggers)
 
 /**
@@ -159,14 +159,14 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 * See "Internal macros documentation"
 */
 #define WARN_0(msg)                                                                 \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::WARN)
 
 /**
 * See "Internal macros documentation"
 */
 #define WARN_1(msg, loggers)                                                        \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::WARN)
 
 /**
@@ -187,14 +187,14 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 * See "Internal macros documentation"
 */
 #define ERROR_0(msg)                                                                \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::ERROR)
 
 /**
 * See "Internal macros documentation"
 */
 #define ERROR_1(msg, loggers)                                                       \
-    LogHelper::log(BUILD(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,             \
+    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
                    LogLevel::ERROR)
 
 /**

@@ -19,6 +19,7 @@
 
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
+#include "api/GroupGet.hpp"
 #include "api/LogGet.hpp"
 #include "api/UserGet.hpp"
 #include "exception/ExceptionsTools.hpp"
@@ -56,11 +57,11 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["authenticate_with_token"] = &APISession::authenticate_with_token;
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
-    handlers_["group_get"]               = &APISession::group_get;
     handlers_["membership_get"]          = &APISession::membership_get;
 
-    handlers2_["user_get"] = &UserGet::create;
-    handlers2_["get_logs"] = &LogGet::create;
+    handlers2_["user_get"]  = &UserGet::create;
+    handlers2_["get_logs"]  = &LogGet::create;
+    handlers2_["group_get"] = &GroupGet::create;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -166,14 +167,9 @@ APIAuth &WSServer::auth()
 
 json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
 {
-    bool notfound        = false;
     auto handler_factory = handlers2_.find(in.type);
 
-    if (handler_factory == handlers2_.end())
-    {
-        notfound = true;
-    }
-    else
+    if (handler_factory != handlers2_.end())
     {
         RequestContext ctx{.session = api_handle,
                            .dbsrv   = std::make_shared<DBService>(db_),
@@ -183,31 +179,25 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
         return method_handler->process(in.content);
     }
 
-    if (notfound)
-    {
-        auto handler_method = handlers_.find(in.type);
+    auto handler_method = handlers_.find(in.type);
 
-        if (handler_method == handlers_.end())
+    if (handler_method == handlers_.end())
+    {
+        throw InvalidCall();
+    }
+    else
+    {
+        if (api_handle->allowed(in.type))
         {
-            throw InvalidCall();
+            api_handle->hook_before_request();
+            auto method_ptr = handler_method->second;
+            return ((*api_handle).*method_ptr)(in.content);
         }
         else
         {
-            if (api_handle->allowed(in.type))
-            {
-                api_handle->hook_before_request();
-                auto method_ptr = handler_method->second;
-                return ((*api_handle).*method_ptr)(in.content);
-            }
-            else
-            {
-                throw PermissionDenied();
-            }
+            throw PermissionDenied();
         }
     }
-    if (notfound)
-        throw InvalidCall();
-    return {};
 }
 
 DBPtr WSServer::db()

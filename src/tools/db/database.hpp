@@ -30,6 +30,7 @@
 #pragma db model version(1, 1, open)
 #endif
 
+#include "tools/db/DBService.hpp"
 #include <odb/connection.hxx>
 #include <odb/schema-catalog.hxx>
 #include <odb/transaction.hxx>
