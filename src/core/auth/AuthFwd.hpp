@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <memory>
 #include <odb/lazy-ptr.hxx>
 

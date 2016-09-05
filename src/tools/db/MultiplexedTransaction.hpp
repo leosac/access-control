@@ -19,39 +19,35 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
-#include "modules/BaseModule.hpp"
-#include <tools/db/db_fwd.hpp>
+#include "tools/db/db_fwd.hpp"
+#include <odb/session.hxx>
 
 namespace Leosac
 {
-namespace Module
+namespace db
 {
-namespace WebSockAPI
-{
-
-class WebSockAPIModule : public BaseModule
+/**
+ * Acts like an odb::transaction, with the exception that it will
+ * becomes the active transaction at construction, and will retore
+ * the previous (if any) transaction when it gets destroyed.
+  */
+class MultiplexedTransaction
 {
   public:
-    WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-    ~WebSockAPIModule() = default;
-
-    virtual void run() override;
+    MultiplexedTransaction();
+    ~MultiplexedTransaction();
 
     /**
-     * This module explicity expose CoreUtils to other
-     * object in the module.
+     * Commit the transaction.
+     *
+     * The call is forward to the real odb::transaction object.
      */
-    CoreUtilsPtr core_utils();
+    void commit();
 
   private:
-    /**
-     * Port to bind the websocket endpoint.
-     */
-    uint16_t port_;
+    bool had_previous_;
+    std::unique_ptr<odb::transaction> transaction_;
+    odb::transaction *previous_;
 };
-}
 }
 }

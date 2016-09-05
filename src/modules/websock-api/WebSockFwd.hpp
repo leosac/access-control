@@ -35,6 +35,8 @@ using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
 
 class WSServer;
 
+struct ClientMessage;
+
 namespace Conditions
 {
 class ConditionBase;

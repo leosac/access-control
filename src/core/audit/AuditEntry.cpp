@@ -17,41 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "AuditEntry.hpp"
 
-#include "core/auth/AuthFwd.hpp"
-#include "modules/BaseModule.hpp"
-#include <tools/db/db_fwd.hpp>
+using namespace Leosac;
+using namespace Leosac::Audit;
 
-namespace Leosac
+AuditEntry::AuditEntry()
 {
-namespace Module
-{
-namespace WebSockAPI
-{
-
-class WebSockAPIModule : public BaseModule
-{
-  public:
-    WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-    ~WebSockAPIModule() = default;
-
-    virtual void run() override;
-
-    /**
-     * This module explicity expose CoreUtils to other
-     * object in the module.
-     */
-    CoreUtilsPtr core_utils();
-
-  private:
-    /**
-     * Port to bind the websocket endpoint.
-     */
-    uint16_t port_;
-};
-}
-}
+    timestamp_ = boost::posix_time::second_clock::local_time();
 }

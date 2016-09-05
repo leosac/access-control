@@ -512,6 +512,14 @@ void Kernel::configure_database()
                 database_->persist(grp);
                 t.commit();
             }
+            v = database_->schema_version("audit");
+            if (v == 0)
+            {
+                // Create schema
+                transaction t(database_->begin());
+                schema_catalog::create_schema(*database_, "audit");
+                t.commit();
+            }
         }
     }
 }

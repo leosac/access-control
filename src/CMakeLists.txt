@@ -61,11 +61,13 @@ set(LEOSAC_LIB_SRCS
     tools/db/LogEntry.cpp
     tools/db/DBService.cpp
     tools/db/MultiplexedSession.cpp
+    tools/db/MultiplexedTransaction.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
     core/tasks/SyncConfig.cpp
     core/tasks/RemoteControlAsyncResponse.cpp
+    core/audit/AuditEntry.cpp
 )
 
 # Rule for ODB code generation.
@@ -89,6 +91,7 @@ target_include_directories(${LEOSAC_LIB}
         PUBLIC
         ${ODB_INCLUDE_DIRS}
         ${ODB_COMPILE_OUTPUT_DIR}
+        ${CMAKE_SOURCE_DIR}/deps/flagset
         )
 
 target_compile_definitions(${LEOSAC_LIB}
@@ -122,6 +125,7 @@ ${CMAKE_SOURCE_DIR}/deps/libmcp23s17/src/
 ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
 ${CMAKE_SOURCE_DIR}/deps/libzmq/include
 ${CMAKE_SOURCE_DIR}/deps/spdlog/include
+${CMAKE_SOURCE_DIR}/deps/flagset
 )
 
 #Set compilation flags for current target

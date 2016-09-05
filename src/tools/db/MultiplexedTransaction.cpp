@@ -17,41 +17,33 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "MultiplexedTransaction.hpp"
+#include <odb/transaction.hxx>
 
-#include "core/auth/AuthFwd.hpp"
-#include "modules/BaseModule.hpp"
-#include <tools/db/db_fwd.hpp>
+using namespace Leosac;
+using namespace Leosac::db;
 
-namespace Leosac
+
+MultiplexedTransaction::MultiplexedTransaction()
+    : had_previous_(odb::transaction::has_current())
 {
-namespace Module
-{
-namespace WebSockAPI
-{
-
-class WebSockAPIModule : public BaseModule
-{
-  public:
-    WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-    ~WebSockAPIModule() = default;
-
-    virtual void run() override;
-
-    /**
-     * This module explicity expose CoreUtils to other
-     * object in the module.
-     */
-    CoreUtilsPtr core_utils();
-
-  private:
-    /**
-     * Port to bind the websocket endpoint.
-     */
-    uint16_t port_;
-};
+    if (had_previous_) // actually current
+    {
+        previous_ = &odb::transaction::current();
+    }
+    transaction_ = std::make_unique<odb::transaction>();
 }
+
+MultiplexedTransaction::~MultiplexedTransaction()
+{
+    transaction_.reset();
+    if (had_previous_)
+    {
+        odb::transaction::current(*previous_);
+    }
 }
+
+void MultiplexedTransaction::commit()
+{
+    transaction_->commit();
 }

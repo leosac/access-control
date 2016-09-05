@@ -19,39 +19,36 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
-#include "modules/BaseModule.hpp"
-#include <tools/db/db_fwd.hpp>
+#include <cstddef>
+#include <flagset.hpp>
+#include <memory>
 
 namespace Leosac
 {
-namespace Module
+namespace Audit
 {
-namespace WebSockAPI
+class AuditEntry;
+using AuditEntryPtr = std::shared_ptr<AuditEntry>;
+
+class WSAPICall;
+using WSAPICallUPtr = std::unique_ptr<WSAPICall>;
+
+enum class EventType
 {
-
-class WebSockAPIModule : public BaseModule
-{
-  public:
-    WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-    ~WebSockAPIModule() = default;
-
-    virtual void run() override;
-
+    USER_CREATED,
+    USER_DELETED,
     /**
-     * This module explicity expose CoreUtils to other
-     * object in the module.
+     * A call to "user_get" websocket API has been made.
      */
-    CoreUtilsPtr core_utils();
-
-  private:
-    /**
-     * Port to bind the websocket endpoint.
-     */
-    uint16_t port_;
+    USER_GET,
+    MEMBERSHIP_CREATED,
+    MEMBERSHIP_DELETED,
+    LAST__
 };
-}
+
+struct EventMask : public FlagSet<EventType>
+{
+    static EventMask UserEvent;
+};
 }
 }

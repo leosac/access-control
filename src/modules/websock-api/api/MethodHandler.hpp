@@ -58,7 +58,7 @@ class MethodHandler
      * It uses Non Virtual Interface pattern and will forward
      * the call to the `process_impl()` method.
      */
-    json process(const json &req);
+    json process(const ClientMessage &msg);
 
     /**
      * An example method that should be implemented in all subclasses.

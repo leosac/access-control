@@ -23,6 +23,7 @@
 #include "api/APIAuth.hpp"
 #include "api/APISession.hpp"
 #include "api/MethodHandler.hpp"
+#include "core/APIStatusCode.hpp"
 #include "tools/db/db_fwd.hpp"
 #include <set>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -41,7 +42,7 @@ using json = nlohmann::json;
  */
 struct ServerMessage
 {
-    StatusCode status_code;
+    APIStatusCode status_code;
     std::string status_string;
     std::string uuid;
     std::string type;
@@ -115,13 +116,23 @@ class WSServer
      *
      * While this may not be the best performance wise, it's
      * unlikely to be a bottleneck, but it helps keep things clean.
+     *
+     * @note This method is reponsible for saving the WSAPICall Audit event.
      */
     void on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg);
 
     /**
+     * Handle a request.
+     *
+     * Extract request header, set-up exception handler for api handler
+     * invokation.
+     */
+    ServerMessage handle_request(APIPtr api_handle, const json &req);
+
+    /**
      * Create a ClientMessage object from a json request.
      */
-    ClientMessage parse_request(json &in);
+    ClientMessage parse_request(const json &in);
 
     /**
      * Send a message over a connection.

@@ -63,7 +63,7 @@ content       | Message specific content.
 **Note**:
     1. `status` indicates whether or not processing the request went well. 
       As an example, even a failed authentication would have 
-      a global status code of Leosac::Module::WebSockAPI::StatusCode::SUCCESS. The authentication failure
+      a global status code of Leosac::APIStatusCode::SUCCESS. The authentication failure
       would be specified in the `content` field of the packet.
     2. If the message is a response to a request, it will copy the request's UUID.
       Otherwise a new UUID will be used.
@@ -71,7 +71,7 @@ content       | Message specific content.
       However, it is still required. When responding to a request, the 
     3. See each API call for the content they return.
 
-For `status` code value, see Leosac::Module::WebSockAPI::StatusCode.
+For `status` code value, see Leosac::APIStatusCode.
 
 Below are a few examples in a few different situations.
 

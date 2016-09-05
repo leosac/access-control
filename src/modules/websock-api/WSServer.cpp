@@ -19,12 +19,15 @@
 
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
+#include "WSAPICall_odb.h"
 #include "api/GroupGet.hpp"
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
 #include "api/UserGet.hpp"
+#include "core/audit/WSAPICall.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
 #include <odb/mysql/exceptions.hxx>
@@ -87,62 +90,22 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
 
     INFO("Incoming payload: \n" << req.dump(4));
 
-    ServerMessage response;
-    response.status_code = StatusCode::SUCCESS;
-    response.content     = {};
-    try
+    Audit::WSAPICall audit;
+    ServerMessage response = handle_request(api_handle, req);
+
+    audit.author_           = api_handle->current_user();
+    audit.uuid_             = response.uuid;
+    audit.api_method_       = response.type;
+    audit.status_code_      = response.status_code;
+    audit.status_string_    = response.status_string;
+    audit.response_content_ = response.content.dump(4);
+
     {
-        ClientMessage input = parse_request(req);
-        response.uuid       = input.uuid;
-        response.type       = input.type;
-        response.content    = dispatch_request(api_handle, input);
+        db::MultiplexedTransaction t;
+        db_->persist(audit);
+        t.commit();
     }
-    catch (const InvalidCall &e)
-    {
-        response.status_code   = StatusCode::INVALID_CALL;
-        response.status_string = e.what();
-    }
-    catch (const PermissionDenied &e)
-    {
-        response.status_code   = StatusCode::PERMISSION_DENIED;
-        response.status_string = e.what();
-    }
-    catch (const MalformedMessage &e)
-    {
-        response.status_code   = StatusCode::MALFORMED;
-        response.status_string = e.what();
-    }
-    catch (const SessionAborted &e)
-    {
-        response.status_code   = StatusCode::SESSION_ABORTED;
-        response.status_string = e.what();
-    }
-    catch (const EntityNotFound &e)
-    {
-        response.status_code            = StatusCode::ENTITY_NOT_FOUND;
-        response.status_string          = e.what();
-        response.content["entity_id"]   = e.entity_id();
-        response.content["entity_type"] = e.entity_type();
-    }
-    catch (const LEOSACException &e)
-    {
-        WARN("Leosac specific exception has been caught: " << e.what() << std::endl
-                                                           << e.trace().str());
-        response.status_code   = StatusCode::GENERAL_FAILURE;
-        response.status_string = e.what(); // todo Maybe remove in production.
-    }
-    catch (const odb::exception &e)
-    {
-        ERROR("Database Error: " << e.what());
-        response.status_code   = StatusCode::GENERAL_FAILURE;
-        response.status_string = "Database Error: " + std::string(e.what());
-    }
-    catch (const std::exception &e)
-    {
-        WARN("Exception when processing request: " << e.what());
-        response.status_code   = StatusCode::GENERAL_FAILURE;
-        response.status_string = e.what();
-    }
+
     send_message(hdl, response);
 }
 
@@ -181,7 +144,7 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
                            .server  = *this};
 
         MethodHandlerUPtr method_handler = handler_factory->second(ctx);
-        return method_handler->process(in.content);
+        return method_handler->process(in);
     }
 
     auto handler_method = handlers_.find(in.type);
@@ -229,7 +192,7 @@ void WSServer::send_message(websocketpp::connection_hdl hdl,
     srv_.send(hdl, json_message.dump(4), websocketpp::frame::opcode::text);
 }
 
-ClientMessage WSServer::parse_request(json &req)
+ClientMessage WSServer::parse_request(const json &req)
 {
     ClientMessage msg;
 
@@ -249,4 +212,65 @@ ClientMessage WSServer::parse_request(json &req)
         throw MalformedMessage();
     }
     return msg;
+}
+
+ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req)
+{
+    ServerMessage response;
+    response.status_code = APIStatusCode::SUCCESS;
+    response.content     = {};
+    try
+    {
+        ClientMessage input = parse_request(req);
+        response.uuid       = input.uuid;
+        response.type       = input.type;
+        response.content    = dispatch_request(api_handle, input);
+    }
+    catch (const InvalidCall &e)
+    {
+        response.status_code   = APIStatusCode::INVALID_CALL;
+        response.status_string = e.what();
+    }
+    catch (const PermissionDenied &e)
+    {
+        response.status_code   = APIStatusCode::PERMISSION_DENIED;
+        response.status_string = e.what();
+    }
+    catch (const MalformedMessage &e)
+    {
+        response.status_code   = APIStatusCode::MALFORMED;
+        response.status_string = e.what();
+    }
+    catch (const SessionAborted &e)
+    {
+        response.status_code   = APIStatusCode::SESSION_ABORTED;
+        response.status_string = e.what();
+    }
+    catch (const EntityNotFound &e)
+    {
+        response.status_code            = APIStatusCode::ENTITY_NOT_FOUND;
+        response.status_string          = e.what();
+        response.content["entity_id"]   = e.entity_id();
+        response.content["entity_type"] = e.entity_type();
+    }
+    catch (const LEOSACException &e)
+    {
+        WARN("Leosac specific exception has been caught: " << e.what() << std::endl
+                                                           << e.trace().str());
+        response.status_code   = APIStatusCode::GENERAL_FAILURE;
+        response.status_string = e.what(); // todo Maybe remove in production.
+    }
+    catch (const odb::exception &e)
+    {
+        ERROR("Database Error: " << e.what());
+        response.status_code   = APIStatusCode::GENERAL_FAILURE;
+        response.status_string = "Database Error: " + std::string(e.what());
+    }
+    catch (const std::exception &e)
+    {
+        WARN("Exception when processing request: " << e.what());
+        response.status_code   = APIStatusCode::GENERAL_FAILURE;
+        response.status_string = e.what();
+    }
+    return response;
 }

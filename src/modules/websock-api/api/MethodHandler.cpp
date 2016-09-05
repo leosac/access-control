@@ -18,21 +18,22 @@
 */
 
 #include "api/MethodHandler.hpp"
+#include "WSServer.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-json MethodHandler::process(const json &req)
+json MethodHandler::process(const ClientMessage &msg)
 {
     for (const auto &condition_group : conditions_)
     {
         bool success = false;
         for (const auto &condition : condition_group.first)
-            success |= condition(req);
+            success |= condition(msg.content);
 
         if (!success)
             condition_group.second();
     }
-    return process_impl(req);
+    return process_impl(msg.content);
 }
