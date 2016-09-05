@@ -48,7 +48,6 @@ bool IsInGroup::operator()()
         using query = odb::query<Auth::User>;
         DBPtr db    = ctx_.dbsrv->db();
         odb::transaction t(db->begin());
-        db::MultiplexedSession s;
 
         Auth::UserPtr fresh_user =
             db->query_one<Auth::User>(query::id == user->id());

@@ -54,4 +54,7 @@ add_library(leosac_db SHARED
         ${OdbCMake_SOURCES_AUTH} ${OdbCMake_ODB_HEADERS_AUTH}
         )
 
-target_include_directories(leosac_db PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(leosac_db PRIVATE
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
+        )

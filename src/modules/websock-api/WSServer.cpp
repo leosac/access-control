@@ -21,12 +21,14 @@
 #include "Exceptions.hpp"
 #include "api/GroupGet.hpp"
 #include "api/LogGet.hpp"
+#include "api/MembershipGet.hpp"
 #include "api/UserGet.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
 #include <odb/mysql/exceptions.hxx>
+#include <odb/session.hxx>
 #include <odb/sqlite/exceptions.hxx>
 
 using namespace Leosac;
@@ -57,11 +59,11 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["authenticate_with_token"] = &APISession::authenticate_with_token;
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
-    handlers_["membership_get"]          = &APISession::membership_get;
 
-    handlers2_["user_get"]  = &UserGet::create;
-    handlers2_["get_logs"]  = &LogGet::create;
-    handlers2_["group_get"] = &GroupGet::create;
+    handlers2_["user_get"]       = &UserGet::create;
+    handlers2_["get_logs"]       = &LogGet::create;
+    handlers2_["group_get"]      = &GroupGet::create;
+    handlers2_["membership_get"] = &MembershipGet::create;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -167,6 +169,9 @@ APIAuth &WSServer::auth()
 
 json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
 {
+    // A request is a "Unit-of-Work" for the application.
+    // We create a default database session for the request.
+    odb::session database_session;
     auto handler_factory = handlers2_.find(in.type);
 
     if (handler_factory != handlers2_.end())

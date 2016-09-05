@@ -56,7 +56,6 @@ json UserGet::process_impl(const json &req)
     using query = odb::query<Auth::User>;
     DBPtr db    = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    odb::session s;
     auto uid = req.at("user_id").get<Auth::UserId>();
 
     Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);

@@ -58,7 +58,6 @@ json GroupGet::process_impl(const json &req)
     using query = odb::query<Auth::Group>;
     DBPtr db    = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    odb::session s;
     auto gid = req.at("group_id").get<Auth::GroupId>();
 
     Auth::GroupPtr group = db->query_one<Auth::Group>(query::id == gid);
@@ -79,6 +78,8 @@ json GroupGet::process_impl(const json &req)
                         }},
                        {"relationships", {{"members", {{"data", memberships}}}}}};
     }
+    else
+        throw EntityNotFound(gid, "group");
     t.commit();
     return rep;
 }

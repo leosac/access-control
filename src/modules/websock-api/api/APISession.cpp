@@ -131,35 +131,6 @@ bool APISession::allowed(const std::string &cmd)
     return auth_status_ == AuthStatus::LOGGED_IN;
 }
 
-json APISession::membership_get(const json &req)
-{
-    json rep;
-
-    using query = odb::query<Auth::UserGroupMembership>;
-    DBPtr db    = server_.core_utils()->database();
-    odb::transaction t(db->begin());
-    odb::session s;
-    auto gid = req.at("membership_id").get<Auth::UserGroupMembershipId>();
-
-    Auth::UserGroupMembershipPtr membership =
-        db->query_one<Auth::UserGroupMembership>(query::id == gid);
-    if (membership)
-    {
-        auto timestamp      = boost::posix_time::to_time_t(membership->timestamp());
-        rep["data"]         = {};
-        rep["data"]["id"]   = membership->id();
-        rep["data"]["type"] = "user-group-membership";
-        rep["data"]["attributes"] = {{"rank", static_cast<int>(membership->rank())},
-                                     {"timestamp", timestamp}};
-        rep["data"]["relationships"]["user"] = {
-            {"data", {{"id", membership->user().object_id()}, {"type", "user"}}}};
-        rep["data"]["relationships"]["group"] = {
-            {"data", {{"id", membership->group().object_id()}, {"type", "group"}}}};
-    };
-    t.commit();
-    return rep;
-}
-
 void APISession::hook_before_request()
 {
     if (auth_status_ == AuthStatus::LOGGED_IN)

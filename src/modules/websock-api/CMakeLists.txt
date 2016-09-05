@@ -11,6 +11,7 @@ set(WEBSOCK_API_SRCS
         api/UserGet.cpp
         api/LogGet.cpp
         api/GroupGet.cpp
+        api/MembershipGet.cpp
         conditions/ConditionBase.cpp
         conditions/IsCurrentUserAdmin.cpp
         conditions/IsAuthenticated.cpp
