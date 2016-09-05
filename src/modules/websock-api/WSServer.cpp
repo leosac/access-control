@@ -83,25 +83,37 @@ void WSServer::on_close(websocketpp::connection_hdl hdl)
 
 void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg)
 {
-    json req = json::parse(msg->get_payload());
-
     assert(connection_api_.find(hdl) != connection_api_.end());
     auto api_handle = connection_api_.find(hdl)->second;
 
-    INFO("Incoming payload: \n" << req.dump(4));
-
     Audit::WSAPICall audit;
-    ServerMessage response = handle_request(api_handle, req);
-
-    audit.author_           = api_handle->current_user();
-    audit.uuid_             = response.uuid;
-    audit.api_method_       = response.type;
-    audit.status_code_      = response.status_code;
-    audit.status_string_    = response.status_string;
-    audit.response_content_ = response.content.dump(4);
-
+    ServerMessage response;
+    json req;
+    try
     {
-        db::MultiplexedTransaction t;
+        audit.author_ = api_handle->current_user();
+        // todo careful potential DDOS as we store the full content without checking
+        // for now.
+        audit.request_content_ = msg->get_payload();
+        req                    = json::parse(msg->get_payload());
+
+        response = handle_request(api_handle, msg->get_payload());
+        INFO("Incoming payload: \n" << response.content.dump(4));
+    }
+    catch (const std::invalid_argument &e)
+    {
+        // JSON parse error
+        response.status_code   = APIStatusCode::MALFORMED;
+        response.status_string = "Failed to parse JSON.";
+    }
+    {
+        audit.uuid_             = response.uuid;
+        audit.api_method_       = response.type;
+        audit.status_code_      = response.status_code;
+        audit.status_string_    = response.status_string;
+        audit.response_content_ = response.content.dump(4);
+
+        db::MultiplexedTransaction t(db_->begin());
         db_->persist(audit);
         t.commit();
     }

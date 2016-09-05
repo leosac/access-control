@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "database.hpp"
 #include "tools/db/db_fwd.hpp"
 #include <odb/session.hxx>
 
@@ -34,7 +35,7 @@ namespace db
 class MultiplexedTransaction
 {
   public:
-    MultiplexedTransaction();
+    MultiplexedTransaction(odb::transaction_impl *impl);
     ~MultiplexedTransaction();
 
     /**

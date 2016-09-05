@@ -60,10 +60,10 @@ class AuditEntry
 #pragma db value_not_null
     std::vector<AuditEntryPtr> children_;
 
-/**
- * The user at the source of the entry.
- */
-#pragma db not_null
+    /**
+     * The user at the source of the entry.
+     * Maybe null.
+     */
     Auth::UserLPtr author_;
 
   private:

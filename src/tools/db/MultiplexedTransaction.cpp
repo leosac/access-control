@@ -24,14 +24,15 @@ using namespace Leosac;
 using namespace Leosac::db;
 
 
-MultiplexedTransaction::MultiplexedTransaction()
+MultiplexedTransaction::MultiplexedTransaction(odb::transaction_impl *impl)
     : had_previous_(odb::transaction::has_current())
 {
     if (had_previous_) // actually current
     {
         previous_ = &odb::transaction::current();
     }
-    transaction_ = std::make_unique<odb::transaction>();
+    odb::transaction::reset_current();
+    transaction_ = std::make_unique<odb::transaction>(impl);
 }
 
 MultiplexedTransaction::~MultiplexedTransaction()
