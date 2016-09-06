@@ -66,6 +66,9 @@ class AuditEntry
      */
     Auth::UserLPtr author_;
 
+#pragma db type("TEXT")
+    EventMask event_mask_;
+
   private:
     friend class odb::access;
 };

@@ -68,6 +68,7 @@ set(LEOSAC_LIB_SRCS
     core/tasks/SyncConfig.cpp
     core/tasks/RemoteControlAsyncResponse.cpp
     core/audit/AuditEntry.cpp
+    core/audit/AuditFwd.cpp
 )
 
 # Rule for ODB code generation.

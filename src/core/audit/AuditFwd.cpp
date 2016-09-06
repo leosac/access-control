@@ -17,44 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "AuditFwd.hpp"
 
-#include <cstddef>
-#include <flagset.hpp>
-#include <memory>
+using namespace Leosac;
+using namespace Leosac::Audit;
 
-namespace Leosac
+EventMask gen_mask()
 {
-namespace Audit
-{
-class AuditEntry;
-using AuditEntryPtr = std::shared_ptr<AuditEntry>;
+    EventMask m;
 
-class WSAPICall;
-using WSAPICallUPtr = std::unique_ptr<WSAPICall>;
+    m |= EventType::USER_GET;
+    m |= EventType::USER_CREATED;
+    m |= EventType::USER_DELETED;
 
-enum class EventType
-{
-    WSAPI_CALL,
-    USER_CREATED,
-    USER_DELETED,
-    /**
-     * A call to "user_get" websocket API has been made.
-     */
-    USER_GET,
-    MEMBERSHIP_CREATED,
-    MEMBERSHIP_DELETED,
-    LAST__
-};
-
-struct EventMask : public FlagSet<EventType>
-{
-    EventMask() = default;
-    EventMask(const std::string bitset_repr)
-        : FlagSet<EventType>(bitset_repr)
-    {
-    }
-    static EventMask UserEvent;
-};
+    return m;
 }
-}
+
+
+EventMask EventMask::UserEvent = gen_mask();

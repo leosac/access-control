@@ -91,6 +91,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     json req;
     try
     {
+        audit.event_mask_ |= Audit::EventType::WSAPI_CALL;
         audit.author_          = api_handle->current_user();
         auto ws_connection_ptr = srv_.get_con_from_hdl(hdl);
         ASSERT_LOG(ws_connection_ptr, "No websocket connection object from handle.");

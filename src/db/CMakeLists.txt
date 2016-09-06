@@ -64,6 +64,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         SCHEMA_FORMAT embedded
         SCHEMA_NAME audit
         PROFILE "boost/date-time"
+        HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset
         INCLUDE_PREFIX core/audit/
         INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
