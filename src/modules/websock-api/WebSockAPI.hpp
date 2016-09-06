@@ -51,6 +51,11 @@ class WebSockAPIModule : public BaseModule
      * Port to bind the websocket endpoint.
      */
     uint16_t port_;
+
+    /**
+     * IP address of the interface to listen on.
+     */
+    std::string interface_;
 };
 }
 }

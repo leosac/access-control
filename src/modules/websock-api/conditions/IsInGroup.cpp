@@ -24,6 +24,7 @@
 #include "tools/db/database.hpp"
 #include "tools/log.hpp"
 #include <tools/db/MultiplexedSession.hpp>
+#include <tools/db/MultiplexedTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -47,7 +48,7 @@ bool IsInGroup::operator()()
     {
         using query = odb::query<Auth::User>;
         DBPtr db    = ctx_.dbsrv->db();
-        odb::transaction t(db->begin());
+        db::MultiplexedTransaction t(db->begin());
 
         Auth::UserPtr fresh_user =
             db->query_one<Auth::User>(query::id == user->id());

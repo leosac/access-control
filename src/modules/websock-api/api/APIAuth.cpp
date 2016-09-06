@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <odb/object-result.hxx>
 #include <odb/session.hxx>
+#include <tools/db/MultiplexedSession.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -55,7 +56,7 @@ Auth::TokenPtr APIAuth::authenticate_token(const std::string &token_str) const
 
     auto db = server_.db();
     transaction t(db->begin());
-    session s;
+    db::MultiplexedSession s;
 
     Auth::TokenPtr token(db->query_one<Auth::Token>(query::token == token_str));
     if (token && token->is_valid())

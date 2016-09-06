@@ -65,6 +65,7 @@ MethodHandlerUPtr MembershipGet::create(RequestContext ctx)
         odb::transaction t(ctx.dbsrv->db()->begin());
         UserGroupMembershipPtr membership =
             ctx.dbsrv->db()->load<UserGroupMembership>(mid);
+        t.commit();
 
         if (membership)
         {

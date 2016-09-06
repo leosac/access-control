@@ -33,13 +33,14 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                                    CoreUtilsPtr utils)
     : BaseModule(ctx, pipe, cfg, utils)
 {
-    port_ = cfg.get<uint16_t>("module_config.port", 8976);
+    port_      = cfg.get<uint16_t>("module_config.port", 8976);
+    interface_ = cfg.get<std::string>("module_config.interface", "127.0.0.1");
 }
 
 void WebSockAPIModule::run()
 {
     WSServer srv(*this, core_utils()->database());
-    std::thread thread(std::bind(&WSServer::run, &srv, port_));
+    std::thread thread(std::bind(&WSServer::run, &srv, interface_, port_));
 
     while (is_running_)
     {

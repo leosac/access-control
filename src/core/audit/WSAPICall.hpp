@@ -59,8 +59,18 @@ class WSAPICall : public AuditEntry
 #pragma db not_null
     APIStatusCode status_code_;
 
+/**
+ * The status string of the response. May be empty.
+ */
 #pragma db not_null
     std::string status_string_;
+
+/**
+ * The source IP:Port of the client
+ * who made the request.
+ */
+#pragma db not_null
+    std::string source_endpoint_;
 
     /**
      * Copy of the JSON content of the request.

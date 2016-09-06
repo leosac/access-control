@@ -72,7 +72,7 @@ class WSServer
     using ConnectionAPIMap = std::map<websocketpp::connection_hdl, APIPtr,
                                       std::owner_less<websocketpp::connection_hdl>>;
 
-    void run(uint16_t port);
+    void run(const std::string &interface, uint16_t port);
 
     Server srv_;
 

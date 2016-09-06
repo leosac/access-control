@@ -33,6 +33,7 @@
 #include <odb/session.hxx>
 #include <odb/sqlite/database.hxx>
 #include <tools/db/LogEntry.hpp>
+#include <tools/db/MultiplexedSession.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -136,7 +137,7 @@ void APISession::hook_before_request()
     if (auth_status_ == AuthStatus::LOGGED_IN)
     {
         odb::core::transaction t(server_.db()->begin());
-        odb::core::session s;
+        db::MultiplexedSession s;
         // Reload token
         try
         {

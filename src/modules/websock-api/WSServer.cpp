@@ -91,13 +91,17 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     json req;
     try
     {
-        audit.author_ = api_handle->current_user();
+        audit.author_          = api_handle->current_user();
+        auto ws_connection_ptr = srv_.get_con_from_hdl(hdl);
+        ASSERT_LOG(ws_connection_ptr, "No websocket connection object from handle.");
+        audit.source_endpoint_ = ws_connection_ptr->get_remote_endpoint();
+
         // todo careful potential DDOS as we store the full content without checking
         // for now.
         audit.request_content_ = msg->get_payload();
         req                    = json::parse(msg->get_payload());
 
-        response = handle_request(api_handle, msg->get_payload());
+        response = handle_request(api_handle, req);
         INFO("Incoming payload: \n" << response.content.dump(4));
     }
     catch (const std::invalid_argument &e)
@@ -121,9 +125,11 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     send_message(hdl, response);
 }
 
-void WSServer::run(uint16_t port)
+void WSServer::run(const std::string &interface, uint16_t port)
 {
-    srv_.listen(port);
+    boost::asio::ip::tcp::endpoint endpoint(
+        boost::asio::ip::address::from_string(interface), port);
+    srv_.listen(endpoint);
     srv_.start_accept();
     srv_.run();
 }
@@ -148,6 +154,7 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
     // We create a default database session for the request.
     odb::session database_session;
     auto handler_factory = handlers2_.find(in.type);
+    api_handle->hook_before_request();
 
     if (handler_factory != handlers2_.end())
     {
@@ -169,7 +176,6 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
     {
         if (api_handle->allowed(in.type))
         {
-            api_handle->hook_before_request();
             auto method_ptr = handler_method->second;
             return ((*api_handle).*method_ptr)(in.content);
         }
@@ -250,6 +256,7 @@ ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req)
     }
     catch (const MalformedMessage &e)
     {
+        WARN("ST: " << e.trace().str());
         response.status_code   = APIStatusCode::MALFORMED;
         response.status_string = e.what();
     }
@@ -275,7 +282,7 @@ ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req)
     catch (const odb::exception &e)
     {
         ERROR("Database Error: " << e.what());
-        response.status_code   = APIStatusCode::GENERAL_FAILURE;
+        response.status_code   = APIStatusCode::DATABASE_ERROR;
         response.status_string = "Database Error: " + std::string(e.what());
     }
     catch (const std::exception &e)

@@ -79,6 +79,11 @@ enum class APIStatusCode
     /**
      * The requested entity cannot be found.
      */
-    ENTITY_NOT_FOUND = 0x08
+    ENTITY_NOT_FOUND = 0x08,
+
+    /**
+     * An internal database operation threw an exception.
+     */
+    DATABASE_ERROR = 0x09,
 };
 }
