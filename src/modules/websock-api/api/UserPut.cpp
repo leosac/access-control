@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "UserGet.hpp"
+#include "UserPut.hpp"
 #include "Exceptions.hpp"
 #include "User_odb.h"
 #include "api/APISession.hpp"
@@ -28,14 +28,26 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-UserGet::UserGet(RequestContext ctx)
+UserPut::UserPut(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr UserGet::create(RequestContext ctx)
+MethodHandlerUPtr UserPut::create(RequestContext ctx)
 {
-    auto instance = std::make_unique<UserGet>(ctx);
+    auto instance = std::make_unique<UserPut>(ctx);
+
+    auto has_json_attributes_object = [ptr = instance.get()](const json &req)
+    {
+        try
+        {
+            return req.at("attributes").is_object();
+        }
+        catch (const std::out_of_range &e)
+        {
+            return false;
+        }
+    };
 
     auto is_self = [ptr = instance.get()](const json &req)
     {
@@ -44,39 +56,34 @@ MethodHandlerUPtr UserGet::create(RequestContext ctx)
     };
 
     instance->add_conditions_or(
+        []() { throw MalformedMessage("No `attributes` subobject"); },
+        has_json_attributes_object);
+
+    instance->add_conditions_or(
         []() { throw PermissionDenied(); },
         Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_self);
     return std::move(instance);
 }
 
-json UserGet::process_impl(const json &req)
+json UserPut::process_impl(const json &req)
 {
     json rep;
 
     using query = odb::query<Auth::User>;
     DBPtr db    = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto uid = req.at("user_id").get<Auth::UserId>();
+    auto uid        = req.at("user_id").get<Auth::UserId>();
+    auto attributes = req.at("attributes");
 
     Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
     if (user)
     {
-        json memberships = {};
-        for (const auto &membership : user->group_memberships())
-        {
-            json group_info = {{"id", membership->id()},
-                               {"type", "user-group-membership"}};
-            memberships.push_back(group_info);
-        }
-        rep["data"] = {
-            {"id", user->id()},
-            {"type", "user"},
-            {"attributes",
-             {{"username", user->username()},
-              {"firstname", user->firstname()},
-              {"lastname", user->lastname()},
-              {"email", user->email()}}},
-            {"relationships", {{"memberships", {{"data", memberships}}}}}};
+        user->firstname(
+            extract_with_default(attributes, "firstname", user->firstname()));
+        user->lastname(
+            extract_with_default(attributes, "lastname", user->lastname()));
+        user->email(extract_with_default(attributes, "email", user->email()));
+        db->update(user);
     }
     else
         throw EntityNotFound(uid, "user");

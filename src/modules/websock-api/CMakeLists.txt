@@ -9,6 +9,7 @@ set(WEBSOCK_API_SRCS
         api/MethodHandler.cpp
         api/APIAuth.cpp
         api/UserGet.cpp
+        api/UserPut.cpp
         api/LogGet.cpp
         api/GroupGet.cpp
         api/MembershipGet.cpp

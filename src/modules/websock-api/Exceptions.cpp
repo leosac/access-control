@@ -35,7 +35,7 @@ SessionAborted::SessionAborted(Auth::TokenPtr token)
 {
 }
 
-std::string SessionAborted::build_msg(Auth::TokenPtr token)
+std::string SessionAborted::build_msg(Auth::TokenPtr token) const
 {
     std::stringstream ss;
     ss << "Websocket session has been aborted.";
@@ -61,7 +61,8 @@ EntityNotFound::EntityNotFound(const std::string &id, const std::string &type)
 {
 }
 
-std::string EntityNotFound::build_msg(const std::string &id, const std::string &type)
+std::string EntityNotFound::build_msg(const std::string &id,
+                                      const std::string &type) const
 {
     std::stringstream ss;
     ss << "Cannot find `" << type << "` with id `" << id << "`.";
@@ -77,4 +78,20 @@ const std::string &EntityNotFound::entity_id() const
 const std::string &EntityNotFound::entity_type() const
 {
     return entity_type_;
+}
+
+MalformedMessage::MalformedMessage(const std::string &detail)
+    : LEOSACException(build_msg(detail))
+{
+}
+
+std::string MalformedMessage::build_msg(const std::string &detail) const
+{
+    std::stringstream ss;
+    ss << "Malformed message";
+
+    if (detail.size())
+        ss << ": " << detail;
+
+    return ss.str();
 }

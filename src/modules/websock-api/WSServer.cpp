@@ -24,6 +24,7 @@
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
 #include "api/UserGet.hpp"
+#include "api/UserPut.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/db/DBService.hpp"
@@ -64,6 +65,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["system_overview"]         = &APISession::system_overview;
 
     handlers2_["user_get"]       = &UserGet::create;
+    handlers2_["user_put"]       = &UserPut::create;
     handlers2_["get_logs"]       = &LogGet::create;
     handlers2_["group_get"]      = &GroupGet::create;
     handlers2_["membership_get"] = &MembershipGet::create;
@@ -103,7 +105,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         req                    = json::parse(msg->get_payload());
 
         response = handle_request(api_handle, req);
-        INFO("Incoming payload: \n" << response.content.dump(4));
+        INFO("Incoming payload: \n" << req.dump(4));
     }
     catch (const std::invalid_argument &e)
     {

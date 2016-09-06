@@ -32,8 +32,11 @@ namespace WebSockAPI
 class MalformedMessage : public LEOSACException
 {
   public:
-    MalformedMessage()
-        : LEOSACException("Message is malformed."){};
+    MalformedMessage(const std::string &detail = "");
+    ;
+
+  private:
+    std::string build_msg(const std::string &detail) const;
 };
 
 class PermissionDenied : public LEOSACException
@@ -67,7 +70,7 @@ class SessionAborted : public LEOSACException
      * Build an exception message for when the reason of the aborted
      * session is an expired token.
      */
-    std::string build_msg(Auth::TokenPtr token);
+    std::string build_msg(Auth::TokenPtr token) const;
 };
 
 class EntityNotFound : public LEOSACException
@@ -89,7 +92,7 @@ class EntityNotFound : public LEOSACException
     const std::string &entity_type() const;
 
   private:
-    std::string build_msg(const std::string &id, const std::string &type);
+    std::string build_msg(const std::string &id, const std::string &type) const;
 
     std::string entity_id_;
     std::string entity_type_;
