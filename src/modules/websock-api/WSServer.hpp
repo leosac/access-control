@@ -24,6 +24,7 @@
 #include "api/APISession.hpp"
 #include "api/MethodHandler.hpp"
 #include "core/APIStatusCode.hpp"
+#include "core/audit/AuditFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 #include <set>
 #include <websocketpp/config/asio_no_tls.hpp>
@@ -127,7 +128,8 @@ class WSServer
      * Extract request header, set-up exception handler for api handler
      * invokation.
      */
-    ServerMessage handle_request(APIPtr api_handle, const json &req);
+    ServerMessage handle_request(APIPtr api_handle, const json &req,
+                                 Audit::AuditEntryPtr);
 
     /**
      * Create a ClientMessage object from a json request.
@@ -145,7 +147,8 @@ class WSServer
      * Process a request from a client.
      * The proper implementation method of WebSockAPI::API is called.
      */
-    json dispatch_request(APIPtr api_handle, const ClientMessage &in);
+    json dispatch_request(APIPtr api_handle, const ClientMessage &in,
+                          Audit::AuditEntryPtr);
 
     ConnectionAPIMap connection_api_;
     APIAuth auth_;

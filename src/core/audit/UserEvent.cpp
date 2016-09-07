@@ -17,35 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "UserEvent.hpp"
 
-#include "WebSockFwd.hpp"
-#include "core/audit/AuditFwd.hpp"
-#include "tools/db/db_fwd.hpp"
-
-namespace Leosac
-{
-namespace Module
-{
-namespace WebSockAPI
-{
-/**
- * Holds valuable pointer to provide context to a request.
- */
-struct RequestContext
-{
-    APIPtr session;
-    DBServicePtr dbsrv;
-    WSServer &server;
-
-    /**
-     * The initial audit trail for the request.
-     * It is garanteed that this audit object is:
-     *     + Non null
-     *     + Already persisted
-     */
-    Audit::AuditEntryPtr audit;
-};
-}
-}
-}
+using namespace Leosac;
+using namespace Leosac::Audit;

@@ -88,23 +88,29 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     assert(connection_api_.find(hdl) != connection_api_.end());
     auto api_handle = connection_api_.find(hdl)->second;
 
-    Audit::WSAPICall audit;
+    Audit::WSAPICallPtr audit = std::make_shared<Audit::WSAPICall>();
+    {
+        // Create the audit, making sure it as an ID.
+        db::MultiplexedTransaction t(db_->begin());
+        db_->persist(audit);
+        t.commit();
+    }
     ServerMessage response;
     json req;
     try
     {
-        audit.event_mask_ |= Audit::EventType::WSAPI_CALL;
-        audit.author_          = api_handle->current_user();
+        audit->event_mask_ |= Audit::EventType::WSAPI_CALL;
+        audit->author_         = api_handle->current_user();
         auto ws_connection_ptr = srv_.get_con_from_hdl(hdl);
         ASSERT_LOG(ws_connection_ptr, "No websocket connection object from handle.");
-        audit.source_endpoint_ = ws_connection_ptr->get_remote_endpoint();
+        audit->source_endpoint_ = ws_connection_ptr->get_remote_endpoint();
 
         // todo careful potential DDOS as we store the full content without checking
         // for now.
-        audit.request_content_ = msg->get_payload();
-        req                    = json::parse(msg->get_payload());
+        audit->request_content_ = msg->get_payload();
+        req                     = json::parse(msg->get_payload());
 
-        response = handle_request(api_handle, req);
+        response = handle_request(api_handle, req, audit);
         INFO("Incoming payload: \n" << req.dump(4));
     }
     catch (const std::invalid_argument &e)
@@ -114,14 +120,14 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         response.status_string = "Failed to parse JSON.";
     }
     {
-        audit.uuid_             = response.uuid;
-        audit.api_method_       = response.type;
-        audit.status_code_      = response.status_code;
-        audit.status_string_    = response.status_string;
-        audit.response_content_ = response.content.dump(4);
+        audit->uuid_             = response.uuid;
+        audit->api_method_       = response.type;
+        audit->status_code_      = response.status_code;
+        audit->status_string_    = response.status_string;
+        audit->response_content_ = response.content.dump(4);
 
         db::MultiplexedTransaction t(db_->begin());
-        db_->persist(audit);
+        db_->update(audit);
         t.commit();
     }
 
@@ -151,7 +157,8 @@ APIAuth &WSServer::auth()
     return auth_;
 }
 
-json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
+json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
+                                Audit::AuditEntryPtr audit)
 {
     // A request is a "Unit-of-Work" for the application.
     // We create a default database session for the request.
@@ -163,7 +170,8 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in)
     {
         RequestContext ctx{.session = api_handle,
                            .dbsrv   = std::make_shared<DBService>(db_),
-                           .server  = *this};
+                           .server  = *this,
+                           .audit   = audit};
 
         MethodHandlerUPtr method_handler = handler_factory->second(ctx);
         return method_handler->process(in);
@@ -235,7 +243,8 @@ ClientMessage WSServer::parse_request(const json &req)
     return msg;
 }
 
-ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req)
+ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
+                                       Audit::AuditEntryPtr audit)
 {
     ServerMessage response;
     response.status_code = APIStatusCode::SUCCESS;
@@ -245,7 +254,7 @@ ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req)
         ClientMessage input = parse_request(req);
         response.uuid       = input.uuid;
         response.type       = input.type;
-        response.content    = dispatch_request(api_handle, input);
+        response.content    = dispatch_request(api_handle, input, audit);
     }
     catch (const InvalidCall &e)
     {

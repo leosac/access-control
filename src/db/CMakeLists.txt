@@ -52,6 +52,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
 set(OdbCMake_ODB_HEADERS_AUDITLOG
         ${CMAKE_SOURCE_DIR}/src/core/audit/AuditEntry.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/WSAPICall.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/audit/UserEvent.hpp
         )
 
 set(OdbCMake_SOURCES_AUDITLOG "")

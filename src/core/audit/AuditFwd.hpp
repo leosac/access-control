@@ -27,17 +27,25 @@ namespace Leosac
 {
 namespace Audit
 {
+using AuditEntryId = unsigned long;
+
 class AuditEntry;
-using AuditEntryPtr = std::shared_ptr<AuditEntry>;
+using AuditEntryPtr  = std::shared_ptr<AuditEntry>;
+using AuditEntryWPtr = std::weak_ptr<AuditEntry>;
 
 class WSAPICall;
 using WSAPICallUPtr = std::unique_ptr<WSAPICall>;
+using WSAPICallPtr  = std::shared_ptr<WSAPICall>;
+
+class UserEvent;
+using UserEventPtr = std::shared_ptr<UserEvent>;
 
 enum class EventType
 {
     WSAPI_CALL,
     USER_CREATED,
     USER_DELETED,
+    USER_EDITED,
     /**
      * A call to "user_get" websocket API has been made.
      */

@@ -85,5 +85,11 @@ enum class APIStatusCode
      * An internal database operation threw an exception.
      */
     DATABASE_ERROR = 0x09,
+
+    /**
+     * Unknown status.
+     * Mostly useful as a default value somewhere.
+     */
+    UNKNOWN = 0x0A
 };
 }

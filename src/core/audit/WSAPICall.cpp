@@ -21,3 +21,8 @@
 
 using namespace Leosac;
 using namespace Leosac::Audit;
+
+WSAPICall::WSAPICall()
+    : status_code_(APIStatusCode::UNKNOWN)
+{
+}

@@ -23,6 +23,8 @@
 #include "core/auth/AuthFwd.hpp"
 #include "tools/db/database.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <memory>
+#include <odb/callback.hxx>
 #include <odb/core.hxx>
 
 namespace Leosac
@@ -39,25 +41,38 @@ namespace Audit
  *
  * The audit log is sequential.
  */
-#pragma db object polymorphic optimistic
-class AuditEntry
+#pragma db object polymorphic optimistic callback(odb_callback)
+class AuditEntry : public std::enable_shared_from_this<AuditEntry>
 {
   public:
     AuditEntry();
 
     virtual ~AuditEntry() = default;
 
-#pragma db id auto
-    unsigned long id_;
+    AuditEntryId id() const;
 
-#pragma db not_null
-    boost::posix_time::ptime timestamp_;
+    /**
+     * Set `parent` as the parent audit entry for
+     * this entry.
+     *
+     * The `set_parent()` will copy the parent's author to this->author_
+     * if there currently is no author assigned to the entry.
+     *
+     * Pre-Conditions:
+     *     + Shall have no parent.
+     *     + The `parent` must be a non-null, already persisted
+     *       object.
+     *
+     * Post-Conditions:
+     *     + Will have a parent.
+     *     + This object will be somewhere in `parent->children_` array.
+     *
+     * @param parent
+     */
+    void set_parent(AuditEntryPtr parent);
 
 #pragma db not_null
     std::string msg_;
-
-#pragma db value_not_null
-    std::vector<AuditEntryPtr> children_;
 
     /**
      * The user at the source of the entry.
@@ -68,11 +83,36 @@ class AuditEntry
 #pragma db type("TEXT")
     EventMask event_mask_;
 
+  private:
+#pragma db not_null
+    boost::posix_time::ptime timestamp_;
+
+#pragma db value_not_null
+    std::vector<AuditEntryPtr> children_;
+
+#pragma db inverse(children_)
+    AuditEntryWPtr parent_;
+
+#pragma db id auto
+    AuditEntryId id_;
+
 #pragma db version
     const ssize_t version_;
 
-  private:
     friend class odb::access;
+
+    /**
+     * Implementation of an ODB callback.
+     *
+     * The callback will make sure to update the parent (if any).
+     * This is to ensure that parent-child relationship are persisted when saving
+     * the child.
+     *
+     * Note that the reverse is not needed, because the child must always be fully
+     * saved
+     * before the parent gets its final update.
+     */
+    void odb_callback(odb::callback_event e, odb::database &) const;
 };
 }
 }

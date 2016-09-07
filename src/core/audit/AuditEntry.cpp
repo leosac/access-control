@@ -18,6 +18,8 @@
 */
 
 #include "AuditEntry.hpp"
+#include "AuditEntry_odb.h"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Audit;
@@ -26,4 +28,37 @@ AuditEntry::AuditEntry()
     : version_(0)
 {
     timestamp_ = boost::posix_time::second_clock::local_time();
+}
+
+AuditEntryId AuditEntry::id() const
+{
+    return id_;
+}
+
+void AuditEntry::set_parent(AuditEntryPtr parent)
+{
+    ASSERT_LOG(parent, "Parent must not be null");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+    ASSERT_LOG(!parent_.lock(), "Entry must have no parent.");
+
+    auto self = shared_from_this();
+    assert(self);
+    parent->children_.push_back(self);
+    parent_ = parent;
+
+    if (!author_)
+        author_ = parent->author_;
+}
+
+void AuditEntry::odb_callback(odb::callback_event e, odb::database &db) const
+{
+    if (e == odb::callback_event::post_update ||
+        e == odb::callback_event::post_persist)
+    {
+        if (auto parent = parent_.lock())
+        {
+            ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+            db.update(parent);
+        }
+    }
 }

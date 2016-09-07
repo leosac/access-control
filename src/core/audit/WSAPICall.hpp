@@ -27,20 +27,16 @@ namespace Leosac
 namespace Audit
 {
 /**
- * An Audit entry.
+ * An audit entry for WebSocket API call.
  *
- * Leosac keeps an audit trail. This serves multiple purposes:
- *     + Additional security
- *     + Keep track of changes in order to generate differential configuration
- *     update to door devices.
- *
- * The audit log is sequential.
+ * This entry indicates that a Websocket API call took place.
+ * It saves the query parameters, the source endpoint, etc.
  */
-#pragma db object polymorphic
+#pragma db object polymorphic callback(odb_callback)
 class WSAPICall : public AuditEntry
 {
   public:
-    WSAPICall() = default;
+    WSAPICall();
 
     virtual ~WSAPICall() = default;
 

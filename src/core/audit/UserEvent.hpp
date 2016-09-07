@@ -19,33 +19,32 @@
 
 #pragma once
 
-#include "WebSockFwd.hpp"
-#include "core/audit/AuditFwd.hpp"
-#include "tools/db/db_fwd.hpp"
+#include "AuditEntry.hpp"
 
 namespace Leosac
 {
-namespace Module
-{
-namespace WebSockAPI
+namespace Audit
 {
 /**
- * Holds valuable pointer to provide context to a request.
+ * An audit that keeps track of an UserEvent.
+ *
+ * UserEvent indicates that a user was modified (wether directly
+ * or indirectly).
  */
-struct RequestContext
+#pragma db object polymorphic callback(odb_callback)
+class UserEvent : public AuditEntry
 {
-    APIPtr session;
-    DBServicePtr dbsrv;
-    WSServer &server;
+  public:
+    UserEvent() = default;
 
-    /**
-     * The initial audit trail for the request.
-     * It is garanteed that this audit object is:
-     *     + Non null
-     *     + Already persisted
-     */
-    Audit::AuditEntryPtr audit;
+    virtual ~UserEvent() = default;
+
+#pragma db not_null
+    Auth::UserLWPtr target_;
+
+
+  private:
+    friend class odb::access;
 };
-}
 }
 }

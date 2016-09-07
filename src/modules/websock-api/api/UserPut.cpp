@@ -19,10 +19,12 @@
 
 #include "UserPut.hpp"
 #include "Exceptions.hpp"
+#include "UserEvent_odb.h"
 #include "User_odb.h"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "tools/db/DBService.hpp"
+#include <core/audit/UserEvent.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -78,11 +80,18 @@ json UserPut::process_impl(const json &req)
     Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
     if (user)
     {
+        Audit::UserEventPtr audit = std::make_shared<Audit::UserEvent>();
+        audit->target_            = user;
+        audit->set_parent(ctx_.audit);
+        audit->event_mask_ |= Audit::EventType::USER_EDITED;
+
         user->firstname(
             extract_with_default(attributes, "firstname", user->firstname()));
         user->lastname(
             extract_with_default(attributes, "lastname", user->lastname()));
         user->email(extract_with_default(attributes, "email", user->email()));
+
+        db->persist(audit);
         db->update(user);
     }
     else

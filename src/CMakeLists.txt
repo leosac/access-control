@@ -69,6 +69,8 @@ set(LEOSAC_LIB_SRCS
     core/tasks/RemoteControlAsyncResponse.cpp
     core/audit/AuditEntry.cpp
     core/audit/AuditFwd.cpp
+    core/audit/UserEvent.cpp
+    core/audit/WSAPICall.cpp
 )
 
 # Rule for ODB code generation.
