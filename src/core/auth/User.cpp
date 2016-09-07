@@ -25,8 +25,14 @@
 
 using namespace Leosac::Auth;
 
+User::User()
+    : version_(0)
+{
+}
+
 User::User(const std::string &username)
     : username_(username)
+    , version_(0)
 {
 }
 

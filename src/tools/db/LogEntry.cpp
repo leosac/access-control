@@ -29,6 +29,10 @@
 using namespace Leosac;
 using namespace Leosac::Tools;
 
+LogEntry::LogEntry()
+    : version_(0)
+{
+}
 
 LogEntry::QueryResult LogEntry::retrieve(DBPtr database, int page_number,
                                          int page_size, bool order_asc)

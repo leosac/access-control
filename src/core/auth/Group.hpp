@@ -34,16 +34,12 @@ namespace Auth
 /**
 * A authentication group regroup users that share permissions.
 */
-#pragma db object callback(odb_callback)
+#pragma db object callback(odb_callback) optimistic
 class Group : public std::enable_shared_from_this<Group>
 {
   public:
+    Group();
     explicit Group(const std::string &group_name);
-    /**
-     * Default constructor, required by ODB.
-     */
-    Group() = default;
-
 
     /**
      * Retrieve the unique identifier of the group.
@@ -104,6 +100,9 @@ class Group : public std::enable_shared_from_this<Group>
 
 #pragma db transient
     IAccessProfilePtr profile_;
+
+#pragma db version
+    const ssize_t version_;
 };
 }
 }

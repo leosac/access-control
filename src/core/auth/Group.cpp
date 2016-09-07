@@ -23,8 +23,14 @@
 #include "core/auth/UserGroupMembership.hpp"
 #include "tools/log.hpp"
 
+Leosac::Auth::Group::Group()
+    : version_(0)
+{
+}
+
 Leosac::Auth::Group::Group(const std::string &group_name)
     : name_(group_name)
+    , version_(0)
 {
 }
 

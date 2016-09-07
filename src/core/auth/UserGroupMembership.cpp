@@ -26,6 +26,7 @@ using namespace Leosac;
 using namespace Leosac::Auth;
 
 UserGroupMembership::UserGroupMembership()
+    : version_(0)
 {
     timestamp_ = boost::posix_time::second_clock::local_time();
     rank_      = GroupRank::MEMBER;

@@ -36,11 +36,11 @@ namespace Tools
  * The class also provide an API via static method to
  * retrieve entries from an underlying database.
  */
-#pragma db object
+#pragma db object optimistic
 class LogEntry
 {
   public:
-    LogEntry() = default;
+    LogEntry();
 
 #pragma db id auto
     unsigned long id_;
@@ -83,6 +83,9 @@ class LogEntry
 
   private:
     friend class odb::access;
+
+#pragma db version
+    const ssize_t version_;
 };
 
 /**

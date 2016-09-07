@@ -18,6 +18,6 @@ doc/html
 ## IDE stuff
 .idea/dictionaries/*
 
-
-## More IDE stuff
-web/.idea/*
+# For now we don't care about ODB xml file.
+# Later we'll need them tho.
+src/*/*/*.xml

@@ -23,6 +23,7 @@ using namespace Leosac;
 using namespace Leosac::Audit;
 
 AuditEntry::AuditEntry()
+    : version_(0)
 {
     timestamp_ = boost::posix_time::second_clock::local_time();
 }

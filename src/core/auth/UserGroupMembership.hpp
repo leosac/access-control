@@ -41,7 +41,7 @@ enum class GroupRank
  * Describe the membership of an User with regroup to a Group.
  * This class is "database enabled".
  */
-#pragma db object
+#pragma db object optimistic
 class UserGroupMembership
 {
   public:
@@ -74,6 +74,9 @@ class UserGroupMembership
 
 #pragma db not_null
     GroupRank rank_;
+
+#pragma db version
+    const ssize_t version_;
 
     friend class odb::access;
 };

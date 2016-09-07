@@ -39,8 +39,7 @@ namespace Audit
  *
  * The audit log is sequential.
  */
-#pragma db object polymorphic
-
+#pragma db object polymorphic optimistic
 class AuditEntry
 {
   public:
@@ -68,6 +67,9 @@ class AuditEntry
 
 #pragma db type("TEXT")
     EventMask event_mask_;
+
+#pragma db version
+    const ssize_t version_;
 
   private:
     friend class odb::access;

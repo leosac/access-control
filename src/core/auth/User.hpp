@@ -34,12 +34,12 @@ namespace Auth
 /**
 * Represent a user
 */
-#pragma db object
+#pragma db object optimistic
 class User
 {
   public:
     User(const std::string &username);
-    User()          = default;
+    User();
     virtual ~User() = default;
 
     /**
@@ -117,6 +117,9 @@ class User
     CredentialValidity validity_;
 #pragma db transient
     IAccessProfilePtr profile_;
+
+#pragma db version
+    const ssize_t version_;
 
   private:
     friend class odb::access;

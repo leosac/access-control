@@ -38,19 +38,14 @@ namespace Auth
  *
  * One token maps to one user.
  */
-#pragma db object
+#pragma db object optimistic
 class Token
 {
   public:
-    Token() = default;
+    Token();
+    ;
 
-    Token(const std::string &token, UserPtr owner)
-        : token_(token)
-        , owner_(owner)
-        , version_(0)
-    {
-        expire_in(std::chrono::milliseconds(0));
-    }
+    Token(const std::string &token, UserPtr owner);
 
     /**
      * Retrieve the string representation of the token.
@@ -86,7 +81,6 @@ class Token
 
         auto now    = boost::posix_time::second_clock::local_time();
         expiration_ = now + boost::posix_time::seconds(duration_second.count());
-        version_++;
     }
 
   private:
@@ -108,12 +102,8 @@ class Token
 #pragma db not_null
     boost::posix_time::ptime expiration_;
 
-/**
- * The version indicates how many time the expiration
- * date has been modified.
- */
-#pragma db not_null
-    ssize_t version_;
+#pragma db version
+    const ssize_t version_;
 };
 }
 }
