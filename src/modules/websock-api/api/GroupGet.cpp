@@ -24,6 +24,7 @@
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "conditions/IsInGroup.hpp"
 #include "tools/db/DBService.hpp"
+#include <core/auth/serializers/GroupJSONSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -63,20 +64,7 @@ json GroupGet::process_impl(const json &req)
     Auth::GroupPtr group = db->query_one<Auth::Group>(query::id == gid);
     if (group)
     {
-        json memberships = {};
-        for (const auto &membership : group->user_memberships())
-        {
-            json group_info = {{"id", membership->id()},
-                               {"type", "user-group-membership"}};
-            memberships.push_back(group_info);
-        }
-        rep["data"] = {{"id", group->id()},
-                       {"type", "group"},
-                       {"attributes",
-                        {
-                            {"name", group->name()},
-                        }},
-                       {"relationships", {{"members", {{"data", memberships}}}}}};
+        rep["data"] = GroupJSONSerializer::to_object(*group);
     }
     else
         throw EntityNotFound(gid, "group");

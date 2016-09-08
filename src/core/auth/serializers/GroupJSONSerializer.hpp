@@ -19,41 +19,18 @@
 
 #pragma once
 
-#include "AuditEntry.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include "tools/JSONSerializer.hpp"
 
 namespace Leosac
 {
-namespace Audit
-{
+
 /**
- * An audit that keeps track of an UserEvent.
- *
- * UserEvent indicates that a user was modified (wether directly
- * or indirectly).
+ * A serializer that handle `Auth::Group` object.
  */
-#pragma db object polymorphic callback(odb_callback)
-class UserEvent : public AuditEntry
+struct GroupJSONSerializer : public JSONSerializer<Auth::Group>
 {
-  public:
-    UserEvent() = default;
-
-    virtual ~UserEvent() = default;
-
-#pragma db not_null
-    Auth::UserLWPtr target_;
-
-    /**
-     * Optional JSON dump of the object before the event took place.
-     */
-    std::string before_;
-
-    /**
-     * Optional JSON dump of the object after the event took place.
-     */
-    std::string after_;
-
-  private:
-    friend class odb::access;
+    static std::string to_string(const Auth::Group &group);
+    static json to_object(const Auth::Group &group);
 };
-}
 }

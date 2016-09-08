@@ -29,6 +29,8 @@ set(LEOSAC_LIB_SRCS
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp
     core/auth/User.cpp
+    core/auth/serializers/UserJSONSerializer.cpp
+    core/auth/serializers/GroupJSONSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
@@ -129,6 +131,7 @@ ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
 ${CMAKE_SOURCE_DIR}/deps/libzmq/include
 ${CMAKE_SOURCE_DIR}/deps/spdlog/include
 ${CMAKE_SOURCE_DIR}/deps/flagset
+${CMAKE_SOURCE_DIR}/deps/json/src
 )
 
 #Set compilation flags for current target

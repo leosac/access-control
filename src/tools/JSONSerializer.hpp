@@ -19,41 +19,36 @@
 
 #pragma once
 
-#include "AuditEntry.hpp"
+#include "tools/log.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
-namespace Audit
-{
+using json = nlohmann::json;
+
 /**
- * An audit that keeps track of an UserEvent.
- *
- * UserEvent indicates that a user was modified (wether directly
- * or indirectly).
+ * A JSON serializer that can serialize an object of type `T`.
  */
-#pragma db object polymorphic callback(odb_callback)
-class UserEvent : public AuditEntry
+template <typename T>
+struct JSONSerializer
 {
-  public:
-    UserEvent() = default;
-
-    virtual ~UserEvent() = default;
-
-#pragma db not_null
-    Auth::UserLWPtr target_;
+    /**
+     * Serialize to an std::string
+     */
+    static std::string to_string(const T &)
+    {
+        ASSERT_LOG(0, "Reimplement the function.");
+        return "";
+    }
 
     /**
-     * Optional JSON dump of the object before the event took place.
+     * Serialize to a json object.
      */
-    std::string before_;
-
-    /**
-     * Optional JSON dump of the object after the event took place.
-     */
-    std::string after_;
-
-  private:
-    friend class odb::access;
+    static json to_object(const T &)
+    {
+        ASSERT_LOG(0, "Reimplement the function.");
+        return {};
+    }
 };
-}
 }

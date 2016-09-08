@@ -25,6 +25,7 @@
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "tools/db/DBService.hpp"
 #include <core/audit/UserEvent.hpp>
+#include <core/auth/serializers/UserJSONSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -81,9 +82,10 @@ json UserPut::process_impl(const json &req)
     if (user)
     {
         Audit::UserEventPtr audit = std::make_shared<Audit::UserEvent>();
-        audit->target_            = user;
         audit->set_parent(ctx_.audit);
+        audit->target_            = user;
         audit->event_mask_ |= Audit::EventType::USER_EDITED;
+        audit->before_ = UserJSONSerializer::to_string(*user);
 
         user->firstname(
             extract_with_default(attributes, "firstname", user->firstname()));
@@ -91,6 +93,7 @@ json UserPut::process_impl(const json &req)
             extract_with_default(attributes, "lastname", user->lastname()));
         user->email(extract_with_default(attributes, "email", user->email()));
 
+        audit->after_ = UserJSONSerializer::to_string(*user);
         db->persist(audit);
         db->update(user);
     }

@@ -22,6 +22,7 @@
 #include "User_odb.h"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
+#include "core/auth/serializers/UserJSONSerializer.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
@@ -61,22 +62,7 @@ json UserGet::process_impl(const json &req)
     Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
     if (user)
     {
-        json memberships = {};
-        for (const auto &membership : user->group_memberships())
-        {
-            json group_info = {{"id", membership->id()},
-                               {"type", "user-group-membership"}};
-            memberships.push_back(group_info);
-        }
-        rep["data"] = {
-            {"id", user->id()},
-            {"type", "user"},
-            {"attributes",
-             {{"username", user->username()},
-              {"firstname", user->firstname()},
-              {"lastname", user->lastname()},
-              {"email", user->email()}}},
-            {"relationships", {{"memberships", {{"data", memberships}}}}}};
+        rep["data"] = UserJSONSerializer::to_object(*user);
     }
     else
         throw EntityNotFound(uid, "user");
