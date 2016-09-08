@@ -71,6 +71,20 @@ class AuditEntry : public std::enable_shared_from_this<AuditEntry>
      */
     void set_parent(AuditEntryPtr parent);
 
+  private:
+#pragma db id auto
+    AuditEntryId id_;
+
+#pragma db not_null
+    boost::posix_time::ptime timestamp_;
+
+#pragma db value_not_null
+    std::vector<AuditEntryPtr> children_;
+
+  public:
+#pragma db inverse(children_)
+    AuditEntryWPtr parent_;
+
 #pragma db not_null
     std::string msg_;
 
@@ -84,18 +98,6 @@ class AuditEntry : public std::enable_shared_from_this<AuditEntry>
     EventMask event_mask_;
 
   private:
-#pragma db not_null
-    boost::posix_time::ptime timestamp_;
-
-#pragma db value_not_null
-    std::vector<AuditEntryPtr> children_;
-
-#pragma db inverse(children_)
-    AuditEntryWPtr parent_;
-
-#pragma db id auto
-    AuditEntryId id_;
-
 #pragma db version
     const ssize_t version_;
 

@@ -69,6 +69,11 @@ class APISession
     Auth::UserPtr current_user() const;
 
     /**
+     * Retrieve the currently in-use token, or nullptr.
+     */
+    Auth::TokenPtr current_token() const;
+
+    /**
      * Is this API client allowed to perform the request `cmd` ?
      */
     bool allowed(const std::string &cmd);
@@ -155,7 +160,6 @@ class APISession
      */
     void hook_before_request();
 
-  private:
     /**
      * Abort the current websocket session.
      *
@@ -163,6 +167,7 @@ class APISession
      */
     void abort_session();
 
+  private:
     /**
      * The API server.
      */

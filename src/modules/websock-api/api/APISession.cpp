@@ -181,3 +181,8 @@ Auth::UserPtr APISession::current_user() const
         return current_auth_token_->owner();
     return nullptr;
 }
+
+Auth::TokenPtr APISession::current_token() const
+{
+    return current_auth_token_;
+}

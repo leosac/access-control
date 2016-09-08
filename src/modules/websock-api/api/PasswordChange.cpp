@@ -17,40 +17,31 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "UserPut.hpp"
+#include "PasswordChange.hpp"
 #include "Exceptions.hpp"
 #include "UserEvent_odb.h"
+#include "UserGet.hpp"
 #include "User_odb.h"
+#include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
-#include "core/audit/UserEvent.hpp"
-#include "core/auth/serializers/UserJSONSerializer.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-UserPut::UserPut(RequestContext ctx)
+PasswordChange::PasswordChange(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr UserPut::create(RequestContext ctx)
+MethodHandlerUPtr PasswordChange::create(RequestContext ctx)
 {
-    auto instance = std::make_unique<UserPut>(ctx);
+    auto instance = std::make_unique<PasswordChange>(ctx);
 
-    auto has_json_attributes_object = [ptr = instance.get()](const json &req)
-    {
-        try
-        {
-            return req.at("attributes").is_object();
-        }
-        catch (const std::out_of_range &e)
-        {
-            return false;
-        }
-    };
+    // Change self password, or is an administrator and
+    // can change anyone's password.
 
     auto is_self = [ptr = instance.get()](const json &req)
     {
@@ -59,41 +50,46 @@ MethodHandlerUPtr UserPut::create(RequestContext ctx)
     };
 
     instance->add_conditions_or(
-        []() { throw MalformedMessage("No `attributes` subobject"); },
-        has_json_attributes_object);
-
-    instance->add_conditions_or(
         []() { throw PermissionDenied(); },
         Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_self);
     return std::move(instance);
 }
 
-json UserPut::process_impl(const json &req)
+json PasswordChange::process_impl(const json &req)
 {
     json rep;
 
     using query = odb::query<Auth::User>;
     DBPtr db    = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto uid        = req.at("user_id").get<Auth::UserId>();
-    auto attributes = req.at("attributes");
+    auto uid          = req.at("user_id").get<Auth::UserId>();
+    auto new_password = req.at("new_password").get<std::string>();
 
     Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
     if (user)
     {
+        using namespace FlagSetOperator;
         Audit::UserEventPtr audit = std::make_shared<Audit::UserEvent>();
         audit->set_parent(ctx_.audit);
         audit->target_ = user;
-        audit->event_mask_ |= Audit::EventType::USER_EDITED;
-        audit->before_ = UserJSONSerializer::to_string(*user);
+        if (uid == ctx_.session->current_user_id())
+        {
+            auto current_password = req.at("current_password").get<std::string>();
+            // When changing our own password, we check the `current_password` field.
+            if (user->password() != current_password)
+            {
+                audit->event_mask_ = Audit::EventType::USER_PASSWORD_CHANGE_FAILURE;
+                db->persist(audit);
+                t.commit();
+                throw PermissionDenied("Invalid `current_password`.");
+            }
+        }
+        audit->event_mask_ =
+            Audit::EventType::USER_EDITED | Audit::EventType::USER_PASSWORD_CHANGED;
+        user->password(new_password);
 
-        user->firstname(
-            extract_with_default(attributes, "firstname", user->firstname()));
-        user->lastname(
-            extract_with_default(attributes, "lastname", user->lastname()));
-        user->email(extract_with_default(attributes, "email", user->email()));
-
-        audit->after_ = UserJSONSerializer::to_string(*user);
+        // todo should probably false.
+        ctx_.server.clear_user_sessions(user, ctx_.session, true);
         db->persist(audit);
         db->update(user);
     }

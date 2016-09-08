@@ -23,8 +23,8 @@
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "conditions/IsInGroup.hpp"
+#include "core/auth/serializers/GroupJSONSerializer.hpp"
 #include "tools/db/DBService.hpp"
-#include <core/auth/serializers/GroupJSONSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;

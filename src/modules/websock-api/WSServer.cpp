@@ -19,13 +19,16 @@
 
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
+#include "Token_odb.h"
 #include "WSAPICall_odb.h"
 #include "api/GroupGet.hpp"
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
+#include "api/PasswordChange.hpp"
 #include "api/UserGet.hpp"
 #include "api/UserPut.hpp"
 #include "core/audit/WSAPICall.hpp"
+#include "core/auth/User.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
@@ -64,11 +67,12 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
 
-    handlers2_["user_get"]       = &UserGet::create;
-    handlers2_["user_put"]       = &UserPut::create;
-    handlers2_["get_logs"]       = &LogGet::create;
-    handlers2_["group_get"]      = &GroupGet::create;
-    handlers2_["membership_get"] = &MembershipGet::create;
+    handlers2_["user_get"]        = &UserGet::create;
+    handlers2_["user_put"]        = &UserPut::create;
+    handlers2_["get_logs"]        = &LogGet::create;
+    handlers2_["group_get"]       = &GroupGet::create;
+    handlers2_["membership_get"]  = &MembershipGet::create;
+    handlers2_["password_change"] = &PasswordChange::create;
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -304,4 +308,38 @@ ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
         response.status_string = e.what();
     }
     return response;
+}
+
+void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
+                                   bool new_transaction /* = true */)
+{
+    ASSERT_LOG(
+        new_transaction || odb::transaction::has_current(),
+        "Not requesting a new transaction, but no currently active transaction.");
+
+    std::unique_ptr<db::MultiplexedTransaction> transaction;
+    if (new_transaction)
+        transaction = std::make_unique<db::MultiplexedTransaction>(db_->begin());
+
+    for (const auto &connection_to_api : connection_api_)
+    {
+        const auto &session = connection_to_api.second;
+        if (session->current_user_id() == user->id() && exception != session)
+        {
+            // Invalidate the token.
+            auto token = session->current_token();
+            if (token)
+                db_->erase(*token);
+            // Clear authentication status from this user.
+            session->abort_session();
+            // Notify them
+            ServerMessage msg;
+            msg.content["reason"] = "Session cleared.";
+            msg.status_code       = APIStatusCode::SUCCESS;
+            msg.type              = "session_closed";
+            send_message(connection_to_api.first, msg);
+        }
+    }
+    if (new_transaction)
+        transaction->commit();
 }

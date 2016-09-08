@@ -34,4 +34,4 @@ EventMask gen_mask()
 }
 
 
-EventMask EventMask::UserEvent = gen_mask();
+// EventMask EventMask::UserEvent = gen_mask();

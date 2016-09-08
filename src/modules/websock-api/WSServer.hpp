@@ -100,6 +100,22 @@ class WSServer
      */
     CoreUtilsPtr core_utils();
 
+    /**
+     * Deauthenticate all the connections of `user`, except
+     * the `exception` APISession.
+     *
+     * @param new_transaction If set to true, a new odb::transaction will be used to
+     * delete the authentication tokens from the database. If this is false, the
+     * currently active transaction is used, and it is the caller responsibility to
+     * make
+     * sure that the transaction will be commited.
+     * Invoking this method with `new_transaction` being false and no currently
+     * active
+     * transaction is not allowed.
+     */
+    void clear_user_sessions(Auth::UserPtr user, APIPtr exception,
+                             bool new_transaction = true);
+
   private:
     void on_open(websocketpp::connection_hdl hdl);
 

@@ -46,6 +46,11 @@ enum class EventType
     USER_CREATED,
     USER_DELETED,
     USER_EDITED,
+    USER_PASSWORD_CHANGED,
+    /**
+     * An attempt to change the password failed.
+     */
+    USER_PASSWORD_CHANGE_FAILURE,
     /**
      * A call to "user_get" websocket API has been made.
      */
@@ -55,14 +60,6 @@ enum class EventType
     LAST__
 };
 
-struct EventMask : public FlagSet<EventType>
-{
-    EventMask() = default;
-    EventMask(const std::string bitset_repr)
-        : FlagSet<EventType>(bitset_repr)
-    {
-    }
-    static EventMask UserEvent;
-};
+using EventMask = FlagSet<EventType>;
 }
 }

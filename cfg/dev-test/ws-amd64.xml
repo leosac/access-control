@@ -27,7 +27,8 @@
             <level>1</level>
 
             <module_config>
-                <port>8888</port>
+              <port>8888</port>
+              <interface>10.2.3.100</interface>
             </module_config>
         </module>
     </modules>

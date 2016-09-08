@@ -33,7 +33,6 @@ class MalformedMessage : public LEOSACException
 {
   public:
     MalformedMessage(const std::string &detail = "");
-    ;
 
   private:
     std::string build_msg(const std::string &detail) const;
@@ -42,8 +41,10 @@ class MalformedMessage : public LEOSACException
 class PermissionDenied : public LEOSACException
 {
   public:
-    PermissionDenied()
-        : LEOSACException("Permission denied."){};
+    PermissionDenied(const std::string &detail = "");
+
+  private:
+    std::string build_msg(const std::string &detail) const;
 };
 
 class InvalidCall : public LEOSACException
