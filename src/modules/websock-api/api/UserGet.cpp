@@ -41,6 +41,13 @@ MethodHandlerUPtr UserGet::create(RequestContext ctx)
     auto is_self = [ptr = instance.get()](const json &req)
     {
         auto uid = req.at("user_id").get<Auth::UserId>();
+
+        if (uid == 0)
+        {
+            // This means we request all users. In that case, the
+            // `is_self` rule is not relevant.
+            return false;
+        }
         return ptr->ctx_.session->current_user_id() == uid;
     };
 
@@ -54,18 +61,30 @@ json UserGet::process_impl(const json &req)
 {
     json rep;
 
-    using query = odb::query<Auth::User>;
-    DBPtr db    = ctx_.dbsrv->db();
+    using Query  = odb::query<Auth::User>;
+    using Result = odb::result<Auth::User>;
+    DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
     auto uid = req.at("user_id").get<Auth::UserId>();
 
-    Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
-    if (user)
+    if (uid != 0)
     {
-        rep["data"] = UserJSONSerializer::to_object(*user);
+        Auth::UserPtr user = db->query_one<Auth::User>(Query::id == uid);
+        if (user)
+            rep["data"] = UserJSONSerializer::to_object(*user);
+        else
+            throw EntityNotFound(uid, "user");
     }
     else
-        throw EntityNotFound(uid, "user");
+    {
+        // All users.
+        Result result = db->query<Auth::User>();
+        rep["data"]   = json::array();
+        for (const auto &user : result)
+        {
+            rep["data"].push_back(UserJSONSerializer::to_object(user));
+        }
+    }
     t.commit();
     return rep;
 }

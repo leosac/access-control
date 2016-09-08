@@ -30,10 +30,12 @@ namespace WebSockAPI
 using json = nlohmann::json;
 
 /**
- * Retrieve information about a given user.
+ * Retrieve information about a given user, or about all users.
  *
  * Request:
- *     + `user_id`: The user_id of the user we want to fetch. Required.
+ *     + `user_id`: The user_id of the user we want to fetch.
+ *        Note that the special value `0` can be used to request all known users.
+ *        This field is required.
  *
  * Response:
  *     + ...

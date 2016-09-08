@@ -83,7 +83,7 @@ json UserPut::process_impl(const json &req)
     {
         Audit::UserEventPtr audit = std::make_shared<Audit::UserEvent>();
         audit->set_parent(ctx_.audit);
-        audit->target_            = user;
+        audit->target_ = user;
         audit->event_mask_ |= Audit::EventType::USER_EDITED;
         audit->before_ = UserJSONSerializer::to_string(*user);
 
