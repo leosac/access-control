@@ -22,6 +22,7 @@ function(odb_compile outvar)
     PROFILE
     INCLUDE_PREFIX
     DEFAULT_POINTER
+    PGSQL_SERVER_VERSION
           )
   set(multiValueParams FILES INCLUDE DB INCLUDE_REGEX)
 
@@ -120,6 +121,10 @@ function(odb_compile outvar)
 
   if (PARAM_DEFAULT_POINTER)
       list(APPEND ODB_ARGS --default-pointer "${PARAM_DEFAULT_POINTER}")
+  endif()
+
+  if (PGSQL_SERVER_VERSION)
+      list(APPEND ODB_ARGS --pgsql-server-version "${PGSQL_SERVER_VERSION}")
   endif()
 
   list(APPEND ODB_ARGS --output-dir "${ODB_COMPILE_OUTPUT_DIR}")

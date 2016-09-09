@@ -29,6 +29,7 @@
 #include <odb/object-result.hxx>
 #include <odb/session.hxx>
 #include <tools/db/MultiplexedSession.hpp>
+#include <tools/db/MultiplexedTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -43,8 +44,10 @@ void APIAuth::invalidate_token(Auth::TokenPtr token) const
 {
     using namespace odb;
     using namespace odb::core;
-    transaction t(server_.db()->begin());
-    server_.db()->erase(token);
+    db::MultiplexedSession s;
+    db::MultiplexedTransaction t(server_.db()->begin());
+    auto t2 = server_.db()->load<Auth::Token>(token->token());
+    server_.db()->erase(t2);
     t.commit();
 }
 

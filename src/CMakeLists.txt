@@ -143,7 +143,7 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
-        ${ODB_LIBRARIES} odb-boost odb-mysql backtrace)
+        ${ODB_LIBRARIES} odb-boost odb-mysql odb-pgsql backtrace)
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

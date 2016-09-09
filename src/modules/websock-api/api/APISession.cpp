@@ -143,7 +143,7 @@ void APISession::hook_before_request()
         {
             server_.db()->reload(current_auth_token_);
         }
-        catch (const odb::object_not_persistent &e)
+        catch (const odb::object_changed &e)
         {
             // Token doesn't exist anymore.
             abort_session();

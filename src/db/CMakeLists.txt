@@ -9,10 +9,10 @@ set(OdbCMake_SOURCES_TOOLS "")
 odb_compile(OdbCMake_SOURCES_TOOLS
         FILES ${OdbCMake_ODB_HEADERS_TOOLS}
         MULTI_DATABASE dynamic
-        DB mysql sqlite
+        DB mysql sqlite pgsql
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        SCHEMA_FORMAT sql
         SCHEMA_NAME tools
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/src
@@ -20,6 +20,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION 9.1
         )
 
 
@@ -35,10 +36,10 @@ set(OdbCMake_SOURCES_AUTH "")
 odb_compile(OdbCMake_SOURCES_AUTH
         FILES ${OdbCMake_ODB_HEADERS_AUTH}
         MULTI_DATABASE dynamic
-        DB mysql sqlite
+        DB mysql sqlite pgsql
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        SCHEMA_FORMAT sql
         SCHEMA_NAME auth
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
@@ -46,6 +47,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION 9.1
         )
 
 # ODB configuration for Audit log
@@ -59,10 +61,10 @@ set(OdbCMake_SOURCES_AUDITLOG "")
 odb_compile(OdbCMake_SOURCES_AUDITLOG
         FILES ${OdbCMake_ODB_HEADERS_AUDITLOG}
         MULTI_DATABASE dynamic
-        DB mysql sqlite
+        DB mysql sqlite pgsql
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        SCHEMA_FORMAT sql
         SCHEMA_NAME audit
         PROFILE "boost/date-time"
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
@@ -73,6 +75,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION 9.1
         )
 
 

@@ -43,7 +43,6 @@ class Token
 {
   public:
     Token();
-    ;
 
     Token(const std::string &token, UserPtr owner);
 
@@ -102,8 +101,9 @@ class Token
 #pragma db not_null
     boost::posix_time::ptime expiration_;
 
+      public:
 #pragma db version
-    const ssize_t version_;
+    ssize_t versionlama_;
 };
 }
 }

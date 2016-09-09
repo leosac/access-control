@@ -20,8 +20,6 @@
 #include "LogGet.hpp"
 #include "Exceptions.hpp"
 #include "LogEntry_odb.h"
-#include "LogEntry_odb_mysql.h"
-#include "LogEntry_odb_sqlite.h"
 #include "User_odb.h"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"

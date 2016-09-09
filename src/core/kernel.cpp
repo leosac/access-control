@@ -38,6 +38,7 @@
 #include <fstream>
 #include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
+#include <odb/pgsql/database.hxx>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -463,15 +464,23 @@ void Kernel::configure_database()
                 database_           = std::make_shared<odb::sqlite::database>(
                     db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
             }
-            else if (db_type == "mysql")
+            else if (db_type == "mysql" || db_type == "pgsql")
             {
                 std::string db_user   = db_cfg_node->get<std::string>("username");
                 std::string db_pw     = db_cfg_node->get<std::string>("password");
                 std::string db_dbname = db_cfg_node->get<std::string>("dbname");
                 std::string db_host   = db_cfg_node->get<std::string>("host", "");
                 uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
-                database_             = std::make_shared<odb::mysql::database>(
-                    db_user, db_pw, db_dbname, db_host, db_port);
+                if (db_type == "mysql")
+                {
+                    database_ = std::make_shared<odb::mysql::database>(
+                        db_user, db_pw, db_dbname, db_host, db_port);
+                }
+                else
+                {
+                    database_ = std::make_shared<odb::pgsql::database>(
+                        db_user, db_pw, db_dbname, db_host, db_port);
+                }
                 database_->tracer(odb::stderr_tracer);
             }
             else

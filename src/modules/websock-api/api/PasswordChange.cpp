@@ -88,8 +88,7 @@ json PasswordChange::process_impl(const json &req)
             Audit::EventType::USER_EDITED | Audit::EventType::USER_PASSWORD_CHANGED;
         user->password(new_password);
 
-        // todo should probably false.
-        ctx_.server.clear_user_sessions(user, ctx_.session, true);
+        ctx_.server.clear_user_sessions(user, ctx_.session, false);
         db->persist(audit);
         db->update(user);
     }

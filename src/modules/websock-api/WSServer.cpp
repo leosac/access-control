@@ -92,6 +92,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     assert(connection_api_.find(hdl) != connection_api_.end());
     auto api_handle = connection_api_.find(hdl)->second;
 
+    // todo maybe parse first so be we can have better error handling.
     Audit::WSAPICallPtr audit = std::make_shared<Audit::WSAPICall>();
     ServerMessage response;
     json req;
@@ -340,19 +341,16 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
         new_transaction || odb::transaction::has_current(),
         "Not requesting a new transaction, but no currently active transaction.");
 
-    std::unique_ptr<db::MultiplexedTransaction> transaction;
-    if (new_transaction)
-        transaction = std::make_unique<db::MultiplexedTransaction>(db_->begin());
-
+    std::vector<Auth::TokenPtr> tokens_to_remove;
     for (const auto &connection_to_api : connection_api_)
     {
         const auto &session = connection_to_api.second;
         if (session->current_user_id() == user->id() && exception != session)
         {
             // Invalidate the token.
-            auto token = session->current_token();
-            if (token)
-                db_->erase(*token);
+            if (auto token = session->current_token())
+                tokens_to_remove.push_back(token);
+
             // Clear authentication status from this user.
             session->abort_session();
             // Notify them
@@ -361,6 +359,38 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
             msg.status_code       = APIStatusCode::SUCCESS;
             msg.type              = "session_closed";
             send_message(connection_to_api.first, msg);
+        }
+    }
+
+    std::unique_ptr<db::MultiplexedTransaction> transaction;
+    if (new_transaction)
+        transaction = std::make_unique<db::MultiplexedTransaction>(db_->begin());
+    for (const auto &token : tokens_to_remove)
+    {
+        try
+        {
+            //ERROR("TOKEN ID:" << token->token() << ". V: " << token->version_);
+            //auto t2 = db_->find<Auth::Token>(token->token());
+            //assert(t2);
+            //ASSERT_LOG(t2 && t2 != token, "BLAH");
+            //db_->reload(token);
+            //db_->erase<Auth::Token>(token->token());
+            db_->erase(token);
+            ERROR("SUCCESSFUL DELETION FIRST TIME");
+        }
+        catch (const odb::object_changed &)
+        {
+            try
+            {
+                ERROR("CAUGHT OBJECT CHANGED !");
+                db_->reload(token);
+                db_->erase(token);
+                ERROR("SUCCESSFUL DELETION SECOND TIME");
+            }
+            catch (const odb::object_changed &)
+            {
+                assert(0);
+            }
         }
     }
     if (new_transaction)

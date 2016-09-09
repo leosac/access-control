@@ -26,14 +26,14 @@ using namespace Leosac;
 using namespace Leosac::Auth;
 
 Token::Token()
-    : version_(0)
+    //: version_(0)
 {
 }
 
 Token::Token(const std::string &token, UserPtr owner)
     : token_(token)
     , owner_(owner)
-    , version_(0)
+    //, version_(0)
 {
     expire_in(std::chrono::milliseconds(0));
 }
