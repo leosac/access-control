@@ -93,7 +93,8 @@ json UserPut::process_impl(const json &req)
             extract_with_default(attributes, "lastname", user->lastname()));
         user->email(extract_with_default(attributes, "email", user->email()));
 
-        audit->after_ = UserJSONSerializer::to_string(*user);
+        audit->after_     = UserJSONSerializer::to_string(*user);
+        audit->finalized_ = true;
         db->persist(audit);
         db->update(user);
     }

@@ -93,14 +93,25 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     auto api_handle = connection_api_.find(hdl)->second;
 
     Audit::WSAPICallPtr audit = std::make_shared<Audit::WSAPICall>();
+    ServerMessage response;
+    json req;
+    try
     {
         // Create the audit, making sure it as an ID.
         db::MultiplexedTransaction t(db_->begin());
         db_->persist(audit);
         t.commit();
     }
-    ServerMessage response;
-    json req;
+    catch (const odb::exception &e)
+    {
+        WARN("Database Error in WServer::on_message. Aborting request processing. "
+             "Error: "
+             << e.what());
+        response.status_code   = APIStatusCode::DATABASE_ERROR;
+        response.status_string = e.what();
+        send_message(hdl, response);
+        return;
+    }
     try
     {
         audit->event_mask_ |= Audit::EventType::WSAPI_CALL;
@@ -123,16 +134,28 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         response.status_code   = APIStatusCode::MALFORMED;
         response.status_string = "Failed to parse JSON.";
     }
-    {
-        audit->uuid_             = response.uuid;
-        audit->api_method_       = response.type;
-        audit->status_code_      = response.status_code;
-        audit->status_string_    = response.status_string;
-        audit->response_content_ = response.content.dump(4);
 
+    // Update audit value.
+    audit->uuid_             = response.uuid;
+    audit->api_method_       = response.type;
+    audit->status_code_      = response.status_code;
+    audit->status_string_    = response.status_string;
+    audit->response_content_ = response.content.dump(4);
+    audit->finalized_        = true;
+    try
+    {
         db::MultiplexedTransaction t(db_->begin());
         db_->update(audit);
         t.commit();
+    }
+    catch (const odb::exception &e)
+    {
+        WARN("Database Error in WServer::on_message. Failed to persist final audit: "
+             << e.what());
+        response.status_code   = APIStatusCode::DATABASE_ERROR;
+        response.status_string = e.what();
+        send_message(hdl, response);
+        return;
     }
 
     send_message(hdl, response);

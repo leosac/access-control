@@ -454,72 +454,82 @@ void Kernel::configure_database()
     auto db_cfg_node = config_manager_.kconfig().get_child_optional("database");
     if (db_cfg_node)
     {
-        std::string db_type = db_cfg_node->get<std::string>("type", "");
-        if (db_type == "sqlite")
+        try
         {
-            std::string db_path = db_cfg_node->get<std::string>("path");
-            database_           = std::make_shared<odb::sqlite::database>(
-                db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
-        }
-        else if (db_type == "mysql")
-        {
-            std::string db_user   = db_cfg_node->get<std::string>("username");
-            std::string db_pw     = db_cfg_node->get<std::string>("password");
-            std::string db_dbname = db_cfg_node->get<std::string>("dbname");
-            std::string db_host   = db_cfg_node->get<std::string>("host", "");
-            uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
-            database_             = std::make_shared<odb::mysql::database>(
-                db_user, db_pw, db_dbname, db_host, db_port);
-            database_->tracer(odb::stderr_tracer);
-        }
-        else
-        {
-            throw ConfigException(config_file_path(),
-                                  "Unsupported database type: " +
-                                      Colorize::underline(db_type));
-        }
-
-        // Create or update database.
-        // Very simple, for now. No migration.
-        {
-            using namespace odb;
-            using namespace odb::core;
-
-            schema_version v(database_->schema_version("tools"));
-            if (v == 0)
+            std::string db_type = db_cfg_node->get<std::string>("type", "");
+            if (db_type == "sqlite")
             {
-                // Create schema
-                transaction t(database_->begin());
-                schema_catalog::create_schema(*database_, "tools");
-                t.commit();
+                std::string db_path = db_cfg_node->get<std::string>("path");
+                database_           = std::make_shared<odb::sqlite::database>(
+                    db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
             }
-            v = database_->schema_version("auth");
-            if (v == 0)
+            else if (db_type == "mysql")
             {
-                transaction t(database_->begin());
-                schema_catalog::create_schema(*database_, "auth");
-
-                Auth::UserPtr admin = std::make_shared<Auth::User>();
-                admin->firstname("Admin");
-                admin->lastname("ADMIN");
-                admin->username("admin");
-                admin->password("admin");
-                database_->persist(admin);
-
-                Auth::GroupPtr grp = std::make_shared<Auth::Group>();
-                grp->name("Administrator");
-                grp->member_add(admin);
-                database_->persist(grp);
-                t.commit();
+                std::string db_user   = db_cfg_node->get<std::string>("username");
+                std::string db_pw     = db_cfg_node->get<std::string>("password");
+                std::string db_dbname = db_cfg_node->get<std::string>("dbname");
+                std::string db_host   = db_cfg_node->get<std::string>("host", "");
+                uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
+                database_             = std::make_shared<odb::mysql::database>(
+                    db_user, db_pw, db_dbname, db_host, db_port);
+                database_->tracer(odb::stderr_tracer);
             }
-            v = database_->schema_version("audit");
-            if (v == 0)
+            else
             {
-                // Create schema
-                transaction t(database_->begin());
-                schema_catalog::create_schema(*database_, "audit");
-                t.commit();
+                throw ConfigException(config_file_path(),
+                                      "Unsupported database type: " +
+                                          Colorize::underline(db_type));
             }
+
+            // Create or update database.
+            // Very simple, for now. No migration.
+            {
+                using namespace odb;
+                using namespace odb::core;
+
+                schema_version v(database_->schema_version("tools"));
+                if (v == 0)
+                {
+                    // Create schema
+                    transaction t(database_->begin());
+                    schema_catalog::create_schema(*database_, "tools");
+                    t.commit();
+                }
+                v = database_->schema_version("auth");
+                if (v == 0)
+                {
+                    transaction t(database_->begin());
+                    schema_catalog::create_schema(*database_, "auth");
+
+                    Auth::UserPtr admin = std::make_shared<Auth::User>();
+                    admin->firstname("Admin");
+                    admin->lastname("ADMIN");
+                    admin->username("admin");
+                    admin->password("admin");
+                    database_->persist(admin);
+
+                    Auth::GroupPtr grp = std::make_shared<Auth::Group>();
+                    grp->name("Administrator");
+                    grp->member_add(admin);
+                    database_->persist(grp);
+                    t.commit();
+                }
+                v = database_->schema_version("audit");
+                if (v == 0)
+                {
+                    // Create schema
+                    transaction t(database_->begin());
+                    schema_catalog::create_schema(*database_, "audit");
+                    t.commit();
+                }
+            }
+        }
+        catch (const odb::exception &e)
+        {
+            if (utils_->is_strict())
+                throw;
+            WARN("Skipping potential database update due to database error: "
+                 << e.what());
         }
     }
 }

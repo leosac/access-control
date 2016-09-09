@@ -97,6 +97,15 @@ class AuditEntry : public std::enable_shared_from_this<AuditEntry>
 #pragma db type("TEXT")
     EventMask event_mask_;
 
+    /**
+     * Audit entry are sometime persisted multiple time before
+     * reaching their final state.
+     *
+     * When set to true, this flag indicates that the audit entry has reach its
+     * final status. This is useful to detect incomplete audit entry.
+     */
+    bool finalized_;
+
   private:
 #pragma db version
     const ssize_t version_;
