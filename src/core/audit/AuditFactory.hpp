@@ -19,33 +19,34 @@
 
 #pragma once
 
-#include "WebSockFwd.hpp"
 #include "core/audit/AuditFwd.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {
-namespace Module
-{
-namespace WebSockAPI
+namespace Audit
 {
 /**
- * Holds valuable pointer to provide context to a request.
+ * Provide static methods to instanciate various Audit objects.
+ *
+ * This is the class to use to instanciate Audit object. All other means to
+ * construct an instance are private to the class. This Factory is friend
+ * with audit objects providing the implementation of the various Audit interfaces.
+ *
+ * Basically, methods in this class forward to private factory function in each
+ * Audit object.
+ *
+ * @note The naming convention differs for those methods: each method is named
+ * after the type of audit object it instanciates.
  */
-struct RequestContext
+class Factory
 {
-    APIPtr session;
-    DBServicePtr dbsrv;
-    WSServer &server;
+  public:
+    static IUserEventPtr UserEvent(const DBPtr &database, Auth::UserPtr target_user,
+                                   IAuditEntryPtr parent);
 
-    /**
-     * The initial audit trail for the request.
-     * It is garanteed that this audit object is:
-     *     + Non null
-     *     + Already persisted
-     */
-    Audit::IAuditEntryPtr audit;
+    static IWSAPICallPtr WSAPICall(const DBPtr &database);
 };
-}
 }
 }

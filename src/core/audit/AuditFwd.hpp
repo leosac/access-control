@@ -29,6 +29,17 @@ namespace Audit
 {
 using AuditEntryId = unsigned long;
 
+class Factory;
+
+class IAuditEntry;
+using IAuditEntryPtr = std::shared_ptr<IAuditEntry>;
+
+class IUserEvent;
+using IUserEventPtr = std::shared_ptr<IUserEvent>;
+
+class IWSAPICall;
+using IWSAPICallPtr = std::shared_ptr<IWSAPICall>;
+
 class AuditEntry;
 using AuditEntryPtr  = std::shared_ptr<AuditEntry>;
 using AuditEntryWPtr = std::weak_ptr<AuditEntry>;

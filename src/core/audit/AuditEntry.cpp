@@ -19,6 +19,7 @@
 
 #include "AuditEntry.hpp"
 #include "AuditEntry_odb.h"
+#include "core/auth/User.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac;
@@ -36,21 +37,6 @@ AuditEntryId AuditEntry::id() const
     return id_;
 }
 
-void AuditEntry::set_parent(AuditEntryPtr parent)
-{
-    ASSERT_LOG(parent, "Parent must not be null");
-    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
-    ASSERT_LOG(!parent_.lock(), "Entry must have no parent.");
-
-    auto self = shared_from_this();
-    assert(self);
-    parent->children_.push_back(self);
-    parent_ = parent;
-
-    if (!author_)
-        author_ = parent->author_;
-}
-
 void AuditEntry::odb_callback(odb::callback_event e, odb::database &db) const
 {
     if (e == odb::callback_event::post_update ||
@@ -62,4 +48,57 @@ void AuditEntry::odb_callback(odb::callback_event e, odb::database &db) const
             db.update(parent);
         }
     }
+}
+
+void AuditEntry::finalize()
+{
+    ASSERT_LOG(odb::transaction::has_current(),
+               "Not currently in a database transaction.");
+    if (finalized_)
+    {
+        NOTICE("Finalizing alreayd finalized entry.");
+        return;
+    }
+    finalized_ = true;
+    ASSERT_LOG(database_, "Null database pointer for AuditEntry.");
+    database_->update(*this);
+}
+
+bool AuditEntry::finalized() const
+{
+    return finalized_;
+}
+
+void AuditEntry::event_mask(const EventMask &mask)
+{
+    ASSERT_LOG(!finalized_, "Audit entry is already finalized.");
+    event_mask_ = mask;
+}
+
+const EventMask &AuditEntry::event_mask() const
+{
+    return event_mask_;
+}
+
+void AuditEntry::author(Auth::UserPtr user)
+{
+    if (user)
+        ASSERT_LOG(user->id(), "Author is not already persisted.");
+    author_ = user;
+}
+
+void AuditEntry::set_parent(IAuditEntryPtr parent)
+{
+    ASSERT_LOG(id_, "Current audit entry must be already persisted.");
+    ASSERT_LOG(parent, "Parent must not be null");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+    ASSERT_LOG(!parent_.lock(), "Entry must have no parent.");
+    auto parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+    ASSERT_LOG(parent_odb, "Parent is not of type AuditEntry");
+
+    parent_odb->children_.push_back(shared_from_this());
+    parent_ = parent_odb;
+
+    if (!author_)
+        author_ = parent_odb->author_;
 }

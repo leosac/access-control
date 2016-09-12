@@ -19,12 +19,13 @@
 
 #include "PasswordChange.hpp"
 #include "Exceptions.hpp"
-#include "UserEvent_odb.h"
 #include "UserGet.hpp"
 #include "User_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
+#include "core/audit/AuditFactory.hpp"
+#include "core/audit/UserEvent.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
@@ -69,27 +70,26 @@ json PasswordChange::process_impl(const json &req)
     if (user)
     {
         using namespace FlagSetOperator;
-        Audit::UserEventPtr audit = std::make_shared<Audit::UserEvent>();
-        audit->set_parent(ctx_.audit);
-        audit->target_ = user;
+        Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, user, ctx_.audit);
+
         if (uid == ctx_.session->current_user_id())
         {
             auto current_password = req.at("current_password").get<std::string>();
             // When changing our own password, we check the `current_password` field.
             if (user->password() != current_password)
             {
-                audit->event_mask_ = Audit::EventType::USER_PASSWORD_CHANGE_FAILURE;
-                db->persist(audit);
+                audit->event_mask(Audit::EventType::USER_PASSWORD_CHANGE_FAILURE);
+                audit->finalize();
                 t.commit();
                 throw PermissionDenied("Invalid `current_password`.");
             }
         }
-        audit->event_mask_ =
-            Audit::EventType::USER_EDITED | Audit::EventType::USER_PASSWORD_CHANGED;
+        audit->event_mask(Audit::EventType::USER_EDITED |
+                          Audit::EventType::USER_PASSWORD_CHANGED);
         user->password(new_password);
 
         ctx_.server.clear_user_sessions(user, ctx_.session, false);
-        db->persist(audit);
+        audit->finalize();
         db->update(user);
     }
     else

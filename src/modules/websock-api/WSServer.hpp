@@ -145,7 +145,7 @@ class WSServer
      * invokation.
      */
     ServerMessage handle_request(APIPtr api_handle, const json &req,
-                                 Audit::AuditEntryPtr);
+                                 Audit::IAuditEntryPtr);
 
     /**
      * Create a ClientMessage object from a json request.
@@ -161,10 +161,9 @@ class WSServer
 
     /**
      * Process a request from a client.
-     * The proper implementation method of WebSockAPI::API is called.
      */
     json dispatch_request(APIPtr api_handle, const ClientMessage &in,
-                          Audit::AuditEntryPtr);
+                          Audit::IAuditEntryPtr);
 
     ConnectionAPIMap connection_api_;
     APIAuth auth_;

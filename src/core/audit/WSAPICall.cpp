@@ -18,6 +18,9 @@
 */
 
 #include "WSAPICall.hpp"
+#include "WSAPICall_odb.h"
+#include "tools/db/MultiplexedTransaction.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Audit;
@@ -25,4 +28,58 @@ using namespace Leosac::Audit;
 WSAPICall::WSAPICall()
     : status_code_(APIStatusCode::UNKNOWN)
 {
+}
+
+WSAPICallPtr WSAPICall::create(const DBPtr &database)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+
+    db::MultiplexedTransaction t(database->begin());
+    WSAPICallPtr audit(new Audit::WSAPICall());
+    database->persist(audit);
+    t.commit();
+    audit->database_ = database;
+    return audit;
+}
+
+void WSAPICall::method(const std::string &str)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    api_method_ = str;
+}
+
+void WSAPICall::uuid(const std::string &str)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    uuid_ = str;
+}
+
+void WSAPICall::status_code(APIStatusCode code)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    status_code_ = code;
+}
+
+void WSAPICall::status_string(const std::string &str)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    status_string_ = str;
+}
+
+void WSAPICall::source_endpoint(const std::string &str)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    source_endpoint_ = str;
+}
+
+void WSAPICall::request_content(const std::string &str)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    request_content_ = str;
+}
+
+void WSAPICall::response_content(const std::string &str)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    response_content_ = str;
 }

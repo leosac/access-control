@@ -20,25 +20,36 @@
 #pragma once
 
 #include "AuditEntry.hpp"
+#include "IUserEvent.hpp"
 
 namespace Leosac
 {
 namespace Audit
 {
 /**
- * An audit that keeps track of an UserEvent.
- *
- * UserEvent indicates that a user was modified (wether directly
- * or indirectly).
+ * Provides an implementation of IUserEvent.
  */
 #pragma db object polymorphic callback(odb_callback)
-class UserEvent : public AuditEntry
+class UserEvent : virtual public IUserEvent, public AuditEntry
 {
-  public:
+  private:
     UserEvent() = default;
 
+    friend class Factory;
+
+    static std::shared_ptr<UserEvent>
+    create(const DBPtr &database, Auth::UserPtr target_user, AuditEntryPtr parent);
+
+  public:
     virtual ~UserEvent() = default;
 
+    virtual void target(Auth::UserPtr user) override;
+
+    virtual void before(const std::string &repr) override;
+
+    virtual void after(const std::string &repr) override;
+
+  public:
 #pragma db not_null
     Auth::UserLWPtr target_;
 
@@ -52,7 +63,6 @@ class UserEvent : public AuditEntry
      */
     std::string after_;
 
-  private:
     friend class odb::access;
 };
 }

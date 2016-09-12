@@ -47,6 +47,14 @@ class Token
     Token(const std::string &token, UserPtr owner);
 
     /**
+     * Return the token identifier.
+     *
+     * This method is an alias to the `token()` method.
+     * @return
+     */
+    const std::string &id() const;
+
+    /**
      * Retrieve the string representation of the token.
      * @return
      */
@@ -101,9 +109,9 @@ class Token
 #pragma db not_null
     boost::posix_time::ptime expiration_;
 
-      public:
+  public:
 #pragma db version
-    ssize_t versionlama_;
+    ssize_t version_;
 };
 }
 }

@@ -19,33 +19,41 @@
 
 #pragma once
 
-#include "WebSockFwd.hpp"
-#include "core/audit/AuditFwd.hpp"
+#include "IAuditEntry.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {
-namespace Module
-{
-namespace WebSockAPI
+namespace Audit
 {
 /**
- * Holds valuable pointer to provide context to a request.
+ * Interface that describes an Audit object when a user-related event
+ * happens.
+ *
+ * Possible use case:
+ *     + User profile edition.
+ *     + User creation/deletion.
  */
-struct RequestContext
+class IUserEvent : virtual public IAuditEntry
 {
-    APIPtr session;
-    DBServicePtr dbsrv;
-    WSServer &server;
+  public:
+    /**
+     * Set the user that is targeted by the event.
+     */
+    virtual void target(Auth::UserPtr user) = 0;
 
     /**
-     * The initial audit trail for the request.
-     * It is garanteed that this audit object is:
-     *     + Non null
-     *     + Already persisted
+     * An optional JSON representation of the object
+     * **before** the event took place.
      */
-    Audit::IAuditEntryPtr audit;
+    virtual void before(const std::string &repr) = 0;
+
+    /**
+     * An optional JSON representation of the object
+     * **after** the event took place.
+     */
+    virtual void after(const std::string &repr) = 0;
 };
-}
 }
 }

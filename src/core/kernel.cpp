@@ -37,8 +37,8 @@
 #include <core/auth/Group.hpp>
 #include <fstream>
 #include <odb/mysql/database.hxx>
-#include <odb/sqlite/database.hxx>
 #include <odb/pgsql/database.hxx>
+#include <odb/sqlite/database.hxx>
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;

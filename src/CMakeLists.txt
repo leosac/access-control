@@ -73,6 +73,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/AuditFwd.cpp
     core/audit/UserEvent.cpp
     core/audit/WSAPICall.cpp
+        core/audit/AuditFactory.cpp
 )
 
 # Rule for ODB code generation.

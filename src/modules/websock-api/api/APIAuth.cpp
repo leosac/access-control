@@ -42,12 +42,12 @@ APIAuth::APIAuth(WSServer &srv)
 
 void APIAuth::invalidate_token(Auth::TokenPtr token) const
 {
+    ASSERT_LOG(token, "nullptr passed when excepting non-null token.");
+
     using namespace odb;
     using namespace odb::core;
-    db::MultiplexedSession s;
-    db::MultiplexedTransaction t(server_.db()->begin());
-    auto t2 = server_.db()->load<Auth::Token>(token->token());
-    server_.db()->erase(t2);
+    odb::transaction t(server_.db()->begin());
+    server_.db()->erase<Auth::Token>(token->id());
     t.commit();
 }
 

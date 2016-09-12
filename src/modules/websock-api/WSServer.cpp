@@ -20,13 +20,13 @@
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
 #include "Token_odb.h"
-#include "WSAPICall_odb.h"
 #include "api/GroupGet.hpp"
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
 #include "api/PasswordChange.hpp"
 #include "api/UserGet.hpp"
 #include "api/UserPut.hpp"
+#include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
 #include "exception/ExceptionsTools.hpp"
@@ -34,9 +34,7 @@
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
-#include <odb/mysql/exceptions.hxx>
 #include <odb/session.hxx>
-#include <odb/sqlite/exceptions.hxx>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -93,15 +91,12 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     auto api_handle = connection_api_.find(hdl)->second;
 
     // todo maybe parse first so be we can have better error handling.
-    Audit::WSAPICallPtr audit = std::make_shared<Audit::WSAPICall>();
+    Audit::IWSAPICallPtr audit;
     ServerMessage response;
     json req;
     try
     {
-        // Create the audit, making sure it as an ID.
-        db::MultiplexedTransaction t(db_->begin());
-        db_->persist(audit);
-        t.commit();
+        audit = Audit::Factory::WSAPICall(db_);
     }
     catch (const odb::exception &e)
     {
@@ -115,16 +110,16 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     }
     try
     {
-        audit->event_mask_ |= Audit::EventType::WSAPI_CALL;
-        audit->author_         = api_handle->current_user();
+        audit->event_mask(Audit::EventType::WSAPI_CALL);
+        audit->author(api_handle->current_user());
         auto ws_connection_ptr = srv_.get_con_from_hdl(hdl);
         ASSERT_LOG(ws_connection_ptr, "No websocket connection object from handle.");
-        audit->source_endpoint_ = ws_connection_ptr->get_remote_endpoint();
+        audit->source_endpoint(ws_connection_ptr->get_remote_endpoint());
 
         // todo careful potential DDOS as we store the full content without checking
         // for now.
-        audit->request_content_ = msg->get_payload();
-        req                     = json::parse(msg->get_payload());
+        audit->request_content(msg->get_payload());
+        req = json::parse(msg->get_payload());
 
         response = handle_request(api_handle, req, audit);
         INFO("Incoming payload: \n" << req.dump(4));
@@ -137,16 +132,15 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     }
 
     // Update audit value.
-    audit->uuid_             = response.uuid;
-    audit->api_method_       = response.type;
-    audit->status_code_      = response.status_code;
-    audit->status_string_    = response.status_string;
-    audit->response_content_ = response.content.dump(4);
-    audit->finalized_        = true;
+    audit->uuid(response.uuid);
+    audit->method(response.type);
+    audit->status_code(response.status_code);
+    audit->status_string(response.status_string);
+    audit->response_content(response.content.dump(4));
     try
     {
         db::MultiplexedTransaction t(db_->begin());
-        db_->update(audit);
+        audit->finalize();
         t.commit();
     }
     catch (const odb::exception &e)
@@ -186,9 +180,9 @@ APIAuth &WSServer::auth()
 }
 
 json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
-                                Audit::AuditEntryPtr audit)
+                                Audit::IAuditEntryPtr audit)
 {
-    // A request is a "Unit-of-Work" for the application.
+    // A request is an "Unit-of-Work" for the application.
     // We create a default database session for the request.
     odb::session database_session;
     auto handler_factory = handlers2_.find(in.type);
@@ -272,7 +266,7 @@ ClientMessage WSServer::parse_request(const json &req)
 }
 
 ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
-                                       Audit::AuditEntryPtr audit)
+                                       Audit::IAuditEntryPtr audit)
 {
     ServerMessage response;
     response.status_code = APIStatusCode::SUCCESS;
@@ -367,31 +361,7 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
         transaction = std::make_unique<db::MultiplexedTransaction>(db_->begin());
     for (const auto &token : tokens_to_remove)
     {
-        try
-        {
-            //ERROR("TOKEN ID:" << token->token() << ". V: " << token->version_);
-            //auto t2 = db_->find<Auth::Token>(token->token());
-            //assert(t2);
-            //ASSERT_LOG(t2 && t2 != token, "BLAH");
-            //db_->reload(token);
-            //db_->erase<Auth::Token>(token->token());
-            db_->erase(token);
-            ERROR("SUCCESSFUL DELETION FIRST TIME");
-        }
-        catch (const odb::object_changed &)
-        {
-            try
-            {
-                ERROR("CAUGHT OBJECT CHANGED !");
-                db_->reload(token);
-                db_->erase(token);
-                ERROR("SUCCESSFUL DELETION SECOND TIME");
-            }
-            catch (const odb::object_changed &)
-            {
-                assert(0);
-            }
-        }
+        db_->erase<Auth::Token>(token->id());
     }
     if (new_transaction)
         transaction->commit();

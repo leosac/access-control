@@ -18,6 +18,55 @@
 */
 
 #include "UserEvent.hpp"
+#include "UserEvent_odb.h"
+#include "core/auth/User.hpp"
+#include "tools/db/MultiplexedTransaction.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Audit;
+
+std::shared_ptr<UserEvent> UserEvent::create(const DBPtr &database,
+                                             Auth::UserPtr target_user,
+                                             AuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(target_user, "Target user must be non null.");
+    ASSERT_LOG(target_user->id(), "Target user must be already persisted.");
+    ASSERT_LOG(parent, "Parent must be non null.");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+
+    db::MultiplexedTransaction t(database->begin());
+    Audit::UserEventPtr audit =
+        std::shared_ptr<Audit::UserEvent>(new Audit::UserEvent());
+    audit->database_ = database;
+    audit->target_   = target_user;
+    database->persist(audit);
+
+    // Now that we are persisted, set parent.
+    // This make sure that if something bad happens, the parent is not left
+    // with an invalid foreign key for its children.
+    audit->set_parent(parent);
+    database->update(audit);
+
+    t.commit();
+    return audit;
+}
+
+void UserEvent::target(Auth::UserPtr user)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    target_ = user;
+}
+
+void UserEvent::before(const std::string &repr)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    before_ = repr;
+}
+
+void UserEvent::after(const std::string &repr)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    after_ = repr;
+}

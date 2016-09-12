@@ -19,10 +19,10 @@
 
 #include "UserPut.hpp"
 #include "Exceptions.hpp"
-#include "UserEvent_odb.h"
 #include "User_odb.h"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
+#include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/auth/serializers/UserJSONSerializer.hpp"
 #include "tools/db/DBService.hpp"
@@ -81,11 +81,9 @@ json UserPut::process_impl(const json &req)
     Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
     if (user)
     {
-        Audit::UserEventPtr audit = std::make_shared<Audit::UserEvent>();
-        audit->set_parent(ctx_.audit);
-        audit->target_ = user;
-        audit->event_mask_ |= Audit::EventType::USER_EDITED;
-        audit->before_ = UserJSONSerializer::to_string(*user);
+        Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, user, ctx_.audit);
+        audit->event_mask(Audit::EventType::USER_EDITED);
+        audit->before(UserJSONSerializer::to_string(*user));
 
         user->firstname(
             extract_with_default(attributes, "firstname", user->firstname()));
@@ -93,9 +91,8 @@ json UserPut::process_impl(const json &req)
             extract_with_default(attributes, "lastname", user->lastname()));
         user->email(extract_with_default(attributes, "email", user->email()));
 
-        audit->after_     = UserJSONSerializer::to_string(*user);
-        audit->finalized_ = true;
-        db->persist(audit);
+        audit->after(UserJSONSerializer::to_string(*user));
+        audit->finalize();
         db->update(user);
     }
     else

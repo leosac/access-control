@@ -20,25 +20,42 @@
 #pragma once
 
 #include "AuditEntry.hpp"
-#include "core/APIStatusCode.hpp"
+#include "core/audit/IWSAPICall.hpp"
 
 namespace Leosac
 {
 namespace Audit
 {
 /**
- * An audit entry for WebSocket API call.
- *
- * This entry indicates that a Websocket API call took place.
- * It saves the query parameters, the source endpoint, etc.
+ * Provides the implementation of IWSAPICall.
  */
 #pragma db object polymorphic callback(odb_callback)
-class WSAPICall : public AuditEntry
+class WSAPICall : virtual public IWSAPICall, public AuditEntry
 {
-  public:
+  private:
     WSAPICall();
 
+    friend class Factory;
+
+    static WSAPICallPtr create(const DBPtr &database);
+
+  public:
     virtual ~WSAPICall() = default;
+
+    virtual void method(const std::string &string) override;
+
+    virtual void uuid(const std::string &string) override;
+
+    virtual void status_code(APIStatusCode code) override;
+
+    virtual void status_string(const std::string &string) override;
+
+    virtual void source_endpoint(const std::string &string) override;
+
+    virtual void request_content(const std::string &string) override;
+
+    virtual void response_content(const std::string &string) override;
+
 
 #pragma db not_null
     std::string api_method_;

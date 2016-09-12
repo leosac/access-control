@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/audit/AuditFwd.hpp"
+#include "core/audit/IAuditEntry.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "tools/db/database.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -32,44 +33,36 @@ namespace Leosac
 namespace Audit
 {
 /**
- * An Audit entry.
+ * Implementation of IAuditEntry, backed by ODB.
  *
- * Leosac keeps an audit trail. This serves multiple purposes:
- *     + Additional security
- *     + Keep track of changes in order to generate differential configuration
- *     update to door devices.
+ * This class, as well as all its child are backed by ODB, and are therefore
+ * persisted in a SQL database.
  *
- * The audit log is sequential.
- */
+ * @see IAuditEntry
+  */
 #pragma db object polymorphic optimistic callback(odb_callback)
-class AuditEntry : public std::enable_shared_from_this<AuditEntry>
+class AuditEntry : virtual public IAuditEntry,
+                   public std::enable_shared_from_this<AuditEntry>
 {
-  public:
+  protected:
     AuditEntry();
 
+  public:
     virtual ~AuditEntry() = default;
 
-    AuditEntryId id() const;
+    virtual AuditEntryId id() const override;
 
-    /**
-     * Set `parent` as the parent audit entry for
-     * this entry.
-     *
-     * The `set_parent()` will copy the parent's author to this->author_
-     * if there currently is no author assigned to the entry.
-     *
-     * Pre-Conditions:
-     *     + Shall have no parent.
-     *     + The `parent` must be a non-null, already persisted
-     *       object.
-     *
-     * Post-Conditions:
-     *     + Will have a parent.
-     *     + This object will be somewhere in `parent->children_` array.
-     *
-     * @param parent
-     */
-    void set_parent(AuditEntryPtr parent);
+    virtual void finalize() override;
+
+    virtual bool finalized() const override;
+
+    virtual void event_mask(const EventMask &mask) override;
+
+    virtual const EventMask &event_mask() const override;
+
+    virtual void author(Auth::UserPtr user) override;
+
+    void set_parent(IAuditEntryPtr parent);
 
   private:
 #pragma db id auto
@@ -90,7 +83,7 @@ class AuditEntry : public std::enable_shared_from_this<AuditEntry>
 
     /**
      * The user at the source of the entry.
-     * Maybe null.
+     * May be null.
      */
     Auth::UserLPtr author_;
 
@@ -105,6 +98,15 @@ class AuditEntry : public std::enable_shared_from_this<AuditEntry>
      * final status. This is useful to detect incomplete audit entry.
      */
     bool finalized_;
+
+/**
+ * Pointer to the database.
+ * Required to implement `finalize()`.
+ *
+ * Manualy set by Audit::Factory.
+ */
+#pragma db transient
+    DBPtr database_;
 
   private:
 #pragma db version
