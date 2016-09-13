@@ -30,11 +30,14 @@ namespace Auth
 {
 using UserGroupMembershipId = unsigned long;
 
+/**
+ * The rank of an User inside a Group.
+ */
 enum class GroupRank
 {
-    ADMIN,
-    OPERATOR,
-    MEMBER
+    ADMIN    = 0,
+    OPERATOR = 1,
+    MEMBER   = 2,
 };
 
 /**

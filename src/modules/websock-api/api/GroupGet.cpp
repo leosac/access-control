@@ -43,6 +43,12 @@ MethodHandlerUPtr GroupGet::create(RequestContext ctx)
     {
         using namespace Conditions;
         auto gid = req.at("group_id").get<Auth::GroupId>();
+        if (gid == 0)
+        {
+            // We want all group. Don't check for membership against
+            // a given target.
+            return false;
+        }
         return wrap(IsInGroup(ctx, gid))(req);
     };
 
@@ -56,18 +62,27 @@ json GroupGet::process_impl(const json &req)
 {
     json rep;
 
-    using query = odb::query<Auth::Group>;
-    DBPtr db    = ctx_.dbsrv->db();
+    using Query  = odb::query<Auth::Group>;
+    using Result = odb::result<Auth::Group>;
+    DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
     auto gid = req.at("group_id").get<Auth::GroupId>();
 
-    Auth::GroupPtr group = db->query_one<Auth::Group>(query::id == gid);
-    if (group)
+    if (gid != 0)
     {
-        rep["data"] = GroupJSONSerializer::to_object(*group);
+        Auth::GroupPtr group = db->query_one<Auth::Group>(Query::id == gid);
+        if (group)
+            rep["data"] = GroupJSONSerializer::to_object(*group);
+        else
+            throw EntityNotFound(gid, "group");
     }
     else
-        throw EntityNotFound(gid, "group");
+    {
+        Result result = db->query<Auth::Group>();
+        rep["data"]   = json::array();
+        for (const auto &group : result)
+            rep["data"].push_back(GroupJSONSerializer::to_object(group));
+    }
     t.commit();
     return rep;
 }

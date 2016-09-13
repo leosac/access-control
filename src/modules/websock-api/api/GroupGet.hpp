@@ -34,6 +34,7 @@ using json = nlohmann::json;
  *
  * Request:
  *     + `group_id`: Group we want information about. Required.
+ *     A `group_id` of 0 means returns all known groups.
  *
  * Response:
  *     + ...

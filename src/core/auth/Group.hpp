@@ -96,6 +96,9 @@ class Group : public std::enable_shared_from_this<Group>
 #pragma db transient
     mutable std::vector<UserPtr> loaded_members_;
 
+#pragma db not_null
+#pragma db unique
+#pragma db type("VARCHAR(128)")
     std::string name_;
 
 #pragma db transient

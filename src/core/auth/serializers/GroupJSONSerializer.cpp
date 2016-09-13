@@ -37,13 +37,14 @@ json GroupJSONSerializer::to_object(const Auth::Group &group)
                            {"type", "user-group-membership"}};
         memberships.push_back(group_info);
     }
-    json serialized = {{"id", group.id()},
-                       {"type", "group"},
-                       {"attributes",
-                        {
-                            {"name", group.name()},
-                        }},
-                       {"relationships", {{"members", {{"data", memberships}}}}}};
+    json serialized = {
+        {"id", group.id()},
+        {"type", "group"},
+        {"attributes",
+         {
+             {"name", group.name()},
+         }},
+        {"relationships", {{"memberships", {{"data", memberships}}}}}};
 
     return serialized;
 }

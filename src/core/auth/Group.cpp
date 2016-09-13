@@ -52,7 +52,6 @@ std::vector<Leosac::Auth::UserPtr> const &Leosac::Auth::Group::members() const
 
 void Leosac::Auth::Group::member_add(Leosac::Auth::UserPtr m)
 {
-    // members_.push_back(m);
     // Create a new UserGroupMembership describing the relationship.
     auto ugm = std::make_shared<UserGroupMembership>();
     ugm->user(m);
