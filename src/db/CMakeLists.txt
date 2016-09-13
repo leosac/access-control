@@ -21,6 +21,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION "9.1"
         )
 
 
@@ -43,11 +44,13 @@ odb_compile(OdbCMake_SOURCES_AUTH
         SCHEMA_FORMAT embedded
         SCHEMA_NAME auth
         PROFILE "boost/date-time"
+        HXX_PROLOGUE "#include \"tools/db/ScryptResultODB.hpp\""
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         INCLUDE_PREFIX core/auth/
         INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION "9.1"
         )
 
 # ODB configuration for Audit log
@@ -76,6 +79,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION "9.1"
         )
 
 add_library(leosac_db SHARED

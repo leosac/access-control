@@ -83,7 +83,7 @@ Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
         transaction t(db->begin());
 
         Auth::UserPtr user = db->query_one<Auth::User>(query::username == username);
-        if (user && user->password() == password)
+        if (user && user->verify_password(password))
         {
             // Create new token.
             auto token = std::make_shared<Auth::Token>(gen_uuid(), user);

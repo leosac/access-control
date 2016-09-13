@@ -117,7 +117,7 @@ class IAuditEntry
      *     + Will have a parent.
      *     + This object will be somewhere in `parent->children_` array.
      */
-    void set_parent(IAuditEntryPtr parent);
+    virtual void set_parent(IAuditEntryPtr parent) = 0;
 };
 }
 }

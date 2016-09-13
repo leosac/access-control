@@ -67,18 +67,11 @@ class APIAuth
     Auth::TokenPtr authenticate_token(const std::string &token_str) const;
 
     /**
-     * Marks the `token` has invalid, effectively removing it
-     * from the list of valid tokens.
+     * Invalidate the authentication token, removing it from the database.
      */
     void invalidate_token(Auth::TokenPtr token) const;
 
   private:
-    /**
-     * Map a token to a user identifier.
-     */
-    using TokenMap = std::map<std::string, ::Leosac::Auth::UserId>;
-    TokenMap tokens_;
-
     /**
      * Reference to the Websocket server.
      * The websocket server is guaranteed to

@@ -481,7 +481,7 @@ void Kernel::configure_database()
                     database_ = std::make_shared<odb::pgsql::database>(
                         db_user, db_pw, db_dbname, db_host, db_port);
                 }
-                database_->tracer(odb::stderr_tracer);
+                // database_->tracer(odb::stderr_tracer);
             }
             else
             {

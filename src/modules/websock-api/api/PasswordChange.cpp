@@ -76,7 +76,7 @@ json PasswordChange::process_impl(const json &req)
         {
             auto current_password = req.at("current_password").get<std::string>();
             // When changing our own password, we check the `current_password` field.
-            if (user->password() != current_password)
+            if (!user->verify_password(current_password))
             {
                 audit->event_mask(Audit::EventType::USER_PASSWORD_CHANGE_FAILURE);
                 audit->finalize();

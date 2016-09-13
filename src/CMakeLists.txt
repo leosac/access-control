@@ -64,6 +64,8 @@ set(LEOSAC_LIB_SRCS
     tools/db/DBService.cpp
     tools/db/MultiplexedSession.cpp
     tools/db/MultiplexedTransaction.cpp
+    tools/scrypt/Random.cpp
+    tools/scrypt/Scrypt.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -73,7 +75,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/AuditFwd.cpp
     core/audit/UserEvent.cpp
     core/audit/WSAPICall.cpp
-        core/audit/AuditFactory.cpp
+    core/audit/AuditFactory.cpp
 )
 
 # Rule for ODB code generation.
@@ -144,7 +146,7 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
-        ${ODB_LIBRARIES} odb-boost odb-mysql odb-pgsql backtrace)
+        ${ODB_LIBRARIES} odb-boost odb-mysql odb-pgsql backtrace scrypt)
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)

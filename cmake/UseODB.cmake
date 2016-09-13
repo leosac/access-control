@@ -132,8 +132,8 @@ function(odb_compile outvar)
       list(APPEND ODB_ARGS --default-pointer "${PARAM_DEFAULT_POINTER}")
   endif()
 
-  if (PGSQL_SERVER_VERSION)
-      list(APPEND ODB_ARGS --pgsql-server-version "${PGSQL_SERVER_VERSION}")
+  if (PARAM_PGSQL_SERVER_VERSION)
+      list(APPEND ODB_ARGS --pgsql-server-version "${PARAM_PGSQL_SERVER_VERSION}")
   endif()
 
   list(APPEND ODB_ARGS --output-dir "${ODB_COMPILE_OUTPUT_DIR}")

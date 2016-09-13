@@ -341,7 +341,7 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
         const auto &session = connection_to_api.second;
         if (session->current_user_id() == user->id() && exception != session)
         {
-            // Invalidate the token.
+            // Mark the token for invalidation.
             if (auto token = session->current_token())
                 tokens_to_remove.push_back(token);
 

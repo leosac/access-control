@@ -24,6 +24,7 @@
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "tools/db/database.hpp"
+#include "tools/scrypt/Scrypt.hpp"
 #include <memory>
 
 namespace Leosac
@@ -50,10 +51,18 @@ class User
     UserId id() const noexcept;
 
     /**
-     * Retrieve password
+     * Set a new password for the user.
+     * @param `pw` A cleartext representation of the password.
      */
-    const std::string &password() const noexcept;
     void password(const std::string &pw);
+
+    /**
+     * Verify that the password `pw` is equal to the user's password.
+     *
+     * @param pw A cleartext string representing the password you want to check.
+     * @return True is `pw` is the correct password, false otherwise.
+     */
+    bool verify_password(const std::string &pw) const;
 
     /**
     * Set a new username.
@@ -100,8 +109,8 @@ class User
 #pragma db type("VARCHAR(128)")
     std::string username_;
 
-#pragma db not_null
-    std::string password_;
+#pragma db not_null type("TEXT")
+    ScryptResult password_;
 
     std::string firstname_;
     std::string lastname_;

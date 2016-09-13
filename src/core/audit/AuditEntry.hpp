@@ -62,7 +62,7 @@ class AuditEntry : virtual public IAuditEntry,
 
     virtual void author(Auth::UserPtr user) override;
 
-    void set_parent(IAuditEntryPtr parent);
+    virtual void set_parent(IAuditEntryPtr parent) override;
 
   private:
 #pragma db id auto

@@ -101,11 +101,6 @@ bool User::is_valid() const
     return validity_.is_valid();
 }
 
-const std::string &User::password() const noexcept
-{
-    return password_;
-}
-
 unsigned long User::id() const noexcept
 {
     return id_;
@@ -113,10 +108,17 @@ unsigned long User::id() const noexcept
 
 void User::password(const std::string &pw)
 {
-    password_ = pw;
+    std::vector<uint8_t> vec(pw.begin(), pw.end());
+    password_ = Scrypt::Hash(vec);
 }
 
 const UserGroupMembershipSet &User::group_memberships() const
 {
     return membership_;
+}
+
+bool User::verify_password(const std::string &pw) const
+{
+    std::vector<uint8_t> vec(pw.begin(), pw.end());
+    return Scrypt::Verify(vec, password_);
 }

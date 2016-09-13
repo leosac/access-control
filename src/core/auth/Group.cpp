@@ -58,7 +58,6 @@ void Leosac::Auth::Group::member_add(Leosac::Auth::UserPtr m)
     ugm->user(m);
     ugm->group(shared_from_this());
     membership_.insert(ugm);
-    ERROR("THERE IS " << membership_.size() << " items in set.");
 }
 
 Leosac::Auth::IAccessProfilePtr Leosac::Auth::Group::profile()
