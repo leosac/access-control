@@ -26,6 +26,7 @@
 #include "tools/GenGuid.h"
 #include "tools/db/database.hpp"
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <odb/object-result.hxx>
 #include <odb/session.hxx>
 #include <tools/db/MultiplexedSession.hpp>
@@ -82,7 +83,9 @@ Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
         auto db = server_.db();
         transaction t(db->begin());
 
-        Auth::UserPtr user = db->query_one<Auth::User>(query::username == username);
+        auto username_lowercase = boost::algorithm::to_lower_copy(username);
+        Auth::UserPtr user =
+            db->query_one<Auth::User>(query::username == username_lowercase);
         if (user && user->verify_password(password))
         {
             // Create new token.

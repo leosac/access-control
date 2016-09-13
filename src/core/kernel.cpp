@@ -517,10 +517,22 @@ void Kernel::configure_database()
                     admin->password("admin");
                     database_->persist(admin);
 
-                    Auth::GroupPtr grp = std::make_shared<Auth::Group>();
-                    grp->name("Administrator");
-                    grp->member_add(admin);
-                    database_->persist(grp);
+                    Auth::UserPtr demo = std::make_shared<Auth::User>();
+                    demo->firstname("Demo");
+                    demo->lastname("Demo");
+                    demo->username("demo");
+                    demo->password("demo");
+                    database_->persist(demo);
+
+                    Auth::GroupPtr administrators = std::make_shared<Auth::Group>();
+                    administrators->name("Administrator");
+                    administrators->member_add(admin);
+                    database_->persist(administrators);
+
+                    Auth::GroupPtr users = std::make_shared<Auth::Group>();
+                    users->name("Users");
+                    users->member_add(demo);
+                    database_->persist(users);
                     t.commit();
                 }
                 v = database_->schema_version("audit");

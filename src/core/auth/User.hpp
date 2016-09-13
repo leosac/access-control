@@ -39,6 +39,12 @@ namespace Auth
 class User
 {
   public:
+    /**
+     * Create a user, specifying an username.
+     *
+     * @see `username(const std::string &)` for more information regarding
+     * username's rules.
+     */
     User(const std::string &username);
     User();
     virtual ~User() = default;
@@ -65,8 +71,14 @@ class User
     bool verify_password(const std::string &pw) const;
 
     /**
-    * Set a new username.
-    */
+     * Set a new username.
+     *
+     * A few rules regarding usernames:
+     *     + Username are always case insentive, and are store in lower case.
+     *     + Only alphanumeric ASCII characters, "_", "." and "-" are allowed.
+     *
+     * @note This function will throw if the username is invalid.
+     */
     void username(const std::string &username);
 
     IAccessProfilePtr profile() const noexcept;

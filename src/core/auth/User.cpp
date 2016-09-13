@@ -21,29 +21,44 @@
 #include "Group_odb.h"
 #include "User_odb.h"
 #include "core/auth/Group.hpp"
+#include "exception/leosacexception.hpp"
 #include "tools/log.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace Leosac::Auth;
+
+static bool is_valid_username_character(char c)
+{
+    return isascii(c) && (isalnum(c) || c == '.' || c == '_' || c == '-');
+}
 
 User::User()
     : version_(0)
 {
 }
 
-User::User(const std::string &username)
-    : username_(username)
-    , version_(0)
+User::User(const std::string &uname)
+    : version_(0)
 {
+    username(uname);
 }
 
 const std::string &User::username() const noexcept
 {
+    for (const auto &c : username_)
+        ASSERT_LOG(is_valid_username_character(c), "Invalid username.");
     return username_;
 }
 
 void User::username(const std::string &username)
 {
-    username_ = username;
+    for (const auto &c : username)
+    {
+        if (is_valid_username_character(c))
+            continue;
+        throw LEOSACException("Invalid username: {" + username + "}");
+    }
+    username_ = boost::algorithm::to_lower_copy(username);
 }
 
 IAccessProfilePtr User::profile() const noexcept

@@ -50,6 +50,9 @@ class APIAuth
      * On success return a new authentication token that will
      * be valid when calling for further authentication.
      * On error returns nullptr.
+     *
+     * @note Username is case isensitive and will be converted to
+     * lower case.
      */
     Auth::TokenPtr authenticate_credentials(const std::string &username,
                                             const std::string &password) const;
