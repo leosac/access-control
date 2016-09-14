@@ -46,6 +46,10 @@ class Factory
     static IUserEventPtr UserEvent(const DBPtr &database, Auth::UserPtr target_user,
                                    IAuditEntryPtr parent);
 
+    static IGroupEventPtr GroupEvent(const DBPtr &database,
+                                     Auth::GroupPtr target_group,
+                                     IAuditEntryPtr parent);
+
     static IWSAPICallPtr WSAPICall(const DBPtr &database);
 };
 }

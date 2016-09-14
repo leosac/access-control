@@ -22,24 +22,30 @@
 #include "UserGroupMembership_odb.h"
 #include "core/auth/UserGroupMembership.hpp"
 #include "tools/log.hpp"
+#include <exception/ModelException.hpp>
 
-Leosac::Auth::Group::Group()
-    : version_(0)
-{
-}
+using namespace Leosac;
+using namespace Leosac::Auth;
 
-Leosac::Auth::Group::Group(const std::string &group_name)
-    : name_(group_name)
+Group::Group()
+    : id_(0)
     , version_(0)
 {
 }
 
-const std::string &Leosac::Auth::Group::name() const
+Group::Group(const std::string &group_name)
+    : id_(0)
+    , name_(group_name)
+    , version_(0)
+{
+}
+
+const std::string &Group::name() const
 {
     return name_;
 }
 
-std::vector<Leosac::Auth::UserPtr> const &Leosac::Auth::Group::members() const
+std::vector<UserPtr> const &Group::members() const
 {
     loaded_members_.clear();
     for (const auto &membership : membership_)
@@ -50,31 +56,32 @@ std::vector<Leosac::Auth::UserPtr> const &Leosac::Auth::Group::members() const
     return loaded_members_;
 }
 
-void Leosac::Auth::Group::member_add(Leosac::Auth::UserPtr m)
+void Group::member_add(UserPtr m, GroupRank rank /*= GroupRank::MEMBER*/)
 {
     // Create a new UserGroupMembership describing the relationship.
     auto ugm = std::make_shared<UserGroupMembership>();
+    ugm->rank(rank);
     ugm->user(m);
     ugm->group(shared_from_this());
     membership_.insert(ugm);
 }
 
-Leosac::Auth::IAccessProfilePtr Leosac::Auth::Group::profile()
+IAccessProfilePtr Group::profile()
 {
     return profile_;
 }
 
-void Leosac::Auth::Group::profile(Leosac::Auth::IAccessProfilePtr p)
+void Group::profile(IAccessProfilePtr p)
 {
     profile_ = p;
 }
 
-Leosac::Auth::GroupId Leosac::Auth::Group::id() const
+GroupId Group::id() const
 {
     return id_;
 }
 
-std::vector<Leosac::Auth::UserLPtr> Leosac::Auth::Group::lazy_members() const
+std::vector<UserLPtr> Group::lazy_members() const
 {
     std::vector<UserLPtr> members;
     for (const auto &membership : membership_)
@@ -86,13 +93,13 @@ std::vector<Leosac::Auth::UserLPtr> Leosac::Auth::Group::lazy_members() const
     return members;
 }
 
-void Leosac::Auth::Group::name(const std::string &name)
+void Group::name(const std::string &name)
 {
+    GroupValidator::validate_name(name);
     name_ = name;
 }
 
-void Leosac::Auth::Group::odb_callback(odb::callback_event e,
-                                       odb::database &db) const
+void Group::odb_callback(odb::callback_event e, odb::database &db) const
 {
     if (e == odb::callback_event::post_update ||
         e == odb::callback_event::post_persist)
@@ -107,8 +114,40 @@ void Leosac::Auth::Group::odb_callback(odb::callback_event e,
     }
 }
 
-const Leosac::Auth::UserGroupMembershipSet &
-Leosac::Auth::Group::user_memberships() const
+const UserGroupMembershipSet &Group::user_memberships() const
 {
     return membership_;
+}
+
+const std::string &Group::description() const
+{
+    return description_;
+}
+
+void Group::description(const std::string &desc)
+{
+    description_ = desc;
+}
+
+void GroupValidator::validate(const GroupPtr &grp)
+{
+    ASSERT_LOG(grp, "Group cannot be null.");
+    validate_name(grp->name());
+}
+
+void GroupValidator::validate_name(const std::string &name)
+{
+    if (name.size() < 3 || name.size() > 50)
+    {
+        throw ModelException("data/attributes/name", "Length must be >=3 and <=50.");
+    }
+    for (const auto &c : name)
+    {
+        if (!isalnum(c) && (c != '_' && c != '-' && c != '.'))
+        {
+            throw ModelException(
+                "data/attributes/name",
+                BUILD_STR("Usage of unauthorized character: " << c));
+        }
+    }
 }

@@ -42,7 +42,7 @@ json GroupJSONSerializer::to_object(const Auth::Group &group)
         {"type", "group"},
         {"attributes",
          {
-             {"name", group.name()},
+             {"name", group.name()}, {"description", group.description()},
          }},
         {"relationships", {{"memberships", {{"data", memberships}}}}}};
 

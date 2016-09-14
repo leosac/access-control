@@ -21,6 +21,7 @@
 #include "Exceptions.hpp"
 #include "Token_odb.h"
 #include "api/GroupGet.hpp"
+#include "api/GroupPut.hpp"
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
 #include "api/PasswordChange.hpp"
@@ -30,6 +31,7 @@
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
 #include "exception/ExceptionsTools.hpp"
+#include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
@@ -69,6 +71,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers2_["user_put"]        = &UserPut::create;
     handlers2_["get_logs"]        = &LogGet::create;
     handlers2_["group_get"]       = &GroupGet::create;
+    handlers2_["group_put"]       = &GroupPut::create;
     handlers2_["membership_get"]  = &MembershipGet::create;
     handlers2_["password_change"] = &PasswordChange::create;
 }
@@ -305,6 +308,12 @@ ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
         response.status_string          = e.what();
         response.content["entity_id"]   = e.entity_id();
         response.content["entity_type"] = e.entity_type();
+    }
+    catch (const ModelException &e)
+    {
+        response.status_code       = APIStatusCode::MODEL_EXCEPTION;
+        response.status_string     = e.what();
+        response.content["errors"] = e.json_errors();
     }
     catch (const LEOSACException &e)
     {

@@ -17,44 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "OptionalTransaction.hpp"
 
-#include "MethodHandler.hpp"
+using namespace Leosac;
+using namespace Leosac::db;
 
-namespace Leosac
+
+OptionalTransaction::OptionalTransaction(odb::transaction_impl *impl)
 {
-namespace Module
-{
-namespace WebSockAPI
-{
-using json = nlohmann::json;
-
-/**
- * Update information about a given user.
- *
- * Request:
- *     + `user_id`: The user_id of the user we want to update. Required.
- *     + `attributes`: A dictionnary of a user's attributes (firstname,
- *       lastname, etc...).
- *
- *     Accepted attributes:
- *         + firstname
- *         + lastname
- *         + email
- *
-  * Response:
- *     + ...
- */
-class UserPut : public MethodHandler
-{
-  public:
-    UserPut(RequestContext ctx);
-
-    static MethodHandlerUPtr create(RequestContext);
-
-  private:
-    virtual json process_impl(const json &req) override;
-};
+    if (!odb::transaction::has_current())
+        transaction_ = std::make_unique<odb::transaction>(impl);
 }
+
+OptionalTransaction::~OptionalTransaction()
+{
+    transaction_.reset();
 }
+
+void OptionalTransaction::commit()
+{
+    if (transaction_)
+        transaction_->commit();
 }

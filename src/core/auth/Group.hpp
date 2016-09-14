@@ -32,6 +32,23 @@ namespace Auth
 {
 
 /**
+ * Validate a Group object's attributes, throwing ModelException
+ * if some attributes are invalid.
+ *
+ * Validations rules:
+ *     + `name` must contains ascii alphanumeric character, "-", "_" or ".".
+ */
+class GroupValidator
+{
+  public:
+    /**
+     * Validate the group's attributes.
+     */
+    static void validate(const GroupPtr &grp);
+    static void validate_name(const std::string &name);
+};
+
+/**
 * A authentication group regroup users that share permissions.
 */
 #pragma db object callback(odb_callback) optimistic
@@ -50,6 +67,9 @@ class Group : public std::enable_shared_from_this<Group>
     const std::string &name() const;
     void name(const std::string &name);
 
+    const std::string &description() const;
+    void description(const std::string &desc);
+
     const std::vector<UserPtr> &members() const;
 
     /**
@@ -57,7 +77,7 @@ class Group : public std::enable_shared_from_this<Group>
      */
     std::vector<UserLPtr> lazy_members() const;
 
-    void member_add(UserPtr m);
+    void member_add(UserPtr m, GroupRank rank = GroupRank::MEMBER);
 
     IAccessProfilePtr profile();
 
@@ -74,6 +94,7 @@ class Group : public std::enable_shared_from_this<Group>
 
   private:
     friend class odb::access;
+    friend class GroupValidator;
 
     void odb_callback(odb::callback_event e, odb::database &) const;
 
@@ -100,6 +121,13 @@ class Group : public std::enable_shared_from_this<Group>
 #pragma db unique
 #pragma db type("VARCHAR(128)")
     std::string name_;
+
+/**
+ * A (potentially long) description of the
+ * group.
+ */
+#pragma db not_null
+    std::string description_;
 
 #pragma db transient
     IAccessProfilePtr profile_;

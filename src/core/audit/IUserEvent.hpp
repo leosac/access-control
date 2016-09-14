@@ -21,7 +21,6 @@
 
 #include "IAuditEntry.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/db/db_fwd.hpp"
 
 namespace Leosac
 {

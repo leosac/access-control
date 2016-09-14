@@ -61,6 +61,7 @@ class UserGroupMembership
     const boost::posix_time::ptime &timestamp() const;
 
     GroupRank rank() const;
+    void rank(const GroupRank &rank);
 
   private:
 #pragma db id auto

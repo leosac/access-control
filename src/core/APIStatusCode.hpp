@@ -90,6 +90,13 @@ enum class APIStatusCode
      * Unknown status.
      * Mostly useful as a default value somewhere.
      */
-    UNKNOWN = 0x0A
+    UNKNOWN = 0x0A,
+
+    /**
+     * Some internal API rules has failed.
+     *
+     * This is likely to model validation.
+     */
+    MODEL_EXCEPTION = 0x0B,
 };
 }

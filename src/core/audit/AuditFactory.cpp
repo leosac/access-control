@@ -18,9 +18,11 @@
 */
 
 #include "core/audit/AuditFactory.hpp"
+#include "core/audit/GroupEvent.hpp"
 #include "core/audit/IUserEvent.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/audit/WSAPICall.hpp"
+#include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "tools/log.hpp"
 
@@ -40,6 +42,22 @@ IUserEventPtr Factory::UserEvent(const DBPtr &database, Auth::UserPtr target_use
     ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
 
     return Audit::UserEvent::create(database, target_user, parent_odb);
+}
+
+IGroupEventPtr Factory::GroupEvent(const DBPtr &database,
+                                   Auth::GroupPtr target_group,
+                                   IAuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(target_group, "Target group must be non null.");
+    ASSERT_LOG(target_group->id(), "Target group must be already persisted.");
+    ASSERT_LOG(parent, "Parent must be non null.");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+
+    AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+    ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+
+    return Audit::GroupEvent::create(database, target_group, parent_odb);
 }
 
 IWSAPICallPtr Factory::WSAPICall(const DBPtr &database)

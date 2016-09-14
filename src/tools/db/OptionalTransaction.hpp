@@ -28,27 +28,32 @@ namespace Leosac
 namespace db
 {
 /**
- * Acts like an odb::transaction, with the exception that it will
- * becomes the active transaction at construction, and will retore
- * the previous (if any) transaction when it gets destroyed.
-  */
-class MultiplexedTransaction
+ * An optional transaction is an object that behave like an
+ * odb::transaction if there is no currently active transaction.
+ *
+ * If a transaction is already in progress, this object actually
+ * does nothing, and calling commit() on it will do nothing.
+ *
+ *
+ * The goal of this object is simple:
+ *     + That the same code can either run independently (ie manages its
+ *     own transaction, and commit() it) or rely on the caller's transaction
+ *     for operation (ie, persists/update its objects, but let the caller commit()).
+ */
+class OptionalTransaction
 {
   public:
-    MultiplexedTransaction(odb::transaction_impl *impl);
-    ~MultiplexedTransaction();
+    OptionalTransaction(odb::transaction_impl *impl);
+    ~OptionalTransaction();
 
     /**
-     * Commit the transaction.
-     *
-     * The call is forward to the real odb::transaction object.
+     * Commit the transaction, if there was no currently active transaction
+     * at the time of this object's creation.
      */
     void commit();
 
   private:
-    bool had_previous_;
     std::unique_ptr<odb::transaction> transaction_;
-    odb::transaction *previous_;
 };
 }
 }

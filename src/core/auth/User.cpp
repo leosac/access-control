@@ -33,12 +33,14 @@ static bool is_valid_username_character(char c)
 }
 
 User::User()
-    : version_(0)
+    : id_(0)
+    , version_(0)
 {
 }
 
 User::User(const std::string &uname)
-    : version_(0)
+    : id_(0)
+    , version_(0)
 {
     username(uname);
 }

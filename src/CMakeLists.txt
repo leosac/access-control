@@ -38,6 +38,7 @@ set(LEOSAC_LIB_SRCS
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
+    exception/ModelException.cpp
     hardware/FGPIO.cpp
     hardware/FLED.cpp
     hardware/FWiegandReader.cpp
@@ -64,6 +65,7 @@ set(LEOSAC_LIB_SRCS
     tools/db/DBService.cpp
     tools/db/MultiplexedSession.cpp
     tools/db/MultiplexedTransaction.cpp
+    tools/db/OptionalTransaction.cpp
     tools/scrypt/Random.cpp
     tools/scrypt/Scrypt.cpp
     core/tasks/GetLocalConfigVersion.cpp
@@ -76,7 +78,8 @@ set(LEOSAC_LIB_SRCS
     core/audit/UserEvent.cpp
     core/audit/WSAPICall.cpp
     core/audit/AuditFactory.cpp
-)
+    core/audit/GroupEvent.cpp
+        )
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db

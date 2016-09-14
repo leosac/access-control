@@ -30,30 +30,31 @@ namespace WebSockAPI
 using json = nlohmann::json;
 
 /**
- * Update information about a given user.
+ * Update information about a group, or create a new group.
  *
  * Request:
- *     + `user_id`: The user_id of the user we want to update. Required.
- *     + `attributes`: A dictionnary of a user's attributes (firstname,
- *       lastname, etc...).
+ *     + `group_id`: The group_id of the group we want to update.
+ *       If this is `0`, this means we want to create a new group.
+ *     + `attributes`: A dictionnary of a groups' attributes.
  *
  *     Accepted attributes:
- *         + firstname
- *         + lastname
- *         + email
+ *         + name
+ *         + description
  *
   * Response:
  *     + ...
  */
-class UserPut : public MethodHandler
+class GroupPut : public MethodHandler
 {
   public:
-    UserPut(RequestContext ctx);
+    GroupPut(RequestContext ctx);
 
     static MethodHandlerUPtr create(RequestContext);
 
   private:
     virtual json process_impl(const json &req) override;
+
+    json create_group(const std::string &name, const std::string &desc);
 };
 }
 }

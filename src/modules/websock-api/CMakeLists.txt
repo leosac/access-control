@@ -18,6 +18,7 @@ set(WEBSOCK_API_SRCS
         conditions/IsCurrentUserAdmin.cpp
         conditions/IsAuthenticated.cpp
         conditions/IsInGroup.cpp
+        api/GroupPut.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED

@@ -37,6 +37,9 @@ using IAuditEntryPtr = std::shared_ptr<IAuditEntry>;
 class IUserEvent;
 using IUserEventPtr = std::shared_ptr<IUserEvent>;
 
+class IGroupEvent;
+using IGroupEventPtr = std::shared_ptr<IGroupEvent>;
+
 class IWSAPICall;
 using IWSAPICallPtr = std::shared_ptr<IWSAPICall>;
 
@@ -50,6 +53,9 @@ using WSAPICallPtr  = std::shared_ptr<WSAPICall>;
 
 class UserEvent;
 using UserEventPtr = std::shared_ptr<UserEvent>;
+
+class GroupEvent;
+using GroupEventPtr = std::shared_ptr<GroupEvent>;
 
 enum class EventType
 {
@@ -66,8 +72,8 @@ enum class EventType
      * A call to "user_get" websocket API has been made.
      */
     USER_GET,
-    MEMBERSHIP_CREATED,
-    MEMBERSHIP_DELETED,
+    GROUP_CREATED,
+    GROUP_MEMBERSHIP_CHANGED,
     LAST__
 };
 

@@ -19,42 +19,39 @@
 
 #pragma once
 
-#include "MethodHandler.hpp"
+#include "IAuditEntry.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
-namespace Module
+namespace Audit
 {
-namespace WebSockAPI
-{
-using json = nlohmann::json;
-
 /**
- * Update information about a given user.
+ * Interface that describes an Audit object for group related event.
  *
- * Request:
- *     + `user_id`: The user_id of the user we want to update. Required.
- *     + `attributes`: A dictionnary of a user's attributes (firstname,
- *       lastname, etc...).
- *
- *     Accepted attributes:
- *         + firstname
- *         + lastname
- *         + email
- *
-  * Response:
- *     + ...
+ * Possible use case:
+ *     + Group creation/deletion.
+ *     + Memberships changes.
  */
-class UserPut : public MethodHandler
+class IGroupEvent : virtual public IAuditEntry
 {
   public:
-    UserPut(RequestContext ctx);
+    /**
+     * Set the group that is targeted by the event.
+     */
+    virtual void target(Auth::GroupPtr user) = 0;
 
-    static MethodHandlerUPtr create(RequestContext);
+    /**
+     * An optional JSON representation of the object
+     * **before** the event took place.
+     */
+    virtual void before(const std::string &repr) = 0;
 
-  private:
-    virtual json process_impl(const json &req) override;
+    /**
+     * An optional JSON representation of the object
+     * **after** the event took place.
+     */
+    virtual void after(const std::string &repr) = 0;
 };
-}
 }
 }

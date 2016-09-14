@@ -68,6 +68,11 @@ GroupRank UserGroupMembership::rank() const
     return rank_;
 }
 
+void UserGroupMembership::rank(const GroupRank &rank)
+{
+    rank_ = rank;
+}
+
 bool UserGroupMembershipComparator::
 operator()(const UserGroupMembershipPtr &m1, const UserGroupMembershipPtr &m2) const
 {
