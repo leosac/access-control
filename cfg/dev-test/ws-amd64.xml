@@ -2,10 +2,11 @@
 <kernel>
     <instance_name>fixe</instance_name>
     <database>
-      <type>mysql</type>
-      <username>root</username>
+      <type>pgsql</type>
+      <username>postgres</username>
       <password></password>
       <dbname>leosac</dbname>
+      <host>127.0.0.1</host>
     </database>
 
     <plugin_directories>
