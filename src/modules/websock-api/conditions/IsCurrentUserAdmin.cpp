@@ -34,5 +34,5 @@ IsCurrentUserAdmin::IsCurrentUserAdmin(RequestContext ctx)
 bool IsCurrentUserAdmin::operator()()
 {
     auto user = ctx_.session->current_user();
-    return user && user->username() == "admin";
+    return user && user->rank() == Auth::UserRank::ADMIN;
 }

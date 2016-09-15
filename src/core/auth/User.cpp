@@ -34,12 +34,14 @@ static bool is_valid_username_character(char c)
 
 User::User()
     : id_(0)
+    , rank_(UserRank::NORMAL)
     , version_(0)
 {
 }
 
 User::User(const std::string &uname)
     : id_(0)
+    , rank_(UserRank::NORMAL)
     , version_(0)
 {
     username(uname);
@@ -138,4 +140,14 @@ bool User::verify_password(const std::string &pw) const
 {
     std::vector<uint8_t> vec(pw.begin(), pw.end());
     return Scrypt::Verify(vec, password_);
+}
+
+UserRank User::rank() const
+{
+    return rank_;
+}
+
+void User::rank(UserRank r)
+{
+    rank_ = r;
 }

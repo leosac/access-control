@@ -23,6 +23,7 @@
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "conditions/IsInGroup.hpp"
+#include "core/auth/User.hpp"
 #include "core/auth/serializers/GroupJSONSerializer.hpp"
 #include "tools/db/DBService.hpp"
 
@@ -45,11 +46,10 @@ MethodHandlerUPtr GroupGet::create(RequestContext ctx)
         auto gid = req.at("group_id").get<Auth::GroupId>();
         if (gid == 0)
         {
-            // We want all group. Don't check for membership against
-            // a given target.
-            return false;
+            // We want all group. Always ok, we filter later.
+            return true;
         }
-        return wrap(IsInGroup(ctx, gid))(req);
+        return IsInGroup(ctx, gid)();
     };
 
     instance->add_conditions_or(
@@ -78,10 +78,28 @@ json GroupGet::process_impl(const json &req)
     }
     else
     {
-        Result result = db->query<Auth::Group>();
-        rep["data"]   = json::array();
+        Result result     = db->query<Auth::Group>();
+        rep["data"]       = json::array();
+        auto current_user = ctx_.session->current_user();
+
+        // fixme: may be rather slow.
         for (const auto &group : result)
-            rep["data"].push_back(GroupJSONSerializer::to_object(group));
+        {
+            if (current_user->rank() == Auth::UserRank::ADMIN)
+            {
+                // Admin sees all.
+                rep["data"].push_back(GroupJSONSerializer::to_object(group));
+            }
+            else
+            {
+                // Otherwise see your own group.
+                for (const auto &membership : group.user_memberships())
+                {
+                    if (membership->user().object_id() == current_user->id())
+                        rep["data"].push_back(GroupJSONSerializer::to_object(group));
+                }
+            }
+        }
     }
     t.commit();
     return rep;

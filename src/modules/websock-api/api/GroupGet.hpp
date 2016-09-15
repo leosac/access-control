@@ -36,6 +36,9 @@ using json = nlohmann::json;
  *     + `group_id`: Group we want information about. Required.
  *     A `group_id` of 0 means returns all known groups.
  *
+ * For a non-administrator user, it will returns the group the user
+ * is a member of.
+ *
  * Response:
  *     + ...
  */

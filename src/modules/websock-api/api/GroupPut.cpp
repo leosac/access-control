@@ -22,6 +22,7 @@
 #include "Group_odb.h"
 #include "api/APISession.hpp"
 #include "conditions/IsCurrentUserAdmin.hpp"
+#include "conditions/IsInGroup.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/GroupEvent.hpp"
 #include "core/auth/Group.hpp"
@@ -55,6 +56,26 @@ MethodHandlerUPtr GroupPut::create(RequestContext ctx)
         }
     };
 
+    auto will_create = [ptr = instance.get()](const json &req)
+    {
+        if (req.at("group_id").get<Auth::GroupId>() == 0)
+        {
+            return true;
+        }
+        return false;
+    };
+
+    auto is_group_admin = [ ctx, ptr = instance.get() ](const json &req)
+    {
+        auto gid = req.at("group_id").get<Auth::GroupId>();
+        if (gid != 0)
+        {
+            using namespace Conditions;
+            return IsInGroup(ctx, gid, Auth::GroupRank::ADMIN)();
+        }
+        return false;
+    };
+
     // todo check if group admin for update operation.
     // also fix update/create permission
 
@@ -63,7 +84,7 @@ MethodHandlerUPtr GroupPut::create(RequestContext ctx)
         has_json_attributes_object);
 
     instance->add_conditions_or(
-        []() { throw PermissionDenied(); },
+        []() { throw PermissionDenied(); }, will_create, is_group_admin,
         Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)));
     return std::move(instance);
 }

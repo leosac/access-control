@@ -109,6 +109,16 @@ class User
      */
     const UserGroupMembershipSet &group_memberships() const;
 
+    /**
+     * Get the global rank of the user.
+     */
+    UserRank rank() const;
+
+    /**
+     * Set the global rank of the user.
+     */
+    void rank(UserRank r);
+
   protected:
 #pragma db id auto
     UserId id_;
@@ -130,6 +140,9 @@ class User
 
 #pragma db value_not_null inverse(user_)
     UserGroupMembershipSet membership_;
+
+#pragma db not_null
+    UserRank rank_;
 
 /**
 * A user can have the same validity than credentials.

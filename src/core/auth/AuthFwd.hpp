@@ -49,6 +49,12 @@ enum class GroupRank
     ADMIN    = 2,
 };
 
+enum class UserRank
+{
+    NORMAL = 0,
+    ADMIN  = 1,
+};
+
 class UserGroupMembership;
 using UserGroupMembershipPtr = std::shared_ptr<UserGroupMembership>;
 

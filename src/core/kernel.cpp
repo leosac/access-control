@@ -518,6 +518,7 @@ void Kernel::configure_database()
                     admin->lastname("ADMIN");
                     admin->username("admin");
                     admin->password("admin");
+                    admin->rank(Auth::UserRank::ADMIN);
                     database_->persist(admin);
 
                     Auth::UserPtr demo = std::make_shared<Auth::User>();
