@@ -39,6 +39,15 @@ using GroupWPtr  = std::weak_ptr<Group>;
 using GroupLWPtr = odb::lazy_weak_ptr<Group>;
 using GroupId    = unsigned long;
 
+/**
+ * The rank of an User inside a Group.
+ */
+enum class GroupRank
+{
+    MEMBER   = 0,
+    OPERATOR = 1,
+    ADMIN    = 2,
+};
 
 class UserGroupMembership;
 using UserGroupMembershipPtr = std::shared_ptr<UserGroupMembership>;

@@ -20,6 +20,7 @@
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
 #include "Token_odb.h"
+#include "api/GroupDelete.hpp"
 #include "api/GroupGet.hpp"
 #include "api/GroupPut.hpp"
 #include "api/LogGet.hpp"
@@ -73,6 +74,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers2_["get_logs"]        = &LogGet::create;
     handlers2_["group_get"]       = &GroupGet::create;
     handlers2_["group_put"]       = &GroupPut::create;
+    handlers2_["group_delete"]    = &GroupDelete::create;
     handlers2_["membership_get"]  = &MembershipGet::create;
     handlers2_["password_change"] = &PasswordChange::create;
 }

@@ -31,18 +31,11 @@ namespace Auth
 using UserGroupMembershipId = unsigned long;
 
 /**
- * The rank of an User inside a Group.
- */
-enum class GroupRank
-{
-    ADMIN    = 0,
-    OPERATOR = 1,
-    MEMBER   = 2,
-};
-
-/**
  * Describe the membership of an User with regroup to a Group.
  * This class is "database enabled".
+ *
+ * @note A membership is deleted on cascade when either its Group or
+ * its User is deleted.
  */
 #pragma db object optimistic
 class UserGroupMembership
@@ -68,9 +61,11 @@ class UserGroupMembership
     UserGroupMembershipId id_;
 
 #pragma db not_null
+#pragma db on_delete(cascade)
     UserLWPtr user_;
 
 #pragma db not_null
+#pragma db on_delete(cascade)
     GroupLWPtr group_;
 
 #pragma db not_null

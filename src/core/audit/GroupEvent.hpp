@@ -43,15 +43,23 @@ class GroupEvent : virtual public IGroupEvent, public AuditEntry
   public:
     virtual ~GroupEvent() = default;
 
-    virtual void target(Auth::GroupPtr user) override;
+    virtual void target(Auth::GroupPtr grp) override;
 
     virtual void before(const std::string &repr) override;
 
     virtual void after(const std::string &repr) override;
 
   public:
-#pragma db not_null
+#pragma db on_delete(set_null)
     Auth::GroupLWPtr target_;
+
+    /**
+     * This is equals to target_->id().
+     *
+     * The reason for this data duplication is to keep
+     * a trail of which group this event used to refer to.
+     */
+    Auth::GroupId target_group_id_;
 
     /**
      * Optional JSON dump of the object before the event took place.

@@ -56,6 +56,7 @@ MethodHandlerUPtr GroupPut::create(RequestContext ctx)
     };
 
     // todo check if group admin for update operation.
+    // also fix update/create permission
 
     instance->add_conditions_or(
         []() { throw MalformedMessage("No `attributes` subobject"); },

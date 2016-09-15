@@ -34,8 +34,18 @@ using namespace Leosac::Module::WebSockAPI::Conditions;
 IsInGroup::IsInGroup(RequestContext ctx, Auth::GroupId group)
     : ConditionBase(ctx)
     , group_id_(group)
+    , min_rank_(Auth::GroupRank::MEMBER)
 {
 }
+
+IsInGroup::IsInGroup(RequestContext ctx, Auth::GroupId group,
+                     Auth::GroupRank min_rank)
+    : ConditionBase(ctx)
+    , group_id_(group)
+    , min_rank_(min_rank)
+{
+}
+
 
 bool IsInGroup::operator()()
 {
@@ -61,8 +71,11 @@ bool IsInGroup::operator()()
         }
         for (const auto &membership : fresh_user->group_memberships())
         {
-            if (membership->group().object_id() == group_id_)
+            if (membership->group().object_id() == group_id_ &&
+                membership->rank() >= min_rank_)
+            {
                 return true;
+            }
         }
     }
     return false;

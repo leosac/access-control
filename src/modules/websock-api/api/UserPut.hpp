@@ -27,8 +27,6 @@ namespace Module
 {
 namespace WebSockAPI
 {
-using json = nlohmann::json;
-
 /**
  * Update information about a given user.
  *

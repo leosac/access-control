@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "ConditionBase.hpp"
+#include "MethodHandler.hpp"
 #include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
@@ -28,35 +28,25 @@ namespace Module
 {
 namespace WebSockAPI
 {
-namespace Conditions
-{
 /**
- * A `Condition` that will return true if the current user is
- * a member of a group.
+ * Delete a group.
  *
- * The current user is retrieved from the RequestContext object.
+ * Request:
+ *     + `group_id`: The group_id of the group we want to delete.
  *
- * @note It's possible to also check for a minimal rank in the group.
+ * Response:
+ *     + ...
  */
-class IsInGroup : public ConditionBase
+class GroupDelete : public MethodHandler
 {
   public:
-    IsInGroup(RequestContext ctx, Auth::GroupId group);
+    GroupDelete(RequestContext ctx);
 
-    /**
-     * Check that an user is in the group and has a minimal rank.
-     * @param min_rank Minimal rank for the user to be consided a part of the group.
-     * @return
-     */
-    IsInGroup(RequestContext ctx, Auth::GroupId group, Auth::GroupRank min_rank);
-
-    bool operator()();
+    static MethodHandlerUPtr create(RequestContext);
 
   private:
-    Auth::GroupId group_id_;
-    Auth::GroupRank min_rank_;
+    virtual json process_impl(const json &req) override;
 };
-}
 }
 }
 }

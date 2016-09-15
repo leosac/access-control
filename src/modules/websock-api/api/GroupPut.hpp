@@ -28,8 +28,6 @@ namespace Module
 {
 namespace WebSockAPI
 {
-using json = nlohmann::json;
-
 /**
  * Update information about a group, or create a new group.
  *

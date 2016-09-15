@@ -535,6 +535,7 @@ void Kernel::configure_database()
                     Auth::GroupPtr users = std::make_shared<Auth::Group>();
                     users->name("Users");
                     users->member_add(demo);
+                    users->member_add(admin);
                     database_->persist(users);
                     t.commit();
                 }

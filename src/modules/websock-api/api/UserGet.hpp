@@ -27,8 +27,6 @@ namespace Module
 {
 namespace WebSockAPI
 {
-using json = nlohmann::json;
-
 /**
  * Retrieve information about a given user, or about all users.
  *

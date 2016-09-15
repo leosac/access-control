@@ -41,7 +41,7 @@ std::shared_ptr<GroupEvent> GroupEvent::create(const DBPtr &database,
     Audit::GroupEventPtr audit =
         std::shared_ptr<Audit::GroupEvent>(new Audit::GroupEvent());
     audit->database_ = database;
-    audit->target_   = target_group;
+    audit->target(target_group);
     database->persist(audit);
 
     audit->set_parent(parent);
@@ -51,10 +51,13 @@ std::shared_ptr<GroupEvent> GroupEvent::create(const DBPtr &database,
     return audit;
 }
 
-void GroupEvent::target(Auth::GroupPtr user)
+void GroupEvent::target(Auth::GroupPtr grp)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
-    target_ = user;
+    if (grp)
+        ASSERT_LOG(grp->id(), "Group has no id.");
+    target_          = grp;
+    target_group_id_ = grp->id();
 }
 
 void GroupEvent::before(const std::string &repr)
