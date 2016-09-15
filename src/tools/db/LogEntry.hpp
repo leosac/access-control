@@ -85,7 +85,7 @@ class LogEntry
     friend class odb::access;
 
 #pragma db version
-    const ssize_t version_;
+    const size_t version_;
 };
 
 /**

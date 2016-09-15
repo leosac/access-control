@@ -26,7 +26,8 @@ using namespace Leosac;
 using namespace Leosac::Audit;
 
 AuditEntry::AuditEntry()
-    : finalized_(false)
+    : duration_(0)
+    , finalized_(false)
     , version_(0)
 {
     timestamp_ = boost::posix_time::second_clock::local_time();
@@ -45,9 +46,6 @@ void AuditEntry::odb_callback(odb::callback_event e, odb::database &db) const
         if (auto parent = parent_.lock())
         {
             ASSERT_LOG(parent->id(), "Parent must be already persisted.");
-            ERROR("IN CALLBAAGIC!");
-            ERROR("IN OBJECT_CALLBACK: PARENT HAS " << parent->children_count()
-                                                    << " children.");
             db.update(parent);
         }
     }
@@ -65,6 +63,7 @@ void AuditEntry::finalize()
     }
     finalized_ = true;
     ASSERT_LOG(database_, "Null database pointer for AuditEntry.");
+    duration_ = etc_.elapsed();
     database_->update(*this);
 }
 
@@ -113,12 +112,9 @@ void AuditEntry::remove_parent()
     if (!parent)
         return;
 
-
     auto &children = parent->children_;
-    ERROR("REMOVE PARENT ! (" << children.size() << ")");
     children.erase(std::remove(children.begin(), children.end(), shared_from_this()),
                    children.end());
-    ERROR("NOW HAS " << children.size() << " items");
     parent_.reset();
 }
 

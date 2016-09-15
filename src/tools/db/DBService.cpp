@@ -18,6 +18,9 @@
 */
 
 #include "DBService.hpp"
+#include "DatabaseTracer.hpp"
+#include "tools/log.hpp"
+#include <odb/database.hxx>
 
 using namespace Leosac;
 
@@ -30,4 +33,11 @@ DBService::DBService(DBPtr db)
 DBPtr DBService::db() const
 {
     return database_;
+}
+
+size_t DBService::operation_count() const
+{
+    auto tracer = dynamic_cast<db::DatabaseTracer *>(database_->tracer());
+    ASSERT_LOG(tracer, "No (valid?) tracer object on the database.");
+    return tracer->count();
 }

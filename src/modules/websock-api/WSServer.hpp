@@ -176,9 +176,9 @@ class WSServer
     std::map<std::string, MethodHandler::Factory> handlers2_;
 
     /**
-     * Handler to the database.
+     * Database service object.
      */
-    DBPtr db_;
+    DBServicePtr dbsrv_;
 
     /**
      * A reference to the module.

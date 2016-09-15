@@ -56,6 +56,8 @@ class WSAPICall : virtual public IWSAPICall, public AuditEntry
 
     virtual void response_content(const std::string &string) override;
 
+    virtual void database_operations(uint16_t nb_operation) override;
+
 
 #pragma db not_null
     std::string api_method_;
@@ -94,6 +96,12 @@ class WSAPICall : virtual public IWSAPICall, public AuditEntry
      * Copy of the JSON content of the response
      */
     std::string response_content_;
+
+    /**
+     * Count the number of database operation that happened while
+     * processing this API call.
+     */
+    uint16_t database_operations_;
 
   private:
     friend class odb::access;

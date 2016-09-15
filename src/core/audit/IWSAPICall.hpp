@@ -73,6 +73,11 @@ class IWSAPICall : virtual public IAuditEntry
      * The (JSON) content of the response.
      */
     virtual void response_content(const std::string &) = 0;
+
+    /**
+     * The number of database queries.
+     */
+    virtual void database_operations(uint16_t nb_operation) = 0;
 };
 }
 }

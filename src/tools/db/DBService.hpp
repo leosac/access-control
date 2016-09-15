@@ -33,6 +33,11 @@ class DBService
 
     DBPtr db() const;
 
+    /**
+     * Return the number of operation against the database.
+     */
+    size_t operation_count() const;
+
   private:
     DBPtr database_;
 };

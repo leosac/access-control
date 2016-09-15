@@ -19,11 +19,12 @@
 
 #pragma once
 
+#include "DatabaseTracer.hpp"
+#include <cstddef>
+#include <cstdint>
 #include <odb/pgsql/tracer.hxx>
 
 namespace Leosac
-{
-namespace Tools
 {
 namespace db
 {
@@ -31,12 +32,16 @@ namespace db
  * An implementation of odb::tracer that use the logging infrastructure
  * of Leosac.
  */
-class PGSQLTracer : public odb::pgsql::tracer
+class PGSQLTracer : public DatabaseTracer
 {
   public:
-    virtual void execute(odb::pgsql::connection &connection,
-                         const char *statement) override;
+    PGSQLTracer() = default;
+    virtual void execute(odb::connection &connection, const char *statement);
+
+    virtual size_t count() const override;
+
+  private:
+    size_t count_;
 };
-}
 }
 }

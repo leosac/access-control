@@ -140,7 +140,7 @@ class User
     IAccessProfilePtr profile_;
 
 #pragma db version
-    const ssize_t version_;
+    const size_t version_;
 
   private:
     friend class odb::access;

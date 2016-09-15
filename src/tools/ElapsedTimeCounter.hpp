@@ -39,7 +39,7 @@ class ElapsedTimeCounter
     ElapsedTimeCounter();
 
     /**
-     * Returns the elapsed time since the creation of
+     * Returns the elapsed time, in milliseconds, since the creation of
      * the ElapsedTimeCounter object.
      */
     size_t elapsed() const;

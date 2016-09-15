@@ -482,7 +482,7 @@ void Kernel::configure_database()
                     auto pg_db = std::make_shared<odb::pgsql::database>(
                         db_user, db_pw, db_dbname, db_host, db_port);
                     // todo: care about leak
-                    pg_db->tracer(new Tools::db::PGSQLTracer());
+                    pg_db->tracer(new db::PGSQLTracer());
                     database_ = pg_db;
                 }
             }

@@ -80,7 +80,7 @@ class UserGroupMembership
     GroupRank rank_;
 
 #pragma db version
-    const ssize_t version_;
+    const size_t version_;
 
     friend class odb::access;
 };

@@ -17,19 +17,28 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "PGSQLTracer.hpp"
-#include "tools/log.hpp"
+#pragma once
 
-using namespace Leosac;
-using namespace Leosac::db;
+#include <cstddef>
+#include <cstdint>
+#include <odb/tracer.hxx>
 
-void PGSQLTracer::execute(odb::connection &connection, const char *statement)
+namespace Leosac
 {
-    DEBUG("SQL: " << statement);
-    ++count_;
+namespace db
+{
+/**
+ * A Leosac specific base class for tracing database operation.
+ */
+class DatabaseTracer : public odb::tracer
+{
+  public:
+    DatabaseTracer() = default;
+
+    /**
+     * Return the number of statement that have been traced.
+     */
+    virtual size_t count() const = 0;
+};
 }
-
-size_t PGSQLTracer::count() const
-{
-    return count_;
 }

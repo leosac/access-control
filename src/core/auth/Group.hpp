@@ -133,7 +133,7 @@ class Group : public std::enable_shared_from_this<Group>
     IAccessProfilePtr profile_;
 
 #pragma db version
-    const ssize_t version_;
+    const size_t version_;
 };
 }
 }

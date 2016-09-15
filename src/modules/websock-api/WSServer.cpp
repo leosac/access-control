@@ -33,6 +33,7 @@
 #include "exception/ExceptionsTools.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/db/DatabaseTracer.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
 #include <json.hpp>
@@ -46,10 +47,10 @@ using json = nlohmann::json;
 
 WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     : auth_(*this)
-    , db_(database)
+    , dbsrv_(std::make_shared<DBService>(database))
     , module_(module)
 {
-    ASSERT_LOG(db_, "No database object passed into WSServer.");
+    ASSERT_LOG(database, "No database object passed into WSServer.");
     using websocketpp::lib::placeholders::_1;
     using websocketpp::lib::placeholders::_2;
     srv_.init_asio();
@@ -90,16 +91,18 @@ void WSServer::on_close(websocketpp::connection_hdl hdl)
 
 void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg)
 {
-    assert(connection_api_.find(hdl) != connection_api_.end());
+    ASSERT_LOG(connection_api_.find(hdl) != connection_api_.end(),
+               "Cannot retrieve API pointer from connection handle.");
     auto api_handle = connection_api_.find(hdl)->second;
 
     // todo maybe parse first so be we can have better error handling.
+    auto global_request_count = dbsrv_->operation_count();
     Audit::IWSAPICallPtr audit;
     ServerMessage response;
     json req;
     try
     {
-        audit = Audit::Factory::WSAPICall(db_);
+        audit = Audit::Factory::WSAPICall(dbsrv_->db());
     }
     catch (const odb::exception &e)
     {
@@ -136,7 +139,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
 
     try
     {
-        db::MultiplexedTransaction t(db_->begin());
+        db::MultiplexedTransaction t(dbsrv_->db()->begin());
         // If something went wrong while processing the request, the audit object
         // may need to be reload. We might as well reload it everytime.
         audit->reload();
@@ -146,6 +149,8 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         audit->status_code(response.status_code);
         audit->status_string(response.status_string);
         audit->response_content(response.content.dump(4));
+        audit->database_operations(
+            static_cast<uint16_t>(dbsrv_->operation_count() - global_request_count));
         audit->finalize();
         t.commit();
     }
@@ -196,10 +201,8 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
 
     if (handler_factory != handlers2_.end())
     {
-        RequestContext ctx{.session = api_handle,
-                           .dbsrv   = std::make_shared<DBService>(db_),
-                           .server  = *this,
-                           .audit   = audit};
+        RequestContext ctx{
+            .session = api_handle, .dbsrv = dbsrv_, .server = *this, .audit = audit};
 
         MethodHandlerUPtr method_handler = handler_factory->second(ctx);
         return method_handler->process(in);
@@ -227,7 +230,7 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
 
 DBPtr WSServer::db()
 {
-    return db_;
+    return dbsrv_->db();
 }
 
 CoreUtilsPtr WSServer::core_utils()
@@ -370,10 +373,11 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
 
     std::unique_ptr<db::MultiplexedTransaction> transaction;
     if (new_transaction)
-        transaction = std::make_unique<db::MultiplexedTransaction>(db_->begin());
+        transaction =
+            std::make_unique<db::MultiplexedTransaction>(dbsrv_->db()->begin());
     for (const auto &token : tokens_to_remove)
     {
-        db_->erase<Auth::Token>(token->id());
+        dbsrv_->db()->erase<Auth::Token>(token->id());
     }
     if (new_transaction)
         transaction->commit();

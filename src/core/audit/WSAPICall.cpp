@@ -27,6 +27,7 @@ using namespace Leosac::Audit;
 
 WSAPICall::WSAPICall()
     : status_code_(APIStatusCode::UNKNOWN)
+    , database_operations_(0)
 {
 }
 
@@ -82,4 +83,10 @@ void WSAPICall::response_content(const std::string &str)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     response_content_ = str;
+}
+
+void WSAPICall::database_operations(uint16_t nb_operation)
+{
+    ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
+    database_operations_ = nb_operation;
 }

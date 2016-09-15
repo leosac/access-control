@@ -27,6 +27,7 @@
 #include <memory>
 #include <odb/callback.hxx>
 #include <odb/core.hxx>
+#include <tools/ElapsedTimeCounter.hpp>
 
 namespace Leosac
 {
@@ -101,6 +102,11 @@ class AuditEntry : virtual public IAuditEntry,
     EventMask event_mask_;
 
     /**
+     * How long did it take for the Audit object to be finalized.
+     */
+    size_t duration_;
+
+    /**
      * Audit entry are sometime persisted multiple time before
      * reaching their final state.
      *
@@ -118,9 +124,16 @@ class AuditEntry : virtual public IAuditEntry,
 #pragma db transient
     DBPtr database_;
 
+/**
+ * Keep track of how long the object has been alive.
+ * This helps populates the `duration_` field.
+ */
+#pragma db transient
+    Tools::ElapsedTimeCounter etc_;
+
   private:
 #pragma db version
-    ssize_t version_;
+    const size_t version_;
 
     friend class odb::access;
 
