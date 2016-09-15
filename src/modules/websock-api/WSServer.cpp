@@ -134,15 +134,18 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         response.status_string = "Failed to parse JSON.";
     }
 
-    // Update audit value.
-    audit->uuid(response.uuid);
-    audit->method(response.type);
-    audit->status_code(response.status_code);
-    audit->status_string(response.status_string);
-    audit->response_content(response.content.dump(4));
     try
     {
         db::MultiplexedTransaction t(db_->begin());
+        // If something went wrong while processing the request, the audit object
+        // may need to be reload. We might as well reload it everytime.
+        audit->reload();
+        // Update audit value.
+        audit->uuid(response.uuid);
+        audit->method(response.type);
+        audit->status_code(response.status_code);
+        audit->status_string(response.status_string);
+        audit->response_content(response.content.dump(4));
         audit->finalize();
         t.commit();
     }

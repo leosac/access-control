@@ -20,6 +20,7 @@
 #pragma once
 
 #include "MethodHandler.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
@@ -54,7 +55,15 @@ class GroupPut : public MethodHandler
   private:
     virtual json process_impl(const json &req) override;
 
+    json edit_group(Auth::GroupId id, const std::string &name,
+                    const std::string &desc);
     json create_group(const std::string &name, const std::string &desc);
+
+    /**
+     * Make sure the group's attribute is valid (by calling
+     * GroupValidator) and that the name is unique.
+     */
+    void validate_and_unique(Auth::GroupPtr grp);
 };
 }
 }

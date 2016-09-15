@@ -103,7 +103,6 @@ PermissionDenied::PermissionDenied(const std::string &detail)
 {
 }
 
-
 std::string PermissionDenied::build_msg(const std::string &detail) const
 {
     std::stringstream ss;

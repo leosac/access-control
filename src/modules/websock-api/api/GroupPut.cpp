@@ -24,10 +24,11 @@
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/GroupEvent.hpp"
+#include "core/auth/Group.hpp"
+#include "core/auth/UserGroupMembership.hpp"
 #include "core/auth/serializers/GroupJSONSerializer.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"
-#include <core/auth/UserGroupMembership.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -68,10 +69,7 @@ MethodHandlerUPtr GroupPut::create(RequestContext ctx)
 
 json GroupPut::process_impl(const json &req)
 {
-    json rep;
-
-    using Query     = odb::query<Auth::Group>;
-    auto gid        = req.at("group_id").get<Auth::UserId>();
+    auto gid        = req.at("group_id").get<Auth::GroupId>();
     auto attributes = req.at("attributes");
 
     if (gid == 0)
@@ -81,15 +79,14 @@ json GroupPut::process_impl(const json &req)
     }
     else
     {
+        return edit_group(gid, attributes.at("name"),
+                          extract_with_default(attributes, "description", ""));
     }
-    return rep;
 }
 
 json GroupPut::create_group(const std::string &name, const std::string &desc)
 {
     json rep;
-    using Query = odb::query<Auth::Group>;
-
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 
@@ -97,17 +94,7 @@ json GroupPut::create_group(const std::string &name, const std::string &desc)
     Auth::GroupPtr new_group = std::make_shared<Auth::Group>();
     new_group->name(name);
     new_group->description(desc);
-    Auth::GroupValidator::validate(new_group);
-
-    // Check that such a name is not already used
-    if (db->query_one<Auth::Group>(Query::name == new_group->name()))
-    {
-        ModelException::ModelError e;
-        e.source_pointer = "data/attributes/name";
-        e.message        = "A group named " + new_group->name() + " already exists.";
-        throw ModelException({e});
-    }
-
+    validate_and_unique(new_group);
     db->persist(new_group);
 
     auto audit = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
@@ -130,4 +117,45 @@ json GroupPut::create_group(const std::string &name, const std::string &desc)
     rep["data"] = GroupJSONSerializer::to_object(*new_group);
     t.commit();
     return rep;
+}
+
+json GroupPut::edit_group(Auth::GroupId id, const std::string &name,
+                          const std::string &desc)
+{
+    json rep;
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+
+    auto grp = db->find<Auth::Group>(id);
+    if (!grp)
+        throw EntityNotFound(id, "group");
+
+    auto audit = Audit::Factory::GroupEvent(db, grp, ctx_.audit);
+    audit->event_mask(Audit::EventType::GROUP_UPDATED);
+    grp->name(name);
+    grp->description(desc);
+    validate_and_unique(grp);
+    db->update(grp);
+
+    audit->finalize();
+    rep["data"] = GroupJSONSerializer::to_object(*grp);
+    t.commit();
+    return rep;
+}
+
+void GroupPut::validate_and_unique(Auth::GroupPtr grp)
+{
+    using Query = odb::query<Auth::Group>;
+
+    Auth::GroupValidator::validate(grp);
+    auto grp_with_same_name =
+        ctx_.dbsrv->db()->query_one<Auth::Group>(Query::name == grp->name());
+    // Check that either the name is available, or the group under modification
+    // owns the name already.
+    if (grp_with_same_name && grp_with_same_name != grp)
+    {
+        throw ModelException(
+            "data/attributes/name",
+            BUILD_STR("A group named " << grp->name() << " already exists."));
+    }
 }

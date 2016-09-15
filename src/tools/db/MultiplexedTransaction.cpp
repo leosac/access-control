@@ -48,3 +48,8 @@ void MultiplexedTransaction::commit()
 {
     transaction_->commit();
 }
+
+void MultiplexedTransaction::rollback()
+{
+    transaction_->rollback();
+}

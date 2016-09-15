@@ -45,6 +45,9 @@ void AuditEntry::odb_callback(odb::callback_event e, odb::database &db) const
         if (auto parent = parent_.lock())
         {
             ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+            ERROR("IN CALLBAAGIC!");
+            ERROR("IN OBJECT_CALLBACK: PARENT HAS " << parent->children_count()
+                                                    << " children.");
             db.update(parent);
         }
     }
@@ -102,4 +105,40 @@ void AuditEntry::set_parent(IAuditEntryPtr parent)
 
     if (!author_)
         author_ = parent_odb->author_;
+}
+
+void AuditEntry::remove_parent()
+{
+    auto parent = parent_.lock();
+    if (!parent)
+        return;
+
+
+    auto &children = parent->children_;
+    ERROR("REMOVE PARENT ! (" << children.size() << ")");
+    children.erase(std::remove(children.begin(), children.end(), shared_from_this()),
+                   children.end());
+    ERROR("NOW HAS " << children.size() << " items");
+    parent_.reset();
+}
+
+ssize_t AuditEntry::children_count() const
+{
+    return children_.size();
+}
+
+ssize_t AuditEntry::version() const
+{
+    return version_;
+}
+
+void AuditEntry::reload()
+{
+    ASSERT_LOG(odb::transaction::has_current(), "Not currently in transaction.");
+    database_->reload(this);
+}
+
+IAuditEntryPtr AuditEntry::parent() const
+{
+    return parent_.lock();
 }

@@ -73,6 +73,7 @@ enum class EventType
      */
     USER_GET,
     GROUP_CREATED,
+    GROUP_UPDATED,
     GROUP_MEMBERSHIP_CHANGED,
     LAST__
 };

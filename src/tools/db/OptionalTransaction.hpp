@@ -52,6 +52,11 @@ class OptionalTransaction
      */
     void commit();
 
+    /**
+     * Retrieve the odb transaction object.
+     */
+    odb::transaction *get();
+
   private:
     std::unique_ptr<odb::transaction> transaction_;
 };

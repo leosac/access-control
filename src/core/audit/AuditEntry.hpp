@@ -64,6 +64,16 @@ class AuditEntry : virtual public IAuditEntry,
 
     virtual void set_parent(IAuditEntryPtr parent) override;
 
+    virtual IAuditEntryPtr parent() const override;
+
+    virtual void remove_parent() override;
+
+    virtual ssize_t children_count() const override;
+
+    virtual ssize_t version() const override;
+
+    virtual void reload() override;
+
   private:
 #pragma db id auto
     AuditEntryId id_;
@@ -74,7 +84,7 @@ class AuditEntry : virtual public IAuditEntry,
 #pragma db value_not_null
     std::vector<AuditEntryPtr> children_;
 
-  public:
+  protected:
 #pragma db inverse(children_)
     AuditEntryWPtr parent_;
 
@@ -110,7 +120,7 @@ class AuditEntry : virtual public IAuditEntry,
 
   private:
 #pragma db version
-    const ssize_t version_;
+    ssize_t version_;
 
     friend class odb::access;
 

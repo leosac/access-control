@@ -45,6 +45,11 @@ class MultiplexedTransaction
      */
     void commit();
 
+    /**
+     * Rollback the transaction.
+     */
+    void rollback();
+
   private:
     bool had_previous_;
     std::unique_ptr<odb::transaction> transaction_;

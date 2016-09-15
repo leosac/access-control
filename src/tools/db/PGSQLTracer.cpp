@@ -17,34 +17,14 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "OptionalTransaction.hpp"
-#include <tools/log.hpp>
+#include "PGSQLTracer.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
-using namespace Leosac::db;
+using namespace Leosac::Tools;
+using namespace Leosac::Tools::db;
 
-
-OptionalTransaction::OptionalTransaction(odb::transaction_impl *impl)
+void PGSQLTracer::execute(odb::pgsql::connection &connection, const char *statement)
 {
-    if (!odb::transaction::has_current())
-        transaction_ = std::make_unique<odb::transaction>(impl);
-}
-
-OptionalTransaction::~OptionalTransaction()
-{
-    transaction_.reset();
-}
-
-void OptionalTransaction::commit()
-{
-    if (transaction_)
-        transaction_->commit();
-}
-
-odb::transaction *OptionalTransaction::get()
-{
-    if (transaction_)
-        return transaction_.get();
-    ASSERT_LOG(odb::transaction::has_current(), "No current transaction.");
-    return &odb::transaction::current();
+    DEBUG("SQL: " << statement);
 }

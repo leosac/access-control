@@ -75,6 +75,17 @@ class IAuditEntry
     virtual bool finalized() const = 0;
 
     /**
+     * Reload the object from the database.
+     *
+     * Pre-Conditions:
+     *     + Must be in a database transaction.
+     *
+     * @note Be careful as internal change made to the object will be
+     *       lost when `reload()`ing the object.
+     */
+    virtual void reload() = 0;
+
+    /**
      * Set the event mask for the entry.
      * @param mask
      */
@@ -118,6 +129,33 @@ class IAuditEntry
      *     + This object will be somewhere in `parent->children_` array.
      */
     virtual void set_parent(IAuditEntryPtr parent) = 0;
+
+    /**
+     * Retrieve the parent of this entry.
+     */
+    virtual IAuditEntryPtr parent() const = 0;
+
+    /**
+     * Remove the parent-child relationship between this entry and its
+     * parent.
+     *
+     * This effectively also remove `this` from the children of its current parent.
+     *
+     * @note This is a no-op is there is already no parent.
+     */
+    virtual void remove_parent() = 0;
+
+    /**
+     * Returns the number of children that this entry has.
+     */
+    virtual ssize_t children_count() const = 0;
+
+    /**
+     * Returns the ODB version of the object.
+     *
+     * This call is for debugging purpose.
+     */
+    virtual ssize_t version() const = 0;
 };
 }
 }

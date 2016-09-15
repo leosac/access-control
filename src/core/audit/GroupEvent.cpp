@@ -44,7 +44,6 @@ std::shared_ptr<GroupEvent> GroupEvent::create(const DBPtr &database,
     audit->target_   = target_group;
     database->persist(audit);
 
-    // todo need rollback callback.
     audit->set_parent(parent);
     database->update(audit);
 

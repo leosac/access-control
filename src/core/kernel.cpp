@@ -24,6 +24,7 @@
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
 #include "tools/XmlPropertyTree.hpp"
+#include "tools/db/PGSQLTracer.hpp"
 #include "tools/db/database.hpp"
 #include "tools/log.hpp"
 #include "tools/signalhandler.hpp"
@@ -478,10 +479,12 @@ void Kernel::configure_database()
                 }
                 else
                 {
-                    database_ = std::make_shared<odb::pgsql::database>(
+                    auto pg_db = std::make_shared<odb::pgsql::database>(
                         db_user, db_pw, db_dbname, db_host, db_port);
+                    // todo: care about leak
+                    pg_db->tracer(new Tools::db::PGSQLTracer());
+                    database_ = pg_db;
                 }
-                // database_->tracer(odb::stderr_tracer);
             }
             else
             {
