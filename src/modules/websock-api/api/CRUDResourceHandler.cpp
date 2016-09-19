@@ -1,0 +1,88 @@
+/*
+    Copyright (C) 2014-2016 Islog
+
+    This file is part of Leosac.
+
+    Leosac is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Leosac is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "api/CRUDResourceHandler.hpp"
+#include "WSServer.hpp"
+#include <boost/algorithm/string/predicate.hpp>
+
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
+
+CRUDResourceHandler::CRUDResourceHandler(RequestContext ctx)
+    : ctx_(ctx)
+{
+}
+
+CRUDResourceHandlerUPtr CRUDResourceHandler::instanciate(RequestContext)
+{
+    return nullptr;
+}
+
+WebSockAPI::json CRUDResourceHandler::process(const ClientMessage &msg)
+{
+    switch (verb_from_request_type(msg.type))
+    {
+    case Verb::READ:
+        enforce_condition(read_conditions_, msg.content);
+        return read_impl(msg.content);
+    case Verb::CREATE:
+        enforce_condition(create_conditions_, msg.content);
+        return create_impl(msg.content);
+    case Verb::UPDATE:
+        enforce_condition(update_conditions_, msg.content);
+        return update_impl(msg.content);
+    case Verb::DELETE:
+        enforce_condition(delete_conditions_, msg.content);
+        return delete_impl(msg.content);
+    }
+    ASSERT_LOG(0, "Should not be here.");
+    throw LEOSACException("Should not be here");
+}
+
+CRUDResourceHandler::Verb
+CRUDResourceHandler::verb_from_request_type(const std::string &req)
+{
+    if (boost::algorithm::ends_with(req, ".read"))
+        return Verb::READ;
+    if (boost::algorithm::ends_with(req, ".create"))
+        return Verb::CREATE;
+    if (boost::algorithm::ends_with(req, ".update"))
+        return Verb::UPDATE;
+    if (boost::algorithm::ends_with(req, ".delete"))
+        return Verb::DELETE;
+    ASSERT_LOG(0, "Invalid request type {" << req << "} for CRUD resource handler");
+    throw LEOSACException("Should not be here");
+}
+
+void CRUDResourceHandler::enforce_condition(const ConditionGroupVector &conditions,
+                                            const json &msg_content)
+{
+    bool global_success = true;
+    for (const auto &condition_group : conditions)
+    {
+        bool success = false;
+        for (const auto &condition : condition_group.first)
+            success |= condition(msg_content);
+        global_success &= success;
+        if (!success)
+            condition_group.second();
+    }
+    ASSERT_LOG(global_success, "Probably should have thrown before.");
+}

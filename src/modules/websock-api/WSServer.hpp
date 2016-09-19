@@ -22,6 +22,7 @@
 #include "WebSockAPI.hpp"
 #include "api/APIAuth.hpp"
 #include "api/APISession.hpp"
+#include "api/CRUDResourceHandler.hpp"
 #include "api/MethodHandler.hpp"
 #include "core/APIStatusCode.hpp"
 #include "core/audit/AuditFwd.hpp"
@@ -160,6 +161,21 @@ class WSServer
     void send_message(websocketpp::connection_hdl hdl, const ServerMessage &msg);
 
     /**
+     * An internal helper function to register a CRUD resource handler.
+     *
+     * The resource name will be expanded to create handler for multiple type of
+     * requests:
+     *     + "resource_name"_read
+     *     + "resource_name"_create
+     *     + ...
+     *
+     * @param resource_name
+     * @param factory
+     */
+    void register_crud_handler(const std::string &resource_name,
+                               CRUDResourceHandler::Factory factory);
+
+    /**
      * Process a request from a client.
      */
     json dispatch_request(APIPtr api_handle, const ClientMessage &in,
@@ -174,6 +190,8 @@ class WSServer
     std::map<std::string, json (APISession::*)(const json &)> handlers_;
 
     std::map<std::string, MethodHandler::Factory> handlers2_;
+
+    std::map<std::string, CRUDResourceHandler::Factory> crud_handlers_;
 
     /**
      * Database service object.

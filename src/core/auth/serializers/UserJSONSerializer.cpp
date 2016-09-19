@@ -44,9 +44,8 @@ json UserJSONSerializer::to_object(const Auth::User &user)
          {{"username", user.username()},
           {"firstname", user.firstname()},
           {"lastname", user.lastname()},
-             {"email", user.email()},
-             {"rank", static_cast<int>(user.rank())}
-         }},
+          {"email", user.email()},
+          {"rank", static_cast<int>(user.rank())}}},
         {"relationships", {{"memberships", {{"data", memberships}}}}}};
 
     return serialized;

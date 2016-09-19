@@ -20,9 +20,7 @@
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
 #include "Token_odb.h"
-#include "api/GroupDelete.hpp"
-#include "api/GroupGet.hpp"
-#include "api/GroupPut.hpp"
+#include "api/GroupCRUD.hpp"
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
 #include "api/PasswordChange.hpp"
@@ -72,11 +70,10 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers2_["user_get"]        = &UserGet::create;
     handlers2_["user_put"]        = &UserPut::create;
     handlers2_["get_logs"]        = &LogGet::create;
-    handlers2_["group_get"]       = &GroupGet::create;
-    handlers2_["group_put"]       = &GroupPut::create;
-    handlers2_["group_delete"]    = &GroupDelete::create;
     handlers2_["membership_get"]  = &MembershipGet::create;
     handlers2_["password_change"] = &PasswordChange::create;
+
+    register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -211,12 +208,7 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
     }
 
     auto handler_method = handlers_.find(in.type);
-
-    if (handler_method == handlers_.end())
-    {
-        throw InvalidCall();
-    }
-    else
+    if (handler_method != handlers_.end())
     {
         if (api_handle->allowed(in.type))
         {
@@ -227,6 +219,18 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
         {
             throw PermissionDenied();
         }
+    }
+
+    auto crud_handler_factory = crud_handlers_.find(in.type);
+    if (crud_handler_factory == crud_handlers_.end())
+        throw InvalidCall();
+    else
+    {
+        RequestContext ctx{
+            .session = api_handle, .dbsrv = dbsrv_, .server = *this, .audit = audit};
+
+        CRUDResourceHandlerUPtr crud_handler = crud_handler_factory->second(ctx);
+        return crud_handler->process(in);
     }
 }
 
@@ -383,4 +387,13 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
     }
     if (new_transaction)
         transaction->commit();
+}
+
+void WSServer::register_crud_handler(const std::string &resource_name,
+                                     CRUDResourceHandler::Factory factory)
+{
+    crud_handlers_[resource_name + ".read"]   = factory;
+    crud_handlers_[resource_name + ".update"] = factory;
+    crud_handlers_[resource_name + ".create"] = factory;
+    crud_handlers_[resource_name + ".delete"] = factory;
 }

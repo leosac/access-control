@@ -33,6 +33,9 @@ using APIPtr = std::shared_ptr<APISession>;
 class MethodHandler;
 using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
 
+class CRUDResourceHandler;
+using CRUDResourceHandlerUPtr = std::unique_ptr<CRUDResourceHandler>;
+
 class WSServer;
 
 struct ClientMessage;

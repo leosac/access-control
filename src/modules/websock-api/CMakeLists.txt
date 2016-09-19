@@ -11,15 +11,14 @@ set(WEBSOCK_API_SRCS
         api/UserGet.cpp
         api/UserPut.cpp
         api/LogGet.cpp
-        api/GroupGet.cpp
         api/MembershipGet.cpp
         api/PasswordChange.cpp
         conditions/ConditionBase.cpp
         conditions/IsCurrentUserAdmin.cpp
         conditions/IsAuthenticated.cpp
         conditions/IsInGroup.cpp
-        api/GroupPut.cpp
-        api/GroupDelete.cpp
+        api/CRUDResourceHandler.cpp
+        api/GroupCRUD.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED
