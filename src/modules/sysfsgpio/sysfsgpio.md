@@ -90,7 +90,7 @@ This is a example of SysFsGpio possible configuration for SysFsGpio module into 
                 <unexport_path>/sys/class/gpio/unexport</unexport_path>
                 <edge_path>/sys/class/gpio/__PLACEHOLDER__/edge</edge_path>
                 <value_path>/sys/class/gpio/__PLACEHOLDER__/value</value_path>
-                <direction_path>/sys/class/gpio/__PLACEHOLDER__/value</direction_path>                
+                <direction_path>/sys/class/gpio/__PLACEHOLDER__/direction</direction_path>                
                 <gpios>
                     <gpio>
                         <name>wiegand_data_high</name>
