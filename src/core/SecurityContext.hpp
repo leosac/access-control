@@ -38,16 +38,22 @@ class SecurityContext
   public:
     enum class Action
     {
+        USER_CREATE,
         USER_READ,
-        USER_EDIT,
+        USER_READ_EMAIL,
+        USER_UPDATE,
         USER_DELETE,
 
         GROUP_CREATE,
         GROUP_READ,
         GROUP_UPDATE,
         GROUP_DELETE,
+        /**
+         * Ability to list member of a group.
+         * The ability to list membership gives USER_READ access against
+         * the user whose membership is listed.
+         */
         GROUP_LIST_MEMBERSHIP,
-
 
         MEMBERSHIP_READ,
     };
@@ -55,6 +61,11 @@ class SecurityContext
     struct GroupActionParam
     {
         Auth::GroupId group_id;
+    };
+
+    struct UserActionParam
+    {
+        Auth::UserId user_id;
     };
 
     struct MembershipActionParam
@@ -65,6 +76,7 @@ class SecurityContext
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
+        UserActionParam user;
     };
 
     SecurityContext(DBServicePtr dbsrv);

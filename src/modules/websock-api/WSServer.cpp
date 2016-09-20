@@ -24,8 +24,7 @@
 #include "api/LogGet.hpp"
 #include "api/MembershipGet.hpp"
 #include "api/PasswordChange.hpp"
-#include "api/UserGet.hpp"
-#include "api/UserPut.hpp"
+#include "api/UserCRUD.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
@@ -67,13 +66,12 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
 
-    handlers2_["user_get"]        = &UserGet::create;
-    handlers2_["user_put"]        = &UserPut::create;
     handlers2_["get_logs"]        = &LogGet::create;
     handlers2_["membership_get"]  = &MembershipGet::create;
     handlers2_["password_change"] = &PasswordChange::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
+    register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)

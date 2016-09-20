@@ -42,6 +42,15 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
 
     switch (action)
     {
+    case Action::USER_CREATE:
+        return is_admin();
+    case Action::USER_READ:
+        return can_read_user(ap.user);
+    case Action::USER_READ_EMAIL:
+        return can_read_user_detail(ap.user);
+    case Action::USER_UPDATE:
+        return can_update_user(ap.user);
+
     case Action::GROUP_CREATE:
         return true;
     case Action::GROUP_READ:
@@ -96,4 +105,34 @@ bool WSSecurityContext::can_read_membership(
     ap.group.group_id = ugm->group_id();
     return ugm->user_id() == user_id_ ||
            check_permission(Action::GROUP_LIST_MEMBERSHIP, ap);
+}
+
+bool WSSecurityContext::can_read_user(
+    const SecurityContext::UserActionParam &uap) const
+{
+    Auth::UserPtr user = dbsrv_->find_user_by_id(uap.user_id);
+    if (user)
+    {
+        if (user->id() == user_id_) // self
+            return true;
+        for (const auto &membership : user->group_memberships())
+        {
+            ActionParam ap;
+            ap.group.group_id = membership->group_id();
+            if (check_permission(Action::GROUP_LIST_MEMBERSHIP, ap))
+                return true;
+        }
+    }
+    return false;
+}
+
+bool WSSecurityContext::can_read_user_detail(const UserActionParam &uap) const
+{
+    return uap.user_id == user_id_;
+}
+
+bool WSSecurityContext::can_update_user(
+    const SecurityContext::UserActionParam &uap) const
+{
+    return uap.user_id == user_id_;
 }

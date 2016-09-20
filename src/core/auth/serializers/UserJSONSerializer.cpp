@@ -23,19 +23,25 @@
 using namespace Leosac;
 using namespace Leosac::Auth;
 
-std::string UserJSONSerializer::to_string(const Auth::User &user)
+std::string UserJSONSerializer::to_string(const Auth::User &user,
+                                          const SecurityContext &sc)
 {
-    return to_object(user).dump(4);
+    return to_object(user, sc).dump(4);
 }
 
-json UserJSONSerializer::to_object(const Auth::User &user)
+json UserJSONSerializer::to_object(const Auth::User &user, const SecurityContext &sc)
 {
     json memberships = {};
     for (const auto &membership : user.group_memberships())
     {
-        json group_info = {{"id", membership->id()},
-                           {"type", "user-group-membership"}};
-        memberships.push_back(group_info);
+        SecurityContext::ActionParam ap;
+        ap.membership.membership_id = membership->id();
+        if (sc.check_permission(SecurityContext::Action::MEMBERSHIP_READ, ap))
+        {
+            json group_info = {{"id", membership->id()},
+                               {"type", "user-group-membership"}};
+            memberships.push_back(group_info);
+        }
     }
     json serialized = {
         {"id", user.id()},
@@ -44,9 +50,14 @@ json UserJSONSerializer::to_object(const Auth::User &user)
          {{"username", user.username()},
           {"firstname", user.firstname()},
           {"lastname", user.lastname()},
-          {"email", user.email()},
           {"rank", static_cast<int>(user.rank())}}},
         {"relationships", {{"memberships", {{"data", memberships}}}}}};
 
+    SecurityContext::ActionParam ap;
+    ap.user.user_id = user.id();
+    if (sc.check_permission(SecurityContext::Action::USER_READ_EMAIL, ap))
+    {
+        serialized["attributes"]["email"] = user.email();
+    }
     return serialized;
 }

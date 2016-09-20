@@ -205,7 +205,7 @@ void GroupCRUD::validate_and_unique(Auth::GroupPtr grp)
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>
-GroupCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req)
+GroupCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
     SecurityContext::ActionParam ap;

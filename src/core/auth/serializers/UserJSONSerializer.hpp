@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "tools/JSONSerializer.hpp"
 
@@ -30,7 +31,7 @@ namespace Leosac
  */
 struct UserJSONSerializer : public JSONSerializer<Auth::User>
 {
-    static std::string to_string(const Auth::User &user);
-    static json to_object(const Auth::User &user);
+    static std::string to_string(const Auth::User &user, const SecurityContext &sc);
+    static json to_object(const Auth::User &user, const SecurityContext &sc);
 };
 }

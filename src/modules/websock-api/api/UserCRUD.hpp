@@ -29,14 +29,12 @@ namespace Module
 namespace WebSockAPI
 {
 /**
- * CRUD Handler for Groups.
- *
- * @see See the *_impl() method for each requests parameters/response.
+ * CRUD Handler for Users.
  */
-class GroupCRUD : public CRUDResourceHandler
+class UserCRUD : public CRUDResourceHandler
 {
   private:
-    GroupCRUD(RequestContext ctx);
+    UserCRUD(RequestContext ctx);
 
   public:
     static CRUDResourceHandlerUPtr instanciate(RequestContext);
@@ -45,30 +43,15 @@ class GroupCRUD : public CRUDResourceHandler
     virtual std::vector<ActionActionParam>
     required_permission(Verb verb, const json &req) const override;
 
-    /**
-     * Create a new group.
-     *
-     * Request:
-     *     + `attributes`: A dictionnary of a groups' attributes.
-     *
-     *     Accepted attributes:
-     *         + name
-     *         + description
-     *
-      * Response:
-     *     + ...
-     */
     virtual json create_impl(const json &req) override;
 
     /**
-     * Retrieve information about a group.
+     * Retrieve information about a given user, or about all users.
      *
      * Request:
-     *     + `group_id`: Group we want information about. Required.
-     *     A `group_id` of 0 means returns all known groups.
-     *
-     * For a non-administrator user, it will returns the group the user
-     * is a member of.
+     *     + `user_id`: The user_id of the user we want to fetch.
+     *        Note that the special value `0` can be used to request all known users.
+     *        This field is required.
      *
      * Response:
      *     + ...
@@ -76,30 +59,23 @@ class GroupCRUD : public CRUDResourceHandler
     virtual json read_impl(const json &req) override;
 
     /**
-     * Update information about a group.
+     * Update information about a given user.
      *
      * Request:
-     *     + `group_id`: The group_id of the group we want to update.
-     *     + `attributes`: A dictionnary of a groups' attributes.
+     *     + `user_id`: The user_id of the user we want to update. Required.
+     *     + `attributes`: A dictionnary of a user's attributes (firstname,
+     *       lastname, etc...).
      *
      *     Accepted attributes:
-     *         + name
-     *         + description
+     *         + firstname
+     *         + lastname
+     *         + email
      *
       * Response:
      *     + ...
      */
     virtual json update_impl(const json &req) override;
 
-    /**
-     * Delete a group.
-     *
-     * Request:
-     *     + `group_id`: The group_id of the group we want to delete.
-     *
-     * Response:
-     *     + ...
-     */
     virtual json delete_impl(const json &req) override;
 
     /**

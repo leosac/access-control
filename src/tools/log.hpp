@@ -224,7 +224,9 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
         if (!(cond))                                                                \
         {                                                                           \
             ERROR(msg);                                                             \
-            ERROR("Assertion failed. Aborting.");                                   \
+            ERROR("Assertion failed in " << __FILE__ << " --> "                     \
+                                         << FUNCTION_NAME_MACRO << ":" << __LINE__  \
+                                         << ". Aborting.");                         \
             raise(SIGABRT);                                                         \
         }                                                                           \
     } while (0)

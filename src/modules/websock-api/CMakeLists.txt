@@ -8,8 +8,6 @@ set(WEBSOCK_API_SRCS
         api/APISession.cpp
         api/MethodHandler.cpp
         api/APIAuth.cpp
-        api/UserGet.cpp
-        api/UserPut.cpp
         api/LogGet.cpp
         api/MembershipGet.cpp
         api/PasswordChange.cpp
@@ -19,6 +17,7 @@ set(WEBSOCK_API_SRCS
         conditions/IsInGroup.cpp
         api/CRUDResourceHandler.cpp
         api/GroupCRUD.cpp
+        api/UserCRUD.cpp
         WSSecurityContext.cpp
         )
 

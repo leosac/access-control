@@ -138,8 +138,8 @@ class CRUDResourceHandler
     SecurityContext &security_context();
 
   private:
-    virtual std::vector<ActionActionParam> required_permission(Verb verb,
-                                                               const json &req) = 0;
+    virtual std::vector<ActionActionParam>
+    required_permission(Verb verb, const json &req) const = 0;
 
 
     virtual json create_impl(const json &req) = 0;

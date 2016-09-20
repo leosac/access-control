@@ -19,7 +19,6 @@
 
 #include "PasswordChange.hpp"
 #include "Exceptions.hpp"
-#include "UserGet.hpp"
 #include "User_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"

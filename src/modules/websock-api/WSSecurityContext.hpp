@@ -47,6 +47,17 @@ class WSSecurityContext : public SecurityContext
     bool can_read_membership(const MembershipActionParam &map) const;
 
     /**
+     * We can retrieve basic user info if:
+     *     + We are ourself
+     *     + We can list membership of at least one of the target user's group.
+     */
+    bool can_read_user(const UserActionParam &uap) const;
+
+    bool can_read_user_detail(const UserActionParam &uap) const;
+
+    bool can_update_user(const UserActionParam &uap) const;
+
+    /**
      * Helper function that returns true if the user is administrator.
      * @return
      */
