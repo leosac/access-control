@@ -28,8 +28,6 @@ namespace Leosac
 {
 namespace Auth
 {
-using UserGroupMembershipId = unsigned long;
-
 /**
  * Describe the membership of an User with regroup to a Group.
  * This class is "database enabled".
@@ -46,9 +44,11 @@ class UserGroupMembership
     const UserGroupMembershipId &id() const;
 
     const UserLWPtr &user() const;
+    UserId user_id() const;
     void user(UserPtr user);
 
     const GroupLWPtr group() const;
+    GroupId group_id() const;
     void group(GroupPtr group);
 
     const boost::posix_time::ptime &timestamp() const;

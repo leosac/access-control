@@ -23,19 +23,27 @@
 using namespace Leosac;
 using namespace Leosac::Auth;
 
-std::string GroupJSONSerializer::to_string(const Auth::Group &group)
+std::string GroupJSONSerializer::to_string(const Auth::Group &group,
+                                           const SecurityContext &sc)
 {
-    return to_object(group).dump(4);
+    return to_object(group, sc).dump(4);
 }
 
-json GroupJSONSerializer::to_object(const Auth::Group &group)
+json GroupJSONSerializer::to_object(const Auth::Group &group,
+                                    const SecurityContext &sc)
 {
     json memberships = {};
+
     for (const auto &membership : group.user_memberships())
     {
-        json group_info = {{"id", membership->id()},
-                           {"type", "user-group-membership"}};
-        memberships.push_back(group_info);
+        SecurityContext::ActionParam ap;
+        ap.membership.membership_id = membership->id();
+        if (sc.check_permission(SecurityContext::Action::MEMBERSHIP_READ, ap))
+        {
+            json group_info = {{"id", membership->id()},
+                               {"type", "user-group-membership"}};
+            memberships.push_back(group_info);
+        }
     }
     json serialized = {
         {"id", group.id()},

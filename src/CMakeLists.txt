@@ -80,7 +80,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/AuditFactory.cpp
     core/audit/GroupEvent.cpp
     tools/db/PGSQLTracer.cpp
-        )
+        core/SecurityContext.cpp core/SecurityContext.hpp)
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db

@@ -92,6 +92,15 @@ class Group : public std::enable_shared_from_this<Group>
      */
     const UserGroupMembershipSet &user_memberships() const;
 
+
+    /**
+     * Check if `user_id` is a member of this group.
+     *
+     * If it is a member, then `rank_out` (if non null) is set to the rank
+     * of the user inside the group.
+     */
+    bool member_has(Auth::UserId user_id, GroupRank *rank_out = nullptr) const;
+
   private:
     friend class odb::access;
     friend class GroupValidator;

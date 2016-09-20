@@ -42,6 +42,9 @@ class GroupCRUD : public CRUDResourceHandler
     static CRUDResourceHandlerUPtr instanciate(RequestContext);
 
   private:
+    virtual std::vector<ActionActionParam>
+    required_permission(Verb verb, const json &req) override;
+
     /**
      * Create a new group.
      *

@@ -19,6 +19,7 @@ set(WEBSOCK_API_SRCS
         conditions/IsInGroup.cpp
         api/CRUDResourceHandler.cpp
         api/GroupCRUD.cpp
+        WSSecurityContext.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED

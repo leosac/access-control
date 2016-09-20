@@ -57,6 +57,7 @@ enum class UserRank
 
 class UserGroupMembership;
 using UserGroupMembershipPtr = std::shared_ptr<UserGroupMembership>;
+using UserGroupMembershipId  = unsigned long;
 
 class Token;
 using TokenPtr = std::shared_ptr<Token>;

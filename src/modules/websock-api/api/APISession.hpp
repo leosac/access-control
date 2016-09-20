@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include <json.hpp>
 #include <memory>
@@ -167,7 +168,12 @@ class APISession
      */
     void abort_session();
 
+    SecurityContext &security_context();
+
   private:
+    void mark_authenticated(Auth::TokenPtr token);
+    void clear_authentication();
+
     /**
      * The API server.
      */
@@ -178,6 +184,8 @@ class APISession
      * The token we are authenticated with.
      */
     Auth::TokenPtr current_auth_token_;
+
+    std::unique_ptr<SecurityContext> security_;
 };
 }
 }

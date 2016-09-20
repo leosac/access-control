@@ -23,6 +23,7 @@
 #include "Token_odb.h"
 #include "UserGroupMembership_odb.h"
 #include "User_odb.h"
+#include "WSSecurityContext.hpp"
 #include "WSServer.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/auth/Group.hpp"
@@ -64,11 +65,10 @@ APISession::json APISession::create_auth_token(const APISession::json &req)
 
     if (token)
     {
-        rep["status"]       = 0;
-        rep["user_id"]      = token->owner()->id();
-        rep["token"]        = token->token();
-        auth_status_        = AuthStatus::LOGGED_IN;
-        current_auth_token_ = token;
+        rep["status"]  = 0;
+        rep["user_id"] = token->owner()->id();
+        rep["token"]   = token->token();
+        mark_authenticated(token);
     }
     else
     {
@@ -86,11 +86,10 @@ APISession::json APISession::authenticate_with_token(const APISession::json &req
     auto token = server_.auth().authenticate_token(req.at("token"));
     if (token)
     {
-        rep["status"]       = 0;
-        rep["user_id"]      = token->owner()->id();
-        rep["username"]     = token->owner()->username();
-        auth_status_        = AuthStatus::LOGGED_IN;
-        current_auth_token_ = token;
+        rep["status"]   = 0;
+        rep["user_id"]  = token->owner()->id();
+        rep["username"] = token->owner()->username();
+        mark_authenticated(token);
     }
     else
     {
@@ -103,10 +102,9 @@ APISession::json APISession::authenticate_with_token(const APISession::json &req
 APISession::json APISession::logout(const APISession::json &)
 {
     ASSERT_LOG(auth_status_ == AuthStatus::LOGGED_IN, "Invalid auth status");
-    auth_status_ = AuthStatus::NONE;
     ASSERT_LOG(current_auth_token_, "Logout called, but user has no current token.");
     server_.auth().invalidate_token(current_auth_token_);
-    current_auth_token_ = nullptr;
+    clear_authentication();
     return {};
 }
 
@@ -185,4 +183,28 @@ Auth::UserPtr APISession::current_user() const
 Auth::TokenPtr APISession::current_token() const
 {
     return current_auth_token_;
+}
+
+void APISession::mark_authenticated(Auth::TokenPtr token)
+{
+    auth_status_        = AuthStatus::LOGGED_IN;
+    current_auth_token_ = token;
+    security_ =
+        std::make_unique<WSSecurityContext>(server_.dbsrv(), token->owner()->id());
+}
+
+void APISession::clear_authentication()
+{
+    auth_status_        = AuthStatus::NONE;
+    current_auth_token_ = nullptr;
+    security_           = nullptr;
+}
+
+SecurityContext &APISession::security_context()
+{
+    static SecurityContext sc(
+        nullptr); // a static default security context for unauth user.
+    if (security_)
+        return *security_.get();
+    return sc;
 }

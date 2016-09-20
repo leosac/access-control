@@ -21,18 +21,38 @@
 
 #include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/JSONSerializer.hpp"
 
 namespace Leosac
 {
 
-/**
- * A serializer that handle `Auth::Group` object.
- */
-struct GroupJSONSerializer : public JSONSerializer<Auth::Group>
+namespace Module
 {
-    static std::string to_string(const Auth::Group &group,
-                                 const SecurityContext &sc);
-    static json to_object(const Auth::Group &group, const SecurityContext &sc);
+namespace WebSockAPI
+{
+/**
+ * A SecurityContext object for WebSocket client.
+ */
+class WSSecurityContext : public SecurityContext
+{
+  public:
+    WSSecurityContext(DBServicePtr dbsrv, Auth::UserId id);
+
+    virtual bool check_permission(Action a, const ActionParam &ap) const override;
+
+  private:
+    bool can_read_group(const GroupActionParam &gap) const;
+
+    bool can_administrate_group(const GroupActionParam &gap) const;
+
+    bool can_read_membership(const MembershipActionParam &map) const;
+
+    /**
+     * Helper function that returns true if the user is administrator.
+     * @return
+     */
+    bool is_admin() const;
+    Auth::UserId user_id_;
 };
+}
+}
 }

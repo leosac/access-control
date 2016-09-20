@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "core/auth/Group.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"

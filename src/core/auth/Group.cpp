@@ -129,6 +129,20 @@ void Group::description(const std::string &desc)
     description_ = desc;
 }
 
+bool Group::member_has(UserId user_id, GroupRank *rank_out) const
+{
+    for (const auto &membership : membership_)
+    {
+        if (membership->user().object_id() == user_id)
+        {
+            if (rank_out)
+                *rank_out = membership->rank();
+            return true;
+        }
+    }
+    return false;
+}
+
 void GroupValidator::validate(const GroupPtr &grp)
 {
     ASSERT_LOG(grp, "Group cannot be null.");

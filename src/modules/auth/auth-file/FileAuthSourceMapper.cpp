@@ -19,6 +19,7 @@
 
 #include "FileAuthSourceMapper.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/Group.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/ProfileMerger.hpp"
 #include "core/auth/User.hpp"

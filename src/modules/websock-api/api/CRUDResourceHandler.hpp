@@ -21,6 +21,7 @@
 
 #include "RequestContext.hpp"
 #include "WebSockFwd.hpp"
+#include "core/SecurityContext.hpp"
 #include <json.hpp>
 #include <vector>
 
@@ -87,6 +88,12 @@ class CRUDResourceHandler
         std::vector<std::pair<ConditionGroup, std::function<void()>>>;
 
   protected:
+    /**
+     * A pair of Action and a generic ActionParam union.
+     */
+    using ActionActionParam =
+        std::pair<SecurityContext::Action, SecurityContext::ActionParam>;
+
     RequestContext ctx_;
 
     /**
@@ -125,7 +132,16 @@ class CRUDResourceHandler
         return extract_with_default<std::string>(obj, key, default_value);
     }
 
+    /**
+     * Helper function that returns the security context.
+     */
+    SecurityContext &security_context();
+
   private:
+    virtual std::vector<ActionActionParam> required_permission(Verb verb,
+                                                               const json &req) = 0;
+
+
     virtual json create_impl(const json &req) = 0;
 
     virtual json read_impl(const json &req) = 0;
@@ -137,6 +153,8 @@ class CRUDResourceHandler
     Verb verb_from_request_type(const std::string &);
     void enforce_condition(const ConditionGroupVector &conditions,
                            const json &msg_content);
+
+    void enforce_permission(const std::vector<ActionActionParam> &);
 };
 }
 }

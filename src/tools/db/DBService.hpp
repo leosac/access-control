@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/auth/AuthFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
@@ -31,12 +32,30 @@ class DBService
   public:
     DBService(DBPtr db);
 
+    /**
+     * Simply returns the underlying database pointer.
+     */
     DBPtr db() const;
 
     /**
      * Return the number of operation against the database.
      */
     size_t operation_count() const;
+
+    /**
+     * Retrieve a group by its id.
+     *
+     * @return The group, or nullptr.
+     */
+    Auth::GroupPtr find_group_by_id(const Auth::GroupId &id);
+
+    /**
+     * Find a user by its id.
+     */
+    Auth::UserPtr find_user_by_id(const Auth::UserId &id);
+
+    Auth::UserGroupMembershipPtr
+    find_membership_by_id(const Auth::UserGroupMembershipId &id);
 
   private:
     DBPtr database_;

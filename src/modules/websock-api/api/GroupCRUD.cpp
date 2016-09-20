@@ -43,26 +43,6 @@ CRUDResourceHandlerUPtr GroupCRUD::instanciate(RequestContext ctx)
 {
     auto instance = CRUDResourceHandlerUPtr(new GroupCRUD(ctx));
 
-    auto is_group_admin = [ ctx, ptr = instance.get() ](const json &req)
-    {
-        auto gid = req.at("group_id").get<Auth::GroupId>();
-        if (gid != 0)
-        {
-            using namespace Conditions;
-            return IsInGroup(ctx, gid, Auth::GroupRank::ADMIN)();
-        }
-        return false;
-    };
-    auto is_in_group = [ ctx = ctx, ptr = instance.get() ](const json &req)
-    {
-        using namespace Conditions;
-        auto gid = req.at("group_id").get<Auth::GroupId>();
-        if (gid != 0)
-        {
-            return IsInGroup(ctx, gid)();
-        }
-        return true;
-    };
     auto has_json_attributes_object = [ptr = instance.get()](const json &req)
     {
         try
@@ -74,26 +54,10 @@ CRUDResourceHandlerUPtr GroupCRUD::instanciate(RequestContext ctx)
             return false;
         }
     };
-
-    // delete condition
-    instance->add_conditions_or(
-        Verb::DELETE, []() { throw PermissionDenied(); },
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_group_admin);
-
-
     // Update conditions
     instance->add_conditions_or(
         Verb::UPDATE, []() { throw MalformedMessage("No `attributes` subobject"); },
         has_json_attributes_object);
-
-    instance->add_conditions_or(
-        Verb::UPDATE, []() { throw PermissionDenied(); }, is_group_admin,
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)));
-
-    // Read conditions
-    instance->add_conditions_or(
-        Verb::READ, []() { throw PermissionDenied(); },
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_in_group);
 
     // Create conditions
     instance->add_conditions_or(
@@ -119,22 +83,25 @@ json GroupCRUD::create_impl(const json &req)
 
     auto audit = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_CREATED);
-    audit->after(GroupJSONSerializer::to_string(*new_group));
+    audit->after(GroupJSONSerializer::to_string(*new_group,
+                                                SystemSecurityContext::instance()));
     audit->finalize();
 
     // Add the current user to the group as administrator.
     auto audit_add_to_group = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
     audit_add_to_group->event_mask(Audit::EventType::GROUP_MEMBERSHIP_CHANGED);
-    audit_add_to_group->before(GroupJSONSerializer::to_string(*new_group));
+    audit_add_to_group->before(GroupJSONSerializer::to_string(
+        *new_group, SystemSecurityContext::instance()));
 
     new_group->member_add(ctx_.session->current_user(), Auth::GroupRank::ADMIN);
 
     db->update(new_group);
-    audit_add_to_group->after(GroupJSONSerializer::to_string(*new_group));
+    audit_add_to_group->after(GroupJSONSerializer::to_string(
+        *new_group, SystemSecurityContext::instance()));
     audit_add_to_group->finalize();
 
     // Send the model back to the client, so it knows the ID.
-    rep["data"] = GroupJSONSerializer::to_object(*new_group);
+    rep["data"] = GroupJSONSerializer::to_object(*new_group, security_context());
     t.commit();
     return rep;
 }
@@ -153,7 +120,7 @@ json GroupCRUD::read_impl(const json &req)
     {
         Auth::GroupPtr group = db->query_one<Auth::Group>(Query::id == gid);
         if (group)
-            rep["data"] = GroupJSONSerializer::to_object(*group);
+            rep["data"] = GroupJSONSerializer::to_object(*group, security_context());
         else
             throw EntityNotFound(gid, "group");
     }
@@ -166,20 +133,11 @@ json GroupCRUD::read_impl(const json &req)
         // fixme: may be rather slow.
         for (const auto &group : result)
         {
-            if (current_user->rank() == Auth::UserRank::ADMIN)
-            {
-                // Admin sees all.
-                rep["data"].push_back(GroupJSONSerializer::to_object(group));
-            }
-            else
-            {
-                // Otherwise see your own group.
-                for (const auto &membership : group.user_memberships())
-                {
-                    if (membership->user().object_id() == current_user->id())
-                        rep["data"].push_back(GroupJSONSerializer::to_object(group));
-                }
-            }
+            if (ctx_.session->security_context().check_permission(
+                    SecurityContext::Action::GROUP_READ,
+                    {.group = {.group_id = group.id()}}))
+                rep["data"].push_back(
+                    GroupJSONSerializer::to_object(group, security_context()));
         }
     }
     t.commit();
@@ -205,7 +163,7 @@ json GroupCRUD::update_impl(const json &req)
     db->update(grp);
 
     audit->finalize();
-    rep["data"] = GroupJSONSerializer::to_object(*grp);
+    rep["data"] = GroupJSONSerializer::to_object(*grp, security_context());
     t.commit();
     return rep;
 }
@@ -244,4 +202,39 @@ void GroupCRUD::validate_and_unique(Auth::GroupPtr grp)
             "data/attributes/name",
             BUILD_STR("A group named " << grp->name() << " already exists."));
     }
+}
+
+std::vector<CRUDResourceHandler::ActionActionParam>
+GroupCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req)
+{
+    std::vector<CRUDResourceHandler::ActionActionParam> ret;
+    SecurityContext::ActionParam ap;
+
+    SecurityContext::GroupActionParam gap;
+    try
+    {
+        gap.group_id = req.at("group_id").get<Auth::GroupId>();
+    }
+    catch (std::out_of_range &e)
+    {
+        gap.group_id = 0;
+    }
+    ap.group = gap;
+
+    switch (verb)
+    {
+    case Verb::READ:
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_READ, ap));
+        break;
+    case Verb::CREATE:
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_CREATE, ap));
+        break;
+    case Verb::UPDATE:
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_UPDATE, ap));
+        break;
+    case Verb::DELETE:
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_DELETE, ap));
+        break;
+    }
+    return ret;
 }

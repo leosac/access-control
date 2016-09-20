@@ -97,6 +97,11 @@ class WSServer
     DBPtr db();
 
     /**
+     * Retrieve database service pointer.
+     */
+    DBServicePtr dbsrv();
+
+    /**
      * Retrieve the CoreUtils pointer.
      */
     CoreUtilsPtr core_utils();

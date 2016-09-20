@@ -104,6 +104,7 @@ class Token
  * The user owning the token.
  */
 #pragma db not_null
+#pragma db on_delete(cascade)
     UserPtr owner_;
 
 #pragma db not_null

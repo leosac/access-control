@@ -19,6 +19,9 @@
 
 #include "DBService.hpp"
 #include "DatabaseTracer.hpp"
+#include "Group_odb.h"
+#include "OptionalTransaction.hpp"
+#include "User_odb.h"
 #include "tools/log.hpp"
 #include <odb/database.hxx>
 
@@ -40,4 +43,23 @@ size_t DBService::operation_count() const
     auto tracer = dynamic_cast<db::DatabaseTracer *>(database_->tracer());
     ASSERT_LOG(tracer, "No (valid?) tracer object on the database.");
     return tracer->count();
+}
+
+Auth::GroupPtr DBService::find_group_by_id(const Auth::GroupId &id)
+{
+    db::OptionalTransaction t(database_->begin());
+    return database_->find<Auth::Group>(id);
+}
+
+Auth::UserPtr DBService::find_user_by_id(const Auth::UserId &id)
+{
+    db::OptionalTransaction t(database_->begin());
+    return database_->find<Auth::User>(id);
+}
+
+Auth::UserGroupMembershipPtr
+DBService::find_membership_by_id(const Auth::UserGroupMembershipId &id)
+{
+    db::OptionalTransaction t(database_->begin());
+    return database_->find<Auth::UserGroupMembership>(id);
 }

@@ -397,3 +397,8 @@ void WSServer::register_crud_handler(const std::string &resource_name,
     crud_handlers_[resource_name + ".create"] = factory;
     crud_handlers_[resource_name + ".delete"] = factory;
 }
+
+DBServicePtr WSServer::dbsrv()
+{
+    return dbsrv_;
+}

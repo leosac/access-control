@@ -19,6 +19,7 @@
 
 #include "api/CRUDResourceHandler.hpp"
 #include "WSServer.hpp"
+#include <Exceptions.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 using namespace Leosac;
@@ -37,19 +38,24 @@ CRUDResourceHandlerUPtr CRUDResourceHandler::instanciate(RequestContext)
 
 WebSockAPI::json CRUDResourceHandler::process(const ClientMessage &msg)
 {
+    auto perms = required_permission(verb_from_request_type(msg.type), msg.content);
     switch (verb_from_request_type(msg.type))
     {
     case Verb::READ:
         enforce_condition(read_conditions_, msg.content);
+        enforce_permission(perms);
         return read_impl(msg.content);
     case Verb::CREATE:
         enforce_condition(create_conditions_, msg.content);
+        enforce_permission(perms);
         return create_impl(msg.content);
     case Verb::UPDATE:
         enforce_condition(update_conditions_, msg.content);
+        enforce_permission(perms);
         return update_impl(msg.content);
     case Verb::DELETE:
         enforce_condition(delete_conditions_, msg.content);
+        enforce_permission(perms);
         return delete_impl(msg.content);
     }
     ASSERT_LOG(0, "Should not be here.");
@@ -85,4 +91,21 @@ void CRUDResourceHandler::enforce_condition(const ConditionGroupVector &conditio
             condition_group.second();
     }
     ASSERT_LOG(global_success, "Probably should have thrown before.");
+}
+
+void CRUDResourceHandler::enforce_permission(
+    const std::vector<ActionActionParam> &permissions)
+{
+    auto &security_ctx = ctx_.session->security_context();
+    for (const auto &action_and_param : permissions)
+    {
+        if (!security_ctx.check_permission(action_and_param.first,
+                                           action_and_param.second))
+            throw PermissionDenied();
+    }
+}
+
+SecurityContext &CRUDResourceHandler::security_context()
+{
+    return ctx_.session->security_context();
 }

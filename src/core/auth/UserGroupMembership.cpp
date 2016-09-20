@@ -73,6 +73,16 @@ void UserGroupMembership::rank(const GroupRank &rank)
     rank_ = rank;
 }
 
+UserId UserGroupMembership::user_id() const
+{
+    return user_.object_id();
+}
+
+GroupId UserGroupMembership::group_id() const
+{
+    return group_.object_id();
+}
+
 bool UserGroupMembershipComparator::
 operator()(const UserGroupMembershipPtr &m1, const UserGroupMembershipPtr &m2) const
 {
