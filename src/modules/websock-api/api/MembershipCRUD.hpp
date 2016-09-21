@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include "MethodHandler.hpp"
+#include "api/CRUDResourceHandler.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
@@ -27,26 +28,38 @@ namespace Module
 {
 namespace WebSockAPI
 {
-using json = nlohmann::json;
-
 /**
- * Retrieve information about a group.
- *
- * Request:
- *     + `membership_id`: The id of the membership to look up. Required
- *
- * Response:
- *     + ...
+ * CRUD Handler for UserGroupMembership.
  */
-class MembershipGet : public MethodHandler
+class MembershipCRUD : public CRUDResourceHandler
 {
-  public:
-    MembershipGet(RequestContext ctx);
+  private:
+    MembershipCRUD(RequestContext ctx);
 
-    static MethodHandlerUPtr create(RequestContext);
+  public:
+    static CRUDResourceHandlerUPtr instanciate(RequestContext);
 
   private:
-    virtual json process_impl(const json &req) override;
+    virtual std::vector<ActionActionParam>
+    required_permission(Verb verb, const json &req) const override;
+
+    virtual json create_impl(const json &req) override;
+
+
+    /**
+     * Retrieve information about a group.
+     *
+     * Request:
+     *     + `membership_id`: The id of the membership to look up. Required
+     *
+     * Response:
+     *     + ...
+     */
+    virtual json read_impl(const json &req) override;
+
+    virtual json update_impl(const json &req) override;
+
+    virtual json delete_impl(const json &req) override;
 };
 }
 }

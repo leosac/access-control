@@ -17,71 +17,37 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "MembershipGet.hpp"
+#include "api/MembershipCRUD.hpp"
 #include "Exceptions.hpp"
 #include "UserGroupMembership_odb.h"
 #include "User_odb.h"
 #include "api/APISession.hpp"
-#include "conditions/IsCurrentUserAdmin.hpp"
+#include "core/audit/AuditFactory.hpp"
+#include "core/audit/UserEvent.hpp"
 #include "core/auth/UserGroupMembership.hpp"
-#include "tools/db/DBService.hpp"
-#include <conditions/IsInGroup.hpp>
+#include <json.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-MembershipGet::MembershipGet(RequestContext ctx)
-    : MethodHandler(ctx)
+MembershipCRUD::MembershipCRUD(RequestContext ctx)
+    : CRUDResourceHandler(ctx)
 {
 }
 
-MethodHandlerUPtr MembershipGet::create(RequestContext ctx)
+CRUDResourceHandlerUPtr MembershipCRUD::instanciate(RequestContext ctx)
 {
-    auto instance = std::make_unique<MembershipGet>(ctx);
-
-    // We are allowed to query Membership information, if:
-    //    + We are a member of the group the membership is about
-    //      (aka we can see other group members' membership info
-    //    + We are an administrator
-    //    + The membership is about the current user.
-
-    auto is_about_self = [ ctx = ctx, ptr = instance.get() ](const json &req)
-    {
-        using namespace Auth;
-        auto mid = req.at("membership_id").get<Auth::UserGroupMembershipId>();
-        odb::transaction t(ctx.dbsrv->db()->begin());
-        UserGroupMembershipPtr membership =
-            ctx.dbsrv->db()->load<UserGroupMembership>(mid);
-
-        return membership &&
-               membership->user().object_id() == ctx.session->current_user_id();
-    };
-
-    auto is_about_my_group = [ ctx = ctx, ptr = instance.get() ](const json &req)
-    {
-        using namespace Auth;
-        auto mid = req.at("membership_id").get<Auth::UserGroupMembershipId>();
-        odb::transaction t(ctx.dbsrv->db()->begin());
-        UserGroupMembershipPtr membership =
-            ctx.dbsrv->db()->load<UserGroupMembership>(mid);
-        t.commit();
-
-        if (membership)
-        {
-            return Conditions::IsInGroup(ctx, membership->group().object_id())();
-        }
-        return false;
-    };
-
-    instance->add_conditions_or(
-        []() { throw PermissionDenied(); },
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_about_my_group,
-        is_about_self);
-    return std::move(instance);
+    auto instance = CRUDResourceHandlerUPtr(new MembershipCRUD(ctx));
+    return instance;
 }
 
-json MembershipGet::process_impl(const json &req)
+json MembershipCRUD::create_impl(const json &req)
+{
+    throw LEOSACException("Not implemented.");
+}
+
+json MembershipCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -109,4 +75,41 @@ json MembershipGet::process_impl(const json &req)
         throw EntityNotFound(mid, "user-group-membership");
     t.commit();
     return rep;
+}
+
+json MembershipCRUD::update_impl(const json &req)
+{
+    throw LEOSACException("Not implemented.");
+}
+
+json MembershipCRUD::delete_impl(const json &req)
+{
+    throw LEOSACException("Not implemented.");
+}
+
+std::vector<CRUDResourceHandler::ActionActionParam>
+MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
+                                    const json &req) const
+{
+    std::vector<CRUDResourceHandler::ActionActionParam> ret;
+    SecurityContext::ActionParam ap;
+
+    SecurityContext::MembershipActionParam map;
+    try
+    {
+        map.membership_id = req.at("membership_id").get<Auth::GroupId>();
+    }
+    catch (std::out_of_range &e)
+    {
+        map.membership_id = 0;
+    }
+    ap.membership = map;
+
+    switch (verb)
+    {
+    case Verb::READ:
+        ret.push_back(std::make_pair(SecurityContext::Action::MEMBERSHIP_READ, ap));
+        break;
+    }
+    return ret;
 }

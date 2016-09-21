@@ -50,6 +50,8 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
         return can_read_user_detail(ap.user);
     case Action::USER_UPDATE:
         return can_update_user(ap.user);
+    case Action::USER_UPDATE_RANK:
+        return is_admin();
 
     case Action::GROUP_CREATE:
         return true;

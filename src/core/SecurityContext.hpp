@@ -42,6 +42,10 @@ class SecurityContext
         USER_READ,
         USER_READ_EMAIL,
         USER_UPDATE,
+        /**
+         * Editing rank means being able to become administrator.
+         */
+        USER_UPDATE_RANK,
         USER_DELETE,
 
         GROUP_CREATE,

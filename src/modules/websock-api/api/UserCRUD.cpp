@@ -121,6 +121,17 @@ json UserCRUD::update_impl(const json &req)
             extract_with_default(attributes, "lastname", user->lastname()));
         user->email(extract_with_default(attributes, "email", user->email()));
 
+        SecurityContext::ActionParam ap;
+        ap.user.user_id = uid;
+        if (security_context().check_permission(
+                SecurityContext::Action::USER_UPDATE_RANK, ap))
+        {
+            // cast to int for json extraction to work, then back to UserRank for
+            // setter to work.
+            user->rank(static_cast<Auth::UserRank>(extract_with_default(
+                attributes, "rank", static_cast<int>(user->rank()))));
+        }
+
         audit->after(
             UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
         audit->finalize();

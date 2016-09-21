@@ -151,3 +151,8 @@ void User::rank(UserRank r)
 {
     rank_ = r;
 }
+
+size_t User::odb_version() const
+{
+    return version_;
+}

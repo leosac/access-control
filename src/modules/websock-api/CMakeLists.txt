@@ -9,7 +9,6 @@ set(WEBSOCK_API_SRCS
         api/MethodHandler.cpp
         api/APIAuth.cpp
         api/LogGet.cpp
-        api/MembershipGet.cpp
         api/PasswordChange.cpp
         conditions/ConditionBase.cpp
         conditions/IsCurrentUserAdmin.cpp
@@ -19,6 +18,7 @@ set(WEBSOCK_API_SRCS
         api/GroupCRUD.cpp
         api/UserCRUD.cpp
         WSSecurityContext.cpp
+        api/MembershipCRUD.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED

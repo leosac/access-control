@@ -77,12 +77,6 @@ class UserCRUD : public CRUDResourceHandler
     virtual json update_impl(const json &req) override;
 
     virtual json delete_impl(const json &req) override;
-
-    /**
-     * Make sure the group's attribute is valid (by calling
-     * GroupValidator) and that the name is unique.
-     */
-    void validate_and_unique(Auth::GroupPtr grp);
 };
 }
 }

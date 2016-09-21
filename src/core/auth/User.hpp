@@ -119,6 +119,8 @@ class User
      */
     void rank(UserRank r);
 
+    size_t odb_version() const;
+
   protected:
 #pragma db id auto
     UserId id_;
