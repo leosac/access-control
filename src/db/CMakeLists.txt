@@ -84,10 +84,39 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         PGSQL_SERVER_VERSION "9.1"
         )
 
+# ODB configuration for Credentials
+set(OdbCMake_ODB_HEADERS_CREDENTIALS
+        ${CMAKE_SOURCE_DIR}/src/core/auth/credentials/Credential.hpp
+        )
+
+set(OdbCMake_SOURCES_CREDENTIALS "")
+odb_compile(OdbCMake_SOURCES_CREDENTIALS
+        FILES ${OdbCMake_ODB_HEADERS_CREDENTIALS}
+        MULTI_DATABASE dynamic
+        #DB mysql sqlite pgsql
+        DB pgsql
+        STANDARD "c++14"
+        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
+        SCHEMA_FORMAT embedded
+        SCHEMA_NAME audit
+        PROFILE "boost/date-time"
+        INCLUDE ${CMAKE_SOURCE_DIR}/src
+        INCLUDE_PREFIX core/auth/credentials/
+        INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/auth/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/auth/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION "9.1"
+        )
+
 add_library(leosac_db SHARED
         ${OdbCMake_SOURCES_TOOLS} ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_SOURCES_AUTH} ${OdbCMake_ODB_HEADERS_AUTH}
         ${OdbCMake_SOURCES_AUDITLOG} ${OdbCMake_ODB_HEADERS_AUDITLOG}
+        ${OdbCMake_SOURCES_CREDENTIALS} ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         )
 
 target_include_directories(leosac_db PRIVATE
@@ -95,6 +124,7 @@ target_include_directories(leosac_db PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
         )
+
 
 ## This generate a leosac.sql file
 ## for creating the database structure.
@@ -110,4 +140,5 @@ add_custom_command(TARGET leosac_db
         ${OdbCMake_ODB_HEADERS_AUDITLOG}
         ${OdbCMake_ODB_HEADERS_AUTH}
         ${OdbCMake_ODB_HEADERS_TOOLS}
+        ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         )

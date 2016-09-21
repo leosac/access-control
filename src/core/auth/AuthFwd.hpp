@@ -77,5 +77,14 @@ class BaseAuthSource;
 using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
 
 class WiegandCard;
+
+
+// Credentials
+class ICredential;
+using ICredentialPtr = std::shared_ptr<ICredential>;
+
+class Credential;
+using CredentialId  = unsigned long;
+using CredentialPtr = std::shared_ptr<Credential>;
 }
 }

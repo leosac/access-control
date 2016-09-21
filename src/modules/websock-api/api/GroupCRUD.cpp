@@ -110,7 +110,6 @@ json GroupCRUD::read_impl(const json &req)
 {
     json rep;
 
-    using Query  = odb::query<Auth::Group>;
     using Result = odb::result<Auth::Group>;
     DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());

@@ -65,9 +65,11 @@ json MembershipCRUD::create_impl(const json &req)
     audit->event_mask(Audit::EventType::GROUP_MEMBERSHIP_JOINED);
 
     if (group->member_has(user->id()))
+    {
         throw LEOSACException(BUILD_STR("User " << user->username()
                                                 << " is already in group "
                                                 << group->name()));
+    }
 
     auto membership = group->member_add(user, rank);
     db->update(group);

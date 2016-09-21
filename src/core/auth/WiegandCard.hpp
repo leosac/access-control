@@ -70,7 +70,7 @@ class WiegandCard : public BaseAuthSource
     /**
      * Convert the bits of the card to an integer.
      *
-     * This format (Wiegand26, 32, ...) is ignored: all bits are used
+     * The format (Wiegand26, 32, ...) is ignored: all bits are used
      * to build the number.
      */
     uint64_t to_raw_int() const;
