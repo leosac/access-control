@@ -30,7 +30,7 @@ namespace Auth
 class User;
 using UserPtr   = std::shared_ptr<User>;
 using UserLPtr  = odb::lazy_shared_ptr<User>;
-using UserLWPtr = odb::lazy_shared_ptr<User>;
+using UserLWPtr = odb::lazy_weak_ptr<User>;
 using UserId    = unsigned long;
 
 class Group;

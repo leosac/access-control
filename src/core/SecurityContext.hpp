@@ -58,7 +58,8 @@ class SecurityContext
          * the user whose membership is listed.
          */
         GROUP_LIST_MEMBERSHIP,
-
+        GROUP_MEMBERSHIP_JOINED,
+        GROUP_MEMBERSHIP_LEFT,
         MEMBERSHIP_READ,
     };
 
@@ -75,6 +76,9 @@ class SecurityContext
     struct MembershipActionParam
     {
         Auth::UserGroupMembershipId membership_id;
+        Auth::GroupId group_id; // for create/delete
+        Auth::UserId user_id;   // for create/delete
+        Auth::GroupRank rank;   // for create
     };
 
     union ActionParam {

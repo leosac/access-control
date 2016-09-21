@@ -31,6 +31,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/User.cpp
     core/auth/serializers/UserJSONSerializer.cpp
     core/auth/serializers/GroupJSONSerializer.cpp
+    core/auth/serializers/UserGroupMembershipJSONSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
@@ -39,6 +40,7 @@ set(LEOSAC_LIB_SRCS
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
     exception/ModelException.cpp
+    exception/EntityNotFound.cpp
     hardware/FGPIO.cpp
     hardware/FLED.cpp
     hardware/FWiegandReader.cpp
@@ -79,8 +81,10 @@ set(LEOSAC_LIB_SRCS
     core/audit/WSAPICall.cpp
     core/audit/AuditFactory.cpp
     core/audit/GroupEvent.cpp
+    core/audit/UserGroupMembershipEvent.cpp
     tools/db/PGSQLTracer.cpp
-        core/SecurityContext.cpp core/SecurityContext.hpp)
+    core/SecurityContext.cpp
+        )
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db

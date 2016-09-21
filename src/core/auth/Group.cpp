@@ -50,13 +50,14 @@ std::vector<UserPtr> const &Group::members() const
     loaded_members_.clear();
     for (const auto &membership : membership_)
     {
-        if (membership->user().get_eager())
-            loaded_members_.push_back(membership->user().get_eager());
+        if (membership->user().get_eager().lock())
+            loaded_members_.push_back(membership->user().get_eager().lock());
     }
     return loaded_members_;
 }
 
-void Group::member_add(UserPtr m, GroupRank rank /*= GroupRank::MEMBER*/)
+UserGroupMembershipPtr Group::member_add(UserPtr m,
+                                         GroupRank rank /*= GroupRank::MEMBER*/)
 {
     // Create a new UserGroupMembership describing the relationship.
     auto ugm = std::make_shared<UserGroupMembership>();
@@ -64,6 +65,8 @@ void Group::member_add(UserPtr m, GroupRank rank /*= GroupRank::MEMBER*/)
     ugm->user(m);
     ugm->group(shared_from_this());
     membership_.insert(ugm);
+
+    return ugm;
 }
 
 IAccessProfilePtr Group::profile()
@@ -88,7 +91,8 @@ std::vector<UserLPtr> Group::lazy_members() const
     {
         ASSERT_LOG(membership->group().object_id() == id_,
                    "Membership doesn't point to self.");
-        members.push_back(membership->user());
+        if (membership->user().lock())
+            members.push_back(membership->user().lock());
     }
     return members;
 }

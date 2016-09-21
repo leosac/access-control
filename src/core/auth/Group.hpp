@@ -77,7 +77,7 @@ class Group : public std::enable_shared_from_this<Group>
      */
     std::vector<UserLPtr> lazy_members() const;
 
-    void member_add(UserPtr m, GroupRank rank = GroupRank::MEMBER);
+    UserGroupMembershipPtr member_add(UserPtr m, GroupRank rank = GroupRank::MEMBER);
 
     IAccessProfilePtr profile();
 

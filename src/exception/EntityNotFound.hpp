@@ -19,39 +19,32 @@
 
 #pragma once
 
-#include "IAuditEntry.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "exception/leosacexception.hpp"
 
 namespace Leosac
 {
-namespace Audit
-{
-/**
- * Interface that describes an Audit object for group related event.
- *
- * Possible use case:
- *     + Group creation/deletion.
- *     + Memberships changes.
- */
-class IGroupEvent : virtual public IAuditEntry
+class EntityNotFound : public LEOSACException
 {
   public:
     /**
-     * Set the group that is targeted by the event.
+     * Construct the exception from a type that can be converted
+     * to string using the `std::to_string()` call.
      */
-    virtual void target(Auth::GroupPtr group) = 0;
+    template <typename T>
+    EntityNotFound(const T &id, const std::string &type)
+        : EntityNotFound(std::to_string(id), type)
+    {
+    }
 
-    /**
-     * An optional JSON representation of the object
-     * **before** the event took place.
-     */
-    virtual void before(const std::string &repr) = 0;
+    EntityNotFound(const std::string &id, const std::string &type);
 
-    /**
-     * An optional JSON representation of the object
-     * **after** the event took place.
-     */
-    virtual void after(const std::string &repr) = 0;
+    const std::string &entity_id() const;
+    const std::string &entity_type() const;
+
+  private:
+    std::string build_msg(const std::string &id, const std::string &type) const;
+
+    std::string entity_id_;
+    std::string entity_type_;
 };
-}
 }

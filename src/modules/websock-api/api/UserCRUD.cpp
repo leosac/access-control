@@ -68,7 +68,6 @@ json UserCRUD::read_impl(const json &req)
 {
     json rep;
 
-    using Query  = odb::query<Auth::User>;
     using Result = odb::result<Auth::User>;
     DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
@@ -76,11 +75,9 @@ json UserCRUD::read_impl(const json &req)
 
     if (uid != 0)
     {
-        Auth::UserPtr user = db->query_one<Auth::User>(Query::id == uid);
-        if (user)
-            rep["data"] = UserJSONSerializer::to_object(*user, security_context());
-        else
-            throw EntityNotFound(uid, "user");
+        Auth::UserPtr user =
+            ctx_.dbsrv->find_user_by_id(uid, DBService::THROW_IF_NOT_FOUND);
+        rep["data"] = UserJSONSerializer::to_object(*user, security_context());
     }
     else
     {
@@ -101,44 +98,38 @@ json UserCRUD::update_impl(const json &req)
 {
     json rep;
 
-    using query = odb::query<Auth::User>;
-    DBPtr db    = ctx_.dbsrv->db();
+    DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
     auto uid        = req.at("user_id").get<Auth::UserId>();
     auto attributes = req.at("attributes");
 
-    Auth::UserPtr user = db->query_one<Auth::User>(query::id == uid);
-    if (user)
+    Auth::UserPtr user =
+        ctx_.dbsrv->find_user_by_id(uid, DBService::THROW_IF_NOT_FOUND);
+    Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, user, ctx_.audit);
+    audit->event_mask(Audit::EventType::USER_EDITED);
+    audit->before(
+        UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
+
+    user->firstname(
+        extract_with_default(attributes, "firstname", user->firstname()));
+    user->lastname(extract_with_default(attributes, "lastname", user->lastname()));
+    user->email(extract_with_default(attributes, "email", user->email()));
+
+    SecurityContext::ActionParam ap;
+    ap.user.user_id = uid;
+    if (security_context().check_permission(
+            SecurityContext::Action::USER_UPDATE_RANK, ap))
     {
-        Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, user, ctx_.audit);
-        audit->event_mask(Audit::EventType::USER_EDITED);
-        audit->before(
-            UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
-
-        user->firstname(
-            extract_with_default(attributes, "firstname", user->firstname()));
-        user->lastname(
-            extract_with_default(attributes, "lastname", user->lastname()));
-        user->email(extract_with_default(attributes, "email", user->email()));
-
-        SecurityContext::ActionParam ap;
-        ap.user.user_id = uid;
-        if (security_context().check_permission(
-                SecurityContext::Action::USER_UPDATE_RANK, ap))
-        {
-            // cast to int for json extraction to work, then back to UserRank for
-            // setter to work.
-            user->rank(static_cast<Auth::UserRank>(extract_with_default(
-                attributes, "rank", static_cast<int>(user->rank()))));
-        }
-
-        audit->after(
-            UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
-        audit->finalize();
-        db->update(user);
+        // cast to int for json extraction to work, then back to UserRank for
+        // setter to work.
+        user->rank(static_cast<Auth::UserRank>(extract_with_default(
+            attributes, "rank", static_cast<int>(user->rank()))));
     }
-    else
-        throw EntityNotFound(uid, "user");
+
+    audit->after(
+        UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
+    audit->finalize();
+    db->update(user);
     t.commit();
     return rep;
 }

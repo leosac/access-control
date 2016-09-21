@@ -43,8 +43,18 @@ class MembershipCRUD : public CRUDResourceHandler
     virtual std::vector<ActionActionParam>
     required_permission(Verb verb, const json &req) const override;
 
+    /**
+     * Creating a new UserGroupMembersip: this means someone is joining a group.
+     *
+     * Request:
+     *     + `group_id`: The group to join
+     *     + `user_id`: The user that join.
+     *     + `rank`: The rank of the user in the group
+     *
+     * Response:
+     *     + ...
+     */
     virtual json create_impl(const json &req) override;
-
 
     /**
      * Retrieve information about a group.

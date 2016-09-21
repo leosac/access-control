@@ -28,6 +28,7 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
+#include "exception/EntityNotFound.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"

@@ -54,32 +54,6 @@ std::string SessionAborted::build_msg(Auth::TokenPtr token) const
     return ss.str();
 }
 
-EntityNotFound::EntityNotFound(const std::string &id, const std::string &type)
-    : LEOSACException(build_msg(id, type))
-    , entity_id_(id)
-    , entity_type_(type)
-{
-}
-
-std::string EntityNotFound::build_msg(const std::string &id,
-                                      const std::string &type) const
-{
-    std::stringstream ss;
-    ss << "Cannot find `" << type << "` with id `" << id << "`.";
-
-    return ss.str();
-}
-
-const std::string &EntityNotFound::entity_id() const
-{
-    return entity_id_;
-}
-
-const std::string &EntityNotFound::entity_type() const
-{
-    return entity_type_;
-}
-
 MalformedMessage::MalformedMessage(const std::string &detail)
     : LEOSACException(build_msg(detail))
 {

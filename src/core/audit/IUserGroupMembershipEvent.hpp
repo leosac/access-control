@@ -27,31 +27,22 @@ namespace Leosac
 namespace Audit
 {
 /**
- * Interface that describes an Audit object for group related event.
- *
- * Possible use case:
- *     + Group creation/deletion.
- *     + Memberships changes.
+ * Interface to audit object that take care of tracking
+ * user/group membership change.
  */
-class IGroupEvent : virtual public IAuditEntry
+class IUserGroupMembershipEvent : virtual public IAuditEntry
 {
   public:
     /**
-     * Set the group that is targeted by the event.
+     * The user that joined or left the group.
      */
-    virtual void target(Auth::GroupPtr group) = 0;
+    virtual void target_user(Auth::UserPtr user) = 0;
+
 
     /**
-     * An optional JSON representation of the object
-     * **before** the event took place.
+     * The group that gained or lost an user.
      */
-    virtual void before(const std::string &repr) = 0;
-
-    /**
-     * An optional JSON representation of the object
-     * **after** the event took place.
-     */
-    virtual void after(const std::string &repr) = 0;
+    virtual void target_group(Auth::GroupPtr grp) = 0;
 };
 }
 }

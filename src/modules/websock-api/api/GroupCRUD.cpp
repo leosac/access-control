@@ -89,7 +89,7 @@ json GroupCRUD::create_impl(const json &req)
 
     // Add the current user to the group as administrator.
     auto audit_add_to_group = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
-    audit_add_to_group->event_mask(Audit::EventType::GROUP_MEMBERSHIP_CHANGED);
+    audit_add_to_group->event_mask(Audit::EventType::GROUP_MEMBERSHIP_JOINED);
     audit_add_to_group->before(GroupJSONSerializer::to_string(
         *new_group, SystemSecurityContext::instance()));
 
@@ -118,11 +118,9 @@ json GroupCRUD::read_impl(const json &req)
 
     if (gid != 0)
     {
-        Auth::GroupPtr group = db->query_one<Auth::Group>(Query::id == gid);
-        if (group)
-            rep["data"] = GroupJSONSerializer::to_object(*group, security_context());
-        else
-            throw EntityNotFound(gid, "group");
+        auto group =
+            ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
+        rep["data"] = GroupJSONSerializer::to_object(*group, security_context());
     }
     else
     {
@@ -149,12 +147,9 @@ json GroupCRUD::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto id = req.at("group_id").get<Auth::GroupId>();
+    auto gid = req.at("group_id").get<Auth::GroupId>();
 
-    auto grp = db->find<Auth::Group>(id);
-    if (!grp)
-        throw EntityNotFound(id, "group");
-
+    auto grp   = ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
     auto audit = Audit::Factory::GroupEvent(db, grp, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_UPDATED);
     grp->name(req.at("attributes").at("name"));
@@ -174,10 +169,7 @@ json GroupCRUD::delete_impl(const json &req)
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 
-    auto group = db->find<Auth::Group>(gid);
-    if (!group)
-        throw new EntityNotFound(gid, "group");
-
+    auto group = ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
     auto audit = Audit::Factory::GroupEvent(db, group, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_DELETED);
 

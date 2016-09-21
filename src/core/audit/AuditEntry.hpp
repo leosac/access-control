@@ -69,9 +69,9 @@ class AuditEntry : virtual public IAuditEntry,
 
     virtual void remove_parent() override;
 
-    virtual ssize_t children_count() const override;
+    virtual size_t children_count() const override;
 
-    virtual ssize_t version() const override;
+    virtual size_t version() const override;
 
     virtual void reload() override;
 

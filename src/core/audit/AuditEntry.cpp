@@ -118,12 +118,12 @@ void AuditEntry::remove_parent()
     parent_.reset();
 }
 
-ssize_t AuditEntry::children_count() const
+size_t AuditEntry::children_count() const
 {
     return children_.size();
 }
 
-ssize_t AuditEntry::version() const
+size_t AuditEntry::version() const
 {
     return version_;
 }

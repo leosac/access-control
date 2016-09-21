@@ -59,6 +59,7 @@ set(OdbCMake_ODB_HEADERS_AUDITLOG
         ${CMAKE_SOURCE_DIR}/src/core/audit/WSAPICall.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/UserEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/GroupEvent.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/audit/UserGroupMembershipEvent.hpp
         )
 
 set(OdbCMake_SOURCES_AUDITLOG "")

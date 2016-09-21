@@ -43,6 +43,9 @@ using IGroupEventPtr = std::shared_ptr<IGroupEvent>;
 class IWSAPICall;
 using IWSAPICallPtr = std::shared_ptr<IWSAPICall>;
 
+class IUserGroupMembershipEvent;
+using IUserGroupMembershipEventPtr = std::shared_ptr<IUserGroupMembershipEvent>;
+
 class AuditEntry;
 using AuditEntryPtr  = std::shared_ptr<AuditEntry>;
 using AuditEntryWPtr = std::weak_ptr<AuditEntry>;
@@ -56,6 +59,9 @@ using UserEventPtr = std::shared_ptr<UserEvent>;
 
 class GroupEvent;
 using GroupEventPtr = std::shared_ptr<GroupEvent>;
+
+class UserGroupMembershipEvent;
+using UserGroupMembershipEventPtr = std::shared_ptr<UserGroupMembershipEvent>;
 
 enum class EventType
 {
@@ -75,7 +81,14 @@ enum class EventType
     GROUP_CREATED,
     GROUP_UPDATED,
     GROUP_DELETED,
-    GROUP_MEMBERSHIP_CHANGED,
+    /**
+     * Someone joined the group.
+     */
+    GROUP_MEMBERSHIP_JOINED,
+    /**
+     * Someone left the group.
+     */
+    GROUP_MEMBERSHIP_LEFT,
     LAST__
 };
 

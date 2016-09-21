@@ -18,10 +18,13 @@
 */
 
 #include "WSSecurityContext.hpp"
+#include "Group_odb.h"
+#include "User_odb.h"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
+#include <tools/db/OptionalTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -63,6 +66,11 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
         return can_administrate_group(ap.group);
     case Action::MEMBERSHIP_READ:
         return can_read_membership(ap.membership);
+
+    case Action::GROUP_MEMBERSHIP_JOINED:
+        return can_create_membership(ap.membership);
+    case Action::GROUP_MEMBERSHIP_LEFT:
+        return can_delete_membership(ap.membership);
     default:
         ASSERT_LOG(0, "Not handled.");
     }
@@ -74,8 +82,9 @@ bool WSSecurityContext::can_read_group(
 {
     if (gap.group_id == 0) // listing group.
         return true;
-    Auth::GroupPtr group = dbsrv_->find_group_by_id(gap.group_id);
-    return group && group->member_has(user_id_);
+    Auth::GroupPtr group =
+        dbsrv_->find_group_by_id(gap.group_id, DBService::THROW_IF_NOT_FOUND);
+    return group->member_has(user_id_);
 }
 
 bool WSSecurityContext::is_admin() const
@@ -90,8 +99,9 @@ bool WSSecurityContext::can_administrate_group(
     const SecurityContext::GroupActionParam &gap) const
 {
     Auth::GroupRank rank;
-    Auth::GroupPtr group = dbsrv_->find_group_by_id(gap.group_id);
-    if (group && group->member_has(user_id_, &rank))
+    Auth::GroupPtr group =
+        dbsrv_->find_group_by_id(gap.group_id, DBService::THROW_IF_NOT_FOUND);
+    if (group->member_has(user_id_, &rank))
     {
         return rank == Auth::GroupRank::ADMIN;
     }
@@ -101,8 +111,9 @@ bool WSSecurityContext::can_administrate_group(
 bool WSSecurityContext::can_read_membership(
     const SecurityContext::MembershipActionParam &map) const
 {
-    Auth::UserGroupMembershipPtr ugm =
-        dbsrv_->find_membership_by_id(map.membership_id);
+    Auth::UserGroupMembershipPtr ugm = dbsrv_->find_membership_by_id(
+        map.membership_id, DBService::THROW_IF_NOT_FOUND);
+
     ActionParam ap;
     ap.group.group_id = ugm->group_id();
     return ugm->user_id() == user_id_ ||
@@ -112,20 +123,7 @@ bool WSSecurityContext::can_read_membership(
 bool WSSecurityContext::can_read_user(
     const SecurityContext::UserActionParam &uap) const
 {
-    Auth::UserPtr user = dbsrv_->find_user_by_id(uap.user_id);
-    if (user)
-    {
-        if (user->id() == user_id_) // self
-            return true;
-        for (const auto &membership : user->group_memberships())
-        {
-            ActionParam ap;
-            ap.group.group_id = membership->group_id();
-            if (check_permission(Action::GROUP_LIST_MEMBERSHIP, ap))
-                return true;
-        }
-    }
-    return false;
+    return true;
 }
 
 bool WSSecurityContext::can_read_user_detail(const UserActionParam &uap) const
@@ -137,4 +135,48 @@ bool WSSecurityContext::can_update_user(
     const SecurityContext::UserActionParam &uap) const
 {
     return uap.user_id == user_id_;
+}
+
+bool WSSecurityContext::can_create_membership(
+    const SecurityContext::MembershipActionParam &map) const
+{
+    // If we are at least Operator in the group, we can add someone.
+    Auth::GroupPtr group =
+        dbsrv_->find_group_by_id(map.group_id, DBService::THROW_IF_NOT_FOUND);
+    Auth::GroupRank rank;
+    if (group->member_has(user_id_, &rank))
+    {
+        if (rank >= Auth::GroupRank::OPERATOR && map.rank <= rank)
+        {
+            // Cannot invite to a rank superior our own rank.
+            return true;
+        }
+    }
+    return false;
+}
+
+bool WSSecurityContext::can_delete_membership(
+    const SecurityContext::MembershipActionParam &map) const
+{
+    db::OptionalTransaction t(dbsrv_->db()->begin());
+    Auth::UserGroupMembershipPtr membership = dbsrv_->find_membership_by_id(
+        map.membership_id, DBService::THROW_IF_NOT_FOUND);
+
+    auto group       = membership->group().load();
+    auto target_user = membership->user().load();
+    t.commit();
+
+    if (target_user->id() == user_id_)
+        return true; // Can leave any group.
+
+    Auth::GroupRank my_rank;
+    if (group && group->member_has(user_id_, &my_rank))
+    {
+        if (my_rank >= Auth::GroupRank::OPERATOR && my_rank >= membership->rank())
+        {
+            // Cannot kick someone with a higher rank.
+            return true;
+        }
+    }
+    return false;
 }

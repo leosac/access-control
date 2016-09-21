@@ -112,7 +112,8 @@ class CRUDResourceHandler
      */
     template <typename T>
     typename std::enable_if<!std::is_same<const char *, T>::value, T>::type
-    extract_with_default(const json &obj, const std::string &key, T default_value)
+    extract_with_default(const json &obj, const std::string &key,
+                         T default_value) const
     {
         T ret = default_value;
         try
@@ -127,7 +128,8 @@ class CRUDResourceHandler
 
     template <typename T>
     typename std::enable_if<std::is_same<const char *, T>::value, std::string>::type
-    extract_with_default(const json &obj, const std::string &key, T default_value)
+    extract_with_default(const json &obj, const std::string &key,
+                         T default_value) const
     {
         return extract_with_default<std::string>(obj, key, default_value);
     }

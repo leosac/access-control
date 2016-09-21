@@ -148,14 +148,14 @@ class IAuditEntry
     /**
      * Returns the number of children that this entry has.
      */
-    virtual ssize_t children_count() const = 0;
+    virtual size_t children_count() const = 0;
 
     /**
      * Returns the ODB version of the object.
      *
      * This call is for debugging purpose.
      */
-    virtual ssize_t version() const = 0;
+    virtual size_t version() const = 0;
 };
 }
 }

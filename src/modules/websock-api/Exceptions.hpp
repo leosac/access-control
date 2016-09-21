@@ -73,31 +73,6 @@ class SessionAborted : public LEOSACException
      */
     std::string build_msg(Auth::TokenPtr token) const;
 };
-
-class EntityNotFound : public LEOSACException
-{
-  public:
-    /**
-     * Construct the exception from a type that can be converted
-     * to string using the `std::to_string()` call.
-     */
-    template <typename T>
-    EntityNotFound(const T &id, const std::string &type)
-        : EntityNotFound(std::to_string(id), type)
-    {
-    }
-
-    EntityNotFound(const std::string &id, const std::string &type);
-
-    const std::string &entity_id() const;
-    const std::string &entity_type() const;
-
-  private:
-    std::string build_msg(const std::string &id, const std::string &type) const;
-
-    std::string entity_id_;
-    std::string entity_type_;
-};
 }
 }
 }

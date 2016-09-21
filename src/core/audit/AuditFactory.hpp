@@ -51,6 +51,11 @@ class Factory
                                      IAuditEntryPtr parent);
 
     static IWSAPICallPtr WSAPICall(const DBPtr &database);
+
+
+    static IUserGroupMembershipEventPtr
+    UserGroupMembershipEvent(const DBPtr &database, Auth::GroupPtr target_group,
+                             Auth::UserPtr target_user, IAuditEntryPtr parent);
 };
 }
 }

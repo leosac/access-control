@@ -19,39 +19,22 @@
 
 #pragma once
 
-#include "IAuditEntry.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "tools/JSONSerializer.hpp"
 
 namespace Leosac
 {
-namespace Audit
-{
+
 /**
- * Interface that describes an Audit object for group related event.
- *
- * Possible use case:
- *     + Group creation/deletion.
- *     + Memberships changes.
+ * A serializer that handle `Auth::UserGroupMembership` object.
  */
-class IGroupEvent : virtual public IAuditEntry
+struct UserGroupMembershipJSONSerializer
+    : public JSONSerializer<Auth::UserGroupMembership>
 {
-  public:
-    /**
-     * Set the group that is targeted by the event.
-     */
-    virtual void target(Auth::GroupPtr group) = 0;
-
-    /**
-     * An optional JSON representation of the object
-     * **before** the event took place.
-     */
-    virtual void before(const std::string &repr) = 0;
-
-    /**
-     * An optional JSON representation of the object
-     * **after** the event took place.
-     */
-    virtual void after(const std::string &repr) = 0;
+    static std::string to_string(const Auth::UserGroupMembership &ugm,
+                                 const SecurityContext &sc);
+    static json to_object(const Auth::UserGroupMembership &ugm,
+                          const SecurityContext &sc);
 };
-}
 }

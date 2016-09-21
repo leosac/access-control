@@ -30,6 +30,11 @@ namespace Leosac
 class DBService
 {
   public:
+    enum Flag
+    {
+        DEFAULT            = 0,
+        THROW_IF_NOT_FOUND = 1
+    };
     DBService(DBPtr db);
 
     /**
@@ -47,15 +52,16 @@ class DBService
      *
      * @return The group, or nullptr.
      */
-    Auth::GroupPtr find_group_by_id(const Auth::GroupId &id);
+    Auth::GroupPtr find_group_by_id(const Auth::GroupId &id, Flag f = Flag::DEFAULT);
 
     /**
      * Find a user by its id.
      */
-    Auth::UserPtr find_user_by_id(const Auth::UserId &id);
+    Auth::UserPtr find_user_by_id(const Auth::UserId &id, Flag f = Flag::DEFAULT);
 
     Auth::UserGroupMembershipPtr
-    find_membership_by_id(const Auth::UserGroupMembershipId &id);
+    find_membership_by_id(const Auth::UserGroupMembershipId &id,
+                          Flag f = Flag::DEFAULT);
 
   private:
     DBPtr database_;

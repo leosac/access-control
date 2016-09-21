@@ -23,8 +23,12 @@
 #include "User_odb.h"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
+#include "core/audit/IUserGroupMembershipEvent.hpp"
 #include "core/audit/UserEvent.hpp"
+#include "core/auth/Group.hpp"
+#include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
+#include <core/auth/serializers/UserGroupMembershipJSONSerializer.hpp>
 #include <json.hpp>
 
 using namespace Leosac;
@@ -44,35 +48,48 @@ CRUDResourceHandlerUPtr MembershipCRUD::instanciate(RequestContext ctx)
 
 json MembershipCRUD::create_impl(const json &req)
 {
-    throw LEOSACException("Not implemented.");
+    json rep;
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+
+    auto attributes = req.at("attributes");
+    auto gid        = attributes.at("group_id").get<size_t>();
+    auto uid        = attributes.at("user_id").get<size_t>();
+    Auth::GroupRank rank =
+        static_cast<Auth::GroupRank>(attributes.at("rank").get<size_t>());
+
+    auto group = ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
+    auto user  = ctx_.dbsrv->find_user_by_id(uid, DBService::THROW_IF_NOT_FOUND);
+    auto audit =
+        Audit::Factory::UserGroupMembershipEvent(db, group, user, ctx_.audit);
+    audit->event_mask(Audit::EventType::GROUP_MEMBERSHIP_JOINED);
+
+    if (group->member_has(user->id()))
+        throw LEOSACException(BUILD_STR("User " << user->username()
+                                                << " is already in group "
+                                                << group->name()));
+
+    auto membership = group->member_add(user, rank);
+    db->update(group);
+    audit->finalize();
+    t.commit();
+    rep["data"] = UserGroupMembershipJSONSerializer::to_object(*membership,
+                                                               security_context());
+    return rep;
 }
 
 json MembershipCRUD::read_impl(const json &req)
 {
     json rep;
 
-    using query = odb::query<Auth::UserGroupMembership>;
-    DBPtr db    = ctx_.dbsrv->db();
+    DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
     auto mid = req.at("membership_id").get<Auth::UserGroupMembershipId>();
 
     Auth::UserGroupMembershipPtr membership =
-        db->query_one<Auth::UserGroupMembership>(query::id == mid);
-    if (membership)
-    {
-        auto timestamp      = boost::posix_time::to_time_t(membership->timestamp());
-        rep["data"]         = {};
-        rep["data"]["id"]   = membership->id();
-        rep["data"]["type"] = "user-group-membership";
-        rep["data"]["attributes"] = {{"rank", static_cast<int>(membership->rank())},
-                                     {"timestamp", timestamp}};
-        rep["data"]["relationships"]["user"] = {
-            {"data", {{"id", membership->user().object_id()}, {"type", "user"}}}};
-        rep["data"]["relationships"]["group"] = {
-            {"data", {{"id", membership->group().object_id()}, {"type", "group"}}}};
-    }
-    else
-        throw EntityNotFound(mid, "user-group-membership");
+        ctx_.dbsrv->find_membership_by_id(mid, DBService::THROW_IF_NOT_FOUND);
+    rep["data"] = UserGroupMembershipJSONSerializer::to_object(*membership,
+                                                               security_context());
     t.commit();
     return rep;
 }
@@ -84,7 +101,19 @@ json MembershipCRUD::update_impl(const json &req)
 
 json MembershipCRUD::delete_impl(const json &req)
 {
-    throw LEOSACException("Not implemented.");
+    odb::transaction t(ctx_.dbsrv->db()->begin());
+    auto mid = req.at("membership_id").get<Auth::UserGroupMembershipId>();
+
+    Auth::UserGroupMembershipPtr membership =
+        ctx_.dbsrv->find_membership_by_id(mid, DBService::THROW_IF_NOT_FOUND);
+    auto audit = Audit::Factory::UserGroupMembershipEvent(
+        ctx_.dbsrv->db(), membership->group().load(), membership->user().load(),
+        ctx_.audit);
+    audit->event_mask(Audit::EventType::GROUP_MEMBERSHIP_LEFT);
+    ctx_.dbsrv->db()->erase(membership);
+    audit->finalize();
+    t.commit();
+    return {};
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>
@@ -95,14 +124,10 @@ MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
     SecurityContext::ActionParam ap;
 
     SecurityContext::MembershipActionParam map;
-    try
-    {
-        map.membership_id = req.at("membership_id").get<Auth::GroupId>();
-    }
-    catch (std::out_of_range &e)
-    {
-        map.membership_id = 0;
-    }
+    map.membership_id = extract_with_default(req, "membership_id", 0u);
+    map.user_id       = extract_with_default(req, "user_id", 0u);
+    map.group_id      = extract_with_default(req, "group_id", 0u);
+    map.rank = static_cast<Auth::GroupRank>(extract_with_default(req, "rank", 0u));
     ap.membership = map;
 
     switch (verb)
@@ -110,6 +135,12 @@ MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
     case Verb::READ:
         ret.push_back(std::make_pair(SecurityContext::Action::MEMBERSHIP_READ, ap));
         break;
+    case Verb::CREATE:
+        ret.push_back(
+            std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_JOINED, ap));
+    case Verb::DELETE:
+        ret.push_back(
+            std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_LEFT, ap));
     }
     return ret;
 }

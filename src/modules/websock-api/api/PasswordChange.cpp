@@ -25,6 +25,7 @@
 #include "conditions/IsCurrentUserAdmin.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
+#include "exception/EntityNotFound.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;

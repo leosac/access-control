@@ -22,6 +22,7 @@
 #include "Group_odb.h"
 #include "OptionalTransaction.hpp"
 #include "User_odb.h"
+#include "exception/EntityNotFound.hpp"
 #include "tools/log.hpp"
 #include <odb/database.hxx>
 
@@ -45,21 +46,33 @@ size_t DBService::operation_count() const
     return tracer->count();
 }
 
-Auth::GroupPtr DBService::find_group_by_id(const Auth::GroupId &id)
+Auth::GroupPtr DBService::find_group_by_id(const Auth::GroupId &id, Flag flags)
 {
     db::OptionalTransaction t(database_->begin());
-    return database_->find<Auth::Group>(id);
+    auto grp = database_->find<Auth::Group>(id);
+    t.commit();
+    if (!grp && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "group");
+    return grp;
 }
 
-Auth::UserPtr DBService::find_user_by_id(const Auth::UserId &id)
+Auth::UserPtr DBService::find_user_by_id(const Auth::UserId &id, Flag flags)
 {
     db::OptionalTransaction t(database_->begin());
-    return database_->find<Auth::User>(id);
+    auto user = database_->find<Auth::User>(id);
+    t.commit();
+    if (!user && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "user");
+    return user;
 }
 
 Auth::UserGroupMembershipPtr
-DBService::find_membership_by_id(const Auth::UserGroupMembershipId &id)
+DBService::find_membership_by_id(const Auth::UserGroupMembershipId &id, Flag flags)
 {
     db::OptionalTransaction t(database_->begin());
-    return database_->find<Auth::UserGroupMembership>(id);
+    auto ugm = database_->find<Auth::UserGroupMembership>(id);
+    t.commit();
+    if (!ugm && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "user-group-membership");
+    return ugm;
 }
