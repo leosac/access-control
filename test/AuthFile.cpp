@@ -182,18 +182,18 @@ TEST_F(AuthFileMapperTest, SimpleMapping)
     ASSERT_FALSE(my_card_->owner().get());
     mapper_->mapToUser(my_card_);
     ASSERT_TRUE(my_card_->owner().get());
-    ASSERT_EQ("MY_USER", my_card_->owner()->username());
+    ASSERT_EQ("my_user", my_card_->owner()->username());
 
     // MY_USER with a PIN Code.
     ASSERT_FALSE(my_pin_->owner().get());
     mapper_->mapToUser(my_pin_);
     ASSERT_TRUE(my_pin_->owner().get());
-    ASSERT_EQ("MY_USER", my_pin_->owner()->username());
+    ASSERT_EQ("my_user", my_pin_->owner()->username());
 
     ASSERT_FALSE(my_card2_->owner().get());
     mapper_->mapToUser(my_card2_);
     ASSERT_TRUE(my_card2_->owner().get());
-    ASSERT_EQ("Toto", my_card2_->owner()->username());
+    ASSERT_EQ("toto", my_card2_->owner()->username());
 }
 
 /**
@@ -300,25 +300,25 @@ TEST_F(AuthFileMapperTest, InvalidFileContent)
 
 TEST_F(AuthFileMapperTest, TestGroupMapping)
 {
-    ASSERT_TRUE(is_in_group("MY_USER", "Admins", mapper2_));
-    ASSERT_TRUE(is_in_group("Toto", "Admins", mapper2_));
+    ASSERT_TRUE(is_in_group("my_user", "Admins", mapper2_));
+    ASSERT_TRUE(is_in_group("toto", "Admins", mapper2_));
 
-    ASSERT_FALSE(is_in_group("Useless", "Admins", mapper2_));
-    ASSERT_TRUE(is_in_group("Useless", "random_group", mapper2_));
+    ASSERT_FALSE(is_in_group("useless", "Admins", mapper2_));
+    ASSERT_TRUE(is_in_group("useless", "random_group", mapper2_));
 }
 
 TEST_F(AuthFileMapperTest, TestMultiGroupMapping)
 {
     // MY_USER has 4 two group here.
-    ASSERT_TRUE(is_in_group("MY_USER", "Admins", mapper3_));
-    ASSERT_TRUE(is_in_group("MY_USER", "Operators", mapper3_));
-    ASSERT_TRUE(is_in_group("MY_USER", "Users", mapper3_));
-    ASSERT_TRUE(is_in_group("MY_USER", "YetAnotherGroup", mapper3_));
-    ASSERT_FALSE(is_in_group("MY_USER", "group_doesnt_exists", mapper3_));
+    ASSERT_TRUE(is_in_group("my_user", "Admins", mapper3_));
+    ASSERT_TRUE(is_in_group("my_user", "Operators", mapper3_));
+    ASSERT_TRUE(is_in_group("my_user", "Users", mapper3_));
+    ASSERT_TRUE(is_in_group("my_user", "YetAnotherGroup", mapper3_));
+    ASSERT_FALSE(is_in_group("my_user", "group_doesnt_exists", mapper3_));
 
-    ASSERT_FALSE(is_in_group("Toto", "Operators", mapper3_));
-    ASSERT_TRUE(is_in_group("Toto", "Admins", mapper3_));
-    ASSERT_TRUE(is_in_group("Toto", "Users", mapper3_));
+    ASSERT_FALSE(is_in_group("toto", "Operators", mapper3_));
+    ASSERT_TRUE(is_in_group("toto", "Admins", mapper3_));
+    ASSERT_TRUE(is_in_group("toto", "Users", mapper3_));
 }
 
 /**
@@ -330,7 +330,7 @@ TEST_F(AuthFileMapperTest, TestGroupPermission)
 
     auto profile = mapper2_->buildProfile(my_card_);
     ASSERT_TRUE(profile.get());
-    ASSERT_TRUE(is_in_group("MY_USER", "Admins", mapper2_));
+    ASSERT_TRUE(is_in_group("my_user", "Admins", mapper2_));
 
     ASSERT_TRUE(profile->isAccessGranted(date_monday_12_00, doorA_));
     ASSERT_FALSE(profile->isAccessGranted(date_monday_16_31, doorA_));
