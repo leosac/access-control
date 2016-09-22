@@ -19,28 +19,39 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
+#include "core/credentials/ICredential.hpp"
 #include <memory>
 
 namespace Leosac
 {
-namespace Auth
+namespace Cred
 {
 /**
  * Base interface for credential objects.
+ *
  */
-class ICredential
+class IWiegandCard : public ICredential
 {
   public:
-    /**
-     * Retrieve the owner of the credential.
-     */
-    virtual UserLPtr owner() = 0;
+    virtual const std::string &card_id() const = 0;
+    virtual int nb_bits() const                = 0;
 
     /**
-     * Set a new owner for the credential.
+     * Returns the integer representation of the
+     * card ID.
+     *
+     * The format (Wiegand 26, 32, ....) is used to build the
+     * card number. If no format is recognized, fallback to `to_raw_int()`
      */
-    virtual void owner(UserPtr) = 0;
+    virtual uint64_t to_int() const = 0;
+
+    /**
+     * Convert the bits of the card to an integer.
+     *
+     * The format (Wiegand26, 32, ...) is ignored: all bits are used
+     * to build the number.
+     */
+    virtual uint64_t to_raw_int() const = 0;
 };
 }
 }

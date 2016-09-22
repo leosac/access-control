@@ -36,7 +36,8 @@ set(LEOSAC_LIB_SRCS
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
     core/auth/CredentialValidity.cpp
-    core/auth/credentials/Credential.cpp
+    core/credentials/Credential.cpp
+    core/credentials/WiegandCard.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp

@@ -10,13 +10,14 @@ set(WEBSOCK_API_SRCS
         api/APIAuth.cpp
         api/LogGet.cpp
         api/PasswordChange.cpp
+        api/CRUDResourceHandler.cpp
+        api/GroupCRUD.cpp
+        api/UserCRUD.cpp
+        api/WiegandCardCRUD.cpp
         conditions/ConditionBase.cpp
         conditions/IsCurrentUserAdmin.cpp
         conditions/IsAuthenticated.cpp
         conditions/IsInGroup.cpp
-        api/CRUDResourceHandler.cpp
-        api/GroupCRUD.cpp
-        api/UserCRUD.cpp
         WSSecurityContext.cpp
         api/MembershipCRUD.cpp
         )

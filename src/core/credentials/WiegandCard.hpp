@@ -19,40 +19,44 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
-#include "core/auth/credentials/ICredential.hpp"
-#include <cstddef>
+#include "core/credentials/Credential.hpp"
+#include "core/credentials/IWiegandCard.hpp"
 
 namespace Leosac
 {
-namespace Auth
+namespace Cred
 {
 /**
- * An ODB enabled credential object.
+ * A WiegandCard credential.
  */
 #pragma db object polymorphic optimistic
-class Credential : public ICredential
+class WiegandCard : public IWiegandCard, public Credential
 {
   public:
-    virtual UserLPtr owner() override;
+    virtual const std::string &card_id() const override;
 
-    virtual void owner(UserPtr ptr) override;
+    virtual int nb_bits() const override;
+
+    virtual uint64_t to_int() const override;
+
+    virtual uint64_t to_raw_int() const override;
 
   protected:
-    UserLPtr owner_;
-
-#pragma db id
-    CredentialId id_;
-
-#pragma db version
-    size_t odb_version_;
+    int nb_bits_;
+    std::string card_id_;
 
   private:
+    /**
+     * Extract the card ID, assuming the format to be Wiegand26.
+     */
+    uint64_t to_wiegand_26() const;
+
+    /**
+     * Extract the card ID, assuming the format to be Wiegand34.
+     */
+    uint64_t to_wiegand_34() const;
+
     friend class odb::access;
 };
 }
 }
-
-#ifdef ODB_COMPILER
-#include "core/auth/User.hpp"
-#endif

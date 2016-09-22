@@ -548,6 +548,13 @@ void Kernel::configure_database()
                     schema_catalog::create_schema(*database_, "audit");
                     t.commit();
                 }
+                v = database_->schema_version("credentials");
+                if (v == 0)
+                {
+                    transaction t(database_->begin());
+                    schema_catalog::create_schema(*database_, "credentials");
+                    t.commit();
+                }
             }
         }
         catch (const odb::exception &e)

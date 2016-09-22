@@ -17,17 +17,19 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/credentials/Credential.hpp"
+#pragma once
 
-using namespace Leosac;
-using namespace Leosac::Auth;
-
-UserLPtr Credential::owner()
+namespace Leosac
 {
-    return owner_;
+namespace Cred
+{
+
+// Credentials
+class ICredential;
+using ICredentialPtr = std::shared_ptr<ICredential>;
+
+class Credential;
+using CredentialId  = unsigned long;
+using CredentialPtr = std::shared_ptr<Credential>;
 }
-
-void Credential::owner(UserPtr ptr)
-{
-    owner_ = ptr;
 }

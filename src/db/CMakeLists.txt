@@ -86,7 +86,8 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
 
 # ODB configuration for Credentials
 set(OdbCMake_ODB_HEADERS_CREDENTIALS
-        ${CMAKE_SOURCE_DIR}/src/core/auth/credentials/Credential.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/credentials/Credential.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/credentials/WiegandCard.hpp
         )
 
 set(OdbCMake_SOURCES_CREDENTIALS "")
@@ -98,14 +99,14 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
-        SCHEMA_NAME audit
+        SCHEMA_NAME credentials
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/src
-        INCLUDE_PREFIX core/auth/credentials/
+        INCLUDE_PREFIX core/credentials/
         INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"

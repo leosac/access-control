@@ -34,21 +34,19 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
     SourceType type;
     *msg >> source_name >> type;
 
-    if (!extract_source_name(source_name, &source_name))
-    {
-        // invalid message.
-        ERROR(
-            "Failed to extract source name: cannot construct the AuthSource object. "
+    bool ret = extract_source_name(source_name, &source_name);
+    ASSERT_LOG(
+        ret,
+        "Failed to extract source name: cannot construct the AuthSource object. "
             << "Source name was {" << source_name << "}");
-        raise(SIGABRT);
-    }
+
     if (type == SourceType::SIMPLE_WIEGAND)
         return create_simple_wiegand(source_name, msg);
     else if (type == SourceType::WIEGAND_PIN)
         return create_wiegand_pin(source_name, msg);
     else if (type == SourceType::WIEGAND_CARD_PIN)
         return create_wiegand_card_pin(source_name, msg);
-    ASSERT_LOG(0, "Unkown auth source type.");
+    ASSERT_LOG(0, "Unknown auth source type.");
     exit(-1);
 }
 
