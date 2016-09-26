@@ -96,7 +96,7 @@ json MembershipCRUD::read_impl(const json &req)
     return rep;
 }
 
-json MembershipCRUD::update_impl(const json &req)
+json MembershipCRUD::update_impl(const json &)
 {
     throw LEOSACException("Not implemented.");
 }

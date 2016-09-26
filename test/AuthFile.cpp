@@ -133,7 +133,7 @@ class AuthFileMapperTest : public ::testing::Test
                      IAuthSourceMapper *mapper)
     {
         auto search_lambda = [&](UserPtr u) -> bool {
-            return u->username() == user_name;
+            return u->username() == boost::algorithm::to_lower_copy(user_name);
         };
 
         for (const auto &group : mapper->groups())

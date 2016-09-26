@@ -182,7 +182,7 @@ void GroupCRUD::validate_and_unique(Auth::GroupPtr grp)
 {
     using Query = odb::query<Auth::Group>;
 
-    Auth::GroupValidator::validate(grp);
+    Auth::GroupValidator::validate(*grp);
     auto grp_with_same_name =
         ctx_.dbsrv->db()->query_one<Auth::Group>(Query::name == grp->name());
     // Check that either the name is available, or the group under modification

@@ -31,7 +31,7 @@ UserGroupMembershipJSONSerializer::to_string(const Auth::UserGroupMembership &ug
 }
 
 json UserGroupMembershipJSONSerializer::to_object(
-    const Auth::UserGroupMembership &membership, const SecurityContext &sc)
+    const Auth::UserGroupMembership &membership, const SecurityContext &)
 {
     json serialized{};
 

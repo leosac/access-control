@@ -80,6 +80,12 @@ class UserGroupMembership
     friend class odb::access;
 };
 
+/**
+ * Compares 2 UserGroupMembership object.
+ *
+ * If the `user` and `group` attribute of any of the compared memberships is not yet
+ * persisted, we fallback on object's address comparison.
+ */
 struct UserGroupMembershipComparator
 {
     bool operator()(const UserGroupMembershipPtr &m1,

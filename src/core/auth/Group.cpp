@@ -45,13 +45,17 @@ const std::string &Group::name() const
     return name_;
 }
 
-std::vector<UserPtr> const &Group::members() const
+const std::vector<UserPtr> &Group::members() const
 {
-    loaded_members_.clear();
     for (const auto &membership : membership_)
     {
-        if (membership->user().get_eager().lock())
-            loaded_members_.push_back(membership->user().get_eager().lock());
+        auto ptr = membership->user().get_eager().lock();
+        if (ptr &&
+            std::find(loaded_members_.begin(), loaded_members_.end(), ptr) ==
+                loaded_members_.end())
+        {
+            loaded_members_.push_back(ptr);
+        }
     }
     return loaded_members_;
 }
@@ -65,7 +69,6 @@ UserGroupMembershipPtr Group::member_add(UserPtr m,
     ugm->user(m);
     ugm->group(shared_from_this());
     membership_.insert(ugm);
-
     return ugm;
 }
 
@@ -147,10 +150,9 @@ bool Group::member_has(UserId user_id, GroupRank *rank_out) const
     return false;
 }
 
-void GroupValidator::validate(const GroupPtr &grp)
+void GroupValidator::validate(const Group &grp)
 {
-    ASSERT_LOG(grp, "Group cannot be null.");
-    validate_name(grp->name());
+    validate_name(grp.name());
 }
 
 void GroupValidator::validate_name(const std::string &name)

@@ -44,7 +44,7 @@ class GroupValidator
     /**
      * Validate the group's attributes.
      */
-    static void validate(const GroupPtr &grp);
+    static void validate(const Group &grp);
     static void validate_name(const std::string &name);
 };
 
@@ -91,7 +91,6 @@ class Group : public std::enable_shared_from_this<Group>
      * method in each Membership will return lazy weak pointer.
      */
     const UserGroupMembershipSet &user_memberships() const;
-
 
     /**
      * Check if `user_id` is a member of this group.

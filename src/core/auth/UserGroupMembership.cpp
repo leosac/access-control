@@ -86,6 +86,10 @@ GroupId UserGroupMembership::group_id() const
 bool UserGroupMembershipComparator::
 operator()(const UserGroupMembershipPtr &m1, const UserGroupMembershipPtr &m2) const
 {
-    return std::make_pair(m1->user().object_id(), m1->group().object_id()) <
-           std::make_pair(m2->user().object_id(), m2->group().object_id());
+    if (m1->user_id() == 0 || m1->group_id() == 0 || m2->user_id() == 0 ||
+        m2->group_id() == 0)
+        return std::addressof(m1) < std::addressof(m2);
+
+    return std::make_pair(m1->user_id(), m1->group_id()) <
+           std::make_pair(m2->user_id(), m2->group_id());
 }

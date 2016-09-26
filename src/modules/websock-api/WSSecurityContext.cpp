@@ -46,6 +46,7 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     switch (action)
     {
     case Action::USER_CREATE:
+    case Action::USER_DELETE:
         return is_admin();
     case Action::USER_READ:
         return can_read_user(ap.user);
@@ -120,8 +121,7 @@ bool WSSecurityContext::can_read_membership(
            check_permission(Action::GROUP_LIST_MEMBERSHIP, ap);
 }
 
-bool WSSecurityContext::can_read_user(
-    const SecurityContext::UserActionParam &uap) const
+bool WSSecurityContext::can_read_user(const SecurityContext::UserActionParam &) const
 {
     return true;
 }

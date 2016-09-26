@@ -56,12 +56,37 @@ CRUDResourceHandlerUPtr UserCRUD::instanciate(RequestContext ctx)
     instance->add_conditions_or(
         Verb::UPDATE, []() { throw MalformedMessage("No `attributes` subobject"); },
         has_json_attributes_object);
+    instance->add_conditions_or(
+        Verb::CREATE, []() { throw MalformedMessage("No `attributes` subobject"); },
+        has_json_attributes_object);
     return instance;
 }
 
 json UserCRUD::create_impl(const json &req)
 {
-    throw LEOSACException("Not implemented.");
+    json rep;
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+    json attributes = req.at("attributes");
+
+    Auth::UserPtr new_user = std::make_shared<Auth::User>();
+    new_user->username(attributes.at("username"));
+    new_user->firstname(attributes.at("firstname"));
+    new_user->lastname(attributes.at("lastname"));
+    new_user->email(attributes.at("email"));
+    new_user->password(attributes.at("password"));
+    db->persist(new_user);
+
+    Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, new_user, ctx_.audit);
+    audit->event_mask(Audit::EventType::USER_CREATED);
+    audit->after(
+        UserJSONSerializer::to_string(*new_user, SystemSecurityContext::instance()));
+    audit->finalize();
+    t.commit();
+
+    rep["data"] = UserJSONSerializer::to_object(*new_user, security_context());
+
+    return rep;
 }
 
 json UserCRUD::read_impl(const json &req)

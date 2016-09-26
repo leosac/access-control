@@ -6,6 +6,7 @@ list(APPEND LEOSAC_TEST_INCLUDE_DIRECTORIES
         ${GTEST_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/deps/spdlog/include
         ${CMAKE_SOURCE_DIR}/deps/libzmq/include
+        ${CMAKE_SOURCE_DIR}/deps/json/src
         )
 list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES})
 
@@ -39,3 +40,4 @@ leosacCreateSingleSourceTest(ConfigManager)
 leosacCreateSingleSourceTest(RemoteControlSecurity)
 leosacCreateSingleSourceTest(WiegandCard)
 leosacCreateSingleSourceTest(TcpNotifierProtocol)
+leosacCreateSingleSourceTest(GroupValidator)
