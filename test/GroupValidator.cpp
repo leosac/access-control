@@ -64,5 +64,18 @@ TEST(TestGroupValidator, name_length)
         { g.name("this_is_so_long_this_name_is_clearly_to_long_to_be_valid"); },
         ModelException);
 }
+
+TEST(TestGroupValidator, name_invalid_char)
+{
+    Group g;
+    ASSERT_NO_THROW({ g.name("aaaa"); });
+    ASSERT_THROW({ g.name("aaa$"); }, ModelException);
+    ASSERT_THROW({ g.name("aaa!"); }, ModelException);
+    ASSERT_THROW({ g.name("aaa^"); }, ModelException);
+    ASSERT_THROW({ g.name("aaa^"); }, ModelException);
+    ASSERT_THROW({ g.name("aaaä"); }, ModelException);
+    ASSERT_THROW({ g.name("aaaé"); }, ModelException);
+    ASSERT_THROW({ g.name("aaa aaa"); }, ModelException);
+}
 }
 }

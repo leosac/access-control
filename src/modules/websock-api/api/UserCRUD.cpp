@@ -65,12 +65,18 @@ CRUDResourceHandlerUPtr UserCRUD::instanciate(RequestContext ctx)
 json UserCRUD::create_impl(const json &req)
 {
     json rep;
-    DBPtr db = ctx_.dbsrv->db();
+    using Query = odb::query<Auth::User>;
+    DBPtr db    = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
     json attributes = req.at("attributes");
 
     Auth::UserPtr new_user = std::make_shared<Auth::User>();
     new_user->username(attributes.at("username"));
+    if (db->query_one<Auth::User>(Query::username == new_user->username()))
+        throw ModelException("data/attributes/username",
+                             BUILD_STR("The username " << new_user->username()
+                                                       << " is already in use."));
+
     new_user->firstname(attributes.at("firstname"));
     new_user->lastname(attributes.at("lastname"));
     new_user->email(attributes.at("email"));

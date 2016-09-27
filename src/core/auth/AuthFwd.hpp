@@ -51,8 +51,8 @@ enum class GroupRank
 
 enum class UserRank
 {
-    NORMAL = 0,
-    ADMIN  = 1,
+    USER  = 0,
+    ADMIN = 1,
 };
 
 class UserGroupMembership;
