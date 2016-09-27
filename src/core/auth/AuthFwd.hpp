@@ -51,8 +51,26 @@ enum class GroupRank
 
 enum class UserRank
 {
-    USER  = 0,
-    ADMIN = 1,
+    /**
+     * A default user.
+     */
+    USER = 0,
+    /**
+     * Has viewing permission
+     */
+    VIEWER = 1,
+    /**
+     * Can access user management aswel as credential management.
+     */
+    MANAGER = 2,
+    /**
+     * Full access except changing user role.
+     */
+    SUPERVISOR = 3,
+    /**
+     * Site administrator.
+     */
+    ADMIN = 4,
 };
 
 class UserGroupMembership;

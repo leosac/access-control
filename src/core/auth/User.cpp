@@ -34,14 +34,14 @@ static bool is_valid_username_character(char c)
 
 User::User()
     : id_(0)
-    , rank_(UserRank::NORMAL)
+    , rank_(UserRank::USER)
     , version_(0)
 {
 }
 
 User::User(const std::string &uname)
     : id_(0)
-    , rank_(UserRank::NORMAL)
+    , rank_(UserRank::USER)
     , version_(0)
 {
     username(uname);

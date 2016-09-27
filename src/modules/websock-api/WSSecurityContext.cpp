@@ -46,6 +46,7 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     switch (action)
     {
     case Action::USER_CREATE:
+        return is_manager();
     case Action::USER_DELETE:
         return is_admin();
     case Action::USER_READ:
@@ -88,17 +89,11 @@ bool WSSecurityContext::can_read_group(
     return group->member_has(user_id_);
 }
 
-bool WSSecurityContext::is_admin() const
-{
-    auto user = dbsrv_->find_user_by_id(user_id_);
-    if (user)
-        return user->rank() == Auth::UserRank::ADMIN;
-    return false;
-}
-
 bool WSSecurityContext::can_administrate_group(
     const SecurityContext::GroupActionParam &gap) const
 {
+    if (is_manager())
+        return true;
     Auth::GroupRank rank;
     Auth::GroupPtr group =
         dbsrv_->find_group_by_id(gap.group_id, DBService::THROW_IF_NOT_FOUND);
@@ -134,12 +129,14 @@ bool WSSecurityContext::can_read_user_detail(const UserActionParam &uap) const
 bool WSSecurityContext::can_update_user(
     const SecurityContext::UserActionParam &uap) const
 {
-    return uap.user_id == user_id_;
+    return is_manager() || uap.user_id == user_id_;
 }
 
 bool WSSecurityContext::can_create_membership(
     const SecurityContext::MembershipActionParam &map) const
 {
+    if (is_manager())
+        return true;
     // If we are at least Operator in the group, we can add someone.
     Auth::GroupPtr group =
         dbsrv_->find_group_by_id(map.group_id, DBService::THROW_IF_NOT_FOUND);
@@ -158,6 +155,8 @@ bool WSSecurityContext::can_create_membership(
 bool WSSecurityContext::can_delete_membership(
     const SecurityContext::MembershipActionParam &map) const
 {
+    if (is_manager())
+        return true;
     db::OptionalTransaction t(dbsrv_->db()->begin());
     Auth::UserGroupMembershipPtr membership = dbsrv_->find_membership_by_id(
         map.membership_id, DBService::THROW_IF_NOT_FOUND);
@@ -178,5 +177,21 @@ bool WSSecurityContext::can_delete_membership(
             return true;
         }
     }
+    return false;
+}
+
+bool WSSecurityContext::is_admin() const
+{
+    auto user = dbsrv_->find_user_by_id(user_id_);
+    if (user)
+        return user->rank() == Auth::UserRank::ADMIN;
+    return false;
+}
+
+bool WSSecurityContext::is_manager() const
+{
+    auto user = dbsrv_->find_user_by_id(user_id_);
+    if (user)
+        return user->rank() == Auth::UserRank::ADMIN;
     return false;
 }

@@ -63,10 +63,15 @@ class WSSecurityContext : public SecurityContext
     bool can_delete_membership(const MembershipActionParam &map) const;
 
     /**
-     * Helper function that returns true if the user is administrator.
-     * @return
+     * Helper function that returns true if the user is an administrator.
      */
     bool is_admin() const;
+
+    /**
+     * Helper function that returns true if the user is at least manager.
+     */
+    bool is_manager() const;
+
     Auth::UserId user_id_;
 };
 }
