@@ -29,13 +29,13 @@ set(LEOSAC_LIB_SRCS
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp
     core/auth/User.cpp
-    core/auth/serializers/UserJSONSerializer.cpp
+    core/auth/serializers/UserSerializer.cpp
     core/auth/serializers/GroupJSONSerializer.cpp
     core/auth/serializers/UserGroupMembershipJSONSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
-        core/auth/ValidityInfo.cpp
+    core/auth/ValidityInfo.cpp
     core/credentials/Credential.cpp
     core/credentials/WiegandCard.cpp
     dynlib/dynamiclibrary.cpp

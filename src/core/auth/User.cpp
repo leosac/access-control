@@ -125,21 +125,26 @@ unsigned long User::id() const noexcept
     return id_;
 }
 
+const UserGroupMembershipSet &User::group_memberships() const
+{
+    return membership_;
+}
+
 void User::password(const std::string &pw)
 {
     std::vector<uint8_t> vec(pw.begin(), pw.end());
     password_ = Scrypt::Hash(vec);
 }
 
-const UserGroupMembershipSet &User::group_memberships() const
-{
-    return membership_;
-}
-
 bool User::verify_password(const std::string &pw) const
 {
     std::vector<uint8_t> vec(pw.begin(), pw.end());
     return Scrypt::Verify(vec, password_);
+}
+
+std::string User::password() const
+{
+    return std::string(password_.hash.begin(), password_.hash.end());
 }
 
 UserRank User::rank() const

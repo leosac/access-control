@@ -17,19 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "UserJSONSerializer.hpp"
+#include "core/auth/serializers/UserSerializer.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/auth/User.hpp"
+#include "tools/JSONUtils.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;
 
-std::string UserJSONSerializer::to_string(const Auth::User &user,
-                                          const SecurityContext &sc)
-{
-    return to_object(user, sc).dump(4);
-}
-
-json UserJSONSerializer::to_object(const Auth::User &user, const SecurityContext &sc)
+json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext &sc)
 {
     json memberships = {};
     for (const auto &membership : user.group_memberships())
@@ -62,4 +58,45 @@ json UserJSONSerializer::to_object(const Auth::User &user, const SecurityContext
         serialized["attributes"]["email"] = user.email();
     }
     return serialized;
+}
+
+void UserJSONSerializer::unserialize(Auth::User &out, const json &in,
+                                     const SecurityContext &sc)
+{
+    using namespace Leosac::JSONUtil;
+
+    out.firstname(extract_with_default(in, "firstname", out.firstname()));
+    out.lastname(extract_with_default(in, "lastname", out.lastname()));
+    out.email(extract_with_default(in, "email", out.email()));
+    out.password(extract_with_default(in, "password", out.password()));
+
+    SecurityContext::ActionParam ap;
+    ap.user.user_id = out.id();
+    if (sc.check_permission(SecurityContext::Action::USER_UPDATE_RANK, ap))
+    {
+        // cast to int for json extraction to work, then back to UserRank for
+        // setter to work.
+        out.rank(static_cast<Auth::UserRank>(
+            extract_with_default(in, "rank", static_cast<int>(out.rank()))));
+    }
+    if (sc.check_permission(SecurityContext::Action::USER_MANAGE_VALIDITY, ap))
+    {
+        auto validity = out.validity();
+        validity.set_enabled(
+            extract_with_default(in, "validity-enabled", validity.is_enabled()));
+        out.validity(validity);
+    }
+}
+
+std::string UserJSONStringSerializer::serialize(const Auth::User &in,
+                                                const SecurityContext &sc)
+{
+    return UserJSONSerializer::serialize(in, sc).dump(4);
+}
+
+void UserJSONStringSerializer::unserialize(Auth::User &out, const std::string &in,
+                                           const SecurityContext &sc)
+{
+    json tmp = json::parse(in);
+    UserJSONSerializer::unserialize(out, tmp, sc);
 }

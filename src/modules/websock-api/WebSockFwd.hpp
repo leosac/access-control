@@ -39,12 +39,6 @@ using CRUDResourceHandlerUPtr = std::unique_ptr<CRUDResourceHandler>;
 class WSServer;
 
 struct ClientMessage;
-
-namespace Conditions
-{
-class ConditionBase;
-using ConditionPtr = std::shared_ptr<ConditionBase>;
-}
 }
 }
 }

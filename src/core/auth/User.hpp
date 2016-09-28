@@ -71,6 +71,13 @@ class User
     bool verify_password(const std::string &pw) const;
 
     /**
+     * Returns the password hash + salt (as stored in the database).
+     *
+     * The use of this function should be rather sparse.
+     */
+    std::string password() const;
+
+    /**
      * Set a new username.
      *
      * A few rules regarding usernames:

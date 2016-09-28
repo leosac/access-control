@@ -24,7 +24,7 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/auth/User.hpp"
-#include "core/auth/serializers/UserJSONSerializer.hpp"
+#include "core/auth/serializers/UserSerializer.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"
 
@@ -77,20 +77,17 @@ json UserCRUD::create_impl(const json &req)
                              BUILD_STR("The username " << new_user->username()
                                                        << " is already in use."));
 
-    new_user->firstname(attributes.at("firstname"));
-    new_user->lastname(attributes.at("lastname"));
-    new_user->email(attributes.at("email"));
-    new_user->password(attributes.at("password"));
+    UserJSONSerializer::unserialize(*new_user, attributes, security_context());
     db->persist(new_user);
 
     Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, new_user, ctx_.audit);
     audit->event_mask(Audit::EventType::USER_CREATED);
-    audit->after(
-        UserJSONSerializer::to_string(*new_user, SystemSecurityContext::instance()));
+    audit->after(UserJSONStringSerializer::serialize(
+        *new_user, SystemSecurityContext::instance()));
     audit->finalize();
     t.commit();
 
-    rep["data"] = UserJSONSerializer::to_object(*new_user, security_context());
+    rep["data"] = UserJSONSerializer::serialize(*new_user, security_context());
 
     return rep;
 }
@@ -108,7 +105,7 @@ json UserCRUD::read_impl(const json &req)
     {
         Auth::UserPtr user =
             ctx_.dbsrv->find_user_by_id(uid, DBService::THROW_IF_NOT_FOUND);
-        rep["data"] = UserJSONSerializer::to_object(*user, security_context());
+        rep["data"] = UserJSONSerializer::serialize(*user, security_context());
     }
     else
     {
@@ -118,7 +115,7 @@ json UserCRUD::read_impl(const json &req)
         for (const auto &user : result)
         {
             rep["data"].push_back(
-                UserJSONSerializer::to_object(user, security_context()));
+                UserJSONSerializer::serialize(user, security_context()));
         }
     }
     t.commit();
@@ -138,35 +135,13 @@ json UserCRUD::update_impl(const json &req)
         ctx_.dbsrv->find_user_by_id(uid, DBService::THROW_IF_NOT_FOUND);
     Audit::IUserEventPtr audit = Audit::Factory::UserEvent(db, user, ctx_.audit);
     audit->event_mask(Audit::EventType::USER_EDITED);
-    audit->before(
-        UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
+    audit->before(UserJSONStringSerializer::serialize(
+        *user, SystemSecurityContext::instance()));
 
-    user->firstname(
-        extract_with_default(attributes, "firstname", user->firstname()));
-    user->lastname(extract_with_default(attributes, "lastname", user->lastname()));
-    user->email(extract_with_default(attributes, "email", user->email()));
+    UserJSONSerializer::unserialize(*user, attributes, security_context());
 
-    SecurityContext::ActionParam ap;
-    ap.user.user_id = uid;
-    if (security_context().check_permission(
-            SecurityContext::Action::USER_UPDATE_RANK, ap))
-    {
-        // cast to int for json extraction to work, then back to UserRank for
-        // setter to work.
-        user->rank(static_cast<Auth::UserRank>(extract_with_default(
-            attributes, "rank", static_cast<int>(user->rank()))));
-    }
-    if (security_context().check_permission(
-            SecurityContext::Action::USER_MANAGE_VALIDITY, ap))
-    {
-        auto validity = user->validity();
-        validity.set_enabled(extract_with_default(attributes, "validity-enabled",
-                                                  validity.is_enabled()));
-        user->validity(validity);
-    }
-
-    audit->after(
-        UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));
+    audit->after(UserJSONStringSerializer::serialize(
+        *user, SystemSecurityContext::instance()));
     audit->finalize();
     db->update(user);
     t.commit();

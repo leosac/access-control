@@ -19,19 +19,32 @@
 
 #pragma once
 
-#include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/JSONSerializer.hpp"
+#include "tools/Serializer.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
+using json = nlohmann::json;
 
 /**
  * A serializer that handle `Auth::User` object.
  */
-struct UserJSONSerializer : public JSONSerializer<Auth::User>
+struct UserJSONSerializer : public Serializer<json, Auth::User, UserJSONSerializer>
 {
-    static std::string to_string(const Auth::User &user, const SecurityContext &sc);
-    static json to_object(const Auth::User &user, const SecurityContext &sc);
+    static json serialize(const Auth::User &in, const SecurityContext &sc);
+
+    static void unserialize(Auth::User &out, const json &in,
+                            const SecurityContext &sc);
+};
+
+struct UserJSONStringSerializer
+    : public Serializer<std::string, Auth::User, UserJSONStringSerializer>
+{
+    static std::string serialize(const Auth::User &in, const SecurityContext &sc);
+
+    static void unserialize(Auth::User &out, const std::string &in,
+                            const SecurityContext &sc);
 };
 }
