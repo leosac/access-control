@@ -138,7 +138,15 @@ json UserCRUD::update_impl(const json &req)
     audit->before(UserJSONStringSerializer::serialize(
         *user, SystemSecurityContext::instance()));
 
+    bool enabled_status = user->validity().is_enabled();
     UserJSONSerializer::unserialize(*user, attributes, security_context());
+
+    // prevent user from disabling themselves
+    if (enabled_status && !user->validity().is_enabled() &&
+        security_context().is_self(user->id()))
+    {
+        throw LEOSACException("You cannot disable your own user account.");
+    }
 
     audit->after(UserJSONStringSerializer::serialize(
         *user, SystemSecurityContext::instance()));

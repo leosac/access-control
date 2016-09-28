@@ -20,8 +20,8 @@
 #pragma once
 
 #include "RequestContext.hpp"
+#include "WSSecurityContext.hpp"
 #include "WebSockFwd.hpp"
-#include "core/SecurityContext.hpp"
 #include <json.hpp>
 #include <vector>
 
@@ -137,7 +137,7 @@ class CRUDResourceHandler
     /**
      * Helper function that returns the security context.
      */
-    SecurityContext &security_context();
+    WSSecurityContext &security_context();
 
   private:
     virtual std::vector<ActionActionParam>

@@ -39,6 +39,12 @@ class WSSecurityContext : public SecurityContext
 
     virtual bool check_permission(Action a, const ActionParam &ap) const override;
 
+    /**
+     * Return true if the owner of the security context is the user whose id
+     * is `id`.
+     */
+    bool is_self(Auth::UserId id) const;
+
   private:
     bool can_read_group(const GroupActionParam &gap) const;
 
@@ -71,8 +77,6 @@ class WSSecurityContext : public SecurityContext
      * Helper function that returns true if the user is at least manager.
      */
     bool is_manager() const;
-
-    bool is_self(Auth::UserId) const;
 
     Auth::UserId user_id_;
 };
