@@ -24,7 +24,7 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IGroupEvent.hpp"
 #include "core/auth/User.hpp"
-#include "core/auth/serializers/GroupJSONSerializer.hpp"
+#include "core/auth/serializers/GroupSerializer.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"
 
@@ -73,33 +73,34 @@ json GroupCRUD::create_impl(const json &req)
 
     // Sanitize input
     Auth::GroupPtr new_group = std::make_shared<Auth::Group>();
-    new_group->name(req.at("attributes").at("name"));
-    new_group->description(
-        extract_with_default(req.at("attributes"), "description", ""));
+
+    GroupJSONSerializer::unserialize(*new_group, req.at("attributes"),
+                                     security_context());
     validate_and_unique(new_group);
+
     db->persist(new_group);
 
     auto audit = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_CREATED);
-    audit->after(GroupJSONSerializer::to_string(*new_group,
-                                                SystemSecurityContext::instance()));
+    audit->after(GroupJSONStringSerializer::serialize(
+        *new_group, SystemSecurityContext::instance()));
     audit->finalize();
 
     // Add the current user to the group as administrator.
     auto audit_add_to_group = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
     audit_add_to_group->event_mask(Audit::EventType::GROUP_MEMBERSHIP_JOINED);
-    audit_add_to_group->before(GroupJSONSerializer::to_string(
+    audit_add_to_group->before(GroupJSONStringSerializer::serialize(
         *new_group, SystemSecurityContext::instance()));
 
     new_group->member_add(ctx_.session->current_user(), Auth::GroupRank::ADMIN);
 
     db->update(new_group);
-    audit_add_to_group->after(GroupJSONSerializer::to_string(
+    audit_add_to_group->after(GroupJSONStringSerializer::serialize(
         *new_group, SystemSecurityContext::instance()));
     audit_add_to_group->finalize();
 
     // Send the model back to the client, so it knows the ID.
-    rep["data"] = GroupJSONSerializer::to_object(*new_group, security_context());
+    rep["data"] = GroupJSONSerializer::serialize(*new_group, security_context());
     t.commit();
     return rep;
 }
@@ -117,7 +118,7 @@ json GroupCRUD::read_impl(const json &req)
     {
         auto group =
             ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
-        rep["data"] = GroupJSONSerializer::to_object(*group, security_context());
+        rep["data"] = GroupJSONSerializer::serialize(*group, security_context());
     }
     else
     {
@@ -132,7 +133,7 @@ json GroupCRUD::read_impl(const json &req)
                     SecurityContext::Action::GROUP_READ,
                     {.group = {.group_id = group.id()}}))
                 rep["data"].push_back(
-                    GroupJSONSerializer::to_object(group, security_context()));
+                    GroupJSONSerializer::serialize(group, security_context()));
         }
     }
     t.commit();
@@ -149,13 +150,14 @@ json GroupCRUD::update_impl(const json &req)
     auto grp   = ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
     auto audit = Audit::Factory::GroupEvent(db, grp, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_UPDATED);
-    grp->name(req.at("attributes").at("name"));
-    grp->description(extract_with_default(req.at("attributes"), "description", ""));
+
+    GroupJSONSerializer::unserialize(*grp, req.at("attributes"), security_context());
+
     validate_and_unique(grp);
     db->update(grp);
 
     audit->finalize();
-    rep["data"] = GroupJSONSerializer::to_object(*grp, security_context());
+    rep["data"] = GroupJSONSerializer::serialize(*grp, security_context());
     t.commit();
     return rep;
 }

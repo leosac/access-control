@@ -28,7 +28,7 @@
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
-#include <core/auth/serializers/UserGroupMembershipJSONSerializer.hpp>
+#include "core/auth/serializers/UserGroupMembershipSerializer.hpp"
 #include <json.hpp>
 
 using namespace Leosac;
@@ -75,7 +75,7 @@ json MembershipCRUD::create_impl(const json &req)
     db->update(group);
     audit->finalize();
     t.commit();
-    rep["data"] = UserGroupMembershipJSONSerializer::to_object(*membership,
+    rep["data"] = UserGroupMembershipJSONSerializer::serialize(*membership,
                                                                security_context());
     return rep;
 }
@@ -90,7 +90,7 @@ json MembershipCRUD::read_impl(const json &req)
 
     Auth::UserGroupMembershipPtr membership =
         ctx_.dbsrv->find_membership_by_id(mid, DBService::THROW_IF_NOT_FOUND);
-    rep["data"] = UserGroupMembershipJSONSerializer::to_object(*membership,
+    rep["data"] = UserGroupMembershipJSONSerializer::serialize(*membership,
                                                                security_context());
     t.commit();
     return rep;

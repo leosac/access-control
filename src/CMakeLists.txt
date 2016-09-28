@@ -30,8 +30,8 @@ set(LEOSAC_LIB_SRCS
     core/auth/AuthTarget.cpp
     core/auth/User.cpp
     core/auth/serializers/UserSerializer.cpp
-    core/auth/serializers/GroupJSONSerializer.cpp
-    core/auth/serializers/UserGroupMembershipJSONSerializer.cpp
+    core/auth/serializers/GroupSerializer.cpp
+    core/auth/serializers/UserGroupMembershipSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp

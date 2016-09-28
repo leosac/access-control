@@ -21,20 +21,36 @@
 
 #include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/JSONSerializer.hpp"
+#include "tools/Serializer.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
+using json = nlohmann::json;
 
 /**
  * A serializer that handle `Auth::UserGroupMembership` object.
  */
 struct UserGroupMembershipJSONSerializer
-    : public JSONSerializer<Auth::UserGroupMembership>
+    : public Serializer<json, Auth::UserGroupMembership,
+                        UserGroupMembershipJSONSerializer>
 {
-    static std::string to_string(const Auth::UserGroupMembership &ugm,
-                                 const SecurityContext &sc);
-    static json to_object(const Auth::UserGroupMembership &ugm,
+
+    static json serialize(const Auth::UserGroupMembership &ugm,
                           const SecurityContext &sc);
+
+    static void unserialize(Auth::UserGroupMembership &out, const json &in,
+                            const SecurityContext &sc);
+};
+
+struct UserGroupMembershipJSONStringSerializer
+    : public Serializer<std::string, Auth::UserGroupMembership,
+                        UserGroupMembershipJSONSerializer>
+{
+    static std::string serialize(const Auth::UserGroupMembership &in,
+                                 const SecurityContext &sc);
+
+    static void unserialize(Auth::UserGroupMembership &out, const std::string &in,
+                            const SecurityContext &sc);
 };
 }

@@ -18,19 +18,13 @@
 */
 
 #include "core/auth/UserGroupMembership.hpp"
-#include "UserGroupMembershipJSONSerializer.hpp"
+#include "UserGroupMembershipSerializer.hpp"
+#include "tools/JSONUtils.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;
 
-std::string
-UserGroupMembershipJSONSerializer::to_string(const Auth::UserGroupMembership &ugm,
-                                             const SecurityContext &sc)
-{
-    return to_object(ugm, sc).dump(4);
-}
-
-json UserGroupMembershipJSONSerializer::to_object(
+json UserGroupMembershipJSONSerializer::serialize(
     const Auth::UserGroupMembership &membership, const SecurityContext &)
 {
     json serialized{};
@@ -46,4 +40,24 @@ json UserGroupMembershipJSONSerializer::to_object(
         {"data", {{"id", membership.group_id()}, {"type", "group"}}}};
 
     return serialized;
+}
+
+void UserGroupMembershipJSONSerializer::unserialize(Auth::UserGroupMembership &out,
+                                                    const json &in,
+                                                    const SecurityContext &sc)
+{
+    using namespace Leosac::JSONUtil;
+}
+
+std::string UserGroupMembershipJSONStringSerializer::serialize(
+    const Auth::UserGroupMembership &in, const SecurityContext &sc)
+{
+    return UserGroupMembershipJSONSerializer::serialize(in, sc).dump(4);
+}
+
+void UserGroupMembershipJSONStringSerializer::unserialize(
+    Auth::UserGroupMembership &out, const std::string &in, const SecurityContext &sc)
+{
+    auto tmp = json::parse(in);
+    UserGroupMembershipJSONSerializer::unserialize(out, tmp, sc);
 }

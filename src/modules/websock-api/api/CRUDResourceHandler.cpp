@@ -101,7 +101,9 @@ void CRUDResourceHandler::enforce_permission(
     {
         if (!security_ctx.check_permission(action_and_param.first,
                                            action_and_param.second))
+        {
             throw PermissionDenied();
+        }
     }
 }
 
