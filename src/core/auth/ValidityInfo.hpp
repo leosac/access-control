@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "AuthFwd.hpp"
 #include <chrono>
 #include <string>
 
@@ -37,15 +38,16 @@ namespace Auth
 * You can set validity_start to time::min(), and validity_end to time::max
 * if there is no validity date.
 */
-class CredentialValidity
+#pragma db value
+class ValidityInfo
 {
   public:
     /**
     * Default credential is enabled and no time-base limitation.
     */
-    CredentialValidity();
+    ValidityInfo();
 
-    CredentialValidity(const CredentialValidity &) = default;
+    ValidityInfo(const ValidityInfo &) = default;
 
     /**
     * Check that the current date is between
@@ -84,11 +86,15 @@ class CredentialValidity
 
     void set_enabled(bool v);
 
-  private:
     using TimePoint = std::chrono::system_clock::time_point;
 
+  private:
+    friend class odb::access;
+#pragma db type("TIMESTAMP")
     TimePoint validity_start_;
+#pragma db type("TIMESTAMP")
     TimePoint validity_end_;
+
     bool enabled_;
 };
 }

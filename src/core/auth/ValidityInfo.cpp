@@ -17,31 +17,31 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/CredentialValidity.hpp"
+#include "core/auth/ValidityInfo.hpp"
 #include <cassert>
 #include <stdexcept>
 #include <tools/log.hpp>
 
 using namespace Leosac::Auth;
 
-CredentialValidity::CredentialValidity()
+ValidityInfo::ValidityInfo()
     : validity_start_(std::chrono::system_clock::time_point::min())
     , validity_end_(std::chrono::system_clock::time_point::max())
     , enabled_(true)
 {
 }
 
-bool CredentialValidity::is_valid() const
+bool ValidityInfo::is_valid() const
 {
     return is_enabled() && is_in_range();
 }
 
-bool CredentialValidity::is_enabled() const
+bool ValidityInfo::is_enabled() const
 {
     return enabled_;
 }
 
-bool CredentialValidity::is_in_range() const
+bool ValidityInfo::is_in_range() const
 {
     TimePoint now = std::chrono::system_clock::now();
 
@@ -50,7 +50,7 @@ bool CredentialValidity::is_in_range() const
     return false;
 }
 
-void CredentialValidity::set_start_date(const std::string &s)
+void ValidityInfo::set_start_date(const std::string &s)
 {
     if (s.empty())
     {
@@ -71,7 +71,7 @@ void CredentialValidity::set_start_date(const std::string &s)
     }
 }
 
-void CredentialValidity::set_end_date(const std::string &s)
+void ValidityInfo::set_end_date(const std::string &s)
 {
     if (s.empty())
     {
@@ -92,7 +92,7 @@ void CredentialValidity::set_end_date(const std::string &s)
     }
 }
 
-void CredentialValidity::set_enabled(bool v)
+void ValidityInfo::set_enabled(bool v)
 {
     enabled_ = v;
 }

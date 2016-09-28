@@ -83,7 +83,7 @@ using TokenPtr = std::shared_ptr<Token>;
 class IAccessProfile;
 using IAccessProfilePtr = std::shared_ptr<IAccessProfile>;
 
-class CredentialValidity;
+class ValidityInfo;
 
 class AuthTarget;
 using AuthTargetPtr = std::shared_ptr<AuthTarget>;

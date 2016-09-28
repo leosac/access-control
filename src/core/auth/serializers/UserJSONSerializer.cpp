@@ -51,7 +51,8 @@ json UserJSONSerializer::to_object(const Auth::User &user, const SecurityContext
           {"username", user.username()},
           {"firstname", user.firstname()},
           {"lastname", user.lastname()},
-          {"rank", static_cast<int>(user.rank())}}},
+          {"rank", static_cast<int>(user.rank())},
+          {"validity-enabled", user.validity().is_enabled()}}},
         {"relationships", {{"memberships", {{"data", memberships}}}}}};
 
     SecurityContext::ActionParam ap;

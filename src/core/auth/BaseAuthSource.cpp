@@ -77,12 +77,12 @@ void BaseAuthSource::id(const std::string &cred_id)
     id_ = cred_id;
 }
 
-const CredentialValidity &BaseAuthSource::validity() const
+const ValidityInfo &BaseAuthSource::validity() const
 {
     return validity_;
 }
 
-void BaseAuthSource::validity(const CredentialValidity &c)
+void BaseAuthSource::validity(const ValidityInfo &c)
 {
     validity_ = c;
 }

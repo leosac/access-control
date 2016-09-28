@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "core/auth/CredentialValidity.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
+#include "core/auth/ValidityInfo.hpp"
 #include <memory>
 #include <vector>
 
@@ -65,9 +65,9 @@ class BaseAuthSource : public IAuthenticationSource
 
     void id(const std::string &cred_id) override;
 
-    virtual const CredentialValidity &validity() const override;
+    virtual const ValidityInfo &validity() const override;
 
-    virtual void validity(const CredentialValidity &c) override;
+    virtual void validity(const ValidityInfo &c) override;
 
   protected:
     /**
@@ -90,7 +90,7 @@ class BaseAuthSource : public IAuthenticationSource
     */
     std::string id_;
 
-    CredentialValidity validity_;
+    ValidityInfo validity_;
 
     IAccessProfilePtr profile_;
 };

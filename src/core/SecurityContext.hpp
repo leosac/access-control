@@ -42,10 +42,17 @@ class SecurityContext
         USER_READ,
         USER_READ_EMAIL,
         USER_UPDATE,
+        USER_CHANGE_PASSWORD,
+
         /**
          * Editing rank means being able to become administrator.
          */
         USER_UPDATE_RANK,
+        /**
+         * Can we enable/disable the user or change its
+         * validity period ?
+         */
+        USER_MANAGE_VALIDITY,
         USER_DELETE,
 
         GROUP_CREATE,
@@ -61,6 +68,8 @@ class SecurityContext
         GROUP_MEMBERSHIP_JOINED,
         GROUP_MEMBERSHIP_LEFT,
         MEMBERSHIP_READ,
+
+        LOG_READ,
     };
 
     struct GroupActionParam

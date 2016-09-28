@@ -22,7 +22,7 @@
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
 #include "tools/log.hpp"
-#include <core/auth/Auth.hpp>
+#include "core/auth/Auth.hpp"
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;

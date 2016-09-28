@@ -72,6 +72,8 @@ class WSSecurityContext : public SecurityContext
      */
     bool is_manager() const;
 
+    bool is_self(Auth::UserId) const;
+
     Auth::UserId user_id_;
 };
 }

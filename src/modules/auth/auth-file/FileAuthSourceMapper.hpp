@@ -135,7 +135,7 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     Leosac::Auth::IAccessProfilePtr
     merge_profiles(const std::vector<Leosac::Auth::IAccessProfilePtr> profiles);
 
-    Leosac::Auth::CredentialValidity
+    Leosac::Auth::ValidityInfo
     extract_credentials_validity(const boost::property_tree::ptree &node);
 
     /**

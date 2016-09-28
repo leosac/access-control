@@ -56,7 +56,10 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     case Action::USER_UPDATE:
         return can_update_user(ap.user);
     case Action::USER_UPDATE_RANK:
-        return is_admin();
+    case Action::USER_MANAGE_VALIDITY:
+        return is_manager();
+    case Action::USER_CHANGE_PASSWORD:
+        return is_manager() || is_self(ap.user.user_id);
 
     case Action::GROUP_CREATE:
         return true;
@@ -73,6 +76,9 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
         return can_create_membership(ap.membership);
     case Action::GROUP_MEMBERSHIP_LEFT:
         return can_delete_membership(ap.membership);
+
+    case Action::LOG_READ:
+        return is_manager();
     default:
         ASSERT_LOG(0, "Not handled.");
     }
@@ -194,4 +200,9 @@ bool WSSecurityContext::is_manager() const
     if (user)
         return user->rank() == Auth::UserRank::ADMIN;
     return false;
+}
+
+bool WSSecurityContext::is_self(Auth::UserId id) const
+{
+    return user_id_ == id;
 }

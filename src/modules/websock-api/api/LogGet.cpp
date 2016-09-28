@@ -22,7 +22,6 @@
 #include "LogEntry_odb.h"
 #include "User_odb.h"
 #include "api/APISession.hpp"
-#include "conditions/IsCurrentUserAdmin.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
@@ -38,10 +37,15 @@ MethodHandlerUPtr LogGet::create(RequestContext ctx)
 {
     auto instance = std::make_unique<LogGet>(ctx);
 
+    auto is_allowed = [ ptr = instance.get(), ctx = ctx ](const json &)
+    {
+        SecurityContext::ActionParam ap;
+        return ctx.session->security_context().check_permission(
+            SecurityContext::Action::LOG_READ, ap);
+    };
+
     // Only administrator can check log.
-    instance->add_conditions_or(
-        []() { throw PermissionDenied(); },
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)));
+    instance->add_conditions_or([]() { throw PermissionDenied(); }, is_allowed);
     return std::move(instance);
 }
 

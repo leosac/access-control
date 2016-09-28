@@ -65,6 +65,7 @@ Auth::TokenPtr APIAuth::authenticate_token(const std::string &token_str) const
     Auth::TokenPtr token(db->query_one<Auth::Token>(query::token == token_str));
     if (token && token->is_valid())
     {
+        enforce_user_enabled(*token->owner());
         token->expire_in(std::chrono::minutes(20));
         db->update(token);
         t.commit();
@@ -88,6 +89,7 @@ Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
             db->query_one<Auth::User>(query::username == username_lowercase);
         if (user && user->verify_password(password))
         {
+            enforce_user_enabled(*user);
             // Create new token.
             auto token = std::make_shared<Auth::Token>(gen_uuid(), user);
             // Valid for 20m
@@ -98,4 +100,14 @@ Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
         }
     }
     return nullptr;
+}
+
+void APIAuth::enforce_user_enabled(const Auth::User &u) const
+{
+    const auto &validity = u.validity();
+    if (!validity.is_enabled())
+        throw LEOSACException(BUILD_STR("This user account is disabled."));
+    if (!validity.is_in_range())
+        throw LEOSACException(
+            BUILD_STR("This user account is not currently active."));
 }

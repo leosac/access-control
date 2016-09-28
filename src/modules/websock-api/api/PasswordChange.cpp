@@ -22,7 +22,6 @@
 #include "User_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
-#include "conditions/IsCurrentUserAdmin.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "exception/EntityNotFound.hpp"
@@ -41,18 +40,17 @@ MethodHandlerUPtr PasswordChange::create(RequestContext ctx)
 {
     auto instance = std::make_unique<PasswordChange>(ctx);
 
-    // Change self password, or is an administrator and
-    // can change anyone's password.
-
-    auto is_self = [ptr = instance.get()](const json &req)
+    auto is_allowed = [ ptr = instance.get(), ctx = ctx ](const json &req)
     {
-        auto uid = req.at("user_id").get<Auth::UserId>();
-        return ptr->ctx_.session->current_user_id() == uid;
+        SecurityContext::UserActionParam uap;
+        uap.user_id = req.at("user_id").get<Auth::UserId>();
+        SecurityContext::ActionParam ap;
+        ap.user = uap;
+        return ctx.session->security_context().check_permission(
+            SecurityContext::Action::USER_CHANGE_PASSWORD, ap);
     };
 
-    instance->add_conditions_or(
-        []() { throw PermissionDenied(); },
-        Conditions::wrap(Conditions::IsCurrentUserAdmin(ctx)), is_self);
+    instance->add_conditions_or([]() { throw PermissionDenied(); }, is_allowed);
     return std::move(instance);
 }
 

@@ -105,12 +105,12 @@ void User::email(std::string const &e)
     email_ = e;
 }
 
-const CredentialValidity &User::validity() const
+const ValidityInfo &User::validity() const
 {
     return validity_;
 }
 
-void User::validity(const CredentialValidity &c)
+void User::validity(const ValidityInfo &c)
 {
     validity_ = c;
 }

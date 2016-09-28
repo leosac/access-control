@@ -156,6 +156,14 @@ json UserCRUD::update_impl(const json &req)
         user->rank(static_cast<Auth::UserRank>(extract_with_default(
             attributes, "rank", static_cast<int>(user->rank()))));
     }
+    if (security_context().check_permission(
+            SecurityContext::Action::USER_MANAGE_VALIDITY, ap))
+    {
+        auto validity = user->validity();
+        validity.set_enabled(extract_with_default(attributes, "validity-enabled",
+                                                  validity.is_enabled()));
+        user->validity(validity);
+    }
 
     audit->after(
         UserJSONSerializer::to_string(*user, SystemSecurityContext::instance()));

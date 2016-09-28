@@ -21,8 +21,6 @@
 #include "Exceptions.hpp"
 #include "Group_odb.h"
 #include "api/APISession.hpp"
-#include "conditions/IsCurrentUserAdmin.hpp"
-#include "conditions/IsInGroup.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IGroupEvent.hpp"
 #include "core/auth/User.hpp"

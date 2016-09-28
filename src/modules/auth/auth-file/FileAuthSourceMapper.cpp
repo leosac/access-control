@@ -443,10 +443,10 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
     }
 }
 
-Leosac::Auth::CredentialValidity FileAuthSourceMapper::extract_credentials_validity(
+Leosac::Auth::ValidityInfo FileAuthSourceMapper::extract_credentials_validity(
     const boost::property_tree::ptree &node)
 {
-    CredentialValidity v;
+    ValidityInfo v;
 
     v.set_start_date(node.get<std::string>("validity_start", ""));
     v.set_end_date(node.get<std::string>("validity_end", ""));

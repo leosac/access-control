@@ -14,10 +14,6 @@ set(WEBSOCK_API_SRCS
         api/GroupCRUD.cpp
         api/UserCRUD.cpp
         api/WiegandCardCRUD.cpp
-        conditions/ConditionBase.cpp
-        conditions/IsCurrentUserAdmin.cpp
-        conditions/IsAuthenticated.cpp
-        conditions/IsInGroup.cpp
         WSSecurityContext.cpp
         api/MembershipCRUD.cpp
         )

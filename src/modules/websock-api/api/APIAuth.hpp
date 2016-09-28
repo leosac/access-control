@@ -76,6 +76,12 @@ class APIAuth
 
   private:
     /**
+     * Make sure the User `u` is authorized to log in. This means
+     * that we check that their ValidityInfo is valid.
+     */
+    void enforce_user_enabled(const Auth::User &u) const;
+
+    /**
      * Reference to the Websocket server.
      * The websocket server is guaranteed to
      * outlive the APIAuth object.

@@ -20,9 +20,9 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
-#include "core/auth/CredentialValidity.hpp"
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/UserGroupMembership.hpp"
+#include "core/auth/ValidityInfo.hpp"
 #include "tools/db/database.hpp"
 #include "tools/scrypt/Scrypt.hpp"
 #include <memory>
@@ -88,12 +88,12 @@ class User
     const std::string &firstname() const;
     const std::string &lastname() const;
     const std::string &email() const;
-    const CredentialValidity &validity() const;
+    const ValidityInfo &validity() const;
 
     void firstname(const std::string &);
     void lastname(const std::string &);
     void email(const std::string &);
-    void validity(const CredentialValidity &c);
+    void validity(const ValidityInfo &c);
 
     /**
     * Check the credentials validity object.
@@ -146,11 +146,10 @@ class User
 #pragma db not_null
     UserRank rank_;
 
-/**
-* A user can have the same validity than credentials.
-*/
-#pragma db transient
-    CredentialValidity validity_;
+    /**
+    * A user can have the same validity than credentials.
+    */
+    ValidityInfo validity_;
 #pragma db transient
     IAccessProfilePtr profile_;
 

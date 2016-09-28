@@ -17,22 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "IsCurrentUserAdmin.hpp"
-#include "api/APISession.hpp"
-#include "core/auth/User.hpp"
+#pragma once
 
-using namespace Leosac;
-using namespace Leosac::Module;
-using namespace Leosac::Module::WebSockAPI;
-using namespace Leosac::Module::WebSockAPI::Conditions;
-
-IsCurrentUserAdmin::IsCurrentUserAdmin(RequestContext ctx)
-    : ConditionBase(ctx)
-{
-}
-
-bool IsCurrentUserAdmin::operator()()
-{
-    auto user = ctx_.session->current_user();
-    return user && user->rank() == Auth::UserRank::ADMIN;
-}
+#include "tools/db/STDTimePointODB.hpp"
+#include "tools/db/ScryptResultODB.hpp"

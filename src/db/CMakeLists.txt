@@ -31,6 +31,7 @@ set(OdbCMake_ODB_HEADERS_AUTH
         ${CMAKE_SOURCE_DIR}/src/core/auth/Group.hpp
         ${CMAKE_SOURCE_DIR}/src/core/auth/Token.hpp
         ${CMAKE_SOURCE_DIR}/src/core/auth/UserGroupMembership.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/auth/ValidityInfo.hpp
         )
 
 set(OdbCMake_SOURCES_AUTH "")
@@ -44,7 +45,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         SCHEMA_FORMAT embedded
         SCHEMA_NAME auth
         PROFILE "boost/date-time"
-        HXX_PROLOGUE "#include \"tools/db/ScryptResultODB.hpp\""
+        HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         INCLUDE_PREFIX core/auth/
         INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
