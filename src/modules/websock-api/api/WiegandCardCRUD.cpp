@@ -21,6 +21,7 @@
 #include "Credential_odb.h"
 #include "core/credentials/Credential.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
+#include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
@@ -64,7 +65,8 @@ json WiegandCardCRUD::read_impl(const json &req)
     {
         Cred::ICredentialPtr cred =
             ctx_.dbsrv->find_credential_by_id(cid, DBService::THROW_IF_NOT_FOUND);
-        rep["data"] = CredentialJSONSerializer::serialize(*cred, security_context());
+        rep["data"] = PolymorphicCredentialJSONSerializer::serialize(
+            *cred, security_context());
     }
     else
     {
@@ -72,8 +74,8 @@ json WiegandCardCRUD::read_impl(const json &req)
         rep["data"]   = json::array();
         for (const auto &cred : result)
         {
-            rep["data"].push_back(
-                CredentialJSONSerializer::serialize(cred, security_context()));
+            rep["data"].push_back(PolymorphicCredentialJSONSerializer::serialize(
+                cred, security_context()));
         }
     }
     t.commit();

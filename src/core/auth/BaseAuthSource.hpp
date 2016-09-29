@@ -34,6 +34,8 @@ using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
 class BaseAuthSource : public IAuthenticationSource
 {
   public:
+    MAKE_VISITABLE();
+
     BaseAuthSource(const std::string &id = "");
     virtual ~BaseAuthSource()            = default;
     virtual void addAuthSource(IAuthenticationSourcePtr source) override;

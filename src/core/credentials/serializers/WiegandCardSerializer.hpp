@@ -19,21 +19,24 @@
 
 #pragma once
 
-#include <memory>
+#include "core/credentials/CredentialFwd.hpp"
+#include "tools/Serializer.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
-namespace Cred
+using json = nlohmann::json;
+
+/**
+ * A serializer that handle `Cred::IWiegandCard` object.
+ */
+struct WiegandCardJSONSerializer
+    : public Serializer<json, Cred::IWiegandCard, WiegandCardJSONSerializer>
 {
+    static json serialize(const Cred::IWiegandCard &in, const SecurityContext &sc);
 
-// Credentials
-class ICredential;
-using ICredentialPtr = std::shared_ptr<ICredential>;
-
-class Credential;
-using CredentialId  = unsigned long;
-using CredentialPtr = std::shared_ptr<Credential>;
-
-class IWiegandCard;
-}
+    static void unserialize(Cred::IWiegandCard &out, const json &in,
+                            const SecurityContext &sc);
+};
 }

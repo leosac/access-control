@@ -39,6 +39,8 @@ set(LEOSAC_LIB_SRCS
     core/credentials/Credential.cpp
     core/credentials/WiegandCard.cpp
     core/credentials/serializers/CredentialSerializer.cpp
+    core/credentials/serializers/WiegandCardSerializer.cpp
+    core/credentials/serializers/PolymorphicCredentialSerializer.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp

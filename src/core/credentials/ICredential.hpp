@@ -21,6 +21,7 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "tools/IVisitable.hpp"
 #include <memory>
 
 namespace Leosac
@@ -30,9 +31,15 @@ namespace Cred
 /**
  * Base interface for credential objects.
  */
-class ICredential
+class ICredential : public virtual Tools::IVisitable
 {
   public:
+    MAKE_VISITABLE();
+    // todo remove this when upgrading visitor infrastructure.
+    virtual void accept(Tools::IVisitor *)
+    {
+    }
+
     /**
      * Retrieve the identifier of the credential.
      */

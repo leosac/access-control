@@ -38,6 +38,8 @@ using WiegandCardPinPtr = std::shared_ptr<WiegandCardPin>;
 class WiegandCardPin : public BaseAuthSource
 {
   public:
+    MAKE_VISITABLE();
+
     /**
     * Create a WiegandCardPin object.
     *

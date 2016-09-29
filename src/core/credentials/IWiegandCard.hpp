@@ -33,6 +33,8 @@ namespace Cred
 class IWiegandCard : public virtual ICredential
 {
   public:
+    MAKE_VISITABLE();
+
     virtual const std::string &card_id() const = 0;
     virtual int nb_bits() const                = 0;
 

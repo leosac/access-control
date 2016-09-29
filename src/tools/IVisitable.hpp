@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include "tools/Visitor.hpp"
+#include <cassert>
+
 namespace Leosac
 {
 namespace Tools
@@ -26,9 +29,17 @@ namespace Tools
 class IVisitor;
 
 /**
-* Provide an interface that visitable object must implement.
-*
-* @see Leosac::Tools::IVisitor
+* Base class to make an object visitable.
+ *
+ * An type wishing to be visitable can simply inherit from this
+ * class and call the `MAKE_VISITABLE()` macro in a public section of
+ * its definition.
+ *
+ * The visitor/visitable infrastructure is NOT statically checked. What
+ * this means is that `accept()`ing a visitor that is not able to visit
+ * us will result in an assert.
+ *
+* @see Leosac::Tools::Visitor
 */
 class IVisitable
 {
@@ -39,7 +50,45 @@ class IVisitable
     *
     * @note This must be reimplemented by **all** subclass.
     */
-    virtual void accept(IVisitor *) = 0;
+    virtual void accept(IVisitor *){};
+
+    // Support for more generic visitor.
+    virtual void accept(::Leosac::Tools::BaseVisitor &) = 0;
+
+    /**
+     * Accept a visitor that will not mutate `this`.
+     */
+    virtual void accept(::Leosac::Tools::BaseVisitor &) const = 0;
+
+  protected:
+    template <class T>
+    static void visitor_dispatch(T &visited, BaseVisitor &visitor)
+    {
+        using VisitedT = std::remove_reference_t<std::remove_const_t<T>>;
+        if (Visitor<VisitedT> *p = dynamic_cast<Visitor<VisitedT> *>(&visitor))
+        {
+            p->visit(visited);
+            return;
+        }
+        assert(0 && "Cannot visit.");
+    }
+
+/**
+ * Provide the object calling this macro in its definition with an
+ * `accept()` method that will accept `BaseVisitor` client.
+ *
+ * Those visitors will be dispatched accordingly by the
+ * `visitor_dispatch()` static method.
+ */
+#define MAKE_VISITABLE()                                                            \
+    virtual void accept(::Leosac::Tools::BaseVisitor &v) override                   \
+    {                                                                               \
+        visitor_dispatch(*this, v);                                                 \
+    }                                                                               \
+    virtual void accept(::Leosac::Tools::BaseVisitor &v) const override             \
+    {                                                                               \
+        visitor_dispatch(*this, v);                                                 \
+    }
 };
 }
 }

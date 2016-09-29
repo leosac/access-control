@@ -38,6 +38,8 @@ using PINCodePtr = std::shared_ptr<PINCode>;
 class PINCode : public BaseAuthSource
 {
   public:
+    MAKE_VISITABLE();
+
     /**
     * Create a PINCode object.
     *
