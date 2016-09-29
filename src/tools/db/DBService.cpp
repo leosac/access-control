@@ -18,6 +18,7 @@
 */
 
 #include "DBService.hpp"
+#include "Credential_odb.h"
 #include "DatabaseTracer.hpp"
 #include "Group_odb.h"
 #include "OptionalTransaction.hpp"
@@ -75,4 +76,15 @@ DBService::find_membership_by_id(const Auth::UserGroupMembershipId &id, Flag fla
     if (!ugm && flags & Flag::THROW_IF_NOT_FOUND)
         throw EntityNotFound(id, "user-group-membership");
     return ugm;
+}
+
+Cred::ICredentialPtr DBService::find_credential_by_id(const Cred::CredentialId &id,
+                                                      DBService::Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto cred = database_->find<Cred::Credential>(id);
+    t.commit();
+    if (!cred && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "credential");
+    return cred;
 }

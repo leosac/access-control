@@ -34,9 +34,20 @@ class ICredential
 {
   public:
     /**
+     * Retrieve the identifier of the credential.
+     */
+    virtual CredentialId id() const = 0;
+
+    /**
      * Retrieve the owner of the credential.
      */
     virtual Auth::UserLPtr owner() const = 0;
+
+    /**
+     * Returns the `id` of the owner, or 0 if there is
+     * no owner (or the owner has no id).
+     */
+    virtual Auth::UserId owner_id() const = 0;
 
     /**
      * Set a new owner for the credential.
@@ -47,6 +58,17 @@ class ICredential
      * An alias for the credential.
      */
     virtual std::string alias() const = 0;
+
+    /**
+     * Set the alias for the credential.
+     */
+    virtual void alias(const std::string &) = 0;
+
+    /**
+     * Credentials are "optimistic" object (wrt ODB). This means they
+     * carry a `version` field. This method returns the version.
+     */
+    virtual size_t odb_version() const = 0;
 };
 }
 }

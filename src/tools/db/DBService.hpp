@@ -21,6 +21,7 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "tools/db/db_fwd.hpp"
+#include <core/credentials/ICredential.hpp>
 
 namespace Leosac
 {
@@ -62,6 +63,9 @@ class DBService
     Auth::UserGroupMembershipPtr
     find_membership_by_id(const Auth::UserGroupMembershipId &id,
                           Flag f = Flag::DEFAULT);
+
+    Cred::ICredentialPtr find_credential_by_id(const Cred::CredentialId &id,
+                                               Flag f = Flag::DEFAULT);
 
   private:
     DBPtr database_;

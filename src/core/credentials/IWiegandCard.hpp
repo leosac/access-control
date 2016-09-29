@@ -30,11 +30,14 @@ namespace Cred
  * Base interface for credential objects.
  *
  */
-class IWiegandCard : public ICredential
+class IWiegandCard : public virtual ICredential
 {
   public:
     virtual const std::string &card_id() const = 0;
     virtual int nb_bits() const                = 0;
+
+    virtual void nb_bits(int)                 = 0;
+    virtual void card_id(const std::string &) = 0;
 
     /**
      * Returns the integer representation of the

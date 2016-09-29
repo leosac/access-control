@@ -19,7 +19,10 @@
 
 #include "kernel.hpp"
 #include "User_odb.h"
+#include "WiegandCard_odb.h"
+#include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
+#include "core/credentials/WiegandCard.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
@@ -35,7 +38,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
-#include <core/auth/Group.hpp>
 #include <fstream>
 #include <odb/mysql/database.hxx>
 #include <odb/pgsql/database.hxx>
@@ -498,6 +500,7 @@ void Kernel::configure_database()
             {
                 using namespace odb;
                 using namespace odb::core;
+                Auth::UserPtr admin;
 
                 schema_version v(database_->schema_version("tools"));
                 if (v == 0)
@@ -513,7 +516,7 @@ void Kernel::configure_database()
                     transaction t(database_->begin());
                     schema_catalog::create_schema(*database_, "auth");
 
-                    Auth::UserPtr admin = std::make_shared<Auth::User>();
+                    admin = std::make_shared<Auth::User>();
                     admin->firstname("Admin");
                     admin->lastname("ADMIN");
                     admin->username("admin");
@@ -553,6 +556,15 @@ void Kernel::configure_database()
                 {
                     transaction t(database_->begin());
                     schema_catalog::create_schema(*database_, "credentials");
+                    t.commit();
+
+                    t.reset(database_->begin());
+                    Cred::WiegandCard card;
+                    card.owner(admin);
+                    card.alias(std::string("BestCardEver"));
+                    card.card_id("00:11:22:33");
+                    card.nb_bits(32);
+                    database_->persist(card);
                     t.commit();
                 }
             }

@@ -18,6 +18,10 @@
 */
 
 #include "api/WiegandCardCRUD.hpp"
+#include "Credential_odb.h"
+#include "core/credentials/Credential.hpp"
+#include "core/credentials/serializers/CredentialSerializer.hpp"
+#include "tools/db/DBService.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -28,16 +32,18 @@ WiegandCardCRUD::WiegandCardCRUD(RequestContext ctx)
 {
 }
 
-CRUDResourceHandlerUPtr WiegandCardCRUD::instanciate(RequestContext)
+CRUDResourceHandlerUPtr WiegandCardCRUD::instanciate(RequestContext ctx)
 {
-    return Leosac::Module::WebSockAPI::CRUDResourceHandlerUPtr();
+    auto instance = CRUDResourceHandlerUPtr(new WiegandCardCRUD(ctx));
+
+    return instance;
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>
 WiegandCardCRUD::required_permission(CRUDResourceHandler::Verb verb,
                                      const json &req) const
 {
-    return std::vector<CRUDResourceHandler::ActionActionParam>();
+    return {};
 }
 
 json WiegandCardCRUD::create_impl(const json &req)
@@ -47,7 +53,31 @@ json WiegandCardCRUD::create_impl(const json &req)
 
 json WiegandCardCRUD::read_impl(const json &req)
 {
-    return Leosac::Module::WebSockAPI::json();
+    json rep;
+
+    using Result = odb::result<Cred::Credential>;
+    DBPtr db     = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+    auto cid = req.at("credential_id").get<Auth::UserId>();
+
+    if (cid != 0)
+    {
+        Cred::ICredentialPtr cred =
+            ctx_.dbsrv->find_credential_by_id(cid, DBService::THROW_IF_NOT_FOUND);
+        rep["data"] = CredentialJSONSerializer::serialize(*cred, security_context());
+    }
+    else
+    {
+        Result result = db->query<Cred::Credential>();
+        rep["data"]   = json::array();
+        for (const auto &cred : result)
+        {
+            rep["data"].push_back(
+                CredentialJSONSerializer::serialize(cred, security_context()));
+        }
+    }
+    t.commit();
+    return rep;
 }
 
 json WiegandCardCRUD::update_impl(const json &req)

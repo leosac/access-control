@@ -31,17 +31,26 @@ namespace Cred
  * An ODB enabled credential object.
  */
 #pragma db object polymorphic optimistic
-class Credential : public ICredential
+class Credential : public virtual ICredential
 {
   public:
+    Credential();
     virtual Auth::UserLPtr owner() const override;
 
     virtual void owner(Auth::UserPtr ptr) override;
 
     virtual std::string alias() const override;
 
+    virtual CredentialId id() const override;
+
+    virtual size_t odb_version() const override;
+
+    virtual Auth::UserId owner_id() const override;
+
+    virtual void alias(const std::string &id) override;
+
   protected:
-#pragma db id
+#pragma db id auto
     CredentialId id_;
 
     Auth::UserLPtr owner_;

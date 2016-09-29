@@ -30,7 +30,7 @@ namespace Cred
  * A WiegandCard credential.
  */
 #pragma db object polymorphic optimistic
-class WiegandCard : public IWiegandCard, public Credential
+class WiegandCard : public virtual IWiegandCard, public Credential
 {
   public:
     virtual const std::string &card_id() const override;
@@ -40,6 +40,10 @@ class WiegandCard : public IWiegandCard, public Credential
     virtual uint64_t to_int() const override;
 
     virtual uint64_t to_raw_int() const override;
+
+    void nb_bits(int i) override;
+
+    void card_id(const std::string &string) override;
 
   protected:
     int nb_bits_;

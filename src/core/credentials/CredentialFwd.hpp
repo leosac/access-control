@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <memory>
+
 namespace Leosac
 {
 namespace Cred

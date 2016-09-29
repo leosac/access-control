@@ -89,3 +89,13 @@ uint64_t WiegandCard::to_wiegand_34() const
     tmp &= 0xFFFFFF;
     return tmp;
 }
+
+void WiegandCard::nb_bits(int i)
+{
+    nb_bits_ = i;
+}
+
+void WiegandCard::card_id(const std::string &id)
+{
+    card_id_ = id;
+}

@@ -25,6 +25,7 @@
 #include "api/MembershipCRUD.hpp"
 #include "api/PasswordChange.hpp"
 #include "api/UserCRUD.hpp"
+#include "api/WiegandCardCRUD.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
@@ -74,6 +75,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);
     register_crud_handler("user-group-membership",
                           &WebSockAPI::MembershipCRUD::instanciate);
+    register_crud_handler("credential", &WebSockAPI::WiegandCardCRUD::instanciate);
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)

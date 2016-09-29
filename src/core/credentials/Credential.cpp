@@ -18,9 +18,15 @@
 */
 
 #include "core/credentials/Credential.hpp"
+#include "User_odb.h"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
+
+Credential::Credential()
+    : id_(0)
+{
+}
 
 Auth::UserLPtr Credential::owner() const
 {
@@ -35,4 +41,24 @@ void Credential::owner(Auth::UserPtr ptr)
 std::string Credential::alias() const
 {
     return alias_;
+}
+
+CredentialId Credential::id() const
+{
+    return id_;
+}
+
+size_t Credential::odb_version() const
+{
+    return odb_version_;
+}
+
+Auth::UserId Credential::owner_id() const
+{
+    return owner_.object_id();
+}
+
+void Credential::alias(const std::string &alias)
+{
+    alias_ = alias;
 }

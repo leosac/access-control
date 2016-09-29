@@ -38,6 +38,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/ValidityInfo.cpp
     core/credentials/Credential.cpp
     core/credentials/WiegandCard.cpp
+    core/credentials/serializers/CredentialSerializer.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
