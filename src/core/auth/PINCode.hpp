@@ -22,7 +22,6 @@
 #include "core/auth/BaseAuthSource.hpp"
 #include <sstream>
 #include <string>
-#include <tools/IVisitor.hpp>
 
 namespace Leosac
 {
@@ -48,11 +47,6 @@ class PINCode : public BaseAuthSource
     PINCode(const std::string &pin)
         : pin_code_(pin)
     {
-    }
-
-    virtual void accept(Tools::IVisitor *visitor) override
-    {
-        visitor->visit(this);
     }
 
     const std::string &pin_code() const

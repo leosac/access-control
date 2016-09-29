@@ -35,10 +35,6 @@ class ICredential : public virtual Tools::IVisitable
 {
   public:
     MAKE_VISITABLE();
-    // todo remove this when upgrading visitor infrastructure.
-    virtual void accept(Tools::IVisitor *)
-    {
-    }
 
     /**
      * Retrieve the identifier of the credential.

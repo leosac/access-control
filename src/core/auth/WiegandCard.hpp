@@ -45,8 +45,6 @@ class WiegandCard : public BaseAuthSource
     */
     WiegandCard(const std::string &cardid, int bits);
 
-    virtual void accept(Tools::IVisitor *visitor) override;
-
     /**
     * Returns the id of the card, as a hexadecimal string.
     */

@@ -18,7 +18,6 @@
 */
 
 #include "BaseAuthSource.hpp"
-#include "tools/IVisitor.hpp"
 
 using namespace Leosac::Auth;
 
@@ -45,11 +44,6 @@ UserPtr BaseAuthSource::owner() const
 IAccessProfilePtr BaseAuthSource::profile() const
 {
     return profile_;
-}
-
-void BaseAuthSource::accept(Leosac::Tools::IVisitor *visitor)
-{
-    visitor->visit(this);
 }
 
 const std::string &BaseAuthSource::name() const

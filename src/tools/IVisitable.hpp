@@ -26,7 +26,6 @@ namespace Leosac
 {
 namespace Tools
 {
-class IVisitor;
 
 /**
 * Base class to make an object visitable.
@@ -44,15 +43,6 @@ class IVisitor;
 class IVisitable
 {
   public:
-    /**
-    * Accept a visitor.
-    * @param Visitor shall inherits from the IVisitor interface.
-    *
-    * @note This must be reimplemented by **all** subclass.
-    */
-    virtual void accept(IVisitor *){};
-
-    // Support for more generic visitor.
     virtual void accept(::Leosac::Tools::BaseVisitor &) = 0;
 
     /**

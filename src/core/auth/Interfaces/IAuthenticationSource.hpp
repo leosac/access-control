@@ -42,8 +42,6 @@ class IAuthenticationSource : public Tools::IVisitable
   public:
     virtual ~IAuthenticationSource() = default;
 
-    virtual void accept(Tools::IVisitor *visitor) override = 0;
-
     /**
     * Adds a new authentication sources as a subsource of this one.
     */

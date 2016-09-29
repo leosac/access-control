@@ -23,7 +23,6 @@
 #include "core/auth/PINCode.hpp"
 #include "core/auth/WiegandCard.hpp"
 #include <string>
-#include <tools/IVisitor.hpp>
 
 namespace Leosac
 {
@@ -47,11 +46,6 @@ class WiegandCardPin : public BaseAuthSource
     */
     WiegandCardPin(const std::string &card_id, int nb_bits,
                    const std::string &pin_code);
-
-    virtual void accept(Tools::IVisitor *visitor) override
-    {
-        visitor->visit(this);
-    }
 
     const WiegandCard &card() const;
     const PINCode &pin() const;

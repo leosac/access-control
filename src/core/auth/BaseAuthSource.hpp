@@ -40,8 +40,6 @@ class BaseAuthSource : public IAuthenticationSource
     virtual ~BaseAuthSource()            = default;
     virtual void addAuthSource(IAuthenticationSourcePtr source) override;
 
-    virtual void accept(Tools::IVisitor *visitor) override;
-
     virtual void owner(UserPtr user) override;
 
     virtual UserPtr owner() const override;

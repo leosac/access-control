@@ -21,12 +21,16 @@
 
 #include "core/auth/Group.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
-#include "tools/IVisitor.hpp"
+#include "tools/Visitor.hpp"
 
 namespace Leosac
 {
 namespace Auth
 {
+class WiegandCard;
+class PINCode;
+class WiegandCardPin;
+
 /**
 * Base class to perform abstracted mapping operation over
 * various AuthSource object.
@@ -36,7 +40,9 @@ namespace Auth
 * with various backend (database, file, ...). Theses shall be able to operate
 * on various AuthSource (card, pin code, fingerprint).
 */
-class IAuthSourceMapper : public Leosac::Tools::IVisitor
+class IAuthSourceMapper : public Leosac::Tools::Visitor<WiegandCard>,
+                          public Leosac::Tools::Visitor<PINCode>,
+                          public Leosac::Tools::Visitor<WiegandCardPin>
 {
   public:
     virtual ~IAuthSourceMapper() = default;

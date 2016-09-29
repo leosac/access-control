@@ -49,9 +49,9 @@ class IVisitable;
  * For this to work, the `T` object needs to subclass IVisitable and use
  * the `MAKE_VISITABLE()` macro.
  *
- * @note You have to implement the "const version" (targeting a `const Visitable`)
- * of the `visit()` method. By default, the non-const version will forward to the
- * const version.
+ * The Visitor<T> class declare and define 2 `visit()` methods. One for
+ * `const Visitable` and one for non-const Visitable. By default the non-const
+ * version forward the call to the const version.
  */
 template <typename T>
 class Visitor : public virtual BaseVisitor
@@ -59,11 +59,14 @@ class Visitor : public virtual BaseVisitor
   public:
     using VisitableT = std::remove_reference_t<std::remove_const_t<T>>;
 
-    static_assert(std::is_base_of<IVisitable, VisitableT>::value,
-                  "Trying to implement a visitor for a type that doesn't implement "
-                  "IVisitable.");
+    // While correct, this forces additional includes.
+    // static_assert(std::is_base_of<IVisitable, VisitableT>::value,
+    //             "Trying to implement a visitor for a type that doesn't implement "
+    //           "IVisitable.");
 
-    virtual void visit(const VisitableT &) = 0;
+    virtual void visit(const VisitableT &)
+    {
+    }
     virtual void visit(VisitableT &visitable)
     {
         visit(const_cast<const VisitableT &>(visitable));

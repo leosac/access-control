@@ -82,9 +82,9 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file)
     }
 }
 
-void FileAuthSourceMapper::visit(WiegandCard *src)
+void FileAuthSourceMapper::visit(WiegandCard &src)
 {
-    auto it = wiegand_cards_.find(src->card_id());
+    auto it = wiegand_cards_.find(src.card_id());
     if (it != wiegand_cards_.end())
     {
         // By copying our instance of the credential to the
@@ -92,14 +92,14 @@ void FileAuthSourceMapper::visit(WiegandCard *src)
         // (like owner) and made them accessible to them.
         auto cred = it->second;
         // the auth source name is only set in the original credential object
-        cred->name(src->name());
-        *src = *cred;
+        cred->name(src.name());
+        src = *cred;
     }
 }
 
-void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
+void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode &src)
 {
-    auto it = pin_codes_.find(src->pin_code());
+    auto it = pin_codes_.find(src.pin_code());
     if (it != pin_codes_.end())
     {
         // By copying our instance of the credential to the
@@ -107,14 +107,14 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode *src)
         // (like owner) and made them accessible to them.
         auto cred = it->second;
         // the auth source name is only set in the original credential object
-        cred->name(src->name());
-        *src = *cred;
+        cred->name(src.name());
+        src = *cred;
     }
 }
 
-void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
+void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin &src)
 {
-    auto key = std::make_pair(src->card().card_id(), src->pin().pin_code());
+    auto key = std::make_pair(src.card().card_id(), src.pin().pin_code());
 
     auto it = wiegand_cards_pins_.find(key);
     if (it != wiegand_cards_pins_.end())
@@ -124,8 +124,8 @@ void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin *src)
         // (like owner) and made them accessible to them.
         auto cred = it->second;
         // the auth source name is only set in the original credential object
-        cred->name(src->name());
-        *src = *cred;
+        cred->name(src.name());
+        src = *cred;
     }
 }
 
@@ -134,7 +134,7 @@ void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
     assert(auth_source);
     try
     {
-        auth_source->accept(this);
+        auth_source->accept(*this);
     }
     catch (...)
     {

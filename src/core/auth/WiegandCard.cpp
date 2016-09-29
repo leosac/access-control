@@ -18,10 +18,9 @@
 */
 
 #include "WiegandCard.hpp"
-#include "tools/IVisitor.hpp"
 #include <boost/algorithm/string.hpp>
 #include <sstream>
-#include <tools/log.hpp>
+#include "tools/log.hpp"
 
 using namespace Leosac::Auth;
 
@@ -29,11 +28,6 @@ WiegandCard::WiegandCard(const std::string &cardid, int bits)
     : card_id_(cardid)
     , nb_bits_(bits)
 {
-}
-
-void WiegandCard::accept(Leosac::Tools::IVisitor *visitor)
-{
-    visitor->visit(this);
 }
 
 const std::string &WiegandCard::card_id() const
