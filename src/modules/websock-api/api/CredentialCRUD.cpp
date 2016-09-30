@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "api/WiegandCardCRUD.hpp"
+#include "api/CredentialCRUD.hpp"
 #include "Credential_odb.h"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/ICredentialEvent.hpp"
@@ -32,21 +32,21 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-WiegandCardCRUD::WiegandCardCRUD(RequestContext ctx)
+CredentialCRUD::CredentialCRUD(RequestContext ctx)
     : CRUDResourceHandler(ctx)
 {
 }
 
-CRUDResourceHandlerUPtr WiegandCardCRUD::instanciate(RequestContext ctx)
+CRUDResourceHandlerUPtr CredentialCRUD::instanciate(RequestContext ctx)
 {
-    auto instance = CRUDResourceHandlerUPtr(new WiegandCardCRUD(ctx));
+    auto instance = CRUDResourceHandlerUPtr(new CredentialCRUD(ctx));
 
     return instance;
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>
-WiegandCardCRUD::required_permission(CRUDResourceHandler::Verb verb,
-                                     const json &req) const
+CredentialCRUD::required_permission(CRUDResourceHandler::Verb verb,
+                                    const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
     SecurityContext::GroupActionParam gap;
@@ -79,14 +79,14 @@ WiegandCardCRUD::required_permission(CRUDResourceHandler::Verb verb,
     return ret;
 }
 
-json WiegandCardCRUD::create_impl(const json &req)
+json CredentialCRUD::create_impl(const json &req)
 {
     json rep;
 
     return rep;
 }
 
-json WiegandCardCRUD::read_impl(const json &req)
+json CredentialCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -129,7 +129,7 @@ json WiegandCardCRUD::read_impl(const json &req)
     return rep;
 }
 
-json WiegandCardCRUD::update_impl(const json &req)
+json CredentialCRUD::update_impl(const json &req)
 {
     json rep;
     auto cid = req.at("credential_id").get<Cred::CredentialId>();
@@ -155,7 +155,7 @@ json WiegandCardCRUD::update_impl(const json &req)
     return rep;
 }
 
-json WiegandCardCRUD::delete_impl(const json &req)
+json CredentialCRUD::delete_impl(const json &req)
 {
     auto cid = req.at("credential_id").get<Cred::CredentialId>();
     auto db  = ctx_.dbsrv->db();

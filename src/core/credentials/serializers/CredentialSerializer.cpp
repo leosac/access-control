@@ -52,7 +52,18 @@ void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &i
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
 
-    DBPtr ptr = GlobalRegistry::get<DBPtr>(GlobalRegistry::DATABASE);
-    Auth::UserLPtr test(*ptr, extract_with_default(in, "owner_id", out.owner_id()));
-    out.owner(test);
+    Auth::UserId new_owner_id = extract_with_default(in, "owner_id", out.owner_id());
+    if (new_owner_id != out.owner_id())
+    {
+        if (new_owner_id)
+        {
+            DBPtr dbptr = GlobalRegistry::get<DBPtr>(GlobalRegistry::DATABASE);
+            Auth::UserLPtr new_owner(*dbptr, new_owner_id);
+            out.owner(new_owner);
+        }
+        else
+        {
+            out.owner(nullptr);
+        }
+    }
 }

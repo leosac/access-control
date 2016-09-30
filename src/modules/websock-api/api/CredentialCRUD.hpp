@@ -33,10 +33,10 @@ namespace WebSockAPI
  *
  * @see See the *_impl() method for each requests parameters/response.
  */
-class WiegandCardCRUD : public CRUDResourceHandler
+class CredentialCRUD : public CRUDResourceHandler
 {
   private:
-    WiegandCardCRUD(RequestContext ctx);
+    CredentialCRUD(RequestContext ctx);
 
   public:
     static CRUDResourceHandlerUPtr instanciate(RequestContext);

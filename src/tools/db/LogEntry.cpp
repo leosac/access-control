@@ -20,13 +20,11 @@
 
 #include "LogEntry.hpp"
 #include "LogEntry_odb.h"
-/*
-#include "LogEntry_odb_mysql.h"
-#include "LogEntry_odb_sqlite.h"
-*/
+#include "LogEntry_odb_pgsql.h"
 #include "tools/db/database.hpp"
 #include <exception/leosacexception.hpp>
 #include <odb/mysql/database.hxx>
+#include <odb/pgsql/database.hxx>
 #include <odb/sqlite/database.hxx>
 
 using namespace Leosac;
@@ -39,26 +37,41 @@ LogEntry::LogEntry()
 using Query  = odb::query<Tools::LogEntry>;
 using Result = odb::result<Tools::LogEntry>;
 
+/*
 static Result fetch_sqlite(DBPtr database, const std::string &order_by,
                            int page_size, int offset)
-{ /*
+{
      using SQLiteQuery = odb::sqlite::query<Tools::LogEntry>;
      auto sl_db = std::static_pointer_cast<odb::sqlite::database>(database);
      odb::sqlite::query<Tools::LogEntry> sl_q(
          "ORDER BY" + Query::id + order_by + "LIMIT" +
              SQLiteQuery::_val(page_size) + "OFFSET" + SQLiteQuery::_val(offset));
-     return sl_db->query<Tools::LogEntry>(sl_q); */
+     return sl_db->query<Tools::LogEntry>(sl_q);
 }
+*/
 
+/*
 static Result fetch_mysql(DBPtr database, const std::string &order_by, int page_size,
                           int offset)
-{ /*
+{
    using MySQLQuery  = odb::mysql::query<Tools::LogEntry>;
    auto my_db = std::static_pointer_cast<odb::mysql::database>(database);
    odb::mysql::query<Tools::LogEntry> my_q(
        "ORDER BY" + Query::id + order_by + "LIMIT" +
            MySQLQuery::_val(page_size) + "OFFSET" + MySQLQuery::_val(offset));
-   return my_db->query<Tools::LogEntry>(my_q);*/
+   return my_db->query<Tools::LogEntry>(my_q);
+}
+ */
+
+static Result fetch_pgsql(DBPtr database, const std::string &order_by, int page_size,
+                          int offset)
+{
+    using PGSQLQuery = odb::pgsql::query<Tools::LogEntry>;
+    auto pg_db       = std::static_pointer_cast<odb::pgsql::database>(database);
+    odb::pgsql::query<Tools::LogEntry> pg_q("ORDER BY" + Query::id + order_by +
+                                            "LIMIT" + PGSQLQuery::_val(page_size) +
+                                            "OFFSET" + PGSQLQuery::_val(offset));
+    return pg_db->query<Tools::LogEntry>(pg_q);
 }
 
 LogEntry::QueryResult LogEntry::retrieve(DBPtr database, int page_number,
@@ -77,15 +90,15 @@ LogEntry::QueryResult LogEntry::retrieve(DBPtr database, int page_number,
         // LIMIT needs to be database specific.
         if (database->id() == odb::database_id::id_sqlite)
         {
-            res = fetch_sqlite(database, order_by, page_size, offset);
+            // res = fetch_sqlite(database, order_by, page_size, offset);
         }
         else if (database->id() == odb::database_id::id_mysql)
         {
-            res = fetch_mysql(database, order_by, page_size, offset);
+            // res = fetch_mysql(database, order_by, page_size, offset);
         }
         else if (database->id() == odb::database_id::id_pgsql)
         {
-            throw LEOSACException("Not yet supported.");
+            res = fetch_pgsql(database, order_by, page_size, offset);
         }
         Tools::LogView view(database->query_value<Tools::LogView>());
         for (Tools::LogEntry &entry : res)

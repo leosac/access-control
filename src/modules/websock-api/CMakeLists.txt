@@ -13,7 +13,7 @@ set(WEBSOCK_API_SRCS
         api/CRUDResourceHandler.cpp
         api/GroupCRUD.cpp
         api/UserCRUD.cpp
-        api/WiegandCardCRUD.cpp
+        api/CredentialCRUD.cpp
         WSSecurityContext.cpp
         api/MembershipCRUD.cpp
         )
