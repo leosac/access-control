@@ -107,7 +107,7 @@ enum class EventType
 
     CREDENTIAL_DELETE,
     CREDENTIAL_CREATE,
-    CREDETIAL_UPDATE,
+    CREDENTIAL_UPDATE,
 
     LAST__
 };

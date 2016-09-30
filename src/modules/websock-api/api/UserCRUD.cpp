@@ -148,10 +148,10 @@ json UserCRUD::update_impl(const json &req)
         throw LEOSACException("You cannot disable your own user account.");
     }
 
+    db->update(user);
     audit->after(UserJSONStringSerializer::serialize(
         *user, SystemSecurityContext::instance()));
     audit->finalize();
-    db->update(user);
     t.commit();
     return rep;
 }

@@ -24,6 +24,7 @@
 #include "core/credentials/Credential.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
+#include "tools/AssertCast.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
@@ -129,7 +130,28 @@ json WiegandCardCRUD::read_impl(const json &req)
 
 json WiegandCardCRUD::update_impl(const json &req)
 {
-    return Leosac::Module::WebSockAPI::json();
+    json rep;
+    auto cid = req.at("credential_id").get<Cred::CredentialId>();
+    auto db  = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+
+    Cred::ICredentialPtr cred =
+        ctx_.dbsrv->find_credential_by_id(cid, DBService::THROW_IF_NOT_FOUND);
+    Audit::ICredentialEventPtr audit =
+        Audit::Factory::CredentialEventPtr(db, cred, ctx_.audit);
+    audit->event_mask(Audit::EventType::CREDENTIAL_UPDATE);
+    audit->before(PolymorphicCredentialJSONStringSerializer::serialize(
+        *cred, SystemSecurityContext::instance()));
+
+    PolymorphicCredentialJSONSerializer::unserialize(*cred, req.at("attributes"),
+                                                     security_context());
+    db->update(assert_cast<Cred::CredentialPtr>(cred));
+
+    audit->after(PolymorphicCredentialJSONStringSerializer::serialize(
+        *cred, SystemSecurityContext::instance()));
+    audit->finalize();
+    t.commit();
+    return rep;
 }
 
 json WiegandCardCRUD::delete_impl(const json &req)
@@ -148,6 +170,7 @@ json WiegandCardCRUD::delete_impl(const json &req)
         audit->before(PolymorphicCredentialJSONStringSerializer::serialize(
             *cred, SystemSecurityContext::instance()));
 
+        audit->finalize();
         db->erase<Cred::Credential>(cred->id());
         t.commit();
     }

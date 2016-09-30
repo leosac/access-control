@@ -68,6 +68,16 @@ class ICredential : public virtual Tools::IVisitable
     virtual void alias(const std::string &) = 0;
 
     /**
+     * An optional description / notes for the credential.
+     */
+    virtual std::string description() const = 0;
+
+    /**
+     * Set a description for this credential.
+     */
+    virtual void description(const std::string &) = 0;
+
+    /**
      * Credentials are "optimistic" object (wrt ODB). This means they
      * carry a `version` field. This method returns the version.
      */

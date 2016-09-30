@@ -40,3 +40,13 @@ json WiegandCardJSONSerializer::serialize(const IWiegandCard &in,
     serialized["attributes"]["card-id"] = in.card_id();
     return serialized;
 }
+
+void WiegandCardJSONSerializer::unserialize(Cred::IWiegandCard &out, const json &in,
+                                            const SecurityContext &sc)
+{
+    CredentialJSONSerializer::unserialize(out, in, sc);
+
+    using namespace JSONUtil;
+    out.card_id(extract_with_default(in, "card-id", out.card_id()));
+    out.nb_bits(extract_with_default(in, "nb-bits", out.nb_bits()));
+}

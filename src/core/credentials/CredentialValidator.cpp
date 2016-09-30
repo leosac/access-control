@@ -17,60 +17,21 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/credentials/Credential.hpp"
-#include "User_odb.h"
 #include "core/credentials/CredentialValidator.hpp"
+#include "core/credentials/ICredential.hpp"
+#include "exception/ModelException.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
 
-Credential::Credential()
-    : id_(0)
+void CredentialValidator::validate(const ICredential &cred)
 {
+    validate_alias(cred.alias());
 }
 
-Auth::UserLPtr Credential::owner() const
+void CredentialValidator::validate_alias(const std::string &alias)
 {
-    return owner_;
-}
-
-void Credential::owner(Auth::UserPtr ptr)
-{
-    owner_ = ptr;
-}
-
-std::string Credential::alias() const
-{
-    return alias_;
-}
-
-CredentialId Credential::id() const
-{
-    return id_;
-}
-
-size_t Credential::odb_version() const
-{
-    return odb_version_;
-}
-
-Auth::UserId Credential::owner_id() const
-{
-    return owner_.object_id();
-}
-
-void Credential::alias(const std::string &alias)
-{
-    CredentialValidator::validate_alias(alias);
-    alias_ = alias;
-}
-
-std::string Credential::description() const
-{
-    return description_;
-}
-
-void Credential::description(const std::string &str)
-{
-    description_ = str;
+    if (alias.length() > 50)
+        throw ModelException("data/attributes/alias",
+                             "Alias must not be longer than 50.");
 }

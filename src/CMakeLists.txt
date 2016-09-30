@@ -37,6 +37,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/AuthSourceBuilder.cpp
     core/auth/ValidityInfo.cpp
     core/credentials/Credential.cpp
+    core/credentials/CredentialValidator.cpp
     core/credentials/WiegandCard.cpp
     core/credentials/serializers/CredentialSerializer.cpp
     core/credentials/serializers/WiegandCardSerializer.cpp

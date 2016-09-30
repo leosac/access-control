@@ -26,23 +26,57 @@
 using namespace Leosac;
 using namespace Leosac::Cred;
 
+
+// JSON
+
+
 json PolymorphicCredentialJSONSerializer::serialize(const ICredential &in,
                                                     const SecurityContext &sc)
 {
-    Helper h(sc);
+    HelperSerialize h(sc);
     in.accept(h);
     return h.result_;
 }
 
-PolymorphicCredentialJSONSerializer::Helper::Helper(const SecurityContext &sc)
+void PolymorphicCredentialJSONSerializer::unserialize(Cred::ICredential &out,
+                                                      const json &in,
+                                                      const SecurityContext &sc)
+{
+    HelperUnserialize h(sc, in);
+    out.accept(h);
+}
+
+
+// HELPERS
+
+PolymorphicCredentialJSONSerializer::HelperUnserialize::HelperUnserialize(
+    const SecurityContext &sc, const json &payload)
+    : security_context_(sc)
+    , payload_(payload)
+{
+}
+
+void PolymorphicCredentialJSONSerializer::HelperUnserialize::visit(
+    Cred::IWiegandCard &t)
+{
+    WiegandCardJSONSerializer::unserialize(t, payload_, security_context_);
+}
+
+PolymorphicCredentialJSONSerializer::HelperSerialize::HelperSerialize(
+    const SecurityContext &sc)
     : security_context_(sc)
 {
 }
 
-void PolymorphicCredentialJSONSerializer::Helper::visit(const IWiegandCard &t)
+void PolymorphicCredentialJSONSerializer::HelperSerialize::visit(
+    const IWiegandCard &t)
 {
     result_ = WiegandCardJSONSerializer::serialize(t, security_context_);
 }
+
+
+// JSONString
+
 
 std::string
 PolymorphicCredentialJSONStringSerializer::serialize(const Cred::ICredential &in,

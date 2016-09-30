@@ -49,6 +49,10 @@ class Credential : public virtual ICredential
 
     virtual void alias(const std::string &id) override;
 
+    std::string description() const override;
+
+    void description(const std::string &str) override;
+
   protected:
 #pragma db id auto
     CredentialId id_;
@@ -56,6 +60,8 @@ class Credential : public virtual ICredential
     Auth::UserLPtr owner_;
 
     std::string alias_;
+
+    std::string description_;
 
 #pragma db version
     size_t odb_version_;

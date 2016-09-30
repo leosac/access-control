@@ -28,10 +28,12 @@ using namespace Leosac::Cred;
 json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
                                          const SecurityContext &sc)
 {
-    json serialized = {
-        {"id", in.id()},
-        {"type", "credential"},
-        {"attributes", {{"version", in.odb_version()}, {"alias", in.alias()}}}};
+    json serialized = {{"id", in.id()},
+                       {"type", "credential"},
+                       {"attributes",
+                        {{"version", in.odb_version()},
+                         {"alias", in.alias()},
+                         {"description", in.description()}}}};
 
     if (in.owner_id())
     {
@@ -44,4 +46,9 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
 void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &in,
                                            const SecurityContext &sc)
 {
+    using namespace JSONUtil;
+    out.alias(extract_with_default(in, "alias", out.alias()));
+    out.description(extract_with_default(in, "description", out.description()));
+
+    // todo handle owner.
 }
