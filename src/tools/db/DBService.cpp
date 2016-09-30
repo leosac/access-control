@@ -42,9 +42,13 @@ DBPtr DBService::db() const
 
 size_t DBService::operation_count() const
 {
-    auto tracer = dynamic_cast<db::DatabaseTracer *>(database_->tracer());
-    ASSERT_LOG(tracer, "No (valid?) tracer object on the database.");
-    return tracer->count();
+    if (database_->tracer())
+    {
+        auto tracer = dynamic_cast<db::DatabaseTracer *>(database_->tracer());
+        ASSERT_LOG(tracer, "No (valid?) tracer object on the database.");
+        return tracer->count();
+    }
+    return 0;
 }
 
 Auth::GroupPtr DBService::find_group_by_id(const Auth::GroupId &id, Flag flags)

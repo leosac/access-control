@@ -18,8 +18,10 @@
 */
 
 #include "core/credentials/serializers/CredentialSerializer.hpp"
+#include "User_odb.h"
 #include "core/SecurityContext.hpp"
 #include "core/credentials/ICredential.hpp"
+#include "tools/GlobalRegistry.hpp"
 #include "tools/JSONUtils.hpp"
 
 using namespace Leosac;
@@ -50,5 +52,7 @@ void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &i
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
 
-    // todo handle owner.
+    DBPtr ptr = GlobalRegistry::get<DBPtr>(GlobalRegistry::DATABASE);
+    Auth::UserLPtr test(*ptr, extract_with_default(in, "owner_id", out.owner_id()));
+    out.owner(test);
 }

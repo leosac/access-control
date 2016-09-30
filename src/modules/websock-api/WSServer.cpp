@@ -32,6 +32,7 @@
 #include "exception/EntityNotFound.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "exception/ModelException.hpp"
+#include "tools/GlobalRegistry.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/db/DatabaseTracer.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
@@ -199,6 +200,10 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
     odb::session database_session;
     auto handler_factory = handlers2_.find(in.type);
     api_handle->hook_before_request();
+
+    // Store the database handle in the global registry.
+    // This may be used later by serializers.
+    GlobalRegistry::set(GlobalRegistry::DATABASE, dbsrv_->db());
 
     if (handler_factory != handlers2_.end())
     {

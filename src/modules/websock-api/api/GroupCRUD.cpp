@@ -150,14 +150,14 @@ json GroupCRUD::update_impl(const json &req)
     auto grp   = ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
     auto audit = Audit::Factory::GroupEvent(db, grp, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_UPDATED);
-    audit->before(
-        GroupJSONSerializer::serialize(*grp, SystemSecurityContext::instance()));
+    audit->before(GroupJSONStringSerializer::serialize(
+        *grp, SystemSecurityContext::instance()));
     GroupJSONSerializer::unserialize(*grp, req.at("attributes"), security_context());
 
     validate_and_unique(grp);
     db->update(grp);
-    audit->after(
-        GroupJSONSerializer::serialize(*grp, SystemSecurityContext::instance()));
+    audit->after(GroupJSONStringSerializer::serialize(
+        *grp, SystemSecurityContext::instance()));
 
     audit->finalize();
     rep["data"] = GroupJSONSerializer::serialize(*grp, security_context());

@@ -123,7 +123,6 @@ MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
                                     const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
-    SecurityContext::ActionParam ap;
 
     SecurityContext::MembershipActionParam map;
     map.membership_id = extract_with_default(req, "membership_id", 0u);

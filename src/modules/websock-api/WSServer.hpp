@@ -115,7 +115,7 @@ class WSServer
      * currently active transaction is used, and it is the caller responsibility to
      * make
      * sure that the transaction will be commited.
-     * Invoking this method with `new_transaction` being false and no currently
+     * Invoking this method with \new_transaction` being false and no currently
      * active
      * transaction is not allowed.
      */

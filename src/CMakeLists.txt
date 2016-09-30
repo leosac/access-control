@@ -76,6 +76,7 @@ set(LEOSAC_LIB_SRCS
     tools/db/OptionalTransaction.cpp
     tools/scrypt/Random.cpp
     tools/scrypt/Scrypt.cpp
+    tools/GlobalRegistry.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp

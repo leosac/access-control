@@ -25,6 +25,7 @@
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/AssertCast.hpp"
+#include "tools/GlobalRegistry.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;

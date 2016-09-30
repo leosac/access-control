@@ -37,7 +37,7 @@ class Credential : public virtual ICredential
     Credential();
     virtual Auth::UserLPtr owner() const override;
 
-    virtual void owner(Auth::UserPtr ptr) override;
+    virtual void owner(Auth::UserLPtr ptr) override;
 
     virtual std::string alias() const override;
 

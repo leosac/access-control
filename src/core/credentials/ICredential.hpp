@@ -55,7 +55,7 @@ class ICredential : public virtual Tools::IVisitable
     /**
      * Set a new owner for the credential.
      */
-    virtual void owner(Auth::UserPtr) = 0;
+    virtual void owner(Auth::UserLPtr) = 0;
 
     /**
      * An alias for the credential.

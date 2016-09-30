@@ -34,7 +34,7 @@ Auth::UserLPtr Credential::owner() const
     return owner_;
 }
 
-void Credential::owner(Auth::UserPtr ptr)
+void Credential::owner(Auth::UserLPtr ptr)
 {
     owner_ = ptr;
 }
@@ -56,7 +56,9 @@ size_t Credential::odb_version() const
 
 Auth::UserId Credential::owner_id() const
 {
-    return owner_.object_id();
+    if (owner_)
+        return owner_.object_id();
+    return 0;
 }
 
 void Credential::alias(const std::string &alias)
