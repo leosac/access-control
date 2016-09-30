@@ -68,6 +68,8 @@ class WSSecurityContext : public SecurityContext
      */
     bool can_delete_membership(const MembershipActionParam &map) const;
 
+    bool can_read_credential(const CredentialActionParam &cap) const;
+
     /**
      * Helper function that returns true if the user is an administrator.
      */

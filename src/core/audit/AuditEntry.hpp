@@ -145,8 +145,7 @@ class AuditEntry : virtual public IAuditEntry,
      * the child.
      *
      * Note that the reverse is not needed, because the child must always be fully
-     * saved
-     * before the parent gets its final update.
+     * saved before the parent gets its final update.
      */
     void odb_callback(odb::callback_event e, odb::database &) const;
 };

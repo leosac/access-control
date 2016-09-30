@@ -165,7 +165,6 @@ std::vector<CRUDResourceHandler::ActionActionParam>
 UserCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
-    SecurityContext::ActionParam ap;
 
     SecurityContext::UserActionParam uap;
     try
@@ -176,21 +175,20 @@ UserCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
     {
         uap.user_id = 0;
     }
-    ap.user = uap;
 
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_READ, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::USER_READ, uap));
         break;
     case Verb::CREATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_CREATE, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::USER_CREATE, uap));
         break;
     case Verb::UPDATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_UPDATE, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::USER_UPDATE, uap));
         break;
     case Verb::DELETE:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_DELETE, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::USER_DELETE, uap));
         break;
     }
     return ret;

@@ -199,8 +199,6 @@ std::vector<CRUDResourceHandler::ActionActionParam>
 GroupCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
-    SecurityContext::ActionParam ap;
-
     SecurityContext::GroupActionParam gap;
     try
     {
@@ -210,21 +208,19 @@ GroupCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) 
     {
         gap.group_id = 0;
     }
-    ap.group = gap;
-
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_READ, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_READ, gap));
         break;
     case Verb::CREATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_CREATE, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_CREATE, gap));
         break;
     case Verb::UPDATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_UPDATE, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_UPDATE, gap));
         break;
     case Verb::DELETE:
-        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_DELETE, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::GROUP_DELETE, gap));
         break;
     }
     return ret;

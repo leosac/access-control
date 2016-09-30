@@ -43,3 +43,10 @@ void PolymorphicCredentialJSONSerializer::Helper::visit(const IWiegandCard &t)
 {
     result_ = WiegandCardJSONSerializer::serialize(t, security_context_);
 }
+
+std::string
+PolymorphicCredentialJSONStringSerializer::serialize(const Cred::ICredential &in,
+                                                     const SecurityContext &sc)
+{
+    return PolymorphicCredentialJSONSerializer::serialize(in, sc).dump(4);
+}

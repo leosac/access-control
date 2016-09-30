@@ -61,6 +61,7 @@ set(OdbCMake_ODB_HEADERS_AUDITLOG
         ${CMAKE_SOURCE_DIR}/src/core/audit/UserEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/GroupEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/UserGroupMembershipEvent.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/audit/CredentialEvent.hpp
         )
 
 set(OdbCMake_SOURCES_AUDITLOG "")
@@ -75,9 +76,11 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         SCHEMA_NAME audit
         PROFILE "boost/date-time"
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset
+        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset
         INCLUDE_PREFIX core/audit/
         INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
@@ -102,7 +105,7 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         SCHEMA_FORMAT embedded
         SCHEMA_NAME credentials
         PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src
+        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         INCLUDE_PREFIX core/credentials/
         INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%

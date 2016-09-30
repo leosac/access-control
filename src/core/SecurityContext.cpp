@@ -48,3 +48,31 @@ SecurityContext &SystemSecurityContext::instance()
     static SystemSecurityContext ssc(nullptr);
     return ssc;
 }
+
+SecurityContext::GroupActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.group = *this;
+    return result;
+}
+
+SecurityContext::UserActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.user = *this;
+    return result;
+}
+
+SecurityContext::MembershipActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.membership = *this;
+    return result;
+}
+
+SecurityContext::CredentialActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.cred = *this;
+    return result;
+}

@@ -18,9 +18,9 @@
 */
 
 #include "WiegandCard.hpp"
+#include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
 #include <sstream>
-#include "tools/log.hpp"
 
 using namespace Leosac::Auth;
 

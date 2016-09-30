@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
@@ -36,6 +37,8 @@ namespace Leosac
 class SecurityContext
 {
   public:
+    // Forward declare the union so we can write cast operator.
+    union ActionParam;
     enum class Action
     {
         USER_CREATE,
@@ -69,17 +72,33 @@ class SecurityContext
         GROUP_MEMBERSHIP_LEFT,
         MEMBERSHIP_READ,
 
+        CREDENTIAL_READ,
+        CREDENTIAL_UPDATE,
+        CREDENTIAL_CREATE,
+        CREDENTIAL_DELETE,
+
         LOG_READ,
     };
 
     struct GroupActionParam
     {
         Auth::GroupId group_id;
+
+        operator ActionParam();
     };
 
     struct UserActionParam
     {
         Auth::UserId user_id;
+
+        operator ActionParam();
+    };
+
+    struct CredentialActionParam
+    {
+        Cred::CredentialId credential_id;
+
+        operator ActionParam();
     };
 
     struct MembershipActionParam
@@ -88,12 +107,15 @@ class SecurityContext
         Auth::GroupId group_id; // for create/delete
         Auth::UserId user_id;   // for create/delete
         Auth::GroupRank rank;   // for create
+
+        operator ActionParam();
     };
 
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
         UserActionParam user;
+        CredentialActionParam cred;
     };
 
     SecurityContext(DBServicePtr dbsrv);

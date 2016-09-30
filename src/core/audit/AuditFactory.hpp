@@ -21,6 +21,7 @@
 
 #include "core/audit/AuditFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
@@ -56,6 +57,10 @@ class Factory
     static IUserGroupMembershipEventPtr
     UserGroupMembershipEvent(const DBPtr &database, Auth::GroupPtr target_group,
                              Auth::UserPtr target_user, IAuditEntryPtr parent);
+
+    static ICredentialEventPtr CredentialEventPtr(const DBPtr &database,
+                                                  Cred::ICredentialPtr target_cred,
+                                                  IAuditEntryPtr parent);
 };
 }
 }

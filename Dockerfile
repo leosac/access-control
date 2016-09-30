@@ -29,7 +29,7 @@ RUN apt-get install libgtest-dev python valgrind python-pip libpython2.7-dev -y
 RUN apt-get install -y libcurl4-openssl-dev
 
 # Database runtime libraries. Required by ODB.
-RUN apt-get install -y libsqlite3-dev libmysqlclient-dev
+RUN apt-get install -y libsqlite3-dev libmysqlclient-dev postgresql-client-9.4
 
 RUN pip install pyzmq
 
@@ -43,6 +43,7 @@ RUN apt-get install -y gcc-5 g++-5
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 2
 RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 2
 
+RUN apt-get install -y libscrypt-dev
 
 RUN git clone git://github.com/zeromq/libzmq.git; \
 cd libzmq; \

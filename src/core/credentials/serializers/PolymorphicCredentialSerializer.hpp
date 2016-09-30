@@ -61,9 +61,26 @@ struct PolymorphicCredentialJSONSerializer
         json result_;
 
         /**
-         * Pointer to the security context.
+         * Reference to the security context.
          */
         const SecurityContext &security_context_;
     };
+};
+
+/**
+ *
+ * Serialize the object as a JSON string.
+ *
+ * @see PolymorphicCredentialJSONSerializer
+ */
+struct PolymorphicCredentialJSONStringSerializer
+    : public Serializer<std::string, Cred::ICredential,
+                        PolymorphicCredentialJSONStringSerializer>
+{
+    static std::string serialize(const Cred::ICredential &in,
+                                 const SecurityContext &sc);
+
+    static void unserialize(Cred::ICredential &out, const std::string &in,
+                            const SecurityContext &sc);
 };
 }

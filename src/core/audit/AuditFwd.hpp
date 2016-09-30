@@ -31,6 +31,10 @@ using AuditEntryId = unsigned long;
 
 class Factory;
 
+/**
+ * Various Audit interface forward declaration.
+ */
+
 class IAuditEntry;
 using IAuditEntryPtr = std::shared_ptr<IAuditEntry>;
 
@@ -45,6 +49,13 @@ using IWSAPICallPtr = std::shared_ptr<IWSAPICall>;
 
 class IUserGroupMembershipEvent;
 using IUserGroupMembershipEventPtr = std::shared_ptr<IUserGroupMembershipEvent>;
+
+class ICredentialEvent;
+using ICredentialEventPtr = std::shared_ptr<ICredentialEvent>;
+
+/**
+ * Forward declartion of implementation class.
+ */
 
 class AuditEntry;
 using AuditEntryPtr  = std::shared_ptr<AuditEntry>;
@@ -62,6 +73,9 @@ using GroupEventPtr = std::shared_ptr<GroupEvent>;
 
 class UserGroupMembershipEvent;
 using UserGroupMembershipEventPtr = std::shared_ptr<UserGroupMembershipEvent>;
+
+class CredentialEvent;
+using CredentialEventPtr = std::shared_ptr<CredentialEvent>;
 
 enum class EventType
 {
@@ -89,6 +103,12 @@ enum class EventType
      * Someone left the group.
      */
     GROUP_MEMBERSHIP_LEFT,
+
+
+    CREDENTIAL_DELETE,
+    CREDENTIAL_CREATE,
+    CREDETIAL_UPDATE,
+
     LAST__
 };
 

@@ -543,14 +543,6 @@ void Kernel::configure_database()
                     database_->persist(users);
                     t.commit();
                 }
-                v = database_->schema_version("audit");
-                if (v == 0)
-                {
-                    // Create schema
-                    transaction t(database_->begin());
-                    schema_catalog::create_schema(*database_, "audit");
-                    t.commit();
-                }
                 v = database_->schema_version("credentials");
                 if (v == 0)
                 {
@@ -565,6 +557,14 @@ void Kernel::configure_database()
                     card.card_id("00:11:22:33");
                     card.nb_bits(32);
                     database_->persist(card);
+                    t.commit();
+                }
+                v = database_->schema_version("audit");
+                if (v == 0)
+                {
+                    // Create schema
+                    transaction t(database_->begin());
+                    schema_catalog::create_schema(*database_, "audit");
                     t.commit();
                 }
             }

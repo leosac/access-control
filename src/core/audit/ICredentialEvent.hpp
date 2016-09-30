@@ -19,23 +19,35 @@
 
 #pragma once
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+#include "IAuditEntry.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 
 namespace Leosac
 {
-namespace Cred
+namespace Audit
 {
+/**
+ * Audit interface to Credential related events.
+ */
+class ICredentialEvent : virtual public IAuditEntry
+{
+  public:
+    /**
+     * Set the user that is targeted by the event.
+     */
+    virtual void target(Cred::ICredentialPtr cred) = 0;
 
-// Credentials
-class ICredential;
-using ICredentialPtr = std::shared_ptr<ICredential>;
+    /**
+     * An optional JSON representation of the object
+     * **before** the event took place.
+     */
+    virtual void before(const std::string &repr) = 0;
 
-class Credential;
-using CredentialId    = unsigned long;
-using CredentialPtr   = std::shared_ptr<Credential>;
-using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
-
-class IWiegandCard;
+    /**
+     * An optional JSON representation of the object
+     * **after** the event took place.
+     */
+    virtual void after(const std::string &repr) = 0;
+};
 }
 }

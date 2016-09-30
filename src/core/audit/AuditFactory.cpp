@@ -18,6 +18,7 @@
 */
 
 #include "core/audit/AuditFactory.hpp"
+#include "core/audit/CredentialEvent.hpp"
 #include "core/audit/GroupEvent.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/audit/UserGroupMembershipEvent.hpp"
@@ -73,13 +74,27 @@ Factory::UserGroupMembershipEvent(const DBPtr &database, Auth::GroupPtr target_g
 {
     ASSERT_LOG(database, "Database cannot be null.");
     ASSERT_LOG(target_group, "Group shall not be null.");
-    ASSERT_LOG(target_group->id(), "Group already be persisted.");
+    ASSERT_LOG(target_group->id(), "Group must be already persisted.");
     ASSERT_LOG(target_user, "User shall not be null.");
-    ASSERT_LOG(target_user->id(), "User already be persisted.");
+    ASSERT_LOG(target_user->id(), "User must be already persisted.");
 
     AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
     ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
 
     return Audit::UserGroupMembershipEvent::create(database, target_group,
                                                    target_user, parent_odb);
+}
+
+ICredentialEventPtr Factory::CredentialEventPtr(const DBPtr &database,
+                                                Cred::ICredentialPtr target_cred,
+                                                IAuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(target_cred, "Credential shall not be null.");
+    ASSERT_LOG(target_cred->id(), "Credential must be already persisted.");
+
+    AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+    ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+
+    return Audit::CredentialEvent::create(database, target_cred, parent_odb);
 }

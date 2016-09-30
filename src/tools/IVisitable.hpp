@@ -43,6 +43,9 @@ namespace Tools
 class IVisitable
 {
   public:
+    /**
+     * Accept a visitor that may mutate `this`.
+     */
     virtual void accept(::Leosac::Tools::BaseVisitor &) = 0;
 
     /**

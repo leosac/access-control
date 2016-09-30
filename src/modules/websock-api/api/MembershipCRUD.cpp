@@ -130,19 +130,20 @@ MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
     map.user_id       = extract_with_default(req, "user_id", 0u);
     map.group_id      = extract_with_default(req, "group_id", 0u);
     map.rank = static_cast<Auth::GroupRank>(extract_with_default(req, "rank", 0u));
-    ap.membership = map;
 
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::MEMBERSHIP_READ, ap));
+        ret.push_back(std::make_pair(SecurityContext::Action::MEMBERSHIP_READ, map));
         break;
     case Verb::CREATE:
         ret.push_back(
-            std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_JOINED, ap));
+            std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_JOINED, map));
+        break;
     case Verb::DELETE:
         ret.push_back(
-            std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_LEFT, ap));
+            std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_LEFT, map));
+        break;
     }
     return ret;
 }

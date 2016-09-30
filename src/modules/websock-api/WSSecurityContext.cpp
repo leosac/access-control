@@ -77,6 +77,15 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     case Action::GROUP_MEMBERSHIP_LEFT:
         return can_delete_membership(ap.membership);
 
+
+    case Action::CREDENTIAL_READ:
+        return can_read_credential(ap.cred);
+
+    case Action::CREDENTIAL_CREATE:
+    case Action::CREDENTIAL_UPDATE:
+    case Action::CREDENTIAL_DELETE:
+        return is_manager();
+
     case Action::LOG_READ:
         return is_manager();
     default:
@@ -205,4 +214,15 @@ bool WSSecurityContext::is_manager() const
 bool WSSecurityContext::is_self(Auth::UserId id) const
 {
     return user_id_ == id;
+}
+
+bool WSSecurityContext::can_read_credential(
+    const SecurityContext::CredentialActionParam &cap) const
+{
+    if (is_manager() || cap.credential_id == 0)
+        return true;
+
+    auto cred = dbsrv_->find_credential_by_id(cap.credential_id,
+                                              DBService::THROW_IF_NOT_FOUND);
+    return is_self(cred->owner_id());
 }

@@ -23,3 +23,7 @@ cd libodb-boost-2.4.0 && ./configure && make -j4 && make install
 # MySQL runtime
 wget http://www.codesynthesis.com/download/odb/2.4/libodb-mysql-2.4.0.tar.gz && tar xvf libodb-mysql-2.4.0.tar.gz
 cd libodb-mysql-2.4.0 && ./configure && make -j4 && make install
+
+#PGSQL runtime
+wget http://www.codesynthesis.com/download/odb/2.4/libodb-pgsql-2.4.0.tar.gz && tar xvf libodb-pgsql-2.4.0.tar.gz
+cd libodb-pgsql-2.4.0 && ./configure && make -j4 && make install

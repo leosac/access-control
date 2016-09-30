@@ -87,6 +87,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/AuditFactory.cpp
     core/audit/GroupEvent.cpp
     core/audit/UserGroupMembershipEvent.cpp
+    core/audit/CredentialEvent.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
         )
