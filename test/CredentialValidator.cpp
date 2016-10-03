@@ -50,5 +50,18 @@ TEST(TestCredentialValidator, alias_length)
     }
     ASSERT_THROW({ c.alias(alias); }, ModelException);
 }
+
+TEST(TestWiegandCardValidator, card_id)
+{
+    WiegandCard c;
+
+    ASSERT_THROW({ c.card_id("11:22:33:4"); }, ModelException);
+    ASSERT_THROW({ c.card_id("11:22:334"); }, ModelException);
+    ASSERT_THROW({ c.card_id("lama"); }, ModelException);
+    ASSERT_THROW({ c.card_id("1a:2-b"); }, ModelException);
+
+    ASSERT_NO_THROW({ c.card_id("11:22:33:44"); });
+    ASSERT_NO_THROW({ c.card_id("aa:bb:cc"); });
+}
 }
 }

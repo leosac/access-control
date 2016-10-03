@@ -62,5 +62,12 @@ class WiegandCard : public virtual IWiegandCard, public Credential
 
     friend class odb::access;
 };
+
+class WiegandCardValidator
+{
+  public:
+    static void validate(const IWiegandCard &card);
+    static void validate_card_id(const std::string &card_id);
+};
 }
 }

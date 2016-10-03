@@ -20,6 +20,7 @@
 #include "core/credentials/WiegandCard.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
+#include <exception/ModelException.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Cred;
@@ -97,5 +98,38 @@ void WiegandCard::nb_bits(int i)
 
 void WiegandCard::card_id(const std::string &id)
 {
+    WiegandCardValidator::validate_card_id(id);
     card_id_ = id;
+}
+
+void WiegandCardValidator::validate(const IWiegandCard &card)
+{
+    validate_card_id(card.card_id());
+}
+
+void WiegandCardValidator::validate_card_id(const std::string &card_id)
+{
+    bool fail = false;
+    char c;
+    std::stringstream ss(card_id);
+    while (true)
+    {
+        c = 0;
+        for (int i = 0; i < 2; ++i)
+        {
+            ss >> c;
+            if (!isxdigit(c) || !ss.good())
+                fail = true;
+        }
+        ss >> c;
+        if (!ss.good())
+            break;
+        if (c != ':')
+            fail = true;
+    }
+    if (fail)
+    {
+        throw ModelException("data/attributes/cardId",
+                             "Card id must have aa:bb:cc:11 format.");
+    }
 }
