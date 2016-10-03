@@ -41,16 +41,18 @@ class LEOSACException : public std::exception
 {
   public:
     explicit LEOSACException(const std::string &message)
-        : _message(message)
+        : message_(message)
         , trace_(2) // Skip 2 frames. The LeosacException ctor and Stacktrace ctor.
     {
     }
+
     virtual ~LEOSACException()
     {
     }
+
     virtual const char *what() const noexcept final
     {
-        return (_message.c_str());
+        return (message_.c_str());
     }
 
     /**
@@ -61,8 +63,10 @@ class LEOSACException : public std::exception
         return trace_;
     }
 
+  protected:
+    std::string message_;
+
   private:
-    const std::string _message;
     Leosac::Tools::Stacktrace trace_;
 };
 

@@ -18,22 +18,26 @@
 */
 
 #include "exception/ModelException.hpp"
+#include "tools/log.hpp"
 
 ModelException::ModelException(const std::string &source_pointer,
                                const std::string &msg)
-    : LEOSACException("APIException.")
+    : LEOSACException("ModelException.")
 {
     ModelError e;
     e.source_pointer = source_pointer;
     e.message        = msg;
     errors_.push_back(e);
+
+    message_ = BUILD_STR("ModelException: " << json_errors().dump(4));
 }
 
 ModelException::ModelException(
     const std::initializer_list<ModelException::ModelError> &errors)
-    : LEOSACException("APIException.")
+    : LEOSACException("ModelException.")
     , errors_(errors)
 {
+    message_ = BUILD_STR("ModelException: " << json_errors().dump(4));
 }
 
 ModelException::json ModelException::json_errors() const

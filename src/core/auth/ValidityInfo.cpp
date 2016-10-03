@@ -25,8 +25,8 @@
 using namespace Leosac::Auth;
 
 ValidityInfo::ValidityInfo()
-    : validity_start_(std::chrono::system_clock::time_point::min())
-    , validity_end_(std::chrono::system_clock::time_point::max())
+    : start_(std::chrono::system_clock::time_point::min())
+    , end_(std::chrono::system_clock::time_point::max())
     , enabled_(true)
 {
 }
@@ -45,16 +45,14 @@ bool ValidityInfo::is_in_range() const
 {
     TimePoint now = std::chrono::system_clock::now();
 
-    if (now >= validity_start_ && now <= validity_end_)
-        return true;
-    return false;
+    return now >= start_ && now <= end_;
 }
 
 void ValidityInfo::set_start_date(const std::string &s)
 {
     if (s.empty())
     {
-        validity_start_ = std::chrono::system_clock::time_point::min();
+        start_ = std::chrono::system_clock::time_point::min();
         return;
     }
 
@@ -62,7 +60,7 @@ void ValidityInfo::set_start_date(const std::string &s)
     bzero(&tm, sizeof(tm));
     if (strptime(s.c_str(), "%d/%m/%Y %H:%M", &tm))
     {
-        validity_start_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+        start_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
     }
     else
     {
@@ -75,7 +73,7 @@ void ValidityInfo::set_end_date(const std::string &s)
 {
     if (s.empty())
     {
-        validity_end_ = std::chrono::system_clock::time_point::max();
+        end_ = std::chrono::system_clock::time_point::max();
         return;
     }
 
@@ -83,7 +81,7 @@ void ValidityInfo::set_end_date(const std::string &s)
     bzero(&tm, sizeof(tm));
     if (strptime(s.c_str(), "%d/%m/%Y %H:%M", &tm))
     {
-        validity_end_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+        end_ = std::chrono::system_clock::from_time_t(std::mktime(&tm));
     }
     else
     {
@@ -95,4 +93,24 @@ void ValidityInfo::set_end_date(const std::string &s)
 void ValidityInfo::set_enabled(bool v)
 {
     enabled_ = v;
+}
+
+const ValidityInfo::TimePoint &ValidityInfo::start() const
+{
+    return start_;
+}
+
+const ValidityInfo::TimePoint &ValidityInfo::end() const
+{
+    return end_;
+}
+
+void ValidityInfo::start(const ValidityInfo::TimePoint &tp)
+{
+    start_ = tp;
+}
+
+void ValidityInfo::end(const ValidityInfo::TimePoint &tp)
+{
+    end_ = tp;
 }

@@ -33,6 +33,7 @@ namespace Cred
 class WiegandCard : public virtual IWiegandCard, public Credential
 {
   public:
+    WiegandCard() = default;
     virtual const std::string &card_id() const override;
 
     virtual int nb_bits() const override;

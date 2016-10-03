@@ -111,7 +111,7 @@ void WiegandCardValidator::validate_card_id(const std::string &card_id)
 {
     bool fail = false;
     char c;
-    std::stringstream ss(card_id);
+    std::istringstream ss(card_id);
     while (true)
     {
         c = 0;

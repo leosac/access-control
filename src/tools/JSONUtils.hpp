@@ -18,6 +18,8 @@
 */
 
 #pragma once
+#include "exception/leosacexception.hpp"
+#include <chrono>
 #include <json.hpp>
 
 namespace Leosac
@@ -34,7 +36,10 @@ namespace JSONUtil
  * value instead.
  */
 template <typename T>
-typename std::enable_if<!std::is_same<const char *, T>::value, T>::type
+typename std::enable_if<!std::is_same<const char *, T>::value &&
+                            !std::is_same<std::chrono::system_clock::time_point,
+                                          std::remove_reference_t<T>>::value,
+                        T>::type
 extract_with_default(const nlohmann::json &obj, const std::string &key,
                      T default_value)
 {
@@ -56,6 +61,29 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
                      T default_value)
 {
     return extract_with_default<std::string>(obj, key, default_value);
+}
+
+/**
+ * Extract an ISO 8601 datetime string from a json object.
+ * It returns its value as a C++ time_point object.
+ */
+std::chrono::system_clock::time_point inline extract_with_default(
+    const nlohmann::json &obj, const std::string &key,
+    const std::chrono::system_clock::time_point &tp)
+{
+    std::string date_str = extract_with_default(obj, key, "");
+    if (date_str.length())
+    {
+        std::istringstream iss(date_str);
+
+        std::tm t = {};
+        iss >> std::get_time(&t, "%Y-%m-%dT%H:%M:%SZ");
+        if (!iss.good())
+            throw ::LEOSACException("Failed to parse date.");
+        std::time_t tt = std::mktime(&t);
+        return std::chrono::system_clock::from_time_t(tt);
+    }
+    return tp;
 }
 }
 }

@@ -29,7 +29,7 @@ namespace Auth
 {
 /**
 * A simple class that stores (and can be queried for) the validity of some
-* credentials.
+* objects.
 * Validity means 3 simple thing:
 *      + Is is enabled ?
 *      + The validity start date.
@@ -42,8 +42,10 @@ namespace Auth
 class ValidityInfo
 {
   public:
+    using TimePoint = std::chrono::system_clock::time_point;
+
     /**
-    * Default credential is enabled and no time-base limitation.
+    * Default status is: enabled and no time-based limitation.
     */
     ValidityInfo();
 
@@ -86,14 +88,18 @@ class ValidityInfo
 
     void set_enabled(bool v);
 
-    using TimePoint = std::chrono::system_clock::time_point;
+    const TimePoint &start() const;
+    void start(const TimePoint &tp);
+
+    const TimePoint &end() const;
+    void end(const TimePoint &tp);
 
   private:
     friend class odb::access;
 #pragma db type("TIMESTAMP")
-    TimePoint validity_start_;
+    TimePoint start_;
 #pragma db type("TIMESTAMP")
-    TimePoint validity_end_;
+    TimePoint end_;
 
     bool enabled_;
 };

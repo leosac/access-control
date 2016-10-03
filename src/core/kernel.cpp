@@ -484,7 +484,7 @@ void Kernel::configure_database()
                     auto pg_db = std::make_shared<odb::pgsql::database>(
                         db_user, db_pw, db_dbname, db_host, db_port);
                     // todo: care about leak
-                    // pg_db->tracer(new db::PGSQLTracer());
+                    pg_db->tracer(new db::PGSQLTracer());
                     database_ = pg_db;
                 }
             }
@@ -560,7 +560,7 @@ void Kernel::configure_database()
 
                     Cred::WiegandCard card2;
                     card2.alias(std::string("Ownerless"));
-                    card2.card_id("aa:bb:cc:d");
+                    card2.card_id("aa:bb:cc:dd");
                     card2.nb_bits(32);
                     database_->persist(card2);
                     t.commit();

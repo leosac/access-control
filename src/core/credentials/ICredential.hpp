@@ -78,6 +78,16 @@ class ICredential : public virtual Tools::IVisitable
     virtual void description(const std::string &) = 0;
 
     /**
+     * Provide the validity info object to the credential.
+     */
+    virtual void validity(const Auth::ValidityInfo &) = 0;
+
+    /**
+     * Retrieve validity status from the credential.
+     */
+    virtual const Auth::ValidityInfo &validity() const = 0;
+
+    /**
      * Credentials are "optimistic" object (wrt ODB). This means they
      * carry a `version` field. This method returns the version.
      */

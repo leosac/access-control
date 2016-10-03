@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "core/auth/ValidityInfo.hpp"
 #include "core/credentials/ICredential.hpp"
 #include <cstddef>
 
@@ -53,6 +54,10 @@ class Credential : public virtual ICredential
 
     void description(const std::string &str) override;
 
+    void validity(const Auth::ValidityInfo &info) override;
+
+    const Auth::ValidityInfo &validity() const override;
+
   protected:
 #pragma db id auto
     CredentialId id_;
@@ -62,6 +67,8 @@ class Credential : public virtual ICredential
     std::string alias_;
 
     std::string description_;
+
+    Auth::ValidityInfo validity_;
 
 #pragma db version
     size_t odb_version_;

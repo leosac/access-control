@@ -76,3 +76,13 @@ void Credential::description(const std::string &str)
 {
     description_ = str;
 }
+
+void Credential::validity(const Auth::ValidityInfo &info)
+{
+    validity_ = info;
+}
+
+const Auth::ValidityInfo &Credential::validity() const
+{
+    return validity_;
+}
