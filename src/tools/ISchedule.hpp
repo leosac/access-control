@@ -17,13 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SingleTimeFrame.hpp"
-#include "tools/ISchedule.hpp"
 #include "tools/ToolsFwd.hpp"
-#include "tools/db/database.hpp"
 #include <chrono>
 #include <string>
-#include <vector>
 
 #pragma once
 
@@ -32,35 +28,32 @@ namespace Leosac
 namespace Tools
 {
 /**
-* A schedule is simply a list of time frame (SingleTimeFrame) with
-* a name.
-*/
-#pragma db object optimistic
-class Schedule : public virtual ISchedule
+ * The interface for Schedule object.
+ *
+ * This class is not "ODB aware". Its main purpose
+ * is to prevent too many includes for clients that do not need
+ * to interact with the database.
+ */
+class ISchedule
 {
   public:
-    Schedule(const std::string &sched_name = "");
-    virtual ~Schedule()                    = default;
-    Schedule(const Schedule &)             = default;
+    virtual ~ISchedule() = default;
 
-    const std::string &name() const override;
+    /**
+    * Retrieve the name of the schedule.
+    */
+    virtual const std::string &name() const = 0;
 
-    bool
-    is_in_schedule(const std::chrono::system_clock::time_point &tp) const override;
+    /**
+    * Check whether or not the given time point can be found in the schedule.
+    */
+    virtual bool
+    is_in_schedule(const std::chrono::system_clock::time_point &tp) const = 0;
 
-    void add_timeframe(const SingleTimeFrame &tf) override;
-
-  private:
-    friend class odb::access;
-
-#pragma db id auto
-    ScheduleId id_;
-
-    std::vector<SingleTimeFrame> timeframes_;
-    std::string name_;
-
-#pragma db version
-    size_t odb_version_;
+    /**
+    * Add the given timeframe to this schedule;
+    */
+    virtual void add_timeframe(const SingleTimeFrame &tf) = 0;
 };
 }
 }

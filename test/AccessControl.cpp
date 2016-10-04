@@ -57,7 +57,7 @@ class AccessControlTest : public ::testing::Test
         tf.end_min    = 0;
         s.add_timeframe(tf);
 
-        profile_r->addAccessSchedule(target, s);
+        profile_r->addAccessSchedule(target, std::make_shared<Tools::Schedule>(s));
     }
 
     ~AccessControlTest()

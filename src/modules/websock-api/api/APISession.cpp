@@ -33,7 +33,7 @@
 #include <odb/mysql/database.hxx>
 #include <odb/session.hxx>
 #include <odb/sqlite/database.hxx>
-#include <tools/db/LogEntry.hpp>
+#include <tools/LogEntry.hpp>
 #include <tools/db/MultiplexedSession.hpp>
 
 using namespace Leosac;

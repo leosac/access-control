@@ -26,31 +26,30 @@ namespace Leosac
 namespace Tools
 {
 /**
-* This struct abstract a single time frame.
-*
-* This single time frame is composed of a day of the week, a start
-* and a end hour.
-*/
+ * This struct abstracts what we call a single time frame.
+ *
+ * A single time frame represents a time slice in a single given day.
+ * It's comprised of:
+ *    + A day of the week
+ *    + A start hour/minute
+ *    + An end hour/minute
+ */
+#pragma db value
 struct SingleTimeFrame
 {
 
-    SingleTimeFrame(int d, int sh, int sm, int eh, int em)
-        : day(d)
-        , start_hour(sh)
-        , start_min(sm)
-        , end_hour(eh)
-        , end_min(em)
-    {
-    }
+    /**
+     * Construct a SingleTimeFrame.
+     *
+     * @param d The day of the week, starts at 0 for monday.
+     * @param sh The starting hour.
+     * @param sm The starting minute.
+     * @param eh The ending hour.
+     * @param em The ending minute.
+     */
+    SingleTimeFrame(int d, int sh, int sm, int eh, int em);
 
-    SingleTimeFrame()
-        : day(0)
-        , start_hour(0)
-        , start_min(0)
-        , end_hour(0)
-        , end_min(0)
-    {
-    }
+    SingleTimeFrame();
 
     SingleTimeFrame(const SingleTimeFrame &) = default;
 
@@ -63,23 +62,7 @@ struct SingleTimeFrame
     /**
     * Is the given timepoint in the time frame ?
     */
-    bool is_in_timeframe(const std::chrono::system_clock::time_point &tp) const
-    {
-        std::time_t time_temp   = std::chrono::system_clock::to_time_t(tp);
-        std::tm const *time_out = std::localtime(&time_temp);
-
-        if (this->day != time_out->tm_wday)
-            return false;
-        if (!(this->start_hour < time_out->tm_hour ||
-              (this->start_hour == time_out->tm_hour &&
-               this->start_min <= time_out->tm_min)))
-            return false;
-        if (!(this->end_hour > time_out->tm_hour ||
-              (this->end_hour == time_out->tm_hour &&
-               this->end_min >= time_out->tm_min)))
-            return false;
-        return true;
-    }
+    bool is_in_timeframe(const std::chrono::system_clock::time_point &tp) const;
 };
 }
 }

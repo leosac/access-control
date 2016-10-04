@@ -49,13 +49,13 @@ IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1,
     }
 
     std::string door_name;
-    std::vector<Tools::Schedule> schedules;
+    std::vector<Tools::IScheduleCPtr> schedules;
     for (const auto &name_sched_pair : t_p1->schedules())
     {
         std::tie(door_name, schedules) = name_sched_pair;
         // hack
         AuthTargetPtr target(new AuthTarget(door_name));
-        for (const Tools::Schedule &sched : schedules)
+        for (const Tools::IScheduleCPtr &sched : schedules)
             result->addAccessSchedule(target, sched);
     }
     for (const auto &name_sched_pair : t_p2->schedules())
@@ -63,7 +63,7 @@ IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1,
         std::tie(door_name, schedules) = name_sched_pair;
         // hack
         AuthTargetPtr target(new AuthTarget(door_name));
-        for (const Tools::Schedule &sched : schedules)
+        for (const Tools::IScheduleCPtr &sched : schedules)
             result->addAccessSchedule(target, sched);
     }
 

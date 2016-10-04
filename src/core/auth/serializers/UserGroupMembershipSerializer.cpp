@@ -42,11 +42,11 @@ json UserGroupMembershipJSONSerializer::serialize(
     return serialized;
 }
 
-void UserGroupMembershipJSONSerializer::unserialize(Auth::UserGroupMembership &out,
-                                                    const json &in,
-                                                    const SecurityContext &sc)
+void UserGroupMembershipJSONSerializer::unserialize(Auth::UserGroupMembership &,
+                                                    const json &,
+                                                    const SecurityContext &)
 {
-    using namespace Leosac::JSONUtil;
+    ASSERT_LOG(false, "Not implemented.");
 }
 
 std::string UserGroupMembershipJSONStringSerializer::serialize(

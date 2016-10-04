@@ -18,18 +18,21 @@
 */
 
 #pragma once
-
-#include <cstdlib>
-#include <ctime>
-#include <string.h>
+#include <memory>
 
 namespace Leosac
 {
 
-/**
- * This is a portable implementation of the timegm() function.
- *
- * It converts a `tm` tp a `time_t` in UTC.
- */
-time_t my_timegm(struct tm *tm);
+namespace Tools
+{
+struct SingleTimeFrame;
+
+class Schedule;
+using SchedulePtr = std::shared_ptr<Schedule>;
+using ScheduleId  = unsigned long;
+
+class ISchedule;
+using ISchedulePtr  = std::shared_ptr<ISchedule>;
+using IScheduleCPtr = std::shared_ptr<const ISchedule>;
+}
 }

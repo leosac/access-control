@@ -17,12 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "XmlScheduleLoader.hpp"
+#include "tools/XmlScheduleLoader.hpp"
 #include "exception/configexception.hpp"
-#include "log.hpp"
+#include "tools/Schedule.hpp"
+#include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <cassert>
 
 using namespace Leosac::Tools;
 
@@ -102,13 +102,13 @@ bool XmlScheduleLoader::extract_one(const boost::property_tree::ptree &node)
     }
     if (schedules_.count(schedule_name))
         NOTICE("A schedule with name " << schedule_name
-                                       << " already exists. It will be overriden");
+                                       << " already exists. It will be overridden.");
 
-    schedules_[schedule_name] = sched;
+    schedules_[schedule_name] = std::make_shared<Schedule>(sched);
     return true;
 }
 
-const std::map<std::string, Schedule> &XmlScheduleLoader::schedules() const
+const std::map<std::string, ISchedulePtr> &XmlScheduleLoader::schedules() const
 {
     return schedules_;
 }

@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Schedule.hpp"
+#include "tools/ISchedule.hpp"
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <map>
 
@@ -49,7 +49,7 @@ class XmlScheduleLoader
     /**
     * Access the map of stored schedules.
     */
-    const std::map<std::string, Schedule> &schedules() const;
+    const std::map<std::string, ISchedulePtr> &schedules() const;
 
   private:
     /**
@@ -57,7 +57,7 @@ class XmlScheduleLoader
     */
     bool extract_one(const boost::property_tree::ptree &node);
 
-    std::map<std::string, Schedule> schedules_;
+    std::map<std::string, ISchedulePtr> schedules_;
 };
 }
 }

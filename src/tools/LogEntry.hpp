@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "database.hpp"
+#include "tools/db/database.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <odb/core.hxx>
 

@@ -53,7 +53,7 @@ json GroupJSONSerializer::serialize(const Auth::Group &group,
 }
 
 void GroupJSONSerializer::unserialize(Auth::Group &out, const json &in,
-                                      const SecurityContext &sc)
+                                      const SecurityContext &)
 {
     using namespace Leosac::JSONUtil;
 

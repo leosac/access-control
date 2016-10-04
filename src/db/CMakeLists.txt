@@ -2,7 +2,9 @@ PROJECT(DATABASELIB CXX)
 
 # ODB configuration for tools/db (LogEntry).
 set(OdbCMake_ODB_HEADERS_TOOLS
-        ${CMAKE_SOURCE_DIR}/src/tools/db/LogEntry.hpp
+        ${CMAKE_SOURCE_DIR}/src/tools/LogEntry.hpp
+        ${CMAKE_SOURCE_DIR}/src/tools/SingleTimeFrame.hpp
+        ${CMAKE_SOURCE_DIR}/src/tools/Schedule.hpp
         )
 
 set(OdbCMake_SOURCES_TOOLS "")
@@ -17,9 +19,9 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         SCHEMA_NAME tools
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/src
-        INCLUDE_PREFIX tools/db
-        INCLUDE_REGEX %tools/db/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/db/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        INCLUDE_PREFIX tools
+        INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )
@@ -52,6 +54,8 @@ odb_compile(OdbCMake_SOURCES_AUTH
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )
@@ -86,6 +90,8 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )
@@ -115,6 +121,8 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )

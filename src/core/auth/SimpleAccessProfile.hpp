@@ -48,26 +48,26 @@ class SimpleAccessProfile : public IAccessProfile
     * Adds a schedule where access to a given target is allowed.
     */
     virtual void addAccessSchedule(AuthTargetPtr target,
-                                   const Tools::Schedule &sched);
+                                   const Tools::IScheduleCPtr &sched);
 
-    virtual const std::vector<Tools::Schedule> &defaultSchedules() const;
+    virtual const std::vector<Tools::IScheduleCPtr> &defaultSchedules() const;
 
     /**
     * Returns the map of schedule for each target (except the default target)
     */
-    virtual const std::map<std::string, std::vector<Tools::Schedule>> &
+    virtual const std::map<std::string, std::vector<Tools::IScheduleCPtr>> &
     schedules() const;
 
   protected:
     /**
     * Map target name to target's schedules.
     */
-    std::map<std::string, std::vector<Tools::Schedule>> schedules_;
+    std::map<std::string, std::vector<Tools::IScheduleCPtr>> schedules_;
 
     /**
     * Schedule for default target.
     */
-    std::vector<Tools::Schedule> default_schedule_;
+    std::vector<Tools::IScheduleCPtr> default_schedule_;
 };
 }
 }

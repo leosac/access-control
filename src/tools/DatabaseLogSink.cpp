@@ -22,7 +22,7 @@
 #include "LogEntry_odb.h"
 #include "log.hpp"
 #include <tools/DateTimeConverter.hpp>
-#include <tools/db/LogEntry.hpp>
+#include <tools/LogEntry.hpp>
 #include <tools/db/database.hpp>
 
 using namespace Leosac;

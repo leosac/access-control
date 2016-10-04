@@ -30,9 +30,9 @@ bool SimpleAccessProfile::isAccessGranted(
     // check "general" permissions that apply to all target
     for (const auto &sched : default_schedule_)
     {
-        if (sched.is_in_schedule(date))
+        if (sched->is_in_schedule(date))
         {
-            INFO("Access is granted through schedule '" << sched.name() << "'");
+            INFO("Access is granted through schedule '" << sched->name() << "'");
             return true;
         }
     }
@@ -42,9 +42,9 @@ bool SimpleAccessProfile::isAccessGranted(
     {
         for (const auto &sched : schedules_[target->name()])
         {
-            if (sched.is_in_schedule(date))
+            if (sched->is_in_schedule(date))
             {
-                INFO("Access is granted through schedule '" << sched.name() << "'");
+                INFO("Access is granted through schedule '" << sched->name() << "'");
                 return true;
             }
         }
@@ -52,8 +52,8 @@ bool SimpleAccessProfile::isAccessGranted(
     return false;
 }
 
-void SimpleAccessProfile::addAccessSchedule(AuthTargetPtr target,
-                                            Leosac::Tools::Schedule const &sched)
+void SimpleAccessProfile::addAccessSchedule(
+    AuthTargetPtr target, Leosac::Tools::IScheduleCPtr const &sched)
 {
     if (target)
         schedules_[target->name()].push_back(sched);
@@ -61,13 +61,13 @@ void SimpleAccessProfile::addAccessSchedule(AuthTargetPtr target,
         default_schedule_.push_back(sched);
 }
 
-std::map<std::string, std::vector<Leosac::Tools::Schedule>> const &
+std::map<std::string, std::vector<Leosac::Tools::IScheduleCPtr>> const &
 SimpleAccessProfile::schedules() const
 {
     return schedules_;
 }
 
-std::vector<Leosac::Tools::Schedule> const &
+std::vector<Leosac::Tools::IScheduleCPtr> const &
 SimpleAccessProfile::defaultSchedules() const
 {
     return default_schedule_;

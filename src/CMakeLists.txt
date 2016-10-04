@@ -69,7 +69,7 @@ set(LEOSAC_LIB_SRCS
     tools/ElapsedTimeCounter.cpp
     tools/XmlNodeNameEnforcer.cpp
     tools/Stacktrace.cpp
-    tools/db/LogEntry.cpp
+        tools/LogEntry.cpp
     tools/db/DBService.cpp
     tools/db/MultiplexedSession.cpp
     tools/db/MultiplexedTransaction.cpp
@@ -80,6 +80,7 @@ set(LEOSAC_LIB_SRCS
     tools/Conversion.cpp
     tools/JSONUtils.cpp
     tools/MyTime.cpp
+    tools/SingleTimeFrame.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp

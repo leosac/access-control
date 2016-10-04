@@ -38,12 +38,12 @@ AuthTarget::AuthTarget(const std::string target_name)
 {
 }
 
-void AuthTarget::add_always_open_sched(Leosac::Tools::Schedule const &sched)
+void AuthTarget::add_always_open_sched(Leosac::Tools::IScheduleCPtr const &sched)
 {
     always_open_.push_back(sched);
 }
 
-void AuthTarget::add_always_close_sched(Leosac::Tools::Schedule const &sched)
+void AuthTarget::add_always_close_sched(Leosac::Tools::IScheduleCPtr const &sched)
 {
     always_close_.push_back(sched);
 }
@@ -63,7 +63,7 @@ bool AuthTarget::is_always_open(
 {
     for (const auto &sched : always_open_)
     {
-        if (sched.is_in_schedule(tp))
+        if (sched->is_in_schedule(tp))
             return true;
     }
     return false;
@@ -74,7 +74,7 @@ bool AuthTarget::is_always_closed(
 {
     for (const auto &sched : always_close_)
     {
-        if (sched.is_in_schedule(tp))
+        if (sched->is_in_schedule(tp))
             return true;
     }
     return false;

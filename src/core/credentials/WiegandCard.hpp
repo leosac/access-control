@@ -69,7 +69,7 @@ class WiegandCardValidator
   public:
     static void validate(const IWiegandCard &card);
     static void validate_card_id(const std::string &card_id);
-        static void validate_nb_bits(int nb_bits);
+    static void validate_nb_bits(int nb_bits);
 };
 }
 }

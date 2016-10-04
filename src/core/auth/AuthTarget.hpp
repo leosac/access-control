@@ -20,7 +20,7 @@
 #pragma once
 
 #include "hardware/FGPIO.hpp"
-#include "tools/Schedule.hpp"
+#include "tools/ISchedule.hpp"
 #include <memory>
 #include <string>
 
@@ -43,8 +43,8 @@ class AuthTarget
     const std::string &name() const;
     void name(const std::string &new_name);
 
-    void add_always_open_sched(const Tools::Schedule &sched);
-    void add_always_close_sched(const Tools::Schedule &sched);
+    void add_always_open_sched(const Tools::IScheduleCPtr &sched);
+    void add_always_close_sched(const Tools::IScheduleCPtr &sched);
 
     /**
     * Check whether the door is in "always open" mode at the given time point.
@@ -73,8 +73,8 @@ class AuthTarget
   protected:
     std::string name_;
 
-    std::vector<Tools::Schedule> always_open_;
-    std::vector<Tools::Schedule> always_close_;
+    std::vector<Tools::IScheduleCPtr> always_open_;
+    std::vector<Tools::IScheduleCPtr> always_close_;
 
     /**
     * Optional GPIO associated with the door.
