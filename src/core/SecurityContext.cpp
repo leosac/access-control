@@ -76,3 +76,10 @@ SecurityContext::CredentialActionParam::operator ActionParam()
     result.cred = *this;
     return result;
 }
+
+SecurityContext::ScheduleActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.sched = *this;
+    return result;
+}

@@ -45,3 +45,8 @@ const std::string &Schedule::name() const
 {
     return name_;
 }
+
+const std::string &Schedule::description() const
+{
+    return description_;
+}

@@ -21,6 +21,7 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
@@ -77,6 +78,11 @@ class SecurityContext
         CREDENTIAL_CREATE,
         CREDENTIAL_DELETE,
 
+        SCHEDULE_READ,
+        SCHEDULE_UPDATE,
+        SCHEDULE_CREATE,
+        SCHEDULE_DELETE,
+
         LOG_READ,
     };
 
@@ -111,11 +117,19 @@ class SecurityContext
         operator ActionParam();
     };
 
+    struct ScheduleActionParam
+    {
+        Tools::ScheduleId schedule_id;
+
+        operator ActionParam();
+    };
+
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
         UserActionParam user;
         CredentialActionParam cred;
+        ScheduleActionParam sched;
     };
 
     SecurityContext(DBServicePtr dbsrv);

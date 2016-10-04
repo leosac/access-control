@@ -50,6 +50,8 @@ class Schedule : public virtual ISchedule
 
     void add_timeframe(const SingleTimeFrame &tf) override;
 
+    const std::string &description() const override;
+
   private:
     friend class odb::access;
 
@@ -57,7 +59,11 @@ class Schedule : public virtual ISchedule
     ScheduleId id_;
 
     std::vector<SingleTimeFrame> timeframes_;
+
+#pragma db unique
     std::string name_;
+
+    std::string description_;
 
 #pragma db version
     size_t odb_version_;

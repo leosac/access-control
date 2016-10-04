@@ -86,6 +86,12 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     case Action::CREDENTIAL_DELETE:
         return is_manager();
 
+    case Action::SCHEDULE_READ:
+    case Action::SCHEDULE_CREATE:
+    case Action::SCHEDULE_UPDATE:
+    case Action::SCHEDULE_DELETE:
+        return is_manager();
+
     case Action::LOG_READ:
         return is_manager();
     default:

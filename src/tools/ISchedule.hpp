@@ -44,6 +44,8 @@ class ISchedule
     */
     virtual const std::string &name() const = 0;
 
+    virtual const std::string &description() const = 0;
+
     /**
     * Check whether or not the given time point can be found in the schedule.
     */

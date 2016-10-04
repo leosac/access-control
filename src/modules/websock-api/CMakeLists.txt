@@ -14,6 +14,7 @@ set(WEBSOCK_API_SRCS
         api/GroupCRUD.cpp
         api/UserCRUD.cpp
         api/CredentialCRUD.cpp
+        api/ScheduleCRUD.cpp
         WSSecurityContext.cpp
         api/MembershipCRUD.cpp
         )

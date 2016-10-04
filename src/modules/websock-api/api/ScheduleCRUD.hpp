@@ -20,7 +20,7 @@
 #pragma once
 
 #include "api/CRUDResourceHandler.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "tools/ToolsFwd.hpp"
 
 namespace Leosac
 {
@@ -29,17 +29,14 @@ namespace Module
 namespace WebSockAPI
 {
 /**
- * CRUD Handler for credentials.
- *
- * This handler is designed to be able to manage various type of
- * credentials.
+ * CRUD Handler for schedules.
  *
  * @see See the *_impl() method for each requests parameters/response.
  */
-class CredentialCRUD : public CRUDResourceHandler
+class ScheduleCRUD : public CRUDResourceHandler
 {
   private:
-    CredentialCRUD(RequestContext ctx);
+    ScheduleCRUD(RequestContext ctx);
 
   public:
     static CRUDResourceHandlerUPtr instanciate(RequestContext);
@@ -48,17 +45,6 @@ class CredentialCRUD : public CRUDResourceHandler
     virtual std::vector<ActionActionParam>
     required_permission(Verb verb, const json &req) const override;
 
-    /**
-     * Create a new credential.
-     *
-     * Request:
-     *     + `credential-type`: The type of the credential we wish to create.
-     *        Can be `wiegand-card`.
-     *     + `attributes`: Dictionnary of attributes for the credential.
-     *
-     * @param req
-     * @return
-     */
     virtual json create_impl(const json &req) override;
 
     virtual json read_impl(const json &req) override;
