@@ -73,7 +73,10 @@ void UserJSONSerializer::unserialize(Auth::User &out, const json &in,
     out.firstname(extract_with_default(in, "firstname", out.firstname()));
     out.lastname(extract_with_default(in, "lastname", out.lastname()));
     out.email(extract_with_default(in, "email", out.email()));
-    out.password(extract_with_default(in, "password", out.password()));
+    if (in.find("password") != in.end() && (*in.find("password")).is_string())
+    {
+        out.password(in.at("password"));
+    }
 
     SecurityContext::ActionParam ap;
     ap.user.user_id = out.id();
