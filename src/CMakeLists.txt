@@ -77,6 +77,9 @@ set(LEOSAC_LIB_SRCS
     tools/scrypt/Random.cpp
     tools/scrypt/Scrypt.cpp
     tools/GlobalRegistry.cpp
+    tools/Conversion.cpp
+    tools/JSONUtils.cpp
+    tools/MyTime.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -122,7 +125,7 @@ target_compile_definitions(${LEOSAC_LIB}
         PRIVATE
         )
 
-set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS}")
+set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 #Add GProf compile flag
 if(LEOSAC_GPROF)

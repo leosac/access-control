@@ -22,34 +22,28 @@
 #include "core/SecurityContext.hpp"
 #include "core/auth/ValidityInfo.hpp"
 #include "core/credentials/ICredential.hpp"
+#include "tools/Conversion.hpp"
 #include "tools/GlobalRegistry.hpp"
 #include "tools/JSONUtils.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
 
-static std::string tp_to_str(const Auth::ValidityInfo::TimePoint &tp)
-{
-    std::stringstream ss;
-    std::time_t dt_time_t = std::chrono::system_clock::to_time_t(tp);
-    ss << std::put_time(std::localtime(&dt_time_t), "%FT%TZ");
-    return ss.str();
-}
-
 json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
-                                         const SecurityContext &sc)
+                                         const SecurityContext &)
 {
-    json serialized = {{"id", in.id()},
-                       {"type", "credential"},
-                       {"attributes",
-                        {
-                            {"version", in.odb_version()},
-                            {"alias", in.alias()},
-                            {"description", in.description()},
-                            {"validity-enabled", in.validity().is_enabled()},
-                            {"validity-start", tp_to_str(in.validity().start())},
-                            {"validity-end", tp_to_str(in.validity().end())},
-                        }}};
+    json serialized = {
+        {"id", in.id()},
+        {"type", "credential"},
+        {"attributes",
+         {
+             {"version", in.odb_version()},
+             {"alias", in.alias()},
+             {"description", in.description()},
+             {"validity-enabled", in.validity().is_enabled()},
+             {"validity-start", Conversion<std::string>(in.validity().start())},
+             {"validity-end", Conversion<std::string>(in.validity().end())},
+         }}};
 
     if (in.owner_id())
     {
@@ -60,23 +54,16 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
 }
 
 void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &in,
-                                           const SecurityContext &sc)
+                                           const SecurityContext &)
 {
     using namespace JSONUtil;
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
 
     // Credential validity attributes
-    auto validity = out.validity();
-    validity.set_enabled(
-        extract_with_default(in, "validity-enabled", validity.is_enabled()));
-
-    validity.start(extract_with_default(
-        in, "validity-start", std::chrono::system_clock::time_point::min()));
-    validity.end(extract_with_default(in, "validity-end",
-                                      std::chrono::system_clock::time_point::max()));
-    out.validity(validity);
-
+    Auth::ValidityInfo validity_default;
+    validity_default.set_enabled(out.validity().is_enabled());
+    out.validity(extract_validity_with_default(in, "validity", validity_default));
 
     // Owner
     Auth::UserId new_owner_id = extract_with_default(in, "owner_id", out.owner_id());

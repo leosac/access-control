@@ -18,6 +18,8 @@
 */
 
 #pragma once
+
+#include "core/auth/ValidityInfo.hpp"
 #include "exception/leosacexception.hpp"
 #include <chrono>
 #include <json.hpp>
@@ -26,6 +28,8 @@ namespace Leosac
 {
 /**
  * Add a few useful extraction functions.
+ *
+ * Some of theses are specific to Leosac.
  */
 namespace JSONUtil
 {
@@ -67,23 +71,20 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
  * Extract an ISO 8601 datetime string from a json object.
  * It returns its value as a C++ time_point object.
  */
-std::chrono::system_clock::time_point inline extract_with_default(
-    const nlohmann::json &obj, const std::string &key,
-    const std::chrono::system_clock::time_point &tp)
-{
-    std::string date_str = extract_with_default(obj, key, "");
-    if (date_str.length())
-    {
-        std::istringstream iss(date_str);
+std::chrono::system_clock::time_point
+extract_with_default(const nlohmann::json &obj, const std::string &key,
+                     const std::chrono::system_clock::time_point &tp);
 
-        std::tm t = {};
-        iss >> std::get_time(&t, "%Y-%m-%dT%H:%M:%SZ");
-        if (!iss.good())
-            throw ::LEOSACException("Failed to parse date.");
-        std::time_t tt = std::mktime(&t);
-        return std::chrono::system_clock::from_time_t(tt);
-    }
-    return tp;
-}
+/**
+ * Extract fields representing a ValidityInfo object.
+ *
+ * The JSON is expected to look like this:
+ *     + `${BASEKEY}-enabled`
+ *     + `${BASEKEY}-start`
+ *     + `${BASEKEY}-end`
+ */
+Auth::ValidityInfo extract_validity_with_default(const nlohmann::json &obj,
+                                                 const std::string &base_key,
+                                                 const Auth::ValidityInfo &def);
 }
 }

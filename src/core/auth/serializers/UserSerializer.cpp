@@ -20,6 +20,7 @@
 #include "core/auth/serializers/UserSerializer.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/auth/User.hpp"
+#include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 
 using namespace Leosac;
@@ -43,12 +44,16 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
         {"id", user.id()},
         {"type", "user"},
         {"attributes",
-         {{"version", user.odb_version()},
-          {"username", user.username()},
-          {"firstname", user.firstname()},
-          {"lastname", user.lastname()},
-          {"rank", static_cast<int>(user.rank())},
-          {"validity-enabled", user.validity().is_enabled()}}},
+         {
+             {"version", user.odb_version()},
+             {"username", user.username()},
+             {"firstname", user.firstname()},
+             {"lastname", user.lastname()},
+             {"rank", static_cast<int>(user.rank())},
+             {"validity-enabled", user.validity().is_enabled()},
+             {"validity-start", Conversion<std::string>(user.validity().start())},
+             {"validity-end", Conversion<std::string>(user.validity().end())},
+         }},
         {"relationships", {{"memberships", {{"data", memberships}}}}}};
 
     SecurityContext::ActionParam ap;
@@ -81,10 +86,10 @@ void UserJSONSerializer::unserialize(Auth::User &out, const json &in,
     }
     if (sc.check_permission(SecurityContext::Action::USER_MANAGE_VALIDITY, ap))
     {
-        auto validity = out.validity();
-        validity.set_enabled(
-            extract_with_default(in, "validity-enabled", validity.is_enabled()));
-        out.validity(validity);
+        Auth::ValidityInfo validity_default;
+        validity_default.set_enabled(out.validity().is_enabled());
+        out.validity(
+            extract_validity_with_default(in, "validity", validity_default));
     }
 }
 

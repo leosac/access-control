@@ -19,8 +19,10 @@
 
 #pragma once
 
+#include "tools/MyTime.hpp"
 #include <cassert>
 #include <chrono>
+#include <iomanip>
 #include <odb/pgsql/traits.hxx>
 
 namespace odb
@@ -100,9 +102,14 @@ class value_traits<std::chrono::system_clock::time_point, id_timestamp>
         TimePoint pg_epoch;
         std::tm tm;
         bzero(&tm, sizeof(tm));
-        bool ret = strptime("01/01/2000 00:00", "%d/%m/%Y %H:%M", &tm);
-        assert(ret);
-        return std::chrono::system_clock::from_time_t(std::mktime(&tm));
+        std::string epoch = "2000-01-01T00:00:00Z";
+        std::istringstream iss(epoch);
+
+        iss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+        assert(iss.good());
+        tm.tm_isdst = 0;
+
+        return std::chrono::system_clock::from_time_t(Leosac::my_timegm(&tm));
     }
 };
 }
