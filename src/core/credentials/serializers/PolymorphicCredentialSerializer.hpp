@@ -45,6 +45,14 @@ struct PolymorphicCredentialJSONSerializer
     static void unserialize(Cred::ICredential &out, const json &in,
                             const SecurityContext &sc);
 
+    /**
+     * Returns the "type-name" of the credential. This is something
+     * that maps to EmberJS models.
+     *
+     * For example, for a wiegand card it would return "wiegand-card".
+     */
+    static std::string type_name(const Cred::ICredential &in);
+
   private:
     /**
      * Non static helper that can visit credential object.

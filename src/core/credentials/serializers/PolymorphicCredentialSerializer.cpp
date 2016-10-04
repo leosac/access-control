@@ -46,6 +46,17 @@ void PolymorphicCredentialJSONSerializer::unserialize(Cred::ICredential &out,
     out.accept(h);
 }
 
+std::string
+PolymorphicCredentialJSONSerializer::type_name(const Cred::ICredential &in)
+{
+    HelperSerialize h(SystemSecurityContext::instance());
+    in.accept(h);
+    ASSERT_LOG(h.result_.find("type") != h.result_.end(),
+               "The serializer didn't set a type.");
+    ASSERT_LOG(h.result_.at("type").is_string(), "Type is not a string.");
+    return h.result_.at("type");
+}
+
 
 // HELPERS
 

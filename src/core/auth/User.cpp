@@ -161,3 +161,8 @@ size_t User::odb_version() const
 {
     return version_;
 }
+
+std::vector<Leosac::Cred::CredentialLWPtr> User::lazy_credentials() const
+{
+    return credentials_;
+}

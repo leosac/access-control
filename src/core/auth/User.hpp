@@ -23,6 +23,7 @@
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "core/auth/ValidityInfo.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 #include "tools/db/database.hpp"
 #include "tools/scrypt/Scrypt.hpp"
 #include <memory>
@@ -128,6 +129,9 @@ class User
 
     size_t odb_version() const;
 
+    std::vector<Cred::CredentialLWPtr> lazy_credentials() const;
+
+
   protected:
 #pragma db id auto
     UserId id_;
@@ -153,6 +157,9 @@ class User
 #pragma db not_null
     UserRank rank_;
 
+#pragma db value_not_null inverse(owner_)
+    std::vector<Cred::CredentialLWPtr> credentials_;
+
     /**
     * A user can have the same validity than credentials.
     */
@@ -172,4 +179,5 @@ class User
 #ifdef ODB_COMPILER
 #include "core/auth/Group.hpp"
 #include "core/auth/UserGroupMembership.hpp"
+#include "core/credentials/Credential.hpp"
 #endif

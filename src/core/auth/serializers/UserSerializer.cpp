@@ -18,8 +18,11 @@
 */
 
 #include "core/auth/serializers/UserSerializer.hpp"
+#include "Credential_odb.h"
 #include "core/SecurityContext.hpp"
 #include "core/auth/User.hpp"
+#include "core/credentials/CredentialFwd.hpp"
+#include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 
@@ -40,6 +43,21 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
             memberships.push_back(group_info);
         }
     }
+    json credentials = {};
+    for (const Cred::CredentialLWPtr &cred : user.lazy_credentials())
+    {
+        SecurityContext::CredentialActionParam cap{.credential_id =
+                                                       cred.object_id()};
+        if (sc.check_permission(SecurityContext::Action::CREDENTIAL_READ, cap))
+        {
+            json cred_info = {
+                {"id", cred.object_id()},
+                {"type",
+                 PolymorphicCredentialJSONSerializer::type_name(*cred.load())}};
+            credentials.push_back(cred_info);
+        }
+    }
+
     json serialized = {
         {"id", user.id()},
         {"type", "user"},
@@ -54,7 +72,9 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
              {"validity-start", Conversion<std::string>(user.validity().start())},
              {"validity-end", Conversion<std::string>(user.validity().end())},
          }},
-        {"relationships", {{"memberships", {{"data", memberships}}}}}};
+        {"relationships",
+         {{"memberships", {{"data", memberships}}},
+          {"credentials", {{"data", credentials}}}}}};
 
     SecurityContext::ActionParam ap;
     ap.user.user_id = user.id();

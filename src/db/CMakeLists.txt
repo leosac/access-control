@@ -50,6 +50,8 @@ odb_compile(OdbCMake_SOURCES_AUTH
         INCLUDE_PREFIX core/auth/
         INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )
