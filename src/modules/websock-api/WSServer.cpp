@@ -180,11 +180,13 @@ void WSServer::run(const std::string &interface, uint16_t port)
 
 void WSServer::start_shutdown()
 {
-    srv_.stop_listening();
-    for (auto con_api : connection_api_)
-    {
-        srv_.close(con_api.first, 0, "bye");
-    }
+    srv_.get_io_service().post([this]() {
+        srv_.stop_listening();
+        for (auto con_api : connection_api_)
+        {
+            srv_.close(con_api.first, 0, "bye");
+        }
+    });
 }
 
 APIAuth &WSServer::auth()

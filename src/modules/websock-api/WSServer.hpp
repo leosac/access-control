@@ -83,6 +83,8 @@ class WSServer
      *
      * The server will stop listening for new connection and will
      * attempt to close existing one.
+     *
+     * @note This method can safely be called from an other thread.
      */
     void start_shutdown();
 
