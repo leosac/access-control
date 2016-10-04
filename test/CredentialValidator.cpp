@@ -63,5 +63,17 @@ TEST(TestWiegandCardValidator, card_id)
     ASSERT_NO_THROW({ c.card_id("11:22:33:44"); });
     ASSERT_NO_THROW({ c.card_id("aa:bb:cc"); });
 }
+
+TEST(TestWiegandCardValidator, nb_bits)
+{
+    WiegandCard c;
+    ASSERT_THROW(c.nb_bits(-1), ModelException);
+    ASSERT_THROW(c.nb_bits(-42), ModelException);
+    ASSERT_THROW(c.nb_bits(-1024), ModelException);
+
+    ASSERT_NO_THROW(c.nb_bits(26));
+    ASSERT_NO_THROW(c.nb_bits(37));
+    ASSERT_NO_THROW(c.nb_bits(500)); // Makes no sense, but is not negative.
+}
 }
 }

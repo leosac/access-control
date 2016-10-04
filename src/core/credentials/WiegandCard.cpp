@@ -93,6 +93,7 @@ uint64_t WiegandCard::to_wiegand_34() const
 
 void WiegandCard::nb_bits(int i)
 {
+    WiegandCardValidator::validate_nb_bits(i);
     nb_bits_ = i;
 }
 
@@ -105,6 +106,7 @@ void WiegandCard::card_id(const std::string &id)
 void WiegandCardValidator::validate(const IWiegandCard &card)
 {
     validate_card_id(card.card_id());
+    validate_nb_bits(card.nb_bits());
 }
 
 void WiegandCardValidator::validate_card_id(const std::string &card_id)
@@ -131,5 +133,14 @@ void WiegandCardValidator::validate_card_id(const std::string &card_id)
     {
         throw ModelException("data/attributes/cardId",
                              "Card id must have aa:bb:cc:11 format.");
+    }
+}
+
+void WiegandCardValidator::validate_nb_bits(int nb)
+{
+    if (nb <= 0)
+    {
+        throw ModelException("data/attributes/nbBits",
+                             "The number of bits must be > 0");
     }
 }
