@@ -45,6 +45,17 @@ class CredentialCRUD : public CRUDResourceHandler
     virtual std::vector<ActionActionParam>
     required_permission(Verb verb, const json &req) const override;
 
+    /**
+     * Create a new credential.
+     *
+     * Request:
+     *     + `credential-type`: The type of the credential we wish to create.
+     *        Can be `wiegand-card`.
+     *     + `attributes`: Dictionnary of attributes for the credential.
+     *
+     * @param req
+     * @return
+     */
     virtual json create_impl(const json &req) override;
 
     virtual json read_impl(const json &req) override;

@@ -22,11 +22,13 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/ICredentialEvent.hpp"
 #include "core/credentials/Credential.hpp"
+#include "core/credentials/WiegandCard.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/GlobalRegistry.hpp"
 #include "tools/db/DBService.hpp"
+#include <exception/leosacexception.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -82,7 +84,35 @@ CredentialCRUD::required_permission(CRUDResourceHandler::Verb verb,
 json CredentialCRUD::create_impl(const json &req)
 {
     json rep;
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
 
+    Cred::ICredentialPtr new_cred;
+    std::string type = req.at("credential-type");
+    if (type == "wiegand-card")
+    {
+        new_cred = std::make_shared<Cred::WiegandCard>();
+    }
+    else
+    {
+        throw LEOSACException(
+            BUILD_STR("Credential {" << type << "} are not supported."));
+    }
+
+    PolymorphicCredentialJSONSerializer::unserialize(*new_cred, req.at("attributes"),
+                                                     security_context());
+    db->persist(assert_cast<Cred::CredentialPtr>(new_cred));
+    Audit::ICredentialEventPtr audit =
+        Audit::Factory::CredentialEventPtr(db, new_cred, ctx_.audit);
+    audit->event_mask(Audit::EventType::CREDENTIAL_CREATE);
+    audit->after(PolymorphicCredentialJSONStringSerializer::serialize(
+        *new_cred, SystemSecurityContext::instance()));
+    audit->finalize();
+
+    rep["data"] = PolymorphicCredentialJSONSerializer::serialize(*new_cred,
+                                                                 security_context());
+
+    t.commit();
     return rep;
 }
 
