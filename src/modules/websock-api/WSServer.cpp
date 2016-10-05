@@ -37,6 +37,7 @@
 #include "tools/db/DatabaseTracer.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
+#include <api/ScheduleCRUD.hpp>
 #include <json.hpp>
 #include <odb/session.hxx>
 
@@ -77,6 +78,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     register_crud_handler("user-group-membership",
                           &WebSockAPI::MembershipCRUD::instanciate);
     register_crud_handler("credential", &WebSockAPI::CredentialCRUD::instanciate);
+    register_crud_handler("schedule", &WebSockAPI::ScheduleCRUD::instanciate);
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)

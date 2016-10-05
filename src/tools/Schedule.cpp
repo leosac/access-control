@@ -23,6 +23,7 @@ using namespace Leosac::Tools;
 
 Schedule::Schedule(const std::string &sched_name)
     : name_(sched_name)
+    , odb_version_(0)
 {
 }
 
@@ -49,4 +50,34 @@ const std::string &Schedule::name() const
 const std::string &Schedule::description() const
 {
     return description_;
+}
+
+ScheduleId Schedule::id() const
+{
+    return id_;
+}
+
+std::vector<SingleTimeFrame> Schedule::timeframes() const
+{
+    return timeframes_;
+}
+
+size_t Schedule::odb_version() const
+{
+    return odb_version_;
+}
+
+void Schedule::name(const std::string &name)
+{
+    name_ = name;
+}
+
+void Schedule::description(const std::string &desc)
+{
+    description_ = desc;
+}
+
+void Schedule::clear_timeframes()
+{
+    timeframes_.clear();
 }

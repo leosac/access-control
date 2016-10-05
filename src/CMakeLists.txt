@@ -69,7 +69,7 @@ set(LEOSAC_LIB_SRCS
     tools/ElapsedTimeCounter.cpp
     tools/XmlNodeNameEnforcer.cpp
     tools/Stacktrace.cpp
-        tools/LogEntry.cpp
+    tools/LogEntry.cpp
     tools/db/DBService.cpp
     tools/db/MultiplexedSession.cpp
     tools/db/MultiplexedTransaction.cpp
@@ -81,6 +81,7 @@ set(LEOSAC_LIB_SRCS
     tools/JSONUtils.cpp
     tools/MyTime.cpp
     tools/SingleTimeFrame.cpp
+    tools/serializers/ScheduleSerializer.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp
@@ -94,6 +95,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/GroupEvent.cpp
     core/audit/UserGroupMembershipEvent.cpp
     core/audit/CredentialEvent.cpp
+    core/audit/ScheduleEvent.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
         )

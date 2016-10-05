@@ -19,6 +19,7 @@
 
 #pragma once
 #include <memory>
+#include <odb/lazy-ptr.hxx>
 
 namespace Leosac
 {
@@ -28,8 +29,9 @@ namespace Tools
 struct SingleTimeFrame;
 
 class Schedule;
-using SchedulePtr = std::shared_ptr<Schedule>;
-using ScheduleId  = unsigned long;
+using SchedulePtr   = std::shared_ptr<Schedule>;
+using ScheduleId    = unsigned long;
+using ScheduleLWPtr = odb::lazy_weak_ptr<Schedule>;
 
 class ISchedule;
 using ISchedulePtr  = std::shared_ptr<ISchedule>;

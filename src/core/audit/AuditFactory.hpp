@@ -22,6 +22,7 @@
 #include "core/audit/AuditFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
 namespace Leosac
@@ -61,6 +62,10 @@ class Factory
     static ICredentialEventPtr CredentialEventPtr(const DBPtr &database,
                                                   Cred::ICredentialPtr target_cred,
                                                   IAuditEntryPtr parent);
+
+    static IScheduleEventPtr ScheduleEvent(const DBPtr &database,
+                                           Tools::ISchedulePtr target_sched,
+                                           IAuditEntryPtr parent);
 };
 }
 }

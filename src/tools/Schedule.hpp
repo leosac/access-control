@@ -52,6 +52,18 @@ class Schedule : public virtual ISchedule
 
     const std::string &description() const override;
 
+    void name(const std::string &) override;
+
+    void description(const std::string &) override;
+
+    void clear_timeframes() override;
+
+    ScheduleId id() const override;
+
+    std::vector<SingleTimeFrame> timeframes() const override;
+
+    size_t odb_version() const override;
+
   private:
     friend class odb::access;
 

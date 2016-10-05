@@ -20,11 +20,13 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/CredentialEvent.hpp"
 #include "core/audit/GroupEvent.hpp"
+#include "core/audit/ScheduleEvent.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/audit/UserGroupMembershipEvent.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
+#include "tools/AssertCast.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac;
@@ -97,4 +99,16 @@ ICredentialEventPtr Factory::CredentialEventPtr(const DBPtr &database,
     ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
 
     return Audit::CredentialEvent::create(database, target_cred, parent_odb);
+}
+
+IScheduleEventPtr Factory::ScheduleEvent(const DBPtr &database,
+                                         Tools::ISchedulePtr target_sched,
+                                         IAuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(target_sched, "Schedule shall not be null.");
+    ASSERT_LOG(target_sched->id(), "Schedule must be already persisted.");
+
+    auto parent_odb = assert_cast<AuditEntryPtr>(parent);
+    return Audit::ScheduleEvent::create(database, target_sched, parent_odb);
 }

@@ -19,34 +19,35 @@
 
 #pragma once
 
-#include "tools/log.hpp"
-#include <memory>
+#include "IAuditEntry.hpp"
+#include "tools/ToolsFwd.hpp"
 
 namespace Leosac
 {
-template <typename Out, typename In>
-Out assert_cast(In in)
+namespace Audit
 {
-    bool is_null = in;
-    Out tmp      = dynamic_cast<Out>(in);
-    if (!is_null)
-        ASSERT_LOG(tmp != nullptr, "Pointer is null after assert_cast");
-    return tmp;
-};
-
-template <typename Out, typename In>
-Out assert_cast(const std::shared_ptr<In> &in)
+/**
+ * Audit interface to Schedule related events.
+ */
+class IScheduleEvent : virtual public IAuditEntry
 {
-    bool is_null = in;
+  public:
+    /**
+     * Set the user that is targeted by the event.
+     */
+    virtual void target(Tools::ISchedulePtr schd) = 0;
 
-    if (auto p = dynamic_cast<typename Out::element_type *>(in.get()))
-    {
-        return Out(in, p);
-    }
-    else if (is_null)
-    {
-        ASSERT_LOG(0, "Pointer is null after assert_cast");
-    }
-    return nullptr;
+    /**
+     * An optional JSON representation of the object
+     * **before** the event took place.
+     */
+    virtual void before(const std::string &repr) = 0;
+
+    /**
+     * An optional JSON representation of the object
+     * **after** the event took place.
+     */
+    virtual void after(const std::string &repr) = 0;
 };
+}
 }

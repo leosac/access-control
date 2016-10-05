@@ -45,6 +45,17 @@ class ScheduleCRUD : public CRUDResourceHandler
     virtual std::vector<ActionActionParam>
     required_permission(Verb verb, const json &req) const override;
 
+    /**
+     * Create a new schedule.
+     *
+     * Request:
+     *     + `attributes`: Various attributes regarding the schedules.
+     *
+     *     Attributes:
+     *         + `name`:
+     *         + `description`:
+     *         + `timeframes`:
+     */
     virtual json create_impl(const json &req) override;
 
     virtual json read_impl(const json &req) override;

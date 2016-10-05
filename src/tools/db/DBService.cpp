@@ -22,6 +22,7 @@
 #include "DatabaseTracer.hpp"
 #include "Group_odb.h"
 #include "OptionalTransaction.hpp"
+#include "Schedule_odb.h"
 #include "User_odb.h"
 #include "exception/EntityNotFound.hpp"
 #include "tools/log.hpp"
@@ -91,4 +92,15 @@ Cred::ICredentialPtr DBService::find_credential_by_id(const Cred::CredentialId &
     if (!cred && flags & Flag::THROW_IF_NOT_FOUND)
         throw EntityNotFound(id, "credential");
     return cred;
+}
+
+Tools::ISchedulePtr DBService::find_schedule_by_id(const Tools::ScheduleId &id,
+                                                   DBService::Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto sched = database_->find<Tools::Schedule>(id);
+    t.commit();
+    if (!sched && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "schedule");
+    return sched;
 }

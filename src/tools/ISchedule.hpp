@@ -20,6 +20,7 @@
 #include "tools/ToolsFwd.hpp"
 #include <chrono>
 #include <string>
+#include <vector>
 
 #pragma once
 
@@ -27,7 +28,8 @@ namespace Leosac
 {
 namespace Tools
 {
-/**
+/**    using namespace Leosac::JSONUtil;
+
  * The interface for Schedule object.
  *
  * This class is not "ODB aware". Its main purpose
@@ -39,12 +41,18 @@ class ISchedule
   public:
     virtual ~ISchedule() = default;
 
+    virtual ScheduleId id() const = 0;
+
     /**
     * Retrieve the name of the schedule.
     */
     virtual const std::string &name() const = 0;
 
+    virtual void name(const std::string &) = 0;
+
     virtual const std::string &description() const = 0;
+
+    virtual void description(const std::string &) = 0;
 
     /**
     * Check whether or not the given time point can be found in the schedule.
@@ -56,6 +64,19 @@ class ISchedule
     * Add the given timeframe to this schedule;
     */
     virtual void add_timeframe(const SingleTimeFrame &tf) = 0;
+
+    /**
+     * Remove all the timeframes from this schedule.
+     */
+    virtual void clear_timeframes() = 0;
+
+    /**
+     * Retrieves the list of timesframes that compose
+     * this schedule.
+     */
+    virtual std::vector<SingleTimeFrame> timeframes() const = 0;
+
+    virtual size_t odb_version() const = 0;
 };
 }
 }

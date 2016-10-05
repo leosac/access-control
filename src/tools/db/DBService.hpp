@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 #include <core/credentials/ICredential.hpp>
 
@@ -66,6 +67,9 @@ class DBService
 
     Cred::ICredentialPtr find_credential_by_id(const Cred::CredentialId &id,
                                                Flag f = Flag::DEFAULT);
+
+    Tools::ISchedulePtr find_schedule_by_id(const Tools::ScheduleId &id,
+                                            Flag f = Flag::DEFAULT);
 
   private:
     DBPtr database_;

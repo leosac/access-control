@@ -53,8 +53,11 @@ using IUserGroupMembershipEventPtr = std::shared_ptr<IUserGroupMembershipEvent>;
 class ICredentialEvent;
 using ICredentialEventPtr = std::shared_ptr<ICredentialEvent>;
 
+class IScheduleEvent;
+using IScheduleEventPtr = std::shared_ptr<IScheduleEvent>;
+
 /**
- * Forward declartion of implementation class.
+ * Forward declaration of implementation class.
  */
 
 class AuditEntry;
@@ -76,6 +79,9 @@ using UserGroupMembershipEventPtr = std::shared_ptr<UserGroupMembershipEvent>;
 
 class CredentialEvent;
 using CredentialEventPtr = std::shared_ptr<CredentialEvent>;
+
+class ScheduleEvent;
+using ScheduleEventPtr = std::shared_ptr<ScheduleEvent>;
 
 enum class EventType
 {
@@ -108,6 +114,10 @@ enum class EventType
     CREDENTIAL_DELETE,
     CREDENTIAL_CREATE,
     CREDENTIAL_UPDATE,
+
+    SCHEDULE_CREATE,
+    SCHEDULE_DELETE,
+    SCHEDULE_UPDATE,
 
     LAST__
 };
