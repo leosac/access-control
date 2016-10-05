@@ -17,7 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Schedule.hpp"
+#include "tools/Schedule.hpp"
+#include "exception/ModelException.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac::Tools;
 
@@ -69,6 +71,7 @@ size_t Schedule::odb_version() const
 
 void Schedule::name(const std::string &name)
 {
+    ScheduleValidator::validate_name(name);
     name_ = name;
 }
 
@@ -80,4 +83,26 @@ void Schedule::description(const std::string &desc)
 void Schedule::clear_timeframes()
 {
     timeframes_.clear();
+}
+
+void ScheduleValidator::validate(const ISchedule &sched)
+{
+    validate_name(sched.name());
+}
+
+void ScheduleValidator::validate_name(const std::string &name)
+{
+    if (name.size() < 3 || name.size() > 50)
+    {
+        throw ModelException("data/attributes/name", "Length must be >=3 and <=50.");
+    }
+    for (const auto &c : name)
+    {
+        if (!isalnum(c) && (c != '_' && c != '-' && c != '.'))
+        {
+            throw ModelException(
+                "data/attributes/name",
+                BUILD_STR("Usage of unauthorized character: " << c));
+        }
+    }
 }

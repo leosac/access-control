@@ -80,5 +80,12 @@ class Schedule : public virtual ISchedule
 #pragma db version
     size_t odb_version_;
 };
+
+class ScheduleValidator
+{
+  public:
+    static void validate(const ISchedule &sched);
+    static void validate_name(const std::string &name);
+};
 }
 }
