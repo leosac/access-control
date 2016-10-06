@@ -85,6 +85,21 @@ void Schedule::clear_timeframes()
     timeframes_.clear();
 }
 
+void Schedule::add_mapping(const ScheduleMappingPtr &map)
+{
+    mapping_.push_back(map);
+}
+
+void Schedule::clear_mapping()
+{
+    mapping_.clear();
+}
+
+std::vector<ScheduleMappingPtr> Schedule::mapping() const
+{
+    return mapping_;
+}
+
 void ScheduleValidator::validate(const ISchedule &sched)
 {
     validate_name(sched.name());

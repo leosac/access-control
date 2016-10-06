@@ -36,6 +36,11 @@ class Random
      */
     static ByteVector GetBytes(size_t n);
 
+    /**
+     * Return a random ASCII string.
+     */
+    static std::string GetASCII(size_t n);
+
   private:
     /**
      * OpenSSL's random number generation is not thread-safe.

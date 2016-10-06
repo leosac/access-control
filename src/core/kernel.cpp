@@ -18,6 +18,8 @@
 */
 
 #include "kernel.hpp"
+#include "ScheduleMapping_odb.h"
+#include "Schedule_odb.h"
 #include "User_odb.h"
 #include "WiegandCard_odb.h"
 #include "core/auth/Group.hpp"
@@ -26,10 +28,12 @@
 #include "exception/ExceptionsTools.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
+#include "tools/Schedule.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/db/PGSQLTracer.hpp"
 #include "tools/db/database.hpp"
 #include "tools/log.hpp"
+#include "tools/scrypt/Random.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixfs.hpp"
 #include "tools/unixshellscript.hpp"
@@ -484,7 +488,7 @@ void Kernel::configure_database()
                     auto pg_db = std::make_shared<odb::pgsql::database>(
                         db_user, db_pw, db_dbname, db_host, db_port);
                     // todo: care about leak
-                    // pg_db->tracer(new db::PGSQLTracer());
+                    pg_db->tracer(new db::PGSQLTracer(true));
                     database_ = pg_db;
                 }
             }
@@ -501,16 +505,9 @@ void Kernel::configure_database()
                 using namespace odb;
                 using namespace odb::core;
                 Auth::UserPtr admin;
-
-                schema_version v(database_->schema_version("tools"));
-                if (v == 0)
-                {
-                    // Create schema
-                    transaction t(database_->begin());
-                    schema_catalog::create_schema(*database_, "tools");
-                    t.commit();
-                }
-                v = database_->schema_version("auth");
+                Auth::GroupPtr users;
+                Cred::WiegandCardPtr card;
+                schema_version v = database_->schema_version("auth");
                 if (v == 0)
                 {
                     transaction t(database_->begin());
@@ -536,7 +533,7 @@ void Kernel::configure_database()
                     administrators->member_add(admin);
                     database_->persist(administrators);
 
-                    Auth::GroupPtr users = std::make_shared<Auth::Group>();
+                    users = std::make_shared<Auth::Group>();
                     users->name("Users");
                     users->member_add(demo);
                     users->member_add(admin);
@@ -551,11 +548,11 @@ void Kernel::configure_database()
                     t.commit();
 
                     t.reset(database_->begin());
-                    Cred::WiegandCard card;
-                    card.owner(admin);
-                    card.alias(std::string("BestCardEver"));
-                    card.card_id("00:11:22:33");
-                    card.nb_bits(32);
+                    card = std::make_shared<Cred::WiegandCard>();
+                    card->owner(admin);
+                    card->alias(std::string("BestCardEver"));
+                    card->card_id("00:11:22:33");
+                    card->nb_bits(32);
                     database_->persist(card);
 
                     Cred::WiegandCard card2;
@@ -565,6 +562,30 @@ void Kernel::configure_database()
                     database_->persist(card2);
                     t.commit();
                 }
+
+                v = (database_->schema_version("tools"));
+                if (v == 0)
+                {
+                    // Create schema
+                    transaction t(database_->begin());
+                    schema_catalog::create_schema(*database_, "tools");
+
+                    Tools::Schedule sched;
+                    sched.name("DummySchedule");
+                    sched.description("A test schedule, with mapping.");
+                    Tools::ScheduleMappingPtr map0 =
+                        std::make_shared<ScheduleMapping>();
+                    map0->users_.push_back(admin);
+                    map0->groups_.push_back(users);
+                    map0->creds_.push_back(card);
+                    map0->alias_ = "My first mapping";
+                    database_->persist(map0);
+                    sched.add_mapping(map0);
+                    database_->persist(sched);
+
+                    t.commit();
+                }
+
                 v = database_->schema_version("audit");
                 if (v == 0)
                 {

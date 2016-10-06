@@ -17,35 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "tools/ScheduleMapping.hpp"
 
-#include "DatabaseTracer.hpp"
-#include <cstddef>
-#include <cstdint>
-#include <odb/pgsql/tracer.hxx>
+using namespace Leosac;
+using namespace Leosac::Tools;
 
-namespace Leosac
+ScheduleMappingId ScheduleMapping::id() const
 {
-namespace db
-{
-/**
- * An implementation of odb::tracer that use the logging infrastructure
- * of Leosac.
- */
-class PGSQLTracer : public DatabaseTracer
-{
-  public:
-    /**
-     * @param count_only Do not log request, only count them.
-     */
-    PGSQLTracer(bool count_only);
-    virtual void execute(odb::connection &connection, const char *statement);
-
-    virtual size_t count() const override;
-
-  private:
-    size_t count_;
-    bool count_only_;
-};
-}
+    return id_;
 }

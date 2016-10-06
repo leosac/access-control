@@ -21,16 +21,44 @@
 #include <cassert>
 #include <cstddef>
 #include <openssl/rand.h>
+#include <sstream>
 #include <vector>
 
 std::mutex Random::mutex_;
 
 ByteVector Random::GetBytes(size_t n)
 {
+    if (n == 0)
+        return {};
     std::unique_lock<std::mutex> ul(mutex_);
     ByteVector ret(n);
 
     int rc = RAND_bytes(&ret[0], n);
     assert(rc == 1);
     return ret;
+}
+
+std::string Random::GetASCII(size_t n)
+{
+    if (n == 0)
+        return "";
+
+    std::stringstream ss;
+    auto bytes = GetBytes(n);
+    int idx    = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        if (idx == bytes.size())
+        {
+            bytes = GetBytes(n);
+            idx   = 0;
+        }
+        if (isalnum(bytes[idx]))
+        {
+            ss << bytes[idx];
+        }
+        idx++;
+    }
+
+    return ss.str();
 }

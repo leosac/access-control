@@ -17,15 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SingleTimeFrame.hpp"
+#pragma once
+
 #include "tools/ISchedule.hpp"
+#include "tools/ScheduleMapping.hpp"
+#include "tools/SingleTimeFrame.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/database.hpp"
 #include <chrono>
 #include <string>
 #include <vector>
-
-#pragma once
 
 namespace Leosac
 {
@@ -62,6 +63,12 @@ class Schedule : public virtual ISchedule
 
     std::vector<SingleTimeFrame> timeframes() const override;
 
+    void add_mapping(const Tools::ScheduleMappingPtr &map) override;
+
+    void clear_mapping() override;
+
+    std::vector<ScheduleMappingPtr> mapping() const override;
+
     size_t odb_version() const override;
 
   private:
@@ -70,12 +77,16 @@ class Schedule : public virtual ISchedule
 #pragma db id auto
     ScheduleId id_;
 
+#pragma db id_column("schedule_id")
     std::vector<SingleTimeFrame> timeframes_;
 
 #pragma db unique
     std::string name_;
 
     std::string description_;
+
+#pragma db id_column("schedule_id")
+    std::vector<Tools::ScheduleMappingPtr> mapping_;
 
 #pragma db version
     size_t odb_version_;
@@ -89,3 +100,7 @@ class ScheduleValidator
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "tools/ScheduleMapping.hpp"
+#endif

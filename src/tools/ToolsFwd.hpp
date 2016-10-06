@@ -36,5 +36,9 @@ using ScheduleLWPtr = odb::lazy_weak_ptr<Schedule>;
 class ISchedule;
 using ISchedulePtr  = std::shared_ptr<ISchedule>;
 using IScheduleCPtr = std::shared_ptr<const ISchedule>;
+
+class ScheduleMapping;
+using ScheduleMappingPtr = std::shared_ptr<ScheduleMapping>;
+using ScheduleMappingId  = unsigned long;
 }
 }

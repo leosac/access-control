@@ -76,6 +76,13 @@ class ISchedule
      */
     virtual std::vector<SingleTimeFrame> timeframes() const = 0;
 
+    virtual void add_mapping(const Tools::ScheduleMappingPtr &map) = 0;
+
+    virtual void clear_mapping() = 0;
+
+    virtual std::vector<Tools::ScheduleMappingPtr> mapping() const = 0;
+
+
     virtual size_t odb_version() const = 0;
 };
 }

@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
 #include "tools/ISchedule.hpp"
 #include <boost/property_tree/ptree_fwd.hpp>
 #include <map>
-
-#pragma once
 
 namespace Leosac
 {

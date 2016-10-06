@@ -82,6 +82,8 @@ set(LEOSAC_LIB_SRCS
     tools/MyTime.cpp
     tools/SingleTimeFrame.cpp
     tools/serializers/ScheduleSerializer.cpp
+    tools/serializers/ScheduleMappingSerializer.cpp
+    tools/ScheduleMapping.cpp
     core/tasks/GetLocalConfigVersion.cpp
     core/tasks/GetRemoteConfigVersion.cpp
     core/tasks/FetchRemoteConfig.cpp

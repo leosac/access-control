@@ -26,6 +26,7 @@
 #include "tools/ISchedule.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/serializers/ScheduleSerializer.hpp"
+#include <tools/serializers/ScheduleMappingSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -98,6 +99,24 @@ json ScheduleCRUD::create_impl(const json &req)
     return rep;
 }
 
+/**
+ * Returns a JSON array that describes the schedule-mapping objects
+ * associated with the schedule.
+ *
+ * This is used to populate the "included" key (emberjs data sideloading)
+ */
+static json schedule_mapping_infos(const Tools::ISchedule &schedule,
+                                   SecurityContext &sc)
+{
+    json infos = json::array();
+    for (const auto &mapping : schedule.mapping())
+    {
+        infos.push_back(
+            Tools::ScheduleMappingJSONSerializer::serialize(*mapping, sc));
+    }
+    return infos;
+}
+
 json ScheduleCRUD::read_impl(const json &req)
 {
     json rep;
@@ -114,15 +133,22 @@ json ScheduleCRUD::read_impl(const json &req)
             ctx_.dbsrv->find_schedule_by_id(sid, DBService::THROW_IF_NOT_FOUND);
         rep["data"] =
             Tools::ScheduleJSONSerializer::serialize(*schedule, security_context());
+
+        // Include the information about the schedule-mapping objects.
+        rep["included"] = schedule_mapping_infos(*schedule, security_context());
     }
     else
     {
-        Result result = db->query<Tools::Schedule>();
-        rep["data"]   = json::array();
+        Result result   = db->query<Tools::Schedule>();
+        rep["data"]     = json::array();
+        rep["included"] = json::array();
         for (const auto &schedule : result)
         {
             rep["data"].push_back(Tools::ScheduleJSONSerializer::serialize(
                 schedule, security_context()));
+            auto &included = rep["included"];
+            auto tmp       = schedule_mapping_infos(schedule, security_context());
+            included.insert(included.end(), tmp.begin(), tmp.end());
         }
     }
     return rep;

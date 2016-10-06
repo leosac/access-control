@@ -19,6 +19,7 @@
 
 #include "tools/serializers/ScheduleSerializer.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/ScheduleMapping.hpp"
 #include "tools/SingleTimeFrame.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -44,13 +45,21 @@ json ScheduleJSONSerializer::serialize(const Tools::ISchedule &in,
         tf_pos++;
     }
 
+    json json_mappings = json::array();
+    for (const auto &mapping : in.mapping())
+    {
+        json json_mapping = {{"id", mapping->id()}, {"type", "schedule-mapping"}};
+        json_mappings.push_back(json_mapping);
+    }
+
     json serialized = {{"id", in.id()},
                        {"type", "schedule"},
                        {"attributes",
                         {{"version", in.odb_version()},
                          {"name", in.name()},
                          {"description", in.description()},
-                         {"timeframes", timeframes}}}};
+                         {"timeframes", timeframes}}},
+                       {"relationships", {{"mapping", {{"data", json_mappings}}}}}};
 
     return serialized;
 }

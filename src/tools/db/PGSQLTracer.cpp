@@ -23,9 +23,15 @@
 using namespace Leosac;
 using namespace Leosac::db;
 
+PGSQLTracer::PGSQLTracer(bool count_only)
+    : count_only_(count_only)
+{
+}
+
 void PGSQLTracer::execute(odb::connection &connection, const char *statement)
 {
-    DEBUG("SQL: " << statement);
+    if (!count_only_)
+        DEBUG("SQL: " << statement);
     ++count_;
 }
 

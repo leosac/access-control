@@ -5,6 +5,7 @@ set(OdbCMake_ODB_HEADERS_TOOLS
         ${CMAKE_SOURCE_DIR}/src/tools/LogEntry.hpp
         ${CMAKE_SOURCE_DIR}/src/tools/SingleTimeFrame.hpp
         ${CMAKE_SOURCE_DIR}/src/tools/Schedule.hpp
+        ${CMAKE_SOURCE_DIR}/src/tools/ScheduleMapping.hpp
         )
 
 set(OdbCMake_SOURCES_TOOLS "")
@@ -22,6 +23,10 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         INCLUDE_PREFIX tools
         INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )
