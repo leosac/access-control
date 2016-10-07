@@ -27,7 +27,7 @@ using namespace Leosac;
 using namespace Leosac::Tools;
 
 json ScheduleJSONSerializer::serialize(const Tools::ISchedule &in,
-                                       const SecurityContext &sc)
+                                       const SecurityContext &)
 {
     int tf_pos      = 0;
     json timeframes = json::array();
@@ -80,7 +80,7 @@ static std::pair<int, int> parse_time(const std::string &tm)
 };
 
 void ScheduleJSONSerializer::unserialize(Tools::ISchedule &out, const json &in,
-                                         const SecurityContext &sc)
+                                         const SecurityContext &)
 {
     using namespace Leosac::JSONUtil;
 

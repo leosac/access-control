@@ -17,32 +17,29 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "core/credentials/PinCode.hpp"
+#include "exception/ModelException.hpp"
+#include "tools/log.hpp"
+#include <boost/algorithm/string.hpp>
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+using namespace Leosac;
+using namespace Leosac::Cred;
 
-namespace Leosac
+const std::string &PinCode::pin_code() const
 {
-namespace Cred
-{
-
-// Credentials
-class ICredential;
-using ICredentialPtr = std::shared_ptr<ICredential>;
-
-class Credential;
-using CredentialId    = unsigned long;
-using CredentialPtr   = std::shared_ptr<Credential>;
-using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
-using CredentialLPtr  = odb::lazy_shared_ptr<Credential>;
-
-class IWiegandCard;
-class WiegandCard;
-using WiegandCardPtr = std::shared_ptr<WiegandCard>;
-
-class IPinCode;
-class PinCode;
-using PinCodePtr = std::shared_ptr<PinCode>;
+    return pin_code_;
 }
+
+void PinCode::pin_code(const std::string &pin)
+{
+    pin_code_ = pin;
+}
+
+void PinCodeValidator::validate(const IPinCode &pin)
+{
+    validate_pin_code(pin.pin_code());
+}
+
+void PinCodeValidator::validate_pin_code(const std::string &)
+{
 }

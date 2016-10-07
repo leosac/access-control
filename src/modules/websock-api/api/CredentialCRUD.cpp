@@ -22,13 +22,14 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/ICredentialEvent.hpp"
 #include "core/credentials/Credential.hpp"
+#include "core/credentials/PinCode.hpp"
 #include "core/credentials/WiegandCard.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
+#include "exception/leosacexception.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/GlobalRegistry.hpp"
 #include "tools/db/DBService.hpp"
-#include <exception/leosacexception.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -93,6 +94,10 @@ json CredentialCRUD::create_impl(const json &req)
     {
         new_cred = std::make_shared<Cred::WiegandCard>();
     }
+    else if (type == "pin-code")
+    {
+        new_cred = std::make_shared<Cred::PinCode>();
+    }
     else
     {
         throw LEOSACException(
@@ -147,13 +152,6 @@ json CredentialCRUD::read_impl(const json &req)
                     cred, security_context()));
             }
         }
-        auto dummy                   = json{};
-        dummy["type"]                = "pin-code";
-        dummy["id"]                  = 42;
-        dummy["attributes"]          = json::object();
-        dummy["attributes"]["alias"] = "BOAP";
-        dummy["attributes"]["code"]  = "1234";
-        rep["data"].push_back(dummy);
     }
     t.commit();
     return rep;

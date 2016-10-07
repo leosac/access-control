@@ -27,35 +27,15 @@ namespace Leosac
 namespace Cred
 {
 /**
- * Interface for WiegandCard credential.
+ * Interface for PinCode credentials.
  */
-class IWiegandCard : public virtual ICredential
+class IPinCode : public virtual ICredential
 {
   public:
     MAKE_VISITABLE();
 
-    virtual const std::string &card_id() const = 0;
-    virtual int nb_bits() const                = 0;
-
-    virtual void nb_bits(int)                 = 0;
-    virtual void card_id(const std::string &) = 0;
-
-    /**
-     * Returns the integer representation of the
-     * card ID.
-     *
-     * The format (Wiegand 26, 32, ....) is used to build the
-     * card number. If no format is recognized, fallback to `to_raw_int()`
-     */
-    virtual uint64_t to_int() const = 0;
-
-    /**
-     * Convert the bits of the card to an integer.
-     *
-     * The format (Wiegand26, 32, ...) is ignored: all bits are used
-     * to build the number.
-     */
-    virtual uint64_t to_raw_int() const = 0;
+    virtual const std::string &pin_code() const = 0;
+    virtual void pin_code(const std::string &)  = 0;
 };
 }
 }

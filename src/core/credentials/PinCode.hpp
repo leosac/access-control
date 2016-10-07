@@ -19,30 +19,37 @@
 
 #pragma once
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+#include "core/credentials/Credential.hpp"
+#include "core/credentials/IPinCode.hpp"
 
 namespace Leosac
 {
 namespace Cred
 {
+/**
+ * A PinCode credential.
+ */
+#pragma db object polymorphic optimistic
+class PinCode : public virtual IPinCode, public Credential
+{
+  public:
+    PinCode() = default;
 
-// Credentials
-class ICredential;
-using ICredentialPtr = std::shared_ptr<ICredential>;
+    const std::string &pin_code() const override;
 
-class Credential;
-using CredentialId    = unsigned long;
-using CredentialPtr   = std::shared_ptr<Credential>;
-using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
-using CredentialLPtr  = odb::lazy_shared_ptr<Credential>;
+    void pin_code(const std::string &string) override;
 
-class IWiegandCard;
-class WiegandCard;
-using WiegandCardPtr = std::shared_ptr<WiegandCard>;
+  protected:
+    std::string pin_code_;
 
-class IPinCode;
-class PinCode;
-using PinCodePtr = std::shared_ptr<PinCode>;
+    friend class odb::access;
+};
+
+class PinCodeValidator
+{
+  public:
+    static void validate(const IPinCode &card);
+    static void validate_pin_code(const std::string &);
+};
 }
 }

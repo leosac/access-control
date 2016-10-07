@@ -44,7 +44,7 @@ struct GroupComparator
     bool operator()(const Auth::Group &g1, const Auth::Group &g2)
     {
         ASSERT_LOG(g1.id(), "g1 has no id.");
-        ASSERT_LOG(g2.id(), "g1 has no id.");
+        ASSERT_LOG(g2.id(), "g2 has no id.");
         return g1.id() < g2.id();
     }
 };
@@ -63,7 +63,7 @@ json GroupSearch::process_impl(const json &req)
     // bruteforce-style implementation.
     // todo: fixme
 
-    for (auto i = 0; i < partial_name.length(); ++i)
+    for (auto i = 0u; i < partial_name.length(); ++i)
     {
         auto partial_name_copy = partial_name;
         partial_name_copy[i]   = std::toupper(partial_name[i]);

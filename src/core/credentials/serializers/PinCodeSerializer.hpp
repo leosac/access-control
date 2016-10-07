@@ -19,30 +19,24 @@
 
 #pragma once
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+#include "core/credentials/CredentialFwd.hpp"
+#include "tools/Serializer.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
-namespace Cred
+using json = nlohmann::json;
+
+/**
+ * A serializer that handle `Cred::IPinCode` object.
+ */
+struct PinCodeJSONSerializer
+    : public Serializer<json, Cred::IPinCode, PinCodeJSONSerializer>
 {
+    static json serialize(const Cred::IPinCode &in, const SecurityContext &sc);
 
-// Credentials
-class ICredential;
-using ICredentialPtr = std::shared_ptr<ICredential>;
-
-class Credential;
-using CredentialId    = unsigned long;
-using CredentialPtr   = std::shared_ptr<Credential>;
-using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
-using CredentialLPtr  = odb::lazy_shared_ptr<Credential>;
-
-class IWiegandCard;
-class WiegandCard;
-using WiegandCardPtr = std::shared_ptr<WiegandCard>;
-
-class IPinCode;
-class PinCode;
-using PinCodePtr = std::shared_ptr<PinCode>;
-}
+    static void unserialize(Cred::IPinCode &out, const json &in,
+                            const SecurityContext &sc);
+};
 }

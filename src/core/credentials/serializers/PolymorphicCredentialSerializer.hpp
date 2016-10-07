@@ -57,10 +57,13 @@ struct PolymorphicCredentialJSONSerializer
     /**
      * Non static helper that can visit credential object.
      */
-    struct HelperSerialize : public Tools::Visitor<Cred::IWiegandCard>
+    struct HelperSerialize : public Tools::Visitor<Cred::IWiegandCard>,
+                             public Tools::Visitor<Cred::IPinCode>
     {
         HelperSerialize(const SecurityContext &sc);
         void visit(const Cred::IWiegandCard &t) override;
+
+        void visit(const Cred::IPinCode &t) override;
 
         /**
          * Store the result here because we can't return from
@@ -74,10 +77,13 @@ struct PolymorphicCredentialJSONSerializer
         const SecurityContext &security_context_;
     };
 
-    struct HelperUnserialize : public Tools::Visitor<Cred::IWiegandCard>
+    struct HelperUnserialize : public Tools::Visitor<Cred::IWiegandCard>,
+                               public Tools::Visitor<Cred::IPinCode>
     {
         HelperUnserialize(const SecurityContext &sc, const json &payload);
         void visit(Cred::IWiegandCard &t) override;
+
+        void visit(Cred::IPinCode &t) override;
 
         /**
          * Reference to the security context.

@@ -28,9 +28,8 @@ using namespace Leosac;
 using namespace Leosac::Tools;
 
 json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
-                                              const SecurityContext &sc)
+                                              const SecurityContext &)
 {
-
     json serialized = {
         {"id", in.id()},
         {"type", "schedule-mapping"},

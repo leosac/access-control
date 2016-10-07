@@ -106,6 +106,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
 set(OdbCMake_ODB_HEADERS_CREDENTIALS
         ${CMAKE_SOURCE_DIR}/src/core/credentials/Credential.hpp
         ${CMAKE_SOURCE_DIR}/src/core/credentials/WiegandCard.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/credentials/PinCode.hpp
         )
 
 set(OdbCMake_SOURCES_CREDENTIALS "")

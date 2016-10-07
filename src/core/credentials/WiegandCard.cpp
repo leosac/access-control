@@ -18,9 +18,9 @@
 */
 
 #include "core/credentials/WiegandCard.hpp"
+#include "exception/ModelException.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
-#include <exception/ModelException.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Cred;

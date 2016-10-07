@@ -18,6 +18,7 @@
 */
 
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
+#include "PinCodeSerializer.hpp"
 #include "WiegandCardSerializer.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/credentials/ICredential.hpp"
@@ -73,6 +74,11 @@ void PolymorphicCredentialJSONSerializer::HelperUnserialize::visit(
     WiegandCardJSONSerializer::unserialize(t, payload_, security_context_);
 }
 
+void PolymorphicCredentialJSONSerializer::HelperUnserialize::visit(IPinCode &t)
+{
+    PinCodeJSONSerializer::unserialize(t, payload_, security_context_);
+}
+
 PolymorphicCredentialJSONSerializer::HelperSerialize::HelperSerialize(
     const SecurityContext &sc)
     : security_context_(sc)
@@ -83,6 +89,11 @@ void PolymorphicCredentialJSONSerializer::HelperSerialize::visit(
     const IWiegandCard &t)
 {
     result_ = WiegandCardJSONSerializer::serialize(t, security_context_);
+}
+
+void PolymorphicCredentialJSONSerializer::HelperSerialize::visit(const IPinCode &t)
+{
+    result_ = PinCodeJSONSerializer::serialize(t, security_context_);
 }
 
 
