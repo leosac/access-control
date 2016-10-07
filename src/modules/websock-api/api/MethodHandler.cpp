@@ -18,6 +18,7 @@
 */
 
 #include "api/MethodHandler.hpp"
+#include "Exceptions.hpp"
 #include "WSServer.hpp"
 
 using namespace Leosac;
@@ -26,14 +27,21 @@ using namespace Leosac::Module::WebSockAPI;
 
 json MethodHandler::process(const ClientMessage &msg)
 {
-    for (const auto &condition_group : conditions_)
+    auto &security_ctx = ctx_.session->security_context();
+    for (const auto &action_and_param : required_permission(msg.content))
     {
-        bool success = false;
-        for (const auto &condition : condition_group.first)
-            success |= condition(msg.content);
-
-        if (!success)
-            condition_group.second();
+        if (!security_ctx.check_permission(action_and_param.first,
+                                           action_and_param.second))
+        {
+            throw PermissionDenied();
+        }
     }
     return process_impl(msg.content);
+}
+
+WSSecurityContext &MethodHandler::security_context()
+{
+    auto wsc = dynamic_cast<WSSecurityContext *>(&ctx_.session->security_context());
+    ASSERT_LOG(wsc, "SecurityContext has unexpected type.");
+    return *wsc;
 }

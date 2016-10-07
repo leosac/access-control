@@ -70,8 +70,8 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
 
-    handlers2_["get_logs"]        = &LogGet::create;
-    handlers2_["password_change"] = &PasswordChange::create;
+    individual_handlers_["get_logs"]        = &LogGet::create;
+    individual_handlers_["password_change"] = &PasswordChange::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);
@@ -202,14 +202,14 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
     // A request is an "Unit-of-Work" for the application.
     // We create a default database session for the request.
     odb::session database_session;
-    auto handler_factory = handlers2_.find(in.type);
+    auto handler_factory = individual_handlers_.find(in.type);
     api_handle->hook_before_request();
 
     // Store the database handle in the global registry.
     // This may be used later by serializers.
     GlobalRegistry::set(GlobalRegistry::DATABASE, dbsrv_->db());
 
-    if (handler_factory != handlers2_.end())
+    if (handler_factory != individual_handlers_.end())
     {
         RequestContext ctx{
             .session = api_handle, .dbsrv = dbsrv_, .server = *this, .audit = audit};

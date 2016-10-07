@@ -40,28 +40,6 @@ GroupCRUD::GroupCRUD(RequestContext ctx)
 CRUDResourceHandlerUPtr GroupCRUD::instanciate(RequestContext ctx)
 {
     auto instance = CRUDResourceHandlerUPtr(new GroupCRUD(ctx));
-
-    auto has_json_attributes_object = [ptr = instance.get()](const json &req)
-    {
-        try
-        {
-            return req.at("attributes").is_object();
-        }
-        catch (const std::out_of_range &e)
-        {
-            return false;
-        }
-    };
-    // Update conditions
-    instance->add_conditions_or(
-        Verb::UPDATE, []() { throw MalformedMessage("No `attributes` subobject"); },
-        has_json_attributes_object);
-
-    // Create conditions
-    instance->add_conditions_or(
-        Verb::CREATE, []() { throw MalformedMessage("No `attributes` subobject"); },
-        has_json_attributes_object);
-
     return instance;
 }
 

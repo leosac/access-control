@@ -20,6 +20,8 @@
 #pragma once
 
 #include "RequestContext.hpp"
+#include "WSSecurityContext.hpp"
+#include "core/SecurityContext.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -34,7 +36,7 @@ using json = nlohmann::json;
 /**
  * The base class for API method handler implementation.
  *
- * The class defines the very simple interface that must be implemented
+ * The class defines the very simple interface that may be implemented
  * by the various API method implementation.
  *
  * Each subclass should provide a static method to instanciate a handler
@@ -62,12 +64,13 @@ class MethodHandler
 
     /**
      * An example method that should be implemented in all subclasses.
-     * Required request-conditions should be created in this method too.
      */
     static MethodHandlerUPtr create(RequestContext)
     {
         return nullptr;
     }
+
+    WSSecurityContext &security_context();
 
   private:
     /**
@@ -79,56 +82,17 @@ class MethodHandler
     virtual json process_impl(const json &req) = 0;
 
   protected:
-    /**
-     * Extract the value of a key from a json object.
-     *
-     * If the key cannot be found, this function returns the default
-     * value instead.
-     */
-    template <typename T>
-    typename std::enable_if<!std::is_same<const char *, T>::value, T>::type
-    extract_with_default(const json &obj, const std::string &key, T default_value)
-    {
-        T ret = default_value;
-        try
-        {
-            ret = obj.at(key).get<T>();
-        }
-        catch (const std::out_of_range &e)
-        {
-        }
-        return ret;
-    }
+    using ActionActionParam =
+        std::pair<SecurityContext::Action, SecurityContext::ActionParam>;
 
-    template <typename T>
-    typename std::enable_if<std::is_same<const char *, T>::value, std::string>::type
-    extract_with_default(const json &obj, const std::string &key, T default_value)
-    {
-        return extract_with_default<std::string>(obj, key, default_value);
-    }
+    /**
+     * Return a list of "Action" / "ActionParam" that must pass before
+     * the request is processed.
+     */
+    virtual std::vector<ActionActionParam>
+    required_permission(const json &req) const = 0;
 
     RequestContext ctx_;
-
-    /**
-     * Add a bunch of condition: at least one of them must return
-     * true, otherwise `on_failure()` will be invoked.
-     *
-     * @param on_failure Invoked if all condition returned false.
-     * @param conditions A bunch of condition-like object.
-     */
-    template <typename OnFailureT, typename... T>
-    void add_conditions_or(const OnFailureT &on_failure, const T &... conditions)
-    {
-        ConditionVector new_conditions{conditions...};
-        conditions_.push_back(std::make_pair(new_conditions, on_failure));
-    };
-
-    using ConditionVector = std::vector<std::function<bool(const json &req)>>;
-
-    /**
-     * Condition that are evaluated before handling the request.
-     */
-    std::vector<std::pair<ConditionVector, std::function<void()>>> conditions_;
 };
 }
 }

@@ -196,7 +196,7 @@ class WSServer
      */
     std::map<std::string, json (APISession::*)(const json &)> handlers_;
 
-    std::map<std::string, MethodHandler::Factory> handlers2_;
+    std::map<std::string, MethodHandler::Factory> individual_handlers_;
 
     std::map<std::string, CRUDResourceHandler::Factory> crud_handlers_;
 

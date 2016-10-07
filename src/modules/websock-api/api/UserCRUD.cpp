@@ -40,25 +40,6 @@ UserCRUD::UserCRUD(RequestContext ctx)
 CRUDResourceHandlerUPtr UserCRUD::instanciate(RequestContext ctx)
 {
     auto instance = CRUDResourceHandlerUPtr(new UserCRUD(ctx));
-
-    auto has_json_attributes_object = [ptr = instance.get()](const json &req)
-    {
-        try
-        {
-            return req.at("attributes").is_object();
-        }
-        catch (const std::out_of_range &e)
-        {
-            return false;
-        }
-    };
-    // Update conditions
-    instance->add_conditions_or(
-        Verb::UPDATE, []() { throw MalformedMessage("No `attributes` subobject"); },
-        has_json_attributes_object);
-    instance->add_conditions_or(
-        Verb::CREATE, []() { throw MalformedMessage("No `attributes` subobject"); },
-        has_json_attributes_object);
     return instance;
 }
 
@@ -156,7 +137,7 @@ json UserCRUD::update_impl(const json &req)
     return rep;
 }
 
-json UserCRUD::delete_impl(const json &req)
+json UserCRUD::delete_impl(const json &)
 {
     throw LEOSACException("Not implemented.");
 }

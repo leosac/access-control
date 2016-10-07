@@ -49,6 +49,10 @@ class PasswordChange : public MethodHandler
 
     static MethodHandlerUPtr create(RequestContext);
 
+  protected:
+    std::vector<ActionActionParam>
+    required_permission(const json &req) const override;
+
   private:
     virtual json process_impl(const json &req) override;
 };

@@ -22,6 +22,7 @@
 #include "LogEntry_odb.h"
 #include "User_odb.h"
 #include "api/APISession.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;
@@ -36,16 +37,6 @@ LogGet::LogGet(RequestContext ctx)
 MethodHandlerUPtr LogGet::create(RequestContext ctx)
 {
     auto instance = std::make_unique<LogGet>(ctx);
-
-    auto is_allowed = [ ptr = instance.get(), ctx = ctx ](const json &)
-    {
-        SecurityContext::ActionParam ap;
-        return ctx.session->security_context().check_permission(
-            SecurityContext::Action::LOG_READ, ap);
-    };
-
-    // Only administrator can check log.
-    instance->add_conditions_or([]() { throw PermissionDenied(); }, is_allowed);
     return std::move(instance);
 }
 
@@ -56,6 +47,7 @@ json LogGet::process_impl(const json &req)
     if (db)
     {
         using namespace Tools;
+        using namespace JSONUtil;
 
         rep["data"]      = json::array();
         std::string sort = extract_with_default(req, "sort", "desc");
@@ -84,4 +76,14 @@ json LogGet::process_impl(const json &req)
         rep["status"] = -1;
     }
     return rep;
+}
+
+std::vector<MethodHandler::ActionActionParam>
+LogGet::required_permission(const json &req) const
+{
+    std::vector<MethodHandler::ActionActionParam> perm_;
+    SecurityContext::ActionParam ap;
+
+    perm_.push_back({SecurityContext::Action::LOG_READ, ap});
+    return perm_;
 }

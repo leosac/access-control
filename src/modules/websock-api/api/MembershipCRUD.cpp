@@ -29,6 +29,7 @@
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "core/auth/serializers/UserGroupMembershipSerializer.hpp"
+#include "tools/JSONUtils.hpp"
 #include <json.hpp>
 
 using namespace Leosac;
@@ -122,8 +123,9 @@ std::vector<CRUDResourceHandler::ActionActionParam>
 MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
                                     const json &req) const
 {
-    std::vector<CRUDResourceHandler::ActionActionParam> ret;
+    using namespace JSONUtil;
 
+    std::vector<CRUDResourceHandler::ActionActionParam> ret;
     SecurityContext::MembershipActionParam map;
     map.membership_id = extract_with_default(req, "membership_id", 0u);
     map.user_id       = extract_with_default(req, "user_id", 0u);
