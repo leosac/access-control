@@ -77,7 +77,7 @@ class Schedule : public virtual ISchedule
 #pragma db id auto
     ScheduleId id_;
 
-#pragma db id_column("schedule_id")
+#pragma db id_column("schedule_id") value_column("timeframe")
     std::vector<SingleTimeFrame> timeframes_;
 
 #pragma db unique
@@ -85,7 +85,7 @@ class Schedule : public virtual ISchedule
 
     std::string description_;
 
-#pragma db id_column("schedule_id")
+#pragma db id_column("schedule_id") value_column("schedule_mapping_id")
     std::vector<Tools::ScheduleMappingPtr> mapping_;
 
 #pragma db version

@@ -37,6 +37,7 @@ class Group;
 using GroupPtr   = std::shared_ptr<Group>;
 using GroupWPtr  = std::weak_ptr<Group>;
 using GroupLWPtr = odb::lazy_weak_ptr<Group>;
+using GroupLPtr  = odb::lazy_shared_ptr<Group>;
 using GroupId    = unsigned long;
 
 /**

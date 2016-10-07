@@ -60,6 +60,24 @@ class ScheduleCRUD : public CRUDResourceHandler
 
     virtual json read_impl(const json &req) override;
 
+    /**
+     * Update a schedule object.
+     *
+     * This call is a bit different than `schedule.create` because it allows
+     * for specifying the mapping (ScheduleMapping objects) of the schedule.
+     *
+     * Request:
+     *     + `attributes`: ...
+     *     + `mapping`:
+     *         [
+     *           {
+     *              + alias: Alias of this mapping
+     *              + groups: [IDs, ...] Ids of groups targeted by the mapping
+     *              + users: [IDs, ...] Ditto for users
+     *              + credentials: [IDs, ...] Ditto for credentials.
+     *            }
+     *         ]
+     */
     virtual json update_impl(const json &req) override;
 
     virtual json delete_impl(const json &req) override;

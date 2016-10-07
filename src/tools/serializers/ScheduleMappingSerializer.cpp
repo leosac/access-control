@@ -20,6 +20,7 @@
 #include "tools/serializers/ScheduleMappingSerializer.hpp"
 #include "User_odb.h"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
+#include "tools/GlobalRegistry.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/ScheduleMapping.hpp"
 
@@ -67,9 +68,37 @@ json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
 
 void ScheduleMappingJSONSerializer::unserialize(Tools::ScheduleMapping &out,
                                                 const json &in,
-                                                const SecurityContext &sc)
+                                                const SecurityContext &)
 {
-    assert(0);
+    // We need to database to build Lazy pointer from object's identifier.
+    auto db = GlobalRegistry::get<DBPtr>(GlobalRegistry::DATABASE);
+    using namespace JSONUtil;
+    out.alias_ = extract_with_default(in, "alias", out.alias_);
+
+    auto group_ids = in.at("groups");
+    out.groups_.clear();
+    for (const auto &group_id : group_ids)
+    {
+        auto group = Auth::GroupLPtr(*db, group_id.get<Tools::ScheduleMappingId>());
+        out.groups_.push_back(group);
+    }
+
+    auto user_ids = in.at("users");
+    out.users_.clear();
+    for (const auto &user_id : user_ids)
+    {
+        Auth::UserLPtr user(*db, user_id.get<Auth::UserId>());
+        out.users_.push_back(user);
+    }
+
+    auto credential_ids = in.at("credentials");
+    out.creds_.clear();
+    for (const auto &credential_id : credential_ids)
+    {
+        Cred::CredentialLPtr credential(*db,
+                                        credential_id.get<Cred::CredentialId>());
+        out.creds_.push_back(credential);
+    }
 }
 
 std::string

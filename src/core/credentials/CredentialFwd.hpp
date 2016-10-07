@@ -35,6 +35,7 @@ class Credential;
 using CredentialId    = unsigned long;
 using CredentialPtr   = std::shared_ptr<Credential>;
 using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
+using CredentialLPtr  = odb::lazy_shared_ptr<Credential>;
 
 class IWiegandCard;
 class WiegandCard;

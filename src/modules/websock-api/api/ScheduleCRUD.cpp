@@ -104,17 +104,19 @@ json ScheduleCRUD::create_impl(const json &req)
  * associated with the schedule.
  *
  * This is used to populate the "included" key (emberjs data sideloading)
+ *
+ * @param dest The json array push into.
  */
-static json schedule_mapping_infos(const Tools::ISchedule &schedule,
-                                   SecurityContext &sc)
+static void include_schedule_mapping_infos(json &dest,
+                                           const Tools::ISchedule &schedule,
+                                           SecurityContext &sc)
 {
-    json infos = json::array();
+    ASSERT_LOG(dest.is_array(), "Destination is not array.");
     for (const auto &mapping : schedule.mapping())
     {
-        infos.push_back(
+        dest.push_back(
             Tools::ScheduleMappingJSONSerializer::serialize(*mapping, sc));
     }
-    return infos;
 }
 
 json ScheduleCRUD::read_impl(const json &req)
@@ -125,7 +127,8 @@ json ScheduleCRUD::read_impl(const json &req)
     DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 
-    auto sid = req.at("schedule_id").get<Tools::ScheduleId>();
+    auto sid        = req.at("schedule_id").get<Tools::ScheduleId>();
+    rep["included"] = json::array();
 
     if (sid != 0)
     {
@@ -133,22 +136,19 @@ json ScheduleCRUD::read_impl(const json &req)
             ctx_.dbsrv->find_schedule_by_id(sid, DBService::THROW_IF_NOT_FOUND);
         rep["data"] =
             Tools::ScheduleJSONSerializer::serialize(*schedule, security_context());
-
-        // Include the information about the schedule-mapping objects.
-        rep["included"] = schedule_mapping_infos(*schedule, security_context());
+        include_schedule_mapping_infos(rep["included"], *schedule,
+                                       security_context());
     }
     else
     {
-        Result result   = db->query<Tools::Schedule>();
-        rep["data"]     = json::array();
-        rep["included"] = json::array();
+        Result result = db->query<Tools::Schedule>();
+        rep["data"]   = json::array();
         for (const auto &schedule : result)
         {
             rep["data"].push_back(Tools::ScheduleJSONSerializer::serialize(
                 schedule, security_context()));
-            auto &included = rep["included"];
-            auto tmp       = schedule_mapping_infos(schedule, security_context());
-            included.insert(included.end(), tmp.begin(), tmp.end());
+            include_schedule_mapping_infos(rep["included"], schedule,
+                                           security_context());
         }
     }
     return rep;
@@ -161,6 +161,8 @@ json ScheduleCRUD::update_impl(const json &req)
     odb::transaction t(db->begin());
     auto sid = req.at("schedule_id").get<Tools::ScheduleId>();
 
+    rep["included"] = json::array(); // Will contain ScheduleMapping data.
+
     auto schedule =
         ctx_.dbsrv->find_schedule_by_id(sid, DBService::THROW_IF_NOT_FOUND);
     Audit::IScheduleEventPtr audit =
@@ -171,6 +173,24 @@ json ScheduleCRUD::update_impl(const json &req)
 
     Tools::ScheduleJSONSerializer::unserialize(*schedule, req.at("attributes"),
                                                security_context());
+
+    for (const auto &mapping : schedule->mapping())
+    {
+        db->erase(mapping);
+    }
+    schedule->clear_mapping();
+    // Extract mappings.
+    for (const auto &json_mapping : req.at("mapping"))
+    {
+        Tools::ScheduleMappingPtr mapping =
+            std::make_shared<Tools::ScheduleMapping>();
+        Tools::ScheduleMappingJSONSerializer::unserialize(*mapping, json_mapping,
+                                                          security_context());
+        db->persist(mapping);
+        schedule->add_mapping(mapping);
+    }
+    include_schedule_mapping_infos(rep["included"], *schedule, security_context());
+
     db->update(assert_cast<Tools::SchedulePtr>(schedule));
     audit->after(Tools::ScheduleJSONStringSerializer::serialize(
         *schedule, SystemSecurityContext::instance()));
@@ -198,6 +218,12 @@ json ScheduleCRUD::delete_impl(const json &req)
         audit->event_mask(Audit::EventType::SCHEDULE_DELETE);
         audit->before(Tools::ScheduleJSONStringSerializer::serialize(
             *schedule, SystemSecurityContext::instance()));
+
+        for (const auto &mapping : schedule->mapping())
+        {
+            db->erase(mapping);
+        }
+
         audit->finalize();
         db->erase<Tools::Schedule>(schedule->id());
         t.commit();
