@@ -63,6 +63,8 @@ class SecurityContext
         GROUP_READ,
         GROUP_UPDATE,
         GROUP_DELETE,
+        GROUP_SEARCH,
+
         /**
          * Ability to list member of a group.
          * The ability to list membership gives USER_READ access against

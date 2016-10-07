@@ -15,8 +15,9 @@ set(WEBSOCK_API_SRCS
         api/UserCRUD.cpp
         api/CredentialCRUD.cpp
         api/ScheduleCRUD.cpp
-        WSSecurityContext.cpp
         api/MembershipCRUD.cpp
+        api/search/GroupSearch.cpp
+        WSSecurityContext.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED

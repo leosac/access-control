@@ -19,9 +19,10 @@
 
 #pragma once
 
-#include "AuditEntry.hpp"
-#include "ICredentialEvent.hpp"
+#include "core/audit/AuditEntry.hpp"
+#include "core/audit/ICredentialEvent.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "core/credentials/ICredential.hpp"
 
 namespace Leosac
 {

@@ -20,9 +20,9 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
-#include <core/credentials/ICredential.hpp>
 
 namespace Leosac
 {

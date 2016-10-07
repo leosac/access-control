@@ -26,6 +26,7 @@
 #include "api/MembershipCRUD.hpp"
 #include "api/PasswordChange.hpp"
 #include "api/UserCRUD.hpp"
+#include "api/search/GroupSearch.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
@@ -70,8 +71,9 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
 
-    individual_handlers_["get_logs"]        = &LogGet::create;
-    individual_handlers_["password_change"] = &PasswordChange::create;
+    individual_handlers_["get_logs"]          = &LogGet::create;
+    individual_handlers_["password_change"]   = &PasswordChange::create;
+    individual_handlers_["search.group_name"] = &GroupSearch::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);

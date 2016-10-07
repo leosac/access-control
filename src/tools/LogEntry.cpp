@@ -17,7 +17,6 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "LogEntry.hpp"
 #include "LogEntry_odb.h"
 #include "LogEntry_odb_pgsql.h"

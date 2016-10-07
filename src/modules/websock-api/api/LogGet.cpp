@@ -20,7 +20,6 @@
 #include "LogGet.hpp"
 #include "Exceptions.hpp"
 #include "LogEntry_odb.h"
-#include "User_odb.h"
 #include "api/APISession.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/DBService.hpp"
@@ -36,8 +35,7 @@ LogGet::LogGet(RequestContext ctx)
 
 MethodHandlerUPtr LogGet::create(RequestContext ctx)
 {
-    auto instance = std::make_unique<LogGet>(ctx);
-    return std::move(instance);
+    return std::make_unique<LogGet>(ctx);
 }
 
 json LogGet::process_impl(const json &req)

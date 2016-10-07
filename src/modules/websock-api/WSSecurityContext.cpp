@@ -61,6 +61,8 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     case Action::USER_CHANGE_PASSWORD:
         return is_manager() || is_self(ap.user.user_id);
 
+    case Action::GROUP_SEARCH:
+        return true;
     case Action::GROUP_CREATE:
         return true;
     case Action::GROUP_READ:
@@ -103,7 +105,7 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
 bool WSSecurityContext::can_read_group(
     const SecurityContext::GroupActionParam &gap) const
 {
-    if (gap.group_id == 0) // listing group.
+    if (is_manager() || gap.group_id == 0) // listing group.
         return true;
     Auth::GroupPtr group =
         dbsrv_->find_group_by_id(gap.group_id, DBService::THROW_IF_NOT_FOUND);
