@@ -20,6 +20,7 @@
 #pragma once
 
 #include "api/MethodHandler.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {

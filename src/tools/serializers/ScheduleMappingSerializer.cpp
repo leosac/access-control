@@ -18,6 +18,7 @@
 */
 
 #include "tools/serializers/ScheduleMappingSerializer.hpp"
+#include "Door_odb.h"
 #include "User_odb.h"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/GlobalRegistry.hpp"
@@ -30,16 +31,19 @@ using namespace Leosac::Tools;
 json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
                                               const SecurityContext &)
 {
+    // general
     json serialized = {
         {"id", in.id()},
         {"type", "schedule-mapping"},
         {"attributes", {{"alias", in.alias_}, {"version", in.odb_version_}}}};
+
     json users = json::array();
     for (const auto &user : in.users_)
     {
         json json_user = {{"id", user.object_id()}, {"type", "user"}};
         users.push_back(json_user);
     }
+
     json groups = json::array();
     for (const auto &group : in.groups_)
     {
@@ -58,9 +62,17 @@ json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
         creds.push_back(json_cred);
     }
 
+    json doors = json::array();
+    for (const auto &door : in.doors_)
+    {
+        json json_door = {{"id", door.object_id()}, {"type", "door"}};
+        doors.push_back(json_door);
+    }
+
     serialized["relationships"]["users"]       = {{"data", users}};
     serialized["relationships"]["groups"]      = {{"data", groups}};
     serialized["relationships"]["credentials"] = {{"data", creds}};
+    serialized["relationships"]["doors"]       = {{"data", doors}};
 
     return serialized;
 }
@@ -97,6 +109,14 @@ void ScheduleMappingJSONSerializer::unserialize(Tools::ScheduleMapping &out,
         Cred::CredentialLPtr credential(*db,
                                         credential_id.get<Cred::CredentialId>());
         out.creds_.push_back(credential);
+    }
+
+    auto door_ids = in.at("doors");
+    out.creds_.clear();
+    for (const auto &door_id : door_ids)
+    {
+        Auth::DoorLWPtr door(*db, door_id.get<Auth::DoorId>());
+        out.doors_.push_back(door);
     }
 }
 

@@ -164,3 +164,5 @@ add_custom_command(TARGET leosac_db
         ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         )
+
+install(TARGETS leosac_db DESTINATION lib)

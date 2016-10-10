@@ -53,6 +53,10 @@ struct ScheduleMapping
 #pragma db value_not_null unordered
     std::vector<Cred::CredentialLWPtr> creds_;
 
+#pragma db id_column("schedule_mapping_id") value_column("door_id")
+#pragma db value_not_null unordered
+    std::vector<Auth::DoorLWPtr> doors_;
+
     /**
      * A non unique, optional alias.
      */
@@ -67,6 +71,7 @@ struct ScheduleMapping
 }
 
 #ifdef ODB_COMPILER
+#include "core/auth/Door.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/Credential.hpp"

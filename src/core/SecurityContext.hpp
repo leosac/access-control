@@ -89,6 +89,7 @@ class SecurityContext
         DOOR_UPDATE,
         DOOR_CREATE,
         DOOR_DELETE,
+        DOOR_SEARCH,
 
         LOG_READ,
     };

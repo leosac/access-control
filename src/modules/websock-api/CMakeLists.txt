@@ -18,6 +18,7 @@ set(WEBSOCK_API_SRCS
         api/MembershipCRUD.cpp
         api/DoorCRUD.cpp
         api/search/GroupSearch.cpp
+        api/search/DoorSearch.cpp
         WSSecurityContext.cpp
         )
 
