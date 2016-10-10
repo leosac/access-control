@@ -71,8 +71,11 @@ bool my_puttime(std::string &out, const std::tm *tt, const char *fmt)
      return true;*/
 
     out.resize(150);
-    if (strftime(&out[0], 150, fmt, tt) != 0)
+    if (size_t sz = strftime(&out[0], 150, fmt, tt))
+    {
+        out.resize(sz);
         return true;
+    }
     return false;
 }
 }
