@@ -9,6 +9,6 @@ set -e
 mkdir -p /tmp/leosac_build;
 pushd /tmp/leosac_build;
 
-(cmake /leosac_src && (make -j5 || make -j5 || make -j5 || make || make) && make install)
+(cmake -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=1 -DZMQ_BUILD_TESTS=off -DZMQPP_LIBZMQ_CMAKE=0 /leosac_src && make -j5 && make install)
 
 popd;

@@ -66,6 +66,9 @@ class Factory
     static IScheduleEventPtr ScheduleEvent(const DBPtr &database,
                                            Tools::ISchedulePtr target_sched,
                                            IAuditEntryPtr parent);
+
+    static IDoorEventPtr DoorEvent(const DBPtr &database, Auth::IDoorPtr target_door,
+                                   IAuditEntryPtr parent);
 };
 }
 }

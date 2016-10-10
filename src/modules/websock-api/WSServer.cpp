@@ -21,10 +21,12 @@
 #include "Exceptions.hpp"
 #include "Token_odb.h"
 #include "api/CredentialCRUD.hpp"
+#include "api/DoorCRUD.hpp"
 #include "api/GroupCRUD.hpp"
 #include "api/LogGet.hpp"
 #include "api/MembershipCRUD.hpp"
 #include "api/PasswordChange.hpp"
+#include "api/ScheduleCRUD.hpp"
 #include "api/UserCRUD.hpp"
 #include "api/search/GroupSearch.hpp"
 #include "core/audit/AuditFactory.hpp"
@@ -38,7 +40,6 @@
 #include "tools/db/DatabaseTracer.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
-#include <api/ScheduleCRUD.hpp>
 #include <json.hpp>
 #include <odb/session.hxx>
 
@@ -81,6 +82,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
                           &WebSockAPI::MembershipCRUD::instanciate);
     register_crud_handler("credential", &WebSockAPI::CredentialCRUD::instanciate);
     register_crud_handler("schedule", &WebSockAPI::ScheduleCRUD::instanciate);
+    register_crud_handler("door", &WebSockAPI::DoorCRUD::instanciate);
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)

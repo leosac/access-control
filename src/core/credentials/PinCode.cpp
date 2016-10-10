@@ -32,6 +32,7 @@ const std::string &PinCode::pin_code() const
 
 void PinCode::pin_code(const std::string &pin)
 {
+    PinCodeValidator::validate_pin_code(pin);
     pin_code_ = pin;
 }
 
@@ -40,6 +41,15 @@ void PinCodeValidator::validate(const IPinCode &pin)
     validate_pin_code(pin.pin_code());
 }
 
-void PinCodeValidator::validate_pin_code(const std::string &)
+void PinCodeValidator::validate_pin_code(const std::string &pin)
 {
+    for (const auto &c : pin)
+    {
+        if (!(c >= '0' && c <= '9'))
+        {
+            throw ModelException(
+                "data/attributes/code",
+                BUILD_STR("Pin code contains invalid character: " << c));
+        }
+    }
 }

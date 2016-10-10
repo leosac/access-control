@@ -94,6 +94,12 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     case Action::SCHEDULE_DELETE:
         return is_manager();
 
+    case Action::DOOR_READ:
+    case Action::DOOR_CREATE:
+    case Action::DOOR_UPDATE:
+    case Action::DOOR_DELETE:
+        return is_manager();
+
     case Action::LOG_READ:
         return is_manager();
     default:

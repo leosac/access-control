@@ -17,25 +17,37 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/Conversion.hpp"
-#include "MyTime.hpp"
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#pragma once
+
+#include "IAuditEntry.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
-
-
-template <>
-std::string Conversion<std::string, std::chrono::system_clock::time_point>(
-    const std::chrono::system_clock::time_point &tp)
+namespace Audit
 {
-    std::time_t dt_time_t = std::chrono::system_clock::to_time_t(tp);
-    std::string out;
-    if (my_puttime(out, std::gmtime(&dt_time_t), "%FT%T%z"))
-        return out;
-    return "";
+/**
+ * Interface that describes an Audit object for door related event.
+ */
+class IDoorEvent : virtual public IAuditEntry
+{
+  public:
+    /**
+     * Set the door that is targeted by the event.
+     */
+    virtual void target(Auth::IDoorPtr door) = 0;
+
+    /**
+     * An optional JSON representation of the object
+     * **before** the event took place.
+     */
+    virtual void before(const std::string &repr) = 0;
+
+    /**
+     * An optional JSON representation of the object
+     * **after** the event took place.
+     */
+    virtual void after(const std::string &repr) = 0;
+};
 }
 }

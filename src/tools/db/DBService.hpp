@@ -71,6 +71,9 @@ class DBService
     Tools::ISchedulePtr find_schedule_by_id(const Tools::ScheduleId &id,
                                             Flag f = Flag::DEFAULT);
 
+    Auth::IDoorPtr find_door_by_id(const Auth::DoorId &id, Flag f = Flag::DEFAULT);
+
+
   private:
     DBPtr database_;
 };

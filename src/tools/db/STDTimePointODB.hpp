@@ -103,10 +103,8 @@ class value_traits<std::chrono::system_clock::time_point, id_timestamp>
         std::tm tm;
         bzero(&tm, sizeof(tm));
         std::string epoch = "2000-01-01T00:00:00Z";
-        std::istringstream iss(epoch);
-
-        iss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
-        assert(iss.good());
+        bool ret          = Leosac::my_gettime(&tm, epoch, "%Y-%m-%dT%H:%M:%SZ");
+        assert(ret);
         tm.tm_isdst = 0;
 
         return std::chrono::system_clock::from_time_t(Leosac::my_timegm(&tm));

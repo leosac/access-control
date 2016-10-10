@@ -19,11 +19,13 @@
 
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/CredentialEvent.hpp"
+#include "core/audit/DoorEvent.hpp"
 #include "core/audit/GroupEvent.hpp"
 #include "core/audit/ScheduleEvent.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/audit/UserGroupMembershipEvent.hpp"
 #include "core/audit/WSAPICall.hpp"
+#include "core/auth/Door.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "tools/AssertCast.hpp"
@@ -111,4 +113,19 @@ IScheduleEventPtr Factory::ScheduleEvent(const DBPtr &database,
 
     auto parent_odb = assert_cast<AuditEntryPtr>(parent);
     return Audit::ScheduleEvent::create(database, target_sched, parent_odb);
+}
+
+IDoorEventPtr Factory::DoorEvent(const DBPtr &database, Auth::IDoorPtr target_door,
+                                 IAuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(target_door, "Target door must be non null.");
+    ASSERT_LOG(target_door->id(), "Target door must be already persisted.");
+    ASSERT_LOG(parent, "Parent must be non null.");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+
+    AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+    ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+
+    return Audit::DoorEvent::create(database, target_door, parent_odb);
 }

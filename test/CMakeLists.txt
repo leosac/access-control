@@ -2,7 +2,7 @@ find_package(GTest REQUIRED)
 
 list(APPEND LEOSAC_TEST_INCLUDE_DIRECTORIES
         ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/zmqpp/src
+        ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${GTEST_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/deps/spdlog/include
         ${CMAKE_SOURCE_DIR}/deps/libzmq/include

@@ -56,6 +56,9 @@ using ICredentialEventPtr = std::shared_ptr<ICredentialEvent>;
 class IScheduleEvent;
 using IScheduleEventPtr = std::shared_ptr<IScheduleEvent>;
 
+class IDoorEvent;
+using IDoorEventPtr = std::shared_ptr<IDoorEvent>;
+
 /**
  * Forward declaration of implementation class.
  */
@@ -82,6 +85,9 @@ using CredentialEventPtr = std::shared_ptr<CredentialEvent>;
 
 class ScheduleEvent;
 using ScheduleEventPtr = std::shared_ptr<ScheduleEvent>;
+
+class DoorEvent;
+using DoorEventPtr = std::shared_ptr<DoorEvent>;
 
 enum class EventType
 {
@@ -118,6 +124,10 @@ enum class EventType
     SCHEDULE_CREATE,
     SCHEDULE_DELETE,
     SCHEDULE_UPDATE,
+
+    DOOR_CREATED,
+    DOOR_UPDATED,
+    DOOR_DELETED,
 
     LAST__
 };

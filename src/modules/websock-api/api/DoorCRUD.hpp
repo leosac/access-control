@@ -17,25 +17,42 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/Conversion.hpp"
-#include "MyTime.hpp"
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#pragma once
+
+#include "api/CRUDResourceHandler.hpp"
+#include "core/auth/AuthFwd.hpp"
 
 namespace Leosac
 {
-
-
-template <>
-std::string Conversion<std::string, std::chrono::system_clock::time_point>(
-    const std::chrono::system_clock::time_point &tp)
+namespace Module
 {
-    std::time_t dt_time_t = std::chrono::system_clock::to_time_t(tp);
-    std::string out;
-    if (my_puttime(out, std::gmtime(&dt_time_t), "%FT%T%z"))
-        return out;
-    return "";
+namespace WebSockAPI
+{
+/**
+ * CRUD Handler for Doors.
+ *
+ * @see See the *_impl() method for each requests parameters/response.
+ */
+class DoorCRUD : public CRUDResourceHandler
+{
+  private:
+    DoorCRUD(RequestContext ctx);
+
+  public:
+    static CRUDResourceHandlerUPtr instanciate(RequestContext);
+
+  private:
+    virtual std::vector<ActionActionParam>
+    required_permission(Verb verb, const json &req) const override;
+
+    virtual json create_impl(const json &req) override;
+
+    virtual json read_impl(const json &req) override;
+
+    virtual json update_impl(const json &req) override;
+
+    virtual json delete_impl(const json &req) override;
+};
+}
 }
 }

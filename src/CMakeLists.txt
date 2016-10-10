@@ -32,10 +32,12 @@ set(LEOSAC_LIB_SRCS
     core/auth/serializers/UserSerializer.cpp
     core/auth/serializers/GroupSerializer.cpp
     core/auth/serializers/UserGroupMembershipSerializer.cpp
+    core/auth/serializers/DoorSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
     core/auth/ValidityInfo.cpp
+    core/auth/Door.cpp
     core/credentials/Credential.cpp
     core/credentials/CredentialValidator.cpp
     core/credentials/WiegandCard.cpp
@@ -100,6 +102,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/UserGroupMembershipEvent.cpp
     core/audit/CredentialEvent.cpp
     core/audit/ScheduleEvent.cpp
+    core/audit/DoorEvent.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
         )

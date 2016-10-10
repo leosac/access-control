@@ -17,25 +17,46 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/Conversion.hpp"
-#include "MyTime.hpp"
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#pragma once
+
+#include "core/auth/AuthFwd.hpp"
+#include "core/auth/IDoor.hpp"
 
 namespace Leosac
 {
-
-
-template <>
-std::string Conversion<std::string, std::chrono::system_clock::time_point>(
-    const std::chrono::system_clock::time_point &tp)
+namespace Auth
 {
-    std::time_t dt_time_t = std::chrono::system_clock::to_time_t(tp);
-    std::string out;
-    if (my_puttime(out, std::gmtime(&dt_time_t), "%FT%T%z"))
-        return out;
-    return "";
+
+/**
+* Represent a door
+*/
+#pragma db object optimistic
+class Door : public virtual IDoor
+{
+  public:
+    Door();
+    DoorId id() const override;
+
+    std::string alias() const override;
+
+    std::string description() const override;
+
+    void alias(const std::string &alias) override;
+
+    void description(const std::string &desc) override;
+
+  protected:
+#pragma db id auto
+    DoorId id_;
+
+    std::string alias_;
+    std::string desc_;
+
+#pragma db version
+    const size_t version_;
+
+  private:
+    friend class odb::access;
+};
 }
 }

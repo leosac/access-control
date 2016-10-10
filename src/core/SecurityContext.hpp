@@ -85,6 +85,11 @@ class SecurityContext
         SCHEDULE_CREATE,
         SCHEDULE_DELETE,
 
+        DOOR_READ,
+        DOOR_UPDATE,
+        DOOR_CREATE,
+        DOOR_DELETE,
+
         LOG_READ,
     };
 
@@ -126,12 +131,20 @@ class SecurityContext
         operator ActionParam();
     };
 
+    struct DoorActionParam
+    {
+        Auth::DoorId door_id;
+
+        operator ActionParam();
+    };
+
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
         UserActionParam user;
         CredentialActionParam cred;
         ScheduleActionParam sched;
+        DoorActionParam door;
     };
 
     SecurityContext(DBServicePtr dbsrv);

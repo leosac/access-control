@@ -18,6 +18,7 @@
 */
 
 #include "core/credentials/ICredential.hpp"
+#include "core/credentials/PinCode.hpp"
 #include "core/credentials/WiegandCard.hpp"
 #include "exception/ModelException.hpp"
 #include "gtest/gtest.h"
@@ -74,6 +75,19 @@ TEST(TestWiegandCardValidator, nb_bits)
     ASSERT_NO_THROW(c.nb_bits(26));
     ASSERT_NO_THROW(c.nb_bits(37));
     ASSERT_NO_THROW(c.nb_bits(500)); // Makes no sense, but is not negative.
+}
+
+TEST(TestWiegandPinValidator, pin_is_numeric)
+{
+    PinCode c;
+    ASSERT_THROW(c.pin_code("-1"), ModelException);
+    ASSERT_THROW(c.pin_code("-42"), ModelException);
+    ASSERT_THROW(c.pin_code("-1024"), ModelException);
+
+    ASSERT_NO_THROW(c.pin_code("26"));
+    ASSERT_NO_THROW(c.pin_code("37"));
+    ASSERT_NO_THROW(c.pin_code("500"));
+    ASSERT_NO_THROW(c.pin_code("12345678"));
 }
 }
 }

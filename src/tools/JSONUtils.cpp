@@ -46,12 +46,11 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
     std::string date_str = extract_with_default(obj, key, "");
     if (date_str.length())
     {
-        std::istringstream iss(date_str);
         std::tm t = {};
 
-        iss >> std::get_time(&t, "%Y-%m-%dT%H:%M:%SZ");
-        if (!iss.good())
+        if (!my_gettime(&t, date_str, "%Y-%m-%dT%H:%M:%SZ"))
             throw ::LEOSACException("Failed to parse date.");
+
         // Input date should already be adjusted for DST.
         t.tm_isdst     = 0;
         std::time_t tt = my_timegm(&t);

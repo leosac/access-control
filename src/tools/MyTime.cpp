@@ -18,6 +18,10 @@
 */
 
 #include "tools/MyTime.hpp"
+#include "exception/leosacexception.hpp"
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 namespace Leosac
 {
@@ -41,5 +45,34 @@ time_t my_timegm(struct tm *tm)
         unsetenv("TZ");
     tzset();
     return ret;
+}
+
+bool my_gettime(std::tm *out, const std::string &date_str, const char *fmt)
+{
+    /*
+        std::istringstream iss(date_str);
+        iss >> std::get_time(out, "%Y-%m-%dT%H:%M:%SZ");
+        if (!iss.good())
+            throw ::LEOSACException("Failed to parse date.");
+
+        return true;
+    */
+    char *ret = strptime(date_str.c_str(), fmt, out);
+    if (ret != date_str.c_str() + date_str.length())
+        return false;
+    return true;
+}
+
+bool my_puttime(std::string &out, const std::tm *tt, const char *fmt)
+{ /*
+     std::stringstream ss;
+     ss << std::put_time(tt, fmt);
+     out = ss.str();
+     return true;*/
+
+    out.resize(150);
+    if (strftime(&out[0], 150, fmt, tt) != 0)
+        return true;
+    return false;
 }
 }

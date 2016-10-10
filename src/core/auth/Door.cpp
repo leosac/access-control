@@ -17,25 +17,36 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/Conversion.hpp"
-#include "MyTime.hpp"
-#include <chrono>
-#include <iomanip>
-#include <iostream>
-#include <string>
+#include "core/auth/Door.hpp"
 
-namespace Leosac
+using namespace Leosac::Auth;
+
+Door::Door()
+    : version_(0)
 {
-
-
-template <>
-std::string Conversion<std::string, std::chrono::system_clock::time_point>(
-    const std::chrono::system_clock::time_point &tp)
-{
-    std::time_t dt_time_t = std::chrono::system_clock::to_time_t(tp);
-    std::string out;
-    if (my_puttime(out, std::gmtime(&dt_time_t), "%FT%T%z"))
-        return out;
-    return "";
 }
+
+DoorId Door::id() const
+{
+    return id_;
+}
+
+std::string Door::alias() const
+{
+    return alias_;
+}
+
+std::string Door::description() const
+{
+    return desc_;
+}
+
+void Door::alias(const std::string &alias)
+{
+    alias_ = alias;
+}
+
+void Door::description(const std::string &desc)
+{
+    desc_ = desc;
 }

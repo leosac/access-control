@@ -77,7 +77,7 @@ json LogGet::process_impl(const json &req)
 }
 
 std::vector<MethodHandler::ActionActionParam>
-LogGet::required_permission(const json &req) const
+LogGet::required_permission(const json &) const
 {
     std::vector<MethodHandler::ActionActionParam> perm_;
     SecurityContext::ActionParam ap;

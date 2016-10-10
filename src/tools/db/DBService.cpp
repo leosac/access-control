@@ -20,6 +20,7 @@
 #include "DBService.hpp"
 #include "Credential_odb.h"
 #include "DatabaseTracer.hpp"
+#include "Door_odb.h"
 #include "Group_odb.h"
 #include "OptionalTransaction.hpp"
 #include "Schedule_odb.h"
@@ -103,4 +104,15 @@ Tools::ISchedulePtr DBService::find_schedule_by_id(const Tools::ScheduleId &id,
     if (!sched && flags & Flag::THROW_IF_NOT_FOUND)
         throw EntityNotFound(id, "schedule");
     return sched;
+}
+
+Auth::IDoorPtr DBService::find_door_by_id(const Auth::DoorId &id,
+                                          DBService::Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto door = database_->find<Auth::Door>(id);
+    t.commit();
+    if (!door && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "door");
+    return door;
 }

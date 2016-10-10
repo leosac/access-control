@@ -83,3 +83,10 @@ SecurityContext::ScheduleActionParam::operator ActionParam()
     result.sched = *this;
     return result;
 }
+
+SecurityContext::DoorActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.door = *this;
+    return result;
+}
