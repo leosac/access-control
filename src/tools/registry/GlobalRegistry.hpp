@@ -35,6 +35,7 @@ class GlobalRegistry
   public:
     using KeyType            = std::string;
     using UnderlyingRegistry = Registry<KeyType>;
+    using Clock              = UnderlyingRegistry::Clock;
 
     template <typename T>
     static T get(const KeyType &key)

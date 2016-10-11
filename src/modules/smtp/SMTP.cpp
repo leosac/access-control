@@ -19,9 +19,9 @@
 
 #include "SMTP.hpp"
 #include "core/auth/Auth.hpp"
-#include "core/auth/WiegandCard.hpp"
 #include "tools/Conversion.hpp"
-#include "tools/MyTime.hpp"
+#include "tools/Mail.hpp"
+#include "tools/registry/GlobalRegistry.hpp"
 #include <curl/curl.h>
 
 using namespace Leosac;
@@ -56,22 +56,24 @@ SMTP::~SMTP()
 void SMTP::handle_msg_bus()
 {
     zmqpp::message msg;
-    std::string src;
-    Leosac::Auth::SourceType type;
-    std::string card;
-    int bits;
+    std::string key;
 
     bus_sub_.receive(msg);
-    if (msg.parts() < 4)
+    if (msg.parts() != 2)
     {
         WARN("Unexpected message content.");
         return;
     }
-    msg >> src >> type >> card >> bits;
-    if (type != Leosac::Auth::SourceType::SIMPLE_WIEGAND)
+    msg.pop_front();
+    msg >> key;
+    try
     {
-        INFO("WS-Notifier cannot handle this type of credential yet.");
-        return;
+        MailInfo mail = GlobalRegistry::get<MailInfo>(key);
+        send_mail(mail);
+    }
+    catch (const RegistryKeyNotFoundException &e)
+    {
+        WARN("SMTP: cannot retrieve MailInfo from GlobalRegistry. Key was: " << key);
     }
 }
 
@@ -80,21 +82,18 @@ void SMTP::process_config()
     for (auto &&itr : config_.get_child("module_config.targets"))
     {
         SMTPServerInfo server;
-        server.url_ = itr.second.get<std::string>("url");
-        // server.connect_timeout_ = itr.second.get<int>("connect_timeout", 7000);
-        // server.request_timeout_ = itr.second.get<int>("request_timeout", 7000);
+        server.url_  = itr.second.get<std::string>("url");
+        server.from_ = itr.second.get<std::string>("from", "leosac@islog.com");
         server.verify_host_  = itr.second.get<bool>("verify_host", true);
         server.verify_peer_  = itr.second.get<bool>("verify_peer", true);
         server.CA_info_file_ = itr.second.get<std::string>("ca_file", "");
 
         INFO("SMTP module server: "
              << Colorize::green(server.url_)
-             //<< " (connect_timeout: " << Colorize::green(server.connect_timeout_)
-             //<< ", request_timeout: " << Colorize::green(server.request_timeout_)
              << ", verify_host: " << Colorize::green(server.verify_host_)
              << ", verify_peer: " << Colorize::green(server.verify_peer_)
              << ", ca_info: " << Colorize::green(server.CA_info_file_) << ")");
-        servers_.push_back(std::move(server));
+        servers_.push_back(server);
     }
 }
 
@@ -112,10 +111,14 @@ void SMTP::send_mail(const MailInfo &mail)
             if (!target.verify_peer_)
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
             if (target.username_.size())
-                curl_easy_setopt(curl, CURLOPT_USERNAME, target.username_);
+                curl_easy_setopt(curl, CURLOPT_USERNAME, target.username_.c_str());
             if (target.password_.size())
-                curl_easy_setopt(curl, CURLOPT_PASSWORD, target.password_);
-            curl_easy_setopt(curl, CURLOPT_URL, target.url_);
+                curl_easy_setopt(curl, CURLOPT_PASSWORD, target.password_.c_str());
+            if (target.from_.size())
+                curl_easy_setopt(curl, CURLOPT_MAIL_FROM, target.from_.c_str());
+
+            ASSERT_LOG(target.url_.size(), "No mail server url.");
+            curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
 
             send_to_server(curl, target, mail);
             curl_easy_cleanup(curl);
@@ -127,57 +130,16 @@ void SMTP::send_mail(const MailInfo &mail)
     }
 }
 
-void SMTP::send_to_server(CURL *curl, const SMTPServerInfo &srv,
-                          const MailInfo &mail)
+struct UploadStatus
 {
-    assert(curl);
-    curl_easy_setopt(curl, CURLOPT_MAIL_FROM, srv.from_);
+    const MailInfo &mail;
+    int counter;
+};
 
-    struct curl_slist *recipients = NULL;
-    for (const auto &recipient : mail.to)
-        recipients = curl_slist_append(recipients, recipient.c_str());
-    curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
-
-    struct UploadStatus
-    {
-        const MailInfo &mail;
-        int counter;
-    } status{.mail = mail, .counter = 0};
-
-    auto readfct = [](void *ptr, size_t size, size_t nmemb, void *userp) {
-        UploadStatus *st = static_cast<UploadStatus *>(userp);
-        ASSERT_LOG(st, "UploadStatus is null.");
-
-        auto content     = build_mail_str(st->mail);
-        auto wanted      = size * nmemb;
-        auto available   = content.size() - st->counter;
-        auto to_transfer = std::min(available, wanted);
-
-        std::memcpy(ptr, &content, to_transfer);
-        st->counter += to_transfer;
-
-        return to_transfer;
-    };
-
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION, &readfct);
-    curl_easy_setopt(curl, CURLOPT_READDATA, &status);
-    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
-
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-
-    // timeouts
-    /*
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, target.connect_timeout_);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, target.request_timeout_);*/
-
-    auto res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
-    {
-        WARN("curl_easy_perform() failed: " << curl_easy_strerror(res));
-    }
-}
-
-std::string SMTP::build_mail_str(const MailInfo &mail)
+/**
+ * Return a string representation of what the whole mail would look like.
+ */
+static std::string build_mail_str(const MailInfo &mail)
 {
     std::stringstream ss;
 
@@ -188,7 +150,58 @@ std::string SMTP::build_mail_str(const MailInfo &mail)
 
     ss << "Subject: " << mail.title << "\r\n";
     ss << "\r\n"; // empty line to divide headers from body, see RFC5322
-    ss << mail.body;
+    ss << mail.body << "\r\n\r\n";
 
     return ss.str();
+}
+
+/**
+ * Callback for libcurl.
+ *
+ * CURL invokes this to get the data it should send to the server.
+ */
+static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *userp)
+{
+    UploadStatus *st = static_cast<UploadStatus *>(userp);
+    ASSERT_LOG(st, "UploadStatus is null.");
+
+    std::string content = build_mail_str(st->mail);
+    auto wanted         = size * nmemb;
+    auto available      = content.size() - st->counter;
+    auto to_transfer    = std::min(available, wanted);
+
+    std::memset(ptr, 0, wanted);
+    std::memcpy(ptr, &content[0] + st->counter, to_transfer);
+    st->counter += to_transfer;
+
+    return to_transfer;
+}
+
+void SMTP::send_to_server(CURL *curl, const SMTPServerInfo &srv,
+                          const MailInfo &mail)
+{
+    ASSERT_LOG(curl, "CURL pointer is null.");
+
+    struct curl_slist *recipients = NULL;
+    for (const auto &recipient : mail.to)
+        recipients = curl_slist_append(recipients, recipient.c_str());
+    curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
+
+    UploadStatus status{.mail = mail, .counter = 0};
+
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, &read_callback);
+    curl_easy_setopt(curl, CURLOPT_READDATA, &status);
+    curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+    auto res = curl_easy_perform(curl);
+    curl_slist_free_all(recipients);
+    if (res != CURLE_OK)
+    {
+        WARN("curl_easy_perform() failed: " << curl_easy_strerror(res));
+    }
+    else
+    {
+        INFO("Mail titled " << Colorize::cyan(mail.title) << " has been sent.");
+    }
 }

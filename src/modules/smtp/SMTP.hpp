@@ -19,9 +19,8 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
 #include "modules/BaseModule.hpp"
-#include "tools/Mail.hpp"
+#include "tools/ToolsFwd.hpp"
 #include <curl/curl.h>
 
 namespace Leosac
@@ -59,6 +58,8 @@ class SMTP : public BaseModule
      */
     struct SMTPServerInfo
     {
+        SMTPServerInfo()                       = default;
+        SMTPServerInfo(const SMTPServerInfo &) = default;
         std::string url_;
 
         std::string from_;
@@ -73,7 +74,6 @@ class SMTP : public BaseModule
     };
 
     std::vector<SMTPServerInfo> servers_;
-    static std::string build_mail_str(const MailInfo &mail);
 
     void send_mail(const MailInfo &mail);
 

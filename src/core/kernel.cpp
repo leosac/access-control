@@ -28,11 +28,14 @@
 #include "exception/ExceptionsTools.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
+#include "tools/GenGuid.h"
+#include "tools/Mail.hpp"
 #include "tools/Schedule.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/db/PGSQLTracer.hpp"
 #include "tools/db/database.hpp"
 #include "tools/log.hpp"
+#include "tools/registry/GlobalRegistry.hpp"
 #include "tools/scrypt/Random.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixfs.hpp"
@@ -618,9 +621,16 @@ std::string Kernel::config_file_path() const
 
 void Kernel::send_mail(const MailInfo &mail)
 {
+    // We'll store the MailInfo structure in the GlobalRegistry and pass
+    // the key to the mailer service. It'll then be able to retrieve the mail info
+    // object and process the command.
+
     zmqpp::message msg;
     msg << "SERVICE.MAILER";
-    // GlobalRegistry::set<int>("oo", 42);
-    // msg <<
+
+    auto expire = GlobalRegistry::Clock::now() + std::chrono::milliseconds(10000);
+    auto key    = gen_uuid();
+    GlobalRegistry::set(key, mail, expire);
+    msg << key;
     bus_push_.send(msg);
 }

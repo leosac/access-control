@@ -208,8 +208,7 @@ class BaseModule
 
     /**
     * The reactor object we poll() on in the main loop. Register additional socket/fd
-    * here if
-    * you need to.
+    * here if you need to.
     */
     zmqpp::reactor reactor_;
 
