@@ -80,7 +80,8 @@ set(LEOSAC_LIB_SRCS
     tools/db/OptionalTransaction.cpp
     tools/scrypt/Random.cpp
     tools/scrypt/Scrypt.cpp
-    tools/GlobalRegistry.cpp
+    tools/registry/ThreadLocalRegistry.cpp
+    tools/registry/GlobalRegistry.cpp
     tools/Conversion.cpp
     tools/JSONUtils.cpp
     tools/MyTime.cpp

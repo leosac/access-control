@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/GlobalRegistry.hpp"
+#include "tools/registry/GlobalRegistry.hpp"
 
-thread_local std::map<Leosac::GlobalRegistry::KeyType, boost::any>
-    Leosac::GlobalRegistry::store_;
+Leosac::GlobalRegistry::UnderlyingRegistry Leosac::GlobalRegistry::registry_;
+std::mutex Leosac::GlobalRegistry::mutex_;

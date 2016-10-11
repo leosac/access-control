@@ -19,62 +19,64 @@
 
 #pragma once
 
-#include "log.hpp"
+#include "tools/log.hpp"
+#include "tools/registry/Registry.hpp"
 #include <boost/any.hpp>
 #include <map>
 
 namespace Leosac
 {
 /**
- * A simple, thread-local, global container to share object.
+ * A simple, thread-local container to share various
+ * type of objects.
  *
- * This is intended to be mostly use while debugging.
+ * @note It uses an internal enumeration as a key type.
  */
-class GlobalRegistry
+class ThreadLocalRegistry
 {
-  private:
-    template <typename T>
-    static bool is_type_valid(const boost::any &a)
-    {
-        try
-        {
-            boost::any_cast<T>(a);
-            return true;
-        }
-        catch (const boost::bad_any_cast &)
-        {
-            return false;
-        }
-    }
-
   public:
-    // Keys
-    enum Keys
+    enum KeyType
     {
         DATABASE
     };
 
-    using KeyType = enum Keys;
+    using UnderlyingRegistry = Registry<KeyType>;
 
     template <typename T>
     static T get(const KeyType &key)
     {
-        auto itr = store_.find(key);
-        ASSERT_LOG(itr != store_.end(), "Cannot find key in registry.");
-
-        ASSERT_LOG(is_type_valid<T>(itr->second),
-                   "The object type for key " << key
-                                              << " mismatch the required type.");
-        return boost::any_cast<T>(itr->second);
+        return registry_.get<T>(key);
     }
 
     template <typename T>
     static void set(const KeyType &key, const T &obj)
     {
-        store_[key] = boost::any(obj);
+        registry_.set(key, obj);
+    }
+
+    template <typename T>
+    static void set(const KeyType &key, const T &obj,
+                    const UnderlyingRegistry::Clock::time_point &expire_at)
+    {
+        registry_.set(key, obj, expire_at);
+    }
+
+    static void erase(const KeyType &key)
+    {
+        return registry_.erase(key);
+    }
+
+    static bool has(const KeyType &key)
+    {
+        return registry_.has(key);
+    }
+
+    static void purge()
+    {
+        return registry_.purge();
     }
 
   private:
-    static thread_local std::map<KeyType, boost::any> store_;
+    static thread_local UnderlyingRegistry registry_;
 };
 }

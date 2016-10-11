@@ -28,8 +28,8 @@
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "exception/leosacexception.hpp"
 #include "tools/AssertCast.hpp"
-#include "tools/GlobalRegistry.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/registry/ThreadLocalRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;

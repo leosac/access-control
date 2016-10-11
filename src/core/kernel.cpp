@@ -620,6 +620,7 @@ void Kernel::send_mail(const MailInfo &mail)
 {
     zmqpp::message msg;
     msg << "SERVICE.MAILER";
+    // GlobalRegistry::set<int>("oo", 42);
     // msg <<
     bus_push_.send(msg);
 }

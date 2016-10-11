@@ -23,8 +23,8 @@
 #include "core/auth/ValidityInfo.hpp"
 #include "core/credentials/ICredential.hpp"
 #include "tools/Conversion.hpp"
-#include "tools/GlobalRegistry.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/registry/ThreadLocalRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
@@ -71,7 +71,8 @@ void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &i
     {
         if (new_owner_id)
         {
-            DBPtr dbptr = GlobalRegistry::get<DBPtr>(GlobalRegistry::DATABASE);
+            DBPtr dbptr =
+                ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
             Auth::UserLPtr new_owner(*dbptr, new_owner_id);
             out.owner(new_owner);
         }
