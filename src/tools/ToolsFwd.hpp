@@ -41,4 +41,6 @@ class ScheduleMapping;
 using ScheduleMappingPtr = std::shared_ptr<ScheduleMapping>;
 using ScheduleMappingId  = unsigned long;
 }
+
+struct MailInfo;
 }

@@ -26,8 +26,6 @@
 
 namespace Leosac
 {
-
-
 template <>
 std::string Conversion<std::string, std::chrono::system_clock::time_point>(
     const std::chrono::system_clock::time_point &tp)

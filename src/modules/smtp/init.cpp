@@ -17,25 +17,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "WebSockAPI.hpp"
+#include "SMTP.hpp"
 #include "tools/log.hpp"
 
-using namespace Leosac::Module::WebSockAPI;
+using namespace Leosac::Module::SMTP;
 
 extern "C" {
 const char *get_module_name()
 {
-    return "WEBSOCK_API";
+    return "SMTP";
 }
 }
 
 /**
-* Entry point for the Websocket API module.
+* Entry point for the SMTP module.
 */
 extern "C" __attribute__((visibility("default"))) bool
 start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
              zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<WebSockAPIModule>(pipe, cfg, zmq_ctx,
-                                                                 utils);
+    return Leosac::Module::start_module_helper<SMTP>(pipe, cfg, zmq_ctx, utils);
 }

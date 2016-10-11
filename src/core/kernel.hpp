@@ -27,6 +27,7 @@
 #include "core/config/ConfigManager.hpp"
 #include "core/netconfig/networkconfig.hpp"
 #include "module_manager.hpp"
+#include "tools/ToolsFwd.hpp"
 #include "tools/XmlNodeNameEnforcer.hpp"
 #include "tools/db/db_fwd.hpp"
 #include "tools/runtimeoptions.hpp"
@@ -221,6 +222,11 @@ class Kernel
     void configure_logger();
 
     void shutdown();
+
+    /**
+     * Send mail. Need support of a module.
+     */
+    void send_mail(const MailInfo &mail);
 
     /**
      * Return the path to the kernel configuration file.

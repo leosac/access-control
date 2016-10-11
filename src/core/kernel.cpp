@@ -615,3 +615,11 @@ std::string Kernel::config_file_path() const
 {
     return config_manager_.kconfig().get<std::string>("kernel-cfg");
 }
+
+void Kernel::send_mail(const MailInfo &mail)
+{
+    zmqpp::message msg;
+    msg << "SERVICE.MAILER";
+    // msg <<
+    bus_push_.send(msg);
+}

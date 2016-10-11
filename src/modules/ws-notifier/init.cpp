@@ -18,7 +18,7 @@
 */
 
 #include "WebServiceNotifier.hpp"
-#include <tools/log.hpp>
+#include "tools/log.hpp"
 
 using namespace Leosac::Module::WSNotifier;
 
@@ -30,7 +30,7 @@ const char *get_module_name()
 }
 
 /**
-* Entry point for the Doorman module.
+* Entry point for the WebService Notifier module.
 */
 extern "C" __attribute__((visibility("default"))) bool
 start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,

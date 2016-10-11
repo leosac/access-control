@@ -17,25 +17,15 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "WebSockAPI.hpp"
-#include "tools/log.hpp"
+#pragma once
 
-using namespace Leosac::Module::WebSockAPI;
-
-extern "C" {
-const char *get_module_name()
+namespace Leosac
 {
-    return "WEBSOCK_API";
-}
-}
 
-/**
-* Entry point for the Websocket API module.
-*/
-extern "C" __attribute__((visibility("default"))) bool
-start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
-             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
+struct MailInfo
 {
-    return Leosac::Module::start_module_helper<WebSockAPIModule>(pipe, cfg, zmq_ctx,
-                                                                 utils);
+    std::vector<std::string> to;
+    std::string title;
+    std::string body;
+};
 }
