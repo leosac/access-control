@@ -149,7 +149,6 @@ target_include_directories(leosac_db PRIVATE
 
 ## This generate a leosac.sql file
 ## for creating the database structure.
-## The reason for this is that embedded seems to fail with Postgresql
 add_custom_command(TARGET leosac_db
         POST_BUILD
         COMMAND odb --profile boost --std c++14 --database pgsql

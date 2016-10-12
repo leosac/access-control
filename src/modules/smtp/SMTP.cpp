@@ -18,9 +18,13 @@
 */
 
 #include "SMTP.hpp"
+#include "SMTPConfig.hpp"
+#include "SMTPConfig_odb.h"
+#include "core/CoreUtils.hpp"
 #include "core/auth/Auth.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/Mail.hpp"
+#include "tools/db/database.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include <curl/curl.h>
 
@@ -79,27 +83,53 @@ void SMTP::handle_msg_bus()
 
 void SMTP::process_config()
 {
-    for (auto &&itr : config_.get_child("module_config.targets"))
+    if ((use_database_ = config_.get<bool>("module_config.use_database", false)))
     {
-        SMTPServerInfo server;
-        server.url_  = itr.second.get<std::string>("url");
-        server.from_ = itr.second.get<std::string>("from", "leosac@islog.com");
-        server.verify_host_  = itr.second.get<bool>("verify_host", true);
-        server.verify_peer_  = itr.second.get<bool>("verify_peer", true);
-        server.CA_info_file_ = itr.second.get<std::string>("ca_file", "");
+        setup_database();
+        // Load config from database.
+        int count = 0;
+        odb::transaction t(utils_->database()->begin());
+        odb::result<SMTPConfig> result(utils_->database()->query<SMTPConfig>());
+        for (const auto &cfg : result)
+        {
+            smtp_config_ = std::make_unique<SMTPConfig>(cfg);
+            count++;
+        }
+        t.commit();
+        ASSERT_LOG(count == 0 || count == 1,
+                   "We have more than one SMTPConfig entry in the database.");
+        INFO("SMTP module using SQL database for configuration.");
+        if (!smtp_config_)
+            smtp_config_ = std::make_unique<SMTPConfig>();
+    }
+    else
+    {
+        smtp_config_ = std::make_unique<SMTPConfig>();
+        for (auto &&itr : config_.get_child("module_config.servers"))
+        {
+            SMTPServerInfo server;
+            server.url_  = itr.second.get<std::string>("url");
+            server.from_ = itr.second.get<std::string>("from", "leosac@islog.com");
+            server.verify_host_  = itr.second.get<bool>("verify_host", true);
+            server.verify_peer_  = itr.second.get<bool>("verify_peer", true);
+            server.CA_info_file_ = itr.second.get<std::string>("ca_file", "");
 
-        INFO("SMTP module server: "
-             << Colorize::green(server.url_)
-             << ", verify_host: " << Colorize::green(server.verify_host_)
-             << ", verify_peer: " << Colorize::green(server.verify_peer_)
-             << ", ca_info: " << Colorize::green(server.CA_info_file_) << ")");
-        servers_.push_back(server);
+            INFO("SMTP module server: "
+                 << Colorize::green(server.url_)
+                 << ", verify_host: " << Colorize::green(server.verify_host_)
+                 << ", verify_peer: " << Colorize::green(server.verify_peer_)
+                 << ", ca_info: " << Colorize::green(server.CA_info_file_) << ")");
+            smtp_config_->server_add(server);
+        }
     }
 }
 
 void SMTP::send_mail(const MailInfo &mail)
 {
-    for (const auto &target : servers_)
+    if (smtp_config_->servers().size() == 0)
+        WARN("Cannot send mail titled " << Colorize::cyan(mail.title)
+                                        << ". No SMTP server configured.");
+    for (const auto &target : smtp_config_->servers())
     {
         auto curl = curl_easy_init();
         if (curl)
@@ -203,5 +233,19 @@ void SMTP::send_to_server(CURL *curl, const SMTPServerInfo &srv,
     else
     {
         INFO("Mail titled " << Colorize::cyan(mail.title) << " has been sent.");
+    }
+}
+
+void SMTP::setup_database()
+{
+    using namespace odb;
+    using namespace odb::core;
+    auto db          = utils_->database();
+    schema_version v = db->schema_version("module_smtp");
+    if (v == 0)
+    {
+        transaction t(db->begin());
+        schema_catalog::create_schema(*db, "module_smtp");
+        t.commit();
     }
 }

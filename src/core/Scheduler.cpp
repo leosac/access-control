@@ -18,8 +18,8 @@
 */
 
 #include "Scheduler.hpp"
+#include "core/tasks/Task.hpp"
 #include <assert.h>
-#include <core/tasks/Task.hpp>
 #include <future>
 
 using namespace Leosac;

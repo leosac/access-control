@@ -21,16 +21,19 @@
 #include "Token_odb.h"
 #include "User_odb.h"
 #include "WSServer.hpp"
+#include "core/CoreAPI.hpp"
+#include "core/CoreUtils.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "tools/GenGuid.h"
+#include "tools/Mail.hpp"
+#include "tools/db/MultiplexedSession.hpp"
+#include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/db/database.hpp"
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <odb/object-result.hxx>
 #include <odb/session.hxx>
-#include <tools/db/MultiplexedSession.hpp>
-#include <tools/db/MultiplexedTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -96,6 +99,18 @@ Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
             token->expire_in(std::chrono::minutes(20));
             db->persist(*token);
             t.commit();
+
+            if (user->username() == "admin")
+            {
+                MailSender ms(server_.core_utils());
+                MailInfo mail;
+                mail.title = "Admin Connected";
+                mail.body  = "The user `admin` logged in !";
+                // todo make this configurable or something.
+                // for now its just to see how MailSender can be used.
+                // ms.send_to_admin(mail);
+            }
+
             return token;
         }
     }

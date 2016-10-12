@@ -415,7 +415,7 @@ bool Kernel::save_config()
     return false;
 }
 
-zmqpp::context &Kernel::get_context()
+zmqpp::context &Kernel::zmqpp_context()
 {
     return ctx_;
 }
@@ -617,20 +617,4 @@ DBPtr Kernel::database()
 std::string Kernel::config_file_path() const
 {
     return config_manager_.kconfig().get<std::string>("kernel-cfg");
-}
-
-void Kernel::send_mail(const MailInfo &mail)
-{
-    // We'll store the MailInfo structure in the GlobalRegistry and pass
-    // the key to the mailer service. It'll then be able to retrieve the mail info
-    // object and process the command.
-
-    zmqpp::message msg;
-    msg << "SERVICE.MAILER";
-
-    auto expire = GlobalRegistry::Clock::now() + std::chrono::milliseconds(10000);
-    auto key    = gen_uuid();
-    GlobalRegistry::set(key, mail, expire);
-    msg << key;
-    bus_push_.send(msg);
 }

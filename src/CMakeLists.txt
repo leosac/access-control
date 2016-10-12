@@ -84,6 +84,7 @@ set(LEOSAC_LIB_SRCS
     tools/registry/GlobalRegistry.cpp
     tools/Conversion.cpp
     tools/JSONUtils.cpp
+    tools/Mail.cpp
     tools/MyTime.cpp
     tools/SingleTimeFrame.cpp
     tools/serializers/ScheduleSerializer.cpp

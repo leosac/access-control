@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "SMTPFwd.hpp"
 #include "modules/BaseModule.hpp"
 #include "tools/ToolsFwd.hpp"
 #include <curl/curl.h>
@@ -53,27 +54,14 @@ class SMTP : public BaseModule
      */
     zmqpp::socket bus_sub_;
 
+    bool use_database_;
+
     /**
-     * Some information for each webservice target.
+     * Configuration: either load from XML or database.
      */
-    struct SMTPServerInfo
-    {
-        SMTPServerInfo()                       = default;
-        SMTPServerInfo(const SMTPServerInfo &) = default;
-        std::string url_;
+    SMTPConfigUPtr smtp_config_;
 
-        std::string from_;
-
-        std::string username_;
-
-        std::string password_;
-
-        bool verify_host_;
-        bool verify_peer_;
-        std::string CA_info_file_;
-    };
-
-    std::vector<SMTPServerInfo> servers_;
+    void setup_database();
 
     void send_mail(const MailInfo &mail);
 

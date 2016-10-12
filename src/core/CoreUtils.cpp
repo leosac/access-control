@@ -70,3 +70,8 @@ Leosac::CoreAPI Leosac::CoreUtils::core_api()
 {
     return Leosac::CoreAPI(kernel());
 }
+
+zmqpp::context &Leosac::CoreUtils::zmqpp_context()
+{
+    return kernel().zmqpp_context();
+}

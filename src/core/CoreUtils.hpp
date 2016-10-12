@@ -23,6 +23,11 @@
 #include "LeosacFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
+namespace zmqpp
+{
+class context;
+}
+
 namespace Leosac
 {
 /**
@@ -30,7 +35,7 @@ namespace Leosac
  * functionalities that may be used by every modules.
  *
  * It currently exposes the scheduler and the configuration checker object along
- * with some command line parameter value.
+ * with some command line parameter value and the zeroMQ context object.
  *
  * A pointer to this object is passed to modules when they are created.
  */
@@ -49,6 +54,7 @@ class CoreUtils
     {
     }
 
+    zmqpp::context &zmqpp_context();
     Scheduler &scheduler();
     ConfigChecker &config_checker();
     Kernel &kernel();

@@ -19,8 +19,12 @@
 
 #include "CoreAPI.hpp"
 #include "Scheduler.hpp"
+#include "core/tasks/GetLocalConfigVersion.hpp"
 #include "kernel.hpp"
-#include <core/tasks/GetLocalConfigVersion.hpp>
+#include "tools/GenGuid.h"
+#include "tools/Mail.hpp"
+#include "tools/registry/GlobalRegistry.hpp"
+#include <chrono>
 
 using namespace Leosac;
 

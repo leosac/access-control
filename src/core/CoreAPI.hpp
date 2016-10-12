@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "tools/ToolsFwd.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <cstdint>
 #include <string>

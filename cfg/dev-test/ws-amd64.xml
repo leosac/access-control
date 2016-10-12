@@ -39,10 +39,7 @@
             <level>1</level>
 
             <module_config>
-              <targets>
-                <t>
-                </t>
-              </targets>
+              <use_database>true</use_database>
             </module_config>
         </module>
 

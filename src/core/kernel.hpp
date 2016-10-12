@@ -149,9 +149,9 @@ class Kernel
     ModuleManager &module_manager();
 
     /**
-    * Returns a reference to the zmqpp context create for the application.
+    * Returns a reference to the zmqpp context created for the application.
     */
-    zmqpp::context &get_context();
+    zmqpp::context &zmqpp_context();
 
     /**
      * Returns a (smart) pointer to the core utils: some thread-safe utilities.
@@ -222,11 +222,6 @@ class Kernel
     void configure_logger();
 
     void shutdown();
-
-    /**
-     * Send mail. Need support of a module.
-     */
-    void send_mail(const MailInfo &mail);
 
     /**
      * Return the path to the kernel configuration file.
