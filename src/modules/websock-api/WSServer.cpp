@@ -20,6 +20,7 @@
 #include "WSServer.hpp"
 #include "Exceptions.hpp"
 #include "Token_odb.h"
+#include "WebSockAPI.hpp"
 #include "api/CredentialCRUD.hpp"
 #include "api/DoorCRUD.hpp"
 #include "api/GroupCRUD.hpp"
@@ -30,6 +31,7 @@
 #include "api/UserCRUD.hpp"
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
+#include "core/CoreUtils.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
@@ -67,6 +69,10 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     // clear all logs.
     // srv_.clear_access_channels(websocketpp::log::alevel::all);
 
+
+    // Register internal handlers, ie handler that are managed by the Websocket
+    // module itself.
+
     handlers_["get_leosac_version"]      = &APISession::get_leosac_version;
     handlers_["create_auth_token"]       = &APISession::create_auth_token;
     handlers_["authenticate_with_token"] = &APISession::authenticate_with_token;
@@ -85,26 +91,33 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     register_crud_handler("credential", &WebSockAPI::CredentialCRUD::instanciate);
     register_crud_handler("schedule", &WebSockAPI::ScheduleCRUD::instanciate);
     register_crud_handler("door", &WebSockAPI::DoorCRUD::instanciate);
+
+    // Setup PUSH socket to talks to the parent module.
+    to_module_ = std::make_unique<zmqpp::socket>(
+        module.core_utils()->zmqpp_context(), zmqpp::socket_type::push);
+    to_module_->connect("inproc://MODULE.WEBSOCKET.INTERNAL_PULL");
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
 {
     INFO("New WebSocket connection !");
-    connection_api_.insert(std::make_pair(hdl, std::make_shared<APISession>(*this)));
+    connection_session_.insert(
+        std::make_pair(hdl, std::make_shared<APISession>(*this)));
 }
 
 void WSServer::on_close(websocketpp::connection_hdl hdl)
 {
     INFO("WebSocket connection closed.");
-    connection_api_.erase(hdl);
+    connection_session_.erase(hdl);
 }
 
 void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg)
 {
-    ASSERT_LOG(connection_api_.find(hdl) != connection_api_.end(),
+    ASSERT_LOG(connection_session_.find(hdl) != connection_session_.end(),
                "Cannot retrieve API pointer from connection handle.");
-    auto api_handle = connection_api_.find(hdl)->second;
+    auto session_handle = connection_session_.find(hdl)->second;
 
+    bool should_reply = true;
     // todo maybe parse first so be we can have better error handling.
     auto global_request_count = dbsrv_->operation_count();
     Audit::IWSAPICallPtr audit;
@@ -127,7 +140,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
     try
     {
         audit->event_mask(Audit::EventType::WSAPI_CALL);
-        audit->author(api_handle->current_user());
+        audit->author(session_handle->current_user());
         auto ws_connection_ptr = srv_.get_con_from_hdl(hdl);
         ASSERT_LOG(ws_connection_ptr, "No websocket connection object from handle.");
         audit->source_endpoint(ws_connection_ptr->get_remote_endpoint());
@@ -137,7 +150,7 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         audit->request_content(msg->get_payload());
         req = json::parse(msg->get_payload());
 
-        response = handle_request(api_handle, req, audit);
+        response = handle_request(session_handle, req, audit, should_reply);
         INFO("Incoming payload: \n" << req.dump(4));
     }
     catch (const std::invalid_argument &e)
@@ -173,8 +186,8 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         send_message(hdl, response);
         return;
     }
-
-    send_message(hdl, response);
+    if (should_reply)
+        send_message(hdl, response);
 }
 
 void WSServer::run(const std::string &interface, uint16_t port)
@@ -190,9 +203,9 @@ void WSServer::start_shutdown()
 {
     srv_.get_io_service().post([this]() {
         srv_.stop_listening();
-        for (auto con_api : connection_api_)
+        for (auto con_session : connection_session_)
         {
-            srv_.close(con_api.first, 0, "bye");
+            srv_.close(con_session.first, 0, "bye");
         }
     });
 }
@@ -203,8 +216,30 @@ APIAuth &WSServer::auth()
 }
 
 json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
-                                Audit::IAuditEntryPtr audit)
+                                Audit::IAuditEntryPtr audit, bool &should_reply)
 {
+    should_reply = true; // be default we reply. Only when delegating to external
+    // handler should we not reply.
+
+    auto external_handler_key = external_handlers_.find(in.type);
+    if (external_handler_key != external_handlers_.end())
+    {
+        should_reply = false; // Do not reply instantly when forwarding.
+        // Forward the message to the WebSockAPIModule thread, which will
+        // itself forward to the corresponding module.
+
+        // We reconstruct the JSON object to send to the module that will
+        // handle the message.
+        json reconstructed = {
+            {"uuid", in.uuid}, {"type", in.type}, {"content", in.content}};
+        zmqpp::message msg;
+        msg << external_handler_key->second << api_handle->connection_identifier()
+            << reconstructed.dump(4);
+        bool sent = to_module_->send(msg);
+        ASSERT_LOG(sent, "Internal send would block. Need to investigate.");
+        return {};
+    }
+
     // A request is an "Unit-of-Work" for the application.
     // We create a default database session for the request.
     odb::session database_session;
@@ -298,7 +333,8 @@ ClientMessage WSServer::parse_request(const json &req)
 }
 
 ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
-                                       Audit::IAuditEntryPtr audit)
+                                       Audit::IAuditEntryPtr audit,
+                                       bool &should_reply)
 {
     ServerMessage response;
     response.status_code = APIStatusCode::SUCCESS;
@@ -308,7 +344,7 @@ ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
         ClientMessage input = parse_request(req);
         response.uuid       = input.uuid;
         response.type       = input.type;
-        response.content    = dispatch_request(api_handle, input, audit);
+        response.content = dispatch_request(api_handle, input, audit, should_reply);
     }
     catch (const InvalidCall &e)
     {
@@ -374,9 +410,9 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
         "Not requesting a new transaction, but no currently active transaction.");
 
     std::vector<Auth::TokenPtr> tokens_to_remove;
-    for (const auto &connection_to_api : connection_api_)
+    for (const auto &connection_to_session : connection_session_)
     {
-        const auto &session = connection_to_api.second;
+        const auto &session = connection_to_session.second;
         if (session->current_user_id() == user->id() && exception != session)
         {
             // Mark the token for invalidation.
@@ -390,7 +426,7 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
             msg.content["reason"] = "Session cleared.";
             msg.status_code       = APIStatusCode::SUCCESS;
             msg.type              = "session_closed";
-            send_message(connection_to_api.first, msg);
+            send_message(connection_to_session.first, msg);
         }
     }
 
@@ -418,4 +454,63 @@ void WSServer::register_crud_handler(const std::string &resource_name,
 DBServicePtr WSServer::dbsrv()
 {
     return dbsrv_;
+}
+
+void WSServer::register_external_handler(const std::string &name,
+                                         const std::string &client_id)
+{
+    srv_.get_io_service().post([=]() {
+        zmqpp::message msg;
+        bool sent;
+        if (has_handler(name))
+        {
+            // Handler already registered.
+            msg << client_id << "KO";
+        }
+        else
+        {
+            external_handlers_[name] = client_id;
+            msg << client_id << "OK";
+        }
+        sent = to_module_->send(msg, true);
+        ASSERT_LOG(sent,
+                   "Internal messaging would block. Something is probably wrong.");
+    });
+}
+
+bool WSServer::has_handler(const std::string &name) const
+{
+    return handlers_.count(name) || individual_handlers_.count(name) ||
+           crud_handlers_.count(name) || external_handlers_.count(name);
+}
+
+void WSServer::send_external_message(const std::string &connection_identifier,
+                                     const std::string &content)
+{
+    srv_.get_io_service().post([=]() {
+        auto connection_handle = find_connection(connection_identifier);
+        if (srv_.get_con_from_hdl(connection_handle))
+        {
+            srv_.send(connection_handle, content, websocketpp::frame::opcode::text);
+        }
+        else
+        {
+            WARN("Message for " << Colorize::cyan(connection_identifier)
+                                << " cannot be delivered because the connection "
+                                   "doesn't exist anymore.");
+        }
+    });
+}
+
+websocketpp::connection_hdl
+WSServer::find_connection(const std::string &connection_identifier) const
+{
+    // Implementation is probably: 1) slow. 2) fast enough for now.
+
+    for (const auto &con_to_session : connection_session_)
+    {
+        if (con_to_session.second->connection_identifier() == connection_identifier)
+            return con_to_session.first;
+    }
+    return websocketpp::connection_hdl();
 }

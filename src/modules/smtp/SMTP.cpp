@@ -122,6 +122,18 @@ void SMTP::process_config()
             smtp_config_->server_add(server);
         }
     }
+
+    if (use_database_)
+    {
+        // Register a websocket handler.
+        websocket_endpoint_ =
+            std::make_unique<zmqpp::socket>(ctx_, zmqpp::socket_type::dealer);
+        websocket_endpoint_->connect("inproc://SERVICE.WEBSOCKET");
+        websocket_endpoint_->send(zmqpp::message() << "REGISTER_HANDLER"
+                                                   << "smtp.hello");
+        reactor_.add(*websocket_endpoint_.get(),
+                     std::bind(&SMTP::handle_websocket_message, this));
+    }
 }
 
 void SMTP::send_mail(const MailInfo &mail)
@@ -248,4 +260,32 @@ void SMTP::setup_database()
         schema_catalog::create_schema(*db, "module_smtp");
         t.commit();
     }
+}
+
+void SMTP::handle_websocket_message()
+{
+    zmqpp::message msg;
+    websocket_endpoint_->receive(msg);
+
+    if (msg.parts() == 1)
+    {
+        // Probably an response to REGISTER_HANDLER. Should work, otherwise
+        // we abort.
+        std::string tmp;
+        msg >> tmp;
+        ASSERT_LOG(tmp == "OK", "Something failed.");
+        return;
+    }
+
+    ASSERT_LOG(msg.parts() == 2, "Ill formed message.");
+    std::string connection_identifier;
+    std::string content;
+
+    msg >> connection_identifier >> content;
+
+    INFO("RECEIVED WEBSOCKET MSG FOR: " << content);
+
+    zmqpp::message response;
+    response << "SEND_MESSAGE" << connection_identifier << "HELLO WORLD\n";
+    websocket_endpoint_->send(response);
 }

@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include "WebSockAPI.hpp"
+#include "LeosacFwd.hpp"
+#include "WebSockFwd.hpp"
 #include "api/APIAuth.hpp"
 #include "api/APISession.hpp"
 #include "api/CRUDResourceHandler.hpp"
@@ -30,6 +31,7 @@
 #include <set>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
+#include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
 {
@@ -61,6 +63,17 @@ struct ClientMessage
     json content;
 };
 
+/**
+ * The implementation class that runs the websocket server.
+ * The `run()` method is invoked in its own thread, and from this point on, the
+ * object lives its life independently in this thread.
+ *
+ * The WebSockAPIModule object can communicate with WSServer by calling any of the
+ * thread safe method. However, for WSServer --> WebSocketAPIModule communicate,
+ * the WSServer object uses a PUSH socket.
+ *
+ * @note Unless specified otherwise, the methods in this class ARE NOT thread-safe.
+ */
 class WSServer
 {
   public:
@@ -87,6 +100,28 @@ class WSServer
      * @note This method can safely be called from an other thread.
      */
     void start_shutdown();
+
+    /**
+     * Register an handler on behalf on an other module.
+     *
+     * This is used as part of the websocket passthrough feature.
+     *
+     * @note This method is thread-safe.
+     *
+     * @param name The name of the handler (ie, the message's `type`)
+     * @param client_id An opaque identifier that identifies the client (ie module)
+     *        on the WebSocketAPI router socket.
+     */
+    void register_external_handler(const std::string &name,
+                                   const std::string &client_id);
+
+    /**
+     * Send a message to a connection identified by `connection_identifier`.
+     *
+     * @note This method is thread-safe.
+     */
+    void send_external_message(const std::string &connection_identifier,
+                               const std::string &content);
 
     /**
      * Retrieve the authentication helper.
@@ -142,7 +177,7 @@ class WSServer
      * While this may not be the best performance wise, it's
      * unlikely to be a bottleneck, but it helps keep things clean.
      *
-     * @note This method is reponsible for saving the WSAPICall Audit event.
+     * @note This method is responsible for saving the WSAPICall Audit event.
      */
     void on_message(websocketpp::connection_hdl hdl, Server::message_ptr msg);
 
@@ -151,9 +186,12 @@ class WSServer
      *
      * Extract request header, set-up exception handler for api handler
      * invokation.
+     *
+     * @param should_reply This is an OUT parameter. Should the caller send the
+     * ServerMessage returned by this method.
      */
     ServerMessage handle_request(APIPtr api_handle, const json &req,
-                                 Audit::IAuditEntryPtr);
+                                 Audit::IAuditEntryPtr, bool &should_reply);
 
     /**
      * Create a ClientMessage object from a json request.
@@ -184,11 +222,27 @@ class WSServer
 
     /**
      * Process a request from a client.
+     *
+     * @param should_reply This is an OUT parameter. If true, a response
+     * will be sent to the client with `content` set to the return of this
+     * call. If set to false, no response shall be send.
      */
     json dispatch_request(APIPtr api_handle, const ClientMessage &in,
-                          Audit::IAuditEntryPtr);
+                          Audit::IAuditEntryPtr, bool &should_reply);
 
-    ConnectionAPIMap connection_api_;
+    /**
+     * Returns true if an handler named `name` already
+     * exists.
+     */
+    bool has_handler(const std::string &name) const;
+
+    /**
+     * Find a connection from its assigned identifier.
+     */
+    websocketpp::connection_hdl
+    find_connection(const std::string &connection_identifier) const;
+
+    ConnectionAPIMap connection_session_;
     APIAuth auth_;
 
     /**
@@ -201,6 +255,15 @@ class WSServer
     std::map<std::string, CRUDResourceHandler::Factory> crud_handlers_;
 
     /**
+     * Handler registered on behalf of other Leosac's modules.
+     *
+     * This maps the handler's name to the `client_id` key, where `client_id`
+     * is the zeroMQ generated identifier for the module that registered the
+     * endpoint.
+     */
+    std::map<std::string, std::string> external_handlers_;
+
+    /**
      * Database service object.
      */
     DBServicePtr dbsrv_;
@@ -211,6 +274,12 @@ class WSServer
      * The module is guaranteed to outlive the WSServer.
      */
     WebSockAPIModule &module_;
+
+    /**
+     * A PUSH socket that connects to the WebSockAPIModule.
+     * Connects to "inproc://MODULE.WEBSOCKET.INTERNAL_PULL".
+     */
+    std::unique_ptr<zmqpp::socket> to_module_;
 };
 }
 }

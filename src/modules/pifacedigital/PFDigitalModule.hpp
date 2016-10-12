@@ -75,7 +75,7 @@ class PFDigitalModule : public BaseModule
     * Should be removed someday...
     * store the name of the input pin with id = idx in dest.
     *
-    * returns true if it was succesful (pin exists), false otherwise.
+    * returns true if it was successful (pin exists), false otherwise.
     */
     bool get_input_pin_name(std::string &dest, int idx);
 

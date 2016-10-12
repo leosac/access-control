@@ -45,6 +45,11 @@ class SMTP : public BaseModule
     void handle_msg_bus();
 
     /**
+     * A websocket message has been forwarded to us.
+     */
+    void handle_websocket_message();
+
+    /**
      * Process the configuration file.
      */
     void process_config();
@@ -53,6 +58,11 @@ class SMTP : public BaseModule
      * Read internal message bus.
      */
     zmqpp::socket bus_sub_;
+
+    /**
+     * A DEALER socket.
+     */
+    std::unique_ptr<zmqpp::socket> websocket_endpoint_;
 
     bool use_database_;
 

@@ -29,12 +29,13 @@
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/kernel.hpp"
+#include "tools/GenGuid.h"
+#include "tools/LogEntry.hpp"
+#include "tools/db/MultiplexedSession.hpp"
 #include "tools/leosac.hpp"
 #include <odb/mysql/database.hxx>
 #include <odb/session.hxx>
 #include <odb/sqlite/database.hxx>
-#include <tools/LogEntry.hpp>
-#include <tools/db/MultiplexedSession.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -43,6 +44,7 @@ using namespace Leosac::Module::WebSockAPI;
 APISession::APISession(WSServer &server)
     : server_(server)
     , auth_status_(AuthStatus::NONE)
+    , connection_identifier_(gen_uuid())
 {
 }
 
@@ -200,11 +202,16 @@ void APISession::clear_authentication()
     security_           = nullptr;
 }
 
-SecurityContext &APISession::security_context()
+SecurityContext &APISession::security_context() const
 {
     static SecurityContext sc(
         nullptr); // a static default security context for unauth user.
     if (security_)
         return *security_.get();
     return sc;
+}
+
+const std::string &APISession::connection_identifier() const
+{
+    return connection_identifier_;
 }

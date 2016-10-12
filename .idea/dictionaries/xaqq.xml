@@ -19,10 +19,12 @@
       <w>leds</w>
       <w>leosac</w>
       <w>netmask</w>
+      <w>passthrough</w>
       <w>piface</w>
       <w>ptree</w>
       <w>realtime</w>
       <w>rpleth</w>
+      <w>smtp</w>
       <w>sqlite</w>
       <w>syscall</w>
       <w>sysfs</w>

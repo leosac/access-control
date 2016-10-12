@@ -30,6 +30,7 @@
 #include "tools/db/MultiplexedSession.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/db/database.hpp"
+#include "tools/log.hpp"
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <odb/object-result.hxx>

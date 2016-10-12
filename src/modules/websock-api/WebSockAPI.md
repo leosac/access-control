@@ -8,6 +8,8 @@ WebSocket API {#mod_websock-api_main}
 Introduction {#mod_websock-api_intro}
 =======================================
 
+OUTDATED ! WILL NEED REWRITE ONCE THE API STABILIZES.
+
 The module expose Leosac's internals and various information
 through a websocket API.
 This API is intended to be mostly consumed by a web interface.

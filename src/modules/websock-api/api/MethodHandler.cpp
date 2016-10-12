@@ -20,6 +20,7 @@
 #include "api/MethodHandler.hpp"
 #include "Exceptions.hpp"
 #include "WSServer.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;
