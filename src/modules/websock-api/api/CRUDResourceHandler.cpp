@@ -88,9 +88,10 @@ void CRUDResourceHandler::enforce_permission(
     }
 }
 
-WSSecurityContext &CRUDResourceHandler::security_context()
+UserSecurityContext &CRUDResourceHandler::security_context()
 {
-    auto wsc = dynamic_cast<WSSecurityContext *>(&ctx_.session->security_context());
+    auto wsc =
+        dynamic_cast<UserSecurityContext *>(&ctx_.session->security_context());
     ASSERT_LOG(wsc, "SecurityContext has unexpected type.");
     return *wsc;
 }

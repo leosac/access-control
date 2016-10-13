@@ -19,6 +19,7 @@
 
 #include "AuditEntry.hpp"
 #include "AuditEntry_odb.h"
+#include "User_odb.h"
 #include "core/auth/User.hpp"
 #include "tools/log.hpp"
 
@@ -142,4 +143,11 @@ IAuditEntryPtr AuditEntry::parent() const
 void AuditEntry::database(DBPtr db)
 {
     database_ = db;
+}
+
+Auth::UserId AuditEntry::author_id()
+{
+    if (author_)
+        return author_.object_id();
+    return 0;
 }

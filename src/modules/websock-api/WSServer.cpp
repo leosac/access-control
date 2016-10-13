@@ -147,13 +147,14 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         // todo careful potential DDOS as we store the full content without checking
         // for now.
         audit->request_content(msg->get_payload());
+        // Parse request, and copy uuid/method into the audit object.
+        req = json::parse(msg->get_payload());
         INFO("Incoming payload: \n" << req.dump(4));
 
-        // Parse request, and copy uuid/method into the audit object.
-        req                     = json::parse(msg->get_payload());
         ClientMessage input_msg = parse_request(req);
         audit->uuid(input_msg.uuid);
         audit->method(input_msg.type);
+        dbsrv_->update(*audit); // update audit with new info
         response = handle_request(session_handle, input_msg, audit);
     }
     catch (const std::invalid_argument &e)
@@ -168,17 +169,12 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         response->status_string = e.what();
     }
 
-    audit->database_operations(
-        static_cast<uint16_t>(dbsrv_->operation_count() - db_req_counter));
     if (response)
     {
+        audit->database_operations(
+            static_cast<uint16_t>(dbsrv_->operation_count() - db_req_counter));
         finalize_audit(audit, *response);
         send_message(hdl, *response);
-    }
-    else
-    {
-        // Just update the not-yet-finalized audit.
-        dbsrv_->update(*audit);
     }
 }
 

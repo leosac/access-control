@@ -109,6 +109,13 @@ class IAuditEntry
     virtual void author(Auth::UserPtr user) = 0;
 
     /**
+     * Retrieve the user id of the author of this entry.
+     *
+     * It may returns 0, which is not a valid user_id.
+     */
+    virtual Auth::UserId author_id() = 0;
+
+    /**
      * Set `parent` as the parent audit entry for
      * this entry.
      *

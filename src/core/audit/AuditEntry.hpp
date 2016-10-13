@@ -64,6 +64,8 @@ class AuditEntry : virtual public IAuditEntry,
 
     virtual void author(Auth::UserPtr user) override;
 
+    Auth::UserId author_id() override;
+
     virtual void set_parent(IAuditEntryPtr parent) override;
 
     virtual IAuditEntryPtr parent() const override;

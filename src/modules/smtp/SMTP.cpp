@@ -21,6 +21,7 @@
 #include "SMTPConfig.hpp"
 #include "SMTPConfig_odb.h"
 #include "core/CoreUtils.hpp"
+#include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
 #include "core/auth/Auth.hpp"
 #include "modules/websock-api/Messages.hpp"
@@ -134,13 +135,14 @@ void SMTP::process_config()
             std::make_unique<zmqpp::socket>(ctx_, zmqpp::socket_type::dealer);
         websocket_endpoint_->connect("inproc://SERVICE.WEBSOCKET");
         websocket_endpoint_->send(zmqpp::message() << "REGISTER_HANDLER"
-                                                   << "smtp.hello");
+                                                   << "module.smtp.getconfig");
         reactor_.add(*websocket_endpoint_.get(),
                      std::bind(&SMTP::handle_websocket_message, this));
 
-        dispatcher_.register_handler(
-            "smtp.hello", std::bind(&SMTP::handle_ws_smtp_getconfig, this,
-                                    std::placeholders::_1, std::placeholders::_2));
+        dispatcher_.register_handler("module.smtp.getconfig",
+                                     std::bind(&SMTP::handle_ws_smtp_getconfig, this,
+                                               std::placeholders::_1,
+                                               std::placeholders::_2));
     }
 }
 
@@ -265,6 +267,19 @@ void SMTP::setup_database()
     {
         transaction t(db->begin());
         schema_catalog::create_schema(*db, "module_smtp");
+
+
+        // Create a dummy SMTP server config
+        // todo remove this
+
+        SMTPConfig cfg;
+        SMTPServerInfo srv;
+        srv.url_      = "smtp://mail.leosac.com";
+        srv.username_ = "leosac-mail";
+        srv.from_     = "leosac@leosac.com";
+        cfg.server_add(srv);
+        db->persist(cfg);
+
         t.commit();
     }
 }
@@ -304,24 +319,39 @@ void SMTP::handle_websocket_message()
     WebSockAPI::ModuleRequestContext ctx;
     ctx.dbsrv = std::make_shared<DBService>(utils_->database());
 
+
     auto wsapi_call_audit = assert_cast<Audit::IWSAPICallPtr>(
         ctx.dbsrv->find_audit_by_id(audit_id, DBService::THROW_IF_NOT_FOUND));
     ctx.audit = wsapi_call_audit;
+    UserSecurityContext security_ctx(ctx.dbsrv, wsapi_call_audit->author_id());
 
-    WebSockAPI::ServerMessage ret = dispatcher_.dispatch(ctx, ws_msg);
+    // hardcoded for testing purpose
+
+    if (security_ctx.check_permission(SecurityContext::Action::SMTP_GETCONFIG, {}))
     {
-        odb::transaction t(utils_->database()->begin());
-        wsapi_call_audit->status_code(ret.status_code);
-        wsapi_call_audit->status_code(ret.status_code);
-        wsapi_call_audit->status_string(ret.status_string);
-        wsapi_call_audit->response_content(ret.content.dump(4));
-        wsapi_call_audit->finalize();
-        t.commit();
+
+        WebSockAPI::ServerMessage ret = dispatcher_.dispatch(ctx, ws_msg);
+        {
+            odb::transaction t(utils_->database()->begin());
+            wsapi_call_audit->status_code(ret.status_code);
+            wsapi_call_audit->status_code(ret.status_code);
+            wsapi_call_audit->status_string(ret.status_string);
+            wsapi_call_audit->response_content(ret.content.dump(4));
+            wsapi_call_audit->finalize();
+            t.commit();
+        }
+
+        zmqpp::message response;
+        response << "SEND_MESSAGE" << connection_identifier
+                 << dispatcher_.convert_response(ret);
+        websocket_endpoint_->send(response);
     }
-    zmqpp::message response;
-    response << "SEND_MESSAGE" << connection_identifier
-             << dispatcher_.convert_response(ret);
-    websocket_endpoint_->send(response);
+    else
+    {
+        zmqpp::message response;
+        response << "SEND_MESSAGE" << connection_identifier << "SORRY, NO";
+        websocket_endpoint_->send(response);
+    }
 }
 
 json SMTP::handle_ws_smtp_getconfig(const WebSockAPI::ModuleRequestContext &,

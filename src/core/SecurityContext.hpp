@@ -91,6 +91,11 @@ class SecurityContext
         DOOR_DELETE,
         DOOR_SEARCH,
 
+        /**
+         * Retrieve SMTP configuration
+         */
+        SMTP_GETCONFIG,
+
         LOG_READ,
     };
 

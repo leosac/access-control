@@ -25,17 +25,13 @@
 namespace Leosac
 {
 
-namespace Module
-{
-namespace WebSockAPI
-{
 /**
- * A SecurityContext object for WebSocket client.
+ * A SecurityContext object for users.
  */
-class WSSecurityContext : public SecurityContext
+class UserSecurityContext : public SecurityContext
 {
   public:
-    WSSecurityContext(DBServicePtr dbsrv, Auth::UserId id);
+    UserSecurityContext(DBServicePtr dbsrv, Auth::UserId id);
 
     virtual bool check_permission(Action a, const ActionParam &ap) const override;
 
@@ -82,6 +78,4 @@ class WSSecurityContext : public SecurityContext
 
     Auth::UserId user_id_;
 };
-}
-}
 }

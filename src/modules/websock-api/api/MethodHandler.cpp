@@ -40,9 +40,10 @@ json MethodHandler::process(const ClientMessage &msg)
     return process_impl(msg.content);
 }
 
-WSSecurityContext &MethodHandler::security_context()
+UserSecurityContext &MethodHandler::security_context()
 {
-    auto wsc = dynamic_cast<WSSecurityContext *>(&ctx_.session->security_context());
+    auto wsc =
+        dynamic_cast<UserSecurityContext *>(&ctx_.session->security_context());
     ASSERT_LOG(wsc, "SecurityContext has unexpected type.");
     return *wsc;
 }

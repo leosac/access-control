@@ -20,8 +20,8 @@
 #pragma once
 
 #include "RequestContext.hpp"
-#include "WSSecurityContext.hpp"
 #include "core/SecurityContext.hpp"
+#include "core/UserSecurityContext.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -70,7 +70,7 @@ class MethodHandler
         return nullptr;
     }
 
-    WSSecurityContext &security_context();
+    UserSecurityContext &security_context();
 
   private:
     /**

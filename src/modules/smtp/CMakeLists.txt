@@ -21,7 +21,7 @@ odb_compile(OdbCMake_SOURCES
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME module_smtp
-        INCLUDE ${CMAKE_SOURCE_DIR}/src
+        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )

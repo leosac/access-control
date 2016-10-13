@@ -23,9 +23,9 @@
 #include "Token_odb.h"
 #include "UserGroupMembership_odb.h"
 #include "User_odb.h"
-#include "WSSecurityContext.hpp"
 #include "WSServer.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/UserSecurityContext.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/kernel.hpp"
@@ -192,7 +192,7 @@ void APISession::mark_authenticated(Auth::TokenPtr token)
     auth_status_        = AuthStatus::LOGGED_IN;
     current_auth_token_ = token;
     security_ =
-        std::make_unique<WSSecurityContext>(server_.dbsrv(), token->owner()->id());
+        std::make_unique<UserSecurityContext>(server_.dbsrv(), token->owner()->id());
 }
 
 void APISession::clear_authentication()

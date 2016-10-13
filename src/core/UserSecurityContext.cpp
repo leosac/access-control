@@ -17,27 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "WSSecurityContext.hpp"
+#include "UserSecurityContext.hpp"
 #include "Group_odb.h"
 #include "User_odb.h"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
-#include <tools/db/OptionalTransaction.hpp>
 
 using namespace Leosac;
-using namespace Leosac::Module;
-using namespace Leosac::Module::WebSockAPI;
 
-WSSecurityContext::WSSecurityContext(DBServicePtr dbsrv, Auth::UserId id)
+UserSecurityContext::UserSecurityContext(DBServicePtr dbsrv, Auth::UserId id)
     : SecurityContext(dbsrv)
     , user_id_(id)
 {
 }
 
-bool WSSecurityContext::check_permission(SecurityContext::Action action,
-                                         const ActionParam &ap) const
+bool UserSecurityContext::check_permission(SecurityContext::Action action,
+                                           const ActionParam &ap) const
 {
     // Simply put: Administrator can do everything, without any permission check.
     if (is_admin())
@@ -102,6 +100,9 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     case Action::DOOR_SEARCH:
         return true;
 
+    case Action::SMTP_GETCONFIG:
+        return is_manager();
+
     case Action::LOG_READ:
         return is_manager();
     default:
@@ -110,7 +111,7 @@ bool WSSecurityContext::check_permission(SecurityContext::Action action,
     return false;
 }
 
-bool WSSecurityContext::can_read_group(
+bool UserSecurityContext::can_read_group(
     const SecurityContext::GroupActionParam &gap) const
 {
     if (is_manager() || gap.group_id == 0) // listing group.
@@ -120,7 +121,7 @@ bool WSSecurityContext::can_read_group(
     return group->member_has(user_id_);
 }
 
-bool WSSecurityContext::can_administrate_group(
+bool UserSecurityContext::can_administrate_group(
     const SecurityContext::GroupActionParam &gap) const
 {
     if (is_manager())
@@ -135,7 +136,7 @@ bool WSSecurityContext::can_administrate_group(
     return false;
 }
 
-bool WSSecurityContext::can_read_membership(
+bool UserSecurityContext::can_read_membership(
     const SecurityContext::MembershipActionParam &map) const
 {
     Auth::UserGroupMembershipPtr ugm = dbsrv_->find_membership_by_id(
@@ -147,23 +148,24 @@ bool WSSecurityContext::can_read_membership(
            check_permission(Action::GROUP_LIST_MEMBERSHIP, ap);
 }
 
-bool WSSecurityContext::can_read_user(const SecurityContext::UserActionParam &) const
+bool UserSecurityContext::can_read_user(
+    const SecurityContext::UserActionParam &) const
 {
     return true;
 }
 
-bool WSSecurityContext::can_read_user_detail(const UserActionParam &uap) const
+bool UserSecurityContext::can_read_user_detail(const UserActionParam &uap) const
 {
-    return uap.user_id == user_id_;
+    return is_self(uap.user_id) || is_manager();
 }
 
-bool WSSecurityContext::can_update_user(
+bool UserSecurityContext::can_update_user(
     const SecurityContext::UserActionParam &uap) const
 {
-    return is_manager() || uap.user_id == user_id_;
+    return is_self(uap.user_id) || is_manager();
 }
 
-bool WSSecurityContext::can_create_membership(
+bool UserSecurityContext::can_create_membership(
     const SecurityContext::MembershipActionParam &map) const
 {
     if (is_manager())
@@ -183,7 +185,7 @@ bool WSSecurityContext::can_create_membership(
     return false;
 }
 
-bool WSSecurityContext::can_delete_membership(
+bool UserSecurityContext::can_delete_membership(
     const SecurityContext::MembershipActionParam &map) const
 {
     if (is_manager())
@@ -211,7 +213,7 @@ bool WSSecurityContext::can_delete_membership(
     return false;
 }
 
-bool WSSecurityContext::is_admin() const
+bool UserSecurityContext::is_admin() const
 {
     auto user = dbsrv_->find_user_by_id(user_id_);
     if (user)
@@ -219,7 +221,7 @@ bool WSSecurityContext::is_admin() const
     return false;
 }
 
-bool WSSecurityContext::is_manager() const
+bool UserSecurityContext::is_manager() const
 {
     auto user = dbsrv_->find_user_by_id(user_id_);
     if (user)
@@ -227,12 +229,12 @@ bool WSSecurityContext::is_manager() const
     return false;
 }
 
-bool WSSecurityContext::is_self(Auth::UserId id) const
+bool UserSecurityContext::is_self(Auth::UserId id) const
 {
     return user_id_ == id;
 }
 
-bool WSSecurityContext::can_read_credential(
+bool UserSecurityContext::can_read_credential(
     const SecurityContext::CredentialActionParam &cap) const
 {
     if (is_manager() || cap.credential_id == 0)

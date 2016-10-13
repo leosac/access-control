@@ -19,7 +19,6 @@ set(WEBSOCK_API_SRCS
         api/DoorCRUD.cpp
         api/search/GroupSearch.cpp
         api/search/DoorSearch.cpp
-        WSSecurityContext.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED
