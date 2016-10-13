@@ -24,8 +24,7 @@
 using namespace Leosac;
 using namespace Leosac::Auth;
 
-json DoorJSONSerializer::serialize(const Auth::IDoor &door,
-                                   const SecurityContext &sc)
+json DoorJSONSerializer::serialize(const Auth::IDoor &door, const SecurityContext &)
 {
     json serialized = {
         {"id", door.id()},

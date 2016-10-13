@@ -71,8 +71,9 @@ namespace WebSockAPI
  *
  * #### Forwarding (sent by WSServer object)
  * Frame1: Client identifier (module that registere the handler)
- * Frame2: `Connection identifier`
- * Frame3: JSON TEXT CONTENT.
+ * Frame2: Audit Entry ID
+ * Frame3: `Connection identifier`
+ * Frame4: JSON TEXT CONTENT.
  *
  */
 class WebSockAPIModule : public BaseModule

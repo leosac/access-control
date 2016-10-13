@@ -24,26 +24,79 @@
 
 namespace Leosac
 {
-template <typename Out, typename In>
-Out assert_cast(In in)
+
+template <typename T>
+struct is_shared_ptr : public std::false_type
 {
-    bool is_null = in;
-    Out tmp      = dynamic_cast<Out>(in);
-    if (!is_null)
-        ASSERT_LOG(tmp != nullptr, "Pointer is null after assert_cast");
-    return tmp;
 };
 
-template <typename Out, typename In>
-Out assert_cast(const std::shared_ptr<In> &in)
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : public std::true_type
 {
-    bool is_null = in;
+};
+
+template <typename T>
+struct is_shared_ptr<const std::shared_ptr<T>> : public std::true_type
+{
+};
+
+template <typename T>
+struct is_shared_ptr<std::shared_ptr<T> &> : public std::true_type
+{
+};
+
+template <typename T>
+struct is_shared_ptr<const std::shared_ptr<T> &> : public std::true_type
+{
+};
+
+template <typename T>
+constexpr bool is_shared_ptr_v = is_shared_ptr<T>::value;
+
+template <typename Out, typename In>
+std::enable_if_t<is_shared_ptr_v<Out>, Out>
+assert_cast(const std::shared_ptr<In> &in)
+{
+    bool is_null = !in;
 
     if (auto p = dynamic_cast<typename Out::element_type *>(in.get()))
     {
         return Out(in, p);
     }
-    else if (is_null)
+    else if (!is_null)
+    {
+        ASSERT_LOG(0, "Pointer is null after assert_cast");
+    }
+    return nullptr;
+};
+
+template <typename Out, typename In>
+std::enable_if_t<!is_shared_ptr_v<Out> && !std::is_pointer<Out>::value, Out &&>
+assert_cast(In &&in)
+{
+    try
+    {
+        Out &&tmp = dynamic_cast<Out &&>(in);
+        return std::forward<Out>(tmp);
+    }
+    catch (const std::bad_cast &)
+    {
+        ASSERT_LOG(false, "Cast failed.");
+    }
+    std::terminate();
+};
+
+template <typename Out, typename In>
+std::enable_if_t<std::is_pointer<Out>::value && std::is_pointer<In>::value, Out>
+assert_cast(In &&in)
+{
+    bool is_null = !in;
+
+    if (auto p = dynamic_cast<Out>(in))
+    {
+        return p;
+    }
+    else if (!is_null)
     {
         ASSERT_LOG(0, "Pointer is null after assert_cast");
     }

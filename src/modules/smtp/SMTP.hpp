@@ -21,8 +21,10 @@
 
 #include "SMTPFwd.hpp"
 #include "modules/BaseModule.hpp"
+#include "modules/websock-api/RequestContext.hpp"
 #include "tools/ToolsFwd.hpp"
 #include <curl/curl.h>
+#include <json.hpp>
 
 namespace Leosac
 {
@@ -30,6 +32,32 @@ namespace Module
 {
 namespace SMTP
 {
+using json = nlohmann::json;
+
+
+class RequestDispatcher
+{
+  public:
+    WebSockAPI::ServerMessage dispatch(const WebSockAPI::ModuleRequestContext &,
+                                       const WebSockAPI::ClientMessage &msg);
+
+    template <typename Callable>
+    void register_handler(const std::string &type, Callable &&c)
+    {
+        handlers_[type] = c;
+    }
+
+    /**
+     * Convert a ServerMessage to its string-JSON representation.
+     */
+    std::string convert_response(const WebSockAPI::ServerMessage &msg);
+
+    std::map<
+        std::string,
+        std::function<json(const WebSockAPI::ModuleRequestContext &, const json &)>>
+        handlers_;
+};
+
 class SMTP : public BaseModule
 {
   public:
@@ -48,6 +76,12 @@ class SMTP : public BaseModule
      * A websocket message has been forwarded to us.
      */
     void handle_websocket_message();
+
+    /**
+     * Process the websocket request "smtp.getconfig".
+     */
+    json handle_ws_smtp_getconfig(const WebSockAPI::ModuleRequestContext &,
+                                  const json &);
 
     /**
      * Process the configuration file.
@@ -71,11 +105,13 @@ class SMTP : public BaseModule
      */
     SMTPConfigUPtr smtp_config_;
 
+    RequestDispatcher dispatcher_;
+
     void setup_database();
 
-    void send_mail(const MailInfo &mail);
+    void prepare_curl(const MailInfo &mail);
 
-    void send_to_server(CURL *curl, const SMTPServerInfo &srv, const MailInfo &mail);
+    void send_mail(CURL *curl, const MailInfo &mail);
 };
 }
 }

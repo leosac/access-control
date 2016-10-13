@@ -21,12 +21,16 @@
 #include "SMTPConfig.hpp"
 #include "SMTPConfig_odb.h"
 #include "core/CoreUtils.hpp"
+#include "core/audit/IWSAPICall.hpp"
 #include "core/auth/Auth.hpp"
+#include "modules/websock-api/Messages.hpp"
+#include "tools/AssertCast.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/Mail.hpp"
 #include "tools/db/database.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include <curl/curl.h>
+#include <json.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module::SMTP;
@@ -73,7 +77,7 @@ void SMTP::handle_msg_bus()
     try
     {
         MailInfo mail = GlobalRegistry::get<MailInfo>(key);
-        send_mail(mail);
+        prepare_curl(mail);
     }
     catch (const RegistryKeyNotFoundException &e)
     {
@@ -133,10 +137,14 @@ void SMTP::process_config()
                                                    << "smtp.hello");
         reactor_.add(*websocket_endpoint_.get(),
                      std::bind(&SMTP::handle_websocket_message, this));
+
+        dispatcher_.register_handler(
+            "smtp.hello", std::bind(&SMTP::handle_ws_smtp_getconfig, this,
+                                    std::placeholders::_1, std::placeholders::_2));
     }
 }
 
-void SMTP::send_mail(const MailInfo &mail)
+void SMTP::prepare_curl(const MailInfo &mail)
 {
     if (smtp_config_->servers().size() == 0)
         WARN("Cannot send mail titled " << Colorize::cyan(mail.title)
@@ -162,7 +170,7 @@ void SMTP::send_mail(const MailInfo &mail)
             ASSERT_LOG(target.url_.size(), "No mail server url.");
             curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
 
-            send_to_server(curl, target, mail);
+            send_mail(curl, mail);
             curl_easy_cleanup(curl);
         }
         else
@@ -219,8 +227,7 @@ static size_t read_callback(void *ptr, size_t size, size_t nmemb, void *userp)
     return to_transfer;
 }
 
-void SMTP::send_to_server(CURL *curl, const SMTPServerInfo &srv,
-                          const MailInfo &mail)
+void SMTP::send_mail(CURL *curl, const MailInfo &mail)
 {
     ASSERT_LOG(curl, "CURL pointer is null.");
 
@@ -277,15 +284,88 @@ void SMTP::handle_websocket_message()
         return;
     }
 
-    ASSERT_LOG(msg.parts() == 2, "Ill formed message.");
+    ASSERT_LOG(msg.parts() == 3, "Ill formed message.");
+    Audit::AuditEntryId audit_id;
     std::string connection_identifier;
     std::string content;
+    msg >> audit_id >> connection_identifier >> content;
 
-    msg >> connection_identifier >> content;
+    json ws_request = json::parse(content);
+    WebSockAPI::ClientMessage ws_msg;
 
-    INFO("RECEIVED WEBSOCKET MSG FOR: " << content);
+    // Extract general message argument. This is sent by the WebSockAPI module
+    // so we assume it is correct.
+    ws_msg.uuid    = ws_request.at("uuid");
+    ws_msg.type    = ws_request.at("type");
+    ws_msg.content = ws_request.at("content");
 
+    odb::session odb_session;
+
+    WebSockAPI::ModuleRequestContext ctx;
+    ctx.dbsrv = std::make_shared<DBService>(utils_->database());
+
+    auto wsapi_call_audit = assert_cast<Audit::IWSAPICallPtr>(
+        ctx.dbsrv->find_audit_by_id(audit_id, DBService::THROW_IF_NOT_FOUND));
+    ctx.audit = wsapi_call_audit;
+
+    WebSockAPI::ServerMessage ret = dispatcher_.dispatch(ctx, ws_msg);
+    {
+        odb::transaction t(utils_->database()->begin());
+        wsapi_call_audit->status_code(ret.status_code);
+        wsapi_call_audit->status_code(ret.status_code);
+        wsapi_call_audit->status_string(ret.status_string);
+        wsapi_call_audit->response_content(ret.content.dump(4));
+        wsapi_call_audit->finalize();
+        t.commit();
+    }
     zmqpp::message response;
-    response << "SEND_MESSAGE" << connection_identifier << "HELLO WORLD\n";
+    response << "SEND_MESSAGE" << connection_identifier
+             << dispatcher_.convert_response(ret);
     websocket_endpoint_->send(response);
+}
+
+json SMTP::handle_ws_smtp_getconfig(const WebSockAPI::ModuleRequestContext &,
+                                    const json &)
+{
+    json ret = json::array();
+    for (const auto &server_cfg : smtp_config_->servers())
+    {
+        json server_desc;
+        server_desc["url"]         = server_cfg.url_;
+        server_desc["from"]        = server_cfg.from_;
+        server_desc["username"]    = server_cfg.username_;
+        server_desc["verify_host"] = server_cfg.verify_host_;
+        server_desc["verify_peer"] = server_cfg.verify_peer_;
+        ret.push_back(server_desc);
+    }
+    return ret;
+}
+
+Module::WebSockAPI::ServerMessage
+RequestDispatcher::dispatch(const WebSockAPI::ModuleRequestContext &ctx,
+                            const Module::WebSockAPI::ClientMessage &msg)
+{
+    auto handler = handlers_.find(msg.type);
+    ASSERT_LOG(handler != handlers_.end(), "No handler found for " << msg.type);
+
+    WebSockAPI::ServerMessage ret;
+    ret.uuid        = msg.uuid;
+    ret.type        = msg.type;
+    ret.content     = handler->second(ctx, msg.content);
+    ret.status_code = APIStatusCode::SUCCESS;
+    return ret;
+}
+
+std::string
+RequestDispatcher::convert_response(const Module::WebSockAPI::ServerMessage &msg)
+{
+    json json_message;
+
+    json_message["uuid"]          = msg.uuid;
+    json_message["type"]          = msg.type;
+    json_message["status_code"]   = static_cast<int64_t>(msg.status_code);
+    json_message["status_string"] = msg.status_string;
+    json_message["content"]       = msg.content;
+
+    return json_message.dump(4);
 }

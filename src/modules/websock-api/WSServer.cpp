@@ -117,11 +117,10 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
                "Cannot retrieve API pointer from connection handle.");
     auto session_handle = connection_session_.find(hdl)->second;
 
-    bool should_reply = true;
     // todo maybe parse first so be we can have better error handling.
-    auto global_request_count = dbsrv_->operation_count();
+    auto db_req_counter = dbsrv_->operation_count();
     Audit::IWSAPICallPtr audit;
-    ServerMessage response;
+    boost::optional<ServerMessage> response = ServerMessage();
     json req;
     try
     {
@@ -132,9 +131,9 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         WARN("Database Error in WServer::on_message. Aborting request processing. "
              "Error: "
              << e.what());
-        response.status_code   = APIStatusCode::DATABASE_ERROR;
-        response.status_string = e.what();
-        send_message(hdl, response);
+        response->status_code   = APIStatusCode::DATABASE_ERROR;
+        response->status_string = e.what();
+        send_message(hdl, *response);
         return;
     }
     try
@@ -148,46 +147,39 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
         // todo careful potential DDOS as we store the full content without checking
         // for now.
         audit->request_content(msg->get_payload());
-        req = json::parse(msg->get_payload());
-
-        response = handle_request(session_handle, req, audit, should_reply);
         INFO("Incoming payload: \n" << req.dump(4));
+
+        // Parse request, and copy uuid/method into the audit object.
+        req                     = json::parse(msg->get_payload());
+        ClientMessage input_msg = parse_request(req);
+        audit->uuid(input_msg.uuid);
+        audit->method(input_msg.type);
+        response = handle_request(session_handle, input_msg, audit);
     }
     catch (const std::invalid_argument &e)
     {
         // JSON parse error
-        response.status_code   = APIStatusCode::MALFORMED;
-        response.status_string = "Failed to parse JSON.";
+        response->status_code   = APIStatusCode::MALFORMED;
+        response->status_string = "Failed to parse JSON.";
+    }
+    catch (const MalformedMessage &e)
+    {
+        response->status_code   = APIStatusCode::MALFORMED;
+        response->status_string = e.what();
     }
 
-    try
+    audit->database_operations(
+        static_cast<uint16_t>(dbsrv_->operation_count() - db_req_counter));
+    if (response)
     {
-        db::MultiplexedTransaction t(dbsrv_->db()->begin());
-        // If something went wrong while processing the request, the audit object
-        // may need to be reload. We might as well reload it everytime.
-        audit->reload();
-        // Update audit value.
-        audit->uuid(response.uuid);
-        audit->method(response.type);
-        audit->status_code(response.status_code);
-        audit->status_string(response.status_string);
-        audit->response_content(response.content.dump(4));
-        audit->database_operations(
-            static_cast<uint16_t>(dbsrv_->operation_count() - global_request_count));
-        audit->finalize();
-        t.commit();
+        finalize_audit(audit, *response);
+        send_message(hdl, *response);
     }
-    catch (const odb::exception &e)
+    else
     {
-        WARN("Database Error in WServer::on_message. Failed to persist final audit: "
-             << e.what());
-        response.status_code   = APIStatusCode::DATABASE_ERROR;
-        response.status_string = e.what();
-        send_message(hdl, response);
-        return;
+        // Just update the not-yet-finalized audit.
+        dbsrv_->update(*audit);
     }
-    if (should_reply)
-        send_message(hdl, response);
 }
 
 void WSServer::run(const std::string &interface, uint16_t port)
@@ -215,16 +207,13 @@ APIAuth &WSServer::auth()
     return auth_;
 }
 
-json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
-                                Audit::IAuditEntryPtr audit, bool &should_reply)
+boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
+                                                 const ClientMessage &in,
+                                                 Audit::IAuditEntryPtr audit)
 {
-    should_reply = true; // be default we reply. Only when delegating to external
-    // handler should we not reply.
-
     auto external_handler_key = external_handlers_.find(in.type);
     if (external_handler_key != external_handlers_.end())
     {
-        should_reply = false; // Do not reply instantly when forwarding.
         // Forward the message to the WebSockAPIModule thread, which will
         // itself forward to the corresponding module.
 
@@ -233,11 +222,11 @@ json WSServer::dispatch_request(APIPtr api_handle, const ClientMessage &in,
         json reconstructed = {
             {"uuid", in.uuid}, {"type", in.type}, {"content", in.content}};
         zmqpp::message msg;
-        msg << external_handler_key->second << api_handle->connection_identifier()
-            << reconstructed.dump(4);
-        bool sent = to_module_->send(msg);
+        msg << external_handler_key->second << audit->id()
+            << api_handle->connection_identifier() << reconstructed.dump(4);
+        bool sent = to_module_->send(msg, true);
         ASSERT_LOG(sent, "Internal send would block. Need to investigate.");
-        return {};
+        return boost::none;
     }
 
     // A request is an "Unit-of-Work" for the application.
@@ -332,19 +321,24 @@ ClientMessage WSServer::parse_request(const json &req)
     return msg;
 }
 
-ServerMessage WSServer::handle_request(APIPtr api_handle, const json &req,
-                                       Audit::IAuditEntryPtr audit,
-                                       bool &should_reply)
+boost::optional<ServerMessage> WSServer::handle_request(APIPtr api_handle,
+                                                        const ClientMessage &msg,
+                                                        Audit::IAuditEntryPtr audit)
 {
     ServerMessage response;
     response.status_code = APIStatusCode::SUCCESS;
     response.content     = {};
     try
     {
-        ClientMessage input = parse_request(req);
-        response.uuid       = input.uuid;
-        response.type       = input.type;
-        response.content = dispatch_request(api_handle, input, audit, should_reply);
+        response.uuid = msg.uuid;
+        response.type = msg.type;
+        auto opt_json = dispatch_request(api_handle, msg, audit);
+        if (opt_json)
+        {
+            response.content = *opt_json;
+            return response;
+        }
+        return boost::none;
     }
     catch (const InvalidCall &e)
     {
@@ -513,4 +507,31 @@ WSServer::find_connection(const std::string &connection_identifier) const
             return con_to_session.first;
     }
     return websocketpp::connection_hdl();
+}
+
+void WSServer::finalize_audit(const Audit::IWSAPICallPtr &audit, ServerMessage &msg)
+{
+    try
+    {
+        db::MultiplexedTransaction t(dbsrv_->db()->begin());
+        // If something went wrong while processing the request, the audit object
+        // may need to be reload. We might as well reload it every time.
+        audit->reload();
+        // Update audit value.
+        audit->uuid(msg.uuid);
+        audit->method(msg.type);
+        audit->status_code(msg.status_code);
+        audit->status_string(msg.status_string);
+        audit->response_content(msg.content.dump(4));
+        audit->finalize();
+        t.commit();
+    }
+    catch (const odb::exception &e)
+    {
+        WARN("Database Error in WServer::on_message. Failed to persist final audit: "
+             << e.what());
+        msg.status_code   = APIStatusCode::DATABASE_ERROR;
+        msg.status_string = e.what();
+        return;
+    }
 }

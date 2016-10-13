@@ -63,7 +63,7 @@ void AuditEntry::finalize()
     }
     finalized_ = true;
     ASSERT_LOG(database_, "Null database pointer for AuditEntry.");
-    duration_ = etc_.elapsed();
+    duration_ += etc_.elapsed();
     database_->update(*this);
 }
 
@@ -137,4 +137,9 @@ void AuditEntry::reload()
 IAuditEntryPtr AuditEntry::parent() const
 {
     return parent_.lock();
+}
+
+void AuditEntry::database(DBPtr db)
+{
+    database_ = db;
 }

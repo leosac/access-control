@@ -40,6 +40,7 @@ class WebSockAPIModule;
 class WSServer;
 
 struct ClientMessage;
+struct ServerMessage;
 }
 }
 }

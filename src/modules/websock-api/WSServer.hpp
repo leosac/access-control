@@ -20,6 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
+#include "Messages.hpp"
 #include "WebSockFwd.hpp"
 #include "api/APIAuth.hpp"
 #include "api/APISession.hpp"
@@ -28,6 +29,7 @@
 #include "core/APIStatusCode.hpp"
 #include "core/audit/AuditFwd.hpp"
 #include "tools/db/db_fwd.hpp"
+#include <boost/optional.hpp>
 #include <set>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
@@ -40,28 +42,6 @@ namespace Module
 namespace WebSockAPI
 {
 using json = nlohmann::json;
-
-/**
- * A message sent by the server to a client.
- */
-struct ServerMessage
-{
-    APIStatusCode status_code;
-    std::string status_string;
-    std::string uuid;
-    std::string type;
-    json content;
-};
-
-/**
- * A message sent by a client to Leosac.
- */
-struct ClientMessage
-{
-    std::string uuid;
-    std::string type;
-    json content;
-};
 
 /**
  * The implementation class that runs the websocket server.
@@ -184,14 +164,14 @@ class WSServer
     /**
      * Handle a request.
      *
-     * Extract request header, set-up exception handler for api handler
-     * invokation.
+     * Extract request header, set-up exception handling for api handler
+     * invocation.
      *
-     * @param should_reply This is an OUT parameter. Should the caller send the
-     * ServerMessage returned by this method.
+     * Optionally returns a ServerMessage that must be send to the client.
      */
-    ServerMessage handle_request(APIPtr api_handle, const json &req,
-                                 Audit::IAuditEntryPtr, bool &should_reply);
+    boost::optional<ServerMessage> handle_request(APIPtr api_handle,
+                                                  const ClientMessage &msg,
+                                                  Audit::IAuditEntryPtr);
 
     /**
      * Create a ClientMessage object from a json request.
@@ -221,14 +201,15 @@ class WSServer
                                CRUDResourceHandler::Factory factory);
 
     /**
-     * Process a request from a client.
+     * Dispatch the request from a client, so that it is processed by
+     * the appropriate handler.
      *
-     * @param should_reply This is an OUT parameter. If true, a response
-     * will be sent to the client with `content` set to the return of this
-     * call. If set to false, no response shall be send.
+     * This method returns an `optional` json object. If the handler is external,
+     * then no json is returned.
      */
-    json dispatch_request(APIPtr api_handle, const ClientMessage &in,
-                          Audit::IAuditEntryPtr, bool &should_reply);
+    boost::optional<json> dispatch_request(APIPtr api_handle,
+                                           const ClientMessage &in,
+                                           Audit::IAuditEntryPtr);
 
     /**
      * Returns true if an handler named `name` already
@@ -241,6 +222,13 @@ class WSServer
      */
     websocketpp::connection_hdl
     find_connection(const std::string &connection_identifier) const;
+
+    /**
+     * Extract values from the `msg` and finalizes the `audit` object with them.
+     *
+     * The `msg` may be modified if finalizing the audit object fails.
+     */
+    void finalize_audit(const Audit::IWSAPICallPtr &audit, ServerMessage &msg);
 
     ConnectionAPIMap connection_session_;
     APIAuth auth_;

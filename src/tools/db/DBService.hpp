@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/audit/IAuditEntry.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
 #include "tools/ToolsFwd.hpp"
@@ -73,8 +74,27 @@ class DBService
 
     Auth::IDoorPtr find_door_by_id(const Auth::DoorId &id, Flag f = Flag::DEFAULT);
 
+    Audit::IAuditEntryPtr find_audit_by_id(const Audit::AuditEntryId &id,
+                                           Flag f = Flag::DEFAULT);
+
+    /**
+     * Persist an audit entry object.
+     *
+     * Begin and commit a new transaction if there is currently no
+     * transaction in progress. Otherwise, simple persist the object
+     * in the current transaction, but does not call commit().
+     *
+     * @note The object may not be const because its using an automatically assigned
+     *       database id.
+     */
+    void persist(Audit::IAuditEntry &);
+
+    /**
+     * Update the object.
+     */
+    void update(Audit::IAuditEntry &);
 
   private:
-    DBPtr database_;
+    const DBPtr database_;
 };
 }

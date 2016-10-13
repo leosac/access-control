@@ -18,6 +18,7 @@
 */
 
 #include "DBService.hpp"
+#include "AuditEntry_odb.h"
 #include "Credential_odb.h"
 #include "DatabaseTracer.hpp"
 #include "Door_odb.h"
@@ -25,7 +26,9 @@
 #include "OptionalTransaction.hpp"
 #include "Schedule_odb.h"
 #include "User_odb.h"
+#include "core/audit/AuditEntry.hpp"
 #include "exception/EntityNotFound.hpp"
+#include "tools/AssertCast.hpp"
 #include "tools/log.hpp"
 #include <odb/database.hxx>
 
@@ -35,6 +38,7 @@ using namespace Leosac;
 DBService::DBService(DBPtr db)
     : database_(db)
 {
+    ASSERT_LOG(database_, "Not valid database pointer for DBService.");
 }
 
 DBPtr DBService::db() const
@@ -46,8 +50,7 @@ size_t DBService::operation_count() const
 {
     if (database_->tracer())
     {
-        auto tracer = dynamic_cast<db::DatabaseTracer *>(database_->tracer());
-        ASSERT_LOG(tracer, "No (valid?) tracer object on the database.");
+        auto tracer = assert_cast<db::DatabaseTracer *>(database_->tracer());
         return tracer->count();
     }
     return 0;
@@ -115,4 +118,43 @@ Auth::IDoorPtr DBService::find_door_by_id(const Auth::DoorId &id,
     if (!door && flags & Flag::THROW_IF_NOT_FOUND)
         throw EntityNotFound(id, "door");
     return door;
+}
+
+Audit::IAuditEntryPtr DBService::find_audit_by_id(const Audit::AuditEntryId &id,
+                                                  Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto audit = database_->find<Audit::AuditEntry>(id);
+    t.commit();
+    if (!audit && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "audit-entry");
+    audit->database(database_);
+    return audit;
+}
+
+template <typename T>
+static void persist_impl(const DBPtr db, T &&obj)
+{
+    db::OptionalTransaction t(db->begin());
+    ASSERT_LOG(obj.id() == 0, "Object is probably already persisted.");
+    db->persist(std::forward<T>(obj));
+    t.commit();
+}
+
+template <typename T>
+static void update_impl(const DBPtr db, T &&obj)
+{
+    db::OptionalTransaction t(db->begin());
+    db->update(std::forward<T>(obj));
+    t.commit();
+}
+
+void DBService::persist(Audit::IAuditEntry &ientry)
+{
+    persist_impl(database_, assert_cast<Audit::AuditEntry &>(ientry));
+}
+
+void DBService::update(Audit::IAuditEntry &ientry)
+{
+    update_impl(database_, assert_cast<Audit::AuditEntry &>(ientry));
 }

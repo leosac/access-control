@@ -49,7 +49,8 @@ class AuditEntry : virtual public IAuditEntry,
     AuditEntry();
 
   public:
-    virtual ~AuditEntry() = default;
+    AuditEntry(const AuditEntry &) = delete;
+    virtual ~AuditEntry()          = default;
 
     virtual AuditEntryId id() const override;
 
@@ -74,6 +75,13 @@ class AuditEntry : virtual public IAuditEntry,
     virtual size_t version() const override;
 
     virtual void reload() override;
+
+    /**
+     * Set the database pointer.
+     *
+     * This is used by the DBService.
+     */
+    void database(DBPtr db);
 
   private:
 #pragma db id auto
@@ -119,7 +127,7 @@ class AuditEntry : virtual public IAuditEntry,
  * Pointer to the database.
  * Required to implement `finalize()`.
  *
- * Manualy set by Audit::Factory.
+ * Manually set by Audit::Factory.
  */
 #pragma db transient
     DBPtr database_;

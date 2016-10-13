@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "WebSockFwd.hpp"
-#include "core/audit/AuditFwd.hpp"
-#include "tools/db/db_fwd.hpp"
+#include "core/APIStatusCode.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
@@ -29,33 +29,32 @@ namespace Module
 {
 namespace WebSockAPI
 {
-/**
- * Holds valuable pointer to provide context to a request.
- */
-struct RequestContext
-{
-    APIPtr session;
-    DBServicePtr dbsrv;
-    WSServer &server;
+using json = nlohmann::json;
 
-    /**
-     * The initial audit trail for the request.
-     * It is guaranteed that this audit object is:
-     *     + Non null
-     *     + Already persisted
-     */
-    Audit::IAuditEntryPtr audit;
+/**
+ * A message sent by the server to a client.
+ */
+struct ServerMessage
+{
+    ServerMessage()
+        : status_code(APIStatusCode::UNKNOWN)
+    {
+    }
+    APIStatusCode status_code;
+    std::string status_string;
+    std::string uuid;
+    std::string type;
+    json content;
 };
 
-
 /**
- * A request context dedicated for websocket request that are
- * handled by other modules.
+ * A message sent by a client to Leosac.
  */
-struct ModuleRequestContext
+struct ClientMessage
 {
-    DBServicePtr dbsrv;
-    Audit::IAuditEntryPtr audit;
+    std::string uuid;
+    std::string type;
+    json content;
 };
 }
 }
