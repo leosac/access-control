@@ -118,16 +118,16 @@ void SMTPModule::process_config()
         for (auto &&itr : config_.get_child("module_config.servers"))
         {
             SMTPServerInfo server;
-            server.url_  = itr.second.get<std::string>("url");
-            server.from_ = itr.second.get<std::string>("from", "leosac@islog.com");
-            server.verify_host_  = itr.second.get<bool>("verify_host", true);
-            server.verify_peer_  = itr.second.get<bool>("verify_peer", true);
+            server.url  = itr.second.get<std::string>("url");
+            server.from = itr.second.get<std::string>("from", "leosac@islog.com");
+            server.verify_host   = itr.second.get<bool>("verify_host", true);
+            server.verify_peer   = itr.second.get<bool>("verify_peer", true);
             server.CA_info_file_ = itr.second.get<std::string>("ca_file", "");
 
             INFO("SMTP module server: "
-                 << Colorize::green(server.url_)
-                 << ", verify_host: " << Colorize::green(server.verify_host_)
-                 << ", verify_peer: " << Colorize::green(server.verify_peer_)
+                 << Colorize::green(server.url)
+                 << ", verify_host: " << Colorize::green(server.verify_host)
+                 << ", verify_peer: " << Colorize::green(server.verify_peer)
                  << ", ca_info: " << Colorize::green(server.CA_info_file_) << ")");
             smtp_config_->server_add(server);
         }
@@ -138,9 +138,9 @@ void SMTPModule::process_config()
         websocket_api = std::make_unique<WebSockAPI::Facade>(reactor_, utils_);
         auto handler  = std::bind(&SMTPModule::handle_websocket_message, this,
                                  std::placeholders::_1, std::placeholders::_2);
-        websocket_api->register_handler(getconfig_websocket_type, handler);
-        websocket_api->register_handler(setconfig_websocket_type, handler);
-        websocket_api->register_handler(sendmail_websocket_type, handler);
+        websocket_api->register_handler(wshandler_getconfig, handler);
+        websocket_api->register_handler(wshandler_setconfig, handler);
+        websocket_api->register_handler(wshandler_sendmail, handler);
     }
 }
 
@@ -151,26 +151,29 @@ bool SMTPModule::prepare_curl(const MailInfo &mail)
                                         << ". No SMTP server configured.");
     for (const auto &target : smtp_config_->servers())
     {
+        if (!target.enabled)
+            continue;
+
         auto curl = curl_easy_init();
         if (curl)
         {
             if (!target.CA_info_file_.empty())
                 curl_easy_setopt(curl, CURLOPT_CAINFO, target.CA_info_file_.c_str());
-            if (!target.verify_host_)
+            if (!target.verify_host)
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-            if (!target.verify_peer_)
+            if (!target.verify_peer)
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-            if (target.username_.size())
-                curl_easy_setopt(curl, CURLOPT_USERNAME, target.username_.c_str());
-            if (target.password_.size())
-                curl_easy_setopt(curl, CURLOPT_PASSWORD, target.password_.c_str());
-            if (target.from_.size())
-                curl_easy_setopt(curl, CURLOPT_MAIL_FROM, target.from_.c_str());
+            if (target.username.size())
+                curl_easy_setopt(curl, CURLOPT_USERNAME, target.username.c_str());
+            if (target.password.size())
+                curl_easy_setopt(curl, CURLOPT_PASSWORD, target.password.c_str());
+            if (target.from.size())
+                curl_easy_setopt(curl, CURLOPT_MAIL_FROM, target.from.c_str());
 
-            ASSERT_LOG(target.url_.size(), "No mail server url.");
-            curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
+            ASSERT_LOG(target.url.size(), "No mail server url.");
+            curl_easy_setopt(curl, CURLOPT_URL, target.url.c_str());
 
-            curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, target.ms_timeout_);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, target.ms_timeout);
 
             bool sent = send_mail(curl, mail);
             curl_easy_cleanup(curl);
@@ -278,9 +281,9 @@ void SMTPModule::setup_database()
 
         SMTPConfig cfg;
         SMTPServerInfo srv;
-        srv.url_      = "smtp://mail.leosac.com";
-        srv.username_ = "leosac-mail";
-        srv.from_     = "leosac@leosac.com";
+        srv.url      = "smtp://mail.leosac.com";
+        srv.username = "leosac-mail";
+        srv.from     = "leosac@leosac.com";
         cfg.server_add(srv);
         db->persist(cfg);
 
@@ -300,7 +303,7 @@ WebSockAPI::ServerMessage SMTPModule::handle_websocket_message(
         response.uuid = msg.uuid;
         response.type = msg.type;
 
-        if (msg.type == std::string(getconfig_websocket_type))
+        if (msg.type == wshandler_getconfig)
         {
             if (request_ctx.security_ctx->check_permission(
                     SecurityContext::Action::SMTP_GETCONFIG, {}))
@@ -312,7 +315,7 @@ WebSockAPI::ServerMessage SMTPModule::handle_websocket_message(
             else
                 throw WebSockAPI::PermissionDenied();
         }
-        else if (msg.type == std::string(setconfig_websocket_type))
+        else if (msg.type == wshandler_setconfig)
         {
             if (request_ctx.security_ctx->check_permission(
                     SecurityContext::Action::SMTP_SETCONFIG, {}))
@@ -324,9 +327,8 @@ WebSockAPI::ServerMessage SMTPModule::handle_websocket_message(
             else
                 throw WebSockAPI::PermissionDenied();
         }
-        else if (msg.type == std::string(sendmail_websocket_type))
+        else if (msg.type == wshandler_sendmail)
         {
-
             if (request_ctx.security_ctx->check_permission(
                     SecurityContext::Action::SMTP_SENDMAIL, {}))
             {

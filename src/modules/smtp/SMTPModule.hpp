@@ -98,9 +98,9 @@ class SMTPModule : public BaseModule
     bool prepare_curl(const MailInfo &mail);
 
     bool send_mail(CURL *curl, const MailInfo &mail);
-    static constexpr const char *getconfig_websocket_type = "module.smtp.getconfig";
-    static constexpr const char *setconfig_websocket_type = "module.smtp.setconfig";
-    static constexpr const char *sendmail_websocket_type  = "module.smtp.sendmail";
+    static constexpr const char *wshandler_getconfig = "module.smtp.getconfig";
+    static constexpr const char *wshandler_setconfig = "module.smtp.setconfig";
+    static constexpr const char *wshandler_sendmail  = "module.smtp.sendmail";
 };
 }
 }

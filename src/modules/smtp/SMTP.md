@@ -1,5 +1,5 @@
-Web Service Notifier {#mod_SMTP_main}
-=====================================
+SMTP {#mod_SMTP_main}
+=====================
 
 @brief A SMTP module that provide the ability to send mail.
 
@@ -14,12 +14,12 @@ based configuration, or can rely on the database for configuration storage.
 The SMTP module watch the application event bus, specifically topic `SERVICE.MAILER`.
 
 When a component wishes to send a email, it can send a message to the application bus,
-with topic `SERVER.MAILER`. The message content shall be a string representing a key
+with topic `SERVER.MAILER`. The message contain shall be a string representing a key
 in the `GlobalRegistry`: this key is then used to retrieve the `MailInfo` object.
  
  
 Configuration Options {#mod_SMTP_user_config}
-====================================================
+=============================================
 
 Options        | Options  | Options         | Description                                                    | Mandatory
 ---------------|----------|-----------------|----------------------------------------------------------------|-----------
@@ -28,6 +28,8 @@ use_database   |          |                 | If true, rely on database for conf
 servers        |          |                 | Remote mail service to use                                     | NO
 --->           | server   |                 | Describe a mail server target.                                 | NO
 --->           | --->     | url             | SMTP server url. "smtp://mail.mydomain.me"                     | YES
+--->           | --->     | username        | Username to use for authentication against the SMTP server     | NO
+--->           | --->     | password        | Password for authentication                                    | NO
 --->           | ---->    | ca_file         | Path to a PEM encoded CA file used to validate certificate.    | NO
 --->           | --->     | verify_host     | If SSL is enabled, do we verify the host name in the SSL certificate ? | NO (defaults to `true`)   
 --->           | --->     | verify_peer     | If SSL is enabled, do we verify the SSL certificate ? | NO (defaults to `true`)   
@@ -35,6 +37,11 @@ servers        |          |                 | Remote mail service to use        
 
 Example {#mod_SMTP_example}
 ---------------------------
+
+### With database {#mod_SMTP_example_db}
+
+In this example, the module will load its configuration from the SQL database,
+and will be configurable through the websocket API (if the websocket module is enabled).
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <module>
@@ -47,6 +54,9 @@ Example {#mod_SMTP_example}
     </module_config>
 </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+### Without database {#mod_SMTP_example_nodb}
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <module>

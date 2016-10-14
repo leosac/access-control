@@ -28,34 +28,37 @@ namespace Module
 {
 namespace SMTP
 {
-#pragma db value
 
+#pragma db value
 struct SMTPServerInfo
 {
     SMTPServerInfo()
-        : ms_timeout_(30 * 1000)
-        , verify_host_(false)
-        , verify_peer_(false){};
+        : ms_timeout(30 * 1000)
+        , verify_host(false)
+        , verify_peer(false)
+        , enabled(true){};
 
     SMTPServerInfo(const SMTPServerInfo &) = default;
 
-    std::string url_;
-
-    std::string from_;
-
-    std::string username_;
-
-    std::string password_;
+    std::string url;
+    std::string from;
+    std::string username;
+    std::string password;
 
     /**
      * Timeout in millisecond for an operation against
      * this server. Defaults to 30s.
      */
-    int ms_timeout_;
+    int ms_timeout;
 
-    bool verify_host_;
-    bool verify_peer_;
+    bool verify_host;
+    bool verify_peer;
     std::string CA_info_file_;
+
+    /**
+     * Should this server be used to send email ?
+     */
+    bool enabled;
 };
 
 /**
