@@ -41,6 +41,8 @@ class WSServer;
 
 struct ClientMessage;
 struct ServerMessage;
+
+class Facade;
 }
 }
 }

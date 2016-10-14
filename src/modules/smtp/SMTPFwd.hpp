@@ -30,6 +30,7 @@ namespace SMTP
 class SMTPConfig;
 using SMTPConfigPtr  = std::shared_ptr<SMTPConfig>;
 using SMTPConfigUPtr = std::unique_ptr<SMTPConfig>;
+using SMTPConfigId   = unsigned long;
 
 class SMTPServerInfo;
 }

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "SMTPFwd.hpp"
 #include "tools/db/database.hpp"
 
 namespace Leosac
@@ -58,7 +59,9 @@ struct SMTPServerInfo
 class SMTPConfig
 {
   public:
-    SMTPConfig() = default;
+    SMTPConfig();
+
+    SMTPConfigId id() const;
 
     void server_add(SMTPServerInfo);
     void server_clear();
@@ -66,7 +69,7 @@ class SMTPConfig
 
   private:
 #pragma db id auto
-    unsigned long id_;
+    SMTPConfigId id_;
 
 #pragma db value_not_null id_column("smtpconfig_id")
     std::vector<SMTPServerInfo> servers_;

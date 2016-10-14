@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "WebSockFwd.hpp"
 #include "core/audit/AuditFwd.hpp"
 #include "tools/db/db_fwd.hpp"
@@ -55,6 +56,11 @@ struct RequestContext
 struct ModuleRequestContext
 {
     DBServicePtr dbsrv;
+    /**
+     * The object lifetime will not expand past the current request processing.
+     * Do not keep a pointer to this object.
+     */
+    UserSecurityContext *security_ctx;
     Audit::IAuditEntryPtr audit;
 };
 }

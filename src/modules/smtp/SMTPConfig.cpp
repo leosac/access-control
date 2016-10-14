@@ -22,6 +22,11 @@
 using namespace Leosac;
 using namespace Leosac::Module::SMTP;
 
+SMTPConfig::SMTPConfig()
+    : id_(0)
+{
+}
+
 void SMTPConfig::server_add(SMTPServerInfo smtps)
 {
     servers_.push_back(smtps);
@@ -35,4 +40,9 @@ void SMTPConfig::server_clear()
 const std::vector<SMTPServerInfo> &SMTPConfig::servers() const
 {
     return servers_;
+}
+
+SMTPConfigId SMTPConfig::id() const
+{
+    return id_;
 }

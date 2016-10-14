@@ -95,6 +95,10 @@ class SecurityContext
          * Retrieve SMTP configuration
          */
         SMTP_GETCONFIG,
+        /**
+         * Edit the SMTP configuration
+         */
+        SMTP_SETCONFIG,
 
         LOG_READ,
     };

@@ -2,8 +2,9 @@ set(SMTP_BIN smtp)
 
 set(SMTP_SRCS
         init.cpp
-        SMTP.cpp
+        SMTPModule.cpp
         SMTPConfig.cpp
+        SMTPServerInfoSerializer.cpp
         )
 
 # Database support
@@ -41,6 +42,6 @@ target_include_directories(${SMTP_BIN} PUBLIC
         ${ODB_COMPILE_OUTPUT_DIR}
         )
 
-target_link_libraries(${SMTP_BIN} curl)
+target_link_libraries(${SMTP_BIN} curl websock-api)
 
 install(TARGETS ${SMTP_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})

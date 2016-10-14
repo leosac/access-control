@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/APIStatusCode.hpp"
+#include "core/audit/AuditFwd.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -55,6 +56,32 @@ struct ClientMessage
     std::string uuid;
     std::string type;
     json content;
+};
+
+/**
+ * This is an appropriate representation of a incoming WS
+ * message as seen by a module.
+ */
+struct ModuleIncomingMessage
+{
+    ModuleIncomingMessage()
+        : audit_id(0)
+    {
+    }
+    /**
+     * The AuditEntry id that traces the request.
+     */
+    Audit::AuditEntryId audit_id;
+
+    /**
+     * An identifier that let the WebsSock find the actual connection.
+     */
+    std::string connection_identifier;
+
+    /**
+     * The content of message.
+     */
+    std::string content;
 };
 }
 }

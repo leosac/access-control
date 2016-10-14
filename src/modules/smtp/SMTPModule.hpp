@@ -22,6 +22,7 @@
 #include "SMTPFwd.hpp"
 #include "modules/BaseModule.hpp"
 #include "modules/websock-api/RequestContext.hpp"
+#include "modules/websock-api/WebSockFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include <curl/curl.h>
 #include <json.hpp>
@@ -34,37 +35,13 @@ namespace SMTP
 {
 using json = nlohmann::json;
 
-
-class RequestDispatcher
+class SMTPModule : public BaseModule
 {
   public:
-    WebSockAPI::ServerMessage dispatch(const WebSockAPI::ModuleRequestContext &,
-                                       const WebSockAPI::ClientMessage &msg);
+    SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+               const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-    template <typename Callable>
-    void register_handler(const std::string &type, Callable &&c)
-    {
-        handlers_[type] = c;
-    }
-
-    /**
-     * Convert a ServerMessage to its string-JSON representation.
-     */
-    std::string convert_response(const WebSockAPI::ServerMessage &msg);
-
-    std::map<
-        std::string,
-        std::function<json(const WebSockAPI::ModuleRequestContext &, const json &)>>
-        handlers_;
-};
-
-class SMTP : public BaseModule
-{
-  public:
-    SMTP(zmqpp::context &ctx, zmqpp::socket *pipe,
-         const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-    ~SMTP();
+    ~SMTPModule();
 
   private:
     /**
@@ -73,15 +50,29 @@ class SMTP : public BaseModule
     void handle_msg_bus();
 
     /**
-     * A websocket message has been forwarded to us.
+     * A websocket message has been forwarded and dispatched to us.
      */
-    void handle_websocket_message();
+    WebSockAPI::ServerMessage
+    handle_websocket_message(const WebSockAPI::ModuleRequestContext &request_ctx,
+                             const WebSockAPI::ClientMessage &msg);
 
     /**
      * Process the websocket request "smtp.getconfig".
      */
     json handle_ws_smtp_getconfig(const WebSockAPI::ModuleRequestContext &,
                                   const json &);
+
+    /**
+     * Process the websocket request "smtp.setconfig".
+     */
+    json handle_ws_smtp_setconfig(const WebSockAPI::ModuleRequestContext &,
+                                  const json &);
+
+    /**
+* Process the websocket request "smtp.sendmail".
+*/
+    json handle_ws_smtp_sendmail(const WebSockAPI::ModuleRequestContext &,
+                                 const json &);
 
     /**
      * Process the configuration file.
@@ -93,11 +84,6 @@ class SMTP : public BaseModule
      */
     zmqpp::socket bus_sub_;
 
-    /**
-     * A DEALER socket.
-     */
-    std::unique_ptr<zmqpp::socket> websocket_endpoint_;
-
     bool use_database_;
 
     /**
@@ -105,13 +91,16 @@ class SMTP : public BaseModule
      */
     SMTPConfigUPtr smtp_config_;
 
-    RequestDispatcher dispatcher_;
+    std::unique_ptr<WebSockAPI::Facade> websocket_api;
 
     void setup_database();
 
-    void prepare_curl(const MailInfo &mail);
+    bool prepare_curl(const MailInfo &mail);
 
-    void send_mail(CURL *curl, const MailInfo &mail);
+    bool send_mail(CURL *curl, const MailInfo &mail);
+    static constexpr const char *getconfig_websocket_type = "module.smtp.getconfig";
+    static constexpr const char *setconfig_websocket_type = "module.smtp.setconfig";
+    static constexpr const char *sendmail_websocket_type  = "module.smtp.sendmail";
 };
 }
 }

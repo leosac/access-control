@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "SMTP.hpp"
+#include "SMTPModule.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac::Module::SMTP;
@@ -36,5 +36,6 @@ extern "C" __attribute__((visibility("default"))) bool
 start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
              zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    return Leosac::Module::start_module_helper<SMTP>(pipe, cfg, zmq_ctx, utils);
+    return Leosac::Module::start_module_helper<SMTPModule>(pipe, cfg, zmq_ctx,
+                                                           utils);
 }

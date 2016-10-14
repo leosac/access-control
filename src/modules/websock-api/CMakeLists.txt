@@ -5,6 +5,7 @@ set(WEBSOCK_API_SRCS
         WebSockAPI.cpp
         WSServer.cpp
         Exceptions.cpp
+        Facade.cpp
         api/APISession.cpp
         api/MethodHandler.cpp
         api/APIAuth.cpp
