@@ -101,8 +101,8 @@ bool UserSecurityContext::check_permission(SecurityContext::Action action,
         return true;
 
     case Action::SMTP_GETCONFIG:
-        return is_manager();
     case Action::SMTP_SETCONFIG:
+    case Action::SMTP_SENDMAIL:
         return is_admin();
 
     case Action::LOG_READ:

@@ -169,6 +169,8 @@ bool SMTPModule::prepare_curl(const MailInfo &mail)
             ASSERT_LOG(target.url_.size(), "No mail server url.");
             curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
 
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, target.ms_timeout_);
+
             bool sent = send_mail(curl, mail);
             curl_easy_cleanup(curl);
             if (sent)
@@ -326,7 +328,7 @@ WebSockAPI::ServerMessage SMTPModule::handle_websocket_message(
         {
 
             if (request_ctx.security_ctx->check_permission(
-                    SecurityContext::Action::SMTP_SETCONFIG, {}))
+                    SecurityContext::Action::SMTP_SENDMAIL, {}))
             {
                 response.content = handle_ws_smtp_sendmail(request_ctx, msg.content);
                 response.status_code = APIStatusCode::SUCCESS;

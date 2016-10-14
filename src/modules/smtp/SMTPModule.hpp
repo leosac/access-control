@@ -69,8 +69,8 @@ class SMTPModule : public BaseModule
                                   const json &);
 
     /**
-* Process the websocket request "smtp.sendmail".
-*/
+     * Process the websocket request "smtp.sendmail".
+     */
     json handle_ws_smtp_sendmail(const WebSockAPI::ModuleRequestContext &,
                                  const json &);
 

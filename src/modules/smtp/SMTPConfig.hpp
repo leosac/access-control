@@ -32,7 +32,10 @@ namespace SMTP
 
 struct SMTPServerInfo
 {
-    SMTPServerInfo() = default;
+    SMTPServerInfo()
+        : ms_timeout_(30 * 1000)
+        , verify_host_(false)
+        , verify_peer_(false){};
 
     SMTPServerInfo(const SMTPServerInfo &) = default;
 
@@ -43,6 +46,12 @@ struct SMTPServerInfo
     std::string username_;
 
     std::string password_;
+
+    /**
+     * Timeout in millisecond for an operation against
+     * this server. Defaults to 30s.
+     */
+    int ms_timeout_;
 
     bool verify_host_;
     bool verify_peer_;

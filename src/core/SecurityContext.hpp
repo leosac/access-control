@@ -99,6 +99,7 @@ class SecurityContext
          * Edit the SMTP configuration
          */
         SMTP_SETCONFIG,
+        SMTP_SENDMAIL,
 
         LOG_READ,
     };

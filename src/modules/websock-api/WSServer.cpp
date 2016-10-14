@@ -479,7 +479,7 @@ void WSServer::send_external_message(const std::string &connection_identifier,
 {
     srv_.get_io_service().post([=]() {
         auto connection_handle = find_connection(connection_identifier);
-        if (srv_.get_con_from_hdl(connection_handle))
+        if (connection_handle.lock() && srv_.get_con_from_hdl(connection_handle))
         {
             srv_.send(connection_handle, content, websocketpp::frame::opcode::text);
         }
