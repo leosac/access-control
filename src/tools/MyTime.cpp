@@ -19,6 +19,7 @@
 
 #include "tools/MyTime.hpp"
 #include "exception/leosacexception.hpp"
+#include "tools/log.hpp"
 #include <chrono>
 #include <iomanip>
 #include <sstream>
@@ -77,5 +78,16 @@ bool my_puttime(std::string &out, const std::tm *tt, const char *fmt)
         return true;
     }
     return false;
+}
+
+std::string to_local_rfc2822(const std::chrono::system_clock::time_point &tp)
+{
+    std::string out;
+    std::time_t tt = std::chrono::system_clock::to_time_t(tp);
+
+    bool ret = my_puttime(out, std::localtime(&tt), "%a, %d %b %Y %T %z");
+    ASSERT_LOG(ret, "Failed to convert date to RFC2822");
+
+    return out;
 }
 }

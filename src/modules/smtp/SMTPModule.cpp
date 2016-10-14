@@ -25,16 +25,17 @@
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
 #include "core/auth/Auth.hpp"
+#include "modules/websock-api/Exceptions.hpp"
 #include "modules/websock-api/Facade.hpp"
 #include "modules/websock-api/Messages.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/Mail.hpp"
+#include "tools/MyTime.hpp"
 #include "tools/db/database.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include <curl/curl.h>
 #include <json.hpp>
-#include <modules/websock-api/Exceptions.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -198,8 +199,7 @@ static std::string build_mail_str(const MailInfo &mail)
     std::stringstream ss;
 
     ASSERT_LOG(mail.to.size(), "No recipients for mail.");
-    ss << "Date: " << Conversion<std::string>(std::chrono::system_clock::now())
-       << "\r\n";
+    ss << "Date: " << to_local_rfc2822(std::chrono::system_clock::now()) << "\r\n";
     ss << "To: " << mail.to.at(0) << "\r\n";
 
     ss << "Subject: " << mail.title << "\r\n";

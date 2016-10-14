@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include <string.h>
@@ -36,4 +37,11 @@ time_t my_timegm(struct tm *tm);
 
 bool my_gettime(std::tm *out, const std::string &date_str, const char *fmt);
 bool my_puttime(std::string &out, const std::tm *tt, const char *fmt);
+
+/**
+ * Convert a timepoint to an RFC2822 (SMTP) date.
+ *
+ * The time represent the local time.
+ */
+std::string to_local_rfc2822(const std::chrono::system_clock::time_point &tp);
 }
