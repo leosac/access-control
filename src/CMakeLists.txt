@@ -188,4 +188,5 @@ install(TARGETS ${LEOSAC_LIB} DESTINATION lib)
 # Build modules
 if(LEOSAC_BUILD_MODULES)
     add_subdirectory(modules)
+    add_subdirectory(altmodules)
 endif()

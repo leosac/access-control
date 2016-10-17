@@ -39,6 +39,7 @@ set(OdbCMake_ODB_HEADERS_AUTH
         ${CMAKE_SOURCE_DIR}/src/core/auth/UserGroupMembership.hpp
         ${CMAKE_SOURCE_DIR}/src/core/auth/ValidityInfo.hpp
         ${CMAKE_SOURCE_DIR}/src/core/auth/Door.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/auth/AccessPoint.hpp
         )
 
 set(OdbCMake_SOURCES_AUTH "")

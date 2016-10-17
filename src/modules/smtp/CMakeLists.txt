@@ -8,7 +8,6 @@ set(SMTP_SRCS
         )
 
 # Database support
-# ODB configuration for tools/db (LogEntry).
 set(OdbCMake_ODB_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/SMTPConfig.hpp
         )

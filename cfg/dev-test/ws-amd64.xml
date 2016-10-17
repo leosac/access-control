@@ -43,5 +43,11 @@
             </module_config>
         </module>
 
+        <module>
+            <name>EVOXS</name>
+            <file>libevoxs.so</file>
+            <level>3</level>
+        </module>
+
     </modules>
 </kernel>
