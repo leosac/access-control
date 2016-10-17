@@ -33,11 +33,13 @@ set(LEOSAC_LIB_SRCS
     core/auth/serializers/GroupSerializer.cpp
     core/auth/serializers/UserGroupMembershipSerializer.cpp
     core/auth/serializers/DoorSerializer.cpp
+    core/auth/serializers/AccessPointSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
     core/auth/ValidityInfo.cpp
     core/auth/Door.cpp
+    core/auth/AccessPoint.cpp
     core/credentials/Credential.cpp
     core/credentials/CredentialValidator.cpp
     core/credentials/WiegandCard.cpp
@@ -46,7 +48,7 @@ set(LEOSAC_LIB_SRCS
     core/credentials/serializers/WiegandCardSerializer.cpp
     core/credentials/serializers/PolymorphicCredentialSerializer.cpp
     core/credentials/serializers/PinCodeSerializer.cpp
-        core/UserSecurityContext.cpp
+    core/UserSecurityContext.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
