@@ -18,6 +18,7 @@
 */
 
 #include "core/SecurityContext.hpp"
+#include "exception/PermissionDenied.hpp"
 
 using namespace Leosac;
 
@@ -26,10 +27,27 @@ SecurityContext::SecurityContext(DBServicePtr dbsrv)
 {
 }
 
-bool SecurityContext::check_permission(SecurityContext::Action,
-                                       const ActionParam &) const
+bool SecurityContext::check_permission(SecurityContext::Action a,
+                                       const ActionParam &ap) const
 {
-    return false;
+    return check_permission_impl(a, ap);
+}
+
+void SecurityContext::enforce_permission(
+    SecurityContext::Action a, const SecurityContext::ActionParam &ap) const
+{
+    if (!check_permission(a, ap))
+        throw PermissionDenied();
+}
+
+bool SecurityContext::check_permission(SecurityContext::Action a) const
+{
+    return check_permission(a, {});
+}
+
+void SecurityContext::enforce_permission(SecurityContext::Action a) const
+{
+    return enforce_permission(a, {});
 }
 
 SystemSecurityContext::SystemSecurityContext(DBServicePtr dbsrv)
@@ -37,7 +55,7 @@ SystemSecurityContext::SystemSecurityContext(DBServicePtr dbsrv)
 {
 }
 
-bool SystemSecurityContext::check_permission(
+bool SystemSecurityContext::check_permission_impl(
     SecurityContext::Action, const SecurityContext::ActionParam &) const
 {
     return true;
@@ -89,4 +107,15 @@ SecurityContext::DoorActionParam::operator ActionParam()
     SecurityContext::ActionParam result;
     result.door = *this;
     return result;
+}
+
+NullSecurityContext::NullSecurityContext()
+    : SecurityContext(nullptr)
+{
+}
+
+bool NullSecurityContext::check_permission_impl(
+    SecurityContext::Action a, const SecurityContext::ActionParam &ap) const
+{
+    return false;
 }

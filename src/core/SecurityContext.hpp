@@ -160,10 +160,40 @@ class SecurityContext
 
     SecurityContext(DBServicePtr dbsrv);
 
+    /**
+     * Check for the permission to perform action `a` with parameters
+     * `ap`.
+     *
+     * Returns true if the permission is granted, false otherwise.
+     */
     virtual bool check_permission(Action a, const ActionParam &ap) const;
+
+    /**
+     * Check for the permission to perform a given action.
+     * @return true if permission is granted, false otherwise.
+     */
+    bool check_permission(Action a) const;
+
+    /**
+     * Similar to check_permission(), but throws is the permission
+     * is denied.
+     */
+    void enforce_permission(Action a, const ActionParam &ap) const;
+
+    /**
+     * Make sure that we have the permission to perform action `a`,
+     * otherwise throws.
+     */
+    void enforce_permission(Action a) const;
 
   protected:
     DBServicePtr dbsrv_;
+
+  private:
+    /**
+     * Reimplement this method to provide permission checking.
+     */
+    virtual bool check_permission_impl(Action a, const ActionParam &ap) const = 0;
 };
 
 /**
@@ -177,6 +207,17 @@ class SystemSecurityContext : public SecurityContext
     SystemSecurityContext(DBServicePtr dbsrv);
 
     static SecurityContext &instance();
-    virtual bool check_permission(Action a, const ActionParam &ap) const override;
+    virtual bool check_permission_impl(Action a,
+                                       const ActionParam &ap) const override;
+};
+
+/**
+ * A SecurityContext with no permission.
+ */
+class NullSecurityContext : public SecurityContext
+{
+  public:
+    NullSecurityContext();
+    bool check_permission_impl(Action a, const ActionParam &ap) const override;
 };
 }

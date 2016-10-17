@@ -204,8 +204,7 @@ void APISession::clear_authentication()
 
 SecurityContext &APISession::security_context() const
 {
-    static SecurityContext sc(
-        nullptr); // a static default security context for unauth user.
+    static NullSecurityContext sc;
     if (security_)
         return *security_.get();
     return sc;

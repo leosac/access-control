@@ -25,6 +25,7 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "exception/EntityNotFound.hpp"
+#include "exception/PermissionDenied.hpp"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;

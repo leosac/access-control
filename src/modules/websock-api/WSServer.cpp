@@ -18,6 +18,7 @@
 */
 
 #include "WSServer.hpp"
+#include "ExceptionConverter.hpp"
 #include "Exceptions.hpp"
 #include "Token_odb.h"
 #include "WebSockAPI.hpp"
@@ -38,6 +39,7 @@
 #include "exception/EntityNotFound.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "exception/ModelException.hpp"
+#include "exception/PermissionDenied.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/db/DatabaseTracer.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
@@ -336,58 +338,10 @@ boost::optional<ServerMessage> WSServer::handle_request(APIPtr api_handle,
         }
         return boost::none;
     }
-    catch (const InvalidCall &e)
+    catch (...)
     {
-        response.status_code   = APIStatusCode::INVALID_CALL;
-        response.status_string = e.what();
-    }
-    catch (const PermissionDenied &e)
-    {
-        response.status_code   = APIStatusCode::PERMISSION_DENIED;
-        response.status_string = e.what();
-    }
-    catch (const MalformedMessage &e)
-    {
-        WARN("ST: " << e.trace().str());
-        response.status_code   = APIStatusCode::MALFORMED;
-        response.status_string = e.what();
-    }
-    catch (const SessionAborted &e)
-    {
-        response.status_code   = APIStatusCode::SESSION_ABORTED;
-        response.status_string = e.what();
-    }
-    catch (const EntityNotFound &e)
-    {
-        response.status_code            = APIStatusCode::ENTITY_NOT_FOUND;
-        response.status_string          = e.what();
-        response.content["entity_id"]   = e.entity_id();
-        response.content["entity_type"] = e.entity_type();
-    }
-    catch (const ModelException &e)
-    {
-        response.status_code       = APIStatusCode::MODEL_EXCEPTION;
-        response.status_string     = e.what();
-        response.content["errors"] = e.json_errors();
-    }
-    catch (const LEOSACException &e)
-    {
-        WARN("Leosac specific exception has been caught: " << e.what() << std::endl
-                                                           << e.trace().str());
-        response.status_code   = APIStatusCode::GENERAL_FAILURE;
-        response.status_string = e.what(); // todo Maybe remove in production.
-    }
-    catch (const odb::exception &e)
-    {
-        ERROR("Database Error: " << e.what());
-        response.status_code   = APIStatusCode::DATABASE_ERROR;
-        response.status_string = "Database Error: " + std::string(e.what());
-    }
-    catch (const std::exception &e)
-    {
-        WARN("Exception when processing request: " << e.what());
-        response.status_code   = APIStatusCode::GENERAL_FAILURE;
-        response.status_string = e.what();
+        return ExceptionConverter().convert_merge(std::current_exception(),
+                                                  response);
     }
     return response;
 }

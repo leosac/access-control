@@ -25,6 +25,7 @@
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
 #include "core/auth/Auth.hpp"
+#include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
 #include "modules/websock-api/Facade.hpp"
 #include "modules/websock-api/Messages.hpp"
@@ -305,63 +306,30 @@ WebSockAPI::ServerMessage SMTPModule::handle_websocket_message(
 
         if (msg.type == wshandler_getconfig)
         {
-            if (request_ctx.security_ctx->check_permission(
-                    SecurityContext::Action::SMTP_GETCONFIG, {}))
-            {
-                response.content =
-                    handle_ws_smtp_getconfig(request_ctx, msg.content);
-                response.status_code = APIStatusCode::SUCCESS;
-            }
-            else
-                throw WebSockAPI::PermissionDenied();
+            request_ctx.security_ctx->enforce_permission(
+                SecurityContext::Action::SMTP_GETCONFIG);
+            response.content = handle_ws_smtp_getconfig(request_ctx, msg.content);
+            response.status_code = APIStatusCode::SUCCESS;
         }
         else if (msg.type == wshandler_setconfig)
         {
-            if (request_ctx.security_ctx->check_permission(
-                    SecurityContext::Action::SMTP_SETCONFIG, {}))
-            {
-                response.content =
-                    handle_ws_smtp_setconfig(request_ctx, msg.content);
-                response.status_code = APIStatusCode::SUCCESS;
-            }
-            else
-                throw WebSockAPI::PermissionDenied();
+            request_ctx.security_ctx->enforce_permission(
+                SecurityContext::Action::SMTP_SETCONFIG);
+            response.content = handle_ws_smtp_setconfig(request_ctx, msg.content);
+            response.status_code = APIStatusCode::SUCCESS;
         }
         else if (msg.type == wshandler_sendmail)
         {
-            if (request_ctx.security_ctx->check_permission(
-                    SecurityContext::Action::SMTP_SENDMAIL, {}))
-            {
-                response.content = handle_ws_smtp_sendmail(request_ctx, msg.content);
-                response.status_code = APIStatusCode::SUCCESS;
-            }
-            else
-                throw WebSockAPI::PermissionDenied();
+            request_ctx.security_ctx->enforce_permission(
+                SecurityContext::Action::SMTP_SENDMAIL);
+            response.content     = handle_ws_smtp_sendmail(request_ctx, msg.content);
+            response.status_code = APIStatusCode::SUCCESS;
         }
     }
-    catch (const WebSockAPI::PermissionDenied &e)
+    catch (...)
     {
-        response.status_code   = APIStatusCode::PERMISSION_DENIED;
-        response.status_string = e.what();
-    }
-    catch (const LEOSACException &e)
-    {
-        WARN("Leosac specific exception has been caught: " << e.what() << std::endl
-                                                           << e.trace().str());
-        response.status_code   = APIStatusCode::GENERAL_FAILURE;
-        response.status_string = e.what(); // todo Maybe remove in production.
-    }
-    catch (const odb::exception &e)
-    {
-        ERROR("Database Error: " << e.what());
-        response.status_code   = APIStatusCode::DATABASE_ERROR;
-        response.status_string = "Database Error: " + std::string(e.what());
-    }
-    catch (const std::exception &e)
-    {
-        WARN("Exception when processing request: " << e.what());
-        response.status_code   = APIStatusCode::GENERAL_FAILURE;
-        response.status_string = e.what();
+        return WebSockAPI::ExceptionConverter().convert_merge(
+            std::current_exception(), response);
     }
     return response;
 }
@@ -414,9 +382,5 @@ json SMTPModule::handle_ws_smtp_sendmail(
     for (const auto &recipient : req.at("to"))
         mail.to.push_back(recipient);
 
-    if (prepare_curl(mail))
-    {
-        return {{"sent", true}};
-    }
-    return {{"sent", false}};
+    return {{"sent", (prepare_curl(mail))}};
 }

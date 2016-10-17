@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
-#include "exception/leosacexception.hpp"
+#include "modules/websock-api/Messages.hpp"
 
 namespace Leosac
 {
@@ -28,41 +27,26 @@ namespace Module
 {
 namespace WebSockAPI
 {
-
-class MalformedMessage : public LEOSACException
+/**
+ * This class is dedicated to converting exception thrown
+ * by various code into a ServerMessage that can be sent
+ * back to a websocket client.
+ */
+class ExceptionConverter
 {
   public:
-    MalformedMessage(const std::string &detail = "");
+    /**
+     * Convert the exception_ptr to a ServerMessage and merge it
+     * with an other message.
+     *
+     * @param ptr
+     * @param msg The "current" message. We will copy type/uuid from it.
+     */
+    ServerMessage convert_merge(const std::exception_ptr &ptr,
+                                const ServerMessage &msg);
 
   private:
-    std::string build_msg(const std::string &detail) const;
-};
-
-class InvalidCall : public LEOSACException
-{
-  public:
-    InvalidCall()
-        : LEOSACException("Unknown message type."){};
-};
-
-class SessionAborted : public LEOSACException
-{
-  public:
-    SessionAborted();
-
-    /**
-     * Aborted due to invalid/expired token.
-     * @param token
-     * @return
-     */
-    SessionAborted(Auth::TokenPtr token);
-
-  private:
-    /**
-     * Build an exception message for when the reason of the aborted
-     * session is an expired token.
-     */
-    std::string build_msg(Auth::TokenPtr token) const;
+    virtual ServerMessage convert_impl(const std::exception_ptr &ptr);
 };
 }
 }

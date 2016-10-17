@@ -54,6 +54,7 @@ set(LEOSAC_LIB_SRCS
     exception/ExceptionsTools.cpp
     exception/ModelException.cpp
     exception/EntityNotFound.cpp
+    exception/PermissionDenied.cpp
     hardware/FGPIO.cpp
     hardware/FLED.cpp
     hardware/FWiegandReader.cpp

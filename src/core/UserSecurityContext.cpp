@@ -34,8 +34,8 @@ UserSecurityContext::UserSecurityContext(DBServicePtr dbsrv, Auth::UserId id)
 {
 }
 
-bool UserSecurityContext::check_permission(SecurityContext::Action action,
-                                           const ActionParam &ap) const
+bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
+                                                const ActionParam &ap) const
 {
     // Simply put: Administrator can do everything, without any permission check.
     if (is_admin())

@@ -19,51 +19,17 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
 #include "exception/leosacexception.hpp"
 
-namespace Leosac
-{
-namespace Module
-{
-namespace WebSockAPI
-{
-
-class MalformedMessage : public LEOSACException
+/**
+ * An exception that can be throw when the permission for a given
+ * operation is denied.
+ */
+class PermissionDenied : public LEOSACException
 {
   public:
-    MalformedMessage(const std::string &detail = "");
+    PermissionDenied(const std::string &detail = "");
 
   private:
     std::string build_msg(const std::string &detail) const;
 };
-
-class InvalidCall : public LEOSACException
-{
-  public:
-    InvalidCall()
-        : LEOSACException("Unknown message type."){};
-};
-
-class SessionAborted : public LEOSACException
-{
-  public:
-    SessionAborted();
-
-    /**
-     * Aborted due to invalid/expired token.
-     * @param token
-     * @return
-     */
-    SessionAborted(Auth::TokenPtr token);
-
-  private:
-    /**
-     * Build an exception message for when the reason of the aborted
-     * session is an expired token.
-     */
-    std::string build_msg(Auth::TokenPtr token) const;
-};
-}
-}
-}

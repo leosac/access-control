@@ -20,6 +20,7 @@
 #include "api/CRUDResourceHandler.hpp"
 #include "Exceptions.hpp"
 #include "WSServer.hpp"
+#include "exception/PermissionDenied.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string/predicate.hpp>
 

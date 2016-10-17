@@ -33,7 +33,8 @@ class UserSecurityContext : public SecurityContext
   public:
     UserSecurityContext(DBServicePtr dbsrv, Auth::UserId id);
 
-    virtual bool check_permission(Action a, const ActionParam &ap) const override;
+    virtual bool check_permission_impl(Action a,
+                                       const ActionParam &ap) const override;
 
     /**
      * Return true if the owner of the security context is the user whose id

@@ -17,48 +17,22 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/scrypt/Random.hpp"
-#include <cassert>
-#include <cstddef>
-#include <openssl/rand.h>
-#include <sstream>
-#include <vector>
+#include "PermissionDenied.hpp"
 
-std::mutex Random::mutex_;
-
-ByteVector Random::GetBytes(size_t n)
+PermissionDenied::PermissionDenied(const std::string &detail)
+    : LEOSACException(build_msg(detail))
 {
-    if (n == 0)
-        return {};
-    std::unique_lock<std::mutex> ul(mutex_);
-    ByteVector ret(n);
-
-    int rc = RAND_bytes(&ret[0], n);
-    assert(rc == 1);
-    return ret;
 }
 
-std::string Random::GetASCII(size_t n)
+std::string PermissionDenied::build_msg(const std::string &detail) const
 {
-    if (n == 0)
-        return "";
-
     std::stringstream ss;
-    auto bytes = GetBytes(n);
-    int idx    = 0;
-    for (size_t i = 0; i < n; ++i)
-    {
-        if (idx == bytes.size())
-        {
-            bytes = GetBytes(n);
-            idx   = 0;
-        }
-        if (isalnum(bytes[idx]))
-        {
-            ss << bytes[idx];
-        }
-        idx++;
-    }
+    ss << "Permission denied";
+
+    if (detail.size())
+        ss << ": " << detail;
+    else
+        ss << ".";
 
     return ss.str();
 }

@@ -71,21 +71,3 @@ std::string MalformedMessage::build_msg(const std::string &detail) const
 
     return ss.str();
 }
-
-PermissionDenied::PermissionDenied(const std::string &detail)
-    : LEOSACException(build_msg(detail))
-{
-}
-
-std::string PermissionDenied::build_msg(const std::string &detail) const
-{
-    std::stringstream ss;
-    ss << "Permission denied";
-
-    if (detail.size())
-        ss << ": " << detail;
-    else
-        ss << ".";
-
-    return ss.str();
-}
