@@ -42,6 +42,11 @@ class IAccessPoint
 
     virtual const std::string &description() const   = 0;
     virtual void description(const std::string &dsc) = 0;
+
+    /**
+     * The name of the module that manages the access point.
+     */
+    virtual std::string controller_module() = 0;
 };
 }
 }

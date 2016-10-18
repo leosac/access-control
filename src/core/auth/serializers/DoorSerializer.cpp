@@ -19,7 +19,9 @@
 
 #include "core/auth/Door.hpp"
 #include "DoorSerializer.hpp"
+#include "core/auth/IAccessPoint.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/registry/ThreadLocalRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;
@@ -33,6 +35,12 @@ json DoorJSONSerializer::serialize(const Auth::IDoor &door, const SecurityContex
          {
              {"alias", door.alias()}, {"description", door.description()},
          }}};
+
+    if (door.access_point())
+    {
+        serialized["relationships"]["access-point"] = {
+            {"data", {{"id", door.access_point()->id()}, {"type", "access-point"}}}};
+    }
     return serialized;
 }
 
@@ -43,6 +51,28 @@ void DoorJSONSerializer::unserialize(Auth::IDoor &out, const json &in,
 
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
+
+    // Update the linked access point.
+    Auth::AccessPointId current_ap_id = 0;
+    if (out.access_point())
+        current_ap_id = out.access_point()->id();
+
+    Auth::AccessPointId new_ap_id =
+        extract_with_default(in, "access_point_id", current_ap_id);
+    if (new_ap_id != current_ap_id)
+    {
+        if (new_ap_id)
+        {
+            //      DBPtr dbptr =
+            //            ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
+            //          Auth::AccessPointLPtr new_access_point(*dbptr, new_ap_id);
+            //            out.access_point(new_access_point.load());
+        }
+        else
+        {
+            out.access_point(nullptr);
+        }
+    }
 }
 
 std::string DoorJSONStringSerializer::serialize(const Auth::IDoor &in,

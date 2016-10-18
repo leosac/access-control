@@ -46,6 +46,10 @@ class IDoor
 
     virtual void alias(const std::string &alias)      = 0;
     virtual void description(const std::string &desc) = 0;
+
+    virtual IAccessPointPtr access_point() const = 0;
+
+    virtual void access_point(IAccessPointPtr) = 0;
 };
 }
 }

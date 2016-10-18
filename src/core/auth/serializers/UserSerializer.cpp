@@ -19,6 +19,8 @@
 
 #include "core/auth/serializers/UserSerializer.hpp"
 #include "Credential_odb.h"
+#include "ScheduleMapping_odb.h"
+#include "Schedule_odb.h"
 #include "core/SecurityContext.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/CredentialFwd.hpp"
@@ -57,6 +59,21 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
             credentials.push_back(cred_info);
         }
     }
+    // We dont list schedule mapping to websocket client, instead we list
+    // schedules.
+    std::set<Tools::ScheduleId> schedule_ids;
+    json schedules = {};
+    for (const Tools::ScheduleMappingLWPtr &mapping : user.lazy_schedules_mapping())
+    {
+        auto loaded = mapping.load();
+        ASSERT_LOG(loaded, "Cannot load. Need to investigate.");
+        schedule_ids.insert(loaded->schedule_.object_id());
+    }
+    for (const auto &id : schedule_ids)
+    {
+        json sched_info = {{"id", id}, {"type", "schedule"}};
+        schedules.push_back(sched_info);
+    }
 
     json serialized = {
         {"id", user.id()},
@@ -74,7 +91,8 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
          }},
         {"relationships",
          {{"memberships", {{"data", memberships}}},
-          {"credentials", {{"data", credentials}}}}}};
+          {"credentials", {{"data", credentials}}},
+          {"schedules", {{"data", schedules}}}}}};
 
     SecurityContext::ActionParam ap;
     ap.user.user_id = user.id();

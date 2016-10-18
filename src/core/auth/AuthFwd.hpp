@@ -111,6 +111,7 @@ using AccessPointId   = unsigned long;
 
 class AccessPoint;
 using AccessPointLWPtr = odb::lazy_weak_ptr<AccessPoint>;
+using AccessPointLPtr  = odb::lazy_ptr<AccessPoint>;
 using AccessPointPtr   = std::shared_ptr<AccessPoint>;
 }
 }

@@ -38,8 +38,9 @@ using ISchedulePtr  = std::shared_ptr<ISchedule>;
 using IScheduleCPtr = std::shared_ptr<const ISchedule>;
 
 class ScheduleMapping;
-using ScheduleMappingPtr = std::shared_ptr<ScheduleMapping>;
-using ScheduleMappingId  = unsigned long;
+using ScheduleMappingPtr   = std::shared_ptr<ScheduleMapping>;
+using ScheduleMappingLWPtr = odb::lazy_weak_ptr<ScheduleMapping>;
+using ScheduleMappingId    = unsigned long;
 }
 
 struct MailInfo;

@@ -166,3 +166,8 @@ std::vector<Leosac::Cred::CredentialLWPtr> User::lazy_credentials() const
 {
     return credentials_;
 }
+
+std::vector<Leosac::Tools::ScheduleMappingLWPtr> User::lazy_schedules_mapping() const
+{
+    return schedules_mapping_;
+}

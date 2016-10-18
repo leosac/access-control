@@ -18,6 +18,8 @@
 */
 
 #include "core/auth/Door.hpp"
+#include "core/auth/AccessPoint.hpp"
+#include "tools/AssertCast.hpp"
 
 using namespace Leosac::Auth;
 
@@ -49,4 +51,14 @@ void Door::alias(const std::string &alias)
 void Door::description(const std::string &desc)
 {
     desc_ = desc;
+}
+
+IAccessPointPtr Door::access_point() const
+{
+    return access_point_;
+}
+
+void Door::access_point(IAccessPointPtr ptr)
+{
+    access_point_ = assert_cast<AccessPointPtr>(ptr);
 }

@@ -45,12 +45,22 @@ class Door : public virtual IDoor
 
     void description(const std::string &desc) override;
 
+    IAccessPointPtr access_point() const override;
+
+    void access_point(IAccessPointPtr ptr) override;
+
   protected:
 #pragma db id auto
     DoorId id_;
 
     std::string alias_;
     std::string desc_;
+
+    /**
+     * The access point that controls the door.
+     * May be null.
+     */
+    std::shared_ptr<AccessPoint> access_point_;
 
 #pragma db version
     const size_t version_;
@@ -60,3 +70,7 @@ class Door : public virtual IDoor
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "core/auth/AccessPoint.hpp"
+#endif

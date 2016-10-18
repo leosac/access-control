@@ -40,11 +40,16 @@ class AccessPoint : public virtual IAccessPoint
 
     void description(const std::string &dsc) override;
 
+    virtual std::string controller_module() override;
+
   protected:
 #pragma db id auto
     AccessPointId id_;
     std::string alias_;
     std::string description_;
+
+#pragma db inverse(access_point_)
+    std::weak_ptr<Door> door_;
 
 #pragma db version
     const size_t version_;
@@ -54,3 +59,7 @@ class AccessPoint : public virtual IAccessPoint
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "core/auth/Door.hpp"
+#endif

@@ -19,6 +19,7 @@ set(WEBSOCK_API_SRCS
         api/ScheduleCRUD.cpp
         api/MembershipCRUD.cpp
         api/DoorCRUD.cpp
+        api/AuditGet.cpp
         api/search/GroupSearch.cpp
         api/search/DoorSearch.cpp
         )

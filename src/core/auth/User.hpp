@@ -131,6 +131,7 @@ class User
 
     std::vector<Cred::CredentialLWPtr> lazy_credentials() const;
 
+    std::vector<Tools::ScheduleMappingLWPtr> lazy_schedules_mapping() const;
 
   protected:
 #pragma db id auto
@@ -160,6 +161,9 @@ class User
 #pragma db value_not_null inverse(owner_)
     std::vector<Cred::CredentialLWPtr> credentials_;
 
+#pragma db value_not_null inverse(users_)
+    std::vector<Tools::ScheduleMappingLWPtr> schedules_mapping_;
+
     /**
     * A user can have the same validity than credentials.
     */
@@ -180,4 +184,5 @@ class User
 #include "core/auth/Group.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "core/credentials/Credential.hpp"
+#include "tools/ScheduleMapping.hpp"
 #endif

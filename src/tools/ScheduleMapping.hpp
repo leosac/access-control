@@ -57,12 +57,16 @@ struct ScheduleMapping
 #pragma db value_not_null unordered
     std::vector<Auth::DoorLWPtr> doors_;
 
+/**
+ * The schedule that owns the mapping.
+ */
+#pragma db not_null inverse(mapping_)
+    ScheduleLWPtr schedule_;
+
     /**
      * A non unique, optional alias.
      */
     std::string alias_;
-
-// todo add door.
 
 #pragma db version
     size_t odb_version_;
