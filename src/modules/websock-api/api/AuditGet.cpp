@@ -48,15 +48,17 @@ json AuditGet::process_impl(const json &req)
     {
         using namespace Tools;
         using namespace JSONUtil;
+        using Query = odb::query<Audit::AuditEntry>;
 
         odb::transaction t(db->begin());
-        auto ret       = db->query<Audit::AuditEntry>();
-        rep["content"] = json::array();
+        auto query  = odb::query<Audit::AuditEntry>("ORDER BY" + Query::id);
+        auto ret    = db->query<Audit::AuditEntry>(query);
+        rep["data"] = json::array();
         for (const auto &audit : ret)
         {
             json audit_json =
                 PolymorphicAuditJSONSerializer::serialize(audit, security_context());
-            rep["content"].push_back(audit_json);
+            rep["data"].push_back(audit_json);
         }
     }
     else

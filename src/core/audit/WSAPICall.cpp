@@ -19,6 +19,7 @@
 
 #include "WSAPICall.hpp"
 #include "WSAPICall_odb.h"
+#include "core/auth/User.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
 
@@ -120,7 +121,16 @@ std::string WSAPICall::generate_description() const
 {
     std::stringstream ss;
 
-    ss << "Websocket API call " << method() << " took " << duration_
-       << " milliseconds.";
+    auto author = author_.load();
+    if (author)
+    {
+        ss << "Websocket API call by user " << author->username() << " to "
+           << method() << " took " << duration_ << " milliseconds.";
+    }
+    else
+    {
+        ss << "Websocket API call by anonymous to " << method() << " took "
+           << duration_ << " milliseconds.";
+    }
     return ss.str();
 }

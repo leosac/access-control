@@ -71,3 +71,51 @@ void GroupEvent::after(const std::string &repr)
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     after_ = repr;
 }
+
+Auth::GroupId GroupEvent::target_id() const
+{
+    if (target_.lock())
+    {
+        return target_.object_id();
+    }
+    return 0;
+}
+
+const std::string &GroupEvent::before() const
+{
+    return before_;
+}
+
+const std::string &GroupEvent::after() const
+{
+    return after_;
+}
+
+std::string GroupEvent::generate_description() const
+{
+    using namespace FlagSetOperator;
+    std::stringstream ss;
+
+    auto target = target_.load();
+    auto author = author_.load();
+    if (event_mask_ & Audit::EventType::GROUP_UPDATED)
+    {
+        ss << "Group "
+           << (target ? target->name() : std::to_string(target_group_id_))
+           << " has been edited by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    else if (event_mask_ & Audit::EventType::GROUP_CREATED)
+    {
+        ss << "Group "
+           << (target ? target->name() : std::to_string(target_group_id_))
+           << " has been created by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    else if (event_mask_ & Audit::EventType::GROUP_DELETED)
+    {
+        ss << "Group " << target_group_id_ << " has been created by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    return ss.str();
+}

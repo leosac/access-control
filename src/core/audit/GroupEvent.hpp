@@ -49,6 +49,14 @@ class GroupEvent : virtual public IGroupEvent, public AuditEntry
 
     virtual void after(const std::string &repr) override;
 
+    Auth::GroupId target_id() const override;
+
+    const std::string &before() const override;
+
+    const std::string &after() const override;
+
+    std::string generate_description() const override;
+
   public:
 #pragma db on_delete(set_null)
     Auth::GroupLWPtr target_;

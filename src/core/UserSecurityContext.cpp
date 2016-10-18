@@ -107,6 +107,11 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
 
     case Action::LOG_READ:
         return is_manager();
+
+    case Action::AUDIT_READ:
+        return is_manager();
+    case Action::AUDIT_READ_FULL:
+        return is_admin();
     default:
         ASSERT_LOG(0, "Not handled.");
     }

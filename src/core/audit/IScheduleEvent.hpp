@@ -38,17 +38,23 @@ class IScheduleEvent : virtual public IAuditEntry
      */
     virtual void target(Tools::ISchedulePtr schd) = 0;
 
+    virtual Tools::ScheduleId target_id() const = 0;
+
     /**
      * An optional JSON representation of the object
      * **before** the event took place.
      */
     virtual void before(const std::string &repr) = 0;
 
+    virtual const std::string &before() const = 0;
+
     /**
      * An optional JSON representation of the object
      * **after** the event took place.
      */
     virtual void after(const std::string &repr) = 0;
+
+    virtual const std::string &after() const = 0;
 };
 }
 }

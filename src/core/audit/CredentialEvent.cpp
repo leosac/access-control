@@ -74,3 +74,22 @@ void CredentialEvent::after(const std::string &repr)
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     after_ = repr;
 }
+
+Cred::CredentialId CredentialEvent::target_id() const
+{
+    if (target_.lock())
+    {
+        return target_.object_id();
+    }
+    return 0;
+}
+
+const std::string &CredentialEvent::before() const
+{
+    return before_;
+}
+
+const std::string &CredentialEvent::after() const
+{
+    return after_;
+}

@@ -18,6 +18,9 @@
 */
 
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
+#include "CredentialEventSerializer.hpp"
+#include "GroupEventSerializer.hpp"
+#include "ScheduleEventSerializer.hpp"
 #include "WSAPICallSerializer.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/audit/serializers/UserEventSerializer.hpp"
@@ -59,4 +62,22 @@ void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
     const Audit::IWSAPICall &t)
 {
     result_ = WSAPICallJSONSerializer::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
+    const Audit::IScheduleEvent &t)
+{
+    result_ = ScheduleEventJSONSerializer::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
+    const Audit::IGroupEvent &t)
+{
+    result_ = GroupEventJSONSerializer::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
+    const Audit::ICredentialEvent &t)
+{
+    result_ = CredentialEventJSONSerializer::serialize(t, security_context_);
 }

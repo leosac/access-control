@@ -51,6 +51,14 @@ class ScheduleEvent : virtual public IScheduleEvent, public AuditEntry
 
     virtual void after(const std::string &repr) override;
 
+    Tools::ScheduleId target_id() const override;
+
+    const std::string &before() const override;
+
+    const std::string &after() const override;
+
+    std::string generate_description() const override;
+
   public:
 #pragma db on_delete(set_null)
     Tools::ScheduleLWPtr target_;

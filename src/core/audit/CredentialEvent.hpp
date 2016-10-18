@@ -52,6 +52,12 @@ class CredentialEvent : virtual public ICredentialEvent, public AuditEntry
 
     virtual void after(const std::string &repr) override;
 
+    Cred::CredentialId target_id() const override;
+
+    const std::string &before() const override;
+
+    const std::string &after() const override;
+
   public:
 #pragma db on_delete(set_null)
     Cred::CredentialLWPtr target_;

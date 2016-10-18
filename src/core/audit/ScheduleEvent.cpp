@@ -74,3 +74,42 @@ void ScheduleEvent::after(const std::string &repr)
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     after_ = repr;
 }
+
+Tools::ScheduleId ScheduleEvent::target_id() const
+{
+    if (target_.lock())
+    {
+        return target_.object_id();
+    }
+    return 0;
+}
+
+const std::string &ScheduleEvent::before() const
+{
+    return before_;
+}
+
+const std::string &ScheduleEvent::after() const
+{
+    return after_;
+}
+
+std::string ScheduleEvent::generate_description() const
+{
+    using namespace FlagSetOperator;
+    std::stringstream ss;
+
+    auto target = target_.load();
+    auto author = author_.load();
+    if (event_mask_ & Audit::EventType::SCHEDULE_UPDATE)
+    {
+        ss << "Schedule " << target->name() << " has been edited by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    else if (event_mask_ & Audit::EventType::SCHEDULE_CREATE)
+    {
+        ss << "Schedule " << target->name() << " has been created by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    return ss.str();
+}
