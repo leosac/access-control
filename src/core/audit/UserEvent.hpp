@@ -45,9 +45,17 @@ class UserEvent : virtual public IUserEvent, public AuditEntry
 
     virtual void target(Auth::UserPtr user) override;
 
+    Auth::UserId target_id() const override;
+
     virtual void before(const std::string &repr) override;
 
+    const std::string &before() const override;
+
+    const std::string &after() const override;
+
     virtual void after(const std::string &repr) override;
+
+    std::string generate_description() const override;
 
   public:
 #pragma db not_null

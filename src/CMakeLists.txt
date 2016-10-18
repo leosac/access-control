@@ -109,6 +109,10 @@ set(LEOSAC_LIB_SRCS
     core/audit/CredentialEvent.cpp
     core/audit/ScheduleEvent.cpp
     core/audit/DoorEvent.cpp
+    core/audit/serializers/AuditSerializer.cpp
+    core/audit/serializers/UserEventSerializer.cpp
+    core/audit/serializers/PolymorphicAuditSerializer.cpp
+    core/audit/serializers/WSAPICallSerializer.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
         )

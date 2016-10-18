@@ -22,6 +22,7 @@
 #include "Exceptions.hpp"
 #include "Token_odb.h"
 #include "WebSockAPI.hpp"
+#include "api/AuditGet.hpp"
 #include "api/CredentialCRUD.hpp"
 #include "api/DoorCRUD.hpp"
 #include "api/GroupCRUD.hpp"
@@ -81,6 +82,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
 
+    individual_handlers_["audit.get"]         = &AuditGet::create;
     individual_handlers_["get_logs"]          = &LogGet::create;
     individual_handlers_["password_change"]   = &PasswordChange::create;
     individual_handlers_["search.group_name"] = &GroupSearch::create;

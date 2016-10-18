@@ -145,9 +145,14 @@ void AuditEntry::database(DBPtr db)
     database_ = db;
 }
 
-Auth::UserId AuditEntry::author_id()
+Auth::UserId AuditEntry::author_id() const
 {
     if (author_)
         return author_.object_id();
     return 0;
+}
+
+boost::posix_time::ptime AuditEntry::timestamp() const
+{
+    return timestamp_;
 }

@@ -19,35 +19,18 @@
 
 #pragma once
 
-#include "MethodHandler.hpp"
+#include "core/audit/AuditFwd.hpp"
+#include "tools/Serializer.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
-namespace Module
-{
-namespace WebSockAPI
-{
 using json = nlohmann::json;
 
-/**
- * Query the audit log.
- *
- * Simply returns all audit entry (todo improve this later)
- */
-class AuditGet : public MethodHandler
+struct WSAPICallJSONSerializer
+    : public Serializer<json, Audit::IWSAPICall, WSAPICallJSONSerializer>
 {
-  public:
-    AuditGet(RequestContext ctx);
-
-    static MethodHandlerUPtr create(RequestContext);
-
-  protected:
-    std::vector<ActionActionParam>
-    required_permission(const json &req) const override;
-
-  private:
-    virtual json process_impl(const json &req) override;
+    static json serialize(const Audit::IWSAPICall &in, const SecurityContext &sc);
 };
-}
-}
 }

@@ -58,6 +58,17 @@ class WSAPICall : virtual public IWSAPICall, public AuditEntry
 
     virtual void database_operations(uint16_t nb_operation) override;
 
+    virtual const std::string &method() const override;
+
+    virtual const std::string &uuid() const override;
+
+    virtual APIStatusCode status_code() const override;
+
+    virtual const std::string &status_string() const override;
+
+    virtual const std::string &source_endpoint() const override;
+
+    virtual std::string generate_description() const override;
 
 #pragma db not_null
     std::string api_method_;

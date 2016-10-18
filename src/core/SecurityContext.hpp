@@ -102,6 +102,16 @@ class SecurityContext
         SMTP_SENDMAIL,
 
         LOG_READ,
+
+        /**
+         * Read the audit log
+         */
+        AUDIT_READ,
+        /**
+         * Read the audit log and access additional information, such
+         * as the JSON "before" and "after" field.
+         */
+        AUDIT_READ_FULL
     };
 
     struct GroupActionParam

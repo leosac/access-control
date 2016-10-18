@@ -32,6 +32,7 @@ namespace Audit
 class IDoorEvent : virtual public IAuditEntry
 {
   public:
+    MAKE_VISITABLE();
     /**
      * Set the door that is targeted by the event.
      */

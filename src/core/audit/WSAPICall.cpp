@@ -90,3 +90,37 @@ void WSAPICall::database_operations(uint16_t nb_operation)
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     database_operations_ = nb_operation;
 }
+
+const std::string &WSAPICall::method() const
+{
+    return api_method_;
+}
+
+const std::string &WSAPICall::uuid() const
+{
+    return uuid_;
+}
+
+APIStatusCode WSAPICall::status_code() const
+{
+    return status_code_;
+}
+
+const std::string &WSAPICall::status_string() const
+{
+    return status_string_;
+}
+
+const std::string &WSAPICall::source_endpoint() const
+{
+    return source_endpoint_;
+}
+
+std::string WSAPICall::generate_description() const
+{
+    std::stringstream ss;
+
+    ss << "Websocket API call " << method() << " took " << duration_
+       << " milliseconds.";
+    return ss.str();
+}

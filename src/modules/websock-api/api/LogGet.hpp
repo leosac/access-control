@@ -31,7 +31,7 @@ using json = nlohmann::json;
 
 /**
  * Retrieve (part of) the logs generated Leosac. In order for this call
- * to work, SQLite logging must be enabled.
+ * to work, database logging must be enabled.
  *
  * Request:
  *     + `p`: The page number. Starts at 0.

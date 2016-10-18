@@ -70,3 +70,39 @@ void UserEvent::after(const std::string &repr)
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     after_ = repr;
 }
+
+Auth::UserId UserEvent::target_id() const
+{
+    // todo check that it cant bug due to null target
+    return target_.object_id();
+}
+
+const std::string &UserEvent::before() const
+{
+    return before_;
+}
+
+const std::string &UserEvent::after() const
+{
+    return after_;
+}
+
+std::string UserEvent::generate_description() const
+{
+    using namespace FlagSetOperator;
+    std::stringstream ss;
+
+    auto target = target_.load();
+    auto author = author_.load();
+    if (event_mask_ & Audit::EventType::USER_EDITED)
+    {
+        ss << "User " << target->username() << " has been edited by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    else if (event_mask_ & Audit::EventType::USER_CREATED)
+    {
+        ss << "User " << target->username() << " has been created by "
+           << (author ? author->username() : "UNKNOWN_USER");
+    }
+    return ss.str();
+}

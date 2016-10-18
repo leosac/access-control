@@ -36,6 +36,7 @@ namespace Audit
 class IGroupEvent : virtual public IAuditEntry
 {
   public:
+    MAKE_VISITABLE();
     /**
      * Set the group that is targeted by the event.
      */

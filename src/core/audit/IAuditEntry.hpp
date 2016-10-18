@@ -21,6 +21,8 @@
 
 #include "core/audit/AuditFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "tools/IVisitable.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <memory>
 
 namespace Leosac
@@ -42,9 +44,11 @@ namespace Audit
  *       stronger garantee against bugs, as part of the object lifecycle is
  *       managed the factory function.
  */
-class IAuditEntry
+class IAuditEntry : public virtual Tools::IVisitable
 {
   public:
+    MAKE_VISITABLE();
+
     /**
      * Retrieve the identifier of the entry.
      *
@@ -113,7 +117,7 @@ class IAuditEntry
      *
      * It may returns 0, which is not a valid user_id.
      */
-    virtual Auth::UserId author_id() = 0;
+    virtual Auth::UserId author_id() const = 0;
 
     /**
      * Set `parent` as the parent audit entry for
@@ -156,6 +160,20 @@ class IAuditEntry
      * Returns the number of children that this entry has.
      */
     virtual size_t children_count() const = 0;
+
+    /**
+     * Retrieve unix timestamp
+     */
+    virtual boost::posix_time::ptime timestamp() const = 0;
+
+    /**
+     * Generate a description for this event.
+     * todo: should be pure virtual
+     */
+    virtual std::string generate_description() const
+    {
+        return "";
+    }
 
     /**
      * Returns the ODB version of the object.
