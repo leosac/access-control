@@ -100,7 +100,11 @@ std::string AuditGet::build_request_string(const json &req)
         for (size_t i = 0; i < enabled_types.size(); ++i)
         {
             auto enabled_type = enabled_types[i].get<std::string>();
-            // todo string sanitation to avoid SQL injection.
+            if (!is_stringtype_sane(enabled_type))
+            {
+                throw LEOSACException(
+                    BUILD_STR("Audit type string is invalid: " << enabled_type));
+            }
             request_builder << "'" << enabled_type << "'";
             if (i != enabled_types.size() - 1)
                 request_builder << ",";
@@ -110,4 +114,14 @@ std::string AuditGet::build_request_string(const json &req)
         DEBUG("QUERY: " << request_builder.str());
     }
     return request_builder.str();
+}
+
+bool AuditGet::is_stringtype_sane(const std::string &str)
+{
+    for (const auto &c : str)
+    {
+        if (c != ':' && !isalpha(c))
+            return false;
+    }
+    return true;
 }

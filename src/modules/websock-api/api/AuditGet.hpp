@@ -58,6 +58,12 @@ class AuditGet : public MethodHandler
   private:
     virtual json process_impl(const json &req) override;
     std::string build_request_string(const json &req);
+
+    /**
+     * Check that a given string representing an audit type
+     * is sane.
+     */
+    bool is_stringtype_sane(const std::string &str);
 };
 }
 }
