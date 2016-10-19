@@ -32,7 +32,17 @@ using json = nlohmann::json;
 /**
  * Query the audit log.
  *
- * Simply returns all audit entry (todo improve this later)
+ * Request:
+ *     + enabled_types: An array of string representing the complete
+ *       C++ type of the object.
+ *       Possible types are:
+ *           + Leosac::Audit::UserEvent
+ *           + Leosac::Audit::WSAPICall
+ *           + ...
+ *       If enabled type is not present, returns all types.
+ *
+ * Response:
+ *     + ...
  */
 class AuditGet : public MethodHandler
 {
@@ -47,6 +57,7 @@ class AuditGet : public MethodHandler
 
   private:
     virtual json process_impl(const json &req) override;
+    std::string build_request_string(const json &req);
 };
 }
 }

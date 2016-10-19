@@ -53,7 +53,8 @@ struct PolymorphicAuditJSONSerializer
                              public Tools::Visitor<Audit::IWSAPICall>,
                              public Tools::Visitor<Audit::IScheduleEvent>,
                              public Tools::Visitor<Audit::IGroupEvent>,
-                             public Tools::Visitor<Audit::ICredentialEvent>
+                             public Tools::Visitor<Audit::ICredentialEvent>,
+                             public Tools::Visitor<Audit::IDoorEvent>
     {
         HelperSerialize(const SecurityContext &sc);
 
@@ -63,10 +64,12 @@ struct PolymorphicAuditJSONSerializer
         void visit(const Audit::IGroupEvent &t) override;
         void visit(const Audit::ICredentialEvent &t) override;
 
+        void visit(const Audit::IDoorEvent &t) override;
+
         /**
-         * Store the result here because we can't return from
-         * the visit() method.
-         */
+     * Store the result here because we can't return from
+     * the visit() method.
+     */
         json result_;
 
         /**

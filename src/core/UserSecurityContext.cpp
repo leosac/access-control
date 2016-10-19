@@ -232,7 +232,7 @@ bool UserSecurityContext::is_manager() const
 {
     auto user = dbsrv_->find_user_by_id(user_id_);
     if (user)
-        return user->rank() == Auth::UserRank::ADMIN;
+        return user->rank() >= Auth::UserRank::MANAGER;
     return false;
 }
 

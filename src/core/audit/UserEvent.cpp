@@ -74,7 +74,9 @@ void UserEvent::after(const std::string &repr)
 Auth::UserId UserEvent::target_id() const
 {
     // todo check that it cant bug due to null target
-    return target_.object_id();
+    if (target_.lock())
+        return target_.object_id();
+    return 0;
 }
 
 const std::string &UserEvent::before() const

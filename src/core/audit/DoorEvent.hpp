@@ -33,7 +33,7 @@ namespace Audit
 class DoorEvent : virtual public IDoorEvent, public AuditEntry
 {
   private:
-    DoorEvent() = default;
+    DoorEvent();
 
     friend class Factory;
 
@@ -45,9 +45,17 @@ class DoorEvent : virtual public IDoorEvent, public AuditEntry
 
     virtual void target(Auth::IDoorPtr door) override;
 
+    Auth::DoorId target_id() const override;
+
     virtual void before(const std::string &repr) override;
 
     virtual void after(const std::string &repr) override;
+
+    const std::string &before() const override;
+
+    const std::string &after() const override;
+
+    std::string generate_description() const override;
 
   public:
 #pragma db on_delete(set_null)

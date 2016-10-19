@@ -26,6 +26,11 @@
 using namespace Leosac;
 using namespace Leosac::Audit;
 
+DoorEvent::DoorEvent()
+    : target_door_id_(0)
+{
+}
+
 std::shared_ptr<DoorEvent> DoorEvent::create(const DBPtr &database,
                                              Auth::IDoorPtr target_door,
                                              AuditEntryPtr parent)
@@ -73,4 +78,40 @@ void DoorEvent::after(const std::string &repr)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     after_ = repr;
+}
+
+Auth::DoorId DoorEvent::target_id() const
+{
+    if (target_.lock())
+        return target_.object_id();
+    return target_door_id_;
+}
+
+const std::string &DoorEvent::before() const
+{
+    return before_;
+}
+
+const std::string &DoorEvent::after() const
+{
+    return after_;
+}
+
+std::string DoorEvent::generate_description() const
+{
+    std::stringstream ss;
+    std::string door_name;
+
+    auto t = target_.load();
+    if (t)
+        door_name = BUILD_STR(t->alias() << " {id: " << target_id() << "}");
+    else
+        door_name = BUILD_STR("{id: " << target_id() << "}");
+
+    if (event_mask_ & EventType::DOOR_CREATED)
+        ss << "Door " << door_name << " has been created.";
+    else if (event_mask_ & EventType::DOOR_UPDATED)
+        ss << "Door " << door_name << " has been edited.";
+
+    return ss.str();
 }

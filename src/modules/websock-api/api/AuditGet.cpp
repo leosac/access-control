@@ -49,10 +49,20 @@ json AuditGet::process_impl(const json &req)
         using namespace Tools;
         using namespace JSONUtil;
         using Query = odb::query<Audit::AuditEntry>;
-
+        Query query;
         odb::transaction t(db->begin());
-        auto query  = odb::query<Audit::AuditEntry>("ORDER BY" + Query::id);
-        auto ret    = db->query<Audit::AuditEntry>(query);
+        odb::result<Audit::AuditEntry> ret;
+
+        if (req.find("enabled_type") != req.end() &&
+            req.at("enabled_type").is_array() && req.at("enabled_type").size())
+        {
+            query = odb::query<Audit::AuditEntry>(build_request_string(req));
+        }
+        else
+        {
+            query = odb::query<Audit::AuditEntry>("ORDER BY" + Query::id);
+        }
+        ret         = db->query<Audit::AuditEntry>(query);
         rep["data"] = json::array();
         for (const auto &audit : ret)
         {
@@ -76,4 +86,28 @@ AuditGet::required_permission(const json &) const
 
     perm_.push_back({SecurityContext::Action::AUDIT_READ, ap});
     return perm_;
+}
+
+std::string AuditGet::build_request_string(const json &req)
+{
+    std::stringstream request_builder;
+
+    if (req.find("enabled_type") != req.end() && req.at("enabled_type").is_array() &&
+        req.at("enabled_type").size())
+    {
+        const auto &enabled_types = req.at("enabled_type");
+        request_builder << "WHERE typeid IN (";
+        for (size_t i = 0; i < enabled_types.size(); ++i)
+        {
+            auto enabled_type = enabled_types[i].get<std::string>();
+            // todo string sanitation to avoid SQL injection.
+            request_builder << "'" << enabled_type << "'";
+            if (i != enabled_types.size() - 1)
+                request_builder << ",";
+        }
+        request_builder << ")";
+        request_builder << " ORDER BY id";
+        DEBUG("QUERY: " << request_builder.str());
+    }
+    return request_builder.str();
 }

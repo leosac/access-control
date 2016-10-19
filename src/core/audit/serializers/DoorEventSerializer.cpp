@@ -17,31 +17,30 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "DoorEventSerializer.hpp"
 #include "AuditSerializer.hpp"
-#include "core/audit/IAuditEntry.hpp"
-#include <boost/date_time/posix_time/conversion.hpp>
+#include "core/audit/IDoorEvent.hpp"
 
 using namespace Leosac;
 
-json AuditJSONSerializer::serialize(const Audit::IAuditEntry &in,
-                                    const SecurityContext &sc)
+json DoorEventJSONSerializer::serialize(const Audit::IDoorEvent &in,
+                                        const SecurityContext &sc)
 {
-    auto timestamp = boost::posix_time::to_time_t(in.timestamp());
+    // First we serialize the base ICredential structure.
+    auto serialized = AuditJSONSerializer::serialize(in, sc);
+    // Now we override the type.
+    ASSERT_LOG(serialized.at("type").is_string(),
+               "Base audit serialization did something unexpected.");
+    serialized["type"] = "audit-door-event";
 
-    json serialized = {
-        {"id", in.id()},
-        {"type", "audit-entry"},
-        {"attributes",
-         {
-             {"eventMask", static_cast<unsigned long>(in.event_mask())},
-             {"timestamp", timestamp},
-             {"description", in.generate_description()},
-         }}};
+    serialized["relationships"]
+              ["target"] = {{{"id", in.target_id()}, {"type", "door"}}};
 
-    if (in.author_id())
+    if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {
-        serialized["relationships"]["author"] = {
-            {"data", {{"id", in.author_id()}, {"type", "user"}}}};
+        serialized["attributes"]["before"] = in.before();
+        serialized["attributes"]["after"]  = in.after();
     }
+
     return serialized;
 }
