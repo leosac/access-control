@@ -100,7 +100,6 @@ set(LEOSAC_LIB_SRCS
     core/tasks/SyncConfig.cpp
     core/tasks/RemoteControlAsyncResponse.cpp
     core/audit/AuditEntry.cpp
-    core/audit/AuditFwd.cpp
     core/audit/UserEvent.cpp
     core/audit/WSAPICall.cpp
     core/audit/AuditFactory.cpp

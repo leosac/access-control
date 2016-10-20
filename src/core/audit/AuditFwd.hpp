@@ -100,10 +100,7 @@ enum class EventType
      * An attempt to change the password failed.
      */
     USER_PASSWORD_CHANGE_FAILURE,
-    /**
-     * A call to "user_get" websocket API has been made.
-     */
-    USER_GET,
+
     GROUP_CREATED,
     GROUP_UPDATED,
     GROUP_DELETED,
@@ -115,7 +112,6 @@ enum class EventType
      * Someone left the group.
      */
     GROUP_MEMBERSHIP_LEFT,
-
 
     CREDENTIAL_DELETED,
     CREDENTIAL_CREATED,
