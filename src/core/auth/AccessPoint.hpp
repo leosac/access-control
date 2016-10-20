@@ -40,7 +40,7 @@ class AccessPoint : public virtual IAccessPoint
 
     void description(const std::string &dsc) override;
 
-    virtual std::string controller_module() override;
+    std::string controller_module() const override;
 
   protected:
 #pragma db id auto
@@ -50,6 +50,11 @@ class AccessPoint : public virtual IAccessPoint
 
 #pragma db inverse(access_point_)
     std::weak_ptr<Door> door_;
+
+    /**
+     * Which module is responsible for this access point.
+     */
+    std::string controller_module_;
 
 #pragma db version
     const size_t version_;

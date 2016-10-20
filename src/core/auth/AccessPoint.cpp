@@ -52,7 +52,7 @@ void AccessPoint::description(const std::string &dsc)
     description_ = dsc;
 }
 
-std::string AccessPoint::controller_module()
+std::string AccessPoint::controller_module() const
 {
-    return "NONE";
+    return controller_module_;
 }

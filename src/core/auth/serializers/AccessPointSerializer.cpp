@@ -28,11 +28,15 @@ using namespace Leosac::Auth;
 json AccessPointJSONSerializer::serialize(const Auth::IAccessPoint &ap,
                                           const SecurityContext &)
 {
+    // todo: type probably needs to be runtime-generated
+    // based on the controller-module value
     json serialized = {{"id", ap.id()},
                        {"type", "access-point"},
                        {"attributes",
                         {
-                            {"alias", ap.alias()}, {"description", ap.description()},
+                            {"alias", ap.alias()},
+                            {"description", ap.description()},
+                            {"controller-module", ap.controller_module()},
                         }}};
     return serialized;
 }

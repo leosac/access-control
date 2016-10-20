@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "DoorEvent.hpp"
-#include "DoorEvent_odb.h"
+#include "AccessPointEvent.hpp"
+#include "AccessPointEvent_odb.h"
 #include "LeosacFwd.hpp"
-#include "core/auth/Door.hpp"
+#include "core/auth/AccessPoint.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
@@ -28,27 +28,27 @@
 using namespace Leosac;
 using namespace Leosac::Audit;
 
-DoorEvent::DoorEvent()
-    : target_door_id_(0)
+AccessPointEvent::AccessPointEvent()
+    : target_ap_id_(0)
 {
 }
 
-std::shared_ptr<DoorEvent> DoorEvent::create(const DBPtr &database,
-                                             Auth::IDoorPtr target_door,
-                                             AuditEntryPtr parent)
+std::shared_ptr<AccessPointEvent>
+AccessPointEvent::create(const DBPtr &database, Auth::IAccessPointPtr target_ap,
+                         AuditEntryPtr parent)
 {
     ASSERT_LOG(database, "Database cannot be null.");
-    ASSERT_LOG(target_door, "Target door must be non null.");
-    ASSERT_LOG(target_door->id(), "Target door must be already persisted.");
+    ASSERT_LOG(target_ap, "Target AccessPoint must be non null.");
+    ASSERT_LOG(target_ap->id(), "Target AccessPoint must be already persisted.");
     ASSERT_LOG(parent, "Parent must be non null.");
     ASSERT_LOG(parent->id(), "Parent must be already persisted.");
 
     db::OptionalTransaction t(database->begin());
 
-    Audit::DoorEventPtr audit =
-        std::shared_ptr<Audit::DoorEvent>(new Audit::DoorEvent());
+    Audit::AccessPointEventPtr audit =
+        std::shared_ptr<Audit::AccessPointEvent>(new Audit::AccessPointEvent());
     audit->database_ = database;
-    audit->target(target_door);
+    audit->target(target_ap);
     database->persist(audit);
 
     audit->set_parent(parent);
@@ -58,62 +58,64 @@ std::shared_ptr<DoorEvent> DoorEvent::create(const DBPtr &database,
     return audit;
 }
 
-void DoorEvent::target(Auth::IDoorPtr door)
+void AccessPointEvent::target(Auth::IAccessPointPtr ap)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
-    if (door)
-        ASSERT_LOG(door->id(), "Door has no id.");
-    auto door_odb = std::dynamic_pointer_cast<Auth::Door>(door);
-    ASSERT_LOG(door_odb, "IDoor is not of type Door.");
+    if (ap)
+        ASSERT_LOG(ap->id(), "AccessPoint has no id.");
+    auto ap_odb = std::dynamic_pointer_cast<Auth::AccessPoint>(ap);
+    ASSERT_LOG(ap_odb, "IAccessPoint is not of type AccessPoint.");
 
-    target_         = door_odb;
-    target_door_id_ = door->id();
+    target_       = ap_odb;
+    target_ap_id_ = ap->id();
 }
 
-void DoorEvent::before(const std::string &repr)
+void AccessPointEvent::before(const std::string &repr)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     before_ = repr;
 }
 
-void DoorEvent::after(const std::string &repr)
+void AccessPointEvent::after(const std::string &repr)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     after_ = repr;
 }
 
-Auth::DoorId DoorEvent::target_id() const
+Auth::AccessPointId AccessPointEvent::target_id() const
 {
     if (target_.lock())
         return target_.object_id();
-    return target_door_id_;
+    return target_ap_id_;
 }
 
-const std::string &DoorEvent::before() const
+const std::string &AccessPointEvent::before() const
 {
     return before_;
 }
 
-const std::string &DoorEvent::after() const
+const std::string &AccessPointEvent::after() const
 {
     return after_;
 }
 
-std::string DoorEvent::generate_description() const
+std::string AccessPointEvent::generate_description() const
 {
     std::stringstream ss;
 
-    if (event_mask_ & EventType::DOOR_CREATED)
-        ss << "Door " << generate_target_description() << " has been created.";
-    else if (event_mask_ & EventType::DOOR_UPDATED)
-        ss << "Door " << generate_target_description() << " has been edited.";
-    else if (event_mask_ & EventType::DOOR_DELETED)
-        ss << "Door " << generate_target_description() << " has been deleted.";
+    if (event_mask_ & EventType::ACCESS_POINT_CREATED)
+        ss << "AccessPoint " << generate_target_description()
+           << " has been created.";
+    else if (event_mask_ & EventType::ACCESS_POINT_UPDATED)
+        ss << "AccessPoint " << generate_target_description() << " has been edited.";
+    else if (event_mask_ & EventType::ACCESS_POINT_DELETED)
+        ss << "AccessPoint " << generate_target_description()
+           << " has been deleted.";
 
     return ss.str();
 }
 
-std::string DoorEvent::generate_target_description() const
+std::string AccessPointEvent::generate_target_description() const
 {
     Leosac::json desc;
 

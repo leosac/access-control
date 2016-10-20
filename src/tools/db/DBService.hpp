@@ -77,6 +77,9 @@ class DBService
     Audit::IAuditEntryPtr find_audit_by_id(const Audit::AuditEntryId &id,
                                            Flag f = Flag::DEFAULT);
 
+    Auth::IAccessPointPtr find_access_point_by_id(const Auth::AccessPointId &id,
+                                                  Flag f = Flag::DEFAULT);
+
     /**
      * Persist an audit entry object.
      *

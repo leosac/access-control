@@ -1,0 +1,14 @@
+//
+// Created by xaqq on 10/20/16.
+//
+
+#ifndef LEOSAC_ACCESSPOINTEVENTSERIALIZER_HPP
+#define LEOSAC_ACCESSPOINTEVENTSERIALIZER_HPP
+
+
+class AccessPointEventSerializer
+{
+};
+
+
+#endif // LEOSAC_ACCESSPOINTEVENTSERIALIZER_HPP

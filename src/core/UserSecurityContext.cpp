@@ -100,6 +100,12 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
     case Action::DOOR_SEARCH:
         return true;
 
+    case Action::ACCESS_POINT_READ:
+    case Action::ACCESS_POINT_CREATE:
+    case Action::ACCESS_POINT_UPDATE:
+    case Action::ACCESS_POINT_DELETE:
+        return is_manager();
+
     case Action::SMTP_GETCONFIG:
     case Action::SMTP_SETCONFIG:
     case Action::SMTP_SENDMAIL:

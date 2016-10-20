@@ -19,34 +19,43 @@
 
 #pragma once
 
+#include "IAuditEntry.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include <string>
 
 namespace Leosac
 {
-namespace Auth
+namespace Audit
 {
 /**
- * An interface for access point.
- *
- * An access point can be thought of as a point where access control
- * is performed.
+ * Interface that describes an Audit object for AccessPoint related
+ * event.
  */
-class IAccessPoint
+class IAccessPointEvent : virtual public IAuditEntry
 {
   public:
-    virtual AccessPointId id() const = 0;
+    MAKE_VISITABLE();
+    /**
+     * Set the AccessPoint that is targeted by the event.
+     */
+    virtual void target(Auth::IAccessPointPtr ap) = 0;
 
-    virtual const std::string &alias() const         = 0;
-    virtual void alias(const std::string &new_alias) = 0;
-
-    virtual const std::string &description() const   = 0;
-    virtual void description(const std::string &dsc) = 0;
+    virtual Auth::AccessPointId target_id() const = 0;
 
     /**
-     * The name of the module that manages the access point.
+     * An optional JSON representation of the object
+     * **before** the event took place.
      */
-    virtual std::string controller_module() const = 0;
+    virtual void before(const std::string &repr) = 0;
+
+    virtual const std::string &before() const = 0;
+
+    /**
+     * An optional JSON representation of the object
+     * **after** the event took place.
+     */
+    virtual void after(const std::string &repr) = 0;
+
+    virtual const std::string &after() const = 0;
 };
 }
 }

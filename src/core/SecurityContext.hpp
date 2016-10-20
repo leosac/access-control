@@ -91,6 +91,11 @@ class SecurityContext
         DOOR_DELETE,
         DOOR_SEARCH,
 
+        ACCESS_POINT_READ,
+        ACCESS_POINT_CREATE,
+        ACCESS_POINT_UPDATE,
+        ACCESS_POINT_DELETE,
+
         /**
          * Retrieve SMTP configuration
          */
@@ -159,6 +164,13 @@ class SecurityContext
         operator ActionParam();
     };
 
+    struct AccessPointActionParam
+    {
+        Auth::AccessPointId ap_id;
+
+        operator ActionParam();
+    };
+
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
@@ -166,6 +178,7 @@ class SecurityContext
         CredentialActionParam cred;
         ScheduleActionParam sched;
         DoorActionParam door;
+        AccessPointActionParam access_point;
     };
 
     SecurityContext(DBServicePtr dbsrv);

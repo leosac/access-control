@@ -109,6 +109,14 @@ SecurityContext::DoorActionParam::operator ActionParam()
     return result;
 }
 
+SecurityContext::AccessPointActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.access_point = *this;
+    return result;
+}
+
+
 NullSecurityContext::NullSecurityContext()
     : SecurityContext(nullptr)
 {

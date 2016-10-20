@@ -18,6 +18,7 @@
 */
 
 #include "DBService.hpp"
+#include "AccessPoint_odb.h"
 #include "AuditEntry_odb.h"
 #include "Credential_odb.h"
 #include "DatabaseTracer.hpp"
@@ -130,6 +131,19 @@ Audit::IAuditEntryPtr DBService::find_audit_by_id(const Audit::AuditEntryId &id,
         throw EntityNotFound(id, "audit-entry");
     audit->database(database_);
     return audit;
+}
+
+
+Auth::IAccessPointPtr
+DBService::find_access_point_by_id(const Auth::AccessPointId &id,
+                                   DBService::Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto ap = database_->find<Auth::AccessPoint>(id);
+    t.commit();
+    if (!ap && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "door");
+    return ap;
 }
 
 template <typename T>

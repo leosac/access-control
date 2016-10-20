@@ -108,9 +108,9 @@ json DoorCRUD::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto gid = req.at("door_id").get<Auth::DoorId>();
+    auto did = req.at("door_id").get<Auth::DoorId>();
 
-    auto door     = ctx_.dbsrv->find_door_by_id(gid, DBService::THROW_IF_NOT_FOUND);
+    auto door     = ctx_.dbsrv->find_door_by_id(did, DBService::THROW_IF_NOT_FOUND);
     auto door_odb = assert_cast<Auth::DoorPtr>(door);
     auto audit    = Audit::Factory::DoorEvent(db, door, ctx_.audit);
     audit->event_mask(Audit::EventType::DOOR_UPDATED);
