@@ -161,6 +161,13 @@ class AuditEntry : virtual public IAuditEntry,
      */
     void odb_callback(odb::callback_event e, odb::database &) const;
 };
+
+#pragma db view object(AuditEntry)
+struct AuditEntryCount
+{
+#pragma db column("count(" + AuditEntry::id_ + ")")
+    std::size_t count;
+};
 }
 }
 

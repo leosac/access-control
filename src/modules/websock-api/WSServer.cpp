@@ -474,7 +474,7 @@ void WSServer::finalize_audit(const Audit::IWSAPICallPtr &audit, ServerMessage &
         audit->method(msg.type);
         audit->status_code(msg.status_code);
         audit->status_string(msg.status_string);
-        audit->response_content(msg.content.dump(4));
+        // audit->response_content(msg.content.dump(4));
         audit->finalize();
         t.commit();
     }

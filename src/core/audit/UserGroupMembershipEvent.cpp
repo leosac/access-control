@@ -21,6 +21,7 @@
 #include "UserGroupMembershipEvent_odb.h"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
+#include <tools/JSONUtils.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Audit;
@@ -63,4 +64,57 @@ UserGroupMembershipEvent::create(const DBPtr &database, Auth::GroupPtr target_gr
 
     t.commit();
     return audit;
+}
+
+Auth::UserId UserGroupMembershipEvent::target_user_id() const
+{
+    if (target_user_.lock())
+        return target_user_.object_id();
+    return target_user_id_;
+}
+
+Auth::GroupId UserGroupMembershipEvent::target_group_id() const
+{
+    if (target_group_.lock())
+        return target_group_.object_id();
+    return target_group_id_;
+}
+
+std::string UserGroupMembershipEvent::generate_description() const
+{
+    using namespace FlagSetOperator;
+    std::stringstream ss;
+
+    if (event_mask_ & Audit::EventType::GROUP_MEMBERSHIP_JOINED)
+        ss << "User " << generate_target_user_description()
+           << " has joined the group " << generate_target_group_description();
+    else if (event_mask_ & Audit::EventType::GROUP_MEMBERSHIP_LEFT)
+        ss << "User " << generate_target_user_description() << " has left the group "
+           << generate_target_group_description();
+
+    return ss.str();
+}
+
+std::string UserGroupMembershipEvent::generate_target_user_description() const
+{
+    Leosac::json desc;
+
+    desc["id"] = target_user_id();
+    auto t     = target_user_.load();
+    if (t)
+        desc["username"] = t->username();
+
+    return desc.dump();
+}
+
+std::string UserGroupMembershipEvent::generate_target_group_description() const
+{
+    Leosac::json desc;
+
+    desc["id"] = target_group_id();
+    auto t     = target_group_.load();
+    if (t)
+        desc["name"] = t->name();
+
+    return desc.dump();
 }

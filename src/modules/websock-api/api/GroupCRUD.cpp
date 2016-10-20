@@ -23,6 +23,7 @@
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IGroupEvent.hpp"
+#include "core/audit/IUserGroupMembershipEvent.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/serializers/GroupSerializer.hpp"
 #include "exception/ModelException.hpp"
@@ -65,16 +66,13 @@ json GroupCRUD::create_impl(const json &req)
     audit->finalize();
 
     // Add the current user to the group as administrator.
-    auto audit_add_to_group = Audit::Factory::GroupEvent(db, new_group, ctx_.audit);
+    auto audit_add_to_group = Audit::Factory::UserGroupMembershipEvent(
+        db, new_group, ctx_.session->current_user(), ctx_.audit);
     audit_add_to_group->event_mask(Audit::EventType::GROUP_MEMBERSHIP_JOINED);
-    audit_add_to_group->before(GroupJSONStringSerializer::serialize(
-        *new_group, SystemSecurityContext::instance()));
 
     new_group->member_add(ctx_.session->current_user(), Auth::GroupRank::ADMIN);
 
     db->update(new_group);
-    audit_add_to_group->after(GroupJSONStringSerializer::serialize(
-        *new_group, SystemSecurityContext::instance()));
     audit_add_to_group->finalize();
 
     // Send the model back to the client, so it knows the ID.
@@ -152,7 +150,10 @@ json GroupCRUD::delete_impl(const json &req)
     auto group = ctx_.dbsrv->find_group_by_id(gid, DBService::THROW_IF_NOT_FOUND);
     auto audit = Audit::Factory::GroupEvent(db, group, ctx_.audit);
     audit->event_mask(Audit::EventType::GROUP_DELETED);
+    audit->before(GroupJSONStringSerializer::serialize(
+        *group, SystemSecurityContext::instance()));
 
+    audit->finalize();
     db->erase(group);
     t.commit();
 

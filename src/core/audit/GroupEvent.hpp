@@ -57,7 +57,13 @@ class GroupEvent : virtual public IGroupEvent, public AuditEntry
 
     std::string generate_description() const override;
 
-  public:
+  private:
+    /**
+     * Generate a small json-string description about the targeted
+     * group.
+     */
+    std::string generate_target_description() const;
+
 #pragma db on_delete(set_null)
     Auth::GroupLWPtr target_;
 

@@ -19,13 +19,16 @@
 
 #pragma once
 
-#include "core/auth/ValidityInfo.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "exception/leosacexception.hpp"
 #include <chrono>
 #include <json.hpp>
 
 namespace Leosac
 {
+
+using json = nlohmann::json;
+
 /**
  * Add a few useful extraction functions.
  *

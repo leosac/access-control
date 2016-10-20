@@ -20,6 +20,7 @@
 #include "UserEvent.hpp"
 #include "UserEvent_odb.h"
 #include "core/auth/User.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 
@@ -94,17 +95,23 @@ std::string UserEvent::generate_description() const
     using namespace FlagSetOperator;
     std::stringstream ss;
 
-    auto target = target_.load();
-    auto author = author_.load();
-    if (event_mask_ & Audit::EventType::USER_EDITED)
-    {
-        ss << "User " << target->username() << " has been edited by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
-    else if (event_mask_ & Audit::EventType::USER_CREATED)
-    {
-        ss << "User " << target->username() << " has been created by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
+    if (event_mask_ & EventType::USER_CREATED)
+        ss << "User " << generate_target_description() << " has been created.";
+    else if (event_mask_ & EventType::USER_EDITED)
+        ss << "User " << generate_target_description() << " has been edited.";
+    else if (event_mask_ & EventType::USER_DELETED)
+        ss << "User " << generate_target_description() << " has been deleted.";
+
     return ss.str();
+}
+
+std::string UserEvent::generate_target_description() const
+{
+    Leosac::json desc;
+
+    desc["id"] = target_id();
+    auto t     = target_.load();
+    if (t)
+        desc["username"] = t->username();
+    return desc.dump();
 }

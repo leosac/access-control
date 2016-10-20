@@ -59,7 +59,9 @@ class ScheduleEvent : virtual public IScheduleEvent, public AuditEntry
 
     std::string generate_description() const override;
 
-  public:
+  private:
+    std::string generate_target_description() const;
+
 #pragma db on_delete(set_null)
     Tools::ScheduleLWPtr target_;
 

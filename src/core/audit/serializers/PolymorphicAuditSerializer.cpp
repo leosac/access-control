@@ -25,6 +25,7 @@
 #include "WSAPICallSerializer.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/audit/serializers/UserEventSerializer.hpp"
+#include "core/audit/serializers/UserGroupMembershipEventSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 
 using namespace Leosac;
@@ -87,4 +88,11 @@ void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
     const Audit::IDoorEvent &t)
 {
     result_ = DoorEventJSONSerializer::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
+    const Audit::IUserGroupMembershipEvent &t)
+{
+    result_ =
+        UserGroupMembershipEventJSONSerializer::serialize(t, security_context_);
 }

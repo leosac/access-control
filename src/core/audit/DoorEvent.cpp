@@ -19,7 +19,9 @@
 
 #include "DoorEvent.hpp"
 #include "DoorEvent_odb.h"
+#include "LeosacFwd.hpp"
 #include "core/auth/Door.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 
@@ -102,16 +104,25 @@ std::string DoorEvent::generate_description() const
     std::stringstream ss;
     std::string door_name;
 
-    auto t = target_.load();
-    if (t)
-        door_name = BUILD_STR(t->alias() << " {id: " << target_id() << "}");
-    else
-        door_name = BUILD_STR("{id: " << target_id() << "}");
-
     if (event_mask_ & EventType::DOOR_CREATED)
-        ss << "Door " << door_name << " has been created.";
+        ss << "Door " << generate_target_description() << " has been created.";
     else if (event_mask_ & EventType::DOOR_UPDATED)
-        ss << "Door " << door_name << " has been edited.";
+        ss << "Door " << generate_target_description() << " has been edited.";
+    else if (event_mask_ & EventType::DOOR_DELETED)
+        ss << "Door " << generate_target_description() << " has been deleted.";
 
     return ss.str();
+}
+
+std::string DoorEvent::generate_target_description() const
+{
+    std::string door_alias;
+    Leosac::json desc;
+
+    desc["id"] = target_id();
+    auto t     = target_.load();
+    if (t)
+        desc["alias"] = t->alias();
+
+    return desc.dump();
 }

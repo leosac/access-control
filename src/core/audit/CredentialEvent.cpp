@@ -21,8 +21,10 @@
 #include "CredentialEvent_odb.h"
 #include "Credential_odb.h"
 #include "core/credentials/Credential.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
+#include <core/credentials/serializers/PolymorphicCredentialSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Audit;
@@ -92,4 +94,36 @@ const std::string &CredentialEvent::before() const
 const std::string &CredentialEvent::after() const
 {
     return after_;
+}
+
+std::string CredentialEvent::generate_description() const
+{
+    using namespace FlagSetOperator;
+    std::stringstream ss;
+
+    auto target = target_.load();
+    auto author = author_.load();
+
+    if (event_mask_ & EventType::CREDENTIAL_CREATED)
+        ss << "Credential " << generate_target_description() << " has been created.";
+    else if (event_mask_ & EventType::CREDENTIAL_UPDATED)
+        ss << "Credential " << generate_target_description() << " has been edited.";
+    else if (event_mask_ & EventType::CREDENTIAL_DELETED)
+        ss << "Credential " << generate_target_description() << " has been deleted.";
+
+    return ss.str();
+}
+
+std::string CredentialEvent::generate_target_description() const
+{
+    Leosac::json desc;
+
+    desc["id"] = target_id();
+    auto t     = target_.load();
+    if (t)
+    {
+        desc["alias"] = t->alias();
+        desc["type"]  = PolymorphicCredentialJSONSerializer::type_name(*t);
+    }
+    return desc.dump();
 }

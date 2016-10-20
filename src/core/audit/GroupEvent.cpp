@@ -20,6 +20,7 @@
 #include "GroupEvent.hpp"
 #include "GroupEvent_odb.h"
 #include "core/auth/Group.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 
@@ -78,7 +79,7 @@ Auth::GroupId GroupEvent::target_id() const
     {
         return target_.object_id();
     }
-    return 0;
+    return target_group_id_;
 }
 
 const std::string &GroupEvent::before() const
@@ -96,26 +97,24 @@ std::string GroupEvent::generate_description() const
     using namespace FlagSetOperator;
     std::stringstream ss;
 
-    auto target = target_.load();
-    auto author = author_.load();
-    if (event_mask_ & Audit::EventType::GROUP_UPDATED)
-    {
-        ss << "Group "
-           << (target ? target->name() : std::to_string(target_group_id_))
-           << " has been edited by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
-    else if (event_mask_ & Audit::EventType::GROUP_CREATED)
-    {
-        ss << "Group "
-           << (target ? target->name() : std::to_string(target_group_id_))
-           << " has been created by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
+    if (event_mask_ & Audit::EventType::GROUP_CREATED)
+        ss << "Group " << generate_target_description() << " has been created.";
+    else if (event_mask_ & Audit::EventType::GROUP_UPDATED)
+        ss << "Group " << generate_target_description() << " has been edited.";
     else if (event_mask_ & Audit::EventType::GROUP_DELETED)
-    {
-        ss << "Group " << target_group_id_ << " has been created by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
+        ss << "Group " << generate_target_description() << " has been deleted.";
+
     return ss.str();
+}
+
+std::string GroupEvent::generate_target_description() const
+{
+    Leosac::json desc;
+
+    desc["id"] = target_id();
+    auto t     = target_.load();
+    if (t)
+        desc["name"] = t->name();
+
+    return desc.dump();
 }

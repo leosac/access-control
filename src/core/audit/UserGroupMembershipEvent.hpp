@@ -50,7 +50,16 @@ class UserGroupMembershipEvent : virtual public IUserGroupMembershipEvent,
 
     virtual void target_group(Auth::GroupPtr grp) override;
 
-  public:
+    Auth::UserId target_user_id() const override;
+
+    Auth::GroupId target_group_id() const override;
+
+    std::string generate_description() const override;
+
+  private:
+    std::string generate_target_user_description() const;
+    std::string generate_target_group_description() const;
+
 #pragma db on_delete(set_null)
     Auth::GroupLWPtr target_group_;
 

@@ -18,6 +18,7 @@
 */
 
 #include "tools/JSONUtils.hpp"
+#include "core/auth/ValidityInfo.hpp"
 #include "tools/MyTime.hpp"
 
 namespace Leosac

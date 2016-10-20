@@ -58,6 +58,11 @@ class DoorEvent : virtual public IDoorEvent, public AuditEntry
     std::string generate_description() const override;
 
   public:
+    /**
+     * Generate a short description for the targeted door.
+     */
+    std::string generate_target_description() const;
+
 #pragma db on_delete(set_null)
     Auth::DoorLWPtr target_;
 

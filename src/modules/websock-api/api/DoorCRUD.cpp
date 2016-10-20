@@ -138,7 +138,10 @@ json DoorCRUD::delete_impl(const json &req)
     auto door_odb = assert_cast<Auth::DoorPtr>(door);
     auto audit    = Audit::Factory::DoorEvent(db, door, ctx_.audit);
     audit->event_mask(Audit::EventType::DOOR_DELETED);
+    audit->before(DoorJSONStringSerializer::serialize(
+        *door, SystemSecurityContext::instance()));
 
+    audit->finalize();
     db->erase(door_odb);
     t.commit();
 

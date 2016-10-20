@@ -19,35 +19,20 @@
 
 #pragma once
 
-#include "IAuditEntry.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "core/audit/AuditFwd.hpp"
+#include "tools/Serializer.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
-namespace Audit
+using json = nlohmann::json;
+
+struct UserGroupMembershipEventJSONSerializer
+    : public Serializer<json, Audit::IUserGroupMembershipEvent,
+                        UserGroupMembershipEventJSONSerializer>
 {
-/**
- * Interface to audit object that take care of tracking
- * user/group membership change.
- */
-class IUserGroupMembershipEvent : virtual public IAuditEntry
-{
-  public:
-    MAKE_VISITABLE();
-
-    /**
-     * The user that joined or left the group.
-     */
-    virtual void target_user(Auth::UserPtr user) = 0;
-
-    virtual Auth::UserId target_user_id() const = 0;
-
-    /**
-     * The group that gained or lost an user.
-     */
-    virtual void target_group(Auth::GroupPtr grp) = 0;
-
-    virtual Auth::GroupId target_group_id() const = 0;
+    static json serialize(const Audit::IUserGroupMembershipEvent &in,
+                          const SecurityContext &sc);
 };
-}
 }

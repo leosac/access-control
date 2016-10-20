@@ -57,7 +57,13 @@ class UserEvent : virtual public IUserEvent, public AuditEntry
 
     std::string generate_description() const override;
 
-  public:
+  private:
+    /**
+     * Generate a small json-string to describe the
+     * target user.
+     */
+    std::string generate_target_description() const;
+
 #pragma db not_null
     Auth::UserLWPtr target_;
 

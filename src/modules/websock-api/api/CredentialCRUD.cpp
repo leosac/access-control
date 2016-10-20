@@ -109,7 +109,7 @@ json CredentialCRUD::create_impl(const json &req)
     db->persist(assert_cast<Cred::CredentialPtr>(new_cred));
     Audit::ICredentialEventPtr audit =
         Audit::Factory::CredentialEventPtr(db, new_cred, ctx_.audit);
-    audit->event_mask(Audit::EventType::CREDENTIAL_CREATE);
+    audit->event_mask(Audit::EventType::CREDENTIAL_CREATED);
     audit->after(PolymorphicCredentialJSONStringSerializer::serialize(
         *new_cred, SystemSecurityContext::instance()));
     audit->finalize();
@@ -168,7 +168,7 @@ json CredentialCRUD::update_impl(const json &req)
         ctx_.dbsrv->find_credential_by_id(cid, DBService::THROW_IF_NOT_FOUND);
     Audit::ICredentialEventPtr audit =
         Audit::Factory::CredentialEventPtr(db, cred, ctx_.audit);
-    audit->event_mask(Audit::EventType::CREDENTIAL_UPDATE);
+    audit->event_mask(Audit::EventType::CREDENTIAL_UPDATED);
     audit->before(PolymorphicCredentialJSONStringSerializer::serialize(
         *cred, SystemSecurityContext::instance()));
 
@@ -195,7 +195,7 @@ json CredentialCRUD::delete_impl(const json &req)
             ctx_.dbsrv->find_credential_by_id(cid, DBService::THROW_IF_NOT_FOUND);
         Audit::ICredentialEventPtr audit =
             Audit::Factory::CredentialEventPtr(db, cred, ctx_.audit);
-        audit->event_mask(Audit::EventType::CREDENTIAL_DELETE);
+        audit->event_mask(Audit::EventType::CREDENTIAL_DELETED);
         audit->before(PolymorphicCredentialJSONStringSerializer::serialize(
             *cred, SystemSecurityContext::instance()));
 

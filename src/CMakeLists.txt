@@ -117,6 +117,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/GroupEventSerializer.cpp
     core/audit/serializers/ScheduleEventSerializer.cpp
     core/audit/serializers/DoorEventSerializer.cpp
+    core/audit/serializers/UserGroupMembershipEventSerializer.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
         )

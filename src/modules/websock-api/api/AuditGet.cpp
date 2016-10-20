@@ -22,9 +22,11 @@
 #include "Exceptions.hpp"
 #include "LogEntry_odb.h"
 #include "api/APISession.hpp"
+#include "core/audit/AuditEntry.hpp"
+#include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/DBService.hpp"
-#include <core/audit/serializers/PolymorphicAuditSerializer.hpp>
+#include <odb/pgsql/query.hxx>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -49,20 +51,24 @@ json AuditGet::process_impl(const json &req)
         using namespace Tools;
         using namespace JSONUtil;
         using Query = odb::query<Audit::AuditEntry>;
-        Query query;
-        odb::transaction t(db->begin());
-        odb::result<Audit::AuditEntry> ret;
 
-        if (req.find("enabled_type") != req.end() &&
-            req.at("enabled_type").is_array() && req.at("enabled_type").size())
-        {
-            query = odb::query<Audit::AuditEntry>(build_request_string(req));
-        }
+        int page      = extract_with_default(req, "p", 1);
+        int page_size = extract_with_default(req, "ps", 20);
+
+        if (page == 0)
+            throw LEOSACException("Cannot request page 0.");
+
+        odb::transaction t(db->begin());
+        Audit::AuditEntryCount view(
+            db->query_value<Audit::AuditEntryCount>(build_in_clause(req)));
+        rep["meta"]["count"] = view.count;
+        if (view.count)
+            rep["meta"]["total_page"] = (view.count / page_size) + 1;
         else
-        {
-            query = odb::query<Audit::AuditEntry>("ORDER BY" + Query::id);
-        }
-        ret         = db->query<Audit::AuditEntry>(query);
+            rep["meta"]["total_page"] = 0;
+
+        auto query  = Query(build_request_string(req, page, page_size));
+        auto ret    = db->query<Audit::AuditEntry>(query);
         rep["data"] = json::array();
         for (const auto &audit : ret)
         {
@@ -88,7 +94,30 @@ AuditGet::required_permission(const json &) const
     return perm_;
 }
 
-std::string AuditGet::build_request_string(const json &req)
+std::string AuditGet::build_request_string(const json &req, int page,
+                                           int page_size) const
+{
+    std::stringstream request_builder;
+
+    request_builder << build_in_clause(req);
+    request_builder << " ORDER BY id DESC";
+    request_builder << " LIMIT " << page_size;
+    request_builder << " OFFSET " << page_size * (page - 1);
+    DEBUG("QUERY: " << request_builder.str());
+    return request_builder.str();
+}
+
+bool AuditGet::is_stringtype_sane(const std::string &str) const
+{
+    for (const auto &c : str)
+    {
+        if (c != ':' && !isalpha(c))
+            return false;
+    }
+    return true;
+}
+
+std::string AuditGet::build_in_clause(const json &req) const
 {
     std::stringstream request_builder;
 
@@ -110,18 +139,10 @@ std::string AuditGet::build_request_string(const json &req)
                 request_builder << ",";
         }
         request_builder << ")";
-        request_builder << " ORDER BY id";
-        DEBUG("QUERY: " << request_builder.str());
+    }
+    else
+    {
+        request_builder << "1 = 1";
     }
     return request_builder.str();
-}
-
-bool AuditGet::is_stringtype_sane(const std::string &str)
-{
-    for (const auto &c : str)
-    {
-        if (c != ':' && !isalpha(c))
-            return false;
-    }
-    return true;
 }

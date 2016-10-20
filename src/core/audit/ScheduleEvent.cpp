@@ -21,6 +21,7 @@
 #include "ScheduleEvent_odb.h"
 #include "Schedule_odb.h"
 #include "tools/AssertCast.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/Schedule.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
@@ -81,7 +82,7 @@ Tools::ScheduleId ScheduleEvent::target_id() const
     {
         return target_.object_id();
     }
-    return 0;
+    return target_sched_id_;
 }
 
 const std::string &ScheduleEvent::before() const
@@ -101,15 +102,25 @@ std::string ScheduleEvent::generate_description() const
 
     auto target = target_.load();
     auto author = author_.load();
-    if (event_mask_ & Audit::EventType::SCHEDULE_UPDATE)
-    {
-        ss << "Schedule " << target->name() << " has been edited by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
-    else if (event_mask_ & Audit::EventType::SCHEDULE_CREATE)
-    {
-        ss << "Schedule " << target->name() << " has been created by "
-           << (author ? author->username() : "UNKNOWN_USER");
-    }
+
+    if (event_mask_ & EventType::SCHEDULE_CREATED)
+        ss << "Schedule " << generate_target_description() << " has been created.";
+    else if (event_mask_ & EventType::SCHEDULE_UPDATED)
+        ss << "Schedule " << generate_target_description() << " has been edited.";
+    else if (event_mask_ & EventType::SCHEDULE_DELETED)
+        ss << "Schedule " << generate_target_description() << " has been deleted.";
+
     return ss.str();
+}
+
+std::string ScheduleEvent::generate_target_description() const
+{
+    Leosac::json desc;
+
+    desc["id"] = target_id();
+    auto t     = target_.load();
+    if (t)
+        desc["name"] = t->name();
+
+    return desc.dump();
 }

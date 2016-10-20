@@ -40,9 +40,15 @@ using json = nlohmann::json;
  *           + Leosac::Audit::WSAPICall
  *           + ...
  *       If enabled type is not present, returns all types.
+ *     + p: Page number
+ *     + ps: Page size
  *
  * Response:
- *     + ...
+ *     + data: [JSON API data]
+ *     + meta:
+ *          + count: The number of entries that match the request.
+ *          + totalPage: The number of page for to retrieve all items that match
+ *            the request.
  */
 class AuditGet : public MethodHandler
 {
@@ -57,13 +63,18 @@ class AuditGet : public MethodHandler
 
   private:
     virtual json process_impl(const json &req) override;
-    std::string build_request_string(const json &req);
+    std::string build_request_string(const json &req, int page, int page_size) const;
+
+    /**
+     * Build the "WHERE typeid IN (...)" string based on the enabled types.
+     */
+    std::string build_in_clause(const json &req) const;
 
     /**
      * Check that a given string representing an audit type
      * is sane.
      */
-    bool is_stringtype_sane(const std::string &str);
+    bool is_stringtype_sane(const std::string &str) const;
 };
 }
 }

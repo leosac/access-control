@@ -26,7 +26,6 @@ using namespace Leosac;
 json CredentialEventJSONSerializer::serialize(const Audit::ICredentialEvent &in,
                                               const SecurityContext &sc)
 {
-    // First we serialize the base ICredential structure.
     auto serialized = AuditJSONSerializer::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),

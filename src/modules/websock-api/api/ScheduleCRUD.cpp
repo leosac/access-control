@@ -89,7 +89,7 @@ json ScheduleCRUD::create_impl(const json &req)
     db->persist(schedule);
     Audit::IScheduleEventPtr audit =
         Audit::Factory::ScheduleEvent(db, schedule, ctx_.audit);
-    audit->event_mask(Audit::EventType::SCHEDULE_CREATE);
+    audit->event_mask(Audit::EventType::SCHEDULE_CREATED);
     audit->after(Tools::ScheduleJSONStringSerializer::serialize(
         *schedule, SystemSecurityContext::instance()));
     audit->finalize();
@@ -167,7 +167,7 @@ json ScheduleCRUD::update_impl(const json &req)
         ctx_.dbsrv->find_schedule_by_id(sid, DBService::THROW_IF_NOT_FOUND);
     Audit::IScheduleEventPtr audit =
         Audit::Factory::ScheduleEvent(db, schedule, ctx_.audit);
-    audit->event_mask(Audit::EventType::SCHEDULE_UPDATE);
+    audit->event_mask(Audit::EventType::SCHEDULE_UPDATED);
     audit->before(Tools::ScheduleJSONStringSerializer::serialize(
         *schedule, SystemSecurityContext::instance()));
 
@@ -215,7 +215,7 @@ json ScheduleCRUD::delete_impl(const json &req)
         Audit::IScheduleEventPtr audit =
             Audit::Factory::ScheduleEvent(db, schedule, ctx_.audit);
 
-        audit->event_mask(Audit::EventType::SCHEDULE_DELETE);
+        audit->event_mask(Audit::EventType::SCHEDULE_DELETED);
         audit->before(Tools::ScheduleJSONStringSerializer::serialize(
             *schedule, SystemSecurityContext::instance()));
 
