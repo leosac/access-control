@@ -17,11 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "api/search/DoorSearch.hpp"
-#include "Door_odb.h"
+#include "api/search/AccessPointSearch.hpp"
+#include "AccessPoint_odb.h"
 #include "Exceptions.hpp"
 #include "api/APISession.hpp"
-#include "core/auth/Door.hpp"
+#include "core/auth/AccessPoint.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
 
@@ -29,39 +29,36 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-DoorSearch::DoorSearch(RequestContext ctx)
+AccessPointSearch::AccessPointSearch(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr DoorSearch::create(RequestContext ctx)
+MethodHandlerUPtr AccessPointSearch::create(RequestContext ctx)
 {
-    return std::make_unique<DoorSearch>(ctx);
+    return std::make_unique<AccessPointSearch>(ctx);
 }
 
-struct DoorComparator
+struct AccessPointComparator
 {
-    bool operator()(const Auth::Door &d1, const Auth::Door &d2)
+    bool operator()(const Auth::AccessPoint &ap1, const Auth::AccessPoint &ap2)
     {
-        ASSERT_LOG(d1.id(), "d1 has no id.");
-        ASSERT_LOG(d2.id(), "d2 has no id.");
-        return d1.id() < d2.id();
+        ASSERT_LOG(ap1.id(), "g1 has no id.");
+        ASSERT_LOG(ap2.id(), "g2 has no id.");
+        return ap1.id() < ap2.id();
     }
 };
 
-json DoorSearch::process_impl(const json &req)
+json AccessPointSearch::process_impl(const json &req)
 {
     json rep = json::array();
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    using Query              = odb::query<Auth::Door>;
+    using Query              = odb::query<Auth::AccessPoint>;
     std::string partial_name = req.at("partial_name");
-    std::set<Auth::Door, DoorComparator> doors;
+    std::set<Auth::AccessPoint, AccessPointComparator> access_points;
 
-    // We want a case insensitive search. However, there is no portable
-    // way to do this. So for now we'll rely on a naive, potentially slow
-    // bruteforce-style implementation.
-    // todo: fixme
+    // todo fix me performance
 
     for (auto i = 0u; i < partial_name.length(); ++i)
     {
@@ -69,22 +66,22 @@ json DoorSearch::process_impl(const json &req)
         partial_name_copy[i]   = std::toupper(partial_name[i]);
         Query q(Query::alias.like("%" + partial_name_copy + "%"));
         auto results = db->query(q);
-        for (const auto &door : results)
+        for (const auto &ap : results)
         {
-            doors.insert(door);
+            access_points.insert(ap);
         }
     }
 
     Query q(Query::alias.like("%" + partial_name + "%"));
     auto results = db->query(q);
-    for (const auto &door : results)
+    for (const auto &ap : results)
     {
-        doors.insert(door);
+        access_points.insert(ap);
     }
 
-    for (const auto &door : doors)
+    for (const auto &ap : access_points)
     {
-        json result_json = {{"id", door.id()}, {"alias", door.alias()}};
+        json result_json = {{"id", ap.id()}, {"alias", ap.alias()}};
         rep.push_back(result_json);
     }
 
@@ -92,11 +89,9 @@ json DoorSearch::process_impl(const json &req)
 }
 
 std::vector<MethodHandler::ActionActionParam>
-DoorSearch::required_permission(const json &) const
+AccessPointSearch::required_permission(const json &) const
 {
     std::vector<MethodHandler::ActionActionParam> perm_;
-    SecurityContext::ActionParam ap{};
-
-    perm_.push_back({SecurityContext::Action::DOOR_SEARCH, ap});
+    perm_.push_back({SecurityContext::Action::ACCESS_POINT_SEARCH, {}});
     return perm_;
 }

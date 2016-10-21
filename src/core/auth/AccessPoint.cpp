@@ -18,6 +18,7 @@
 */
 
 #include "AccessPoint.hpp"
+#include "Door.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;
@@ -55,4 +56,21 @@ void AccessPoint::description(const std::string &dsc)
 std::string AccessPoint::controller_module() const
 {
     return controller_module_;
+}
+
+void AccessPoint::controller_module(const std::string &ctrl_mod)
+{
+    controller_module_ = ctrl_mod;
+}
+
+IDoorPtr AccessPoint::door() const
+{
+    return door_.lock();
+}
+
+DoorId AccessPoint::door_id() const
+{
+    if (door_.lock())
+        return door_.lock()->id();
+    return 0;
 }

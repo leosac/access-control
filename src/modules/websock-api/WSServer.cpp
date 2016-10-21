@@ -22,6 +22,7 @@
 #include "Exceptions.hpp"
 #include "Token_odb.h"
 #include "WebSockAPI.hpp"
+#include "api/AccessPointCRUD.hpp"
 #include "api/AuditGet.hpp"
 #include "api/CredentialCRUD.hpp"
 #include "api/DoorCRUD.hpp"
@@ -31,6 +32,7 @@
 #include "api/PasswordChange.hpp"
 #include "api/ScheduleCRUD.hpp"
 #include "api/UserCRUD.hpp"
+#include "api/search/AccessPointSearch.hpp"
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
 #include "core/CoreUtils.hpp"
@@ -82,11 +84,12 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     handlers_["logout"]                  = &APISession::logout;
     handlers_["system_overview"]         = &APISession::system_overview;
 
-    individual_handlers_["audit.get"]         = &AuditGet::create;
-    individual_handlers_["get_logs"]          = &LogGet::create;
-    individual_handlers_["password_change"]   = &PasswordChange::create;
-    individual_handlers_["search.group_name"] = &GroupSearch::create;
-    individual_handlers_["search.door_alias"] = &DoorSearch::create;
+    individual_handlers_["audit.get"]                 = &AuditGet::create;
+    individual_handlers_["get_logs"]                  = &LogGet::create;
+    individual_handlers_["password_change"]           = &PasswordChange::create;
+    individual_handlers_["search.group_name"]         = &GroupSearch::create;
+    individual_handlers_["search.door_alias"]         = &DoorSearch::create;
+    individual_handlers_["search.access_point_alias"] = &AccessPointSearch::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);
@@ -95,6 +98,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     register_crud_handler("credential", &WebSockAPI::CredentialCRUD::instanciate);
     register_crud_handler("schedule", &WebSockAPI::ScheduleCRUD::instanciate);
     register_crud_handler("door", &WebSockAPI::DoorCRUD::instanciate);
+    register_crud_handler("access_point", &WebSockAPI::AccessPointCRUD::instanciate);
 
     // Setup PUSH socket to talks to the parent module.
     to_module_ = std::make_unique<zmqpp::socket>(

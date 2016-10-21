@@ -95,6 +95,7 @@ class SecurityContext
         ACCESS_POINT_CREATE,
         ACCESS_POINT_UPDATE,
         ACCESS_POINT_DELETE,
+        ACCESS_POINT_SEARCH,
 
         /**
          * Retrieve SMTP configuration

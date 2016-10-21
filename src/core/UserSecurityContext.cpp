@@ -104,6 +104,7 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
     case Action::ACCESS_POINT_CREATE:
     case Action::ACCESS_POINT_UPDATE:
     case Action::ACCESS_POINT_DELETE:
+    case Action::ACCESS_POINT_SEARCH:
         return is_manager();
 
     case Action::SMTP_GETCONFIG:

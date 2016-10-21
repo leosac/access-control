@@ -98,8 +98,10 @@ using BaseAuthSourcePtr = std::shared_ptr<BaseAuthSource>;
 class WiegandCard;
 
 class IDoor;
-using IDoorPtr = std::shared_ptr<IDoor>;
-using DoorId   = unsigned long;
+using IDoorPtr   = std::shared_ptr<IDoor>;
+using IDoorLPtr  = odb::lazy_shared_ptr<IDoor>;
+using IDoorLWPtr = odb::lazy_weak_ptr<IDoor>;
+using DoorId     = unsigned long;
 
 class Door;
 using DoorLWPtr = odb::lazy_weak_ptr<Door>;
@@ -111,7 +113,7 @@ using AccessPointId   = unsigned long;
 
 class AccessPoint;
 using AccessPointLWPtr = odb::lazy_weak_ptr<AccessPoint>;
-using AccessPointLPtr  = odb::lazy_ptr<AccessPoint>;
+using AccessPointLPtr  = odb::lazy_shared_ptr<AccessPoint>;
 using AccessPointPtr   = std::shared_ptr<AccessPoint>;
 }
 }

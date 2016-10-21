@@ -18,6 +18,7 @@
 */
 
 #include "core/auth/Door.hpp"
+#include "AccessPoint_odb.h"
 #include "DoorSerializer.hpp"
 #include "core/auth/IAccessPoint.hpp"
 #include "tools/JSONUtils.hpp"
@@ -63,10 +64,10 @@ void DoorJSONSerializer::unserialize(Auth::IDoor &out, const json &in,
     {
         if (new_ap_id)
         {
-            //      DBPtr dbptr =
-            //            ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
-            //          Auth::AccessPointLPtr new_access_point(*dbptr, new_ap_id);
-            //            out.access_point(new_access_point.load());
+            DBPtr dbptr =
+                ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
+            Auth::AccessPointLPtr new_access_point(*dbptr, new_ap_id);
+            out.access_point(new_access_point.load());
         }
         else
         {

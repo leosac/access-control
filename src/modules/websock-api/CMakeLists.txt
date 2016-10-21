@@ -23,6 +23,7 @@ set(WEBSOCK_API_SRCS
         api/AccessPointCRUD.cpp
         api/search/GroupSearch.cpp
         api/search/DoorSearch.cpp
+        api/search/AccessPointSearch.cpp
         )
 
 add_library(${WEBSOCK_API_BIN} SHARED

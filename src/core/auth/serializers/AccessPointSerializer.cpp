@@ -38,6 +38,12 @@ json AccessPointJSONSerializer::serialize(const Auth::IAccessPoint &ap,
                             {"description", ap.description()},
                             {"controller-module", ap.controller_module()},
                         }}};
+
+    if (ap.door_id())
+    {
+        serialized["relationships"]
+                  ["door"] = {{"data", {{"id", ap.door_id()}, {"type", "door"}}}};
+    }
     return serialized;
 }
 
@@ -48,6 +54,8 @@ void AccessPointJSONSerializer::unserialize(Auth::IAccessPoint &out, const json 
 
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
+    out.controller_module(
+        extract_with_default(in, "controller-module", out.controller_module()));
 }
 
 std::string AccessPointJSONStringSerializer::serialize(const Auth::IAccessPoint &in,

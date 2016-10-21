@@ -74,7 +74,7 @@ json AccessPointCRUD::read_impl(const json &req)
     using Result = odb::result<Auth::AccessPoint>;
     DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto ap_id = req.at("ap_id").get<Auth::AccessPointId>();
+    auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
 
     if (ap_id != 0)
     {
@@ -109,7 +109,7 @@ json AccessPointCRUD::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto gid = req.at("ap_id").get<Auth::AccessPointId>();
+    auto gid = req.at("access_point_id").get<Auth::AccessPointId>();
 
     auto ap =
         ctx_.dbsrv->find_access_point_by_id(gid, DBService::THROW_IF_NOT_FOUND);
@@ -133,7 +133,7 @@ json AccessPointCRUD::update_impl(const json &req)
 
 json AccessPointCRUD::delete_impl(const json &req)
 {
-    auto ap_id = req.at("ap_id").get<Auth::AccessPointId>();
+    auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
     DBPtr db   = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 
@@ -160,7 +160,7 @@ AccessPointCRUD::required_permission(CRUDResourceHandler::Verb verb,
     SecurityContext::AccessPointActionParam aap;
     try
     {
-        aap.ap_id = req.at("ap_id").get<Auth::AccessPointId>();
+        aap.ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
     }
     catch (std::out_of_range &e)
     {

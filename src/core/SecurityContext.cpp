@@ -123,7 +123,7 @@ NullSecurityContext::NullSecurityContext()
 }
 
 bool NullSecurityContext::check_permission_impl(
-    SecurityContext::Action a, const SecurityContext::ActionParam &ap) const
+    SecurityContext::Action, const SecurityContext::ActionParam &) const
 {
     return false;
 }

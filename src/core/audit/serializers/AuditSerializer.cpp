@@ -24,7 +24,7 @@
 using namespace Leosac;
 
 json AuditJSONSerializer::serialize(const Audit::IAuditEntry &in,
-                                    const SecurityContext &sc)
+                                    const SecurityContext &)
 {
     auto timestamp = boost::posix_time::to_time_t(in.timestamp());
 

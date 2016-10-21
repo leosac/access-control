@@ -40,7 +40,13 @@ class AccessPoint : public virtual IAccessPoint
 
     void description(const std::string &dsc) override;
 
+    void controller_module(const std::string &ctrl_mod) override;
+
     std::string controller_module() const override;
+
+    IDoorPtr door() const override;
+
+    DoorId door_id() const override;
 
   protected:
 #pragma db id auto
