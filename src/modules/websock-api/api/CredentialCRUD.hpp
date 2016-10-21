@@ -59,13 +59,13 @@ class CredentialCRUD : public CRUDResourceHandler
      * @param req
      * @return
      */
-    virtual json create_impl(const json &req) override;
+    virtual boost::optional<json> create_impl(const json &req) override;
 
-    virtual json read_impl(const json &req) override;
+    virtual boost::optional<json> read_impl(const json &req) override;
 
-    virtual json update_impl(const json &req) override;
+    virtual boost::optional<json> update_impl(const json &req) override;
 
-    virtual json delete_impl(const json &req) override;
+    virtual boost::optional<json> delete_impl(const json &req) override;
 };
 }
 }

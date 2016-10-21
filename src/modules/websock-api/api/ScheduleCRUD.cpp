@@ -76,7 +76,7 @@ ScheduleCRUD::required_permission(CRUDResourceHandler::Verb verb,
     return ret;
 }
 
-json ScheduleCRUD::create_impl(const json &req)
+boost::optional<json> ScheduleCRUD::create_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -119,7 +119,7 @@ static void include_schedule_mapping_infos(json &dest,
     }
 }
 
-json ScheduleCRUD::read_impl(const json &req)
+boost::optional<json> ScheduleCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -154,7 +154,7 @@ json ScheduleCRUD::read_impl(const json &req)
     return rep;
 }
 
-json ScheduleCRUD::update_impl(const json &req)
+boost::optional<json> ScheduleCRUD::update_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -202,7 +202,7 @@ json ScheduleCRUD::update_impl(const json &req)
     return rep;
 }
 
-json ScheduleCRUD::delete_impl(const json &req)
+boost::optional<json> ScheduleCRUD::delete_impl(const json &req)
 {
     auto sid = req.at("schedule_id").get<Tools::ScheduleId>();
     auto db  = ctx_.dbsrv->db();

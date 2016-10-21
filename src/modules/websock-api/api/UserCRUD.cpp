@@ -43,7 +43,7 @@ CRUDResourceHandlerUPtr UserCRUD::instanciate(RequestContext ctx)
     return instance;
 }
 
-json UserCRUD::create_impl(const json &req)
+boost::optional<json> UserCRUD::create_impl(const json &req)
 {
     json rep;
     using Query = odb::query<Auth::User>;
@@ -73,7 +73,7 @@ json UserCRUD::create_impl(const json &req)
     return rep;
 }
 
-json UserCRUD::read_impl(const json &req)
+boost::optional<json> UserCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -103,7 +103,7 @@ json UserCRUD::read_impl(const json &req)
     return rep;
 }
 
-json UserCRUD::update_impl(const json &req)
+boost::optional<json> UserCRUD::update_impl(const json &req)
 {
     json rep;
 
@@ -137,7 +137,7 @@ json UserCRUD::update_impl(const json &req)
     return rep;
 }
 
-json UserCRUD::delete_impl(const json &)
+boost::optional<json> UserCRUD::delete_impl(const json &)
 {
     throw LEOSACException("Not implemented.");
 }

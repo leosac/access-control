@@ -28,17 +28,40 @@ using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Module::WebSockAPI;
 
-CRUDResourceHandler::CRUDResourceHandler(RequestContext ctx)
-    : ctx_(ctx)
+ICRUDResourceHandler::Verb
+ICRUDResourceHandler::verb_from_request_type(const std::string &req)
 {
+    if (boost::algorithm::ends_with(req, ".read"))
+        return Verb::READ;
+    else if (boost::algorithm::ends_with(req, ".create"))
+        return Verb::CREATE;
+    else if (boost::algorithm::ends_with(req, ".update"))
+        return Verb::UPDATE;
+    else if (boost::algorithm::ends_with(req, ".delete"))
+        return Verb::DELETE;
+    else
+    {
+        ASSERT_LOG(0, "Invalid request type {" << req
+                                               << "} for CRUD resource handler");
+        throw LEOSACException("Should not be here");
+    }
 }
 
-CRUDResourceHandlerUPtr CRUDResourceHandler::instanciate(RequestContext)
+void ICRUDResourceHandler::enforce_permission(
+    const std::vector<ActionActionParam> &permissions)
 {
-    return nullptr;
+    auto &security_ctx = security_context();
+    for (const auto &action_and_param : permissions)
+    {
+        if (!security_ctx.check_permission(action_and_param.first,
+                                           action_and_param.second))
+        {
+            throw PermissionDenied();
+        }
+    }
 }
 
-WebSockAPI::json CRUDResourceHandler::process(const ClientMessage &msg)
+boost::optional<json> ICRUDResourceHandler::process(const ClientMessage &msg)
 {
     auto perms = required_permission(verb_from_request_type(msg.type), msg.content);
     switch (verb_from_request_type(msg.type))
@@ -60,39 +83,30 @@ WebSockAPI::json CRUDResourceHandler::process(const ClientMessage &msg)
     throw LEOSACException("Should not be here");
 }
 
-CRUDResourceHandler::Verb
-CRUDResourceHandler::verb_from_request_type(const std::string &req)
+CRUDResourceHandler::CRUDResourceHandler(RequestContext ctx)
+    : ctx_(ctx)
 {
-    if (boost::algorithm::ends_with(req, ".read"))
-        return Verb::READ;
-    if (boost::algorithm::ends_with(req, ".create"))
-        return Verb::CREATE;
-    if (boost::algorithm::ends_with(req, ".update"))
-        return Verb::UPDATE;
-    if (boost::algorithm::ends_with(req, ".delete"))
-        return Verb::DELETE;
-    ASSERT_LOG(0, "Invalid request type {" << req << "} for CRUD resource handler");
-    throw LEOSACException("Should not be here");
 }
 
-void CRUDResourceHandler::enforce_permission(
-    const std::vector<ActionActionParam> &permissions)
+CRUDResourceHandlerUPtr CRUDResourceHandler::instanciate(RequestContext)
 {
-    auto &security_ctx = ctx_.session->security_context();
-    for (const auto &action_and_param : permissions)
-    {
-        if (!security_ctx.check_permission(action_and_param.first,
-                                           action_and_param.second))
-        {
-            throw PermissionDenied();
-        }
-    }
+    return nullptr;
 }
 
-UserSecurityContext &CRUDResourceHandler::security_context()
+UserSecurityContext &CRUDResourceHandler::security_context() const
 {
     auto wsc =
         dynamic_cast<UserSecurityContext *>(&ctx_.session->security_context());
     ASSERT_LOG(wsc, "SecurityContext has unexpected type.");
     return *wsc;
+}
+
+ExternalCRUDResourceHandler::ExternalCRUDResourceHandler(ModuleRequestContext ctx)
+    : ctx_(ctx)
+{
+}
+
+UserSecurityContext &ExternalCRUDResourceHandler::security_context() const
+{
+    return *ctx_.security_ctx;
 }

@@ -82,7 +82,7 @@ void WebSockAPIModule::handle_router()
         msg >> handler;
         wssrv_->register_external_handler(handler, client_identifier);
     }
-    if (cmd == "SEND_MESSAGE")
+    else if (cmd == "SEND_MESSAGE")
     {
         ASSERT_LOG(msg.remaining() == 2, "message is ill formed.");
         std::string connection_identifier;
@@ -90,13 +90,46 @@ void WebSockAPIModule::handle_router()
         msg >> connection_identifier >> content;
         wssrv_->send_external_message(connection_identifier, content);
     }
+    else if (cmd == "REGISTER_MODULE")
+    {
+        ASSERT_LOG(msg.remaining() == 1, "Message is ill formed.");
+        std::string module_name;
+        msg >> module_name;
+        ASSERT_LOG(module_name_client_id_.count(module_name) == 0,
+                   BUILD_STR("A module named " << module_name
+                                               << " is already registered."));
+        module_name_client_id_[module_name] = client_identifier;
+    }
 }
 
 void WebSockAPIModule::handle_pull()
 {
+    // Forward message from the websocketpp thread to the
+    // router.
     zmqpp::message msg;
     pull_->receive(msg);
 
+    std::string first_frame;
+    msg.get(first_frame, 0);
+
+    if (first_frame == "SEND_TO_MODULE")
+    {
+        // Modify the message object so that it can be sent over the router socket.
+        std::string module_name;
+        msg.get(module_name, 1);
+        ASSERT_LOG(
+            module_name_client_id_.count(module_name),
+            BUILD_STR("Module named " << module_name << " is not registered."));
+
+        // We pop the "SEND_TO_MODULE" and "${MODULE_NAME}" frames...
+        msg.pop_front();
+        msg.pop_front();
+        // ... and replace them with the ZMQ router client identifier for this
+        // module.
+        msg.push_front(module_name_client_id_[module_name]);
+    }
+
     ASSERT_LOG(msg.parts() >= 2, "Ill formed message from WSServer");
-    router_->send(msg);
+    bool ret = router_->send(msg, true);
+    ASSERT_LOG(ret, "Internal send would have blocked.");
 }

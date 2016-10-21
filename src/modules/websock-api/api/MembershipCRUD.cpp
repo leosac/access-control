@@ -47,7 +47,7 @@ CRUDResourceHandlerUPtr MembershipCRUD::instanciate(RequestContext ctx)
     return instance;
 }
 
-json MembershipCRUD::create_impl(const json &req)
+boost::optional<json> MembershipCRUD::create_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -81,7 +81,7 @@ json MembershipCRUD::create_impl(const json &req)
     return rep;
 }
 
-json MembershipCRUD::read_impl(const json &req)
+boost::optional<json> MembershipCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -97,12 +97,12 @@ json MembershipCRUD::read_impl(const json &req)
     return rep;
 }
 
-json MembershipCRUD::update_impl(const json &)
+boost::optional<json> MembershipCRUD::update_impl(const json &)
 {
     throw LEOSACException("Not implemented.");
 }
 
-json MembershipCRUD::delete_impl(const json &req)
+boost::optional<json> MembershipCRUD::delete_impl(const json &req)
 {
     odb::transaction t(ctx_.dbsrv->db()->begin());
     auto mid = req.at("membership_id").get<Auth::UserGroupMembershipId>();

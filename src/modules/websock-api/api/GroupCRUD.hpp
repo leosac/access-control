@@ -58,7 +58,7 @@ class GroupCRUD : public CRUDResourceHandler
       * Response:
      *     + ...
      */
-    virtual json create_impl(const json &req) override;
+    virtual boost::optional<json> create_impl(const json &req) override;
 
     /**
      * Retrieve information about a group.
@@ -73,7 +73,7 @@ class GroupCRUD : public CRUDResourceHandler
      * Response:
      *     + ...
      */
-    virtual json read_impl(const json &req) override;
+    virtual boost::optional<json> read_impl(const json &req) override;
 
     /**
      * Update information about a group.
@@ -89,7 +89,7 @@ class GroupCRUD : public CRUDResourceHandler
       * Response:
      *     + ...
      */
-    virtual json update_impl(const json &req) override;
+    virtual boost::optional<json> update_impl(const json &req) override;
 
     /**
      * Delete a group.
@@ -100,7 +100,7 @@ class GroupCRUD : public CRUDResourceHandler
      * Response:
      *     + ...
      */
-    virtual json delete_impl(const json &req) override;
+    virtual boost::optional<json> delete_impl(const json &req) override;
 
     /**
      * Make sure the group's attribute is valid (by calling

@@ -44,7 +44,7 @@ CRUDResourceHandlerUPtr GroupCRUD::instanciate(RequestContext ctx)
     return instance;
 }
 
-json GroupCRUD::create_impl(const json &req)
+boost::optional<json> GroupCRUD::create_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -81,7 +81,7 @@ json GroupCRUD::create_impl(const json &req)
     return rep;
 }
 
-json GroupCRUD::read_impl(const json &req)
+boost::optional<json> GroupCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -116,7 +116,7 @@ json GroupCRUD::read_impl(const json &req)
     return rep;
 }
 
-json GroupCRUD::update_impl(const json &req)
+boost::optional<json> GroupCRUD::update_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -141,7 +141,7 @@ json GroupCRUD::update_impl(const json &req)
     return rep;
 }
 
-json GroupCRUD::delete_impl(const json &req)
+boost::optional<json> GroupCRUD::delete_impl(const json &req)
 {
     auto gid = req.at("group_id").get<Auth::GroupId>();
     DBPtr db = ctx_.dbsrv->db();

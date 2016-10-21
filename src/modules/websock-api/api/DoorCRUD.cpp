@@ -45,7 +45,7 @@ CRUDResourceHandlerUPtr DoorCRUD::instanciate(RequestContext ctx)
     return instance;
 }
 
-json DoorCRUD::create_impl(const json &req)
+boost::optional<json> DoorCRUD::create_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -67,7 +67,7 @@ json DoorCRUD::create_impl(const json &req)
     return rep;
 }
 
-json DoorCRUD::read_impl(const json &req)
+boost::optional<json> DoorCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -103,7 +103,7 @@ json DoorCRUD::read_impl(const json &req)
     return rep;
 }
 
-json DoorCRUD::update_impl(const json &req)
+boost::optional<json> DoorCRUD::update_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -128,7 +128,7 @@ json DoorCRUD::update_impl(const json &req)
     return rep;
 }
 
-json DoorCRUD::delete_impl(const json &req)
+boost::optional<json> DoorCRUD::delete_impl(const json &req)
 {
     auto did = req.at("door_id").get<Auth::DoorId>();
     DBPtr db = ctx_.dbsrv->db();

@@ -36,6 +36,9 @@ using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
 class CRUDResourceHandler;
 using CRUDResourceHandlerUPtr = std::unique_ptr<CRUDResourceHandler>;
 
+class ExternalCRUDResourceHandler;
+using ExternalCRUDResourceHandlerUPtr = std::unique_ptr<ExternalCRUDResourceHandler>;
+
 class WebSockAPIModule;
 class WSServer;
 
@@ -43,6 +46,7 @@ struct ClientMessage;
 struct ServerMessage;
 
 class Facade;
+using FacadeUPtr = std::unique_ptr<Facade>;
 }
 }
 }

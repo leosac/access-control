@@ -42,6 +42,8 @@ class UserSecurityContext : public SecurityContext
      */
     bool is_self(Auth::UserId id) const;
 
+    Auth::UserId user_id() const;
+
   private:
     bool can_read_group(const GroupActionParam &gap) const;
 

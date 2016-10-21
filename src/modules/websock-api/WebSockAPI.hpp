@@ -44,7 +44,19 @@ namespace WebSockAPI
  * at "inproc://SERVICE.WEBSOCKET". Other modules are expected to connect to this
  * socket and issue command.
  *
+ * Todo: This doc needs to be improved.
+ *
  * ### Supported commands.
+ *
+ * #### REGISTER_MODULE
+ *
+ * Frame1: Module name
+ *
+ * This register the module name to the websocket module. It will allows
+ * websocket handler to communicate with this module. A use case is
+ * the forwarding of AccessPoint related request to their implementation
+ * modules.
+ *
  *
  * #### REGISTER_HANDLER.
  *
@@ -68,6 +80,11 @@ namespace WebSockAPI
  *
  * The module will also emit messages (when receiving message for a registered
  * handler).
+ *
+ * The internal PULL socket must be connected only by the websocketpp thread.
+ * All message received will be forwarded as is, unless the first frame is
+ * "SEND_TO_MODULE". In that case, the message will be delivered to the appropriate
+ * module. Or assert if not found.
  *
  * #### Forwarding (sent by WSServer object)
  * Frame1: Client identifier (module that registere the handler)
@@ -133,6 +150,8 @@ class WebSockAPIModule : public BaseModule
      * Our websocket server object.
      */
     std::unique_ptr<WSServer> wssrv_;
+
+    std::map<std::string, std::string> module_name_client_id_;
 };
 }
 }

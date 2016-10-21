@@ -258,3 +258,8 @@ bool UserSecurityContext::can_read_credential(
                                               DBService::THROW_IF_NOT_FOUND);
     return is_self(cred->owner_id());
 }
+
+Auth::UserId UserSecurityContext::user_id() const
+{
+    return user_id_;
+}

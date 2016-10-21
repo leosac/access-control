@@ -82,7 +82,7 @@ CredentialCRUD::required_permission(CRUDResourceHandler::Verb verb,
     return ret;
 }
 
-json CredentialCRUD::create_impl(const json &req)
+boost::optional<json> CredentialCRUD::create_impl(const json &req)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();
@@ -121,7 +121,7 @@ json CredentialCRUD::create_impl(const json &req)
     return rep;
 }
 
-json CredentialCRUD::read_impl(const json &req)
+boost::optional<json> CredentialCRUD::read_impl(const json &req)
 {
     json rep;
 
@@ -157,7 +157,7 @@ json CredentialCRUD::read_impl(const json &req)
     return rep;
 }
 
-json CredentialCRUD::update_impl(const json &req)
+boost::optional<json> CredentialCRUD::update_impl(const json &req)
 {
     json rep;
     auto cid = req.at("credential_id").get<Cred::CredentialId>();
@@ -183,7 +183,7 @@ json CredentialCRUD::update_impl(const json &req)
     return rep;
 }
 
-json CredentialCRUD::delete_impl(const json &req)
+boost::optional<json> CredentialCRUD::delete_impl(const json &req)
 {
     auto cid = req.at("credential_id").get<Cred::CredentialId>();
     auto db  = ctx_.dbsrv->db();

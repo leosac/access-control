@@ -20,15 +20,17 @@
 #include "api/AccessPointCRUD.hpp"
 #include "AccessPoint_odb.h"
 #include "Exceptions.hpp"
+#include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IAccessPointEvent.hpp"
+#include "core/auth/AccessPoint.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/serializers/AccessPointSerializer.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/db/DBService.hpp"
-
+#include <cctype>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -41,34 +43,20 @@ AccessPointCRUD::AccessPointCRUD(RequestContext ctx)
 
 CRUDResourceHandlerUPtr AccessPointCRUD::instanciate(RequestContext ctx)
 {
-    auto instance = CRUDResourceHandlerUPtr(new AccessPointCRUD(ctx));
-    return instance;
+    return CRUDResourceHandlerUPtr(new AccessPointCRUD(ctx));
 }
 
-json AccessPointCRUD::create_impl(const json &req)
+boost::optional<json> AccessPointCRUD::create_impl(const json &req)
 {
-    json rep;
-    DBPtr db = ctx_.dbsrv->db();
-    odb::transaction t(db->begin());
-
-    Auth::AccessPointPtr new_ap = std::make_shared<Auth::AccessPoint>();
-    AccessPointJSONSerializer::unserialize(*new_ap, req.at("attributes"),
-                                           security_context());
-    db->persist(new_ap);
-
-    auto audit = Audit::Factory::AccessPointEvent(db, new_ap, ctx_.audit);
-    audit->event_mask(Audit::EventType::ACCESS_POINT_CREATED);
-    audit->after(AccessPointJSONStringSerializer::serialize(
-        *new_ap, SystemSecurityContext::instance()));
-    audit->finalize();
-
-    rep["data"] = AccessPointJSONSerializer::serialize(*new_ap, security_context());
-    t.commit();
-    return rep;
+    forward_to_impl_module(
+        req, req.at("attributes").at("controller-module").get<std::string>());
+    return boost::none;
 }
 
-json AccessPointCRUD::read_impl(const json &req)
+boost::optional<json> AccessPointCRUD::read_impl(const json &req)
 {
+    // Read is not forwarded. We simply returns the informations
+    // about the base object.
     json rep;
 
     using Result = odb::result<Auth::AccessPoint>;
@@ -104,52 +92,61 @@ json AccessPointCRUD::read_impl(const json &req)
     return rep;
 }
 
-json AccessPointCRUD::update_impl(const json &req)
+boost::optional<json> AccessPointCRUD::update_impl(const json &req)
 {
-    json rep;
-    DBPtr db = ctx_.dbsrv->db();
-    odb::transaction t(db->begin());
-    auto gid = req.at("access_point_id").get<Auth::AccessPointId>();
-
-    auto ap =
-        ctx_.dbsrv->find_access_point_by_id(gid, DBService::THROW_IF_NOT_FOUND);
-    auto ap_odb = assert_cast<Auth::AccessPointPtr>(ap);
-    auto audit  = Audit::Factory::AccessPointEvent(db, ap, ctx_.audit);
-    audit->event_mask(Audit::EventType::ACCESS_POINT_UPDATED);
-    audit->before(AccessPointJSONStringSerializer::serialize(
-        *ap, SystemSecurityContext::instance()));
-    AccessPointJSONSerializer::unserialize(*ap, req.at("attributes"),
-                                           security_context());
-
-    db->update(ap_odb);
-    audit->after(AccessPointJSONStringSerializer::serialize(
-        *ap, SystemSecurityContext::instance()));
-
-    audit->finalize();
-    rep["data"] = AccessPointJSONSerializer::serialize(*ap, security_context());
-    t.commit();
-    return rep;
-}
-
-json AccessPointCRUD::delete_impl(const json &req)
-{
+    // To perform deletion, we first lookup the base access point object.
+    // We then forward the update request to its controller module.
     auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
     DBPtr db   = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 
     auto ap =
         ctx_.dbsrv->find_access_point_by_id(ap_id, DBService::THROW_IF_NOT_FOUND);
-    auto ap_odb = assert_cast<Auth::AccessPointPtr>(ap);
-    auto audit  = Audit::Factory::AccessPointEvent(db, ap, ctx_.audit);
-    audit->event_mask(Audit::EventType::ACCESS_POINT_DELETED);
-    audit->before(AccessPointJSONStringSerializer::serialize(
-        *ap, SystemSecurityContext::instance()));
+    forward_to_impl_module(req, ap->controller_module());
+    return boost::none;
+}
 
-    audit->finalize();
-    db->erase(ap_odb);
-    t.commit();
+boost::optional<json> AccessPointCRUD::delete_impl(const json &req)
+{
+    // To perform deletion, we first lookup the base access point object.
+    // We then forward the deletion request to its controller module.
+    auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
+    DBPtr db   = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
 
-    return {};
+    auto ap =
+        ctx_.dbsrv->find_access_point_by_id(ap_id, DBService::THROW_IF_NOT_FOUND);
+    forward_to_impl_module(req, ap->controller_module());
+    return boost::none;
+}
+
+void AccessPointCRUD::forward_to_impl_module(const json &req, const std::string &mod)
+{
+    // We we forward the call to the proper implementation module
+    // endpoint.
+
+    // Note that we have currently no way to make sure the module
+    // we are sending to exists. If it doesn't, Leosac may assert.
+
+    std::string controller_module = mod;
+    std::transform(controller_module.begin(), controller_module.end(),
+                   controller_module.begin(), ::tolower);
+    std::string new_type =
+        "module." + controller_module + "." + ctx_.original_msg.type;
+
+    json reconstructed = {{"uuid", ctx_.original_msg.uuid},
+                          {"type", new_type},
+                          {"content", ctx_.original_msg.content}};
+
+    // We need to emulate the behavior of WSServer::dispatch_request, so that
+    // the target module is able to handle this correctly.
+    zmqpp::message zmq_msg;
+    zmq_msg << ctx_.audit->id() << ctx_.session->connection_identifier()
+            << reconstructed.dump(4);
+
+    std::transform(controller_module.begin(), controller_module.end(),
+                   controller_module.begin(), ::toupper);
+    ctx_.server.send_to_module(controller_module, std::move(zmq_msg));
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>

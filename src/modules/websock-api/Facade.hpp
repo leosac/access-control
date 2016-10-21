@@ -22,6 +22,7 @@
 #include "LeosacFwd.hpp"
 #include "modules/websock-api/Messages.hpp"
 #include "modules/websock-api/RequestContext.hpp"
+#include "modules/websock-api/api/CRUDResourceHandler.hpp"
 #include <map>
 #include <zmqpp/zmqpp.hpp>
 
@@ -43,7 +44,18 @@ namespace WebSockAPI
 class Facade
 {
   public:
+    /**
+     * Create a Facade to interact with the websocket module.
+     */
     Facade(zmqpp::reactor &, CoreUtilsPtr utils);
+
+    /**
+     * This constructor is aimed to be used once per module.
+     *
+     * It will send the REGISTER_MODULE message at construction, to let
+     * the websocket module know who it is talking to.
+     */
+    Facade(zmqpp::reactor &, CoreUtilsPtr utils, const std::string module_name);
 
     void send_message(const std::string &connection_identifier,
                       const std::string &content);
@@ -51,12 +63,21 @@ class Facade
     void send_message(const std::string &connection_identifier,
                       const ServerMessage &msg);
 
+    /**
+     * Register a handler for a single API call.
+     * @tparam Callable
+     * @param type The name of the handler (= message type)
+     */
     template <typename Callable>
     void register_handler(const std::string &type, Callable &&c)
     {
         handlers_[type] = c;
         send_handler_registration_message(type);
     }
+
+    void
+    register_crud_handler(const std::string &type,
+                          ExternalCRUDResourceHandler::Factory crud_handler_factory);
 
   private:
     void handle_dealer();
@@ -66,9 +87,12 @@ class Facade
     ServerMessage dispatch(const ModuleRequestContext &mrc,
                            const ClientMessage &msg);
 
-    std::map<std::string, std::function<ServerMessage(const ModuleRequestContext &,
-                                                      const ClientMessage &)>>
-        handlers_;
+    using HandlerMap =
+        std::map<std::string,
+                 std::function<ServerMessage(const ModuleRequestContext &,
+                                             const ClientMessage &)>>;
+
+    HandlerMap handlers_;
     zmqpp::reactor &reactor_;
     CoreUtilsPtr utils_;
     zmqpp::socket dealer_;

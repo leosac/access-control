@@ -239,14 +239,17 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
     auto handler_factory = individual_handlers_.find(in.type);
     api_handle->hook_before_request();
 
-    // Store the database handle in the global registry.
+    // Store the database handle in the thread local registry.
     // This may be used later by serializers.
     ThreadLocalRegistry::set(ThreadLocalRegistry::DATABASE, dbsrv_->db());
 
     if (handler_factory != individual_handlers_.end())
     {
-        RequestContext ctx{
-            .session = api_handle, .dbsrv = dbsrv_, .server = *this, .audit = audit};
+        RequestContext ctx{.session      = api_handle,
+                           .dbsrv        = dbsrv_,
+                           .server       = *this,
+                           .original_msg = in,
+                           .audit        = audit};
 
         MethodHandlerUPtr method_handler = handler_factory->second(ctx);
         return method_handler->process(in);
@@ -271,8 +274,11 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
         throw InvalidCall();
     else
     {
-        RequestContext ctx{
-            .session = api_handle, .dbsrv = dbsrv_, .server = *this, .audit = audit};
+        RequestContext ctx{.session      = api_handle,
+                           .dbsrv        = dbsrv_,
+                           .server       = *this,
+                           .original_msg = in,
+                           .audit        = audit};
 
         CRUDResourceHandlerUPtr crud_handler = crud_handler_factory->second(ctx);
         return crud_handler->process(in);
@@ -415,6 +421,7 @@ void WSServer::register_external_handler(const std::string &name,
         if (has_handler(name))
         {
             // Handler already registered.
+            WARN("An websocket handler named " << name << " is already registered.");
             msg << client_id << "KO";
         }
         else
@@ -490,4 +497,15 @@ void WSServer::finalize_audit(const Audit::IWSAPICallPtr &audit, ServerMessage &
         msg.status_string = e.what();
         return;
     }
+}
+
+void WSServer::send_to_module(const std::string &module_name, zmqpp::message msg)
+{
+    msg.push_front(module_name);
+    msg.push_front("SEND_TO_MODULE");
+
+    // Note that this socket doesn't send directly to the target module.
+    // The message will be dispatched by the WebSockAPI thread.
+    bool ret = to_module_->send(msg, true);
+    ASSERT_LOG(ret, "Internal send would have blocked.");
 }

@@ -40,6 +40,11 @@ struct RequestContext
     WSServer &server;
 
     /**
+     * The original, complete, client message object.
+     */
+    const ClientMessage &original_msg;
+
+    /**
      * The initial audit trail for the request.
      * It is guaranteed that this audit object is:
      *     + Non null

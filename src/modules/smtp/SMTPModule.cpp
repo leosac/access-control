@@ -361,7 +361,7 @@ json SMTPModule::handle_ws_smtp_setconfig(
     {
         auto db = utils_->database();
         odb::transaction t(db->begin());
-        if (smtp_config_->id()) // May we don't have a persisted configuration yet
+        if (smtp_config_->id()) // Maybe we don't have a persisted configuration yet
             db->erase<SMTPConfig>(smtp_config_->id());
 
         db->persist(*cfg);

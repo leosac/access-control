@@ -56,9 +56,9 @@ class ScheduleCRUD : public CRUDResourceHandler
      *         + `description`:
      *         + `timeframes`:
      */
-    virtual json create_impl(const json &req) override;
+    virtual boost::optional<json> create_impl(const json &req) override;
 
-    virtual json read_impl(const json &req) override;
+    virtual boost::optional<json> read_impl(const json &req) override;
 
     /**
      * Update a schedule object.
@@ -78,9 +78,9 @@ class ScheduleCRUD : public CRUDResourceHandler
      *            }
      *         ]
      */
-    virtual json update_impl(const json &req) override;
+    virtual boost::optional<json> update_impl(const json &req) override;
 
-    virtual json delete_impl(const json &req) override;
+    virtual boost::optional<json> delete_impl(const json &req) override;
 };
 }
 }

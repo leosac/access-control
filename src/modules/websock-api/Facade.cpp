@@ -18,6 +18,7 @@
 */
 
 #include "Facade.hpp"
+#include "ExceptionConverter.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
@@ -26,6 +27,7 @@
 #include "tools/Colorize.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
+#include <exception>
 #include <map>
 #include <zmqpp/zmqpp.hpp>
 
@@ -43,6 +45,17 @@ Facade::Facade(zmqpp::reactor &reactor, CoreUtilsPtr utils)
 {
     dealer_.connect("inproc://SERVICE.WEBSOCKET");
     reactor_.add(dealer_, std::bind(&Facade::handle_dealer, this));
+}
+
+
+Facade::Facade(zmqpp::reactor &reactor, CoreUtilsPtr utils,
+               const std::string module_name)
+    : Facade(reactor, utils)
+{
+    zmqpp::message msg;
+    msg << "REGISTER_MODULE" << module_name;
+    bool sent = dealer_.send(msg, true);
+    ASSERT_LOG(sent, "Internal send would have blocked.");
 }
 
 void Facade::send_message(const std::string &connection_identifier,
@@ -83,7 +96,6 @@ void Facade::handle_dealer()
         ASSERT_LOG(tmp == "OK", "Something failed.");
         return;
     }
-
 
     // A websocket message has arrived.
     ASSERT_LOG(msg.parts() == 3, "Ill formed message.");
@@ -141,6 +153,44 @@ ServerMessage Facade::dispatch(const ModuleRequestContext &mrc,
     ASSERT_LOG(handler != handlers_.end(), "No handler for "
                                                << Colorize::cyan(msg.type));
     return handler->second(mrc, msg);
+}
+
+void Facade::register_crud_handler(
+    const std::string &type,
+    ExternalCRUDResourceHandler::Factory crud_handler_factory)
+{
+    auto wrapper = [=](const ModuleRequestContext &mrc,
+                       const ClientMessage &msg) -> WebSockAPI::ServerMessage {
+
+        WebSockAPI::ServerMessage response;
+        response.status_code = APIStatusCode::SUCCESS;
+        response.content     = {};
+        try
+        {
+            response.uuid = msg.uuid;
+            response.type = msg.type;
+
+            auto opt_json = crud_handler_factory(mrc)->process(msg);
+            if (opt_json)
+            {
+                response.content = *opt_json;
+            }
+        }
+        catch (...)
+        {
+            return WebSockAPI::ExceptionConverter().convert_merge(
+                std::current_exception(), response);
+        }
+        return response;
+    };
+    handlers_[type + ".read"] = wrapper;
+    send_handler_registration_message(type + ".read");
+    handlers_[type + ".update"] = wrapper;
+    send_handler_registration_message(type + ".update");
+    handlers_[type + ".create"] = wrapper;
+    send_handler_registration_message(type + ".create");
+    handlers_[type + ".delete"] = wrapper;
+    send_handler_registration_message(type + ".delete");
 }
 }
 }

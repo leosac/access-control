@@ -139,6 +139,12 @@ class WSServer
     void clear_user_sessions(Auth::UserPtr user, APIPtr exception,
                              bool new_transaction = true);
 
+    /**
+     * Can be used by internal handlers to send a message to a give
+     * Leosac module.
+     */
+    void send_to_module(const std::string &module_name, zmqpp::message msg);
+
   private:
     void on_open(websocketpp::connection_hdl hdl);
 
