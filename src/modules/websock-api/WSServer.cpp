@@ -35,6 +35,7 @@
 #include "api/search/AccessPointSearch.hpp"
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
+#include "api/search/ScheduleSearch.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
@@ -90,6 +91,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["search.group_name"]         = &GroupSearch::create;
     individual_handlers_["search.door_alias"]         = &DoorSearch::create;
     individual_handlers_["search.access_point_alias"] = &AccessPointSearch::create;
+    individual_handlers_["search.schedule_name"]      = &ScheduleSearch::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);

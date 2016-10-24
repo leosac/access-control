@@ -91,6 +91,8 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
     case Action::SCHEDULE_UPDATE:
     case Action::SCHEDULE_DELETE:
         return is_manager();
+    case Action::SCHEDULE_SEARCH:
+        return true;
 
     case Action::DOOR_READ:
     case Action::DOOR_CREATE:

@@ -84,6 +84,7 @@ class SecurityContext
         SCHEDULE_UPDATE,
         SCHEDULE_CREATE,
         SCHEDULE_DELETE,
+        SCHEDULE_SEARCH,
 
         DOOR_READ,
         DOOR_UPDATE,
