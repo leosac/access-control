@@ -41,8 +41,7 @@ struct use_name_tag
  * This is a templated class that perform case-insensitive database
  * search against entities.
  *
- * It is use to implemented the various `search.*` API endpoints.
- *
+ * It can be used to implemented the various `search.*` API endpoints.
  */
 template <typename DatabaseEntity, typename AliasOrName>
 struct EntitySearchTool

@@ -188,6 +188,7 @@ boost::optional<json> ScheduleCRUD::update_impl(const json &req)
                                                           security_context());
         db->persist(mapping);
         schedule->add_mapping(mapping);
+        mapping->schedule_ = assert_cast<Tools::SchedulePtr>(schedule);
     }
     include_schedule_mapping_infos(rep["included"], *schedule, security_context());
 

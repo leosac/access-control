@@ -86,3 +86,8 @@ const Auth::ValidityInfo &Credential::validity() const
 {
     return validity_;
 }
+
+std::vector<Tools::ScheduleMappingLWPtr> Credential::lazy_schedules_mapping() const
+{
+    return schedules_mapping_;
+}

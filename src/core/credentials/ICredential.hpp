@@ -22,6 +22,7 @@
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
 #include "tools/IVisitable.hpp"
+#include "tools/ToolsFwd.hpp"
 #include <memory>
 
 namespace Leosac
@@ -86,6 +87,13 @@ class ICredential : public virtual Tools::IVisitable
      * Retrieve validity status from the credential.
      */
     virtual const Auth::ValidityInfo &validity() const = 0;
+
+    /**
+     * Retrieve the lazy_weak_ptr to ScheduleMapping that map
+     * this credential.
+     */
+    virtual std::vector<Tools::ScheduleMappingLWPtr>
+    lazy_schedules_mapping() const = 0;
 
     /**
      * Credentials are "optimistic" object (wrt ODB). This means they

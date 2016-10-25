@@ -112,7 +112,7 @@ void ScheduleMappingJSONSerializer::unserialize(Tools::ScheduleMapping &out,
     }
 
     auto door_ids = in.at("doors");
-    out.creds_.clear();
+    out.doors_.clear();
     for (const auto &door_id : door_ids)
     {
         Auth::DoorLWPtr door(*db, door_id.get<Auth::DoorId>());

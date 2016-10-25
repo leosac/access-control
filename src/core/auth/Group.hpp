@@ -21,6 +21,7 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/UserGroupMembership.hpp"
+#include "tools/ToolsFwd.hpp"
 #include "tools/db/database.hpp"
 #include <odb/callback.hxx>
 #include <string>
@@ -77,6 +78,11 @@ class Group : public std::enable_shared_from_this<Group>
      */
     std::vector<UserLPtr> lazy_members() const;
 
+    /**
+     * Returns the vector of lazy_weak_ptr to schedule mapping.
+     */
+    std::vector<Tools::ScheduleMappingLWPtr> lazy_schedules_mapping() const;
+
     UserGroupMembershipPtr member_add(UserPtr m, GroupRank rank = GroupRank::MEMBER);
 
     IAccessProfilePtr profile();
@@ -116,6 +122,9 @@ class Group : public std::enable_shared_from_this<Group>
 
 #pragma db value_not_null inverse(group_)
     UserGroupMembershipSet membership_;
+
+#pragma db value_not_null inverse(groups_)
+    std::vector<Tools::ScheduleMappingLWPtr> schedules_mapping_;
 
 /**
  * This returns a vector of loaded User object.

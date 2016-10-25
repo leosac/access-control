@@ -150,6 +150,11 @@ bool Group::member_has(UserId user_id, GroupRank *rank_out) const
     return false;
 }
 
+std::vector<Tools::ScheduleMappingLWPtr> Group::lazy_schedules_mapping() const
+{
+    return schedules_mapping_;
+}
+
 void GroupValidator::validate(const Group &grp)
 {
     validate_name(grp.name());

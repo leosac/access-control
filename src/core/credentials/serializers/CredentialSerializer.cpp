@@ -18,6 +18,7 @@
 */
 
 #include "core/credentials/serializers/CredentialSerializer.hpp"
+#include "Schedule_odb.h"
 #include "User_odb.h"
 #include "core/SecurityContext.hpp"
 #include "core/auth/ValidityInfo.hpp"
@@ -32,6 +33,20 @@ using namespace Leosac::Cred;
 json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
                                          const SecurityContext &)
 {
+    std::set<Tools::ScheduleId> schedule_ids;
+    json schedules = {};
+    for (const Tools::ScheduleMappingLWPtr &mapping : in.lazy_schedules_mapping())
+    {
+        auto loaded = mapping.load();
+        ASSERT_LOG(loaded, "Cannot load. Need to investigate.");
+        schedule_ids.insert(loaded->schedule_.object_id());
+    }
+    for (const auto &id : schedule_ids)
+    {
+        json sched_info = {{"id", id}, {"type", "schedule"}};
+        schedules.push_back(sched_info);
+    }
+
     json serialized = {
         {"id", in.id()},
         {"type", "credential"},
@@ -50,6 +65,7 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
         serialized["relationships"]
                   ["owner"] = {{"data", {{"id", in.owner_id()}, {"type", "user"}}}};
     }
+    serialized["relationships"]["schedules"] = {{"data", schedules}};
     return serialized;
 }
 
