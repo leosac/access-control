@@ -145,7 +145,7 @@ boost::optional<json> DoorCRUD::delete_impl(const json &req)
     db->erase(door_odb);
     t.commit();
 
-    return {};
+    return json{};
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>

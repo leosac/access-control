@@ -203,5 +203,5 @@ boost::optional<json> CredentialCRUD::delete_impl(const json &req)
         db->erase<Cred::Credential>(cred->id());
         t.commit();
     }
-    return {};
+    return json{};
 }

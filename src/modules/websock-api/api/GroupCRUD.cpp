@@ -157,7 +157,7 @@ boost::optional<json> GroupCRUD::delete_impl(const json &req)
     db->erase(group);
     t.commit();
 
-    return {};
+    return json{};
 }
 
 void GroupCRUD::validate_and_unique(Auth::GroupPtr grp)

@@ -228,5 +228,5 @@ boost::optional<json> ScheduleCRUD::delete_impl(const json &req)
         db->erase<Tools::Schedule>(schedule->id());
         t.commit();
     }
-    return {};
+    return json{};
 }

@@ -116,7 +116,7 @@ boost::optional<json> MembershipCRUD::delete_impl(const json &req)
     ctx_.dbsrv->db()->erase(membership);
     audit->finalize();
     t.commit();
-    return {};
+    return json{};
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>
