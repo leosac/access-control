@@ -44,6 +44,11 @@ class UserSecurityContext : public SecurityContext
 
     Auth::UserId user_id() const;
 
+    /**
+     * Load the User object that owns this security context.
+     */
+    Auth::UserPtr self() const;
+
   private:
     bool can_read_group(const GroupActionParam &gap) const;
 
@@ -68,6 +73,10 @@ class UserSecurityContext : public SecurityContext
     bool can_delete_membership(const MembershipActionParam &map) const;
 
     bool can_read_credential(const CredentialActionParam &cap) const;
+
+    bool can_read_schedule(const ScheduleActionParam &sap) const;
+
+    bool can_read_door(const DoorActionParam &dap) const;
 
     /**
      * Helper function that returns true if the user is an administrator.

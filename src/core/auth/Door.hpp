@@ -49,6 +49,8 @@ class Door : public virtual IDoor
 
     void access_point(IAccessPointPtr ptr) override;
 
+    virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const override;
+
   protected:
 #pragma db id auto
     DoorId id_;
@@ -61,6 +63,12 @@ class Door : public virtual IDoor
      * May be null.
      */
     std::shared_ptr<AccessPoint> access_point_;
+
+/**
+ * ScheduleMapping that maps this door.
+ */
+#pragma db value_not_null inverse(doors_)
+    std::vector<Tools::ScheduleMappingLWPtr> schedules_mapping_;
 
 #pragma db version
     const size_t version_;

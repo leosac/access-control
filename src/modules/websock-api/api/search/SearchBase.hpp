@@ -118,7 +118,7 @@ struct EntitySearchTool
     std::enable_if_t<std::is_same<T, use_alias_tag>::value, json>
     build_json_entry(const DatabaseEntity entity)
     {
-        json result_json = {{"id", entity.id()}, {"alias", entity.name()}};
+        json result_json = {{"id", entity.id()}, {"alias", entity.alias()}};
         return result_json;
     }
 

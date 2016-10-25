@@ -18,6 +18,10 @@
 */
 
 #include "tools/ScheduleMapping.hpp"
+#include "Credential_odb.h"
+#include "Group_odb.h"
+#include "User_odb.h"
+#include "core/auth/User.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Tools;
@@ -25,4 +29,66 @@ using namespace Leosac::Tools;
 ScheduleMappingId ScheduleMapping::id() const
 {
     return id_;
+}
+
+bool ScheduleMapping::has_user(Auth::UserId uid) const
+{
+    for (const auto &lazy_weak_user : users_)
+    {
+        if (lazy_weak_user.object_id() == uid)
+            return true;
+    }
+    return false;
+}
+
+bool ScheduleMapping::has_group(Auth::GroupId gid) const
+{
+    for (const auto &lazy_weak_group : groups_)
+    {
+        if (lazy_weak_group.object_id() == gid)
+            return true;
+    }
+    return false;
+}
+
+bool ScheduleMapping::has_cred(Cred::CredentialId cid) const
+{
+    for (const auto &lazy_weak_cred : creds_)
+    {
+        if (lazy_weak_cred.object_id() == cid)
+            return true;
+    }
+    return false;
+}
+
+bool ScheduleMapping::has_door(Auth::DoorId did) const
+{
+    for (const auto &lazy_weak_door : doors_)
+    {
+        if (lazy_weak_door.object_id() == did)
+            return true;
+    }
+    return false;
+}
+
+bool ScheduleMapping::has_user_indirect(Auth::UserPtr user) const
+{
+    // Has user
+    if (has_user(user->id()))
+        return true;
+
+    // Has group
+    for (const auto &group_membership : user->group_memberships())
+    {
+        if (has_group(group_membership->group_id()))
+            return true;
+    }
+
+    // Has credential
+    for (const auto &lazy_credentials : user->lazy_credentials())
+    {
+        if (has_cred(lazy_credentials.object_id()))
+            return true;
+    }
+    return true;
 }

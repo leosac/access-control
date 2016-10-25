@@ -145,6 +145,9 @@ MembershipCRUD::required_permission(CRUDResourceHandler::Verb verb,
         ret.push_back(
             std::make_pair(SecurityContext::Action::GROUP_MEMBERSHIP_LEFT, map));
         break;
+    case Verb::UPDATE:
+        // No permission required as the call is not implemented.
+        break;
     }
     return ret;
 }

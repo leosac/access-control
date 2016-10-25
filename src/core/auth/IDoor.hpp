@@ -50,6 +50,12 @@ class IDoor
     virtual IAccessPointPtr access_point() const = 0;
 
     virtual void access_point(IAccessPointPtr) = 0;
+
+    /**
+     * Retrieve the lazy pointers to the ScheduleMapping objects that
+     * map this door.
+     */
+    virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const = 0;
 };
 }
 }

@@ -161,6 +161,9 @@ class User
 #pragma db value_not_null inverse(owner_)
     std::vector<Cred::CredentialLWPtr> credentials_;
 
+/**
+ * ScheduleMapping object to which we are mapped directly (as user).
+ */
 #pragma db value_not_null inverse(users_)
     std::vector<Tools::ScheduleMappingLWPtr> schedules_mapping_;
 

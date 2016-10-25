@@ -21,10 +21,13 @@
 #include "Group_odb.h"
 #include "User_odb.h"
 #include "core/auth/Group.hpp"
+#include "core/auth/IDoor.hpp"
 #include "core/auth/User.hpp"
+#include "tools/ScheduleMapping.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
+#include <tools/db/MultiplexedTransaction.hpp>
 
 using namespace Leosac;
 
@@ -87,6 +90,7 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
         return is_manager();
 
     case Action::SCHEDULE_READ:
+        return can_read_schedule(ap.sched);
     case Action::SCHEDULE_CREATE:
     case Action::SCHEDULE_UPDATE:
     case Action::SCHEDULE_DELETE:
@@ -95,6 +99,7 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
         return true;
 
     case Action::DOOR_READ:
+        return can_read_door(ap.door);
     case Action::DOOR_CREATE:
     case Action::DOOR_UPDATE:
     case Action::DOOR_DELETE:
@@ -229,6 +234,57 @@ bool UserSecurityContext::can_delete_membership(
     return false;
 }
 
+bool UserSecurityContext::can_read_schedule(
+    const SecurityContext::ScheduleActionParam &cap) const
+{
+    if (is_manager() || cap.schedule_id == 0)
+        return true;
+
+    Tools::ISchedulePtr sched =
+        dbsrv_->find_schedule_by_id(cap.schedule_id, DBService::THROW_IF_NOT_FOUND);
+    // We need to find out is assigned to the schedule.
+    // If it is, we can read the schedule's data.
+    // Todo: Maybe have more fine grained permission here, like being able to read
+    // timeframes and door mapped but not everything.
+
+    for (const auto &mapping : sched->mapping())
+    {
+        if (mapping->has_user_indirect(self()))
+            return true;
+    }
+    return false;
+}
+
+bool UserSecurityContext::can_read_door(
+    const SecurityContext::DoorActionParam &dap) const
+{
+    if (is_manager() || dap.door_id == 0)
+        return true;
+
+    db::MultiplexedTransaction t(dbsrv_->db()->begin());
+    Auth::IDoorPtr door =
+        dbsrv_->find_door_by_id(dap.door_id, DBService::THROW_IF_NOT_FOUND);
+    for (const auto &mapping : door->lazy_mapping())
+    {
+        auto loaded_mapping = mapping.load();
+        if (loaded_mapping->has_user_indirect(self()))
+            return true;
+    }
+    return false;
+}
+
+bool UserSecurityContext::can_read_credential(
+    const SecurityContext::CredentialActionParam &cap) const
+{
+    if (is_manager() || cap.credential_id == 0)
+        return true;
+
+    auto cred = dbsrv_->find_credential_by_id(cap.credential_id,
+                                              DBService::THROW_IF_NOT_FOUND);
+    return is_self(cred->owner_id());
+}
+
+
 bool UserSecurityContext::is_admin() const
 {
     auto user = dbsrv_->find_user_by_id(user_id_);
@@ -250,18 +306,12 @@ bool UserSecurityContext::is_self(Auth::UserId id) const
     return user_id_ == id;
 }
 
-bool UserSecurityContext::can_read_credential(
-    const SecurityContext::CredentialActionParam &cap) const
-{
-    if (is_manager() || cap.credential_id == 0)
-        return true;
-
-    auto cred = dbsrv_->find_credential_by_id(cap.credential_id,
-                                              DBService::THROW_IF_NOT_FOUND);
-    return is_self(cred->owner_id());
-}
-
 Auth::UserId UserSecurityContext::user_id() const
 {
     return user_id_;
+}
+
+Auth::UserPtr UserSecurityContext::self() const
+{
+    return dbsrv_->find_user_by_id(user_id_, DBService::THROW_IF_NOT_FOUND);
 }

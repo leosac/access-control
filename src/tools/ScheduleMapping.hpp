@@ -38,6 +38,36 @@ struct ScheduleMapping
 {
     ScheduleMappingId id() const;
 
+    /**
+     * Check if the user with id `uid` is directly part of the
+     * mapping.
+     */
+    bool has_user(Auth::UserId) const;
+
+    /**
+     * Check if the group is directly mapping by the ScheduleMapping object.
+     */
+    bool has_group(Auth::GroupId) const;
+
+    /**
+     * Check if the credential is mapped by this ScheduleMapping.
+     */
+    bool has_cred(Cred::CredentialId) const;
+
+    /**
+     * Check if the door is mapped by this object.
+     */
+    bool has_door(Auth::DoorId) const;
+
+    /**
+     * Check wether the user is mapped, either directly or not, by
+     * this ScheduleMapping object.
+     *
+     * Being mapped indirectly means that either at least one of the user's
+     * groups or credential is mapped.
+     */
+    bool has_user_indirect(Auth::UserPtr) const;
+
 #pragma db id auto
     ScheduleMappingId id_;
 
