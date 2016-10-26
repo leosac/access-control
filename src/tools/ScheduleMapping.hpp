@@ -73,18 +73,22 @@ struct ScheduleMapping
 
 #pragma db id_column("schedule_mapping_id") value_column("user_id")
 #pragma db value_not_null unordered
+#pragma db on_delete(cascade)
     std::vector<Auth::UserLWPtr> users_;
 
 #pragma db id_column("schedule_mapping_id") value_column("group_id")
 #pragma db value_not_null unordered
+#pragma db on_delete(cascade)
     std::vector<Auth::GroupLWPtr> groups_;
 
 #pragma db id_column("schedule_mapping_id") value_column("credential_id")
 #pragma db value_not_null unordered
+#pragma db on_delete(cascade)
     std::vector<Cred::CredentialLWPtr> creds_;
 
 #pragma db id_column("schedule_mapping_id") value_column("door_id")
 #pragma db value_not_null unordered
+#pragma db on_delete(cascade)
     std::vector<Auth::DoorLWPtr> doors_;
 
 /**
