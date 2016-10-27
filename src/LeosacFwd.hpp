@@ -50,4 +50,18 @@ using SyncConfigPtr = std::shared_ptr<SyncConfig>;
 class FetchRemoteConfig;
 using FetchRemoteConfigPtr = std::shared_ptr<FetchRemoteConfig>;
 }
+
+/**
+ * This is class that can be used to access some object's internal.
+ *
+ * It is used for implementing some unittest.
+ */
+struct TestAccess
+{
+    template <typename T, typename IdT>
+    static void set_id(T &obj, IdT id)
+    {
+        obj.id_ = id;
+    }
+};
 }

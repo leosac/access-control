@@ -34,7 +34,7 @@ namespace Tools
  * This object is designed to be embedded into Schedule object.
  */
 #pragma db object optimistic
-struct ScheduleMapping
+struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
 {
     ScheduleMappingId id() const;
 
@@ -67,6 +67,14 @@ struct ScheduleMapping
      * groups or credential is mapped.
      */
     bool has_user_indirect(Auth::UserPtr) const;
+
+    /**
+     * Add a door to the mapping.
+     *
+     * This call properly notify the door object (if eager) that a
+     * ScheduleMapping has added it into its mapping.
+     */
+    void add_door(const Auth::DoorLPtr &door);
 
 #pragma db id auto
     ScheduleMappingId id_;

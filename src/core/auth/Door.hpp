@@ -51,6 +51,15 @@ class Door : public virtual IDoor
 
     virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const override;
 
+    /**
+     * A ScheduleMapping object has added this door as part of its mapping.
+     *
+     * This method is called by the ScheduleMapping to give a chance to the
+     * door to maintain its inverse vector.
+     * @param sched_mapping
+     */
+    void schedule_mapping_added(const Tools::ScheduleMappingPtr &sched_mapping);
+
   protected:
 #pragma db id auto
     DoorId id_;

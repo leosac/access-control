@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "tools/ISchedule.hpp"
 #include "tools/ScheduleMapping.hpp"
 #include "tools/SingleTimeFrame.hpp"
@@ -73,6 +74,7 @@ class Schedule : public virtual ISchedule
 
   private:
     friend class odb::access;
+    friend class ::Leosac::TestAccess;
 
 #pragma db id auto
     ScheduleId id_;

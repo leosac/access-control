@@ -19,43 +19,44 @@
 
 #pragma once
 
-#include "core/auth/AuthFwd.hpp"
-#include "core/auth/Interfaces/IAccessProfile.hpp"
-#include "core/auth/UserGroupMembership.hpp"
-#include "core/auth/ValidityInfo.hpp"
-#include "core/credentials/CredentialFwd.hpp"
+#include "core/audit/IAuditTracker.hpp"
 #include "tools/db/database.hpp"
-#include "tools/scrypt/Scrypt.hpp"
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <memory>
+#include <odb/core.hxx>
 
 namespace Leosac
 {
-namespace Auth
+namespace Audit
 {
-
 /**
- * A door.
+ * Implementation of IAuditTracker, backed by ODB.
+ *
+ * @see IAuditTracker
  */
-class IDoor : public std::enable_shared_from_this<IDoor>
+#pragma db value
+class AuditTracker // : virtual public IAuditTracker
 {
   public:
-    virtual DoorId id() const = 0;
+    AuditTracker() = default;
 
-    virtual std::string alias() const       = 0;
-    virtual std::string description() const = 0;
+    AuditTracker(const AuditEntry &) = delete;
 
-    virtual void alias(const std::string &alias)      = 0;
-    virtual void description(const std::string &desc) = 0;
+    virtual ~AuditTracker() = default;
 
-    virtual IAccessPointPtr access_point() const = 0;
+    virtual AuditEntryId last_id() const; // override;
 
-    virtual void access_point(IAccessPointPtr) = 0;
-
+  private:
     /**
-     * Retrieve the lazy pointers to the ScheduleMapping objects that
-     * map this door.
+     * The last audit entry we kept track of.
      */
-    virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const = 0;
+    odb::lazy_shared_ptr<AuditEntry> last_;
+
+    friend class odb::access;
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "core/audit/AuditEntry.hpp"
+#endif

@@ -21,7 +21,9 @@
 #include "Credential_odb.h"
 #include "Group_odb.h"
 #include "User_odb.h"
+#include "core/auth/Door.hpp"
 #include "core/auth/User.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Tools;
@@ -90,5 +92,14 @@ bool ScheduleMapping::has_user_indirect(Auth::UserPtr user) const
         if (has_cred(lazy_credentials.object_id()))
             return true;
     }
-    return true;
+    return false;
+}
+
+void ScheduleMapping::add_door(const Auth::DoorLPtr &door)
+{
+    ASSERT_LOG(door, "Cannot add a null door to a ScheduleMapping.");
+
+    doors_.push_back(door);
+    if (door.get_eager())
+        door->schedule_mapping_added(shared_from_this());
 }

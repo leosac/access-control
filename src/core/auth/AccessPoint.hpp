@@ -67,6 +67,12 @@ class AccessPoint : public virtual IAccessPoint
 
   private:
     friend class odb::access;
+
+    /**
+     * We are friend with Door so Door can set the inverse pointer (`door_`)
+     * when the access-point is set on a door.
+     */
+    friend class Door;
 };
 }
 }

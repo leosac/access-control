@@ -61,9 +61,17 @@ IAccessPointPtr Door::access_point() const
 void Door::access_point(IAccessPointPtr ptr)
 {
     access_point_ = assert_cast<AccessPointPtr>(ptr);
+    if (access_point_)
+        access_point_->door_ = assert_cast<DoorPtr>(shared_from_this());
 }
 
 std::vector<Leosac::Tools::ScheduleMappingLWPtr> Door::lazy_mapping() const
 {
     return schedules_mapping_;
+}
+
+void Door::schedule_mapping_added(
+    const Leosac::Tools::ScheduleMappingPtr &sched_mapping)
+{
+    schedules_mapping_.push_back(sched_mapping);
 }

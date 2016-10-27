@@ -43,7 +43,11 @@ class UserEvent : virtual public IUserEvent, public AuditEntry
   public:
     virtual ~UserEvent() = default;
 
+    static std::shared_ptr<UserEvent> create_empty();
+
     virtual void target(Auth::UserPtr user) override;
+
+    virtual Auth::UserLPtr target() const override;
 
     Auth::UserId target_id() const override;
 

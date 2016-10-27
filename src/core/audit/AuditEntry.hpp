@@ -22,12 +22,12 @@
 #include "core/audit/AuditFwd.hpp"
 #include "core/audit/IAuditEntry.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "tools/ElapsedTimeCounter.hpp"
 #include "tools/db/database.hpp"
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <memory>
 #include <odb/callback.hxx>
 #include <odb/core.hxx>
-#include <tools/ElapsedTimeCounter.hpp>
 
 namespace Leosac
 {

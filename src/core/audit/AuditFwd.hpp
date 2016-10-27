@@ -38,6 +38,9 @@ class Factory;
 class IAuditEntry;
 using IAuditEntryPtr = std::shared_ptr<IAuditEntry>;
 
+class IAuditTracker;
+using IAuditTrackerPtr = std::shared_ptr<IAuditTracker>;
+
 class IUserEvent;
 using IUserEventPtr = std::shared_ptr<IUserEvent>;
 
@@ -69,6 +72,10 @@ using IAccessPointEventPtr = std::shared_ptr<IAccessPointEvent>;
 class AuditEntry;
 using AuditEntryPtr  = std::shared_ptr<AuditEntry>;
 using AuditEntryWPtr = std::weak_ptr<AuditEntry>;
+
+class AuditTracker;
+using AuditTrackerPtr  = std::shared_ptr<AuditTracker>;
+using AuditTrackerWPtr = std::weak_ptr<AuditTracker>;
 
 class WSAPICall;
 using WSAPICallUPtr = std::unique_ptr<WSAPICall>;

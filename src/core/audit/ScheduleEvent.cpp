@@ -52,8 +52,14 @@ ScheduleEvent::create(const DBPtr &database, Tools::ISchedulePtr target_sched,
     return audit;
 }
 
+std::shared_ptr<ScheduleEvent> ScheduleEvent::create_empty()
+{
+    return std::shared_ptr<ScheduleEvent>(new Audit::ScheduleEvent());
+}
+
 void ScheduleEvent::target(Tools::ISchedulePtr sched)
 {
+    ASSERT_LOG(sched, "sched must not be null.");
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     if (sched)
         ASSERT_LOG(sched->id(), "Schedule has no id.");

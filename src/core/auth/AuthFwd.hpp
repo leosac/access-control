@@ -105,6 +105,7 @@ using DoorId     = unsigned long;
 
 class Door;
 using DoorLWPtr = odb::lazy_weak_ptr<Door>;
+using DoorLPtr  = odb::lazy_shared_ptr<Door>;
 using DoorPtr   = std::shared_ptr<Door>;
 
 class IAccessPoint;

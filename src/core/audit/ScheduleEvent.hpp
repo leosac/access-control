@@ -43,6 +43,11 @@ class ScheduleEvent : virtual public IScheduleEvent, public AuditEntry
                                                  AuditEntryPtr parent);
 
   public:
+    /**
+     * A factory function for usage in tests.
+     */
+    static std::shared_ptr<ScheduleEvent> create_empty();
+
     virtual ~ScheduleEvent() = default;
 
     virtual void target(Tools::ISchedulePtr sch) override;

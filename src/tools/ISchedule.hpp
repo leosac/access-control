@@ -28,15 +28,14 @@ namespace Leosac
 {
 namespace Tools
 {
-/**    using namespace Leosac::JSONUtil;
-
+/*
  * The interface for Schedule object.
  *
  * This class is not "ODB aware". Its main purpose
  * is to prevent too many includes for clients that do not need
  * to interact with the database.
  */
-class ISchedule
+class ISchedule : public std::enable_shared_from_this<ISchedule>
 {
   public:
     virtual ~ISchedule() = default;

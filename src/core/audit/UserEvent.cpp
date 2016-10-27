@@ -115,3 +115,13 @@ std::string UserEvent::generate_target_description() const
         desc["username"] = t->username();
     return desc.dump();
 }
+
+std::shared_ptr<UserEvent> UserEvent::create_empty()
+{
+    return UserEventPtr(new UserEvent());
+}
+
+Auth::UserLPtr UserEvent::target() const
+{
+    return target_.lock();
+}

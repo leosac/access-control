@@ -18,6 +18,7 @@
 */
 
 #include "tools/Schedule.hpp"
+#include "AssertCast.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/log.hpp"
 
@@ -87,6 +88,8 @@ void Schedule::clear_timeframes()
 
 void Schedule::add_mapping(const ScheduleMappingPtr &map)
 {
+    ASSERT_LOG(map, "Cannot add a null mapping.");
+    map->schedule_ = assert_cast<SchedulePtr>(shared_from_this());
     mapping_.push_back(map);
 }
 

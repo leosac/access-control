@@ -44,6 +44,8 @@ class IUserEvent : virtual public IAuditEntry
      */
     virtual void target(Auth::UserPtr user) = 0;
 
+    virtual Auth::UserLPtr target() const = 0;
+
     /**
      * Retrieve the user_id that was targeted by this event.
      */
