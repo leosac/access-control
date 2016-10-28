@@ -126,3 +126,8 @@ std::string AccessPointEvent::generate_target_description() const
 
     return desc.dump();
 }
+
+AccessPointEventPtr AccessPointEvent::create_empty()
+{
+    return AccessPointEventPtr(new AccessPointEvent());
+}

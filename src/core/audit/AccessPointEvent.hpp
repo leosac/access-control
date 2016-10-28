@@ -44,6 +44,8 @@ class AccessPointEvent : virtual public IAccessPointEvent, public AuditEntry
   public:
     virtual ~AccessPointEvent() = default;
 
+    static std::shared_ptr<AccessPointEvent> create_empty();
+
     virtual void target(Auth::IAccessPointPtr door) override;
 
     Auth::AccessPointId target_id() const override;

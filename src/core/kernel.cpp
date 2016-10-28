@@ -573,17 +573,17 @@ void Kernel::configure_database()
                     transaction t(database_->begin());
                     schema_catalog::create_schema(*database_, "tools");
 
-                    Tools::Schedule sched;
-                    sched.name("DummySchedule");
-                    sched.description("A test schedule, with mapping.");
+                    Tools::SchedulePtr sched = std::make_shared<Tools::Schedule>();
+                    sched->name("DummySchedule");
+                    sched->description("A test schedule, with mapping.");
                     Tools::ScheduleMappingPtr map0 =
                         std::make_shared<ScheduleMapping>();
-                    map0->users_.push_back(admin);
-                    map0->groups_.push_back(users);
-                    map0->creds_.push_back(card);
-                    map0->alias_ = "My first mapping";
+                    map0->add_user(admin);
+                    map0->add_group(users);
+                    map0->add_credential(card);
+                    map0->alias("My first mapping");
                     database_->persist(map0);
-                    sched.add_mapping(map0);
+                    sched->add_mapping(map0);
                     database_->persist(sched);
 
                     t.commit();

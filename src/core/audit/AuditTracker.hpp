@@ -46,6 +46,11 @@ class AuditTracker // : virtual public IAuditTracker
 
     virtual AuditEntryId last_id() const; // override;
 
+    /**
+     * Set the last tracked audit entry.
+     */
+    void last(AuditEntryLPtr);
+
   private:
     /**
      * The last audit entry we kept track of.

@@ -35,24 +35,24 @@ json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
     json serialized = {
         {"id", in.id()},
         {"type", "schedule-mapping"},
-        {"attributes", {{"alias", in.alias_}, {"version", in.odb_version_}}}};
+        {"attributes", {{"alias", in.alias()}, {"version", in.odb_version()}}}};
 
     json users = json::array();
-    for (const auto &user : in.users_)
+    for (const auto &user : in.users())
     {
         json json_user = {{"id", user.object_id()}, {"type", "user"}};
         users.push_back(json_user);
     }
 
     json groups = json::array();
-    for (const auto &group : in.groups_)
+    for (const auto &group : in.groups())
     {
         json json_group = {{"id", group.object_id()}, {"type", "group"}};
         groups.push_back(json_group);
     }
 
     json creds = json::array();
-    for (const auto &cred : in.creds_)
+    for (const auto &cred : in.credentials())
     {
         // Credentials needs to be loaded to determine the underlying type.
         // This is done silently by the serializer.
@@ -63,7 +63,7 @@ json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
     }
 
     json doors = json::array();
-    for (const auto &door : in.doors_)
+    for (const auto &door : in.doors())
     {
         json json_door = {{"id", door.object_id()}, {"type", "door"}};
         doors.push_back(json_door);
@@ -84,39 +84,39 @@ void ScheduleMappingJSONSerializer::unserialize(Tools::ScheduleMapping &out,
     // We need to database to build Lazy pointer from object's identifier.
     auto db = ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
     using namespace JSONUtil;
-    out.alias_ = extract_with_default(in, "alias", out.alias_);
+    out.alias(extract_with_default(in, "alias", out.alias()));
 
     auto group_ids = in.at("groups");
-    out.groups_.clear();
+    out.clear_groups();
     for (const auto &group_id : group_ids)
     {
         auto group = Auth::GroupLPtr(*db, group_id.get<Tools::ScheduleMappingId>());
-        out.groups_.push_back(group);
+        out.add_group(group);
     }
 
     auto user_ids = in.at("users");
-    out.users_.clear();
+    out.clear_users();
     for (const auto &user_id : user_ids)
     {
         Auth::UserLPtr user(*db, user_id.get<Auth::UserId>());
-        out.users_.push_back(user);
+        out.add_user(user);
     }
 
     auto credential_ids = in.at("credentials");
-    out.creds_.clear();
+    out.clear_credential();
     for (const auto &credential_id : credential_ids)
     {
         Cred::CredentialLPtr credential(*db,
                                         credential_id.get<Cred::CredentialId>());
-        out.creds_.push_back(credential);
+        out.add_credential(credential);
     }
 
     auto door_ids = in.at("doors");
-    out.doors_.clear();
+    out.clear_doors();
     for (const auto &door_id : door_ids)
     {
-        Auth::DoorLWPtr door(*db, door_id.get<Auth::DoorId>());
-        out.doors_.push_back(door);
+        Auth::DoorLPtr door(*db, door_id.get<Auth::DoorId>());
+        out.add_door(door);
     }
 }
 

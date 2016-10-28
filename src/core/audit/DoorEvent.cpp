@@ -124,3 +124,8 @@ std::string DoorEvent::generate_target_description() const
 
     return desc.dump();
 }
+
+std::shared_ptr<DoorEvent> DoorEvent::create_empty()
+{
+    return std::shared_ptr<DoorEvent>(new DoorEvent());
+}

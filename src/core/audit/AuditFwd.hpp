@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <flagset.hpp>
 #include <memory>
+#include <odb/lazy-ptr.hxx>
 
 namespace Leosac
 {
@@ -70,6 +71,7 @@ using IAccessPointEventPtr = std::shared_ptr<IAccessPointEvent>;
  */
 
 class AuditEntry;
+using AuditEntryLPtr = odb::lazy_shared_ptr<AuditEntry>;
 using AuditEntryPtr  = std::shared_ptr<AuditEntry>;
 using AuditEntryWPtr = std::weak_ptr<AuditEntry>;
 

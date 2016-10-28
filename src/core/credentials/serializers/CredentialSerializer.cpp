@@ -39,7 +39,7 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
     {
         auto loaded = mapping.load();
         ASSERT_LOG(loaded, "Cannot load. Need to investigate.");
-        schedule_ids.insert(loaded->schedule_.object_id());
+        schedule_ids.insert(loaded->schedule_id());
     }
     for (const auto &id : schedule_ids)
     {

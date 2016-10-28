@@ -63,7 +63,10 @@ class IVisitable
             p->visit(visited);
             return;
         }
-        assert(0 && "Cannot visit.");
+        else
+        {
+            visitor.cannot_visit(static_cast<const IVisitable &>(visited));
+        }
     }
 
 /**

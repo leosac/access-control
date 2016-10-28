@@ -133,6 +133,12 @@ class User
 
     std::vector<Tools::ScheduleMappingLWPtr> lazy_schedules_mapping() const;
 
+    /**
+     * The user has been mapped by a schedule.
+     * @see Auth::Door::schedule_mapping_added
+     */
+    void schedule_mapping_added(const Tools::ScheduleMappingPtr &sched_mapping);
+
   protected:
 #pragma db id auto
     UserId id_;

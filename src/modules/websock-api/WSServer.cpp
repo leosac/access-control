@@ -203,7 +203,16 @@ void WSServer::start_shutdown()
         srv_.stop_listening();
         for (auto con_session : connection_session_)
         {
-            srv_.close(con_session.first, 0, "bye");
+            websocketpp::lib::error_code ec;
+            srv_.close(con_session.first, 0, "bye", ec);
+            if (ec.value() == websocketpp::error::value::invalid_state)
+            {
+                // Maybe the connection is already dead at this point.
+                // We can then safely ignore this error code.
+                continue;
+            }
+            ASSERT_LOG(ec.value() == 0,
+                       BUILD_STR("Websocketpp error: " << ec.message()));
         }
     });
 }

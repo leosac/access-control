@@ -91,3 +91,9 @@ std::vector<Tools::ScheduleMappingLWPtr> Credential::lazy_schedules_mapping() co
 {
     return schedules_mapping_;
 }
+
+void Credential::schedule_mapping_added(
+    const Tools::ScheduleMappingPtr &sched_mapping)
+{
+    schedules_mapping_.push_back(sched_mapping);
+}

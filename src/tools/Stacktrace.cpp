@@ -30,7 +30,7 @@ using namespace Leosac::Tools;
 Stacktrace::Stacktrace(uint skip /* = 0 */)
 {
     auto cb_error = [](void * /*data*/, const char *msg, int errnum) {
-        ERROR("Problem when generation stacktrace: " << msg
+        ERROR("Problem when generating stacktrace: " << msg
                                                      << ". Error code: " << errnum);
     };
 

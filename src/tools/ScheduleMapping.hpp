@@ -38,6 +38,21 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
 {
     ScheduleMappingId id() const;
 
+    const std::string &alias() const;
+    void alias(const std::string &);
+
+    /**
+     * Retrieve the id of the owning schedule.
+     */
+    ScheduleId schedule_id() const;
+
+    const std::vector<Auth::UserLWPtr> &users() const;
+    const std::vector<Auth::GroupLWPtr> &groups() const;
+    const std::vector<Cred::CredentialLWPtr> &credentials() const;
+    const std::vector<Auth::DoorLWPtr> &doors() const;
+
+    size_t odb_version() const;
+
     /**
      * Check if the user with id `uid` is directly part of the
      * mapping.
@@ -76,9 +91,42 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
      */
     void add_door(const Auth::DoorLPtr &door);
 
+    void clear_doors();
+
+    /**
+     * Add a user to the mapping.
+     *
+     * This call will notify the user object (when possible) that it has
+     * been added to the mapping.
+     */
+    void add_user(const Auth::UserLPtr &user);
+
+    void clear_users();
+
+    /**
+     * Add a group to the mapping.
+     *
+     * This call will notify the group object (when possible) that it has
+     * been added to the mapping.
+     */
+    void add_group(const Auth::GroupLPtr &group);
+
+    void clear_groups();
+
+    /**
+     * Add a credential to the mapping.
+     *
+     * This call will notify the credential object (when possible) that it has
+     * been added to the mapping.
+     */
+    void add_credential(const Cred::CredentialLPtr &cred);
+
+    void clear_credential();
+
 #pragma db id auto
     ScheduleMappingId id_;
 
+  protected:
 #pragma db id_column("schedule_mapping_id") value_column("user_id")
 #pragma db value_not_null unordered
 #pragma db on_delete(cascade)
@@ -112,6 +160,10 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
 
 #pragma db version
     size_t odb_version_;
+
+  private:
+    friend class Schedule;
+    friend class odb::access;
 };
 }
 }

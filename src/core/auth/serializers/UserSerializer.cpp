@@ -19,7 +19,6 @@
 
 #include "core/auth/serializers/UserSerializer.hpp"
 #include "Credential_odb.h"
-#include "ScheduleMapping_odb.h"
 #include "Schedule_odb.h"
 #include "core/SecurityContext.hpp"
 #include "core/auth/User.hpp"
@@ -67,7 +66,7 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
     {
         auto loaded = mapping.load();
         ASSERT_LOG(loaded, "Cannot load. Need to investigate.");
-        schedule_ids.insert(loaded->schedule_.object_id());
+        schedule_ids.insert(loaded->schedule_id());
     }
     for (const auto &id : schedule_ids)
     {

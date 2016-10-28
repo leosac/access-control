@@ -19,12 +19,15 @@
 
 #pragma once
 
+#include <cassert>
 #include <type_traits>
 
 namespace Leosac
 {
 namespace Tools
 {
+
+class IVisitable;
 
 /**
  * Base class for visitor, should not be used directly.
@@ -36,6 +39,14 @@ class BaseVisitor
 {
   public:
     virtual ~BaseVisitor() = default;
+
+    /**
+     * Invoked when the visitable cannot be visited by the visitor.
+     */
+    virtual void cannot_visit(const IVisitable &)
+    {
+        assert(0 && "Cannot visit");
+    }
 };
 
 class IVisitable;

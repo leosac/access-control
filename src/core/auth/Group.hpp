@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "tools/ToolsFwd.hpp"
@@ -106,9 +107,16 @@ class Group : public std::enable_shared_from_this<Group>
      */
     bool member_has(Auth::UserId user_id, GroupRank *rank_out = nullptr) const;
 
+    /**
+     * The group has been mapped by a schedule.
+     * @see Auth::Door::schedule_mapping_added
+     */
+    void schedule_mapping_added(const Tools::ScheduleMappingPtr &sched_mapping);
+
   private:
     friend class odb::access;
     friend class GroupValidator;
+    friend class Leosac::TestAccess;
 
     void odb_callback(odb::callback_event e, odb::database &) const;
 

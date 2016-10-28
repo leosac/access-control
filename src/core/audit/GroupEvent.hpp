@@ -43,6 +43,8 @@ class GroupEvent : virtual public IGroupEvent, public AuditEntry
   public:
     virtual ~GroupEvent() = default;
 
+    static std::shared_ptr<GroupEvent> create_empty();
+
     virtual void target(Auth::GroupPtr grp) override;
 
     virtual void before(const std::string &repr) override;

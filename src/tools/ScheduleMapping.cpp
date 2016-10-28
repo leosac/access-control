@@ -20,9 +20,12 @@
 #include "tools/ScheduleMapping.hpp"
 #include "Credential_odb.h"
 #include "Group_odb.h"
+#include "ScheduleMapping_odb.h"
 #include "User_odb.h"
 #include "core/auth/Door.hpp"
+#include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
+#include "core/credentials/Credential.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac;
@@ -31,6 +34,23 @@ using namespace Leosac::Tools;
 ScheduleMappingId ScheduleMapping::id() const
 {
     return id_;
+}
+
+const std::string &ScheduleMapping::alias() const
+{
+    return alias_;
+}
+
+void ScheduleMapping::alias(const std::string &a)
+{
+    alias_ = a;
+}
+
+ScheduleId ScheduleMapping::schedule_id() const
+{
+    if (schedule_.lock())
+        return schedule_.object_id();
+    return 0;
 }
 
 bool ScheduleMapping::has_user(Auth::UserId uid) const
@@ -102,4 +122,76 @@ void ScheduleMapping::add_door(const Auth::DoorLPtr &door)
     doors_.push_back(door);
     if (door.get_eager())
         door->schedule_mapping_added(shared_from_this());
+}
+
+void ScheduleMapping::add_user(const Auth::UserLPtr &user)
+{
+    ASSERT_LOG(user, "Cannot add a null user to a ScheduleMapping.");
+
+    users_.push_back(user);
+    if (user.get_eager())
+        user->schedule_mapping_added(shared_from_this());
+}
+
+void ScheduleMapping::add_group(const Auth::GroupLPtr &group)
+{
+    ASSERT_LOG(group, "Cannot add a null group to a ScheduleMapping.");
+
+    groups_.push_back(group);
+    if (group.get_eager())
+        group->schedule_mapping_added(shared_from_this());
+}
+
+void ScheduleMapping::add_credential(const Cred::CredentialLPtr &cred)
+{
+    ASSERT_LOG(cred, "Cannot add a null creential to a ScheduleMapping.");
+
+    creds_.push_back(cred);
+    if (cred.get_eager())
+        cred->schedule_mapping_added(shared_from_this());
+}
+
+const std::vector<Auth::UserLWPtr> &ScheduleMapping::users() const
+{
+    return users_;
+}
+
+const std::vector<Auth::GroupLWPtr> &ScheduleMapping::groups() const
+{
+    return groups_;
+}
+
+const std::vector<Cred::CredentialLWPtr> &ScheduleMapping::credentials() const
+{
+    return creds_;
+}
+
+const std::vector<Auth::DoorLWPtr> &ScheduleMapping::doors() const
+{
+    return doors_;
+}
+
+void ScheduleMapping::clear_doors()
+{
+    doors_.clear();
+}
+
+void ScheduleMapping::clear_users()
+{
+    users_.clear();
+}
+
+void ScheduleMapping::clear_groups()
+{
+    groups_.clear();
+}
+
+void ScheduleMapping::clear_credential()
+{
+    creds_.clear();
+}
+
+size_t ScheduleMapping::odb_version() const
+{
+    return odb_version_;
 }

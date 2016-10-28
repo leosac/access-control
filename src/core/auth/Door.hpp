@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/IDoor.hpp"
 
@@ -84,6 +85,7 @@ class Door : public virtual IDoor
 
   private:
     friend class odb::access;
+    friend class Leosac::TestAccess;
 };
 }
 }

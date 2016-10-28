@@ -56,8 +56,8 @@ class Stacktrace
         }
 
         /**
-         * Flaged as true if the frame repsents
-         * an unkown function.
+         * Flagged as true if the frame represents
+         * an unknown function.
          */
         bool suppressed_;
         std::string function_;

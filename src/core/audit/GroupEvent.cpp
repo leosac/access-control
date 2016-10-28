@@ -118,3 +118,8 @@ std::string GroupEvent::generate_target_description() const
 
     return desc.dump();
 }
+
+std::shared_ptr<GroupEvent> GroupEvent::create_empty()
+{
+    return GroupEventPtr(new GroupEvent());
+}

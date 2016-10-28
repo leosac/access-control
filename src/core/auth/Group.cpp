@@ -155,6 +155,11 @@ std::vector<Tools::ScheduleMappingLWPtr> Group::lazy_schedules_mapping() const
     return schedules_mapping_;
 }
 
+void Group::schedule_mapping_added(const Tools::ScheduleMappingPtr &sched_mapping)
+{
+    schedules_mapping_.push_back(sched_mapping);
+}
+
 void GroupValidator::validate(const Group &grp)
 {
     validate_name(grp.name());

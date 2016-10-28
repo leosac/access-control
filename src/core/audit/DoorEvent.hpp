@@ -43,6 +43,8 @@ class DoorEvent : virtual public IDoorEvent, public AuditEntry
   public:
     virtual ~DoorEvent() = default;
 
+    static std::shared_ptr<DoorEvent> create_empty();
+
     virtual void target(Auth::IDoorPtr door) override;
 
     Auth::DoorId target_id() const override;

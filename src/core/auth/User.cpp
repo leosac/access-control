@@ -171,3 +171,9 @@ std::vector<Leosac::Tools::ScheduleMappingLWPtr> User::lazy_schedules_mapping() 
 {
     return schedules_mapping_;
 }
+
+void User::schedule_mapping_added(
+    const Leosac::Tools::ScheduleMappingPtr &sched_mapping)
+{
+    schedules_mapping_.push_back(sched_mapping);
+}

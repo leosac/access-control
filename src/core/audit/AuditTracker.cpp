@@ -19,6 +19,7 @@
 
 #include "AuditTracker.hpp"
 #include "AuditEntry_odb.h"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Audit;
@@ -29,4 +30,10 @@ AuditEntryId AuditTracker::last_id() const
     if (last_)
         return last_.object_id();
     return 0;
+}
+
+void AuditTracker::last(AuditEntryLPtr l)
+{
+    ASSERT_LOG(l, "Cannot set a null entry as last.");
+    last_ = l;
 }

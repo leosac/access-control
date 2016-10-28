@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/auth/IAccessPoint.hpp"
 
 namespace Leosac
@@ -67,6 +68,8 @@ class AccessPoint : public virtual IAccessPoint
 
   private:
     friend class odb::access;
+
+    friend class Leosac::TestAccess;
 
     /**
      * We are friend with Door so Door can set the inverse pointer (`door_`)

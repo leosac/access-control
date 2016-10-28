@@ -32,10 +32,10 @@
 #include <string>
 
 /**
- * A base class for Leosac specific expection.
+ * A base class for Leosac specific exception.
  *
  * This exception class store a stacktrace of the program at the time it was
- * instanciated (not at the time it was thrown).
+ * instantiated (not at the time it was thrown).
  */
 class LEOSACException : public std::exception
 {
