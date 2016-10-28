@@ -87,6 +87,11 @@ class AuditEntry : virtual public IAuditEntry,
      */
     void database(DBPtr db);
 
+    /**
+     * Retrieve the last (finalized) audit entry.
+     */
+    static AuditEntryPtr get_last_audit(DBPtr db);
+
   private:
 #pragma db id auto
     AuditEntryId id_;

@@ -22,6 +22,8 @@
 #include "User_odb.h"
 #include "core/auth/User.hpp"
 #include "tools/log.hpp"
+#include <odb/query.hxx>
+#include <tools/db/OptionalTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Audit;
@@ -155,4 +157,13 @@ Auth::UserId AuditEntry::author_id() const
 boost::posix_time::ptime AuditEntry::timestamp() const
 {
     return timestamp_;
+}
+
+AuditEntryPtr AuditEntry::get_last_audit(DBPtr db)
+{
+    db::OptionalTransaction t(db->begin());
+    using Query = odb::query<AuditEntry>;
+    Query q("ORDER BY id DESC LIMIT 1");
+
+    return db->query_one<AuditEntry>(q);
 }
