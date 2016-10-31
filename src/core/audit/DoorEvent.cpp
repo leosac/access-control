@@ -30,6 +30,8 @@ using namespace Leosac::Audit;
 
 DoorEvent::DoorEvent()
     : target_door_id_(0)
+    , access_point_id_before_(0)
+    , access_point_id_after_(0)
 {
 }
 
@@ -128,4 +130,24 @@ std::string DoorEvent::generate_target_description() const
 std::shared_ptr<DoorEvent> DoorEvent::create_empty()
 {
     return std::shared_ptr<DoorEvent>(new DoorEvent());
+}
+
+Auth::AccessPointId DoorEvent::access_point_id_before() const
+{
+    return access_point_id_before_;
+}
+
+void DoorEvent::access_point_id_before(Auth::AccessPointId id)
+{
+    access_point_id_before_ = id;
+}
+
+Auth::AccessPointId DoorEvent::access_point_id_after() const
+{
+    return access_point_id_after_;
+}
+
+void DoorEvent::access_point_id_after(Auth::AccessPointId id)
+{
+    access_point_id_after_ = id;
 }

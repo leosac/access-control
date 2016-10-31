@@ -49,6 +49,8 @@ class IDoor : public std::enable_shared_from_this<IDoor>
 
     virtual IAccessPointPtr access_point() const = 0;
 
+    virtual AccessPointId access_point_id() const = 0;
+
     virtual void access_point(IAccessPointPtr) = 0;
 
     /**

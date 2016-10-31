@@ -36,19 +36,21 @@ class Door : public virtual IDoor
 {
   public:
     Door();
-    DoorId id() const override;
+    virtual DoorId id() const override;
 
-    std::string alias() const override;
+    virtual std::string alias() const override;
 
-    std::string description() const override;
+    virtual std::string description() const override;
 
-    void alias(const std::string &alias) override;
+    virtual void alias(const std::string &alias) override;
 
-    void description(const std::string &desc) override;
+    virtual void description(const std::string &desc) override;
 
-    IAccessPointPtr access_point() const override;
+    virtual IAccessPointPtr access_point() const override;
 
-    void access_point(IAccessPointPtr ptr) override;
+    virtual AccessPointId access_point_id() const override;
+
+    virtual void access_point(IAccessPointPtr ptr) override;
 
     virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const override;
 

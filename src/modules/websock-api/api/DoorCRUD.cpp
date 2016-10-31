@@ -60,6 +60,8 @@ boost::optional<json> DoorCRUD::create_impl(const json &req)
     audit->event_mask(Audit::EventType::DOOR_CREATED);
     audit->after(DoorJSONStringSerializer::serialize(
         *new_door, SystemSecurityContext::instance()));
+
+    audit->access_point_id_after(new_door->access_point_id());
     audit->finalize();
 
     rep["data"] = DoorJSONSerializer::serialize(*new_door, security_context());
@@ -116,11 +118,14 @@ boost::optional<json> DoorCRUD::update_impl(const json &req)
     audit->event_mask(Audit::EventType::DOOR_UPDATED);
     audit->before(DoorJSONStringSerializer::serialize(
         *door, SystemSecurityContext::instance()));
+    audit->access_point_id_before(door->access_point_id());
+
     DoorJSONSerializer::unserialize(*door, req.at("attributes"), security_context());
 
     db->update(door_odb);
     audit->after(DoorJSONStringSerializer::serialize(
         *door, SystemSecurityContext::instance()));
+    audit->access_point_id_after(door->access_point_id());
 
     audit->finalize();
     rep["data"] = DoorJSONSerializer::serialize(*door, security_context());
@@ -138,6 +143,8 @@ boost::optional<json> DoorCRUD::delete_impl(const json &req)
     auto door_odb = assert_cast<Auth::DoorPtr>(door);
     auto audit    = Audit::Factory::DoorEvent(db, door, ctx_.audit);
     audit->event_mask(Audit::EventType::DOOR_DELETED);
+
+    audit->access_point_id_before(door->access_point_id());
     audit->before(DoorJSONStringSerializer::serialize(
         *door, SystemSecurityContext::instance()));
 

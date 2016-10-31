@@ -75,3 +75,10 @@ void Door::schedule_mapping_added(
 {
     schedules_mapping_.push_back(sched_mapping);
 }
+
+AccessPointId Door::access_point_id() const
+{
+    if (access_point_)
+        return access_point_->id();
+    return 0;
+}

@@ -55,6 +55,22 @@ class IDoorEvent : virtual public IAuditEntry
     virtual void after(const std::string &repr) = 0;
 
     virtual const std::string &after() const = 0;
+
+    /**
+     * Return the id of the associated access_point before
+     * the event took place.
+     */
+    virtual Auth::AccessPointId access_point_id_before() const = 0;
+
+    virtual void access_point_id_before(Auth::AccessPointId) = 0;
+
+    /**
+     * Return the id of the associated access_point after the
+     * event took place.
+     */
+    virtual Auth::AccessPointId access_point_id_after() const = 0;
+
+    virtual void access_point_id_after(Auth::AccessPointId) = 0;
 };
 }
 }

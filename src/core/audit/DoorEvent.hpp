@@ -47,17 +47,25 @@ class DoorEvent : virtual public IDoorEvent, public AuditEntry
 
     virtual void target(Auth::IDoorPtr door) override;
 
-    Auth::DoorId target_id() const override;
+    virtual Auth::DoorId target_id() const override;
 
     virtual void before(const std::string &repr) override;
 
     virtual void after(const std::string &repr) override;
 
-    const std::string &before() const override;
+    virtual const std::string &before() const override;
 
-    const std::string &after() const override;
+    virtual const std::string &after() const override;
 
-    std::string generate_description() const override;
+    virtual Auth::AccessPointId access_point_id_before() const override;
+
+    virtual void access_point_id_before(Auth::AccessPointId id) override;
+
+    virtual Auth::AccessPointId access_point_id_after() const override;
+
+    virtual void access_point_id_after(Auth::AccessPointId id) override;
+
+    virtual std::string generate_description() const override;
 
   public:
     /**
@@ -79,6 +87,22 @@ class DoorEvent : virtual public IDoorEvent, public AuditEntry
      * Optional JSON dump of the object after the event took place.
      */
     std::string after_;
+
+    /**
+     * The id of the associated AP before the event.
+     *
+     * @note We don't store a real reference to an object, just
+     * a dump integer. Foreign Keys wont be enforced (which is what we
+     * want because we want to keep history).
+     */
+    Auth::AccessPointId access_point_id_before_;
+
+    /**
+     * The id of associated AP after the event.
+     *
+     * @see access_point_id_before_;
+     */
+    Auth::AccessPointId access_point_id_after_;
 
     friend class odb::access;
 };
