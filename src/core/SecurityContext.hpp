@@ -118,7 +118,12 @@ class SecurityContext
          * Read the audit log and access additional information, such
          * as the JSON "before" and "after" field.
          */
-        AUDIT_READ_FULL
+        AUDIT_READ_FULL,
+
+        /**
+         * Overview of users/doors access permission.
+         */
+        ACCESS_OVERVIEW
     };
 
     struct GroupActionParam

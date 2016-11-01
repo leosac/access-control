@@ -21,6 +21,7 @@ set(WEBSOCK_API_SRCS
         api/DoorCRUD.cpp
         api/AuditGet.cpp
         api/AccessPointCRUD.cpp
+        api/AccessOverview.cpp
         api/search/GroupSearch.cpp
         api/search/DoorSearch.cpp
         api/search/AccessPointSearch.cpp

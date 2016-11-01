@@ -49,6 +49,7 @@
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
+#include <api/AccessOverview.hpp>
 #include <json.hpp>
 #include <odb/session.hxx>
 
@@ -92,6 +93,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["search.door_alias"]         = &DoorSearch::create;
     individual_handlers_["search.access_point_alias"] = &AccessPointSearch::create;
     individual_handlers_["search.schedule_name"]      = &ScheduleSearch::create;
+    individual_handlers_["access_overview"]           = &AccessOverview::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);
