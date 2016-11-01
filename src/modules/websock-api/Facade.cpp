@@ -192,6 +192,32 @@ void Facade::register_crud_handler(
     handlers_[type + ".delete"] = wrapper;
     send_handler_registration_message(type + ".delete");
 }
+
+void Facade::register_handler_simple(const std::string &type,
+                                     SimpleHandlerT callable, ActionActionParam perm)
+{
+    auto wrapper = [=](const ModuleRequestContext &mrc,
+                       const ClientMessage &msg) -> WebSockAPI::ServerMessage {
+        WebSockAPI::ServerMessage response;
+        response.status_code = APIStatusCode::SUCCESS;
+        response.content     = {};
+        try
+        {
+            response.uuid = msg.uuid;
+            response.type = msg.type;
+
+            mrc.security_ctx->enforce_permission(perm.first, perm.second);
+            response.content = callable(mrc, msg);
+        }
+        catch (...)
+        {
+            return WebSockAPI::ExceptionConverter().convert_merge(
+                std::current_exception(), response);
+        }
+        return response;
+    };
+    register_handler(type, wrapper);
+}
 }
 }
 }

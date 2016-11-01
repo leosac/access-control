@@ -42,6 +42,16 @@ class SecurityContext
     union ActionParam;
     enum class Action
     {
+        /**
+         * A workaround permission that requires the user to be administrator
+         */
+        IS_ADMIN,
+        /**
+         * Requires that the user be at least manager.
+         */
+        IS_MANAGER,
+
+
         USER_CREATE,
         USER_READ,
         USER_READ_EMAIL,

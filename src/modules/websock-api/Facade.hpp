@@ -20,6 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
+#include "modules/websock-api/ActionActionParam.hpp"
 #include "modules/websock-api/Messages.hpp"
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/api/CRUDResourceHandler.hpp"
@@ -65,6 +66,10 @@ class Facade
 
     /**
      * Register a handler for a single API call.
+     * The handler invocation is wrapped into a try/catch clause that
+     * use WebSockAPI::ExceptionConverter() to return an error message to the
+     * client rather than crashing Leosac.
+     *
      * @tparam Callable
      * @param type The name of the handler (= message type)
      */
@@ -74,6 +79,21 @@ class Facade
         handlers_[type] = c;
         send_handler_registration_message(type);
     }
+
+    using SimpleHandlerT =
+        std::function<json(const ModuleRequestContext &, const ClientMessage &)>;
+
+    /**
+     * Register a handler for a single API call.
+     *
+     * This ease the work required to implement the handler:
+     *     + The handler invocation is wrapped into a try/catch clause that
+     * use WebSockAPI::ExceptionConverter() to return an error message to the
+     * client rather than crashing Leosac.
+     *     + The handler shall returns the `json` content directly.
+     */
+    void register_handler_simple(const std::string &type, SimpleHandlerT callable,
+                                 ActionActionParam perm);
 
     void
     register_crud_handler(const std::string &type,

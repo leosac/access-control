@@ -43,10 +43,10 @@ json ScheduleSearch::process_impl(const json &req)
         ctx_.dbsrv->db(), req.at("partial_name").get<std::string>());
 }
 
-std::vector<MethodHandler::ActionActionParam>
+std::vector<ActionActionParam>
 ScheduleSearch::required_permission(const json &) const
 {
-    std::vector<MethodHandler::ActionActionParam> perm_;
+    std::vector<ActionActionParam> perm_;
     perm_.push_back({SecurityContext::Action::SCHEDULE_SEARCH, {}});
     return perm_;
 }

@@ -46,6 +46,11 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
 
     switch (action)
     {
+    case Action::IS_ADMIN:
+        return is_admin();
+    case Action::IS_MANAGER:
+        return is_manager();
+
     case Action::USER_CREATE:
         return is_manager();
     case Action::USER_DELETE:

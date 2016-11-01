@@ -91,10 +91,9 @@ json DoorSearch::process_impl(const json &req)
     return rep;
 }
 
-std::vector<MethodHandler::ActionActionParam>
-DoorSearch::required_permission(const json &) const
+std::vector<ActionActionParam> DoorSearch::required_permission(const json &) const
 {
-    std::vector<MethodHandler::ActionActionParam> perm_;
+    std::vector<ActionActionParam> perm_;
     SecurityContext::ActionParam ap{};
 
     perm_.push_back({SecurityContext::Action::DOOR_SEARCH, ap});

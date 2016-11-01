@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "ActionActionParam.hpp"
 #include "RequestContext.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/UserSecurityContext.hpp"
@@ -82,9 +83,6 @@ class MethodHandler
     virtual json process_impl(const json &req) = 0;
 
   protected:
-    using ActionActionParam =
-        std::pair<SecurityContext::Action, SecurityContext::ActionParam>;
-
     /**
      * Return a list of "Action" / "ActionParam" that must pass before
      * the request is processed.

@@ -84,10 +84,10 @@ json PasswordChange::process_impl(const json &req)
     return rep;
 }
 
-std::vector<MethodHandler::ActionActionParam>
+std::vector<ActionActionParam>
 PasswordChange::required_permission(const json &req) const
 {
-    std::vector<MethodHandler::ActionActionParam> perm_;
+    std::vector<ActionActionParam> perm_;
     SecurityContext::UserActionParam uap;
     uap.user_id = req.at("user_id").get<Auth::UserId>();
 

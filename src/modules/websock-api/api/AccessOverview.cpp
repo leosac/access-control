@@ -40,7 +40,6 @@ MethodHandlerUPtr AccessOverview::create(RequestContext ctx)
 
 json AccessOverview::process_impl(const json &req)
 {
-    // We build a 2D array with user in Y and door in X.
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
@@ -87,10 +86,10 @@ json AccessOverview::process_impl(const json &req)
     return rep;
 }
 
-std::vector<MethodHandler::ActionActionParam>
+std::vector<ActionActionParam>
 AccessOverview::required_permission(const json &) const
 {
-    std::vector<MethodHandler::ActionActionParam> perm_;
+    std::vector<ActionActionParam> perm_;
     SecurityContext::ActionParam ap;
 
     perm_.push_back({SecurityContext::Action::ACCESS_OVERVIEW, ap});

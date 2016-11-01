@@ -88,10 +88,10 @@ json AccessPointSearch::process_impl(const json &req)
     return rep;
 }
 
-std::vector<MethodHandler::ActionActionParam>
+std::vector<ActionActionParam>
 AccessPointSearch::required_permission(const json &) const
 {
-    std::vector<MethodHandler::ActionActionParam> perm_;
+    std::vector<ActionActionParam> perm_;
     perm_.push_back({SecurityContext::Action::ACCESS_POINT_SEARCH, {}});
     return perm_;
 }

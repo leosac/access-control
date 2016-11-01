@@ -74,7 +74,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
     srv_.set_reuse_addr(true);
     // clear all logs.
-    // srv_.clear_access_channels(websocketpp::log::alevel::all);
+    srv_.clear_access_channels(websocketpp::log::alevel::all);
 
 
     // Register internal handlers, ie handler that are managed by the Websocket
