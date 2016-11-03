@@ -120,7 +120,7 @@ boost::optional<json> AccessPointCRUD::delete_impl(const json &req)
     return boost::none;
 }
 
-void AccessPointCRUD::forward_to_impl_module(const json &req, const std::string &mod)
+void AccessPointCRUD::forward_to_impl_module(const json &, const std::string &mod)
 {
     // We we forward the call to the proper implementation module
     // endpoint.

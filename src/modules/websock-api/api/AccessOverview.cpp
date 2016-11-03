@@ -38,7 +38,7 @@ MethodHandlerUPtr AccessOverview::create(RequestContext ctx)
     return std::make_unique<AccessOverview>(ctx);
 }
 
-json AccessOverview::process_impl(const json &req)
+json AccessOverview::process_impl(const json &)
 {
     json rep;
     DBPtr db = ctx_.dbsrv->db();

@@ -373,7 +373,7 @@ json SMTPModule::handle_ws_smtp_setconfig(
 }
 
 json SMTPModule::handle_ws_smtp_sendmail(
-    const WebSockAPI::ModuleRequestContext &req_ctx, const json &req)
+    const WebSockAPI::ModuleRequestContext &, const json &req)
 {
     MailInfo mail;
 
