@@ -21,12 +21,15 @@
 #include "AuditSerializer.hpp"
 #include "core/audit/IWSAPICall.hpp"
 
-using namespace Leosac;
-
-json WSAPICallJSONSerializer::serialize(const Audit::IWSAPICall &in,
-                                        const SecurityContext &sc)
+namespace Leosac
 {
-    auto serialized = AuditJSONSerializer::serialize(in, sc);
+namespace Audit
+{
+namespace Serializer
+{
+json WSAPICallJSON::serialize(const Audit::IWSAPICall &in, const SecurityContext &sc)
+{
+    auto serialized = Audit::Serializer::AuditJSON::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base audit serialization did something unexpected.");
@@ -38,4 +41,7 @@ json WSAPICallJSONSerializer::serialize(const Audit::IWSAPICall &in,
     serialized["attributes"]["status-code"]     = static_cast<int>(in.status_code());
     serialized["attributes"]["source-endpoint"] = in.source_endpoint();
     return serialized;
+}
+}
+}
 }

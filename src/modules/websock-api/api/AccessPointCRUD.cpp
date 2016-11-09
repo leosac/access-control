@@ -94,7 +94,7 @@ boost::optional<json> AccessPointCRUD::read_impl(const json &req)
 
 boost::optional<json> AccessPointCRUD::update_impl(const json &req)
 {
-    // To perform deletion, we first lookup the base access point object.
+    // To perform update, we first lookup the base access point object.
     // We then forward the update request to its controller module.
     auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
     DBPtr db   = ctx_.dbsrv->db();

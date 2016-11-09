@@ -5,11 +5,14 @@ set(SMTP_SRCS
         SMTPModule.cpp
         SMTPConfig.cpp
         SMTPServerInfoSerializer.cpp
+        SMTPAudit.cpp
+        SMTPAuditSerializer.cpp
         )
 
 # Database support
 set(OdbCMake_ODB_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/SMTPConfig.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SMTPAudit.hpp
         )
 
 set(OdbCMake_SOURCES "")
@@ -21,7 +24,16 @@ odb_compile(OdbCMake_SOURCES
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME module_smtp
+        PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset
+        INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
         )

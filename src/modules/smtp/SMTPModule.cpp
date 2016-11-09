@@ -18,12 +18,16 @@
 */
 
 #include "SMTPModule.hpp"
+#include "SMTPAudit.hpp"
+#include "SMTPAuditSerializer.hpp"
+#include "SMTPAudit_odb.h"
 #include "SMTPConfig.hpp"
 #include "SMTPConfig_odb.h"
 #include "SMTPServerInfoSerializer.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
+#include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "core/auth/Auth.hpp"
 #include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
@@ -61,6 +65,22 @@ SMTPModule::SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     bus_sub_.subscribe("SERVICE.MAILER");
     process_config();
     reactor_.add(bus_sub_, std::bind(&SMTPModule::handle_msg_bus, this));
+
+
+    // Register our own serializer for SMTPAudit.
+    smtp_audit_serializer_ = std::make_shared<std::function<boost::optional<json>(
+        const Audit::IAuditEntry &, const SecurityContext &)>>(
+        [](const Audit::IAuditEntry &audit,
+           const SecurityContext &sc) -> boost::optional<json> {
+            SMTPAuditSerializer::Helper h(sc);
+            audit.accept(h);
+            if (h.has_visited_)
+                return h.result_;
+            return boost::none;
+        });
+
+    Audit::Serializer::PolymorphicAuditJSON::register_serializer(
+        smtp_audit_serializer_);
 }
 
 SMTPModule::~SMTPModule()
@@ -271,14 +291,11 @@ void SMTPModule::setup_database()
     using namespace odb::core;
     auto db          = utils_->database();
     schema_version v = db->schema_version("module_smtp");
+    schema_version cv(schema_catalog::current_version(*db, "module_smtp"));
     if (v == 0)
     {
         transaction t(db->begin());
         schema_catalog::create_schema(*db, "module_smtp");
-
-
-        // Create a dummy SMTP server config
-        // todo remove this
 
         SMTPConfig cfg;
         SMTPServerInfo srv;
@@ -288,6 +305,14 @@ void SMTPModule::setup_database()
         cfg.server_add(srv);
         db->persist(cfg);
 
+        t.commit();
+    }
+    else if (v < cv)
+    {
+        INFO("SMTP Module performing database migration. Going from version "
+             << v << " to version " << cv);
+        transaction t(db->begin());
+        schema_catalog::migrate(*db, cv, "module_smtp");
         t.commit();
     }
 }
@@ -361,10 +386,13 @@ json SMTPModule::handle_ws_smtp_setconfig(
     {
         auto db = utils_->database();
         odb::transaction t(db->begin());
+        auto smtp_audit = SMTPAudit::create(db, req_ctx.audit);
+
         if (smtp_config_->id()) // Maybe we don't have a persisted configuration yet
             db->erase<SMTPConfig>(smtp_config_->id());
 
         db->persist(*cfg);
+        smtp_audit->finalize();
         t.commit();
         smtp_config_ = std::move(cfg);
     }
@@ -372,8 +400,8 @@ json SMTPModule::handle_ws_smtp_setconfig(
     return {};
 }
 
-json SMTPModule::handle_ws_smtp_sendmail(
-    const WebSockAPI::ModuleRequestContext &, const json &req)
+json SMTPModule::handle_ws_smtp_sendmail(const WebSockAPI::ModuleRequestContext &,
+                                         const json &req)
 {
     MailInfo mail;
 

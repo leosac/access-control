@@ -24,6 +24,7 @@
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/WebSockFwd.hpp"
 #include "tools/ToolsFwd.hpp"
+#include <core/audit/serializers/PolymorphicAuditSerializer.hpp>
 #include <curl/curl.h>
 #include <json.hpp>
 
@@ -101,6 +102,10 @@ class SMTPModule : public BaseModule
     static constexpr const char *wshandler_getconfig = "module.smtp.getconfig";
     static constexpr const char *wshandler_setconfig = "module.smtp.setconfig";
     static constexpr const char *wshandler_sendmail  = "module.smtp.sendmail";
+
+    // Stored in the module for automatic lifetime management.
+    Audit::Serializer::PolymorphicAuditJSON::RuntimeSerializerCallable
+        smtp_audit_serializer_;
 };
 }
 }

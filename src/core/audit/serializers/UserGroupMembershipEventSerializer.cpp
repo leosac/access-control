@@ -21,12 +21,16 @@
 #include "AuditSerializer.hpp"
 #include "core/audit/IUserGroupMembershipEvent.hpp"
 
-using namespace Leosac;
-
-json UserGroupMembershipEventJSONSerializer::serialize(
+namespace Leosac
+{
+namespace Audit
+{
+namespace Serializer
+{
+json UserGroupMembershipEventJSON::serialize(
     const Audit::IUserGroupMembershipEvent &in, const SecurityContext &sc)
 {
-    auto serialized = AuditJSONSerializer::serialize(in, sc);
+    auto serialized = Audit::Serializer::AuditJSON::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base audit serialization did something unexpected.");
@@ -38,4 +42,7 @@ json UserGroupMembershipEventJSONSerializer::serialize(
               ["target-group"] = {{{"id", in.target_group_id()}, {"type", "group"}}};
 
     return serialized;
+}
+}
+}
 }

@@ -21,12 +21,16 @@
 #include "AuditSerializer.hpp"
 #include "core/audit/IGroupEvent.hpp"
 
-using namespace Leosac;
-
-json GroupEventJSONSerializer::serialize(const Audit::IGroupEvent &in,
-                                         const SecurityContext &sc)
+namespace Leosac
 {
-    auto serialized = AuditJSONSerializer::serialize(in, sc);
+namespace Audit
+{
+namespace Serializer
+{
+json GroupEventJSON::serialize(const Audit::IGroupEvent &in,
+                               const SecurityContext &sc)
+{
+    auto serialized = AuditJSON::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base audit serialization did something unexpected.");
@@ -42,4 +46,7 @@ json GroupEventJSONSerializer::serialize(const Audit::IGroupEvent &in,
     }
 
     return serialized;
+}
+}
+}
 }

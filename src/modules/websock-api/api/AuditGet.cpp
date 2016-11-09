@@ -72,8 +72,8 @@ json AuditGet::process_impl(const json &req)
         rep["data"] = json::array();
         for (const auto &audit : ret)
         {
-            json audit_json =
-                PolymorphicAuditJSONSerializer::serialize(audit, security_context());
+            json audit_json = Audit::Serializer::PolymorphicAuditJSON::serialize(
+                audit, security_context());
             rep["data"].push_back(audit_json);
         }
     }

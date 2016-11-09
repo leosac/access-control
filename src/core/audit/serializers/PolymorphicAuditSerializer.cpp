@@ -26,19 +26,29 @@
 #include "core/SecurityContext.hpp"
 #include "core/audit/serializers/UserEventSerializer.hpp"
 #include "core/audit/serializers/UserGroupMembershipEventSerializer.hpp"
+#include "tools/AssertCast.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/registry/GlobalRegistry.hpp"
 
-using namespace Leosac;
+namespace Leosac
+{
+namespace Audit
+{
+namespace Serializer
+{
 
-json PolymorphicAuditJSONSerializer::serialize(const Audit::IAuditEntry &in,
-                                               const SecurityContext &sc)
+PolymorphicAuditJSON::RuntimeSerializerSignal
+    PolymorphicAuditJSON::runtime_serializers_;
+
+json PolymorphicAuditJSON::serialize(const Audit::IAuditEntry &in,
+                                     const SecurityContext &sc)
 {
     HelperSerialize h(sc);
     in.accept(h);
     return h.result_;
 }
 
-std::string PolymorphicAuditJSONSerializer::type_name(const Audit::IAuditEntry &in)
+std::string PolymorphicAuditJSON::type_name(const Audit::IAuditEntry &in)
 {
     HelperSerialize h(SystemSecurityContext::instance());
     in.accept(h);
@@ -48,51 +58,70 @@ std::string PolymorphicAuditJSONSerializer::type_name(const Audit::IAuditEntry &
     return h.result_.at("type");
 }
 
-PolymorphicAuditJSONSerializer::HelperSerialize::HelperSerialize(
-    const SecurityContext &sc)
+bs2::connection
+PolymorphicAuditJSON::register_serializer(RuntimeSerializerCallable callable)
+{
+    return runtime_serializers_.connect(
+        RuntimeSerializerSignal::slot_type(*callable).track_foreign(callable));
+}
+
+PolymorphicAuditJSON::HelperSerialize::HelperSerialize(const SecurityContext &sc)
     : security_context_(sc)
 {
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
-    const Audit::IUserEvent &t)
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IUserEvent &t)
 {
-    result_ = UserEventJSONSerializer::serialize(t, security_context_);
+    result_ = UserEventJSON::serialize(t, security_context_);
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
-    const Audit::IWSAPICall &t)
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IWSAPICall &t)
 {
-    result_ = WSAPICallJSONSerializer::serialize(t, security_context_);
+    result_ = WSAPICallJSON::serialize(t, security_context_);
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
-    const Audit::IScheduleEvent &t)
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IScheduleEvent &t)
 {
-    result_ = ScheduleEventJSONSerializer::serialize(t, security_context_);
+    result_ = ScheduleEventJSON::serialize(t, security_context_);
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
-    const Audit::IGroupEvent &t)
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IGroupEvent &t)
 {
-    result_ = GroupEventJSONSerializer::serialize(t, security_context_);
+    result_ = GroupEventJSON::serialize(t, security_context_);
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
-    const Audit::ICredentialEvent &t)
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::ICredentialEvent &t)
 {
-    result_ = CredentialEventJSONSerializer::serialize(t, security_context_);
+    result_ = CredentialEventJSON::serialize(t, security_context_);
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
-    const Audit::IDoorEvent &t)
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IDoorEvent &t)
 {
-    result_ = DoorEventJSONSerializer::serialize(t, security_context_);
+    result_ = DoorEventJSON::serialize(t, security_context_);
 }
 
-void PolymorphicAuditJSONSerializer::HelperSerialize::visit(
+void PolymorphicAuditJSON::HelperSerialize::visit(
     const Audit::IUserGroupMembershipEvent &t)
 {
-    result_ =
-        UserGroupMembershipEventJSONSerializer::serialize(t, security_context_);
+    result_ = UserGroupMembershipEventJSON::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSON::HelperSerialize::cannot_visit(
+    const Tools::IVisitable &visitable)
+{
+    // If we cannot visit a visitable it may mean 2 things:
+    //   + It is an Audit object defined in a module. In that case we'll rely
+    //       on dynamically registered serializer.
+    //   + Its an other object, and in that case, we shouldn't be here.
+    const auto &audit_entry = assert_cast<const Audit::IAuditEntry &>(visitable);
+
+    boost::optional<json> ret = runtime_serializers_(audit_entry, security_context_);
+
+    // Hopefully we had a registered serializer that was able to process the
+    // entry, otherwise, we assert.
+    ASSERT_LOG(ret, "Failed to find a serializer for an audit entry.");
+    result_ = *ret;
+}
+}
+}
 }

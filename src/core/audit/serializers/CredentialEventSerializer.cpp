@@ -21,12 +21,17 @@
 #include "AuditSerializer.hpp"
 #include "core/audit/ICredentialEvent.hpp"
 
-using namespace Leosac;
 
-json CredentialEventJSONSerializer::serialize(const Audit::ICredentialEvent &in,
-                                              const SecurityContext &sc)
+namespace Leosac
 {
-    auto serialized = AuditJSONSerializer::serialize(in, sc);
+namespace Audit
+{
+namespace Serializer
+{
+json CredentialEventJSON::serialize(const Audit::ICredentialEvent &in,
+                                    const SecurityContext &sc)
+{
+    auto serialized = AuditJSON::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base audit serialization did something unexpected.");
@@ -42,4 +47,7 @@ json CredentialEventJSONSerializer::serialize(const Audit::ICredentialEvent &in,
     }
 
     return serialized;
+}
+}
+}
 }

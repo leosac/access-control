@@ -19,24 +19,12 @@
 
 #pragma once
 
-#include "core/audit/AuditFwd.hpp"
-#include "tools/Serializer.hpp"
-#include <json.hpp>
-#include <string>
+#include <boost/signals2.hpp>
 
 namespace Leosac
 {
-using json = nlohmann::json;
-
-namespace Audit
-{
-namespace Serializer
-{
-struct WSAPICallJSON
-    : public Leosac::Serializer<json, Audit::IWSAPICall, WSAPICallJSON>
-{
-    static json serialize(const Audit::IWSAPICall &in, const SecurityContext &sc);
-};
-}
-}
+/**
+ * A shortname for the boost::signals2 namespace.
+ */
+namespace bs2 = boost::signals2;
 }

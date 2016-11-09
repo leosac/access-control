@@ -26,8 +26,11 @@
 
 // Define the database model version.
 // This is required in order to use ODB schema/data migration capabilities.
+
+#ifndef ODB_NO_BASE_VERSION
 #ifdef ODB_COMPILER
 #pragma db model version(1, 1, open)
+#endif
 #endif
 
 #include "tools/db/DBService.hpp"

@@ -33,6 +33,9 @@ using SMTPConfigUPtr = std::unique_ptr<SMTPConfig>;
 using SMTPConfigId   = unsigned long;
 
 class SMTPServerInfo;
+
+class SMTPAudit;
+using SMTPAuditPtr = std::shared_ptr<SMTPAudit>;
 }
 }
 }

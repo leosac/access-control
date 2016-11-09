@@ -21,10 +21,13 @@
 #include "core/audit/IAuditEntry.hpp"
 #include <boost/date_time/posix_time/conversion.hpp>
 
-using namespace Leosac;
-
-json AuditJSONSerializer::serialize(const Audit::IAuditEntry &in,
-                                    const SecurityContext &)
+namespace Leosac
+{
+namespace Audit
+{
+namespace Serializer
+{
+json AuditJSON::serialize(const Audit::IAuditEntry &in, const SecurityContext &)
 {
     auto timestamp = boost::posix_time::to_time_t(in.timestamp());
 
@@ -45,4 +48,7 @@ json AuditJSONSerializer::serialize(const Audit::IAuditEntry &in,
             {"data", {{"id", in.author_id()}, {"type", "user"}}}};
     }
     return serialized;
+}
+}
+}
 }

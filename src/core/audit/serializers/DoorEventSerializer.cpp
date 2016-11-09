@@ -21,12 +21,15 @@
 #include "AuditSerializer.hpp"
 #include "core/audit/IDoorEvent.hpp"
 
-using namespace Leosac;
-
-json DoorEventJSONSerializer::serialize(const Audit::IDoorEvent &in,
-                                        const SecurityContext &sc)
+namespace Leosac
 {
-    auto serialized = AuditJSONSerializer::serialize(in, sc);
+namespace Audit
+{
+namespace Serializer
+{
+json DoorEventJSON::serialize(const Audit::IDoorEvent &in, const SecurityContext &sc)
+{
+    auto serialized = AuditJSON::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base audit serialization did something unexpected.");
@@ -42,4 +45,7 @@ json DoorEventJSONSerializer::serialize(const Audit::IDoorEvent &in,
     }
 
     return serialized;
+}
+}
+}
 }

@@ -28,9 +28,16 @@ namespace Leosac
 {
 using json = nlohmann::json;
 
-struct UserEventJSONSerializer
-    : public Serializer<json, Audit::IUserEvent, UserEventJSONSerializer>
+namespace Audit
+{
+namespace Serializer
+{
+
+struct UserEventJSON
+    : public ::Leosac::Serializer<json, Audit::IUserEvent, UserEventJSON>
 {
     static json serialize(const Audit::IUserEvent &in, const SecurityContext &sc);
 };
+}
+}
 }

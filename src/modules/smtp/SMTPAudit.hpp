@@ -19,24 +19,46 @@
 
 #pragma once
 
-#include "core/audit/AuditFwd.hpp"
-#include "tools/Serializer.hpp"
-#include <json.hpp>
-#include <string>
+#define ODB_NO_BASE_VERSION
+#include "SMTPFwd.hpp"
+#include "core/audit/AuditEntry.hpp"
+
+#pragma db model version(1, 1, open)
 
 namespace Leosac
 {
-using json = nlohmann::json;
+namespace Module
+{
 
-namespace Audit
+namespace SMTP
 {
-namespace Serializer
+/**
+ * Keeps track of SMTP event.
+ */
+#pragma db object polymorphic
+
+class SMTPAudit : public Audit::AuditEntry
 {
-struct WSAPICallJSON
-    : public Leosac::Serializer<json, Audit::IWSAPICall, WSAPICallJSON>
-{
-    static json serialize(const Audit::IWSAPICall &in, const SecurityContext &sc);
+  private:
+    MAKE_VISITABLE();
+
+    struct ConstructorAccess
+    {
+    };
+
+    SMTPAudit() = default;
+
+  public:
+    explicit SMTPAudit(const ConstructorAccess &);
+
+    virtual std::string generate_description() const override;
+
+    static SMTPAuditPtr create(const DBPtr &database, Audit::IAuditEntryPtr parent);
+
+  private:
+    friend class odb::access;
 };
 }
 }
 }
+#undef ODB_NO_BASE_VERSION
