@@ -21,6 +21,7 @@
 #include "tools/JSONUtils.hpp"
 #include "tools/ScheduleMapping.hpp"
 #include "tools/SingleTimeFrame.hpp"
+#include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
 
 using namespace Leosac;

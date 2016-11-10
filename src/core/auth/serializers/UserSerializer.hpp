@@ -19,8 +19,8 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -31,7 +31,7 @@ using json = nlohmann::json;
 /**
  * A serializer that handle `Auth::User` object.
  */
-struct UserJSONSerializer : public Serializer<json, Auth::User, UserJSONSerializer>
+struct UserJSONSerializer
 {
     static json serialize(const Auth::User &in, const SecurityContext &sc);
 
@@ -40,7 +40,6 @@ struct UserJSONSerializer : public Serializer<json, Auth::User, UserJSONSerializ
 };
 
 struct UserJSONStringSerializer
-    : public Serializer<std::string, Auth::User, UserJSONStringSerializer>
 {
     static std::string serialize(const Auth::User &in, const SecurityContext &sc);
 

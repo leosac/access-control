@@ -19,7 +19,9 @@
 
 #include "ScheduleEventSerializer.hpp"
 #include "AuditSerializer.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/audit/IScheduleEvent.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {

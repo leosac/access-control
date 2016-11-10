@@ -73,7 +73,7 @@ SMTPModule::SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                "Cannot retrieve Audit::Serializer::JSONService.");
 
     audit_serializer_service->register_serializer<SMTPAudit>(
-        [](const SMTPAudit &audit, const SecurityContext &sc) {
+        [](const SMTPAudit &audit, const SecurityContext &sc) -> json {
             return SMTPAuditSerializer::serialize(audit, sc);
         });
 }

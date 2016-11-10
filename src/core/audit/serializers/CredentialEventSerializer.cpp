@@ -19,8 +19,9 @@
 
 #include "CredentialEventSerializer.hpp"
 #include "AuditSerializer.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/audit/ICredentialEvent.hpp"
-
+#include "tools/log.hpp"
 
 namespace Leosac
 {

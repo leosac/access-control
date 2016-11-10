@@ -20,6 +20,7 @@
 #include "core/auth/UserGroupMembership.hpp"
 #include "UserGroupMembershipSerializer.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;

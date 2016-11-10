@@ -23,13 +23,12 @@
 #include "core/SecurityContext.hpp"
 #include "core/credentials/ICredential.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
 
-
 // JSON
-
 
 json PolymorphicCredentialJSONSerializer::serialize(const ICredential &in,
                                                     const SecurityContext &sc)

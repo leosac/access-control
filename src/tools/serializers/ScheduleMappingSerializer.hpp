@@ -19,7 +19,8 @@
 
 #pragma once
 
-#include "tools/Serializer.hpp"
+#include "LeosacFwd.hpp"
+#include "tools/ToolsFwd.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -33,7 +34,6 @@ using json = nlohmann::json;
  * Serialize ScheduleMappings.
  */
 struct ScheduleMappingJSONSerializer
-    : public Serializer<json, Tools::ScheduleMapping, ScheduleMappingJSONSerializer>
 {
     static json serialize(const Tools::ScheduleMapping &in,
                           const SecurityContext &sc);
@@ -43,8 +43,6 @@ struct ScheduleMappingJSONSerializer
 };
 
 struct ScheduleMappingJSONStringSerializer
-    : public Serializer<std::string, Tools::ScheduleMapping,
-                        ScheduleMappingJSONStringSerializer>
 {
     static std::string serialize(const Tools::ScheduleMapping &in,
                                  const SecurityContext &sc);

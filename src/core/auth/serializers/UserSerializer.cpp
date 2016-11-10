@@ -26,6 +26,7 @@
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;

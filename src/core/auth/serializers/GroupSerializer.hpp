@@ -21,7 +21,6 @@
 
 #include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -32,7 +31,6 @@ using json = nlohmann::json;
  * A serializer that handle `Auth::Group` object.
  */
 struct GroupJSONSerializer
-    : public Serializer<json, Auth::Group, GroupJSONSerializer>
 {
     static json serialize(const Auth::Group &group, const SecurityContext &sc);
 
@@ -41,7 +39,6 @@ struct GroupJSONSerializer
 };
 
 struct GroupJSONStringSerializer
-    : public Serializer<std::string, Auth::Group, GroupJSONStringSerializer>
 {
     static std::string serialize(const Auth::Group &in, const SecurityContext &sc);
 

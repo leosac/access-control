@@ -19,10 +19,9 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/audit/IAuditEntry.hpp"
-#include "tools/Serializer.hpp"
 #include "tools/Visitor.hpp"
-#include "tools/bs2.hpp"
 #include "tools/service/ServiceRegistry.hpp"
 #include <json.hpp>
 #include <string>
@@ -42,23 +41,13 @@ namespace Serializer
  * This class, through the use of other classes in the Audit::Serializer
  * namespace, is able to serialize core Audit objects.
  *
- * However, the audit system being extensible, we need a mechanism for
- * runtime registered serializer: serializers that can handle specific,
- * module-defined audit object (generally, specific audit
- * entry and their serializer comes from the same module).
- *
- * This class provides a `register_serializer(Callable c)` static function
- * to let modules register their serializers.
- *
- * @note The serializer adapter (ie, the callable passed to `register_adapter()`)
- * must return `optional<json>`. The reason for this is: the adapter may be
- * invoked with audit entry that it is not able to marshal. Returning an
- * empty `optional<json>` will let the system knows that this serializer
- * is inadequate for this audit entry.
- *
+ * However, the audit system being extensible, we need to be able to use
+ * externally registered serializer. This is why the `serialize()` method
+ * takes an additional ServiceRegistry parameter: in the case where the
+ * to-be-serialized entry is not part of the core, we'll attempt to serialize
+ * it through the Audit::Serializer::JSONService class.
  */
 struct PolymorphicAuditJSON
-    : public Leosac::Serializer<json, Audit::IAuditEntry, PolymorphicAuditJSON>
 {
     /**
      * Perform deep serialization of the AuditEntry `in`.
@@ -79,7 +68,7 @@ struct PolymorphicAuditJSON
 
   private:
     /**
-     * Non static helper that can visit audit object.
+     * Non static helper that can visit a core audit object.
      */
     struct HelperSerialize : public Tools::Visitor<Audit::IUserEvent>,
                              public Tools::Visitor<Audit::IWSAPICall>,
@@ -101,7 +90,8 @@ struct PolymorphicAuditJSON
 
         /**
          * Called when no "hardcoded" audit type match, this method
-         * will delegate to runtime-registered serializer (if any).
+         * will delegate to runtime-registered serializer (if any) through
+         * the Audit::Serializer::JSONService class.
          */
         virtual void cannot_visit(const Tools::IVisitable &visitable) override;
 

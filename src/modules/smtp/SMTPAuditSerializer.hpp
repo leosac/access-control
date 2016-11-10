@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "SMTPAudit.hpp"
 #include "core/audit/IAuditEntry.hpp"
-#include "tools/Serializer.hpp"
 #include "tools/Visitor.hpp"
 #include <json.hpp>
 #include <string>
@@ -34,7 +34,7 @@ namespace Module
 {
 namespace SMTP
 {
-struct SMTPAuditSerializer : public Serializer<json, SMTPAudit, SMTPAuditSerializer>
+struct SMTPAuditSerializer
 {
     static json serialize(const SMTPAudit &in, const SecurityContext &sc);
 };

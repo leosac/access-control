@@ -20,6 +20,7 @@
 #include "WSAPICallSerializer.hpp"
 #include "AuditSerializer.hpp"
 #include "core/audit/IWSAPICall.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {

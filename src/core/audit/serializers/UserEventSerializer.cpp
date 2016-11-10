@@ -19,7 +19,9 @@
 
 #include "UserEventSerializer.hpp"
 #include "AuditSerializer.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/audit/IUserEvent.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {

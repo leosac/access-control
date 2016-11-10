@@ -19,8 +19,8 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/audit/AuditFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -32,8 +32,6 @@ namespace Audit
 namespace Serializer
 {
 struct CredentialEventJSON
-    : public ::Leosac::Serializer<json, ::Leosac::Audit::ICredentialEvent,
-                                  CredentialEventJSON>
 {
     static json serialize(const Audit::ICredentialEvent &in,
                           const SecurityContext &sc);

@@ -19,6 +19,7 @@
 
 #include "SMTPAuditSerializer.hpp"
 #include "core/audit/serializers/AuditSerializer.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {

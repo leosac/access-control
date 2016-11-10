@@ -19,9 +19,9 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "SMTPFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -35,7 +35,6 @@ namespace SMTP
 using json = nlohmann::json;
 
 struct SMTPServerInfoJSONSerializer
-    : public Serializer<json, SMTPServerInfo, SMTPServerInfoJSONSerializer>
 {
     static json serialize(const SMTPServerInfo &in, const SecurityContext &sc);
 
@@ -44,8 +43,6 @@ struct SMTPServerInfoJSONSerializer
 };
 
 struct SMTPServerInfoJSONStringSerializer
-    : public Serializer<std::string, SMTPServerInfo,
-                        SMTPServerInfoJSONStringSerializer>
 {
     static std::string serialize(const SMTPServerInfo &in,
                                  const SecurityContext &sc);

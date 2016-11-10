@@ -22,6 +22,7 @@
 #include "core/credentials/IWiegandCard.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;

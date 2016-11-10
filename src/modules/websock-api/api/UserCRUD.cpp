@@ -27,6 +27,7 @@
 #include "core/auth/serializers/UserSerializer.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Module;

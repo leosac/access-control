@@ -21,6 +21,7 @@
 #include "GroupSerializer.hpp"
 #include "Schedule_odb.h"
 #include "tools/JSONUtils.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;

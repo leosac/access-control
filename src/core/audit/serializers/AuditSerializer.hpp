@@ -19,8 +19,8 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/audit/AuditFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -32,7 +32,7 @@ namespace Audit
 {
 namespace Serializer
 {
-struct AuditJSON : public ::Leosac::Serializer<json, Audit::IAuditEntry, AuditJSON>
+struct AuditJSON
 {
     static json serialize(const Audit::IAuditEntry &in, const SecurityContext &sc);
 

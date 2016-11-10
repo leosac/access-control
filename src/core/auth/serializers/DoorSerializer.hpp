@@ -21,7 +21,6 @@
 
 #include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -31,7 +30,7 @@ using json = nlohmann::json;
 /**
  * A serializer that handle `Auth::Door` object.
  */
-struct DoorJSONSerializer : public Serializer<json, Auth::IDoor, DoorJSONSerializer>
+struct DoorJSONSerializer
 {
     static json serialize(const Auth::IDoor &door, const SecurityContext &sc);
 
@@ -40,7 +39,6 @@ struct DoorJSONSerializer : public Serializer<json, Auth::IDoor, DoorJSONSeriali
 };
 
 struct DoorJSONStringSerializer
-    : public Serializer<std::string, Auth::IDoor, DoorJSONStringSerializer>
 {
     static std::string serialize(const Auth::IDoor &in, const SecurityContext &sc);
 

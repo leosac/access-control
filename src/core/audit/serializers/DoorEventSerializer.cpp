@@ -19,7 +19,9 @@
 
 #include "DoorEventSerializer.hpp"
 #include "AuditSerializer.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/audit/IDoorEvent.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {

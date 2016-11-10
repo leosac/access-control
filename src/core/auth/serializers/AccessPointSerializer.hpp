@@ -21,7 +21,6 @@
 
 #include "core/SecurityContext.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -32,7 +31,6 @@ using json = nlohmann::json;
  * A serializer that handle `Auth::AccessPoint` object.
  */
 struct AccessPointJSONSerializer
-    : public Serializer<json, Auth::IAccessPoint, AccessPointJSONSerializer>
 {
     static json serialize(const Auth::IAccessPoint &ap, const SecurityContext &sc);
 
@@ -41,8 +39,6 @@ struct AccessPointJSONSerializer
 };
 
 struct AccessPointJSONStringSerializer
-    : public Serializer<std::string, Auth::IAccessPoint,
-                        AccessPointJSONStringSerializer>
 {
     static std::string serialize(const Auth::IAccessPoint &in,
                                  const SecurityContext &sc);

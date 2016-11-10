@@ -19,8 +19,8 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
-#include "tools/Serializer.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -32,7 +32,6 @@ using json = nlohmann::json;
  * A serializer that handle `Cred::ICredential` object.
  */
 struct CredentialJSONSerializer
-    : public Serializer<json, Cred::ICredential, CredentialJSONSerializer>
 {
     static json serialize(const Cred::ICredential &in, const SecurityContext &sc);
 
@@ -41,8 +40,6 @@ struct CredentialJSONSerializer
 };
 
 struct CredentialJSONStringSerializer
-    : public Serializer<std::string, Cred::ICredential,
-                        CredentialJSONStringSerializer>
 {
     static std::string serialize(const Cred::ICredential &in,
                                  const SecurityContext &sc);
