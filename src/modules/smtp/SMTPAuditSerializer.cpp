@@ -26,8 +26,6 @@ namespace Module
 {
 namespace SMTP
 {
-
-
 json SMTPAuditSerializer::serialize(const SMTPAudit &in, const SecurityContext &sc)
 {
     auto serialized = Audit::Serializer::AuditJSON::serialize(in, sc);
@@ -37,29 +35,6 @@ json SMTPAuditSerializer::serialize(const SMTPAudit &in, const SecurityContext &
     serialized["type"] = "smtp-event";
 
     return serialized;
-}
-
-SMTPAuditSerializer::Helper::Helper(const SecurityContext &sc)
-    : has_visited_(false)
-    , sc_(sc)
-{
-}
-
-void SMTPAuditSerializer::Helper::cannot_visit(const Tools::IVisitable &visitable)
-{
-    ASSERT_LOG(!has_visited_, "Already visited something. This object has been "
-                              "reused. Something is wrong.");
-    // It's important that we don't care about not being able to visit.
-    // Since we are runtime-registered, its likely that we'll be attempting
-    // to visit audit object that we don't care about.
-}
-
-void SMTPAuditSerializer::Helper::visit(const SMTPAudit &t)
-{
-    ASSERT_LOG(!has_visited_, "Already visited something. This object has been "
-                              "reused. Something is wrong.");
-    has_visited_ = true;
-    result_      = SMTPAuditSerializer::serialize(t, sc_);
 }
 }
 }

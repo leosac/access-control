@@ -64,7 +64,7 @@ class AuditEntry : virtual public IAuditEntry,
 
     virtual void author(Auth::UserPtr user) override;
 
-    Auth::UserId author_id() const override;
+    virtual Auth::UserId author_id() const override;
 
     virtual void set_parent(IAuditEntryPtr parent) override;
 
@@ -78,7 +78,7 @@ class AuditEntry : virtual public IAuditEntry,
 
     virtual void reload() override;
 
-    boost::posix_time::ptime timestamp() const override;
+    virtual boost::posix_time::ptime timestamp() const override;
 
     /**
      * Set the database pointer.

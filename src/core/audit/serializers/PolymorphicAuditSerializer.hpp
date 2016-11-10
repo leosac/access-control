@@ -23,6 +23,7 @@
 #include "tools/Serializer.hpp"
 #include "tools/Visitor.hpp"
 #include "tools/bs2.hpp"
+#include "tools/service/ServiceRegistry.hpp"
 #include <json.hpp>
 #include <string>
 
@@ -59,77 +60,22 @@ namespace Serializer
 struct PolymorphicAuditJSON
     : public Leosac::Serializer<json, Audit::IAuditEntry, PolymorphicAuditJSON>
 {
-    static json serialize(const Audit::IAuditEntry &in, const SecurityContext &sc);
+    /**
+     * Perform deep serialization of the AuditEntry `in`.
+     *
+     * This call requires a reference to the ServiceRegistry in order
+     * to use, if need and available, the runtime registered serializer.
+     */
+    static json serialize(ServiceRegistry &srv_registry,
+                          const Audit::IAuditEntry &in, const SecurityContext &sc);
 
     /**
      * Returns the "type-name" of the audit entry.
      *
      * Possible return value could be "audit-user-event".
      */
-    static std::string type_name(const Audit::IAuditEntry &in);
-
-    /**
-     * A typedef to callable that must be provided by a client when invoking
-     * register_serializer().
-     *
-     * The corresponding slot must accept a reference to the audit entry to be
-     * serialized, aswell as a reference to the security context.
-     * It shall returns an `optional<json>`, empty if the serializer doesn't match
-     * the audit entry's type.
-     */
-    using RuntimeSerializerCallable =
-        std::shared_ptr<std::function<boost::optional<json>(
-            const Audit::IAuditEntry &, const SecurityContext &)>>;
-
-  private:
-    /**
-     * A combiner for boost::signals2.
-     *
-     * This combiner will make sure to ignore the return value of
-     * serializers that can't handle a given type of audit entry.
-     */
-    struct RuntimeSerializerCombiner
-    {
-        using result_type = boost::optional<json>;
-        template <typename InputIterator>
-        boost::optional<json> operator()(InputIterator first,
-                                         InputIterator last) const
-        {
-            for (; first != last; ++first)
-            {
-                boost::optional<json> serialized = *first;
-                if (serialized)
-                    return serialized;
-            }
-            // No valid serializers, or simply no serializers.
-            return boost::none;
-        }
-    };
-
-    /**
-     * The type of signal object used to represents available serializers.
-     */
-    using RuntimeSerializerSignal =
-        bs2::signal<boost::optional<json>(const Audit::IAuditEntry &,
-                                          const SecurityContext &),
-                    RuntimeSerializerCombiner>;
-
-    /**
-     * A signal object that, when triggered, will invoked runtime-registered
-     * serializers, giving them a chance to serializer the audit entry.
-     */
-    static RuntimeSerializerSignal runtime_serializers_;
-
-  public:
-    /**
-     * Register a dynamic serializer that can handle some subtype of AuditEntry.
-     *
-     * The serializer takes the form a shared_ptr to an std::function. The reason
-     * for this is so we are able to automatically tracks disconnection.
-     * (Disconnection will happen if a module that provide a serializer gets
-     * unloaded from memory).
-     */
-    static bs2::connection register_serializer(RuntimeSerializerCallable callable);
+    static std::string type_name(ServiceRegistry &srv_registry,
+                                 const Audit::IAuditEntry &in);
 
   private:
     /**
@@ -143,22 +89,23 @@ struct PolymorphicAuditJSON
                              public Tools::Visitor<Audit::IDoorEvent>,
                              public Tools::Visitor<Audit::IUserGroupMembershipEvent>
     {
-        HelperSerialize(const SecurityContext &sc);
+        HelperSerialize(ServiceRegistry &registry, const SecurityContext &sc);
 
-        void visit(const Audit::IUserEvent &t) override;
-        void visit(const Audit::IWSAPICall &t) override;
-        void visit(const Audit::IScheduleEvent &t) override;
-        void visit(const Audit::IGroupEvent &t) override;
-        void visit(const Audit::ICredentialEvent &t) override;
-        void visit(const Audit::IDoorEvent &t) override;
-        void visit(const Audit::IUserGroupMembershipEvent &t) override;
+        virtual void visit(const Audit::IUserEvent &t) override;
+        virtual void visit(const Audit::IWSAPICall &t) override;
+        virtual void visit(const Audit::IScheduleEvent &t) override;
+        virtual void visit(const Audit::IGroupEvent &t) override;
+        virtual void visit(const Audit::ICredentialEvent &t) override;
+        virtual void visit(const Audit::IDoorEvent &t) override;
+        virtual void visit(const Audit::IUserGroupMembershipEvent &t) override;
 
-
-            /**
-             * Called when no "hardcoded" audit type match, this method
-             * will delegate to runtime-registered serializer (if any).
-             */
+        /**
+         * Called when no "hardcoded" audit type match, this method
+         * will delegate to runtime-registered serializer (if any).
+         */
         virtual void cannot_visit(const Tools::IVisitable &visitable) override;
+
+        ServiceRegistry &registry_;
 
         /**
          * Store the result here because we can't return from

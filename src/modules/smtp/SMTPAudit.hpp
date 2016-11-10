@@ -35,13 +35,16 @@ namespace SMTP
 /**
  * Keeps track of SMTP event.
  */
-#pragma db object polymorphic
-
+#pragma db object polymorphic callback(odb_callback)
 class SMTPAudit : public Audit::AuditEntry
 {
   private:
     MAKE_VISITABLE();
 
+    /**
+     * A tag struct to be able to call std::make_shared() despite
+     * a private ctor.
+     */
     struct ConstructorAccess
     {
     };
@@ -53,6 +56,9 @@ class SMTPAudit : public Audit::AuditEntry
 
     virtual std::string generate_description() const override;
 
+    /**
+     * Factory function, similar to those found in Audit::Factory
+     */
     static SMTPAuditPtr create(const DBPtr &database, Audit::IAuditEntryPtr parent);
 
   private:
@@ -61,4 +67,3 @@ class SMTPAudit : public Audit::AuditEntry
 }
 }
 }
-#undef ODB_NO_BASE_VERSION

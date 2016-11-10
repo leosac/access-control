@@ -42,14 +42,15 @@ namespace Leosac
 template <typename SerializedType, typename T, typename CRTP>
 struct Serializer
 {
-    static SerializedType serialize(const T &in, const SecurityContext &sc)
-    {
-        return CRTP::serialize(in, sc);
-    }
-    static void unserialize(T &out, const SerializedType &in,
-                            const SecurityContext &sc)
-    {
-        CRTP::unserialize(out, in, sc);
-    }
+    // todo: So apparently that was useless, remove and cleanup later.
+    /*    static SerializedType serialize(const T &in, const SecurityContext &sc)
+        {
+            return CRTP::serialize(in, sc);
+        }
+        static void unserialize(T &out, const SerializedType &in,
+                                const SecurityContext &sc)
+        {
+            CRTP::unserialize(out, in, sc);
+        }*/
 };
 }

@@ -31,6 +31,7 @@
 #include "tools/XmlNodeNameEnforcer.hpp"
 #include "tools/db/db_fwd.hpp"
 #include "tools/runtimeoptions.hpp"
+#include "tools/service/ServiceFwd.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/context.hpp>
 
@@ -103,6 +104,11 @@ class Kernel
     * Disable move-construction.
     */
     Kernel(Kernel &&) = delete;
+
+    /**
+     * Implemented in .cpp for unique_ptr to work.
+     */
+    ~Kernel();
 
     /**
     * Build a property tree from a runtime object object.
@@ -186,6 +192,11 @@ class Kernel
      */
     DBPtr database();
 
+    /**
+     * Retrieve a reference to the service registry.
+     */
+    ServiceRegistry &service_registry();
+
   private:
     /**
     * Init the module manager by feeding it paths to library file, loading module,
@@ -220,6 +231,17 @@ class Kernel
     void configure_database();
 
     void configure_logger();
+
+    /**
+     * Register some important services to the service registry.
+     */
+    void register_core_services();
+
+    /**
+     * Unregister the service that were registered into
+     * `register_core_services()`.
+     */
+    void unregister_core_services();
 
     void shutdown();
 
@@ -313,5 +335,7 @@ class Kernel
     DBPtr database_;
 
     Tools::XmlNodeNameEnforcer xmlnne_;
+
+    ServiceRegistryUPtr service_registry_;
 };
 }

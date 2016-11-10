@@ -26,7 +26,7 @@ namespace Leosac
 {
 namespace Auth
 {
-#pragma db object optimistic
+#pragma db object optimistic polymorphic
 class AccessPoint : public virtual IAccessPoint
 {
   public:

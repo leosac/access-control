@@ -19,25 +19,10 @@
 
 #pragma once
 
-#include "SMTPAudit.hpp"
-#include "core/audit/IAuditEntry.hpp"
-#include "tools/Serializer.hpp"
-#include "tools/Visitor.hpp"
-#include <json.hpp>
-#include <string>
+#include <memory>
 
 namespace Leosac
 {
-using json = nlohmann::json;
-
-namespace Module
-{
-namespace SMTP
-{
-struct SMTPAuditSerializer : public Serializer<json, SMTPAudit, SMTPAuditSerializer>
-{
-    static json serialize(const SMTPAudit &in, const SecurityContext &sc);
-};
-}
-}
+class ServiceRegistry;
+using ServiceRegistryUPtr = std::unique_ptr<ServiceRegistry>;
 }

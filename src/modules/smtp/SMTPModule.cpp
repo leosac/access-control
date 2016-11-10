@@ -27,6 +27,7 @@
 #include "core/CoreUtils.hpp"
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
+#include "core/audit/serializers/JSONService.hpp"
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "core/auth/Auth.hpp"
 #include "modules/websock-api/ExceptionConverter.hpp"
@@ -66,26 +67,25 @@ SMTPModule::SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     process_config();
     reactor_.add(bus_sub_, std::bind(&SMTPModule::handle_msg_bus, this));
 
+    auto audit_serializer_service =
+        utils_->service_registry().get_service<Audit::Serializer::JSONService>();
+    ASSERT_LOG(audit_serializer_service,
+               "Cannot retrieve Audit::Serializer::JSONService.");
 
-    // Register our own serializer for SMTPAudit.
-    smtp_audit_serializer_ = std::make_shared<std::function<boost::optional<json>(
-        const Audit::IAuditEntry &, const SecurityContext &)>>(
-        [](const Audit::IAuditEntry &audit,
-           const SecurityContext &sc) -> boost::optional<json> {
-            SMTPAuditSerializer::Helper h(sc);
-            audit.accept(h);
-            if (h.has_visited_)
-                return h.result_;
-            return boost::none;
+    audit_serializer_service->register_serializer<SMTPAudit>(
+        [](const SMTPAudit &audit, const SecurityContext &sc) {
+            return SMTPAuditSerializer::serialize(audit, sc);
         });
-
-    Audit::Serializer::PolymorphicAuditJSON::register_serializer(
-        smtp_audit_serializer_);
 }
 
 SMTPModule::~SMTPModule()
 {
     curl_global_cleanup();
+    auto audit_serializer_service =
+        utils_->service_registry().get_service<Audit::Serializer::JSONService>();
+    ASSERT_LOG(audit_serializer_service,
+               "Cannot retrieve Audit::Serializer::JSONService.");
+    audit_serializer_service->unregister_serializer<SMTPAudit>();
 }
 
 void SMTPModule::handle_msg_bus()

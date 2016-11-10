@@ -102,10 +102,6 @@ class SMTPModule : public BaseModule
     static constexpr const char *wshandler_getconfig = "module.smtp.getconfig";
     static constexpr const char *wshandler_setconfig = "module.smtp.setconfig";
     static constexpr const char *wshandler_sendmail  = "module.smtp.sendmail";
-
-    // Stored in the module for automatic lifetime management.
-    Audit::Serializer::PolymorphicAuditJSON::RuntimeSerializerCallable
-        smtp_audit_serializer_;
 };
 }
 }

@@ -51,8 +51,7 @@ Leosac::ConfigChecker &Leosac::CoreUtils::config_checker()
 
 Leosac::DBPtr Leosac::CoreUtils::database()
 {
-    ASSERT_LOG(kptr_, "Kernel pointer is NULL in CoreUtils.");
-    return kptr_->database();
+    return kernel().database();
 }
 
 bool Leosac::CoreUtils::is_strict() const
@@ -74,4 +73,9 @@ Leosac::CoreAPI Leosac::CoreUtils::core_api()
 zmqpp::context &Leosac::CoreUtils::zmqpp_context()
 {
     return kernel().zmqpp_context();
+}
+
+Leosac::ServiceRegistry &Leosac::CoreUtils::service_registry()
+{
+    return kernel().service_registry();
 }

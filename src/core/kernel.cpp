@@ -22,6 +22,7 @@
 #include "Schedule_odb.h"
 #include "User_odb.h"
 #include "WiegandCard_odb.h"
+#include "core/audit/serializers/JSONService.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/WiegandCard.hpp"
@@ -37,6 +38,7 @@
 #include "tools/log.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include "tools/scrypt/Random.hpp"
+#include "tools/service/ServiceRegistry.hpp"
 #include "tools/signalhandler.hpp"
 #include "tools/unixfs.hpp"
 #include "tools/unixshellscript.hpp"
@@ -76,6 +78,7 @@ Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
     configure_database();
     configure_logger();
     extract_environ();
+    register_core_services();
 
     if (config.get_child_optional("network"))
     {
@@ -102,6 +105,11 @@ Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
     control_.bind("inproc://leosac-kernel");
     bus_push_.connect("inproc://zmq-bus-pull");
     network_config_->reload();
+}
+
+Kernel::~Kernel()
+{
+    unregister_core_services();
 }
 
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
@@ -617,4 +625,31 @@ DBPtr Kernel::database()
 std::string Kernel::config_file_path() const
 {
     return config_manager_.kconfig().get<std::string>("kernel-cfg");
+}
+
+void Kernel::register_core_services()
+{
+    ASSERT_LOG(!service_registry_, "ServiceRegistry is already created.");
+    service_registry_ = std::make_unique<ServiceRegistry>();
+    {
+        service_registry_->register_service<Audit::Serializer::JSONService>(
+            new Audit::Serializer::JSONService());
+    }
+}
+
+void Kernel::unregister_core_services()
+{
+    // Get and retrieve raw pointer as to not count as "currently using the service"
+    Audit::Serializer::JSONService *ptr =
+        service_registry_->get_service<Audit::Serializer::JSONService>().get();
+    bool ret =
+        service_registry_->unregister_service<Audit::Serializer::JSONService>();
+    ASSERT_LOG(ret, "Failed to unregister AuditSerializerService.");
+    delete ptr;
+}
+
+ServiceRegistry &Kernel::service_registry()
+{
+    ASSERT_LOG(service_registry_, "Service registry is null.");
+    return *service_registry_;
 }

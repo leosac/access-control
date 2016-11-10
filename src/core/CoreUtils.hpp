@@ -22,6 +22,7 @@
 #include "CoreAPI.hpp"
 #include "LeosacFwd.hpp"
 #include "tools/db/db_fwd.hpp"
+#include "tools/service/ServiceRegistry.hpp"
 
 namespace zmqpp
 {
@@ -59,6 +60,7 @@ class CoreUtils
     ConfigChecker &config_checker();
     Kernel &kernel();
     DBPtr database();
+    ServiceRegistry &service_registry();
 
     /**
      * Instantiate a new, ready to use, CoreAPI object.

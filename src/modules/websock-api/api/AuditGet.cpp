@@ -21,7 +21,9 @@
 #include "AuditEntry_odb.h"
 #include "Exceptions.hpp"
 #include "LogEntry_odb.h"
+#include "WSServer.hpp"
 #include "api/APISession.hpp"
+#include "core/CoreUtils.hpp"
 #include "core/audit/AuditEntry.hpp"
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "tools/JSONUtils.hpp"
@@ -73,7 +75,8 @@ json AuditGet::process_impl(const json &req)
         for (const auto &audit : ret)
         {
             json audit_json = Audit::Serializer::PolymorphicAuditJSON::serialize(
-                audit, security_context());
+                ctx_.server.core_utils()->service_registry(), audit,
+                security_context());
             rep["data"].push_back(audit_json);
         }
     }

@@ -68,7 +68,7 @@ class IAuditEntry : public virtual Tools::IVisitable
      *     + Must be in a database transaction.
      *
      * @warning While updating the object state in the database, the transaction
-     * itself is not `commit()`ed. Make sure to commit the transaction to garantee
+     * itself is not `commit()`ed. Make sure to commit the transaction to guarantee
      * that the audit is stored in the database.
      */
     virtual void finalize() = 0;

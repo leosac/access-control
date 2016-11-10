@@ -19,8 +19,11 @@
 
 #pragma once
 
+#define ODB_NO_BASE_VERSION
 #include "SMTPFwd.hpp"
 #include "tools/db/database.hpp"
+
+#pragma db model version(1, 1, open)
 
 namespace Leosac
 {
@@ -67,7 +70,6 @@ struct SMTPServerInfo
  * of this type in the database.
  */
 #pragma db object
-
 class SMTPConfig
 {
   public:

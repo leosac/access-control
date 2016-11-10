@@ -21,6 +21,7 @@
 #include "CredentialEventSerializer.hpp"
 #include "DoorEventSerializer.hpp"
 #include "GroupEventSerializer.hpp"
+#include "JSONService.hpp"
 #include "ScheduleEventSerializer.hpp"
 #include "WSAPICallSerializer.hpp"
 #include "core/SecurityContext.hpp"
@@ -37,20 +38,19 @@ namespace Audit
 namespace Serializer
 {
 
-PolymorphicAuditJSON::RuntimeSerializerSignal
-    PolymorphicAuditJSON::runtime_serializers_;
-
-json PolymorphicAuditJSON::serialize(const Audit::IAuditEntry &in,
+json PolymorphicAuditJSON::serialize(ServiceRegistry &srv_registry,
+                                     const Audit::IAuditEntry &in,
                                      const SecurityContext &sc)
 {
-    HelperSerialize h(sc);
+    HelperSerialize h(srv_registry, sc);
     in.accept(h);
     return h.result_;
 }
 
-std::string PolymorphicAuditJSON::type_name(const Audit::IAuditEntry &in)
+std::string PolymorphicAuditJSON::type_name(ServiceRegistry &srv_registry,
+                                            const Audit::IAuditEntry &in)
 {
-    HelperSerialize h(SystemSecurityContext::instance());
+    HelperSerialize h(srv_registry, SystemSecurityContext::instance());
     in.accept(h);
     ASSERT_LOG(h.result_.find("type") != h.result_.end(),
                "The serializer didn't set a type.");
@@ -58,15 +58,10 @@ std::string PolymorphicAuditJSON::type_name(const Audit::IAuditEntry &in)
     return h.result_.at("type");
 }
 
-bs2::connection
-PolymorphicAuditJSON::register_serializer(RuntimeSerializerCallable callable)
-{
-    return runtime_serializers_.connect(
-        RuntimeSerializerSignal::slot_type(*callable).track_foreign(callable));
-}
-
-PolymorphicAuditJSON::HelperSerialize::HelperSerialize(const SecurityContext &sc)
-    : security_context_(sc)
+PolymorphicAuditJSON::HelperSerialize::HelperSerialize(ServiceRegistry &registry,
+                                                       const SecurityContext &sc)
+    : registry_(registry)
+    , security_context_(sc)
 {
 }
 
@@ -112,15 +107,15 @@ void PolymorphicAuditJSON::HelperSerialize::cannot_visit(
     // If we cannot visit a visitable it may mean 2 things:
     //   + It is an Audit object defined in a module. In that case we'll rely
     //       on dynamically registered serializer.
-    //   + Its an other object, and in that case, we shouldn't be here.
+    //   + Its an other object, and in that case, we shouldn't be here (we will
+    //       assert)
     const auto &audit_entry = assert_cast<const Audit::IAuditEntry &>(visitable);
+    auto service = registry_.get_service<Audit::Serializer::JSONService>();
+    ASSERT_LOG(service,
+               "Cannot retrieve Audit::Serializer::JSONService. Since this a "
+               "core service, something must be very wrong.");
 
-    boost::optional<json> ret = runtime_serializers_(audit_entry, security_context_);
-
-    // Hopefully we had a registered serializer that was able to process the
-    // entry, otherwise, we assert.
-    ASSERT_LOG(ret, "Failed to find a serializer for an audit entry.");
-    result_ = *ret;
+    result_ = service->serialize(audit_entry, security_context_);
 }
 }
 }
