@@ -49,6 +49,7 @@ set(LEOSAC_LIB_SRCS
     core/credentials/serializers/PolymorphicCredentialSerializer.cpp
     core/credentials/serializers/PinCodeSerializer.cpp
     core/UserSecurityContext.cpp
+    core/GetServiceRegistry.cpp
     dynlib/dynamiclibrary.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
@@ -110,7 +111,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/DoorEvent.cpp
     core/audit/AccessPointEvent.cpp
     core/audit/AuditTracker.cpp
-        core/audit/serializers/JSONService.cpp
+    core/audit/serializers/JSONService.cpp
     core/audit/serializers/AuditSerializer.cpp
     core/audit/serializers/UserEventSerializer.cpp
     core/audit/serializers/PolymorphicAuditSerializer.cpp

@@ -24,6 +24,7 @@
 #include "JSONService.hpp"
 #include "ScheduleEventSerializer.hpp"
 #include "WSAPICallSerializer.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/audit/serializers/UserEventSerializer.hpp"
 #include "core/audit/serializers/UserGroupMembershipEventSerializer.hpp"
@@ -38,19 +39,17 @@ namespace Audit
 namespace Serializer
 {
 
-json PolymorphicAuditJSON::serialize(ServiceRegistry &srv_registry,
-                                     const Audit::IAuditEntry &in,
+json PolymorphicAuditJSON::serialize(const Audit::IAuditEntry &in,
                                      const SecurityContext &sc)
 {
-    HelperSerialize h(srv_registry, sc);
+    HelperSerialize h(sc);
     in.accept(h);
     return h.result_;
 }
 
-std::string PolymorphicAuditJSON::type_name(ServiceRegistry &srv_registry,
-                                            const Audit::IAuditEntry &in)
+std::string PolymorphicAuditJSON::type_name(const Audit::IAuditEntry &in)
 {
-    HelperSerialize h(srv_registry, SystemSecurityContext::instance());
+    HelperSerialize h(SystemSecurityContext::instance());
     in.accept(h);
     ASSERT_LOG(h.result_.find("type") != h.result_.end(),
                "The serializer didn't set a type.");
@@ -58,10 +57,8 @@ std::string PolymorphicAuditJSON::type_name(ServiceRegistry &srv_registry,
     return h.result_.at("type");
 }
 
-PolymorphicAuditJSON::HelperSerialize::HelperSerialize(ServiceRegistry &registry,
-                                                       const SecurityContext &sc)
-    : registry_(registry)
-    , security_context_(sc)
+PolymorphicAuditJSON::HelperSerialize::HelperSerialize(const SecurityContext &sc)
+    : security_context_(sc)
 {
 }
 
@@ -110,7 +107,8 @@ void PolymorphicAuditJSON::HelperSerialize::cannot_visit(
     //   + Its an other object, and in that case, we shouldn't be here (we will
     //       assert)
     const auto &audit_entry = assert_cast<const Audit::IAuditEntry &>(visitable);
-    auto service = registry_.get_service<Audit::Serializer::JSONService>();
+    auto service =
+        get_service_registry().get_service<Audit::Serializer::JSONService>();
     ASSERT_LOG(service,
                "Cannot retrieve Audit::Serializer::JSONService. Since this a "
                "core service, something must be very wrong.");

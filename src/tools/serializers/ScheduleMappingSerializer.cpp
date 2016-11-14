@@ -20,10 +20,13 @@
 #include "tools/serializers/ScheduleMappingSerializer.hpp"
 #include "Door_odb.h"
 #include "User_odb.h"
+#include "core/GetServiceRegistry.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/ScheduleMapping.hpp"
+#include "tools/db/DBService.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
+#include "tools/service/ServiceRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Tools;
@@ -82,7 +85,7 @@ void ScheduleMappingJSONSerializer::unserialize(Tools::ScheduleMapping &out,
                                                 const SecurityContext &)
 {
     // We need to database to build Lazy pointer from object's identifier.
-    auto db = ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
+    auto db = get_service_registry().get_service<DBService>()->db();
     using namespace JSONUtil;
     out.alias(extract_with_default(in, "alias", out.alias()));
 

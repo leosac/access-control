@@ -51,20 +51,15 @@ struct PolymorphicAuditJSON
 {
     /**
      * Perform deep serialization of the AuditEntry `in`.
-     *
-     * This call requires a reference to the ServiceRegistry in order
-     * to use, if need and available, the runtime registered serializer.
      */
-    static json serialize(ServiceRegistry &srv_registry,
-                          const Audit::IAuditEntry &in, const SecurityContext &sc);
+    static json serialize(const Audit::IAuditEntry &in, const SecurityContext &sc);
 
     /**
      * Returns the "type-name" of the audit entry.
      *
      * Possible return value could be "audit-user-event".
      */
-    static std::string type_name(ServiceRegistry &srv_registry,
-                                 const Audit::IAuditEntry &in);
+    static std::string type_name(const Audit::IAuditEntry &in);
 
   private:
     /**
@@ -78,7 +73,7 @@ struct PolymorphicAuditJSON
                              public Tools::Visitor<Audit::IDoorEvent>,
                              public Tools::Visitor<Audit::IUserGroupMembershipEvent>
     {
-        HelperSerialize(ServiceRegistry &registry, const SecurityContext &sc);
+        HelperSerialize(const SecurityContext &sc);
 
         virtual void visit(const Audit::IUserEvent &t) override;
         virtual void visit(const Audit::IWSAPICall &t) override;
@@ -94,8 +89,6 @@ struct PolymorphicAuditJSON
          * the Audit::Serializer::JSONService class.
          */
         virtual void cannot_visit(const Tools::IVisitable &visitable) override;
-
-        ServiceRegistry &registry_;
 
         /**
          * Store the result here because we can't return from

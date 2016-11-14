@@ -41,8 +41,8 @@ json JSONService::serialize(const Audit::IAuditEntry &audit,
     auto itr        = serializers_.find(type_index);
     if (itr != serializers_.end())
     {
-        // Invoked the adapter we store in the map.
-        // The wrapper will invoked the user-defined callable.
+        // Invoke the adapter we stored in the map.
+        // The wrapper will invoke the user-defined callable.
         return itr->second(audit, sc);
     }
     ASSERT_LOG(false, "Cannot find an appropriate serializer for " +

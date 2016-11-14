@@ -20,9 +20,11 @@
 #include "core/auth/Door.hpp"
 #include "AccessPoint_odb.h"
 #include "DoorSerializer.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/auth/IAccessPoint.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
+#include "tools/service/ServiceRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;
@@ -64,8 +66,7 @@ void DoorJSONSerializer::unserialize(Auth::IDoor &out, const json &in,
     {
         if (new_ap_id)
         {
-            DBPtr dbptr =
-                ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
+            DBPtr dbptr = get_service_registry().get_service<DBService>()->db();
             Auth::AccessPointLPtr new_access_point(*dbptr, new_ap_id);
             out.access_point(new_access_point.load());
         }

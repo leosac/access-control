@@ -23,6 +23,7 @@
 #include "MessageBus.hpp"
 #include "RemoteControl.hpp"
 #include "Scheduler.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/config/ConfigChecker.hpp"
 #include "core/config/ConfigManager.hpp"
 #include "core/netconfig/networkconfig.hpp"
@@ -73,10 +74,9 @@ class Kernel
 {
   public:
     /**
-    * Construct a Kernel object. Only one should live, it doesn't make sense to have
-    * more than one, and could
-    * cause problem.
-    *
+    * Construct a Kernel object. Only one Kernel object may be alive at any given
+     * time. This is because a global reference to the instance is kept.
+     *
     * @param config initial configuration tree
     * @param strict_mode are we running in strict mode ? (This is wrt configuration
     * validation)
@@ -337,5 +337,11 @@ class Kernel
     Tools::XmlNodeNameEnforcer xmlnne_;
 
     ServiceRegistryUPtr service_registry_;
+
+    /**
+     * A global pointer to the Kernel instance.
+     */
+    static Kernel *instance_;
+    friend ServiceRegistry &get_service_registry();
 };
 }

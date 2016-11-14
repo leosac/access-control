@@ -40,7 +40,7 @@ namespace Leosac
  * Important notes regarding object lifecycle:
  *    + `register_service()` takes a naked pointer. It is the responsibility of the
  *       caller to make sure that the service object will stay alive
- *       at least until a succesful call to `unregister_service()` happens.
+ *       at least until a successful call to `unregister_service()` happens.
  *    + The ServiceRegistry implements reference counting with regards to service
  *      object it hands over to client.
  *    + `unregister_service()` will fail if the service is currently being used by
@@ -50,19 +50,65 @@ namespace Leosac
 class ServiceRegistry
 {
 
+    /**
+     * An internal registration structure.
+     *
+     * Each registered services is mapped to a RegistrationInfo
+     * through an instance of boost::typeindex::type_index.
+     *
+     * @note Either raw_service or unique_service must be set.
+     */
     struct RegistrationInfo
     {
-        boost::typeindex::type_index service_interface_;
-        void *srv_;
+        RegistrationInfo()
+            : raw_service(nullptr){};
+        boost::typeindex::type_index service_interface;
+
+        void *raw_service;
+        std::unique_ptr<void, std::function<void(void *)>> unique_service;
     };
+    using RegistrationInfoPtr = std::shared_ptr<RegistrationInfo>;
 
   public:
     using RegistrationHandle = std::weak_ptr<void>;
 
+    /**
+     * Register a service by passing an unique_ptr to it.
+     *
+     * By calling this overload over the more general
+     * `register_service()`, the caller free themselves from managing
+     * the lifetime of the service.
+     *
+     * The service will be automatically deleted once a successful call
+     * to `unregister_service()` is made.
+     */
+    template <typename ServiceInterface>
+    RegistrationHandle register_service(std::unique_ptr<ServiceInterface> srv)
+    {
+        auto type_index = boost::typeindex::type_id<ServiceInterface>();
+        ASSERT_LOG(!services_.has(type_index),
+                   "Already has a service registered for this interface: "
+                       << type_index.pretty_name());
+
+        RegistrationInfoPtr registration = std::make_shared<RegistrationInfo>();
+        registration->service_interface  = type_index;
+        registration->unique_service =
+            std::unique_ptr<void, std::function<void(void *)>>(
+                srv.release(), [](void *service_instance) {
+                    auto typed_service_ptr =
+                        static_cast<ServiceInterface *>(service_instance);
+                    ASSERT_LOG(service_instance && typed_service_ptr,
+                               "service_instance is null.");
+                    delete typed_service_ptr;
+                });
+        services_.set(type_index, registration);
+
+        return registration;
+    }
+
     template <typename ServiceInterface>
     RegistrationHandle register_service(ServiceInterface *srv)
     {
-        using RegistrationInfoSPtr = std::shared_ptr<RegistrationInfo>;
         std::lock_guard<std::mutex> lg(mutex_);
 
         auto type_index = boost::typeindex::type_id<ServiceInterface>();
@@ -70,14 +116,24 @@ class ServiceRegistry
                    "Already has a service registered for this interface: "
                        << type_index.pretty_name());
 
-        RegistrationInfoSPtr registration = std::make_shared<RegistrationInfo>();
-        registration->service_interface_  = type_index;
-        registration->srv_                = srv;
+        RegistrationInfoPtr registration = std::make_shared<RegistrationInfo>();
+        registration->service_interface  = type_index;
+        registration->raw_service        = srv;
         services_.set(type_index, registration);
 
         return registration;
     }
 
+    /**
+     * Unregister a service using the RegistrationHandle that was returned
+     * from the `register_service()` call.
+     *
+     * @return This call returns true if the service was properly unregistered.
+     * Otherwise it returns false.
+     *
+     * @note It's not possible to unregister a service if something is holding
+     * a reference to it.
+     */
     bool unregister_service(RegistrationHandle h)
     {
         std::lock_guard<std::mutex> lg(mutex_);
@@ -85,7 +141,7 @@ class ServiceRegistry
         std::shared_ptr<void> registration = h.lock();
         if (registration)
         {
-            std::shared_ptr<RegistrationInfo> registration_sptr =
+            RegistrationInfoPtr registration_sptr =
                 std::static_pointer_cast<RegistrationInfo>(registration);
 
             // We must check that the service is not currently in use. If that's the
@@ -104,9 +160,9 @@ class ServiceRegistry
             }
 
             // Sanity check
-            ASSERT_LOG(services_.has(registration_sptr->service_interface_),
+            ASSERT_LOG(services_.has(registration_sptr->service_interface),
                        "Trying to unregister a service using an invalid handle.");
-            services_.erase(registration_sptr->service_interface_);
+            services_.erase(registration_sptr->service_interface);
             return true;
         }
         return false;
@@ -114,6 +170,12 @@ class ServiceRegistry
 
     /**
      * Unregister the service for the interface ServiceInterface.
+     *
+     * @return This call returns true if the service was properly unregistered.
+     * Otherwise it returns false.
+     *
+     * @note It's not possible to unregister a service if something is holding
+     * a reference to it.
      */
     template <typename ServiceInterface>
     bool unregister_service()
@@ -144,16 +206,20 @@ class ServiceRegistry
     template <typename ServiceInterface>
     std::shared_ptr<ServiceInterface> get_service() const
     {
-        using RegistrationInfoSPtr = std::shared_ptr<RegistrationInfo>;
         std::lock_guard<std::mutex> lg(mutex_);
 
         auto type_index = boost::typeindex::type_id<ServiceInterface>();
         if (services_.has(type_index))
         {
-            auto registration = services_.get<RegistrationInfoSPtr>(type_index);
-            ServiceInterface *srv_ptr =
-                static_cast<ServiceInterface *>(registration->srv_);
-            return std::shared_ptr<ServiceInterface>(registration, srv_ptr);
+            auto registration = services_.get<RegistrationInfoPtr>(type_index);
+            ServiceInterface *service_ptr;
+            if (registration->raw_service)
+                service_ptr =
+                    static_cast<ServiceInterface *>(registration->raw_service);
+            else
+                service_ptr = static_cast<ServiceInterface *>(
+                    registration->unique_service.get());
+            return std::shared_ptr<ServiceInterface>(registration, service_ptr);
         }
         return nullptr;
     }

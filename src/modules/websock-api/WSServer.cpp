@@ -252,10 +252,6 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
     auto handler_factory = individual_handlers_.find(in.type);
     api_handle->hook_before_request();
 
-    // Store the database handle in the thread local registry.
-    // This may be used later by serializers.
-    ThreadLocalRegistry::set(ThreadLocalRegistry::DATABASE, dbsrv_->db());
-
     if (handler_factory != individual_handlers_.end())
     {
         RequestContext ctx{.session      = api_handle,

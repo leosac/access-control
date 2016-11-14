@@ -75,8 +75,7 @@ json AuditGet::process_impl(const json &req)
         for (const auto &audit : ret)
         {
             json audit_json = Audit::Serializer::PolymorphicAuditJSON::serialize(
-                ctx_.server.core_utils()->service_registry(), audit,
-                security_context());
+                audit, security_context());
             rep["data"].push_back(audit_json);
         }
     }

@@ -57,6 +57,8 @@ using boost::property_tree::ptree_error;
 using namespace Leosac::Tools;
 using namespace Leosac;
 
+Kernel *Kernel::instance_ = nullptr;
+
 Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
     : utils_(std::make_shared<CoreUtils>(this, std::make_shared<Scheduler>(this),
                                          std::make_shared<ConfigChecker>(), strict))
@@ -105,11 +107,13 @@ Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
     control_.bind("inproc://leosac-kernel");
     bus_push_.connect("inproc://zmq-bus-pull");
     network_config_->reload();
+    instance_ = this;
 }
 
 Kernel::~Kernel()
 {
     unregister_core_services();
+    instance_ = nullptr;
 }
 
 boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
@@ -633,19 +637,25 @@ void Kernel::register_core_services()
     service_registry_ = std::make_unique<ServiceRegistry>();
     {
         service_registry_->register_service<Audit::Serializer::JSONService>(
-            new Audit::Serializer::JSONService());
+            std::make_unique<Audit::Serializer::JSONService>());
+        if (database_)
+        {
+            service_registry_->register_service<DBService>(
+                std::make_unique<DBService>(database_));
+        }
     }
 }
 
 void Kernel::unregister_core_services()
 {
-    // Get and retrieve raw pointer as to not count as "currently using the service"
-    Audit::Serializer::JSONService *ptr =
-        service_registry_->get_service<Audit::Serializer::JSONService>().get();
     bool ret =
         service_registry_->unregister_service<Audit::Serializer::JSONService>();
     ASSERT_LOG(ret, "Failed to unregister AuditSerializerService.");
-    delete ptr;
+    if (database_)
+    {
+        ret = service_registry_->unregister_service<DBService>();
+        ASSERT_LOG(ret, "Failed to unregister DBService");
+    }
 }
 
 ServiceRegistry &Kernel::service_registry()

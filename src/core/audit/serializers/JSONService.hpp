@@ -39,9 +39,8 @@ namespace Serializer
  * is a core service and there is no point in providing an alternative
  * implementation.
  *
- * Its goal is to hand over instance of serializer that can target a specific type of
+ * Its goal is to hand over callable that can target a specific type of
  * AuditEntry.
- *
  *
  * @note This service is for serialization extended audit entry (those provided by
  * modules) rather than the ones present in leosac's core.

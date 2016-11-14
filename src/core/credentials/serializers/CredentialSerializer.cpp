@@ -20,12 +20,14 @@
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "Schedule_odb.h"
 #include "User_odb.h"
+#include "core/GetServiceRegistry.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/auth/ValidityInfo.hpp"
 #include "core/credentials/ICredential.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
+#include "tools/service/ServiceRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
@@ -87,8 +89,7 @@ void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &i
     {
         if (new_owner_id)
         {
-            DBPtr dbptr =
-                ThreadLocalRegistry::get<DBPtr>(ThreadLocalRegistry::DATABASE);
+            DBPtr dbptr = get_service_registry().get_service<DBService>()->db();
             Auth::UserLPtr new_owner(*dbptr, new_owner_id);
             out.owner(new_owner);
         }
