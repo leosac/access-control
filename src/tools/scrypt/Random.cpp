@@ -45,7 +45,7 @@ std::string Random::GetASCII(size_t n)
 
     std::stringstream ss;
     auto bytes = GetBytes(n);
-    size_t idx    = 0;
+    size_t idx = 0;
     for (size_t i = 0; i < n; ++i)
     {
         if (idx == bytes.size())

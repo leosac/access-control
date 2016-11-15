@@ -28,6 +28,7 @@
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/log.hpp"
 #include <odb/pgsql/query.hxx>
 
 using namespace Leosac;

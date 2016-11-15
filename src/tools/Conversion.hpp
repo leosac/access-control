@@ -42,4 +42,8 @@ To Conversion(const From &in);
 template <>
 std::string Conversion<std::string, std::chrono::system_clock::time_point>(
     const std::chrono::system_clock::time_point &tp);
+
+template <>
+std::string Conversion<std::string, std::chrono::steady_clock::time_point>(
+    const std::chrono::steady_clock::time_point &tp);
 }

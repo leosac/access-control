@@ -18,6 +18,7 @@
 */
 
 #include "log.hpp"
+#include "gettid.hpp"
 #include <boost/regex.hpp>
 
 namespace
@@ -56,55 +57,60 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
         return;
     }
 
+    // fixme Maybe update spdlog and use its formatting utilities.
+    std::stringstream ss;
+    ss << "[" << Leosac::gettid() << "] " << log_msg;
+    std::string log_msg_with_thread_id = ss.str();
+
     switch (level)
     {
     case LogLevel::DEBUG:
         if (console)
-            console->debug(log_msg);
+            console->debug(log_msg_with_thread_id);
         if (syslog)
-            syslog->debug(remove_ascii_format(log_msg));
+            syslog->debug(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::INFO:
         if (console)
-            console->info(log_msg);
+            console->info(log_msg_with_thread_id);
         if (syslog)
-            syslog->info(remove_ascii_format(log_msg));
+            syslog->info(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::NOTICE:
         if (console)
-            console->notice(log_msg);
+            console->notice(log_msg_with_thread_id);
         if (syslog)
-            syslog->notice(remove_ascii_format(log_msg));
+            syslog->notice(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::WARN:
         if (console)
-            console->warn(log_msg);
+            console->warn(log_msg_with_thread_id);
         if (syslog)
-            syslog->warn(remove_ascii_format(log_msg));
+            syslog->warn(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::ERROR:
         if (console)
-            console->error(log_msg);
+            console->error(log_msg_with_thread_id);
         if (syslog)
-            syslog->error(remove_ascii_format(log_msg));
+            syslog->error(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::CRIT:
         if (console)
-            console->critical(log_msg);
+            console->critical(log_msg_with_thread_id);
         if (syslog)
-            syslog->critical(remove_ascii_format(log_msg));
+            syslog->critical(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::ALERT:
         if (console)
-            console->alert(log_msg);
+            console->alert(log_msg_with_thread_id);
         if (syslog)
-            syslog->alert(remove_ascii_format(log_msg));
+            syslog->alert(remove_ascii_format(log_msg_with_thread_id));
         break;
     case LogLevel::EMERG:
         if (console)
-            console->emerg(log_msg);
+            console->emerg(log_msg_with_thread_id);
         if (syslog)
-            syslog->emerg(remove_ascii_format(log_msg));
+            syslog->emerg(remove_ascii_format(log_msg_with_thread_id));
         break;
     }
 }

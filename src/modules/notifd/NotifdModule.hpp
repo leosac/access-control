@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -19,39 +19,36 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
-#include <json.hpp>
-#include <memory>
+#include "modules/BaseModule.hpp"
+#include <boost/asio/io_service.hpp>
+#include <boost/fiber/all.hpp>
 
 namespace Leosac
 {
 namespace Module
 {
-namespace WebSockAPI
+namespace Notifd
 {
-class APISession;
-using APIPtr = std::shared_ptr<APISession>;
 
-class MethodHandler;
-using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
+class NotifdModule : public BaseModule
+{
+  public:
+    NotifdModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                 const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-class CRUDResourceHandler;
-using CRUDResourceHandlerUPtr = std::unique_ptr<CRUDResourceHandler>;
+    ~NotifdModule();
 
-class ExternalCRUDResourceHandler;
-using ExternalCRUDResourceHandlerUPtr = std::unique_ptr<ExternalCRUDResourceHandler>;
+    virtual void run() override;
 
-class WebSockAPIModule;
-class WSServer;
+  private:
+    /**
+     * Install a fiber that will watch for the STOP signal from
+     * Leosac's Kernel.
+     */
+    void install_stop_watcher();
 
-struct ClientMessage;
-struct ServerMessage;
-struct RequestContext;
-using FiberHandlerT =
-    std::function<boost::optional<nlohmann::json>(const RequestContext &)>;
-
-class Facade;
-using FacadeUPtr = std::unique_ptr<Facade>;
+    std::shared_ptr<boost::asio::io_service> io_service_;
+};
 }
 }
 }

@@ -35,15 +35,19 @@ struct MailInfo
 };
 
 /**
- * A "facade" object for sending mail.
+ * Reference interface for SMTP module.
  *
- * This object is responsible for attempting to send email.
+ * @note It is expected that the service implementation
+ * is non-blocking and asynchronous.
+ *
+ * @note All methods in this interface MUST be thread safe.
  */
-class MailSender
+class SMTPService
 {
-
   public:
-    MailSender(CoreUtilsPtr utils);
+    virtual ~SMTPService()
+    {
+    }
 
     /**
      * Send a message to the mailer service (if any) to enqueue
@@ -53,17 +57,14 @@ class MailSender
      * that the mail as been queue, nor does it wait for the ZeroMQ connection
      * to the message bus.
      */
-    void send(const MailInfo &mail);
+    virtual void async_send(const MailInfo &mail) = 0;
 
     /**
      * Similar to send, but add the leosac administrator email to the
      * recipients' list.
      *
-     * The admin email is fetch from the environment: LEOSAC_ADMIN_MAIL
+     * The admin email is fetched from the environment: LEOSAC_ADMIN_MAIL
      */
-    void send_to_admin(const MailInfo &mail);
-
-  private:
-    CoreUtilsPtr utils_;
+    virtual void async_send_to_admin(const MailInfo &mail) = 0;
 };
 }

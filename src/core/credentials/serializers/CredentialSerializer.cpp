@@ -27,7 +27,6 @@
 #include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
-#include "tools/service/ServiceRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Cred;
@@ -64,8 +63,8 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
 
     if (in.owner_id())
     {
-        serialized["relationships"]
-                  ["owner"] = {{"data", {{"id", in.owner_id()}, {"type", "user"}}}};
+        serialized["relationships"]["owner"] = {
+            {"data", {{"id", in.owner_id()}, {"type", "user"}}}};
     }
     serialized["relationships"]["schedules"] = {{"data", schedules}};
     return serialized;

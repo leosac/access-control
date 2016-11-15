@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,19 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "NotifdModule.hpp"
+#include "tools/log.hpp"
 
-#include "tools/service/ServiceFwd.hpp"
-
-namespace Leosac
+extern "C" {
+const char *get_module_name()
 {
-/**
- * A function to retrieve the ServiceRegistry from pretty
- * much anywhere.
- *
- * The only requirement is that a Kernel object is currently alive.
- */
-ServiceRegistry &get_service_registry();
+    return "NOTIFD";
+}
 }
 
-#include "tools/service/ServiceRegistry.hpp"
+
+/**
+* Entry point for the NOTIFD module.
+*/
+
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
+{
+    return Leosac::Module::start_module_helper<Leosac::Module::Notifd::NotifdModule>(
+        pipe, cfg, zmq_ctx, utils);
+}

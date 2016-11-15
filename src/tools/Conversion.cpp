@@ -36,4 +36,18 @@ std::string Conversion<std::string, std::chrono::system_clock::time_point>(
         return out;
     return "";
 }
+
+template <>
+std::string Conversion<std::string, std::chrono::steady_clock::time_point>(
+    const std::chrono::steady_clock::time_point &tp)
+{
+    using namespace std::chrono;
+
+    auto system_clock_tp  = system_clock::now() + (tp - steady_clock::now());
+    std::time_t dt_time_t = system_clock::to_time_t(system_clock_tp);
+    std::string out;
+    if (my_puttime(out, std::gmtime(&dt_time_t), "%FT%T%z"))
+        return out;
+    return "";
+}
 }

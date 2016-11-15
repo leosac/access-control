@@ -17,14 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/Door.hpp"
-#include "AccessPoint_odb.h"
 #include "DoorSerializer.hpp"
+#include "AccessPoint_odb.h"
 #include "core/GetServiceRegistry.hpp"
+#include "core/auth/Door.hpp"
 #include "core/auth/IAccessPoint.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
-#include "tools/service/ServiceRegistry.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;

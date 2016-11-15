@@ -38,8 +38,8 @@ json GroupEventJSON::serialize(const Audit::IGroupEvent &in,
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-group-event";
 
-    serialized["relationships"]
-              ["target"] = {{{"id", in.target_id()}, {"type", "group"}}};
+    serialized["relationships"]["target"] = {
+        {{"id", in.target_id()}, {"type", "group"}}};
 
     if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {

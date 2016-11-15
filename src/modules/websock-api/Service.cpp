@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2016 Islog
 
     This file is part of Leosac.
 
@@ -17,11 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include <boost/optional.hpp>
-#include <json.hpp>
-#include <memory>
+#include "modules/websock-api/Service.hpp"
+#include "modules/websock-api/WSServer.hpp"
 
 namespace Leosac
 {
@@ -29,29 +26,12 @@ namespace Module
 {
 namespace WebSockAPI
 {
-class APISession;
-using APIPtr = std::shared_ptr<APISession>;
 
-class MethodHandler;
-using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
-
-class CRUDResourceHandler;
-using CRUDResourceHandlerUPtr = std::unique_ptr<CRUDResourceHandler>;
-
-class ExternalCRUDResourceHandler;
-using ExternalCRUDResourceHandlerUPtr = std::unique_ptr<ExternalCRUDResourceHandler>;
-
-class WebSockAPIModule;
-class WSServer;
-
-struct ClientMessage;
-struct ServerMessage;
-struct RequestContext;
-using FiberHandlerT =
-    std::function<boost::optional<nlohmann::json>(const RequestContext &)>;
-
-class Facade;
-using FacadeUPtr = std::unique_ptr<Facade>;
+bool Service::register_typed_handler(const Service::WSHandler &handler,
+                                     const std::string &type)
+{
+    return server_.ASIO_REGISTER_HANDLER(handler, type);
+}
 }
 }
 }

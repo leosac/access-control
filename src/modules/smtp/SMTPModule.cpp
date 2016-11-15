@@ -24,7 +24,9 @@
 #include "SMTPConfig.hpp"
 #include "SMTPConfig_odb.h"
 #include "SMTPServerInfoSerializer.hpp"
+#include "SMTPServiceImpl.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
 #include "core/audit/serializers/JSONService.hpp"
@@ -34,12 +36,16 @@
 #include "modules/websock-api/Exceptions.hpp"
 #include "modules/websock-api/Facade.hpp"
 #include "modules/websock-api/Messages.hpp"
+#include "modules/websock-api/RequestContext.hpp"
+#include "modules/websock-api/Service.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/Mail.hpp"
 #include "tools/MyTime.hpp"
 #include "tools/db/database.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
+#include <boost/asio.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <curl/curl.h>
 #include <json.hpp>
 
@@ -49,8 +55,7 @@ using namespace Leosac::Module::SMTP;
 
 SMTPModule::SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                        const boost::property_tree::ptree &cfg, CoreUtilsPtr utils)
-    : BaseModule(ctx, pipe, cfg, utils)
-    , bus_sub_(ctx, zmqpp::socket_type::sub)
+    : AsioModule(ctx, pipe, cfg, utils)
 {
     int ret;
     long flags = 0;
@@ -62,10 +67,7 @@ SMTPModule::SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
         throw std::runtime_error("Failed to initialize curl: return code: " +
                                  std::to_string(ret));
     }
-    bus_sub_.connect("inproc://zmq-bus-pub");
-    bus_sub_.subscribe("SERVICE.MAILER");
     process_config();
-    reactor_.add(bus_sub_, std::bind(&SMTPModule::handle_msg_bus, this));
 
     auto audit_serializer_service =
         utils_->service_registry().get_service<Audit::Serializer::JSONService>();
@@ -76,6 +78,10 @@ SMTPModule::SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
         [](const SMTPAudit &audit, const SecurityContext &sc) -> json {
             return SMTPAuditSerializer::serialize(audit, sc);
         });
+
+    // We're now mostly constructed, time to advertise our services.
+    get_service_registry().register_service<SMTPService>(
+        std::make_unique<SMTPServiceImpl>(*this));
 }
 
 SMTPModule::~SMTPModule()
@@ -86,30 +92,10 @@ SMTPModule::~SMTPModule()
     ASSERT_LOG(audit_serializer_service,
                "Cannot retrieve Audit::Serializer::JSONService.");
     audit_serializer_service->unregister_serializer<SMTPAudit>();
-}
 
-void SMTPModule::handle_msg_bus()
-{
-    zmqpp::message msg;
-    std::string key;
-
-    bus_sub_.receive(msg);
-    if (msg.parts() != 2)
-    {
-        WARN("Unexpected message content.");
-        return;
-    }
-    msg.pop_front();
-    msg >> key;
-    try
-    {
-        MailInfo mail = GlobalRegistry::get<MailInfo>(key);
-        prepare_curl(mail);
-    }
-    catch (const RegistryKeyNotFoundException &e)
-    {
-        WARN("SMTP: cannot retrieve MailInfo from GlobalRegistry. Key was: " << key);
-    }
+    // Make sure we properly unregister the service.
+    while (!get_service_registry().unregister_service<SMTPService>())
+        ;
 }
 
 void SMTPModule::process_config()
@@ -155,14 +141,7 @@ void SMTPModule::process_config()
     }
 
     if (use_database_)
-    {
-        websocket_api = std::make_unique<WebSockAPI::Facade>(reactor_, utils_);
-        auto handler  = std::bind(&SMTPModule::handle_websocket_message, this,
-                                 std::placeholders::_1, std::placeholders::_2);
-        websocket_api->register_handler(wshandler_getconfig, handler);
-        websocket_api->register_handler(wshandler_setconfig, handler);
-        websocket_api->register_handler(wshandler_sendmail, handler);
-    }
+        register_ws_handlers();
 }
 
 bool SMTPModule::prepare_curl(const MailInfo &mail)
@@ -170,6 +149,12 @@ bool SMTPModule::prepare_curl(const MailInfo &mail)
     if (smtp_config_->servers().size() == 0)
         WARN("Cannot send mail titled " << Colorize::cyan(mail.title)
                                         << ". No SMTP server configured.");
+    if (mail.to.size() == 0)
+    {
+        WARN("No recipient for mail titled " << Colorize::cyan(mail.title) << '.');
+        return false;
+    }
+
     for (const auto &target : smtp_config_->servers())
     {
         if (!target.enabled)
@@ -317,69 +302,27 @@ void SMTPModule::setup_database()
     }
 }
 
-WebSockAPI::ServerMessage SMTPModule::handle_websocket_message(
-    const WebSockAPI::ModuleRequestContext &request_ctx,
-    const WebSockAPI::ClientMessage &msg)
-{
-    WebSockAPI::ServerMessage response;
-    response.status_code = APIStatusCode::UNKNOWN;
-    response.content     = {};
-    try
-    {
-        response.uuid = msg.uuid;
-        response.type = msg.type;
-
-        if (msg.type == wshandler_getconfig)
-        {
-            request_ctx.security_ctx->enforce_permission(
-                SecurityContext::Action::SMTP_GETCONFIG);
-            response.content = handle_ws_smtp_getconfig(request_ctx, msg.content);
-            response.status_code = APIStatusCode::SUCCESS;
-        }
-        else if (msg.type == wshandler_setconfig)
-        {
-            request_ctx.security_ctx->enforce_permission(
-                SecurityContext::Action::SMTP_SETCONFIG);
-            response.content = handle_ws_smtp_setconfig(request_ctx, msg.content);
-            response.status_code = APIStatusCode::SUCCESS;
-        }
-        else if (msg.type == wshandler_sendmail)
-        {
-            request_ctx.security_ctx->enforce_permission(
-                SecurityContext::Action::SMTP_SENDMAIL);
-            response.content     = handle_ws_smtp_sendmail(request_ctx, msg.content);
-            response.status_code = APIStatusCode::SUCCESS;
-        }
-    }
-    catch (...)
-    {
-        return WebSockAPI::ExceptionConverter().convert_merge(
-            std::current_exception(), response);
-    }
-    return response;
-}
-
-json SMTPModule::handle_ws_smtp_getconfig(
-    const WebSockAPI::ModuleRequestContext &req_ctx, const json &)
+json SMTPModule::handle_ws_smtp_getconfig(const WebSockAPI::RequestContext &req_ctx,
+                                          const json &)
 {
     json ret = json::array();
     for (const auto &server_cfg : smtp_config_->servers())
     {
-        ret.push_back(SMTPServerInfoJSONSerializer::serialize(
-            server_cfg, *req_ctx.security_ctx));
+        ret.push_back(SMTPServerInfoJSONSerializer::serialize(server_cfg,
+                                                              req_ctx.security_ctx));
     }
     return ret;
 }
 
-json SMTPModule::handle_ws_smtp_setconfig(
-    const WebSockAPI::ModuleRequestContext &req_ctx, const json &req)
+json SMTPModule::handle_ws_smtp_setconfig(const WebSockAPI::RequestContext &req_ctx,
+                                          const json &req)
 {
     SMTPConfigUPtr cfg = std::make_unique<SMTPConfig>();
     for (const auto &server : req.at("servers"))
     {
         SMTPServerInfo srv_info;
         SMTPServerInfoJSONSerializer::unserialize(srv_info, server,
-                                                  *req_ctx.security_ctx);
+                                                  req_ctx.security_ctx);
         cfg->server_add(srv_info);
     }
 
@@ -400,7 +343,7 @@ json SMTPModule::handle_ws_smtp_setconfig(
     return {};
 }
 
-json SMTPModule::handle_ws_smtp_sendmail(const WebSockAPI::ModuleRequestContext &,
+json SMTPModule::handle_ws_smtp_sendmail(const WebSockAPI::RequestContext &,
                                          const json &req)
 {
     MailInfo mail;
@@ -411,4 +354,83 @@ json SMTPModule::handle_ws_smtp_sendmail(const WebSockAPI::ModuleRequestContext 
         mail.to.push_back(recipient);
 
     return {{"sent", (prepare_curl(mail))}};
+}
+
+void SMTPModule::on_service_event(const service_event::Event &e)
+{
+    // We are interested in WebSockAPI::Service registration so we can
+    // register our websocket handler against it.
+    if (e.type() == service_event::REGISTERED)
+    {
+        auto &service_registered_event =
+            assert_cast<const service_event::ServiceRegistered &>(e);
+        if (service_registered_event.interface_type() ==
+            boost::typeindex::type_id<WebSockAPI::Service>())
+        {
+            // The service-event handler is invoked in the Websocket thread.
+            // We want the registration to happen from our own thread, otherwise
+            // it will deadlock (because the ws thread event loop is blocked
+            // invoking this handler, that in turn would rely on a callable being
+            // invoked from the ws thread event loop.
+            io_service_.post([this]() {
+                // We don't care about registering WS handler if we don't use the
+                // database.
+                if (!use_database_)
+                    return;
+                register_ws_handlers();
+            });
+        }
+    }
+}
+
+void SMTPModule::register_ws_handlers()
+{
+    auto ws_srv = get_service_registry().get_service<Module::WebSockAPI::Service>();
+    if (ws_srv)
+    {
+        // GetConfig
+        bool ret = ws_srv->register_asio_handler(
+            [this](const WebSockAPI::RequestContext &req_ctx) {
+                req_ctx.security_ctx.enforce_permission(
+                    SecurityContext::Action::SMTP_GETCONFIG);
+                return handle_ws_smtp_getconfig(req_ctx,
+                                                req_ctx.original_msg.content);
+            },
+            wshandler_getconfig, io_service_);
+        if (!ret)
+            WARN("Cannot register SMTP WS handler: " << wshandler_getconfig);
+
+        // SetConfig
+        ret = ws_srv->register_asio_handler(
+            [this](const WebSockAPI::RequestContext &req_ctx) {
+                req_ctx.security_ctx.enforce_permission(
+                    SecurityContext::Action::SMTP_SETCONFIG);
+                return handle_ws_smtp_setconfig(req_ctx,
+                                                req_ctx.original_msg.content);
+            },
+            wshandler_setconfig, io_service_);
+        if (!ret)
+            WARN("Cannot register SMTP WS handler: " << wshandler_setconfig);
+
+        // SendMail
+        ret = ws_srv->register_asio_handler(
+            [this](const WebSockAPI::RequestContext &req_ctx) {
+                req_ctx.security_ctx.enforce_permission(
+                    SecurityContext::Action::SMTP_SENDMAIL);
+                return handle_ws_smtp_sendmail(req_ctx,
+                                               req_ctx.original_msg.content);
+            },
+            wshandler_sendmail, io_service_);
+        if (!ret)
+            WARN("Cannot register SMTP WS handler: " << wshandler_sendmail);
+    }
+    else
+    {
+        INFO("Cannot register Websocket handlers. Service is not (yet) available.");
+    }
+}
+
+void SMTPModule::async_send_mail(const MailInfo &mail)
+{
+    io_service_.post([this, mail]() { prepare_curl(mail); });
 }

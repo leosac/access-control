@@ -44,6 +44,8 @@ struct RequestContext
      */
     const ClientMessage &original_msg;
 
+    SecurityContext &security_ctx;
+
     /**
      * The initial audit trail for the request.
      * It is guaranteed that this audit object is:

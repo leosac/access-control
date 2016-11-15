@@ -22,7 +22,7 @@
 #include "CoreAPI.hpp"
 #include "LeosacFwd.hpp"
 #include "tools/db/db_fwd.hpp"
-#include "tools/service/ServiceRegistry.hpp"
+#include "tools/service/ServiceFwd.hpp"
 
 namespace zmqpp
 {

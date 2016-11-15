@@ -33,6 +33,7 @@ namespace Module
 {
 namespace WebSockAPI
 {
+
 /**
  * This object is a facade to interact with the WebSockAPI module.
  *

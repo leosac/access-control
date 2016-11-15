@@ -20,11 +20,15 @@
 #pragma once
 
 #include "SMTPFwd.hpp"
-#include "modules/BaseModule.hpp"
+#include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
+#include "modules/AsioModule.hpp"
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/WebSockFwd.hpp"
 #include "tools/ToolsFwd.hpp"
-#include <core/audit/serializers/PolymorphicAuditSerializer.hpp>
+#include "tools/bs2.hpp"
+#include "tools/service/ServiceRegistry.hpp"
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/steady_timer.hpp>
 #include <curl/curl.h>
 #include <json.hpp>
 
@@ -36,7 +40,7 @@ namespace SMTP
 {
 using json = nlohmann::json;
 
-class SMTPModule : public BaseModule
+class SMTPModule : public AsioModule
 {
   public:
     SMTPModule(zmqpp::context &ctx, zmqpp::socket *pipe,
@@ -44,46 +48,34 @@ class SMTPModule : public BaseModule
 
     ~SMTPModule();
 
+    /**
+     * Asynchronously and thread-safely send an email.
+     *
+     * This method doesn't provide a way to inform the caller of
+     * completion of his operation.
+     */
+    void async_send_mail(const MailInfo &mail);
+
   private:
-    /**
-     * Process a message that was read on the bus.
-     */
-    void handle_msg_bus();
-
-    /**
-     * A websocket message has been forwarded and dispatched to us.
-     */
-    WebSockAPI::ServerMessage
-    handle_websocket_message(const WebSockAPI::ModuleRequestContext &request_ctx,
-                             const WebSockAPI::ClientMessage &msg);
-
     /**
      * Process the websocket request "smtp.getconfig".
      */
-    json handle_ws_smtp_getconfig(const WebSockAPI::ModuleRequestContext &,
-                                  const json &);
+    json handle_ws_smtp_getconfig(const WebSockAPI::RequestContext &, const json &);
 
     /**
      * Process the websocket request "smtp.setconfig".
      */
-    json handle_ws_smtp_setconfig(const WebSockAPI::ModuleRequestContext &,
-                                  const json &);
+    json handle_ws_smtp_setconfig(const WebSockAPI::RequestContext &, const json &);
 
     /**
      * Process the websocket request "smtp.sendmail".
      */
-    json handle_ws_smtp_sendmail(const WebSockAPI::ModuleRequestContext &,
-                                 const json &);
+    json handle_ws_smtp_sendmail(const WebSockAPI::RequestContext &, const json &);
 
     /**
      * Process the configuration file.
      */
     void process_config();
-
-    /**
-     * Read internal message bus.
-     */
-    zmqpp::socket bus_sub_;
 
     bool use_database_;
 
@@ -91,8 +83,6 @@ class SMTPModule : public BaseModule
      * Configuration: either load from XML or database.
      */
     SMTPConfigUPtr smtp_config_;
-
-    std::unique_ptr<WebSockAPI::Facade> websocket_api;
 
     void setup_database();
 
@@ -102,6 +92,17 @@ class SMTPModule : public BaseModule
     static constexpr const char *wshandler_getconfig = "module.smtp.getconfig";
     static constexpr const char *wshandler_setconfig = "module.smtp.setconfig";
     static constexpr const char *wshandler_sendmail  = "module.smtp.sendmail";
+
+    virtual void on_service_event(const service_event::Event &) override;
+
+    /**
+     * Attempt to register websocket handlers against the websocket service,
+     * if available.
+     *
+     * If it cannot register handlers, this function fails silently (because
+     * most of the time we don't care at the point the function is called).
+     */
+    void register_ws_handlers();
 };
 }
 }

@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/UserGroupMembership.hpp"
 #include "UserGroupMembershipSerializer.hpp"
+#include "core/auth/UserGroupMembership.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
 

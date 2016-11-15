@@ -38,8 +38,8 @@ json CredentialEventJSON::serialize(const Audit::ICredentialEvent &in,
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-credential-event";
 
-    serialized["relationships"]
-              ["target"] = {{{"id", in.target_id()}, {"type", "credential"}}};
+    serialized["relationships"]["target"] = {
+        {{"id", in.target_id()}, {"type", "credential"}}};
 
     if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {

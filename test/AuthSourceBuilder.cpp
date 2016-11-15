@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/Auth.hpp"
-#include "core/auth/Auth.hpp"
 #include "core/auth/AuthSourceBuilder.hpp"
+#include "core/auth/Auth.hpp"
+#include "core/auth/Auth.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/PINCode.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"

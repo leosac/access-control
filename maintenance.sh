@@ -5,7 +5,7 @@
 
 
 # Format source code
-find -L src test -name "*.cpp" -or -name "*.hpp" | xargs clang-format-3.8 -i -style=file 
+find -L src test -name "*.cpp" -or -name "*.hpp" | xargs clang-format-3.9 -i -style=file 
 
 
 # Find files missing license header

@@ -112,6 +112,11 @@ Kernel::Kernel(const boost::property_tree::ptree &config, bool strict)
 
 Kernel::~Kernel()
 {
+    // Was done automatically by the destructor,
+    // but we need modules to be stopped before unregistering services.
+    // A more elegant workaround would be to register core services
+    // through a RAII object.
+    module_manager_.stopModules();
     unregister_core_services();
     instance_ = nullptr;
 }

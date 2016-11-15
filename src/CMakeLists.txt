@@ -51,6 +51,7 @@ set(LEOSAC_LIB_SRCS
     core/UserSecurityContext.cpp
     core/GetServiceRegistry.cpp
     dynlib/dynamiclibrary.cpp
+    modules/AsioModule.cpp
     modules/BaseModule.cpp
     exception/ExceptionsTools.cpp
     exception/ModelException.cpp
@@ -89,7 +90,6 @@ set(LEOSAC_LIB_SRCS
     tools/registry/GlobalRegistry.cpp
     tools/Conversion.cpp
     tools/JSONUtils.cpp
-    tools/Mail.cpp
     tools/MyTime.cpp
     tools/SingleTimeFrame.cpp
     tools/serializers/ScheduleSerializer.cpp
@@ -124,7 +124,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/AccessPointEventSerializer.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
-        )
+    )
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db
@@ -138,7 +138,6 @@ add_library(${LEOSAC_LIB} SHARED
         ${OdbCMake_SOURCES_TOOLS}
         ${OdbCMake_SOURCES_AUTH}
         )
-
 
 target_include_directories(${LEOSAC_LIB}
         PUBLIC
@@ -161,7 +160,7 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -g3 -Wl,-z,now")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O2 -Wextra -g3 -Wl,-z,now")
     endif()
 endif()
 
@@ -179,6 +178,7 @@ ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
 ${CMAKE_SOURCE_DIR}/deps/spdlog/include
 ${CMAKE_SOURCE_DIR}/deps/flagset
 ${CMAKE_SOURCE_DIR}/deps/json/src
+${Boost_INCLUDE_DIRS}
 )
 
 #Set compilation flags for current target

@@ -19,39 +19,27 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
-#include <json.hpp>
-#include <memory>
+#include "SMTPFwd.hpp"
+#include "tools/Mail.hpp"
 
 namespace Leosac
 {
 namespace Module
 {
-namespace WebSockAPI
+namespace SMTP
 {
-class APISession;
-using APIPtr = std::shared_ptr<APISession>;
+class SMTPServiceImpl : public SMTPService
+{
+  public:
+    SMTPServiceImpl(SMTPModule &);
 
-class MethodHandler;
-using MethodHandlerUPtr = std::unique_ptr<MethodHandler>;
+    virtual void async_send(const MailInfo &mail) override;
 
-class CRUDResourceHandler;
-using CRUDResourceHandlerUPtr = std::unique_ptr<CRUDResourceHandler>;
+    virtual void async_send_to_admin(const MailInfo &mail) override;
 
-class ExternalCRUDResourceHandler;
-using ExternalCRUDResourceHandlerUPtr = std::unique_ptr<ExternalCRUDResourceHandler>;
-
-class WebSockAPIModule;
-class WSServer;
-
-struct ClientMessage;
-struct ServerMessage;
-struct RequestContext;
-using FiberHandlerT =
-    std::function<boost::optional<nlohmann::json>(const RequestContext &)>;
-
-class Facade;
-using FacadeUPtr = std::unique_ptr<Facade>;
+  private:
+    SMTPModule &smtp_;
+};
 }
 }
 }

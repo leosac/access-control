@@ -21,6 +21,7 @@
 
 #include "LeosacFwd.hpp"
 #include "Messages.hpp"
+#include "Service.hpp"
 #include "WebSockFwd.hpp"
 #include "api/APIAuth.hpp"
 #include "api/APISession.hpp"
@@ -31,6 +32,7 @@
 #include "tools/db/db_fwd.hpp"
 #include <boost/optional.hpp>
 #include <set>
+#include <type_traits>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 #include <zmqpp/zmqpp.hpp>
@@ -62,6 +64,7 @@ class WSServer
      * database.
      */
     WSServer(WebSockAPIModule &module, DBPtr database);
+    ~WSServer();
 
     using Server           = websocketpp::server<websocketpp::config::asio>;
     using ConnectionAPIMap = std::map<websocketpp::connection_hdl, APIPtr,
@@ -94,6 +97,13 @@ class WSServer
      */
     void register_external_handler(const std::string &name,
                                    const std::string &client_id);
+
+    /**
+     * This function block the calling thread until the WebSocket thread has
+     * processed the handler registration.
+     */
+    bool ASIO_REGISTER_HANDLER(const Service::WSHandler &handler,
+                               const std::string &name);
 
     /**
      * Send a message to a connection identified by `connection_identifier`.
@@ -223,6 +233,13 @@ class WSServer
      */
     bool has_handler(const std::string &name) const;
 
+
+    /**
+     * Todo: comment
+     */
+    boost::optional<json> INVOKE_ASIO_HANDLER(Service::WSHandler &handler,
+                                              const RequestContext &reqctx);
+
     /**
      * Find a connection from its assigned identifier.
      */
@@ -256,6 +273,8 @@ class WSServer
      * endpoint.
      */
     std::map<std::string, std::string> external_handlers_;
+
+    std::map<std::string, Service::WSHandler> asio_handlers_;
 
     /**
      * Database service object.

@@ -17,13 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/Schedule.hpp"
-#include "Schedule_odb.h"
 #include "api/ScheduleCRUD.hpp"
+#include "Schedule_odb.h"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IScheduleEvent.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/ISchedule.hpp"
+#include "tools/Schedule.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/serializers/ScheduleSerializer.hpp"
 #include <tools/serializers/ScheduleMappingSerializer.hpp>

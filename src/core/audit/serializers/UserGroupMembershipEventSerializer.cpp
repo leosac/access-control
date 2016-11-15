@@ -38,10 +38,10 @@ json UserGroupMembershipEventJSON::serialize(
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-user-group-membership-event";
 
-    serialized["relationships"]
-              ["target-user"] = {{{"id", in.target_user_id()}, {"type", "user"}}};
-    serialized["relationships"]
-              ["target-group"] = {{{"id", in.target_group_id()}, {"type", "group"}}};
+    serialized["relationships"]["target-user"] = {
+        {{"id", in.target_user_id()}, {"type", "user"}}};
+    serialized["relationships"]["target-group"] = {
+        {{"id", in.target_group_id()}, {"type", "group"}}};
 
     return serialized;
 }

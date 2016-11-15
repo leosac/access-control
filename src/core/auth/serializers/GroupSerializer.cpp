@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/Group.hpp"
 #include "GroupSerializer.hpp"
 #include "Schedule_odb.h"
+#include "core/auth/Group.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
 

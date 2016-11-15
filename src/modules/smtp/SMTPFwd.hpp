@@ -27,6 +27,8 @@ namespace Module
 {
 namespace SMTP
 {
+class SMTPModule;
+
 class SMTPConfig;
 using SMTPConfigPtr  = std::shared_ptr<SMTPConfig>;
 using SMTPConfigUPtr = std::unique_ptr<SMTPConfig>;

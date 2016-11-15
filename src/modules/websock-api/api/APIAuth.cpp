@@ -23,6 +23,7 @@
 #include "WSServer.hpp"
 #include "core/CoreAPI.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
 #include "tools/GenGuid.h"
@@ -103,13 +104,14 @@ Auth::TokenPtr APIAuth::authenticate_credentials(const std::string &username,
 
             if (user->username() == "admin")
             {
-                MailSender ms(server_.core_utils());
-                MailInfo mail;
-                mail.title = "Admin Connected";
-                mail.body  = "The user `admin` logged in !";
-                // todo make this configurable or something.
-                // for now its just to see how MailSender can be used.
-                // ms.send_to_admin(mail);
+                if (const auto &mailer =
+                        get_service_registry().get_service<SMTPService>())
+                {
+                    MailInfo mail;
+                    mail.title = "Admin Connected";
+                    mail.body  = "The user `admin` logged in !";
+                    mailer->async_send_to_admin(mail);
+                }
             }
 
             return token;

@@ -20,6 +20,7 @@ set(HELPER_SRC  helper/FakeGPIO.cpp helper/FakeWiegandReader.cpp)
         COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -W -Wall -g"
         INCLUDE_DIRECTORIES "${LEOSAC_TEST_INCLUDE_DIRECTORIES}")
     target_link_libraries(${TEST_NAME} ${MODULES_LIB} ${LEOSAC_TEST_LIBRARIES})
+    target_include_directories(${TEST_NAME} PUBLIC ${Boost_INCLUDE_DIRS})
 
     ## pass the data folder as a parameter.
     add_test(NAME ${TEST_NAME}

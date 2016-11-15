@@ -7,6 +7,7 @@ set(WEBSOCK_API_SRCS
         Exceptions.cpp
         ExceptionConverter.cpp
         Facade.cpp
+        Service.cpp
         api/APISession.cpp
         api/MethodHandler.cpp
         api/APIAuth.cpp
@@ -39,6 +40,7 @@ set_target_properties(${WEBSOCK_API_BIN} PROPERTIES
 target_link_libraries(${WEBSOCK_API_BIN}
         ${Boost_LIBRARIES}
         leosac_db
+        leosac_lib
         )
 
 target_include_directories(${WEBSOCK_API_BIN}

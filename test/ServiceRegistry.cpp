@@ -54,8 +54,17 @@ TEST(TestRegistry, register_get_service)
     // No service yet, will return null.
     ASSERT_EQ(nullptr, srv_registry.get_service<DummyServiceInterface>());
 
+
+    bool event_listener_invoked = false;
+    srv_registry.register_event_listener([&](const service_event::Event &ev) {
+        event_listener_invoked = true;
+        ASSERT_EQ(service_event::EventType::REGISTERED, ev.type());
+        ASSERT_NO_THROW(dynamic_cast<const service_event::ServiceRegistered &>(ev));
+    });
+
     auto handle =
         srv_registry.register_service<DummyServiceInterface>(new DummyServiceImpl());
+    ASSERT_TRUE(event_listener_invoked);
 
     ASSERT_EQ(0, srv_registry.use_count<DummyServiceInterface>());
     {
@@ -72,11 +81,21 @@ TEST(TestRegistry, unregister_simple)
 {
     ServiceRegistry srv_registry;
 
+    bool event_listener_invoked = false;
+    srv_registry.register_event_listener([&](const service_event::Event &ev) {
+        event_listener_invoked = true;
+        ASSERT_EQ(service_event::EventType::UNREGISTERED, ev.type());
+        ASSERT_NO_THROW(
+            dynamic_cast<const service_event::ServiceUnregistered &>(ev));
+    });
+
     auto handle =
         srv_registry.register_service<DummyServiceInterface>(new DummyServiceImpl());
     ASSERT_NE(nullptr, srv_registry.get_service<DummyServiceInterface>());
+    ASSERT_FALSE(event_listener_invoked);
 
     ASSERT_TRUE(srv_registry.unregister_service(handle));
+    ASSERT_TRUE(event_listener_invoked);
     ASSERT_EQ(nullptr, srv_registry.get_service<DummyServiceInterface>());
 }
 

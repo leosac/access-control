@@ -22,7 +22,6 @@
 #include "LeosacFwd.hpp"
 #include "core/audit/IAuditEntry.hpp"
 #include "tools/Visitor.hpp"
-#include "tools/service/ServiceRegistry.hpp"
 #include <json.hpp>
 #include <string>
 

@@ -20,8 +20,10 @@
 #include "WSServer.hpp"
 #include "ExceptionConverter.hpp"
 #include "Exceptions.hpp"
+#include "Service.hpp"
 #include "Token_odb.h"
 #include "WebSockAPI.hpp"
+#include "api/AccessOverview.hpp"
 #include "api/AccessPointCRUD.hpp"
 #include "api/AuditGet.hpp"
 #include "api/CredentialCRUD.hpp"
@@ -37,6 +39,7 @@
 #include "api/search/GroupSearch.hpp"
 #include "api/search/ScheduleSearch.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
 #include "core/auth/User.hpp"
@@ -49,7 +52,6 @@
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
-#include <api/AccessOverview.hpp>
 #include <json.hpp>
 #include <odb/session.hxx>
 
@@ -74,7 +76,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
     srv_.set_reuse_addr(true);
     // clear all logs.
-    srv_.clear_access_channels(websocketpp::log::alevel::all);
+    // srv_.clear_access_channels(websocketpp::log::alevel::all);
 
 
     // Register internal handlers, ie handler that are managed by the Websocket
@@ -108,6 +110,12 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     to_module_ = std::make_unique<zmqpp::socket>(
         module.core_utils()->zmqpp_context(), zmqpp::socket_type::push);
     to_module_->connect("inproc://MODULE.WEBSOCKET.INTERNAL_PULL");
+}
+
+WSServer::~WSServer()
+{
+    ASSERT_LOG(get_service_registry().use_count<Service>() <= 0,
+               "Someone is still using the WSService");
 }
 
 void WSServer::on_open(websocketpp::connection_hdl hdl)
@@ -192,11 +200,19 @@ void WSServer::on_message(websocketpp::connection_hdl hdl, Server::message_ptr m
 
 void WSServer::run(const std::string &interface, uint16_t port)
 {
+    INFO("WebSockAPI server thread id is " << gettid());
+
     boost::asio::ip::tcp::endpoint endpoint(
         boost::asio::ip::address::from_string(interface), port);
     srv_.listen(endpoint);
     srv_.start_accept();
+
+    get_service_registry().register_service<Service>(
+        std::make_unique<Service>(*this));
     srv_.run();
+    bool ok = get_service_registry().unregister_service<Service>();
+    if (!ok)
+        WARN("Failed to unregister the WebSockAPI::Service.");
 }
 
 void WSServer::start_shutdown()
@@ -228,6 +244,20 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
                                                  const ClientMessage &in,
                                                  Audit::IAuditEntryPtr audit)
 {
+    auto asio_handler = asio_handlers_.find(in.type);
+    if (asio_handler != asio_handlers_.end())
+    {
+        auto &sec_ctx = api_handle->security_context();
+        RequestContext ctx{.session      = api_handle,
+                           .dbsrv        = dbsrv_,
+                           .server       = *this,
+                           .original_msg = in,
+                           .security_ctx = api_handle->security_context(),
+                           .audit        = audit};
+
+        return INVOKE_ASIO_HANDLER(asio_handler->second, ctx);
+    }
+
     auto external_handler_key = external_handlers_.find(in.type);
     if (external_handler_key != external_handlers_.end())
     {
@@ -258,6 +288,7 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
                            .dbsrv        = dbsrv_,
                            .server       = *this,
                            .original_msg = in,
+                           .security_ctx = api_handle->security_context(),
                            .audit        = audit};
 
         MethodHandlerUPtr method_handler = handler_factory->second(ctx);
@@ -287,6 +318,7 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
                            .dbsrv        = dbsrv_,
                            .server       = *this,
                            .original_msg = in,
+                           .security_ctx = api_handle->security_context(),
                            .audit        = audit};
 
         CRUDResourceHandlerUPtr crud_handler = crud_handler_factory->second(ctx);
@@ -447,7 +479,8 @@ void WSServer::register_external_handler(const std::string &name,
 bool WSServer::has_handler(const std::string &name) const
 {
     return handlers_.count(name) || individual_handlers_.count(name) ||
-           crud_handlers_.count(name) || external_handlers_.count(name);
+           crud_handlers_.count(name) || external_handlers_.count(name) ||
+           asio_handlers_.count(name);
 }
 
 void WSServer::send_external_message(const std::string &connection_identifier,
@@ -517,4 +550,28 @@ void WSServer::send_to_module(const std::string &module_name, zmqpp::message msg
     // The message will be dispatched by the WebSockAPI thread.
     bool ret = to_module_->send(msg, true);
     ASSERT_LOG(ret, "Internal send would have blocked.");
+}
+
+bool WSServer::ASIO_REGISTER_HANDLER(const Service::WSHandler &handler,
+                                     const std::string &name)
+{
+    DEBUG("Scheduling ASIO-based-handler registration. (name: " << name << ')');
+    std::packaged_task<bool()> pt([=]() {
+        if (has_handler(name))
+            return false;
+        DEBUG("Performing registration of ASIO-based-handler. (name: " << name
+                                                                       << ')');
+        asio_handlers_[name] = handler;
+        return true;
+    });
+    std::future<bool> future = pt.get_future();
+
+    srv_.get_io_service().post([&]() { pt(); });
+    return future.get();
+}
+
+boost::optional<json> WSServer::INVOKE_ASIO_HANDLER(Service::WSHandler &handler,
+                                                    const RequestContext &reqctx)
+{
+    return handler(reqctx);
 }

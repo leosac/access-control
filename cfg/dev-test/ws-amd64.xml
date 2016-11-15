@@ -25,7 +25,7 @@
         <module>
             <name>WEBSOCK_API</name>
             <file>libwebsock-api.so</file>
-            <level>2</level>
+            <level>1</level>
 
             <module_config>
               <port>8888</port>
@@ -36,7 +36,7 @@
         <module>
             <name>SMTP</name>
             <file>libsmtp.so</file>
-            <level>1</level>
+            <level>2</level>
 
             <module_config>
               <use_database>true</use_database>
