@@ -30,7 +30,7 @@ ByteVector Random::GetBytes(size_t n)
 {
     if (n == 0)
         return {};
-    std::unique_lock<std::mutex> ul(mutex_);
+    std::lock_guard<std::mutex> ul(mutex_);
     ByteVector ret(n);
 
     int rc = RAND_bytes(&ret[0], n);
@@ -45,7 +45,7 @@ std::string Random::GetASCII(size_t n)
 
     std::stringstream ss;
     auto bytes = GetBytes(n);
-    int idx    = 0;
+    size_t idx    = 0;
     for (size_t i = 0; i < n; ++i)
     {
         if (idx == bytes.size())
@@ -59,6 +59,6 @@ std::string Random::GetASCII(size_t n)
         }
         idx++;
     }
-
+    assert(ss.str().size() == n);
     return ss.str();
 }
