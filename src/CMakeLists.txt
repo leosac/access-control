@@ -176,7 +176,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}
 ${CMAKE_SOURCE_DIR}/deps/libpifacedigital/src/
 ${CMAKE_SOURCE_DIR}/deps/libmcp23s17/src/
 ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
-${CMAKE_SOURCE_DIR}/deps/libzmq/include
 ${CMAKE_SOURCE_DIR}/deps/spdlog/include
 ${CMAKE_SOURCE_DIR}/deps/flagset
 ${CMAKE_SOURCE_DIR}/deps/json/src
