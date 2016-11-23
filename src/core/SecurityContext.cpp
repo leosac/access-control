@@ -115,15 +115,3 @@ SecurityContext::AccessPointActionParam::operator ActionParam()
     result.access_point = *this;
     return result;
 }
-
-
-NullSecurityContext::NullSecurityContext()
-    : SecurityContext(nullptr)
-{
-}
-
-bool NullSecurityContext::check_permission_impl(
-    SecurityContext::Action, const SecurityContext::ActionParam &) const
-{
-    return false;
-}

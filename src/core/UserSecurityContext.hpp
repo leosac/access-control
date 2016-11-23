@@ -90,4 +90,17 @@ class UserSecurityContext : public SecurityContext
 
     Auth::UserId user_id_;
 };
+
+
+/**
+ * A SecurityContext with no permission.
+ */
+class NullSecurityContext : public UserSecurityContext
+{
+  public:
+    NullSecurityContext();
+
+    virtual bool check_permission_impl(Action a,
+                                       const ActionParam &ap) const override;
+};
 }

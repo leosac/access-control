@@ -250,14 +250,4 @@ class SystemSecurityContext : public SecurityContext
     virtual bool check_permission_impl(Action a,
                                        const ActionParam &ap) const override;
 };
-
-/**
- * A SecurityContext with no permission.
- */
-class NullSecurityContext : public SecurityContext
-{
-  public:
-    NullSecurityContext();
-    bool check_permission_impl(Action a, const ActionParam &ap) const override;
-};
 }

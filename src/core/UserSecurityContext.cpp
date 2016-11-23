@@ -322,3 +322,14 @@ Auth::UserPtr UserSecurityContext::self() const
 {
     return dbsrv_->find_user_by_id(user_id_, DBService::THROW_IF_NOT_FOUND);
 }
+
+NullSecurityContext::NullSecurityContext()
+    : UserSecurityContext(nullptr, 0)
+{
+}
+
+bool NullSecurityContext::check_permission_impl(
+    SecurityContext::Action, const SecurityContext::ActionParam &) const
+{
+    return false;
+}
