@@ -66,13 +66,13 @@ You have your first choice to make:
 From Source {#install_guide_installing_src}
 -------------------------------------------
 
-If you chose to build from source, follow [this guide](https://github.com/islog/leosac/wiki/Build-and-install).
+If you chose to build from source, follow [this guide](https://github.com/leosac/leosac/wiki/Build-and-install).
 Note that building on Raspberry Pi will take quite a while, and cross compiling is out of scope for this guide.
 
 Debian Package {#install_guide_installing_deb}
 ----------------------------------------------
 
-Grab the latest armhf package from the [Github Release tab](https://github.com/islog/leosac/releases).
+Grab the latest armhf package from the [Github Release tab](https://github.com/leosac/leosac/releases).
 Install the package and install missing dependencies:
 
 ~~~~~~~~~~.sh

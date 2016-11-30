@@ -67,7 +67,7 @@ This is to prevent problem when synchronizing configuration between Leosac unit.
 Issues {#issues}
 ================
 
-Please report issues (and ask questions) [here](https://github.com/islog/leosac/issues).
+Please report issues (and ask questions) [here](https://github.com/leosac/leosac/issues).
 
 License {#license}
 ==================
@@ -76,4 +76,4 @@ This project is released under the GNU Affero GPLv3 license.
 A copy of the license can be found in the root folder.
 
 ![alt text][logo]
-[logo]: https://raw.githubusercontent.com/islog/leosac/master/rc/AGPLv3.png  "AGPL Logo"
+[logo]: https://raw.githubusercontent.com/leosac/leosac/master/rc/AGPLv3.png  "AGPL Logo"

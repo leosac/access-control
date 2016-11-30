@@ -22,7 +22,7 @@ echo $TMP_DIR
 
 function clone()
 {
-    git clone https://github.com/islog/leosac.git
+    git clone https://github.com/leosac/leosac.git
     pushd leosac
     git checkout master;
     git submodule init;

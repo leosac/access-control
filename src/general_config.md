@@ -144,7 +144,7 @@ it is recommended to use Linux tools to configure your network instead (ie, writ
 the network management that Leosac does. If you want to fully disable the network, you'll have to do this
 at the operating system level.
 
-@note CIDR notation is not supported (see [#54](https://github.com/islog/leosac/issues/54)).
+@note CIDR notation is not supported (see [#54](https://github.com/leosac/leosac/issues/54)).
 
 Example {#network_example}
 --------------------------

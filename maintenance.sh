@@ -13,7 +13,7 @@ for f in `find test src -name "*.cpp" -or -name "*.hpp"`
 do
     # get line 2 of the files. 
     COPYRIGHT=`head -n2 $f | tail -n1`
-    EXPECTED="    Copyright (C) 2014-2016 Islog"
+    EXPECTED="    Copyright (C) 2014-2016 Leosac"
     if [ "$COPYRIGHT" != "$EXPECTED" ]
     then
         echo "File $f doesn't have license information."
@@ -23,5 +23,5 @@ done
 # Update year of copyright info
 #for f in `find test src -name "*.cpp" -or -name "*.hpp"`
 #do
-#    sed -i 's/Copyright (C) 2014-2015 Islog/Copyright (C) 2014-2016 Islog/' $f
+#    sed -i 's/Copyright (C) 2014-2015 Leosac/Copyright (C) 2014-2016 Leosac/' $f
 #done

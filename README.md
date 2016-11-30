@@ -1,4 +1,4 @@
-The **complete documentation** for both end user and developpers can be found [here](http://islog.github.io/leosac/doc_output/develop/html/).
+The **complete documentation** for both end user and developpers can be found [here](http://leosac.github.io/leosac/doc_output/develop/html/).
 
 # Leosac
 
@@ -19,12 +19,12 @@ A Leosac setup is usually composed of an embedded Linux board running the softwa
 
 ## Getting started  
 
-You can follow the [install guide](http://islog.github.io/leosac/doc_output/develop/html/d5/d38/install_guide.html)
+You can follow the [install guide](http://leosac.github.io/leosac/doc_output/develop/html/d5/d38/install_guide.html)
 to have a basic setup ready.
 
 ## Issues
 
-Please report issues [here](https://github.com/islog/leosac/issues).
+Please report issues [here](https://github.com/leosac/leosac/issues).
 
 ## License
 
@@ -32,4 +32,4 @@ This project is released under the GNU Affero GPLv3 license.
 A copy of the license can be found in the root folder.
 
 ![alt text][logo]
-[logo]: https://raw.githubusercontent.com/islog/leosac/master/rc/AGPLv3.png  "AGPL Logo"
+[logo]: https://raw.githubusercontent.com/leosac/leosac/master/rc/AGPLv3.png  "AGPL Logo"

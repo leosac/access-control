@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Islog
+    Copyright (C) 2014-2016 Leosac
 
     This file is part of Leosac.
 
@@ -140,7 +140,7 @@ void SMTPModule::process_config()
         {
             SMTPServerInfo server;
             server.url  = itr.second.get<std::string>("url");
-            server.from = itr.second.get<std::string>("from", "leosac@islog.com");
+            server.from = itr.second.get<std::string>("from", "leosac@leosac.com");
             server.verify_host   = itr.second.get<bool>("verify_host", true);
             server.verify_peer   = itr.second.get<bool>("verify_peer", true);
             server.CA_info_file_ = itr.second.get<std::string>("ca_file", "");
