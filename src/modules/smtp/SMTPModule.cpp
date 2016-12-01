@@ -389,38 +389,35 @@ void SMTPModule::register_ws_handlers()
     if (ws_srv)
     {
         // GetConfig
-        bool ret = ws_srv->register_asio_handler(
+
+        bool ret = ws_srv->register_asio_handler_permission(
             [this](const WebSockAPI::RequestContext &req_ctx) {
-                req_ctx.security_ctx.enforce_permission(
-                    SecurityContext::Action::SMTP_GETCONFIG);
                 return handle_ws_smtp_getconfig(req_ctx,
                                                 req_ctx.original_msg.content);
             },
-            wshandler_getconfig, io_service_);
+            wshandler_getconfig, SecurityContext::Action::SMTP_GETCONFIG,
+            io_service_);
         if (!ret)
             WARN("Cannot register SMTP WS handler: " << wshandler_getconfig);
 
         // SetConfig
-        ret = ws_srv->register_asio_handler(
+        ret = ws_srv->register_asio_handler_permission(
             [this](const WebSockAPI::RequestContext &req_ctx) {
-                req_ctx.security_ctx.enforce_permission(
-                    SecurityContext::Action::SMTP_SETCONFIG);
                 return handle_ws_smtp_setconfig(req_ctx,
                                                 req_ctx.original_msg.content);
             },
-            wshandler_setconfig, io_service_);
+            wshandler_setconfig, SecurityContext::Action::SMTP_SETCONFIG,
+            io_service_);
         if (!ret)
             WARN("Cannot register SMTP WS handler: " << wshandler_setconfig);
 
         // SendMail
-        ret = ws_srv->register_asio_handler(
+        ret = ws_srv->register_asio_handler_permission(
             [this](const WebSockAPI::RequestContext &req_ctx) {
-                req_ctx.security_ctx.enforce_permission(
-                    SecurityContext::Action::SMTP_SENDMAIL);
                 return handle_ws_smtp_sendmail(req_ctx,
                                                req_ctx.original_msg.content);
             },
-            wshandler_sendmail, io_service_);
+            wshandler_sendmail, SecurityContext::Action::SMTP_SENDMAIL, io_service_);
         if (!ret)
             WARN("Cannot register SMTP WS handler: " << wshandler_sendmail);
     }

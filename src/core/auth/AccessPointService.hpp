@@ -17,25 +17,19 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "NotifdModule.hpp"
-#include "tools/log.hpp"
+#pragma once
 
-extern "C" {
-const char *get_module_name()
+namespace Leosac
 {
-    return "NOTIFD";
-}
-}
-
+namespace Auth
+{
 
 /**
-* Entry point for the NOTIFD module.
-*/
-
-extern "C" __attribute__((visibility("default"))) bool
-start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
-             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
+  */
+class AccessPointService
 {
-    return Leosac::Module::start_module_helper<Leosac::Module::Notifd::NotifdModule>(
-        pipe, cfg, zmq_ctx, utils);
+    template <typename BackendT>
+    void register_backend();
+};
+}
 }

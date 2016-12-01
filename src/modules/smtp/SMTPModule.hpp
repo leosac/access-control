@@ -68,7 +68,7 @@ class SMTPModule : public AsioModule
     json handle_ws_smtp_setconfig(const WebSockAPI::RequestContext &, const json &);
 
     /**
-     * Process the websocket request "smtp.sendmail".
+     * Process thesocket request "smtp.sendmail".
      */
     json handle_ws_smtp_sendmail(const WebSockAPI::RequestContext &, const json &);
 

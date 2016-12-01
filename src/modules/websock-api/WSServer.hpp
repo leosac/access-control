@@ -233,13 +233,6 @@ class WSServer
      */
     bool has_handler(const std::string &name) const;
 
-
-    /**
-     * Todo: comment
-     */
-    boost::optional<json> INVOKE_ASIO_HANDLER(Service::WSHandler &handler,
-                                              const RequestContext &reqctx);
-
     /**
      * Find a connection from its assigned identifier.
      */

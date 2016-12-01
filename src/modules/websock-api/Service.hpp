@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Islog
+    Copyright (C) 2014-2016 Leosac
 
     This file is part of Leosac.
 
@@ -19,15 +19,15 @@
 
 #pragma once
 
+#include "ActionActionParam.hpp"
 #include "LeosacFwd.hpp"
+#include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/WebSockFwd.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
 #include <boost/asio/io_service.hpp>
 #include <boost/optional.hpp>
 #include <future>
-
-#include "modules/websock-api/RequestContext.hpp"
 
 namespace Leosac
 {
@@ -75,6 +75,31 @@ class Service
             return future.get();
         };
         return register_typed_handler(wrapped_handler, type);
+    }
+
+    template <typename HandlerT>
+    bool register_asio_handler_permission(HandlerT &&handler,
+                                          const std::string &type,
+                                          ActionActionParam permission,
+                                          boost::asio::io_service &io)
+    {
+        auto wrapped = [handler, permission](const RequestContext &req_ctx) {
+            req_ctx.security_ctx.enforce_permission(permission.first,
+                                                    permission.second);
+            return handler(req_ctx);
+        };
+        return register_asio_handler(wrapped, type, io);
+    }
+
+    template <typename HandlerT>
+    bool register_asio_handler_permission(HandlerT &&handler,
+                                          const std::string &type,
+                                          SecurityContext::Action permission,
+                                          boost::asio::io_service &io)
+    {
+        ActionActionParam aap;
+        aap.first = permission;
+        return register_asio_handler_permission(handler, type, aap, io);
     }
 
   private:

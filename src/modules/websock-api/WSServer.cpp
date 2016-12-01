@@ -247,15 +247,14 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
     auto asio_handler = asio_handlers_.find(in.type);
     if (asio_handler != asio_handlers_.end())
     {
-        auto &sec_ctx = api_handle->security_context();
         RequestContext ctx{.session      = api_handle,
                            .dbsrv        = dbsrv_,
                            .server       = *this,
                            .original_msg = in,
                            .security_ctx = api_handle->security_context(),
                            .audit        = audit};
-
-        return INVOKE_ASIO_HANDLER(asio_handler->second, ctx);
+        // Will block the current thread until the response has been built.
+        return asio_handler->second(ctx);
     }
 
     auto external_handler_key = external_handlers_.find(in.type);
@@ -568,10 +567,4 @@ bool WSServer::ASIO_REGISTER_HANDLER(const Service::WSHandler &handler,
 
     srv_.get_io_service().post([&]() { pt(); });
     return future.get();
-}
-
-boost::optional<json> WSServer::INVOKE_ASIO_HANDLER(Service::WSHandler &handler,
-                                                    const RequestContext &reqctx)
-{
-    return handler(reqctx);
 }
