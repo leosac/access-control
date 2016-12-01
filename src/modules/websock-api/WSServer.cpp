@@ -551,7 +551,7 @@ void WSServer::send_to_module(const std::string &module_name, zmqpp::message msg
     ASSERT_LOG(ret, "Internal send would have blocked.");
 }
 
-bool WSServer::ASIO_REGISTER_HANDLER(const Service::WSHandler &handler,
+bool WSServer::register_asio_handler(const Service::WSHandler &handler,
                                      const std::string &name)
 {
     DEBUG("Scheduling ASIO-based-handler registration. (name: " << name << ')');

@@ -101,8 +101,10 @@ class WSServer
     /**
      * This function block the calling thread until the WebSocket thread has
      * processed the handler registration.
+     *
+     * @note This method is thread-safe.
      */
-    bool ASIO_REGISTER_HANDLER(const Service::WSHandler &handler,
+    bool register_asio_handler(const Service::WSHandler &handler,
                                const std::string &name);
 
     /**

@@ -19,17 +19,49 @@
 
 #pragma once
 
+#include <boost/type_index.hpp>
+#include <map>
+#include <tools/log.hpp>
+#include <type_traits>
+
 namespace Leosac
 {
 namespace Auth
 {
 
+struct AccessPointBackend
+{
+};
+
 /**
-  */
+ * This service lets various AccessPoint backend register
+ * and provide implementation to use by the AccessPointCRUD object.
+ *
+ *  The registration is done by specifying the name (string) of
+ *  the controller module for the type of AccessPoint.
+ */
 class AccessPointService
 {
-    template <typename BackendT>
-    void register_backend();
+    void register_backend(const std::string &controller_module,
+                          AccessPointBackend *backend)
+    {
+        ASSERT_LOG(backends_.count(controller_module) == 0,
+                   "A backend for this serializer is already registered.");
+        backends_[controller_module] = backend;
+    }
+
+    /**
+     * Get the AccessPointBackend that supports the given
+     * `controller_module`.
+     * @return nullptr if none found.
+     */
+    AccessPointBackend *get_backend(const std::string &controller_module);
+
+    /**
+     * The various backend for various type of AccessPoint.
+     * Those are registered by modules.
+     */
+    std::map<std::string, AccessPointBackend *> backends_;
 };
 }
 }

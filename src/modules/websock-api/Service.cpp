@@ -30,7 +30,7 @@ namespace WebSockAPI
 bool Service::register_typed_handler(const Service::WSHandler &handler,
                                      const std::string &type)
 {
-    return server_.ASIO_REGISTER_HANDLER(handler, type);
+    return server_.register_asio_handler(handler, type);
 }
 }
 }

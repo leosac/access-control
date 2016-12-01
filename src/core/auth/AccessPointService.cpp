@@ -24,5 +24,14 @@ namespace Leosac
 {
 namespace Auth
 {
+AccessPointBackend *
+AccessPointService::get_backend(const std::string &controller_module)
+{
+    /*    if ((auto itr = backends_.find(controller_module)) != backends_.end())
+        {
+        return itr->second;
+        }
+        return nullptr;*/
+}
 }
 }
