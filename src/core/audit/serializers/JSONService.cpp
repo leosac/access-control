@@ -37,6 +37,8 @@ JSONService::~JSONService()
 json JSONService::serialize(const Audit::IAuditEntry &audit,
                             const SecurityContext &sc)
 {
+    std::lock_guard<std::mutex> lg(mutex_);
+
     auto type_index = boost::typeindex::type_id_runtime(audit);
     auto itr        = serializers_.find(type_index);
     if (itr != serializers_.end())

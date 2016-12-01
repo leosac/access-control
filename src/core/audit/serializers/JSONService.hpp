@@ -42,7 +42,7 @@ namespace Serializer
  * Its goal is to hand over callable that can target a specific type of
  * AuditEntry.
  *
- * @note This service is for serialization extended audit entry (those provided by
+ * @note This service is for serializing extended audit entry (those provided by
  * modules) rather than the ones present in leosac's core.
  */
 class JSONService
@@ -65,6 +65,7 @@ class JSONService
     template <typename T>
     void register_serializer(SerializationCallable<T> fct)
     {
+        std::lock_guard<std::mutex> lg(mutex_);
         static_assert(std::is_base_of<Audit::IAuditEntry, T>::value,
                       "Trying to register a serializer for T, but T is not a child "
                       "of IAuditEntry.");
@@ -92,11 +93,14 @@ class JSONService
     template <typename T>
     void unregister_serializer()
     {
+        std::lock_guard<std::mutex> lg(mutex_);
+
         auto type_index = boost::typeindex::type_id<T>();
         serializers_.erase(type_index);
     }
 
   private:
+    mutable std::mutex mutex_;
     std::map<boost::typeindex::type_index, SerializationCallable<Audit::IAuditEntry>>
         serializers_;
 };
