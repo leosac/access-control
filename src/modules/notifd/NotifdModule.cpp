@@ -31,55 +31,13 @@ namespace Notifd
 NotifdModule::NotifdModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                            const boost::property_tree::ptree &cfg,
                            CoreUtilsPtr utils)
-    : BaseModule(ctx, pipe, cfg, utils)
+    : AsioModule(ctx, pipe, cfg, utils)
 {
 }
 
 NotifdModule::~NotifdModule()
 {
-    ASSERT_LOG(io_service_->stopped(), "io_service not stopped.");
-}
-
-void NotifdModule::run()
-{
-    io_service_ = std::make_shared<boost::asio::io_service>();
-
-    install_stop_watcher();
-    io_service_->run();
-    DEBUG("DONE RUNNING !");
-}
-
-void NotifdModule::install_stop_watcher()
-{
-    // Not very good because it can introduces a delay of up to 1second.
-    // However, there is a bug in libzmq that make watching the FD not working.
-    // See https://github.com/zeromq/libzmq/issues/1434
-    /*    boost::fibers::async(
-            boost::fibers::launch::post, std::allocator_arg,
-            ValgrindStackAllocator<void>::instance(), [this]() {
-                while (true)
-                {
-                    zmqpp::message msg;
-                    if (pipe_.receive(msg, true))
-                    {
-                        assert(msg.is_signal());
-                        zmqpp::signal sig;
-                        msg >> sig;
-                        if (sig == zmqpp::signal::stop)
-                        {
-                            is_running_ = false;
-                            FiberCounter::instance().wait_zero();
-                            io_service_->post([this]() { io_service_->stop(); });
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        DEBUG("NOTIFD SLEEPING A BIT...");
-                        boost::this_fiber::sleep_for(std::chrono::seconds(1));
-                    }
-                }
-            });*/
+    ASSERT_LOG(io_service_.stopped(), "io_service not stopped.");
 }
 }
 }

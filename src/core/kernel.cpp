@@ -23,6 +23,7 @@
 #include "User_odb.h"
 #include "WiegandCard_odb.h"
 #include "core/audit/serializers/JSONService.hpp"
+#include "core/auth/AccessPointService.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/WiegandCard.hpp"
@@ -47,6 +48,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
+#include <core/auth/serializers/AccessPointSerializer.hpp>
 #include <fstream>
 #include <odb/mysql/database.hxx>
 #include <odb/pgsql/database.hxx>
@@ -648,6 +650,14 @@ void Kernel::register_core_services()
             service_registry_->register_service<DBService>(
                 std::make_unique<DBService>(database_));
         }
+
+        // Register the AccessPoint service. Also register default serializer
+        // for simple AccessPoint object.
+        auto aps = std::make_unique<Auth::AccessPointService>();
+        aps->register_serializer<Auth::AccessPoint>(
+            &AccessPointJSONSerializer::serialize);
+        service_registry_->register_service<Auth::AccessPointService>(
+            std::move(aps));
     }
 }
 
@@ -661,6 +671,14 @@ void Kernel::unregister_core_services()
         ret = service_registry_->unregister_service<DBService>();
         ASSERT_LOG(ret, "Failed to unregister DBService");
     }
+
+    // Unregister AccessPointService and its  default serializers.
+    {
+        auto aps = service_registry_->get_service<Auth::AccessPointService>();
+        aps->unregister_serializer<Auth::AccessPoint>();
+    }
+    ret = service_registry_->unregister_service<Auth::AccessPointService>();
+    ASSERT_LOG(ret, "Failed to unregister Auth::AccessPointService");
 }
 
 ServiceRegistry &Kernel::service_registry()

@@ -57,14 +57,6 @@ class AccessPointCRUD : public CRUDResourceHandler
     virtual boost::optional<json> update_impl(const json &req) override;
 
     virtual boost::optional<json> delete_impl(const json &req) override;
-
-    /**
-     * Forward the request to the proper implementation module.
-     *
-     * This checks the `controller-module` field to find the
-     * target module.
-     */
-    void forward_to_impl_module(const json &req, const std::string &mod);
 };
 }
 }

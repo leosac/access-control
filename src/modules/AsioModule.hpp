@@ -47,6 +47,19 @@ class AsioModule : public BaseModule
 
     virtual void run() override final;
 
+    /**
+     * Post some work onto the work queue of the module.
+     *
+     * @note This function is thread-safe.
+     * @note Callable `post()`ed through this function are
+     * guaranteed to be executed in the module's thread.
+     */
+    template <typename Callable>
+    void post(Callable &&callable)
+    {
+        io_service_.post(std::forward<Callable>(callable));
+    }
+
   protected:
     boost::asio::io_service io_service_;
 
@@ -65,7 +78,11 @@ class AsioModule : public BaseModule
     bs2::connection service_event_listener_;
 
     /**
-     * todo comment.
+     * Install handlers that periodically for activity on the
+     * ZMQ reactor from BaseModule.
+     *
+     * While this impedes reactivity, it is the less complicated
+     * solution for now.
      */
     void install_async_handlers();
 

@@ -22,6 +22,7 @@
 #include "Exceptions.hpp"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IAccessPointEvent.hpp"
 #include "core/auth/AccessPoint.hpp"
@@ -31,6 +32,7 @@
 #include "tools/AssertCast.hpp"
 #include "tools/db/DBService.hpp"
 #include <cctype>
+#include <core/auth/AccessPointService.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -48,9 +50,20 @@ CRUDResourceHandlerUPtr AccessPointCRUD::instanciate(RequestContext ctx)
 
 boost::optional<json> AccessPointCRUD::create_impl(const json &req)
 {
-    forward_to_impl_module(
-        req, req.at("attributes").at("controller-module").get<std::string>());
-    return boost::none;
+    auto service_ptr =
+        get_service_registry().get_service<Auth::AccessPointService>();
+    auto controller_module =
+        req.at("attributes").at("controller-module").get<std::string>();
+    auto ap_backend_ptr = service_ptr->get_backend(controller_module);
+    if (ap_backend_ptr)
+        return ap_backend_ptr->create(security_context(), ctx_.audit, req);
+
+    // No backend for the requested type of controller module...
+    // Throw a general exception that will be mostly useless to the end user
+    // but may make sense to devs or system administrators.
+    throw LEOSACException(BUILD_STR(
+        "Cannot find an AccessPointBackend corresponding to controller-module "
+        << controller_module));
 }
 
 boost::optional<json> AccessPointCRUD::read_impl(const json &req)
@@ -64,11 +77,14 @@ boost::optional<json> AccessPointCRUD::read_impl(const json &req)
     odb::transaction t(db->begin());
     auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
 
+    auto service_ptr =
+        get_service_registry().get_service<Auth::AccessPointService>();
+
     if (ap_id != 0)
     {
         auto ap = ctx_.dbsrv->find_access_point_by_id(ap_id,
                                                       DBService::THROW_IF_NOT_FOUND);
-        rep["data"] = AccessPointJSONSerializer::serialize(*ap, security_context());
+        rep["data"] = service_ptr->serialize(*ap, security_context());
     }
     else
     {
@@ -84,7 +100,7 @@ boost::optional<json> AccessPointCRUD::read_impl(const json &req)
                     SecurityContext::Action::ACCESS_POINT_READ, aap))
             {
                 rep["data"].push_back(
-                    AccessPointJSONSerializer::serialize(ap, security_context()));
+                    service_ptr->serialize(ap, security_context()));
             }
         }
     }
@@ -97,13 +113,17 @@ boost::optional<json> AccessPointCRUD::update_impl(const json &req)
     // To perform update, we first lookup the base access point object.
     // We then forward the update request to its controller module.
     auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
-    DBPtr db   = ctx_.dbsrv->db();
-    odb::transaction t(db->begin());
-
     auto ap =
         ctx_.dbsrv->find_access_point_by_id(ap_id, DBService::THROW_IF_NOT_FOUND);
-    forward_to_impl_module(req, ap->controller_module());
-    return boost::none;
+
+    auto service_ptr =
+        get_service_registry().get_service<Auth::AccessPointService>();
+    auto ap_backend_ptr = service_ptr->get_backend(ap->controller_module());
+    if (ap_backend_ptr)
+        return ap_backend_ptr->update(security_context(), ctx_.audit, req, ap);
+    throw LEOSACException(BUILD_STR(
+        "Cannot find an AccessPointBackend corresponding to controller-module "
+        << ap->controller_module()));
 }
 
 boost::optional<json> AccessPointCRUD::delete_impl(const json &req)
@@ -111,42 +131,18 @@ boost::optional<json> AccessPointCRUD::delete_impl(const json &req)
     // To perform deletion, we first lookup the base access point object.
     // We then forward the deletion request to its controller module.
     auto ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
-    DBPtr db   = ctx_.dbsrv->db();
-    odb::transaction t(db->begin());
-
     auto ap =
         ctx_.dbsrv->find_access_point_by_id(ap_id, DBService::THROW_IF_NOT_FOUND);
-    forward_to_impl_module(req, ap->controller_module());
-    return boost::none;
-}
 
-void AccessPointCRUD::forward_to_impl_module(const json &, const std::string &mod)
-{
-    // We we forward the call to the proper implementation module
-    // endpoint.
+    auto service_ptr =
+        get_service_registry().get_service<Auth::AccessPointService>();
+    auto ap_backend_ptr = service_ptr->get_backend(ap->controller_module());
 
-    // Note that we have currently no way to make sure the module
-    // we are sending to exists. If it doesn't, Leosac may assert.
-
-    std::string controller_module = mod;
-    std::transform(controller_module.begin(), controller_module.end(),
-                   controller_module.begin(), ::tolower);
-    std::string new_type =
-        "module." + controller_module + "." + ctx_.original_msg.type;
-
-    json reconstructed = {{"uuid", ctx_.original_msg.uuid},
-                          {"type", new_type},
-                          {"content", ctx_.original_msg.content}};
-
-    // We need to emulate the behavior of WSServer::dispatch_request, so that
-    // the target module is able to handle this correctly.
-    zmqpp::message zmq_msg;
-    zmq_msg << ctx_.audit->id() << ctx_.session->connection_identifier()
-            << reconstructed.dump(4);
-
-    std::transform(controller_module.begin(), controller_module.end(),
-                   controller_module.begin(), ::toupper);
-    ctx_.server.send_to_module(controller_module, std::move(zmq_msg));
+    if (ap_backend_ptr)
+        return ap_backend_ptr->erase(security_context(), ctx_.audit, req, ap);
+    throw LEOSACException(BUILD_STR(
+        "Cannot find an AccessPointBackend corresponding to controller-module "
+        << ap->controller_module()));
 }
 
 std::vector<CRUDResourceHandler::ActionActionParam>

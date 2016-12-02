@@ -19,9 +19,7 @@
 
 #pragma once
 
-#include "modules/BaseModule.hpp"
-#include <boost/asio/io_service.hpp>
-#include <boost/fiber/all.hpp>
+#include "modules/AsioModule.hpp"
 
 namespace Leosac
 {
@@ -30,24 +28,13 @@ namespace Module
 namespace Notifd
 {
 
-class NotifdModule : public BaseModule
+class NotifdModule : public AsioModule
 {
   public:
     NotifdModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                  const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
     ~NotifdModule();
-
-    virtual void run() override;
-
-  private:
-    /**
-     * Install a fiber that will watch for the STOP signal from
-     * Leosac's Kernel.
-     */
-    void install_stop_watcher();
-
-    std::shared_ptr<boost::asio::io_service> io_service_;
 };
 }
 }
