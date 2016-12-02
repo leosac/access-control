@@ -41,14 +41,17 @@ AsioModule::~AsioModule()
 void AsioModule::run()
 {
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
-    install_stop_watcher();
+    install_async_handlers();
     io_service_.run();
 }
 
-void AsioModule::install_stop_watcher()
+void AsioModule::install_async_handlers()
 {
     auto stop_watcher(std::make_shared<StopWatcher>(*this));
     stop_watcher->schedule_wait();
+
+    auto reactor_poller(std::make_shared<AsyncReactorPoller>(*this));
+    reactor_poller->schedule_wait();
 }
 
 void AsioModule::StopWatcher::wait(const boost::system::error_code &ec)
@@ -58,20 +61,8 @@ void AsioModule::StopWatcher::wait(const boost::system::error_code &ec)
         WARN("SMTPModule StopWatcher timer has errored: " << ec.message());
         ASSERT_LOG(0, "Failed.");
     }
-    zmqpp::message msg;
-    if (self_.pipe_.receive(msg, true))
-    {
-        assert(msg.is_signal());
-        zmqpp::signal sig;
-        msg >> sig;
-        if (sig == zmqpp::signal::stop)
-        {
-            DEBUG("StopWatcher detected that we need to shutdown.");
-            self_.is_running_ = false;
-            self_.work_.reset();
-            return;
-        }
-    }
+    if (!self_.is_running_)
+        self_.work_.reset();
     schedule_wait();
 }
 
@@ -80,6 +71,21 @@ void AsioModule::StopWatcher::schedule_wait()
     timer_.expires_from_now(std::chrono::milliseconds(1000));
     timer_.async_wait(std::bind(&AsioModule::StopWatcher::wait, shared_from_this(),
                                 std::placeholders::_1));
+}
+
+void AsioModule::AsyncReactorPoller::schedule_wait()
+{
+    timer_.expires_from_now(std::chrono::milliseconds(25));
+    timer_.async_wait(std::bind(&AsioModule::AsyncReactorPoller::wait_handler,
+                                shared_from_this(), std::placeholders::_1));
+}
+
+void AsioModule::AsyncReactorPoller::wait_handler(
+    const boost::system::error_code &ec)
+{
+    ASSERT_LOG(ec == 0, "Error while processing wait_handler: " << ec.message());
+    self_.reactor_.poll(0);
+    schedule_wait();
 }
 }
 }

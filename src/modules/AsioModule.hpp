@@ -65,10 +65,9 @@ class AsioModule : public BaseModule
     bs2::connection service_event_listener_;
 
     /**
-     * Install a StopWatcher that periodically check for the STOP
-     * signal from Leosac's core.
+     * todo comment.
      */
-    void install_stop_watcher();
+    void install_async_handlers();
 
     struct StopWatcher : public std::enable_shared_from_this<StopWatcher>
     {
@@ -82,6 +81,24 @@ class AsioModule : public BaseModule
         AsioModule &self_;
         boost::asio::steady_timer timer_;
         void wait(const boost::system::error_code &ec);
+    };
+
+    /**
+     * Poll the zmq reactor from BaseModule.
+     */
+    struct AsyncReactorPoller
+        : public std::enable_shared_from_this<AsyncReactorPoller>
+    {
+        AsyncReactorPoller(AsioModule &self)
+            : self_(self)
+            , timer_(self.io_service_){};
+
+        void schedule_wait();
+
+      private:
+        AsioModule &self_;
+        boost::asio::steady_timer timer_;
+        void wait_handler(const boost::system::error_code &ec);
     };
 };
 }
