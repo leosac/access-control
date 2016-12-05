@@ -19,6 +19,7 @@
 
 #include "AccessPoint.hpp"
 #include "Door.hpp"
+#include "tools/log.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Auth;
@@ -73,4 +74,11 @@ DoorId AccessPoint::door_id() const
     if (door_.lock())
         return door_.lock()->id();
     return 0;
+}
+
+void AccessPoint::attach_update(AccessPointUpdatePtr ap_update)
+{
+    ASSERT_LOG(ap_update, "Cannot attach a null update.");
+    updates_.push_back(ap_update);
+    ap_update->access_point(shared_from_this());
 }

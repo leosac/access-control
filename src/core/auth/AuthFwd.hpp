@@ -116,5 +116,10 @@ class AccessPoint;
 using AccessPointLWPtr = odb::lazy_weak_ptr<AccessPoint>;
 using AccessPointLPtr  = odb::lazy_shared_ptr<AccessPoint>;
 using AccessPointPtr   = std::shared_ptr<AccessPoint>;
+
+    class AccessPointUpdate;
+    using AccessPointUpdatePtr  = std::shared_ptr<AccessPointUpdate>;
+    using AccessPointUpdateLPtr = odb::lazy_shared_ptr<AccessPointUpdate>;
+
 }
 }

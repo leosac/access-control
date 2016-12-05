@@ -33,14 +33,20 @@ namespace Leosac
 namespace Auth
 {
 
+/**
+ * An AccessPointBackend object is used for module to provide
+ * implementation for access point CRUD operations.
+ *
+ * An AccessPointBackend is mapped to one module, by name.
+ */
 struct AccessPointBackend
 {
     virtual json update(SecurityContext &sec_ctx, Audit::IAuditEntryPtr,
                         const json &req, IAccessPointPtr ap) = 0;
+
     virtual json create(SecurityContext &sec_ctx, Audit::IAuditEntryPtr,
                         const json &req) = 0;
-    virtual json read(SecurityContext &sec_ctx, Audit::IAuditEntryPtr,
-                      const json &req) = 0;
+
     virtual json erase(SecurityContext &sec_ctx, Audit::IAuditEntryPtr,
                        const json &req, IAccessPointPtr ap) = 0;
 };

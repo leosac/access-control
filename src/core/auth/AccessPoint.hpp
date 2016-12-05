@@ -49,6 +49,14 @@ class AccessPoint : public virtual IAccessPoint
 
     DoorId door_id() const override;
 
+    /**
+     * Attach a new update object to the access-point.
+     *
+     * The inverse pointer of AccessPointUpdate object will be set
+     * so that it points to this access-point.
+     */
+    void attach_update(AccessPointUpdatePtr);
+
   protected:
 #pragma db id auto
     AccessPointId id_;
@@ -67,6 +75,13 @@ class AccessPoint : public virtual IAccessPoint
     const size_t version_;
 
   private:
+
+/**
+ * The history of the updates performed against the access-point.
+ */
+#pragma db value_not_null
+            std::vector<AccessPointUpdateLPtr> updates_;
+
     friend class odb::access;
 
     friend class Leosac::TestAccess;
@@ -82,4 +97,5 @@ class AccessPoint : public virtual IAccessPoint
 
 #ifdef ODB_COMPILER
 #include "core/auth/Door.hpp"
+#include "core/auth/AccessPointUpdate.hpp"
 #endif

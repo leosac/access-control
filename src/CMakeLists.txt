@@ -40,6 +40,8 @@ set(LEOSAC_LIB_SRCS
     core/auth/ValidityInfo.cpp
     core/auth/Door.cpp
     core/auth/AccessPoint.cpp
+    core/auth/AccessPointUpdate.cpp
+    core/auth/AccessPointService.cpp
     core/credentials/Credential.cpp
     core/credentials/CredentialValidator.cpp
     core/credentials/WiegandCard.cpp
@@ -122,9 +124,11 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/DoorEventSerializer.cpp
     core/audit/serializers/UserGroupMembershipEventSerializer.cpp
     core/audit/serializers/AccessPointEventSerializer.cpp
+    core/update/UpdateService.cpp
+    core/update/Update.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
-        core/auth/AccessPointService.cpp core/auth/AccessPointService.hpp)
+    )
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db

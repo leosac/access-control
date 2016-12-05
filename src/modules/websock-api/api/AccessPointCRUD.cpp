@@ -68,8 +68,8 @@ boost::optional<json> AccessPointCRUD::create_impl(const json &req)
 
 boost::optional<json> AccessPointCRUD::read_impl(const json &req)
 {
-    // Read is not forwarded. We simply returns the informations
-    // about the base object.
+    // Read is not forwarded to the implementation module.
+    // Instead we let the serializer server do its job.
     json rep;
 
     using Result = odb::result<Auth::AccessPoint>;

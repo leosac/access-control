@@ -41,6 +41,8 @@ AccessPointService::get_backend(const std::string &controller_module)
 json AccessPointService::serialize(const Auth::IAccessPoint &ap,
                                    const SecurityContext &sc)
 {
+    // We hold a lock while serializing to prevent deregistration
+    // and deletion of the underlying serializer callable.
     std::lock_guard<std::mutex> lg(mutex_);
 
     auto type_index = boost::typeindex::type_id_runtime(ap);
