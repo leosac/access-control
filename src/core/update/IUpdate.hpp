@@ -36,6 +36,22 @@ class IUpdate
     virtual UpdateId id() const = 0;
 
     virtual const TimePoint &generated_at() const = 0;
+
+    virtual Status status() const  = 0;
+    virtual void status(Status st) = 0;
+
+    virtual const TimePoint &status_updated_at() const = 0;
+
+
+    /**
+     * Set the checkpoint for the update object.
+     *
+     * The checkpoint represents the timepoint at which this update
+     * apply.
+     */
+    virtual void set_checkpoint(Audit::AuditEntryPtr) = 0;
+
+    virtual Audit::AuditEntryId get_checkpoint() const = 0;
 };
 }
 }

@@ -39,5 +39,32 @@ const IUpdate::TimePoint &Update::generated_at() const
 {
     return generated_at_;
 }
+
+
+Status Update::status() const
+{
+    return status_;
+}
+
+void Update::status(Status st)
+{
+    status_updated_at_ = std::chrono::system_clock::now();
+    status_            = st;
+}
+
+const IUpdate::TimePoint &Update::status_updated_at() const
+{
+    return status_updated_at_;
+}
+
+void Update::set_checkpoint(Audit::AuditEntryPtr audit)
+{
+    checkpoint_.last(audit);
+}
+
+Audit::AuditEntryId Update::get_checkpoint() const
+{
+    return checkpoint_.last_id();
+}
 }
 }

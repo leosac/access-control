@@ -26,8 +26,10 @@
 #include "core/auth/AccessPointService.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
+#include "core/auth/serializers/AccessPointSerializer.hpp"
 #include "core/credentials/WiegandCard.hpp"
 #include "core/update/UpdateService.hpp"
+#include "core/update/serializers/AccessPointUpdateSerializer.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
@@ -49,7 +51,6 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
-#include <core/auth/serializers/AccessPointSerializer.hpp>
 #include <fstream>
 #include <odb/mysql/database.hxx>
 #include <odb/pgsql/database.hxx>
@@ -666,8 +667,11 @@ void Kernel::register_core_services()
 
         // Update
         {
+            auto update_srv = std::make_unique<update::UpdateService>();
+            update_srv->register_serializer<Auth::AccessPointUpdate>(
+                &Auth::AccessPointUpdateJSONSerializer::serialize);
             service_registry_->register_service<update::UpdateService>(
-                std::make_unique<update::UpdateService>());
+                std::move(update_srv));
         }
     }
 }
@@ -698,7 +702,6 @@ void Kernel::unregister_core_services()
 
     // Update service
     {
-
         bool ret = service_registry_->unregister_service<update::UpdateService>();
         ASSERT_LOG(ret, "Failed to unregister update::UpdateService");
     }

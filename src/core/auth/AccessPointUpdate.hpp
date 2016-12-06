@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "core/audit/AuditTracker.hpp"
 #include "core/update/Update.hpp"
 
 namespace Leosac
@@ -27,7 +26,7 @@ namespace Leosac
 namespace Auth
 {
 #pragma db object table("AccessPointUpdate")
-class AccessPointUpdate : public update::Update
+class AccessPointUpdate : public ::Leosac::update::Update
 {
   public:
     /**
@@ -36,23 +35,7 @@ class AccessPointUpdate : public update::Update
      */
     AccessPointUpdate();
 
-    enum Status
-    {
-        ST_PENDING      = 0,
-        ST_ACKNOWLEDGED = 1,
-        ST_CANCELLED    = 2
-    };
-
-    /**
-     * Pass the last audit entry at the time of this update's
-     * generation.
-     */
-    void set_checkpoint(Audit::AuditEntryPtr);
-
-    Status status() const;
-    void status(Status st);
-
-    Audit::AuditEntryId get_checkpoint() const;
+    virtual ~AccessPointUpdate() = default;
 
     Auth::AccessPointId access_point_id() const;
 
@@ -65,25 +48,6 @@ class AccessPointUpdate : public update::Update
      * the caller responsibility to persist any change.
      */
     void access_point(Auth::AccessPointPtr ap);
-
-    const TimePoint &status_updated_at() const;
-
-  private:
-    /**
-     * Tracks the audit entry that represents the point in time
-     * of this update.
-     */
-    Audit::AuditTracker checkpoint_;
-
-    enum Status status_;
-
-/**
- * Last timepoint when status was updated.
- *
- * Normally we should only change status once.
- */
-#pragma db type("TIMESTAMP")
-    TimePoint status_updated_at_;
 
 /**
  * The access point targeted by this update.

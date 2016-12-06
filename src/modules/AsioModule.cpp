@@ -18,7 +18,7 @@
 */
 
 #include "AsioModule.hpp"
-#include <core/GetServiceRegistry.hpp>
+#include "core/GetServiceRegistry.hpp"
 
 namespace Leosac
 {

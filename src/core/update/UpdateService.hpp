@@ -20,22 +20,31 @@
 #pragma once
 
 #include "UpdateFwd.hpp"
+#include "core/SecurityContext.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/bs2.hpp"
+#include "tools/serializers/ExtensibleSerializer.hpp"
 #include <mutex>
 
 namespace Leosac
 {
-
-
 namespace update
 {
-
 
 class UpdateBackend
 {
   public:
-    // check for update and create database entry if found.
-    virtual void check_update() = 0;
+    /**
+     * Check for updates against arbitrary, module-owned object.
+     *
+     * The update returned by check update are supposed to be
+     * transient. They are informative only and simply indicates
+     * that an update is needed.
+     *
+     * Module specific websocket-handler should be called in order
+     * to to perform other operation wrt updates.
+     */
+    virtual std::vector<update::IUpdatePtr> check_update() = 0;
 };
 
 /**
@@ -52,9 +61,12 @@ class UpdateBackend
  * @warning The update service requires that database be enabled.
  */
 class UpdateService
+    : public ExtensibleSerializer<json, IUpdate, const SecurityContext &>
 {
   public:
-    void check_update();
+    UpdateService();
+
+    std::vector<update::IUpdatePtr> check_update();
 
     /**
      * Retrieve the list of pending updates.
@@ -72,7 +84,10 @@ class UpdateService
   private:
     mutable std::mutex mutex_;
 
-    using CheckUpdateT = boost::signals2::signal<void(void)>;
+    using CheckUpdateT =
+        boost::signals2::signal<std::vector<update::IUpdatePtr>(void),
+                                VectorAppenderCombiner<update::IUpdatePtr>>;
+
     CheckUpdateT check_update_sig_;
 };
 }

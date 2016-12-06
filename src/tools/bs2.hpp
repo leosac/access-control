@@ -27,4 +27,30 @@ namespace Leosac
  * A shortname for the boost::signals2 namespace.
  */
 namespace bs2 = boost::signals2;
+
+/**
+ * A boost::signals2 combiner that appends vector together.
+ */
+template <typename T>
+struct VectorAppenderCombiner
+{
+    using result_type = std::vector<T>;
+
+    template <typename InputIterator>
+    std::vector<T> operator()(InputIterator first, InputIterator last) const
+    {
+        std::vector<T> result;
+        if (first == last)
+            return {};
+
+        while (first != last)
+        {
+            std::vector<T> this_slot_result = *first;
+            result.insert(result.end(), this_slot_result.begin(),
+                          this_slot_result.end());
+            ++first;
+        }
+        return result;
+    }
+};
 }

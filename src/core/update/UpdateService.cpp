@@ -33,9 +33,9 @@ void UpdateService::register_backend(UpdateBackendPtr backend)
             .track_foreign(backend));
 }
 
-void UpdateService::check_update()
+std::vector<IUpdatePtr> UpdateService::check_update()
 {
-    check_update_sig_();
+    return check_update_sig_();
 }
 
 std::vector<IUpdatePtr> UpdateService::pending_updates()
@@ -51,6 +51,10 @@ std::vector<IUpdatePtr> UpdateService::pending_updates()
     }
     t.commit();
     return updates;
+}
+
+UpdateService::UpdateService()
+{
 }
 }
 }

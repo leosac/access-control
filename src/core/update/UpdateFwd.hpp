@@ -25,6 +25,22 @@ namespace Leosac
 {
 namespace update
 {
+
+enum class Status
+{
+    PENDING      = 0,
+    ACKNOWLEDGED = 1,
+    CANCELLED    = 2,
+
+    /**
+     * The update is not stored in the database.
+     * The object is simply here to indicates that an update
+     * is needed.
+     */
+    TRANSIENT = 3
+};
+
+
 class IUpdate;
 using IUpdatePtr = std::shared_ptr<IUpdate>;
 

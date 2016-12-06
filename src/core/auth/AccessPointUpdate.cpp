@@ -26,24 +26,8 @@ namespace Auth
 {
 
 AccessPointUpdate::AccessPointUpdate()
-    : status_(ST_PENDING)
 {
-}
-
-void AccessPointUpdate::set_checkpoint(Audit::AuditEntryPtr audit)
-{
-    checkpoint_.last(audit);
-}
-
-
-AccessPointUpdate::Status AccessPointUpdate::status() const
-{
-    return status_;
-}
-
-Audit::AuditEntryId AccessPointUpdate::get_checkpoint() const
-{
-    return checkpoint_.last_id();
+    status(update::Status::PENDING);
 }
 
 Auth::AccessPointId AccessPointUpdate::access_point_id() const
@@ -53,20 +37,9 @@ Auth::AccessPointId AccessPointUpdate::access_point_id() const
     return 0;
 }
 
-void AccessPointUpdate::status(AccessPointUpdate::Status st)
-{
-    status_updated_at_ = std::chrono::system_clock::now();
-    status_            = st;
-}
-
 AccessPointLWPtr AccessPointUpdate::access_point() const
 {
     return access_point_;
-}
-
-const AccessPointUpdate::TimePoint &AccessPointUpdate::status_updated_at() const
-{
-    return status_updated_at_;
 }
 
 void AccessPointUpdate::access_point(Auth::AccessPointPtr ap)
