@@ -526,6 +526,10 @@ void Kernel::configure_database()
             {
                 using namespace odb;
                 using namespace odb::core;
+
+                // fix me generation from binary is broken
+                // due to cylic dependencies.
+
                 Auth::UserPtr admin;
                 Auth::GroupPtr users;
                 Cred::WiegandCardPtr card;

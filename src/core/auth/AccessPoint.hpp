@@ -27,7 +27,8 @@ namespace Leosac
 namespace Auth
 {
 #pragma db object optimistic polymorphic
-class AccessPoint : public virtual IAccessPoint
+class AccessPoint : public virtual IAccessPoint,
+                    public std::enable_shared_from_this<AccessPoint>
 {
   public:
     AccessPoint();
@@ -71,17 +72,17 @@ class AccessPoint : public virtual IAccessPoint
      */
     std::string controller_module_;
 
-#pragma db version
-    const size_t version_;
-
-  private:
 
 /**
  * The history of the updates performed against the access-point.
  */
 #pragma db value_not_null
-            std::vector<AccessPointUpdateLPtr> updates_;
+    std::vector<AccessPointUpdateLPtr> updates_;
 
+#pragma db version
+    const size_t version_;
+
+  private:
     friend class odb::access;
 
     friend class Leosac::TestAccess;
@@ -96,6 +97,6 @@ class AccessPoint : public virtual IAccessPoint
 }
 
 #ifdef ODB_COMPILER
-#include "core/auth/Door.hpp"
 #include "core/auth/AccessPointUpdate.hpp"
+#include "core/auth/Door.hpp"
 #endif

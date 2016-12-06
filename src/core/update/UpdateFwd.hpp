@@ -26,7 +26,7 @@ namespace Leosac
 namespace update
 {
 class IUpdate;
-    using IUpdatePtr = std::shared_ptr<IUpdate>;
+using IUpdatePtr = std::shared_ptr<IUpdate>;
 
 class Update;
 class UpdateBackend;

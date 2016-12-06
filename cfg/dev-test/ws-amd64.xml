@@ -3,8 +3,8 @@
     <instance_name>fixe</instance_name>
     <database>
       <type>pgsql</type>
-      <username>leosac</username>
-      <password>leosac</password>
+      <username>postgres</username>
+      <password>postgres</password>
       <dbname>leosac</dbname>
       <host>127.0.0.1</host>
     </database>

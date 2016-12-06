@@ -17,27 +17,30 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Update.hpp"
+#pragma once
+
+#include "core/SecurityContext.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
-namespace update
-{
+using json = nlohmann::json;
 
-Update::Update()
-    : generated_at_(std::chrono::system_clock::now())
-    , odb_version_(0)
+namespace Auth
 {
-}
+/**
+ * Serializer for EvoXS AccessPointUpdate.
+ */
+struct AccessPointUpdateJSONSerializer
+{
+    static json serialize(const AccessPointUpdate &in, const SecurityContext &sc);
+};
 
-UpdateId Update::id() const
+struct AccessPointUpdateJSONStringSerializer
 {
-    return id_;
-}
-
-const IUpdate::TimePoint &Update::generated_at() const
-{
-    return generated_at_;
-}
+    static std::string serialize(const AccessPointUpdate &in,
+                                 const SecurityContext &sc);
+};
 }
 }

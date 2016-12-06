@@ -17,10 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "tools/db/OptionalTransaction.hpp"
-#include "core/GetServiceRegistry.hpp"
 #include "UpdateService.hpp"
 #include "Update_odb.h"
+#include "core/GetServiceRegistry.hpp"
+#include "tools/db/OptionalTransaction.hpp"
 
 namespace Leosac
 {
@@ -30,25 +30,27 @@ void UpdateService::register_backend(UpdateBackendPtr backend)
 {
     check_update_sig_.connect(
         CheckUpdateT::slot_type(&UpdateBackend::check_update, backend.get())
-                .track_foreign(backend));
+            .track_foreign(backend));
 }
 
-    void UpdateService::check_update() {
-        check_update_sig_();
-    }
+void UpdateService::check_update()
+{
+    check_update_sig_();
+}
 
-    std::vector<IUpdatePtr> UpdateService::pending_updates() {
-        const auto &db = get_service_registry().get_service<DBService>()->db();
-        db::OptionalTransaction t(db->begin());
+std::vector<IUpdatePtr> UpdateService::pending_updates()
+{
+    const auto &db = get_service_registry().get_service<DBService>()->db();
+    db::OptionalTransaction t(db->begin());
 
-        std::vector<IUpdatePtr> updates;
+    std::vector<IUpdatePtr> updates;
     auto updates_odb = db->query<Update>();
     for (const auto &update : updates)
     {
         updates.push_back(update);
     }
-        t.commit();
-        return updates;
-    }
+    t.commit();
+    return updates;
+}
 }
 }

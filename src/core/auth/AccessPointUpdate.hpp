@@ -24,7 +24,7 @@
 
 namespace Leosac
 {
-    namespace Auth
+namespace Auth
 {
 #pragma db object table("AccessPointUpdate")
 class AccessPointUpdate : public update::Update
@@ -69,7 +69,6 @@ class AccessPointUpdate : public update::Update
     const TimePoint &status_updated_at() const;
 
   private:
-
     /**
      * Tracks the audit entry that represents the point in time
      * of this update.

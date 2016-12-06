@@ -102,11 +102,13 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/audit/
         INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
@@ -138,6 +140,8 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
+        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
         %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"

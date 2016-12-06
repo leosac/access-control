@@ -18,11 +18,12 @@
 */
 
 #include "AccessPointUpdate.hpp"
-#include "EvoXSAccessPoint_odb.h"
+#include "AccessPoint_odb.h"
 
-using namespace Leosac;
-using namespace Leosac::Module;
-using namespace Leosac::Module::EvoXS;
+namespace Leosac
+{
+namespace Auth
+{
 
 AccessPointUpdate::AccessPointUpdate()
     : status_(ST_PENDING)
@@ -58,7 +59,7 @@ void AccessPointUpdate::status(AccessPointUpdate::Status st)
     status_            = st;
 }
 
-EvoXSAccessPointLWPtr AccessPointUpdate::access_point() const
+AccessPointLWPtr AccessPointUpdate::access_point() const
 {
     return access_point_;
 }
@@ -66,4 +67,11 @@ EvoXSAccessPointLWPtr AccessPointUpdate::access_point() const
 const AccessPointUpdate::TimePoint &AccessPointUpdate::status_updated_at() const
 {
     return status_updated_at_;
+}
+
+void AccessPointUpdate::access_point(Auth::AccessPointPtr ap)
+{
+    access_point_ = ap;
+}
+}
 }

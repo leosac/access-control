@@ -18,6 +18,7 @@
 */
 
 #include "AccessPoint.hpp"
+#include "AccessPointUpdate.hpp"
 #include "Door.hpp"
 #include "tools/log.hpp"
 

@@ -44,7 +44,7 @@ class Update : virtual public IUpdate
 
     virtual const TimePoint &generated_at() const override;
 
-private:
+  private:
 #pragma db id auto
     UpdateId id_;
 
