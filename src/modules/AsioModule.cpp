@@ -63,7 +63,8 @@ void AsioModule::StopWatcher::wait(const boost::system::error_code &ec)
     }
     if (!self_.is_running_)
         self_.work_.reset();
-    schedule_wait();
+    else
+        schedule_wait();
 }
 
 void AsioModule::StopWatcher::schedule_wait()
@@ -85,7 +86,8 @@ void AsioModule::AsyncReactorPoller::wait_handler(
 {
     ASSERT_LOG(ec == 0, "Error while processing wait_handler: " << ec.message());
     self_.reactor_.poll(0);
-    schedule_wait();
+    if (self_.is_running_)
+        schedule_wait();
 }
 }
 }
