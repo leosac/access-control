@@ -37,25 +37,5 @@ AccessPointService::get_backend(const std::string &controller_module)
     }
     return nullptr;
 }
-
-json AccessPointService::serialize(const Auth::IAccessPoint &ap,
-                                   const SecurityContext &sc)
-{
-    // We hold a lock while serializing to prevent deregistration
-    // and deletion of the underlying serializer callable.
-    std::lock_guard<std::mutex> lg(mutex_);
-
-    auto type_index = boost::typeindex::type_id_runtime(ap);
-    auto itr        = serializers_.find(type_index);
-    if (itr != serializers_.end())
-    {
-        // Invoke the adapter we stored in the map.
-        // The wrapper will invoke the user-defined callable.
-        return itr->second(ap, sc);
-    }
-    ASSERT_LOG(false, "Cannot find an appropriate serializer for " +
-                          type_index.pretty_name());
-    return {};
-}
 }
 }

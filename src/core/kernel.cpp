@@ -27,6 +27,7 @@
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/WiegandCard.hpp"
+#include "core/update/UpdateService.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
@@ -641,42 +642,66 @@ void Kernel::register_core_services()
     ASSERT_LOG(!service_registry_, "ServiceRegistry is already created.");
     service_registry_ = std::make_unique<ServiceRegistry>();
     {
-        service_registry_->register_service<Audit::Serializer::JSONService>(
-            std::make_unique<Audit::Serializer::JSONService>());
-        if (database_)
+        // Audit serializers
         {
-            service_registry_->register_service<DBService>(
-                std::make_unique<DBService>(database_));
+            service_registry_->register_service<Audit::Serializer::JSONService>(
+                std::make_unique<Audit::Serializer::JSONService>());
+            if (database_)
+            {
+                service_registry_->register_service<DBService>(
+                    std::make_unique<DBService>(database_));
+            }
         }
 
-        // Register the AccessPoint service. Also register default serializer
-        // for simple AccessPoint object.
-        auto aps = std::make_unique<Auth::AccessPointService>();
-        aps->register_serializer<Auth::AccessPoint>(
-            &AccessPointJSONSerializer::serialize);
-        service_registry_->register_service<Auth::AccessPointService>(
-            std::move(aps));
+        // AccessPoint
+        {
+            // Register the AccessPoint service. Also register default serializer
+            // for simple AccessPoint object.
+            auto aps = std::make_unique<Auth::AccessPointService>();
+            aps->register_serializer<Auth::AccessPoint>(
+                &AccessPointJSONSerializer::serialize);
+            service_registry_->register_service<Auth::AccessPointService>(
+                std::move(aps));
+        }
+
+        // Update
+        {
+            service_registry_->register_service<update::UpdateService>(
+                std::make_unique<update::UpdateService>());
+        }
     }
 }
 
 void Kernel::unregister_core_services()
 {
-    bool ret =
-        service_registry_->unregister_service<Audit::Serializer::JSONService>();
-    ASSERT_LOG(ret, "Failed to unregister AuditSerializerService.");
-    if (database_)
+    // Audit serializers
     {
-        ret = service_registry_->unregister_service<DBService>();
-        ASSERT_LOG(ret, "Failed to unregister DBService");
+        bool ret =
+            service_registry_->unregister_service<Audit::Serializer::JSONService>();
+        ASSERT_LOG(ret, "Failed to unregister AuditSerializerService.");
+        if (database_)
+        {
+            ret = service_registry_->unregister_service<DBService>();
+            ASSERT_LOG(ret, "Failed to unregister DBService");
+        }
     }
 
-    // Unregister AccessPointService and its  default serializers.
+    // Access Point service
     {
-        auto aps = service_registry_->get_service<Auth::AccessPointService>();
-        aps->unregister_serializer<Auth::AccessPoint>();
+        {
+            auto aps = service_registry_->get_service<Auth::AccessPointService>();
+            aps->unregister_serializer<Auth::AccessPoint>();
+        }
+        bool ret = service_registry_->unregister_service<Auth::AccessPointService>();
+        ASSERT_LOG(ret, "Failed to unregister Auth::AccessPointService");
     }
-    ret = service_registry_->unregister_service<Auth::AccessPointService>();
-    ASSERT_LOG(ret, "Failed to unregister Auth::AccessPointService");
+
+    // Update service
+    {
+
+        bool ret = service_registry_->unregister_service<update::UpdateService>();
+        ASSERT_LOG(ret, "Failed to unregister update::UpdateService");
+    }
 }
 
 ServiceRegistry &Kernel::service_registry()

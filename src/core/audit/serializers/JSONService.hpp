@@ -24,6 +24,7 @@
 #include "tools/AssertCast.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/registry/Registry.hpp"
+#include "tools/serializers/ExtensibleSerializer.hpp"
 
 namespace Leosac
 {
@@ -35,74 +36,12 @@ namespace Serializer
 /**
  * This service manages runtime registered serializer that target AuditEntry object.
  *
- * We make no difference between the interface and the implementation because this
- * is a core service and there is no point in providing an alternative
- * implementation.
- *
- * Its goal is to hand over callable that can target a specific type of
- * AuditEntry.
- *
  * @note This service is for serializing extended audit entry (those provided by
  * modules) rather than the ones present in leosac's core.
  */
 class JSONService
+    : public ExtensibleSerializer<json, Audit::IAuditEntry, const SecurityContext &>
 {
-  public:
-    /**
-     * Perform the serialization of an audit entry using a runtime
-     * registered serializer.
-     *
-     * @note This method will assert if no matching serializer are available.
-     */
-    json serialize(const Audit::IAuditEntry &, const SecurityContext &sc);
-
-    ~JSONService();
-
-    template <typename T>
-    using SerializationCallable =
-        std::function<json(const T &, const SecurityContext &sc)>;
-
-    template <typename T>
-    void register_serializer(SerializationCallable<T> fct)
-    {
-        std::lock_guard<std::mutex> lg(mutex_);
-        static_assert(std::is_base_of<Audit::IAuditEntry, T>::value,
-                      "Trying to register a serializer for T, but T is not a child "
-                      "of IAuditEntry.");
-        auto type_index = boost::typeindex::type_id<T>();
-        ASSERT_LOG(serializers_.count(type_index) == 0,
-                   "Already got a serializer for this type of audit entry.");
-
-        // This is an adapter that wraps the user function. This allows us to
-        // store uniform function objects.
-        auto wrapper = [fct](const Audit::IAuditEntry &base_audit,
-                             const SecurityContext &sc) -> json {
-            // This cast is safe, because we'll only pick this serializer when
-            // the typeid of the base_audit match T.
-            const T &audit = reinterpret_cast<const T &>(base_audit);
-
-            // However, for extra safety.
-            const T &extra_safety = assert_cast<const T &>(base_audit);
-            ASSERT_LOG(std::addressof(audit) == std::addressof(extra_safety),
-                       "Memory error.");
-            return fct(audit, sc);
-        };
-        serializers_[type_index] = wrapper;
-    }
-
-    template <typename T>
-    void unregister_serializer()
-    {
-        std::lock_guard<std::mutex> lg(mutex_);
-
-        auto type_index = boost::typeindex::type_id<T>();
-        serializers_.erase(type_index);
-    }
-
-  private:
-    mutable std::mutex mutex_;
-    std::map<boost::typeindex::type_index, SerializationCallable<Audit::IAuditEntry>>
-        serializers_;
 };
 }
 }
