@@ -1,5 +1,13 @@
 PROJECT(DATABASELIB CXX)
 
+## Build scripts for database support code.
+## We run multiple compilation with close but slightly different
+## compilation flag (most notably the INCLUDE_PREFIX variable).
+##
+## All those compilation are part of the same ODB schema: "core".
+## This schema old database structure information for the leosac
+## core system. Modules can create additional schema.
+
 # ODB configuration for tools/db (LogEntry).
 set(OdbCMake_ODB_HEADERS_TOOLS
         ${CMAKE_SOURCE_DIR}/src/tools/LogEntry.hpp
@@ -16,7 +24,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
-        SCHEMA_NAME tools
+        SCHEMA_NAME core
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX tools
@@ -55,7 +63,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
-        SCHEMA_NAME auth
+        SCHEMA_NAME core
         PROFILE "boost/date-time"
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
@@ -96,7 +104,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
-        SCHEMA_NAME audit
+        SCHEMA_NAME core
         PROFILE "boost/date-time"
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
@@ -130,7 +138,7 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
-        SCHEMA_NAME credentials
+        SCHEMA_NAME core
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/credentials/
@@ -162,7 +170,7 @@ odb_compile(OdbCMake_SOURCES_UPDATES
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
-        SCHEMA_NAME update
+        SCHEMA_NAME core
         PROFILE "boost/date-time"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/update/

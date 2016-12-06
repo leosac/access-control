@@ -527,98 +527,92 @@ void Kernel::configure_database()
                 using namespace odb;
                 using namespace odb::core;
 
-                // fix me generation from binary is broken
-                // due to cylic dependencies.
-
                 Auth::UserPtr admin;
                 Auth::GroupPtr users;
                 Cred::WiegandCardPtr card;
-                schema_version v = database_->schema_version("auth");
+                schema_version v = database_->schema_version("core");
                 if (v == 0)
                 {
-                    transaction t(database_->begin());
-                    schema_catalog::create_schema(*database_, "auth");
 
-                    admin = std::make_shared<Auth::User>();
-                    admin->firstname("Admin");
-                    admin->lastname("ADMIN");
-                    admin->username("admin");
-                    admin->password("admin");
-                    admin->rank(Auth::UserRank::ADMIN);
-                    database_->persist(admin);
+                    // Create the core schema.
+                    {
+                        transaction t(database_->begin());
+                        schema_catalog::create_schema(*database_, "core");
+                        t.commit();
+                    }
 
-                    Auth::UserPtr demo = std::make_shared<Auth::User>();
-                    demo->firstname("Demo");
-                    demo->lastname("Demo");
-                    demo->username("demo");
-                    demo->password("demo");
-                    database_->persist(demo);
+                    // Default users / groups
+                    {
+                        transaction t(database_->begin());
 
-                    Auth::GroupPtr administrators = std::make_shared<Auth::Group>();
-                    administrators->name("Administrator");
-                    administrators->member_add(admin);
-                    database_->persist(administrators);
+                        admin = std::make_shared<Auth::User>();
+                        admin->firstname("Admin");
+                        admin->lastname("ADMIN");
+                        admin->username("admin");
+                        admin->password("admin");
+                        admin->rank(Auth::UserRank::ADMIN);
+                        database_->persist(admin);
 
-                    users = std::make_shared<Auth::Group>();
-                    users->name("Users");
-                    users->member_add(demo);
-                    users->member_add(admin);
-                    database_->persist(users);
-                    t.commit();
-                }
-                v = database_->schema_version("credentials");
-                if (v == 0)
-                {
-                    transaction t(database_->begin());
-                    schema_catalog::create_schema(*database_, "credentials");
-                    t.commit();
+                        Auth::UserPtr demo = std::make_shared<Auth::User>();
+                        demo->firstname("Demo");
+                        demo->lastname("Demo");
+                        demo->username("demo");
+                        demo->password("demo");
+                        database_->persist(demo);
 
-                    t.reset(database_->begin());
-                    card = std::make_shared<Cred::WiegandCard>();
-                    card->owner(admin);
-                    card->alias(std::string("BestCardEver"));
-                    card->card_id("00:11:22:33");
-                    card->nb_bits(32);
-                    database_->persist(card);
+                        Auth::GroupPtr administrators =
+                            std::make_shared<Auth::Group>();
+                        administrators->name("Administrator");
+                        administrators->member_add(admin);
+                        database_->persist(administrators);
 
-                    Cred::WiegandCard card2;
-                    card2.alias(std::string("Ownerless"));
-                    card2.card_id("aa:bb:cc:dd");
-                    card2.nb_bits(32);
-                    database_->persist(card2);
-                    t.commit();
-                }
+                        users = std::make_shared<Auth::Group>();
+                        users->name("Users");
+                        users->member_add(demo);
+                        users->member_add(admin);
+                        database_->persist(users);
+                        t.commit();
+                    }
 
-                v = (database_->schema_version("tools"));
-                if (v == 0)
-                {
-                    // Create schema
-                    transaction t(database_->begin());
-                    schema_catalog::create_schema(*database_, "tools");
+                    // Credentials stuff
+                    {
+                        transaction t(database_->begin());
 
-                    Tools::SchedulePtr sched = std::make_shared<Tools::Schedule>();
-                    sched->name("DummySchedule");
-                    sched->description("A test schedule, with mapping.");
-                    Tools::ScheduleMappingPtr map0 =
-                        std::make_shared<ScheduleMapping>();
-                    map0->add_user(admin);
-                    map0->add_group(users);
-                    map0->add_credential(card);
-                    map0->alias("My first mapping");
-                    database_->persist(map0);
-                    sched->add_mapping(map0);
-                    database_->persist(sched);
+                        card = std::make_shared<Cred::WiegandCard>();
+                        card->owner(admin);
+                        card->alias(std::string("BestCardEver"));
+                        card->card_id("00:11:22:33");
+                        card->nb_bits(32);
+                        database_->persist(card);
 
-                    t.commit();
-                }
+                        Cred::WiegandCard card2;
+                        card2.alias(std::string("Ownerless"));
+                        card2.card_id("aa:bb:cc:dd");
+                        card2.nb_bits(32);
+                        database_->persist(card2);
+                        t.commit();
+                    }
 
-                v = database_->schema_version("audit");
-                if (v == 0)
-                {
-                    // Create schema
-                    transaction t(database_->begin());
-                    schema_catalog::create_schema(*database_, "audit");
-                    t.commit();
+                    // Schedules stuff
+                    {
+                        transaction t(database_->begin());
+
+                        Tools::SchedulePtr sched =
+                            std::make_shared<Tools::Schedule>();
+                        sched->name("DummySchedule");
+                        sched->description("A test schedule, with mapping.");
+                        Tools::ScheduleMappingPtr map0 =
+                            std::make_shared<ScheduleMapping>();
+                        map0->add_user(admin);
+                        map0->add_group(users);
+                        map0->add_credential(card);
+                        map0->alias("My first mapping");
+                        database_->persist(map0);
+                        sched->add_mapping(map0);
+                        database_->persist(sched);
+
+                        t.commit();
+                    }
                 }
             }
         }
