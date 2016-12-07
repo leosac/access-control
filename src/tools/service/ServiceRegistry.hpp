@@ -240,6 +240,7 @@ class ServiceRegistry
         }
         if (success)
             signal_deregistration(registration_sptr);
+        return success;
     }
 
     /**
