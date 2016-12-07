@@ -32,11 +32,7 @@ enum class Status
     ACKNOWLEDGED = 1,
     CANCELLED    = 2,
 
-    /**
-     * The update is not stored in the database.
-     * The object is simply here to indicates that an update
-     * is needed.
-     */
+    // unused
     TRANSIENT = 3
 };
 
@@ -45,9 +41,12 @@ class IUpdate;
 using IUpdatePtr = std::shared_ptr<IUpdate>;
 
 class Update;
-class UpdateBackend;
 
+class UpdateBackend;
 using UpdateBackendPtr = std::shared_ptr<UpdateBackend>;
+
+struct UpdateDescriptor;
+using UpdateDescriptorPtr = std::shared_ptr<UpdateDescriptor>;
 
 class UpdateService;
 

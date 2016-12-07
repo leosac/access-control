@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "CheckUpdate.hpp"
+#include "PendingUpdateGet.hpp"
 #include "core/GetServiceRegistry.hpp"
 #include "core/update/IUpdate.hpp"
 #include "core/update/UpdateService.hpp"
@@ -29,17 +29,18 @@ namespace Module
 {
 namespace WebSockAPI
 {
-CheckUpdate::CheckUpdate(RequestContext ctx)
+PendingUpdateGet::PendingUpdateGet(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr CheckUpdate::create(RequestContext ctx)
+MethodHandlerUPtr PendingUpdateGet::create(RequestContext ctx)
 {
-    return std::make_unique<CheckUpdate>(ctx);
+    return std::make_unique<PendingUpdateGet>(ctx);
 }
 
-std::vector<ActionActionParam> CheckUpdate::required_permission(const json &) const
+std::vector<ActionActionParam>
+PendingUpdateGet::required_permission(const json &) const
 {
     std::vector<ActionActionParam> perm_;
     SecurityContext::ActionParam ap;
@@ -48,19 +49,17 @@ std::vector<ActionActionParam> CheckUpdate::required_permission(const json &) co
     return perm_;
 }
 
-json CheckUpdate::process_impl(const json &)
+json PendingUpdateGet::process_impl(const json &)
 {
     auto srv_ptr = get_service_registry().get_service<update::UpdateService>();
     ASSERT_LOG(srv_ptr, "Cannot retrieve UpdateService.");
-    json ret     = json::array();
-    auto updates = srv_ptr->check_update();
+    json ret;
+    ret["data"] = json::array();
 
-    for (const auto &update_desc : updates)
+    for (const auto &update_desc : srv_ptr->pending_updates())
     {
-        ret.push_back(
-            update::UpdateDescriptorJSONSerializer::serialize(*update_desc));
+        ret["data"].push_back(srv_ptr->serialize(*update_desc, security_context()));
     }
-
     return ret;
 }
 }

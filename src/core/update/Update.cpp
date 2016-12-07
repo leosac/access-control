@@ -25,7 +25,8 @@ namespace update
 {
 
 Update::Update()
-    : generated_at_(std::chrono::system_clock::now())
+    : id_(0)
+    , generated_at_(std::chrono::system_clock::now())
     , odb_version_(0)
 {
 }
@@ -65,6 +66,16 @@ void Update::set_checkpoint(Audit::AuditEntryPtr audit)
 Audit::AuditEntryId Update::get_checkpoint() const
 {
     return checkpoint_.last_id();
+}
+
+const std::string &Update::source_module() const
+{
+    return source_module_;
+}
+
+const std::string &Update::description() const
+{
+    return description_;
 }
 }
 }

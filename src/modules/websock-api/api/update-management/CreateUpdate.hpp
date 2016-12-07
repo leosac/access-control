@@ -19,29 +19,40 @@
 
 #pragma once
 
-#include "core/SecurityContext.hpp"
-#include "core/auth/AuthFwd.hpp"
-#include <json.hpp>
+#include "modules/websock-api/api/MethodHandler.hpp"
 
 namespace Leosac
 {
+namespace Module
+{
+namespace WebSockAPI
+{
 using json = nlohmann::json;
 
-namespace update
-{
 /**
- * Serializer for AccessPointUpdate objects.
+ * Request the creation of a persistent update based
+ * on the uuid of a transient update::UpdateDescriptor
+ * object.
+ *
+ * Request:
+ *   {
+ *     descriptor_uuid: xxxx-yyy-....
+ *   }
  */
-struct AccessPointUpdateJSONSerializer
+class CreateUpdate : public MethodHandler
 {
-    static json serialize(const Auth::AccessPointUpdate &in,
-                          const SecurityContext &sc);
-};
+  public:
+    CreateUpdate(RequestContext ctx);
 
-struct AccessPointUpdateJSONStringSerializer
-{
-    static std::string serialize(const Auth::AccessPointUpdate &in,
-                                 const SecurityContext &sc);
+    static MethodHandlerUPtr create(RequestContext);
+
+  protected:
+    std::vector<ActionActionParam>
+    required_permission(const json &req) const override;
+
+  private:
+    virtual json process_impl(const json &req) override;
 };
+}
 }
 }

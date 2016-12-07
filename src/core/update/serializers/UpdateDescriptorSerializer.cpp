@@ -17,31 +17,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include "core/SecurityContext.hpp"
-#include "core/auth/AuthFwd.hpp"
-#include <json.hpp>
+#include "UpdateDescriptorSerializer.hpp"
+#include "core/update/UpdateService.hpp"
+#include "tools/JSONUtils.hpp"
 
 namespace Leosac
 {
-using json = nlohmann::json;
-
 namespace update
 {
-/**
- * Serializer for AccessPointUpdate objects.
- */
-struct AccessPointUpdateJSONSerializer
+json UpdateDescriptorJSONSerializer::serialize(const UpdateDescriptor &in)
 {
-    static json serialize(const Auth::AccessPointUpdate &in,
-                          const SecurityContext &sc);
-};
+    json serialized;
 
-struct AccessPointUpdateJSONStringSerializer
-{
-    static std::string serialize(const Auth::AccessPointUpdate &in,
-                                 const SecurityContext &sc);
-};
+    serialized["uuid"]          = in.uuid;
+    serialized["severity"]      = static_cast<int>(in.severity);
+    serialized["source_module"] = in.source_module;
+    serialized["update_desc"]   = in.update_desc;
+
+    return serialized;
+}
 }
 }

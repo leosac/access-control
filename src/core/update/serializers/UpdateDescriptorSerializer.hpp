@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "core/SecurityContext.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "core/update/UpdateFwd.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -29,19 +28,9 @@ using json = nlohmann::json;
 
 namespace update
 {
-/**
- * Serializer for AccessPointUpdate objects.
- */
-struct AccessPointUpdateJSONSerializer
+struct UpdateDescriptorJSONSerializer
 {
-    static json serialize(const Auth::AccessPointUpdate &in,
-                          const SecurityContext &sc);
-};
-
-struct AccessPointUpdateJSONStringSerializer
-{
-    static std::string serialize(const Auth::AccessPointUpdate &in,
-                                 const SecurityContext &sc);
+    static json serialize(const UpdateDescriptor &in);
 };
 }
 }

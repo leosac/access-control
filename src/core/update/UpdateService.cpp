@@ -20,6 +20,7 @@
 #include "UpdateService.hpp"
 #include "Update_odb.h"
 #include "core/GetServiceRegistry.hpp"
+#include "tools/GenGuid.h"
 #include "tools/db/OptionalTransaction.hpp"
 
 namespace Leosac
@@ -31,11 +32,32 @@ void UpdateService::register_backend(UpdateBackendPtr backend)
     check_update_sig_.connect(
         CheckUpdateT::slot_type(&UpdateBackend::check_update, backend.get())
             .track_foreign(backend));
+
+    create_update_sig_.connect(
+        CreateUpdateT::slot_type(&UpdateBackend::create_update, backend.get(),
+                                 boost::placeholders::_1)
+            .track_foreign(backend));
+
+    backend_ = backend;
 }
 
-std::vector<IUpdatePtr> UpdateService::check_update()
+std::vector<UpdateDescriptorPtr> UpdateService::check_update()
 {
-    return check_update_sig_();
+    auto descriptors = check_update_sig_();
+
+    // When a new check_update happens, we clear all
+    // previous update descriptor as they would possibly
+    // become outdated.
+    published_descriptors_.clear();
+    for (const auto &descriptor : descriptors)
+    {
+        // This is so a client can reference a descriptor later to
+        // trigger creation of an update. (This is needed since we don't want
+        // update descriptor to be database-persisted).
+        published_descriptors_[descriptor->uuid] = descriptor;
+    }
+
+    return descriptors;
 }
 
 std::vector<IUpdatePtr> UpdateService::pending_updates()
@@ -45,15 +67,31 @@ std::vector<IUpdatePtr> UpdateService::pending_updates()
 
     std::vector<IUpdatePtr> updates;
     auto updates_odb = db->query<Update>();
-    for (const auto &update : updates)
+
+    for (auto i(updates_odb.begin()); i != updates_odb.end(); ++i)
     {
-        updates.push_back(update);
+        IUpdatePtr ptr(i.load());
+        ASSERT_LOG(ptr, "Loading failed, but object should already be loaded.");
+        updates.push_back(ptr);
     }
     t.commit();
     return updates;
 }
 
-UpdateService::UpdateService()
+IUpdatePtr UpdateService::create_update(const std::string &update_descriptor_uuid)
+{
+    auto itr = published_descriptors_.find(update_descriptor_uuid);
+    if (itr == published_descriptors_.end())
+    {
+        throw LEOSACException("UpdateDescriptor doesn't exist anymore.");
+    }
+
+    return create_update_sig_(*(itr->second));
+}
+
+UpdateDescriptor::UpdateDescriptor()
+    : uuid(gen_uuid())
+    , severity(Severity::NORMAL)
 {
 }
 }

@@ -23,6 +23,7 @@
 #include "core/SecurityContext.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/bs2.hpp"
+#include "tools/registry/Registry.hpp"
 #include "tools/serializers/ExtensibleSerializer.hpp"
 #include <mutex>
 
@@ -30,6 +31,42 @@ namespace Leosac
 {
 namespace update
 {
+enum class Severity
+{
+    LOW      = 0,
+    NORMAL   = 1,
+    HIGHT    = 2,
+    CRITICAL = 3,
+};
+
+/**
+ * Describe an update that has yet to be done.
+ *
+ * This object is the format used to let end-user
+ * knows that update are available. It stores which
+ * module is the source of the potential update, aswel
+ * as a quick description of the update itself.
+ *
+ * @note Update descriptor are kept alive in memory by the
+ * UpdateService.
+ */
+struct UpdateDescriptor
+{
+    UpdateDescriptor();
+    virtual ~UpdateDescriptor() = default;
+
+    std::string uuid;
+    Severity severity;
+    std::string source_module;
+    std::string update_desc;
+
+  private:
+    /**
+     * Just to make UpdateDescriptor abstract so module have to provide their own
+     * subclass. (needed for dynamic caster in create_update)
+     */
+    virtual void implement_me_() = 0;
+};
 
 class UpdateBackend
 {
@@ -44,7 +81,24 @@ class UpdateBackend
      * Module specific websocket-handler should be called in order
      * to to perform other operation wrt updates.
      */
-    virtual std::vector<update::IUpdatePtr> check_update() = 0;
+    virtual std::vector<UpdateDescriptorPtr> check_update() = 0;
+
+    /**
+     * Create an update based on the UpdateDescriptor `ud`.
+     *
+     * If the `ud` cannot be casted back to the implementation of your
+     * module, make sure return nullptr from this method because it
+     * means the update creation wasn't targeted at your module.
+     */
+    virtual IUpdatePtr create_update(const UpdateDescriptor &ud) = 0;
+
+    /**
+     * Acknowledge the update `u`.
+     *
+     * If the update `u` doesn't target your module, ignore
+     * it.
+     */
+    // virtual void ack_update(IUpdatePtr u) = 0;
 };
 
 /**
@@ -64,9 +118,19 @@ class UpdateService
     : public ExtensibleSerializer<json, IUpdate, const SecurityContext &>
 {
   public:
-    UpdateService();
+    std::vector<UpdateDescriptorPtr> check_update();
 
-    std::vector<update::IUpdatePtr> check_update();
+    /**
+     * Create an Update object corresponding to the update descriptor
+     * whose uuid is `update_descriptor_uuid`.
+     *
+     * @note Throw if the uuid doesn't reference anything anymore.
+     *
+     * @note We call create_update() for each registered backend with
+     * a reference to the update descriptor. Backends can cast the
+     * descriptor object to check whether the call is really for them or not.
+     */
+    IUpdatePtr create_update(const std::string &update_descriptor_uuid);
 
     /**
      * Retrieve the list of pending updates.
@@ -85,10 +149,19 @@ class UpdateService
     mutable std::mutex mutex_;
 
     using CheckUpdateT =
-        boost::signals2::signal<std::vector<update::IUpdatePtr>(void),
-                                VectorAppenderCombiner<update::IUpdatePtr>>;
+        boost::signals2::signal<std::vector<UpdateDescriptorPtr>(void),
+                                VectorAppenderCombiner<UpdateDescriptorPtr>>;
+
+    using CreateUpdateT =
+        boost::signals2::signal<IUpdatePtr(const UpdateDescriptor &),
+                                AtMostOneCombiner<IUpdatePtr>>;
 
     CheckUpdateT check_update_sig_;
+    CreateUpdateT create_update_sig_;
+
+    std::map<std::string, UpdateDescriptorPtr> published_descriptors_;
+
+    UpdateBackendPtr backend_;
 };
 }
 }

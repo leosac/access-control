@@ -128,7 +128,7 @@ set(LEOSAC_LIB_SRCS
     core/update/serializers/AccessPointUpdateSerializer.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
-        core/update/serializers/UpdateSerializer.cpp core/update/serializers/UpdateSerializer.hpp)
+        core/update/serializers/UpdateSerializer.cpp core/update/serializers/UpdateSerializer.hpp core/update/serializers/UpdateDescriptorSerializer.cpp core/update/serializers/UpdateDescriptorSerializer.hpp)
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db
@@ -164,7 +164,7 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O2 -Wextra -g3 -Wl,-z,now")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O0 -Wextra -g3 -Wl,-z,now")
     endif()
 endif()
 

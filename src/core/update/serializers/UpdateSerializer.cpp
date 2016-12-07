@@ -39,6 +39,10 @@ json UpdateJSONSerializer::serialize(const update::IUpdate &in,
         Conversion<std::string>(in.generated_at());
     serialized["attributes"]["status-updated-at"] =
         Conversion<std::string>(in.status_updated_at());
+
+    serialized["attributes"]["source-module"] = in.source_module();
+    serialized["attributes"]["description"]   = in.description();
+
     return serialized;
 }
 }

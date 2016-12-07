@@ -43,6 +43,8 @@ class IUpdate
 
     virtual const TimePoint &status_updated_at() const = 0;
 
+    virtual const std::string &source_module() const = 0;
+    virtual const std::string &description() const   = 0;
 
     /**
      * Set the checkpoint for the update object.

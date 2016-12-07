@@ -25,7 +25,7 @@ namespace Leosac
 {
 namespace Auth
 {
-#pragma db object table("AccessPointUpdate")
+#pragma db object polymorphic table("AccessPointUpdate")
 class AccessPointUpdate : public ::Leosac::update::Update
 {
   public:

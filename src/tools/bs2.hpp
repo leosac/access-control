@@ -53,4 +53,45 @@ struct VectorAppenderCombiner
         return result;
     }
 };
+
+/**
+ * A boost::signals2 combiner that makes sure that at most
+ * one slot returns a non-null pointer.
+ *
+ * This combiner works for pointer object.
+ */
+template <typename T>
+struct AtMostOneCombiner
+{
+    using result_type = T;
+
+    template <typename InputIterator>
+    T operator()(InputIterator first, InputIterator last) const
+    {
+        bool set = false;
+        T result = nullptr;
+        if (first == last)
+            return T{};
+
+        while (first != last)
+        {
+            T tmp = nullptr;
+            tmp   = *first;
+
+            if (tmp && set)
+            {
+                throw LEOSACException("AtMostOneCombiner: A non-null pointer has "
+                                      "already been returned.");
+            }
+            else if (tmp)
+            {
+                result = tmp;
+                set    = true;
+            }
+
+            ++first;
+        }
+        return result;
+    }
+};
 }

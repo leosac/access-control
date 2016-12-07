@@ -27,7 +27,7 @@ set(WEBSOCK_API_SRCS
         api/search/DoorSearch.cpp
         api/search/AccessPointSearch.cpp
         api/search/ScheduleSearch.cpp
-        api/update-management/CheckUpdate.cpp api/update-management/CheckUpdate.hpp)
+        api/update-management/CheckUpdate.cpp api/update-management/CheckUpdate.hpp api/update-management/CreateUpdate.cpp api/update-management/CreateUpdate.hpp api/update-management/PendingUpdateGet.cpp api/update-management/PendingUpdateGet.hpp)
 
 add_library(${WEBSOCK_API_BIN} SHARED
         ${WEBSOCK_API_SRCS}

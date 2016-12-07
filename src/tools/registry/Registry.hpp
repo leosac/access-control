@@ -173,6 +173,11 @@ class Registry
         }
     }
 
+    size_t size() const
+    {
+        return store_.size();
+    }
+
   private:
     std::map<KeyType, Clock::time_point> expiry_;
     std::map<KeyType, boost::any> store_;
