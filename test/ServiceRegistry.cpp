@@ -92,7 +92,7 @@ TEST(TestRegistry, unregister_simple)
         event_listener_invoked = true;
         ASSERT_EQ(service_event::EventType::UNREGISTERED, ev.type());
         ASSERT_NO_THROW(
-                dynamic_cast<const service_event::ServiceUnregistered &>(ev));
+            dynamic_cast<const service_event::ServiceUnregistered &>(ev));
     });
 
     ASSERT_TRUE(srv_registry.unregister_service(handle));

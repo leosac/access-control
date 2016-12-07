@@ -18,28 +18,21 @@
 */
 
 #include "AccessPointUpdateSerializer.hpp"
+#include "UpdateSerializer.hpp"
 #include "core/auth/AccessPointUpdate.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 
 namespace Leosac
 {
-namespace Auth
+namespace update
 {
-json AccessPointUpdateJSONSerializer::serialize(const AccessPointUpdate &in,
+json AccessPointUpdateJSONSerializer::serialize(const Auth::AccessPointUpdate &in,
                                                 const SecurityContext &sc)
 {
-    json serialized;
-    serialized["type"] = "evoxs-access-point-update";
-    serialized["id"]   = in.id();
+    json serialized(UpdateJSONSerializer::serialize(in, sc));
 
-    serialized["attributes"]["status"]     = static_cast<int>(in.status());
-    serialized["attributes"]["checkpoint"] = in.get_checkpoint();
-    serialized["attributes"]["generated-at"] =
-        Conversion<std::string>(in.generated_at());
-    serialized["attributes"]["status-updated-at"] =
-        Conversion<std::string>(in.status_updated_at());
-
+    serialized["type"]                          = "evoxs-access-point-update";
     serialized["relationships"]["access-point"] = {
         {"data", {{"id", in.access_point_id()}, {"type", "evoxs-access-point"}}}};
 
@@ -47,7 +40,7 @@ json AccessPointUpdateJSONSerializer::serialize(const AccessPointUpdate &in,
 }
 
 std::string
-AccessPointUpdateJSONStringSerializer::serialize(const AccessPointUpdate &in,
+AccessPointUpdateJSONStringSerializer::serialize(const Auth::AccessPointUpdate &in,
                                                  const SecurityContext &sc)
 {
     return AccessPointUpdateJSONSerializer::serialize(in, sc).dump(4);

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/audit/AuditFwd.hpp"
 #include "core/update/UpdateFwd.hpp"
 #include <chrono>
 

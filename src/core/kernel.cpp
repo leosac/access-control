@@ -669,7 +669,7 @@ void Kernel::register_core_services()
         {
             auto update_srv = std::make_unique<update::UpdateService>();
             update_srv->register_serializer<Auth::AccessPointUpdate>(
-                &Auth::AccessPointUpdateJSONSerializer::serialize);
+                &update::AccessPointUpdateJSONSerializer::serialize);
             service_registry_->register_service<update::UpdateService>(
                 std::move(update_srv));
         }

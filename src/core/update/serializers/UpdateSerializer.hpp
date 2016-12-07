@@ -20,7 +20,7 @@
 #pragma once
 
 #include "core/SecurityContext.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "core/update/UpdateFwd.hpp"
 #include <json.hpp>
 
 namespace Leosac
@@ -32,16 +32,9 @@ namespace update
 /**
  * Serializer for EvoXS AccessPointUpdate.
  */
-struct AccessPointUpdateJSONSerializer
+struct UpdateJSONSerializer
 {
-    static json serialize(const Auth::AccessPointUpdate &in,
-                          const SecurityContext &sc);
-};
-
-struct AccessPointUpdateJSONStringSerializer
-{
-    static std::string serialize(const Auth::AccessPointUpdate &in,
-                                 const SecurityContext &sc);
+    static json serialize(const update::IUpdate &in, const SecurityContext &sc);
 };
 }
 }
