@@ -22,6 +22,7 @@
 #include "core/audit/IAuditEntry.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "core/update/UpdateFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
@@ -80,6 +81,8 @@ class DBService
     Auth::IAccessPointPtr find_access_point_by_id(const Auth::AccessPointId &id,
                                                   Flag f = Flag::DEFAULT);
 
+    update::IUpdatePtr find_update_by_id(const update::UpdateId &id,
+                                         Flag f = Flag::DEFAULT);
     /**
      * Persist an audit entry object.
      *

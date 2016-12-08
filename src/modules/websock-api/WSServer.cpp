@@ -38,9 +38,12 @@
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
 #include "api/search/ScheduleSearch.hpp"
+#include "api/update-management/AckUpdate.hpp"
+#include "api/update-management/CancelUpdate.hpp"
 #include "api/update-management/CheckUpdate.hpp"
 #include "api/update-management/CreateUpdate.hpp"
 #include "api/update-management/PendingUpdateGet.hpp"
+#include "api/update-management/UpdateHistory.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/GetServiceRegistry.hpp"
 #include "core/audit/AuditFactory.hpp"
@@ -101,6 +104,9 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["access_overview"]           = &AccessOverview::create;
     individual_handlers_["check_update"]              = &CheckUpdate::create;
     individual_handlers_["create_update"]             = &CreateUpdate::create;
+    individual_handlers_["ack_update"]                = &AckUpdate::create;
+    individual_handlers_["cancel_update"]             = &CancelUpdate::create;
+    individual_handlers_["get_update_history"]        = &UpdateHistory::create;
     individual_handlers_["get_pending_update"]        = &PendingUpdateGet::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);

@@ -73,9 +73,18 @@ const std::string &Update::source_module() const
     return source_module_;
 }
 
+void Update::source_module(const std::string &s)
+{
+    source_module_ = s;
+}
+
 const std::string &Update::description() const
 {
     return description_;
+}
+void Update::description(const std::string &d)
+{
+    description_ = d;
 }
 }
 }

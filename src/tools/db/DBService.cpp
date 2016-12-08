@@ -146,6 +146,17 @@ DBService::find_access_point_by_id(const Auth::AccessPointId &id,
     return ap;
 }
 
+update::IUpdatePtr DBService::find_update_by_id(const update::UpdateId &id,
+                                                DBService::Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto ap = database_->find<update::Update>(id);
+    t.commit();
+    if (!ap && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "update");
+    return ap;
+}
+
 template <typename T>
 static void persist_impl(const DBPtr db, T &&obj)
 {

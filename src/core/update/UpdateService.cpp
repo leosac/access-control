@@ -38,7 +38,15 @@ void UpdateService::register_backend(UpdateBackendPtr backend)
                                  boost::placeholders::_1)
             .track_foreign(backend));
 
-    backend_ = backend;
+    ack_update_sig_.connect(AckUpdateT::slot_type(&UpdateBackend::ack_update,
+                                                  backend.get(),
+                                                  boost::placeholders::_1)
+                                .track_foreign(backend));
+
+    cancel_update_sig_.connect(
+        CancelUpdateT::slot_type(&UpdateBackend::cancel_update, backend.get(),
+                                 boost::placeholders::_1)
+            .track_foreign(backend));
 }
 
 std::vector<UpdateDescriptorPtr> UpdateService::check_update()
@@ -66,7 +74,9 @@ std::vector<IUpdatePtr> UpdateService::pending_updates()
     db::OptionalTransaction t(db->begin());
 
     std::vector<IUpdatePtr> updates;
-    auto updates_odb = db->query<Update>();
+    using Query = odb::query<update::Update>;
+    auto updates_odb =
+        db->query<update::Update>(Query::status == update::Status::PENDING);
 
     for (auto i(updates_odb.begin()); i != updates_odb.end(); ++i)
     {
@@ -87,6 +97,16 @@ IUpdatePtr UpdateService::create_update(const std::string &update_descriptor_uui
     }
 
     return create_update_sig_(*(itr->second));
+}
+
+void UpdateService::ack_update(IUpdatePtr update)
+{
+    ack_update_sig_(update);
+}
+
+void UpdateService::cancel_update(IUpdatePtr update)
+{
+    cancel_update_sig_(update);
 }
 
 UpdateDescriptor::UpdateDescriptor()

@@ -62,7 +62,10 @@ class Update : virtual public IUpdate
 
     virtual const std::string &source_module() const override;
 
+    virtual void source_module(const std::string &s) override;
+
     virtual const std::string &description() const override;
+    virtual void description(const std::string &d) override;
 
   private:
 #pragma db id auto

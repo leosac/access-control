@@ -93,12 +93,20 @@ class UpdateBackend
     virtual IUpdatePtr create_update(const UpdateDescriptor &ud) = 0;
 
     /**
-     * Acknowledge the update `u`.
+     * Acknowledge the pending update `u`.
      *
      * If the update `u` doesn't target your module, ignore
      * it.
      */
-    // virtual void ack_update(IUpdatePtr u) = 0;
+    virtual void ack_update(IUpdatePtr u) = 0;
+
+    /**
+     * Cancel (not rollback) the pending update `u`.
+     *
+     * If the update `u` doesn't target your module, ignore
+     * it.
+     */
+    virtual void cancel_update(IUpdatePtr u) = 0;
 };
 
 /**
@@ -137,6 +145,10 @@ class UpdateService
      */
     std::vector<IUpdatePtr> pending_updates();
 
+    void ack_update(IUpdatePtr update);
+
+    void cancel_update(IUpdatePtr update);
+
     /**
      * Register a backend object.
      *
@@ -156,12 +168,17 @@ class UpdateService
         boost::signals2::signal<IUpdatePtr(const UpdateDescriptor &),
                                 AtMostOneCombiner<IUpdatePtr>>;
 
+    using AckUpdateT = boost::signals2::signal<void(IUpdatePtr)>;
+
+    using CancelUpdateT = boost::signals2::signal<void(IUpdatePtr)>;
+
     CheckUpdateT check_update_sig_;
     CreateUpdateT create_update_sig_;
+    AckUpdateT ack_update_sig_;
+    CancelUpdateT cancel_update_sig_;
+
 
     std::map<std::string, UpdateDescriptorPtr> published_descriptors_;
-
-    UpdateBackendPtr backend_;
 };
 }
 }
