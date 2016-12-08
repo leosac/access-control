@@ -6,7 +6,6 @@ set(WEBSOCK_API_SRCS
         WSServer.cpp
         Exceptions.cpp
         ExceptionConverter.cpp
-        Facade.cpp
         Service.cpp
         api/APISession.cpp
         api/MethodHandler.cpp
@@ -27,7 +26,13 @@ set(WEBSOCK_API_SRCS
         api/search/DoorSearch.cpp
         api/search/AccessPointSearch.cpp
         api/search/ScheduleSearch.cpp
-        api/update-management/CheckUpdate.cpp api/update-management/CheckUpdate.hpp api/update-management/CreateUpdate.cpp api/update-management/CreateUpdate.hpp api/update-management/PendingUpdateGet.cpp api/update-management/PendingUpdateGet.hpp api/update-management/AckUpdate.cpp api/update-management/AckUpdate.hpp api/update-management/CancelUpdate.cpp api/update-management/CancelUpdate.hpp api/update-management/UpdateHistory.cpp api/update-management/UpdateHistory.hpp)
+        api/update-management/CheckUpdate.cpp
+        api/update-management/CreateUpdate.cpp
+        api/update-management/PendingUpdateGet.cpp
+        api/update-management/AckUpdate.cpp
+        api/update-management/CancelUpdate.cpp
+        api/update-management/UpdateHistory.cpp
+)
 
 add_library(${WEBSOCK_API_BIN} SHARED
         ${WEBSOCK_API_SRCS}

@@ -85,20 +85,6 @@ class WSServer
     void start_shutdown();
 
     /**
-     * Register an handler on behalf on an other module.
-     *
-     * This is used as part of the websocket passthrough feature.
-     *
-     * @note This method is thread-safe.
-     *
-     * @param name The name of the handler (ie, the message's `type`)
-     * @param client_id An opaque identifier that identifies the client (ie module)
-     *        on the WebSocketAPI router socket.
-     */
-    void register_external_handler(const std::string &name,
-                                   const std::string &client_id);
-
-    /**
      * This function block the calling thread until the WebSocket thread has
      * processed the handler registration.
      *
@@ -106,14 +92,6 @@ class WSServer
      */
     bool register_asio_handler(const Service::WSHandler &handler,
                                const std::string &name);
-
-    /**
-     * Send a message to a connection identified by `connection_identifier`.
-     *
-     * @note This method is thread-safe.
-     */
-    void send_external_message(const std::string &connection_identifier,
-                               const std::string &content);
 
     /**
      * Retrieve the authentication helper.
@@ -150,12 +128,6 @@ class WSServer
      */
     void clear_user_sessions(Auth::UserPtr user, APIPtr exception,
                              bool new_transaction = true);
-
-    /**
-     * Can be used by internal handlers to send a message to a give
-     * Leosac module.
-     */
-    void send_to_module(const std::string &module_name, zmqpp::message msg);
 
   private:
     void on_open(websocketpp::connection_hdl hdl);
@@ -261,14 +233,8 @@ class WSServer
     std::map<std::string, CRUDResourceHandler::Factory> crud_handlers_;
 
     /**
-     * Handler registered on behalf of other Leosac's modules.
-     *
-     * This maps the handler's name to the `client_id` key, where `client_id`
-     * is the zeroMQ generated identifier for the module that registered the
-     * endpoint.
+     * Handlers registered through the WebSockAPI::Service object.
      */
-    std::map<std::string, std::string> external_handlers_;
-
     std::map<std::string, Service::WSHandler> asio_handlers_;
 
     /**
@@ -283,11 +249,6 @@ class WSServer
      */
     WebSockAPIModule &module_;
 
-    /**
-     * A PUSH socket that connects to the WebSockAPIModule.
-     * Connects to "inproc://MODULE.WEBSOCKET.INTERNAL_PULL".
-     */
-    std::unique_ptr<zmqpp::socket> to_module_;
 };
 }
 }

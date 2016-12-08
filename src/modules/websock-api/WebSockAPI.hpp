@@ -40,58 +40,8 @@ namespace WebSockAPI
  *    + It can passthrough websocket traffic, effectively giving the ability to
  *      any module to expose a websocket API for itself.
  *
- * To provide this features, the module binds a ROUTER socket
- * at "inproc://SERVICE.WEBSOCKET". Other modules are expected to connect to this
- * socket and issue command.
- *
- * Todo: This doc needs to be improved.
- *
- * ### Supported commands.
- *
- * #### REGISTER_MODULE
- *
- * Frame1: Module name
- *
- * This register the module name to the websocket module. It will allows
- * websocket handler to communicate with this module. A use case is
- * the forwarding of AccessPoint related request to their implementation
- * modules.
- *
- *
- * #### REGISTER_HANDLER.
- *
- * Frame1: "REGISTER_HANDLER"
- * Frame2: "MY_HANDLER_NAME"
- *
- * This command let the module that the caller wants to receive message
- * whose `type` is "MY_HANDLER_NAME". From this point on, all message whose
- * type is "MY_HANDLER_NAME" will be forward to the module that registered the
- * handler.
- *
- * The websocket module will either response "OK" ok "KO" depending on whether or
- * not registration was successful.
- *
- * #### SEND_MESSAGE
- *
- * Frame1: "SEND_MESSAGE"
- * Frame2: `Connection identifier`
- * Frame3: JSON TEXT CONTENT.
- *
- *
- * The module will also emit messages (when receiving message for a registered
- * handler).
- *
- * The internal PULL socket must be connected only by the websocketpp thread.
- * All message received will be forwarded as is, unless the first frame is
- * "SEND_TO_MODULE". In that case, the message will be delivered to the appropriate
- * module. Or assert if not found.
- *
- * #### Forwarding (sent by WSServer object)
- * Frame1: Client identifier (module that registere the handler)
- * Frame2: Audit Entry ID
- * Frame3: `Connection identifier`
- * Frame4: JSON TEXT CONTENT.
- *
+ * This module registers the WebSockAPI::Service object. It can be used
+ * to register handler for specific message type.
  */
 class WebSockAPIModule : public BaseModule
 {
@@ -110,18 +60,6 @@ class WebSockAPIModule : public BaseModule
     CoreUtilsPtr core_utils();
 
   private:
-    /**
-     * A message arrived on the router socket.
-     */
-    void handle_router();
-
-    /**
-     * A message arrived on the pull socket.
-     *
-     * Message received on this socket are supposed to be forwarded
-     * to a client of the router socket.
-     */
-    void handle_pull();
 
     /**
      * Port to bind the websocket endpoint.
@@ -134,24 +72,10 @@ class WebSockAPIModule : public BaseModule
     std::string interface_;
 
     /**
-     * A ROUTER socket that will be used to communicate
-     * with other module.
-     *
-     * This socket binds to SERVICE.WEBSOCKET
-     */
-    std::unique_ptr<zmqpp::socket> router_;
-
-    /**
-     * PULL socket that receives message from the WSServer object.
-     */
-    std::unique_ptr<zmqpp::socket> pull_;
-
-    /**
      * Our websocket server object.
      */
     std::unique_ptr<WSServer> wssrv_;
 
-    std::map<std::string, std::string> module_name_client_id_;
 };
 }
 }

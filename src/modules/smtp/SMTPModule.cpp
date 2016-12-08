@@ -34,7 +34,6 @@
 #include "core/auth/Auth.hpp"
 #include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
-#include "modules/websock-api/Facade.hpp"
 #include "modules/websock-api/Messages.hpp"
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/Service.hpp"

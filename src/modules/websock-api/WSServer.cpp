@@ -117,11 +117,6 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     register_crud_handler("schedule", &WebSockAPI::ScheduleCRUD::instanciate);
     register_crud_handler("door", &WebSockAPI::DoorCRUD::instanciate);
     register_crud_handler("access_point", &WebSockAPI::AccessPointCRUD::instanciate);
-
-    // Setup PUSH socket to talks to the parent module.
-    to_module_ = std::make_unique<zmqpp::socket>(
-        module.core_utils()->zmqpp_context(), zmqpp::socket_type::push);
-    to_module_->connect("inproc://MODULE.WEBSOCKET.INTERNAL_PULL");
 }
 
 WSServer::~WSServer()
@@ -256,6 +251,7 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
                                                  const ClientMessage &in,
                                                  Audit::IAuditEntryPtr audit)
 {
+    // Handlers registered by others modules.
     auto asio_handler = asio_handlers_.find(in.type);
     if (asio_handler != asio_handlers_.end())
     {
@@ -267,24 +263,6 @@ boost::optional<json> WSServer::dispatch_request(APIPtr api_handle,
                            .audit        = audit};
         // Will block the current thread until the response has been built.
         return asio_handler->second(ctx);
-    }
-
-    auto external_handler_key = external_handlers_.find(in.type);
-    if (external_handler_key != external_handlers_.end())
-    {
-        // Forward the message to the WebSockAPIModule thread, which will
-        // itself forward to the corresponding module.
-
-        // We reconstruct the JSON object to send to the module that will
-        // handle the message.
-        json reconstructed = {
-            {"uuid", in.uuid}, {"type", in.type}, {"content", in.content}};
-        zmqpp::message msg;
-        msg << external_handler_key->second << audit->id()
-            << api_handle->connection_identifier() << reconstructed.dump(4);
-        bool sent = to_module_->send(msg, true);
-        ASSERT_LOG(sent, "Internal send would block. Need to investigate.");
-        return boost::none;
     }
 
     // A request is an "Unit-of-Work" for the application.
@@ -464,52 +442,10 @@ DBServicePtr WSServer::dbsrv()
     return dbsrv_;
 }
 
-void WSServer::register_external_handler(const std::string &name,
-                                         const std::string &client_id)
-{
-    srv_.get_io_service().post([=]() {
-        zmqpp::message msg;
-        bool sent;
-        if (has_handler(name))
-        {
-            // Handler already registered.
-            WARN("An websocket handler named " << name << " is already registered.");
-            msg << client_id << "KO";
-        }
-        else
-        {
-            external_handlers_[name] = client_id;
-            msg << client_id << "OK";
-        }
-        sent = to_module_->send(msg, true);
-        ASSERT_LOG(sent,
-                   "Internal messaging would block. Something is probably wrong.");
-    });
-}
-
 bool WSServer::has_handler(const std::string &name) const
 {
     return handlers_.count(name) || individual_handlers_.count(name) ||
-           crud_handlers_.count(name) || external_handlers_.count(name) ||
-           asio_handlers_.count(name);
-}
-
-void WSServer::send_external_message(const std::string &connection_identifier,
-                                     const std::string &content)
-{
-    srv_.get_io_service().post([=]() {
-        auto connection_handle = find_connection(connection_identifier);
-        if (connection_handle.lock() && srv_.get_con_from_hdl(connection_handle))
-        {
-            srv_.send(connection_handle, content, websocketpp::frame::opcode::text);
-        }
-        else
-        {
-            WARN("Message for " << Colorize::cyan(connection_identifier)
-                                << " cannot be delivered because the connection "
-                                   "doesn't exist anymore.");
-        }
-    });
+           crud_handlers_.count(name) ||            asio_handlers_.count(name);
 }
 
 websocketpp::connection_hdl
@@ -550,17 +486,6 @@ void WSServer::finalize_audit(const Audit::IWSAPICallPtr &audit, ServerMessage &
         msg.status_string = e.what();
         return;
     }
-}
-
-void WSServer::send_to_module(const std::string &module_name, zmqpp::message msg)
-{
-    msg.push_front(module_name);
-    msg.push_front("SEND_TO_MODULE");
-
-    // Note that this socket doesn't send directly to the target module.
-    // The message will be dispatched by the WebSockAPI thread.
-    bool ret = to_module_->send(msg, true);
-    ASSERT_LOG(ret, "Internal send would have blocked.");
 }
 
 bool WSServer::register_asio_handler(const Service::WSHandler &handler,
