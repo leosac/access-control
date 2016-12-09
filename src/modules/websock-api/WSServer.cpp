@@ -60,6 +60,7 @@
 #include "tools/registry/ThreadLocalRegistry.hpp"
 #include <json.hpp>
 #include <odb/session.hxx>
+#include <tools/db/OptionalTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -388,12 +389,9 @@ boost::optional<ServerMessage> WSServer::handle_request(APIPtr api_handle,
     return response;
 }
 
-void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
-                                   bool new_transaction /* = true */)
+void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception)
 {
-    ASSERT_LOG(
-        new_transaction || odb::transaction::has_current(),
-        "Not requesting a new transaction, but no currently active transaction.");
+    db::OptionalTransaction t(dbsrv_->db()->begin());
 
     std::vector<Auth::TokenPtr> tokens_to_remove;
     for (const auto &connection_to_session : connection_session_)
@@ -416,16 +414,11 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception,
         }
     }
 
-    std::unique_ptr<db::MultiplexedTransaction> transaction;
-    if (new_transaction)
-        transaction =
-            std::make_unique<db::MultiplexedTransaction>(dbsrv_->db()->begin());
     for (const auto &token : tokens_to_remove)
     {
         dbsrv_->db()->erase<Auth::Token>(token->id());
     }
-    if (new_transaction)
-        transaction->commit();
+    t.commit();
 }
 
 void WSServer::register_crud_handler(const std::string &resource_name,
@@ -445,20 +438,7 @@ DBServicePtr WSServer::dbsrv()
 bool WSServer::has_handler(const std::string &name) const
 {
     return handlers_.count(name) || individual_handlers_.count(name) ||
-           crud_handlers_.count(name) ||            asio_handlers_.count(name);
-}
-
-websocketpp::connection_hdl
-WSServer::find_connection(const std::string &connection_identifier) const
-{
-    // Implementation is probably: 1) slow. 2) fast enough for now.
-
-    for (const auto &con_to_session : connection_session_)
-    {
-        if (con_to_session.second->connection_identifier() == connection_identifier)
-            return con_to_session.first;
-    }
-    return websocketpp::connection_hdl();
+           crud_handlers_.count(name) || asio_handlers_.count(name);
 }
 
 void WSServer::finalize_audit(const Audit::IWSAPICallPtr &audit, ServerMessage &msg)

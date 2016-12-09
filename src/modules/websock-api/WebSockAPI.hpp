@@ -60,7 +60,6 @@ class WebSockAPIModule : public BaseModule
     CoreUtilsPtr core_utils();
 
   private:
-
     /**
      * Port to bind the websocket endpoint.
      */
@@ -75,7 +74,6 @@ class WebSockAPIModule : public BaseModule
      * Our websocket server object.
      */
     std::unique_ptr<WSServer> wssrv_;
-
 };
 }
 }
