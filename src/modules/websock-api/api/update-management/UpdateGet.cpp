@@ -17,10 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "CreateUpdate.hpp"
+#include "UpdateGet.hpp"
 #include "core/GetServiceRegistry.hpp"
 #include "core/update/IUpdate.hpp"
 #include "core/update/UpdateService.hpp"
+#include "tools/db/DBService.hpp"
 
 namespace Leosac
 {
@@ -28,17 +29,17 @@ namespace Module
 {
 namespace WebSockAPI
 {
-CreateUpdate::CreateUpdate(RequestContext ctx)
+UpdateGet::UpdateGet(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr CreateUpdate::create(RequestContext ctx)
+MethodHandlerUPtr UpdateGet::create(RequestContext ctx)
 {
-    return std::make_unique<CreateUpdate>(ctx);
+    return std::make_unique<UpdateGet>(ctx);
 }
 
-std::vector<ActionActionParam> CreateUpdate::required_permission(const json &) const
+std::vector<ActionActionParam> UpdateGet::required_permission(const json &) const
 {
     std::vector<ActionActionParam> perm_;
     SecurityContext::ActionParam ap;
@@ -47,15 +48,14 @@ std::vector<ActionActionParam> CreateUpdate::required_permission(const json &) c
     return perm_;
 }
 
-json CreateUpdate::process_impl(const json &req)
+json UpdateGet::process_impl(const json &req)
 {
     auto srv_ptr = get_service_registry().get_service<update::UpdateService>();
     ASSERT_LOG(srv_ptr, "Cannot retrieve UpdateService.");
-    update::IUpdatePtr update = srv_ptr->create_update(req.at("descriptor_uuid"));
-
+    auto update = get_service_registry().get_service<DBService>()->find_update_by_id(
+        req.at("update_id"));
     json ret;
-    if (update)
-        ret["data"] = srv_ptr->serialize(*update, security_context());
+    ret["data"] = srv_ptr->serialize(*update, security_context());
     return ret;
 }
 }

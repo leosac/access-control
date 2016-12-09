@@ -66,6 +66,9 @@ using IDoorEventPtr = std::shared_ptr<IDoorEvent>;
 class IAccessPointEvent;
 using IAccessPointEventPtr = std::shared_ptr<IAccessPointEvent>;
 
+class IUpdateEvent;
+using IUpdateEventPtr = std::shared_ptr<IUpdateEvent>;
+
 /**
  * Forward declaration of implementation class.
  */
@@ -103,6 +106,9 @@ using DoorEventPtr = std::shared_ptr<DoorEvent>;
 
 class AccessPointEvent;
 using AccessPointEventPtr = std::shared_ptr<AccessPointEvent>;
+
+class UpdateEvent;
+using UpdateEventPtr = std::shared_ptr<UpdateEvent>;
 
 enum class EventType
 {
@@ -143,6 +149,10 @@ enum class EventType
     ACCESS_POINT_CREATED,
     ACCESS_POINT_UPDATED,
     ACCESS_POINT_DELETED,
+
+    UPDATE_CREATED,
+    UPDATE_ACKED,
+    UPDATE_CANCELLED,
 
     LAST__
 };

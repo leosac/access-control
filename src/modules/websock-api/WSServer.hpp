@@ -51,8 +51,10 @@ using json = nlohmann::json;
  * object lives its life independently in this thread.
  *
  * The WebSockAPIModule object can communicate with WSServer by calling any of the
- * thread safe method. However, for WSServer --> WebSocketAPIModule communicate,
- * the WSServer object uses a PUSH socket.
+ * thread safe method.
+ *
+ * The WebSockAPI::Service class communicates with the WSServer object through
+ * the asio loop.
  *
  * @note Unless specified otherwise, the methods in this class ARE NOT thread-safe.
  */

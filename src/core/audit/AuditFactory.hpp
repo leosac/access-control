@@ -24,6 +24,7 @@
 #include "core/credentials/CredentialFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
+#include <core/update/UpdateFwd.hpp>
 
 namespace Leosac
 {
@@ -73,6 +74,10 @@ class Factory
     static IAccessPointEventPtr AccessPointEvent(const DBPtr &database,
                                                  Auth::IAccessPointPtr target_ap,
                                                  IAuditEntryPtr parent);
+
+    static IUpdateEventPtr UpdateEvent(const DBPtr &database,
+                                       update::IUpdatePtr target_update,
+                                       IAuditEntryPtr parent);
 };
 }
 }

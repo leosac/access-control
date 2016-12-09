@@ -19,40 +19,30 @@
 
 #pragma once
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+#include "IAuditEntry.hpp"
+#include "core/update/UpdateFwd.hpp"
 
 namespace Leosac
 {
-namespace update
+namespace Audit
 {
-
-enum class Status
+/**
+ * Interface for update-related event.
+ */
+class IUpdateEvent : virtual public IAuditEntry
 {
-    PENDING      = 0,
-    ACKNOWLEDGED = 1,
-    CANCELLED    = 2,
+  public:
+    MAKE_VISITABLE();
 
-    // unused
-    TRANSIENT = 3
+    /**
+     * Set the update that is targeted by the event.
+     */
+    virtual void target(update::IUpdatePtr u) = 0;
+
+    /**
+     * Retrieve the user_id that was targeted by this event.
+     */
+    virtual update::UpdateId target_id() const = 0;
 };
-
-
-class IUpdate;
-using IUpdatePtr = std::shared_ptr<IUpdate>;
-
-class Update;
-using UpdatePtr   = std::shared_ptr<Update>;
-using UpdateLWPtr = odb::lazy_weak_ptr<Update>;
-
-class UpdateBackend;
-using UpdateBackendPtr = std::shared_ptr<UpdateBackend>;
-
-struct UpdateDescriptor;
-using UpdateDescriptorPtr = std::shared_ptr<UpdateDescriptor>;
-
-class UpdateService;
-
-using UpdateId = unsigned long;
 }
 }

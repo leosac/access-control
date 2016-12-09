@@ -32,7 +32,7 @@ set(WEBSOCK_API_SRCS
         api/update-management/AckUpdate.cpp
         api/update-management/CancelUpdate.cpp
         api/update-management/UpdateHistory.cpp
-)
+        api/update-management/UpdateGet.cpp api/update-management/UpdateGet.hpp)
 
 add_library(${WEBSOCK_API_BIN} SHARED
         ${WEBSOCK_API_SRCS}

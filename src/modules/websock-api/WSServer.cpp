@@ -43,6 +43,7 @@
 #include "api/update-management/CheckUpdate.hpp"
 #include "api/update-management/CreateUpdate.hpp"
 #include "api/update-management/PendingUpdateGet.hpp"
+#include "api/update-management/UpdateGet.hpp"
 #include "api/update-management/UpdateHistory.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/GetServiceRegistry.hpp"
@@ -56,11 +57,11 @@
 #include "tools/db/DBService.hpp"
 #include "tools/db/DatabaseTracer.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
+#include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
 #include <json.hpp>
 #include <odb/session.hxx>
-#include <tools/db/OptionalTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -109,6 +110,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["cancel_update"]             = &CancelUpdate::create;
     individual_handlers_["get_update_history"]        = &UpdateHistory::create;
     individual_handlers_["get_pending_update"]        = &PendingUpdateGet::create;
+    individual_handlers_["get_update"]                = &UpdateGet::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);

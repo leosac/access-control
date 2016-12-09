@@ -94,6 +94,7 @@ set(OdbCMake_ODB_HEADERS_AUDITLOG
         ${CMAKE_SOURCE_DIR}/src/core/audit/ScheduleEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/DoorEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/AccessPointEvent.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/audit/UpdateEvent.hpp
         )
 
 set(OdbCMake_SOURCES_AUDITLOG "")

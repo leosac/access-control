@@ -19,40 +19,36 @@
 
 #pragma once
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+#include "modules/websock-api/api/MethodHandler.hpp"
 
 namespace Leosac
 {
-namespace update
+namespace Module
 {
-
-enum class Status
+namespace WebSockAPI
 {
-    PENDING      = 0,
-    ACKNOWLEDGED = 1,
-    CANCELLED    = 2,
+using json = nlohmann::json;
 
-    // unused
-    TRANSIENT = 3
+/**
+ * Retrieve information WRT an update.
+ *
+ * Request:
+ *     update_id: 1337
+ */
+class UpdateGet : public MethodHandler
+{
+  public:
+    UpdateGet(RequestContext ctx);
+
+    static MethodHandlerUPtr create(RequestContext);
+
+  protected:
+    std::vector<ActionActionParam>
+    required_permission(const json &req) const override;
+
+  private:
+    virtual json process_impl(const json &req) override;
 };
-
-
-class IUpdate;
-using IUpdatePtr = std::shared_ptr<IUpdate>;
-
-class Update;
-using UpdatePtr   = std::shared_ptr<Update>;
-using UpdateLWPtr = odb::lazy_weak_ptr<Update>;
-
-class UpdateBackend;
-using UpdateBackendPtr = std::shared_ptr<UpdateBackend>;
-
-struct UpdateDescriptor;
-using UpdateDescriptorPtr = std::shared_ptr<UpdateDescriptor>;
-
-class UpdateService;
-
-using UpdateId = unsigned long;
+}
 }
 }
