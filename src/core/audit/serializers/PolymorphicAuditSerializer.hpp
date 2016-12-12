@@ -70,7 +70,8 @@ struct PolymorphicAuditJSON
                              public Tools::Visitor<Audit::IGroupEvent>,
                              public Tools::Visitor<Audit::ICredentialEvent>,
                              public Tools::Visitor<Audit::IDoorEvent>,
-                             public Tools::Visitor<Audit::IUserGroupMembershipEvent>
+                             public Tools::Visitor<Audit::IUserGroupMembershipEvent>,
+                             public Tools::Visitor<Audit::IUpdateEvent>
     {
         HelperSerialize(const SecurityContext &sc);
 
@@ -81,6 +82,7 @@ struct PolymorphicAuditJSON
         virtual void visit(const Audit::ICredentialEvent &t) override;
         virtual void visit(const Audit::IDoorEvent &t) override;
         virtual void visit(const Audit::IUserGroupMembershipEvent &t) override;
+        virtual void visit(const Audit::IUpdateEvent &t) override;
 
         /**
          * Called when no "hardcoded" audit type match, this method

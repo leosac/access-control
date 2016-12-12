@@ -69,5 +69,25 @@ std::shared_ptr<UpdateEvent> UpdateEvent::create_empty()
 {
     return UpdateEventPtr(new UpdateEvent());
 }
+
+std::string UpdateEvent::generate_description() const
+{
+    std::stringstream ss;
+
+    if (event_mask_ & EventType::UPDATE_CREATED)
+    {
+        ss << "Update " << target_id() << " has been created.";
+    }
+    else if (event_mask_ & EventType::UPDATE_ACKED)
+    {
+        ss << "Update " << target_id() << " has been acknowledged.";
+    }
+    else if (event_mask_ & EventType::UPDATE_CANCELLED)
+    {
+        ss << "Update " << target_id() << " has been cancelled.";
+    }
+
+    return ss.str();
+}
 }
 }

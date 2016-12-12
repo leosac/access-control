@@ -131,7 +131,7 @@ set(LEOSAC_LIB_SRCS
     core/update/serializers/UpdateDescriptorSerializer.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
-        )
+        core/audit/serializers/UpdateEventSerializer.cpp core/audit/serializers/UpdateEventSerializer.hpp)
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db

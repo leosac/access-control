@@ -42,6 +42,9 @@ class UpdateEvent : virtual public IUpdateEvent, public AuditEntry
                                                AuditEntryPtr parent);
 
   public:
+    std::string generate_description() const override;
+
+  public:
     virtual ~UpdateEvent() = default;
 
     static std::shared_ptr<UpdateEvent> create_empty();
