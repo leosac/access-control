@@ -23,6 +23,7 @@
 #include "core/credentials/CredentialFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
+#include <core/audit/AuditFwd.hpp>
 
 namespace Leosac
 {
@@ -249,5 +250,33 @@ class SystemSecurityContext : public SecurityContext
     static SecurityContext &instance();
     virtual bool check_permission_impl(Action a,
                                        const ActionParam &ap) const override;
+};
+
+/**
+ * An ExecutionContext is passed around to service so they
+ * have context about who is making the call and how.
+ */
+struct ExecutionContext
+{
+    ExecutionContext(SecurityContext &sc);
+
+    ExecutionContext(SecurityContext &sc, const Audit::IAuditEntryPtr &);
+
+
+    /**
+     * The SecurityContext of the caller.
+     */
+    SecurityContext &sec;
+
+    /**
+     * An optional audit object that would
+     * act as parent for the audit trail.
+     */
+    Audit::IAuditEntryPtr audit;
+};
+
+struct SystemExecutionContext : public ExecutionContext
+{
+    SystemExecutionContext();
 };
 }

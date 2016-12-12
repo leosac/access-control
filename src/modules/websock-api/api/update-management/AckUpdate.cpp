@@ -54,7 +54,7 @@ json AckUpdate::process_impl(const json &req)
     ASSERT_LOG(srv_ptr, "Cannot retrieve UpdateService.");
     auto update = get_service_registry().get_service<DBService>()->find_update_by_id(
         req.at("update_id"));
-    srv_ptr->ack_update(update);
+    srv_ptr->ack_update(update, exec_context());
 
     json ret;
     ret["data"] = srv_ptr->serialize(*update, security_context());

@@ -35,17 +35,17 @@ void UpdateService::register_backend(UpdateBackendPtr backend)
 
     create_update_sig_.connect(
         CreateUpdateT::slot_type(&UpdateBackend::create_update, backend.get(),
-                                 boost::placeholders::_1)
+                                 boost::placeholders::_1, boost::placeholders::_2)
             .track_foreign(backend));
 
-    ack_update_sig_.connect(AckUpdateT::slot_type(&UpdateBackend::ack_update,
-                                                  backend.get(),
-                                                  boost::placeholders::_1)
-                                .track_foreign(backend));
+    ack_update_sig_.connect(
+        AckUpdateT::slot_type(&UpdateBackend::ack_update, backend.get(),
+                              boost::placeholders::_1, boost::placeholders::_2)
+            .track_foreign(backend));
 
     cancel_update_sig_.connect(
         CancelUpdateT::slot_type(&UpdateBackend::cancel_update, backend.get(),
-                                 boost::placeholders::_1)
+                                 boost::placeholders::_1, boost::placeholders::_2)
             .track_foreign(backend));
 }
 
@@ -88,7 +88,8 @@ std::vector<IUpdatePtr> UpdateService::pending_updates()
     return updates;
 }
 
-IUpdatePtr UpdateService::create_update(const std::string &update_descriptor_uuid)
+IUpdatePtr UpdateService::create_update(const std::string &update_descriptor_uuid,
+                                        const ExecutionContext &ec)
 {
     auto itr = published_descriptors_.find(update_descriptor_uuid);
     if (itr == published_descriptors_.end())
@@ -96,17 +97,17 @@ IUpdatePtr UpdateService::create_update(const std::string &update_descriptor_uui
         throw LEOSACException("UpdateDescriptor doesn't exist anymore.");
     }
 
-    return create_update_sig_(*(itr->second));
+    return create_update_sig_(*(itr->second), ec);
 }
 
-void UpdateService::ack_update(IUpdatePtr update)
+void UpdateService::ack_update(IUpdatePtr update, const ExecutionContext &ec)
 {
-    ack_update_sig_(update);
+    ack_update_sig_(update, ec);
 }
 
-void UpdateService::cancel_update(IUpdatePtr update)
+void UpdateService::cancel_update(IUpdatePtr update, const ExecutionContext &ec)
 {
-    cancel_update_sig_(update);
+    cancel_update_sig_(update, ec);
 }
 
 UpdateDescriptor::UpdateDescriptor()

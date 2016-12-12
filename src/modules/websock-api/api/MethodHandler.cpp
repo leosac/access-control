@@ -48,3 +48,9 @@ UserSecurityContext &MethodHandler::security_context()
     ASSERT_LOG(wsc, "SecurityContext has unexpected type.");
     return *wsc;
 }
+
+ExecutionContext MethodHandler::exec_context()
+{
+    ExecutionContext ec{security_context(), ctx_.audit};
+    return ec;
+}

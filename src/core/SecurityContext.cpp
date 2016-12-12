@@ -115,3 +115,20 @@ SecurityContext::AccessPointActionParam::operator ActionParam()
     result.access_point = *this;
     return result;
 }
+
+ExecutionContext::ExecutionContext(SecurityContext &sc)
+    : sec(sc)
+{
+}
+
+ExecutionContext::ExecutionContext(SecurityContext &sc,
+                                   const Audit::IAuditEntryPtr &audit)
+    : sec(sc)
+    , audit(audit)
+{
+}
+
+SystemExecutionContext::SystemExecutionContext()
+    : ExecutionContext(SystemSecurityContext::instance())
+{
+}

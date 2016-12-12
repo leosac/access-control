@@ -51,7 +51,8 @@ json CreateUpdate::process_impl(const json &req)
 {
     auto srv_ptr = get_service_registry().get_service<update::UpdateService>();
     ASSERT_LOG(srv_ptr, "Cannot retrieve UpdateService.");
-    update::IUpdatePtr update = srv_ptr->create_update(req.at("descriptor_uuid"));
+    update::IUpdatePtr update =
+        srv_ptr->create_update(req.at("descriptor_uuid"), exec_context());
 
     json ret;
     if (update)

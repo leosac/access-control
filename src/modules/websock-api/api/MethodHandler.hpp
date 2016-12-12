@@ -73,14 +73,11 @@ class MethodHandler
 
     UserSecurityContext &security_context();
 
-  private:
     /**
-     * The API method implementation.
-     *
-     * @return A json object that will be assigned to the `content` key
-     * in the JSON message sent to the client.
+     * Returns a representation of the execution context of this request.
+     * This context can be passed to service.
      */
-    virtual json process_impl(const json &req) = 0;
+    ExecutionContext exec_context();
 
   protected:
     /**
@@ -91,6 +88,15 @@ class MethodHandler
     required_permission(const json &req) const = 0;
 
     RequestContext ctx_;
+
+  private:
+    /**
+     * The API method implementation.
+     *
+     * @return A json object that will be assigned to the `content` key
+     * in the JSON message sent to the client.
+     */
+    virtual json process_impl(const json &req) = 0;
 };
 }
 }

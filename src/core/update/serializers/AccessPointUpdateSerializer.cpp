@@ -32,7 +32,9 @@ json AccessPointUpdateJSONSerializer::serialize(const Auth::AccessPointUpdate &i
 {
     json serialized(UpdateJSONSerializer::serialize(in, sc));
 
-    serialized["type"]                          = "evoxs-access-point-update";
+    serialized["type"]                          = "access-point-update";
+
+    //fixme dynamically retrieve the correct type.
     serialized["relationships"]["access-point"] = {
         {"data", {{"id", in.access_point_id()}, {"type", "evoxs-access-point"}}}};
 

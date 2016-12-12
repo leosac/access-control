@@ -90,7 +90,8 @@ class UpdateBackend
      * module, make sure return nullptr from this method because it
      * means the update creation wasn't targeted at your module.
      */
-    virtual IUpdatePtr create_update(const UpdateDescriptor &ud) = 0;
+    virtual IUpdatePtr create_update(const UpdateDescriptor &ud,
+                                     const ExecutionContext &) = 0;
 
     /**
      * Acknowledge the pending update `u`.
@@ -98,7 +99,7 @@ class UpdateBackend
      * If the update `u` doesn't target your module, ignore
      * it.
      */
-    virtual void ack_update(IUpdatePtr u) = 0;
+    virtual void ack_update(IUpdatePtr u, const ExecutionContext &) = 0;
 
     /**
      * Cancel (not rollback) the pending update `u`.
@@ -106,7 +107,7 @@ class UpdateBackend
      * If the update `u` doesn't target your module, ignore
      * it.
      */
-    virtual void cancel_update(IUpdatePtr u) = 0;
+    virtual void cancel_update(IUpdatePtr u, const ExecutionContext &) = 0;
 };
 
 /**
@@ -138,16 +139,17 @@ class UpdateService
      * a reference to the update descriptor. Backends can cast the
      * descriptor object to check whether the call is really for them or not.
      */
-    IUpdatePtr create_update(const std::string &update_descriptor_uuid);
+    IUpdatePtr create_update(const std::string &update_descriptor_uuid,
+                             const ExecutionContext &ec);
 
     /**
      * Retrieve the list of pending updates.
      */
     std::vector<IUpdatePtr> pending_updates();
 
-    void ack_update(IUpdatePtr update);
+    void ack_update(IUpdatePtr update, const ExecutionContext &ec);
 
-    void cancel_update(IUpdatePtr update);
+    void cancel_update(IUpdatePtr update, const ExecutionContext &ec);
 
     /**
      * Register a backend object.
@@ -165,12 +167,15 @@ class UpdateService
                                 VectorAppenderCombiner<UpdateDescriptorPtr>>;
 
     using CreateUpdateT =
-        boost::signals2::signal<IUpdatePtr(const UpdateDescriptor &),
+        boost::signals2::signal<IUpdatePtr(const UpdateDescriptor &,
+                                           const ExecutionContext &),
                                 AtMostOneCombiner<IUpdatePtr>>;
 
-    using AckUpdateT = boost::signals2::signal<void(IUpdatePtr)>;
+    using AckUpdateT =
+        boost::signals2::signal<void(IUpdatePtr, const ExecutionContext &)>;
 
-    using CancelUpdateT = boost::signals2::signal<void(IUpdatePtr)>;
+    using CancelUpdateT =
+        boost::signals2::signal<void(IUpdatePtr, const ExecutionContext &)>;
 
     CheckUpdateT check_update_sig_;
     CreateUpdateT create_update_sig_;
