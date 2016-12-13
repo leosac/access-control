@@ -35,7 +35,7 @@ namespace SMTP
 /**
  * Keeps track of SMTP event.
  */
-#pragma db object polymorphic callback(odb_callback)
+#pragma db object polymorphic callback(odb_callback) table("SMTP_Audit")
 class SMTPAudit : public Audit::AuditEntry
 {
   private:

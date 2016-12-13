@@ -69,7 +69,7 @@ struct SMTPServerInfo
  * There probably shouldn't be more than one object
  * of this type in the database.
  */
-#pragma db object
+#pragma db object table("SMTP_Config")
 class SMTPConfig
 {
   public:
