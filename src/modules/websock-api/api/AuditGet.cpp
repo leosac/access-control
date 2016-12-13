@@ -60,13 +60,18 @@ json AuditGet::process_impl(const json &req)
 
         if (page == 0)
             throw LEOSACException("Cannot request page 0.");
+        if (page_size == 0)
+            throw LEOSACException("Cannot request a pagesize of 0.");
 
         odb::transaction t(db->begin());
         Audit::AuditEntryCount view(
             db->query_value<Audit::AuditEntryCount>(build_in_clause(req)));
         rep["meta"]["count"] = view.count;
         if (view.count)
-            rep["meta"]["total_page"] = (view.count / page_size) + 1;
+        {
+            rep["meta"]["total_page"] =
+                (view.count / page_size) + (view.count % page_size ? 1 : 0);
+        }
         else
             rep["meta"]["total_page"] = 0;
 
