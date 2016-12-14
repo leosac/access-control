@@ -60,5 +60,11 @@ bool SingleTimeFrame::is_in_timeframe(
         return false;
     return true;
 }
+
+bool SingleTimeFrame::operator==(const SingleTimeFrame &o) const
+{
+    return day == o.day && start_hour == o.start_hour && start_min == o.start_min &&
+           end_hour == o.end_hour && end_min == o.end_min;
+}
 }
 }

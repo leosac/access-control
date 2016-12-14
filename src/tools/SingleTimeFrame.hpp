@@ -53,6 +53,8 @@ struct SingleTimeFrame
 
     SingleTimeFrame(const SingleTimeFrame &) = default;
 
+    bool operator==(const SingleTimeFrame &o) const;
+
     int day;
     int start_hour;
     int start_min;

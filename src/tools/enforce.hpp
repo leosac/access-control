@@ -19,31 +19,28 @@
 
 #pragma once
 
-#include <memory>
-#include <odb/lazy-ptr.hxx>
+#include <utility>
 
-namespace Leosac
-{
-namespace Cred
+namespace details
 {
 
-// Credentials
-class ICredential;
-using ICredentialPtr = std::shared_ptr<ICredential>;
-
-class Credential;
-using CredentialId    = unsigned long;
-using CredentialPtr   = std::shared_ptr<Credential>;
-using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
-using CredentialLPtr  = odb::lazy_shared_ptr<Credential>;
-
-class IWiegandCard;
-using IWiegandCardPtr = std::shared_ptr<IWiegandCard>;
-class WiegandCard;
-using WiegandCardPtr = std::shared_ptr<WiegandCard>;
-
-class IPinCode;
-class PinCode;
-using PinCodePtr = std::shared_ptr<PinCode>;
+template <typename E, typename Assessable, typename... Args>
+inline auto enforce(Assessable &&value, Args &&... args)
+{
+    if (!value)
+        throw E(std::forward<Args>(args)...);
+    return std::forward<Assessable>(value);
 }
 }
+
+/**
+ * Enforce that a condition is true, otherwise
+ * throw an exception of type `ex` with parameters
+ */
+#define ENFORCE(cond, ex_type, ...) ::details::enforce<ex_type>((cond), __VA_ARGS__)
+
+/**
+ * Similar to enforce, except that it will throw a LEOSACException.
+ */
+#define LEOSAC_ENFORCE(cond, ...)                                                   \
+    ::details::enforce<LEOSACException>((cond), __VA_ARGS__)

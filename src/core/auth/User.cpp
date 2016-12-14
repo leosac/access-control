@@ -21,7 +21,9 @@
 #include "Group_odb.h"
 #include "User_odb.h"
 #include "core/auth/Group.hpp"
+#include "core/credentials/ICredential.hpp"
 #include "exception/leosacexception.hpp"
+#include "tools/AssertCast.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
 
@@ -176,4 +178,14 @@ void User::schedule_mapping_added(
     const Leosac::Tools::ScheduleMappingPtr &sched_mapping)
 {
     schedules_mapping_.push_back(sched_mapping);
+}
+
+void User::add_credential(const Leosac::Cred::ICredentialPtr &cred)
+{
+    ASSERT_LOG(cred, "Credential is null.");
+    ASSERT_LOG(cred->owner_id() == 0 || cred->owner_id() == id_,
+               "Credential is already owned by someone else.");
+
+    cred->owner(shared_from_this());
+    credentials_.push_back(assert_cast<Cred::CredentialPtr>(cred));
 }

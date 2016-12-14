@@ -46,6 +46,8 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
      */
     ScheduleId schedule_id() const;
 
+    ScheduleLWPtr schedule() const;
+
     const std::vector<Auth::UserLWPtr> &users() const;
     const std::vector<Auth::GroupLWPtr> &groups() const;
     const std::vector<Cred::CredentialLWPtr> &credentials() const;

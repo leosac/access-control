@@ -44,6 +44,8 @@ class CredentialEvent : virtual public ICredentialEvent, public AuditEntry
                                                    AuditEntryPtr parent);
 
   public:
+    static std::shared_ptr<CredentialEvent> create_empty();
+
     virtual ~CredentialEvent() = default;
 
     virtual void target(Cred::ICredentialPtr cred) override;

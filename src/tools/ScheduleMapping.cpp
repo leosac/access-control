@@ -53,6 +53,11 @@ ScheduleId ScheduleMapping::schedule_id() const
     return 0;
 }
 
+ScheduleLWPtr ScheduleMapping::schedule() const
+{
+    return schedule_;
+}
+
 bool ScheduleMapping::has_user(Auth::UserId uid) const
 {
     for (const auto &lazy_weak_user : users_)

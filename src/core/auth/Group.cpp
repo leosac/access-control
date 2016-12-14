@@ -94,6 +94,7 @@ std::vector<UserLPtr> Group::lazy_members() const
     {
         ASSERT_LOG(membership->group().object_id() == id_,
                    "Membership doesn't point to self.");
+        ASSERT_LOG(membership->user().lock(), "Why is this null?");
         if (membership->user().lock())
             members.push_back(membership->user().lock());
     }

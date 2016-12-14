@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/ValidityInfo.hpp"
 #include "core/credentials/ICredential.hpp"
@@ -88,6 +89,7 @@ class Credential : public virtual ICredential
 
   private:
     friend class odb::access;
+    friend class ::Leosac::TestAccess;
 };
 }
 }

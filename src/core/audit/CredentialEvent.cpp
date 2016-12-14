@@ -56,7 +56,7 @@ void CredentialEvent::target(Cred::ICredentialPtr cred)
 {
     ASSERT_LOG(!finalized(), "Audit entry is already finalized.");
     if (cred)
-        ASSERT_LOG(cred->id(), "Group has no id.");
+        ASSERT_LOG(cred->id(), "Credential has no id.");
 
     auto cred_odb = std::dynamic_pointer_cast<Cred::Credential>(cred);
     ASSERT_LOG(cred_odb, "ICredential is not of type Credential.");
@@ -126,4 +126,9 @@ std::string CredentialEvent::generate_target_description() const
         desc["type"]  = PolymorphicCredentialJSONSerializer::type_name(*t);
     }
     return desc.dump();
+}
+
+std::shared_ptr<CredentialEvent> CredentialEvent::create_empty()
+{
+    return std::shared_ptr<CredentialEvent>(new CredentialEvent());
 }

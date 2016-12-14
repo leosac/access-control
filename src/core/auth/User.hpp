@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "core/auth/UserGroupMembership.hpp"
@@ -37,7 +38,7 @@ namespace Auth
 * Represent a user
 */
 #pragma db object optimistic
-class User
+class User : public std::enable_shared_from_this<User>
 {
   public:
     /**
@@ -104,7 +105,7 @@ class User
     void validity(const ValidityInfo &c);
 
     /**
-    * Check the credentials validity object.
+    * Check the validity status (enabled / disabled) of the user.
     */
     bool is_valid() const;
 
@@ -128,6 +129,8 @@ class User
     void rank(UserRank r);
 
     size_t odb_version() const;
+
+    void add_credential(const Cred::ICredentialPtr &cred);
 
     std::vector<Cred::CredentialLWPtr> lazy_credentials() const;
 
@@ -185,6 +188,7 @@ class User
 
   private:
     friend class odb::access;
+    friend class ::Leosac::TestAccess;
 };
 }
 }
