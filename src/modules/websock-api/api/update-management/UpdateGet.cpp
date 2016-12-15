@@ -53,7 +53,7 @@ json UpdateGet::process_impl(const json &req)
     auto srv_ptr = get_service_registry().get_service<update::UpdateService>();
     ASSERT_LOG(srv_ptr, "Cannot retrieve UpdateService.");
     auto update = get_service_registry().get_service<DBService>()->find_update_by_id(
-        req.at("update_id"));
+        req.at("update_id"), DBService::THROW_IF_NOT_FOUND);
     json ret;
     ret["data"] = srv_ptr->serialize(*update, security_context());
     return ret;
