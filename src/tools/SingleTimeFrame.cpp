@@ -18,6 +18,7 @@
 */
 
 #include "tools/SingleTimeFrame.hpp"
+#include <tuple>
 
 namespace Leosac
 {
@@ -65,6 +66,12 @@ bool SingleTimeFrame::operator==(const SingleTimeFrame &o) const
 {
     return day == o.day && start_hour == o.start_hour && start_min == o.start_min &&
            end_hour == o.end_hour && end_min == o.end_min;
+}
+
+bool SingleTimeFrame::operator<(const SingleTimeFrame &o) const
+{
+    return std::make_tuple(day, start_hour, start_min, end_hour, end_min) <
+           std::make_tuple(o.day, o.start_hour, o.start_min, o.end_hour, o.end_min);
 }
 }
 }
