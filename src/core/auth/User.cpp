@@ -140,13 +140,19 @@ void User::password(const std::string &pw)
 
 bool User::verify_password(const std::string &pw) const
 {
-    std::vector<uint8_t> vec(pw.begin(), pw.end());
-    return Scrypt::Verify(vec, password_);
+    if (password_)
+    {
+        std::vector<uint8_t> vec(pw.begin(), pw.end());
+        return Scrypt::Verify(vec, *password_);
+    }
+    return false;
 }
 
 std::string User::password() const
 {
-    return std::string(password_.hash.begin(), password_.hash.end());
+    if (password_)
+        return std::string(password_->hash.begin(), password_->hash.end());
+    return "";
 }
 
 UserRank User::rank() const

@@ -27,6 +27,7 @@
 #include "core/credentials/CredentialFwd.hpp"
 #include "tools/db/database.hpp"
 #include "tools/scrypt/Scrypt.hpp"
+#include <boost/optional.hpp>
 #include <memory>
 
 namespace Leosac
@@ -154,8 +155,8 @@ class User : public std::enable_shared_from_this<User>
 #pragma db type("VARCHAR(128)")
     std::string username_;
 
-#pragma db not_null type("TEXT")
-    ScryptResult password_;
+#pragma db type("TEXT")
+    boost::optional<ScryptResult> password_;
 
     std::string firstname_;
     std::string lastname_;
