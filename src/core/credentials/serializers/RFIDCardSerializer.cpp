@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/credentials/serializers/WiegandCardSerializer.hpp"
+#include "core/credentials/serializers/RFIDCardSerializer.hpp"
 #include "core/SecurityContext.hpp"
-#include "core/credentials/IWiegandCard.hpp"
+#include "core/credentials/IRFIDCard.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
@@ -27,23 +27,23 @@
 using namespace Leosac;
 using namespace Leosac::Cred;
 
-json WiegandCardJSONSerializer::serialize(const IWiegandCard &in,
-                                          const SecurityContext &sc)
+json RFIDCardJSONSerializer::serialize(const IRFIDCard &in,
+                                       const SecurityContext &sc)
 {
     // First we serialize the base ICredential structure.
     auto serialized = CredentialJSONSerializer::serialize(in, sc);
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base credential serialization did something unexpected.");
-    serialized["type"] = "wiegand-card";
+    serialized["type"] = "rfid-card";
 
     serialized["attributes"]["nb-bits"] = in.nb_bits();
     serialized["attributes"]["card-id"] = in.card_id();
     return serialized;
 }
 
-void WiegandCardJSONSerializer::unserialize(Cred::IWiegandCard &out, const json &in,
-                                            const SecurityContext &sc)
+void RFIDCardJSONSerializer::unserialize(Cred::IRFIDCard &out, const json &in,
+                                         const SecurityContext &sc)
 {
     CredentialJSONSerializer::unserialize(out, in, sc);
 

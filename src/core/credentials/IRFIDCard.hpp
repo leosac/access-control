@@ -27,9 +27,9 @@ namespace Leosac
 namespace Cred
 {
 /**
- * Interface for WiegandCard credential.
+ * Interface for RFIDCard credential.
  */
-class IWiegandCard : public virtual ICredential
+class IRFIDCard : public virtual ICredential
 {
   public:
     MAKE_VISITABLE();

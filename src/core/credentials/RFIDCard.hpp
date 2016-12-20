@@ -20,20 +20,20 @@
 #pragma once
 
 #include "core/credentials/Credential.hpp"
-#include "core/credentials/IWiegandCard.hpp"
+#include "core/credentials/IRFIDCard.hpp"
 
 namespace Leosac
 {
 namespace Cred
 {
 /**
- * A WiegandCard credential.
+ * An RFID card credential.
  */
 #pragma db object polymorphic optimistic
-class WiegandCard : public virtual IWiegandCard, public Credential
+class RFIDCard : public virtual IRFIDCard, public Credential
 {
   public:
-    WiegandCard() = default;
+    RFIDCard() = default;
     virtual const std::string &card_id() const override;
 
     virtual int nb_bits() const override;
@@ -64,10 +64,10 @@ class WiegandCard : public virtual IWiegandCard, public Credential
     friend class odb::access;
 };
 
-class WiegandCardValidator
+class RFIDCardValidator
 {
   public:
-    static void validate(const IWiegandCard &card);
+    static void validate(const IRFIDCard &card);
     static void validate_card_id(const std::string &card_id);
     static void validate_nb_bits(int nb_bits);
 };

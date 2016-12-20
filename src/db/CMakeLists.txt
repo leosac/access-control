@@ -127,7 +127,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
 # ODB configuration for Credentials
 set(OdbCMake_ODB_HEADERS_CREDENTIALS
         ${CMAKE_SOURCE_DIR}/src/core/credentials/Credential.hpp
-        ${CMAKE_SOURCE_DIR}/src/core/credentials/WiegandCard.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/credentials/RFIDCard.hpp
         ${CMAKE_SOURCE_DIR}/src/core/credentials/PinCode.hpp
         )
 

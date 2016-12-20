@@ -23,7 +23,7 @@
 #include "core/audit/ICredentialEvent.hpp"
 #include "core/credentials/Credential.hpp"
 #include "core/credentials/PinCode.hpp"
-#include "core/credentials/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "exception/leosacexception.hpp"
@@ -90,9 +90,9 @@ boost::optional<json> CredentialCRUD::create_impl(const json &req)
 
     Cred::ICredentialPtr new_cred;
     std::string type = req.at("credential-type");
-    if (type == "wiegand-card")
+    if (type == "rfid-card")
     {
-        new_cred = std::make_shared<Cred::WiegandCard>();
+        new_cred = std::make_shared<Cred::RFIDCard>();
     }
     else if (type == "pin-code")
     {

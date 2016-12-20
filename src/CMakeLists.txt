@@ -44,10 +44,10 @@ set(LEOSAC_LIB_SRCS
     core/auth/AccessPointService.cpp
     core/credentials/Credential.cpp
     core/credentials/CredentialValidator.cpp
-    core/credentials/WiegandCard.cpp
+    core/credentials/RFIDCard.cpp
     core/credentials/PinCode.cpp
     core/credentials/serializers/CredentialSerializer.cpp
-    core/credentials/serializers/WiegandCardSerializer.cpp
+        core/credentials/serializers/RFIDCardSerializer.cpp
     core/credentials/serializers/PolymorphicCredentialSerializer.cpp
     core/credentials/serializers/PinCodeSerializer.cpp
     core/UserSecurityContext.cpp

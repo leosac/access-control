@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/credentials/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
@@ -26,17 +26,17 @@ using namespace Leosac;
 using namespace Leosac::Cred;
 
 
-const std::string &WiegandCard::card_id() const
+const std::string &RFIDCard::card_id() const
 {
     return card_id_;
 }
 
-int WiegandCard::nb_bits() const
+int RFIDCard::nb_bits() const
 {
     return nb_bits_;
 }
 
-uint64_t WiegandCard::to_raw_int() const
+uint64_t RFIDCard::to_raw_int() const
 {
     auto card_num_hex = boost::replace_all_copy(card_id_, ":", "");
 
@@ -50,7 +50,7 @@ uint64_t WiegandCard::to_raw_int() const
     return tmp;
 }
 
-uint64_t WiegandCard::to_int() const
+uint64_t RFIDCard::to_int() const
 {
     switch (nb_bits_)
     {
@@ -65,7 +65,7 @@ uint64_t WiegandCard::to_int() const
     }
 }
 
-uint64_t WiegandCard::to_wiegand_26() const
+uint64_t RFIDCard::to_wiegand_26() const
 {
     assert(nb_bits_ == 26);
     assert(card_id_.size() == 2 * 4 + 3);
@@ -78,7 +78,7 @@ uint64_t WiegandCard::to_wiegand_26() const
     return tmp;
 }
 
-uint64_t WiegandCard::to_wiegand_34() const
+uint64_t RFIDCard::to_wiegand_34() const
 {
     assert(nb_bits_ == 34);
     assert(card_id_.size() == 2 * 5 + 4);
@@ -91,25 +91,25 @@ uint64_t WiegandCard::to_wiegand_34() const
     return tmp;
 }
 
-void WiegandCard::nb_bits(int i)
+void RFIDCard::nb_bits(int i)
 {
-    WiegandCardValidator::validate_nb_bits(i);
+    RFIDCardValidator::validate_nb_bits(i);
     nb_bits_ = i;
 }
 
-void WiegandCard::card_id(const std::string &id)
+void RFIDCard::card_id(const std::string &id)
 {
-    WiegandCardValidator::validate_card_id(id);
+    RFIDCardValidator::validate_card_id(id);
     card_id_ = id;
 }
 
-void WiegandCardValidator::validate(const IWiegandCard &card)
+void RFIDCardValidator::validate(const IRFIDCard &card)
 {
     validate_card_id(card.card_id());
     validate_nb_bits(card.nb_bits());
 }
 
-void WiegandCardValidator::validate_card_id(const std::string &card_id)
+void RFIDCardValidator::validate_card_id(const std::string &card_id)
 {
     bool fail = false;
     char c;
@@ -136,7 +136,7 @@ void WiegandCardValidator::validate_card_id(const std::string &card_id)
     }
 }
 
-void WiegandCardValidator::validate_nb_bits(int nb)
+void RFIDCardValidator::validate_nb_bits(int nb)
 {
     if (nb <= 0)
     {

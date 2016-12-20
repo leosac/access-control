@@ -20,7 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
-#include "core/credentials/IWiegandCard.hpp"
+#include "core/credentials/IRFIDCard.hpp"
 #include "tools/Visitor.hpp"
 #include <json.hpp>
 #include <string>
@@ -48,7 +48,7 @@ struct PolymorphicCredentialJSONSerializer
      * Returns the "type-name" of the credential. This is something
      * that maps to EmberJS models.
      *
-     * For example, for a wiegand card it would return "wiegand-card".
+     * For example, for an Cred::RFIDCard it would return "rfid-card".
      */
     static std::string type_name(const Cred::ICredential &in);
 
@@ -56,11 +56,11 @@ struct PolymorphicCredentialJSONSerializer
     /**
      * Non static helper that can visit credential object.
      */
-    struct HelperSerialize : public Tools::Visitor<Cred::IWiegandCard>,
+    struct HelperSerialize : public Tools::Visitor<Cred::IRFIDCard>,
                              public Tools::Visitor<Cred::IPinCode>
     {
         HelperSerialize(const SecurityContext &sc);
-        void visit(const Cred::IWiegandCard &t) override;
+        void visit(const Cred::IRFIDCard &t) override;
 
         void visit(const Cred::IPinCode &t) override;
 
@@ -76,11 +76,11 @@ struct PolymorphicCredentialJSONSerializer
         const SecurityContext &security_context_;
     };
 
-    struct HelperUnserialize : public Tools::Visitor<Cred::IWiegandCard>,
+    struct HelperUnserialize : public Tools::Visitor<Cred::IRFIDCard>,
                                public Tools::Visitor<Cred::IPinCode>
     {
         HelperUnserialize(const SecurityContext &sc, const json &payload);
-        void visit(Cred::IWiegandCard &t) override;
+        void visit(Cred::IRFIDCard &t) override;
 
         void visit(Cred::IPinCode &t) override;
 

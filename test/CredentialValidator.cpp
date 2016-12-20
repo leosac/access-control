@@ -19,7 +19,7 @@
 
 #include "core/credentials/ICredential.hpp"
 #include "core/credentials/PinCode.hpp"
-#include "core/credentials/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include "exception/ModelException.hpp"
 #include "gtest/gtest.h"
 
@@ -33,7 +33,7 @@ namespace Test
 
 TEST(TestCredentialValidator, alias_length)
 {
-    WiegandCard c;
+    RFIDCard c;
 
     ASSERT_NO_THROW({ c.alias("long_enough"); });
 
@@ -54,7 +54,7 @@ TEST(TestCredentialValidator, alias_length)
 
 TEST(TestWiegandCardValidator, card_id)
 {
-    WiegandCard c;
+    RFIDCard c;
 
     ASSERT_THROW({ c.card_id("11:22:33:4"); }, ModelException);
     ASSERT_THROW({ c.card_id("11:22:334"); }, ModelException);
@@ -67,7 +67,7 @@ TEST(TestWiegandCardValidator, card_id)
 
 TEST(TestWiegandCardValidator, nb_bits)
 {
-    WiegandCard c;
+    RFIDCard c;
     ASSERT_THROW(c.nb_bits(-1), ModelException);
     ASSERT_THROW(c.nb_bits(-42), ModelException);
     ASSERT_THROW(c.nb_bits(-1024), ModelException);

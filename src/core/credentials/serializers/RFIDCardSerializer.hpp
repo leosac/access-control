@@ -29,13 +29,13 @@ namespace Leosac
 using json = nlohmann::json;
 
 /**
- * A serializer that handle `Cred::IWiegandCard` object.
+ * A serializer that handle `Cred::IRFIDCard` object.
  */
-struct WiegandCardJSONSerializer
+struct RFIDCardJSONSerializer
 {
-    static json serialize(const Cred::IWiegandCard &in, const SecurityContext &sc);
+    static json serialize(const Cred::IRFIDCard &in, const SecurityContext &sc);
 
-    static void unserialize(Cred::IWiegandCard &out, const json &in,
+    static void unserialize(Cred::IRFIDCard &out, const json &in,
                             const SecurityContext &sc);
 };
 }

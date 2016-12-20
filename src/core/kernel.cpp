@@ -18,16 +18,16 @@
 */
 
 #include "kernel.hpp"
+#include "RFIDCard_odb.h"
 #include "ScheduleMapping_odb.h"
 #include "Schedule_odb.h"
 #include "User_odb.h"
-#include "WiegandCard_odb.h"
 #include "core/audit/serializers/JSONService.hpp"
 #include "core/auth/AccessPointService.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/serializers/AccessPointSerializer.hpp"
-#include "core/credentials/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include "core/update/UpdateService.hpp"
 #include "core/update/serializers/AccessPointUpdateSerializer.hpp"
 #include "exception/ExceptionsTools.hpp"
@@ -531,7 +531,7 @@ void Kernel::configure_database()
 
                 Auth::UserPtr admin;
                 Auth::GroupPtr users;
-                Cred::WiegandCardPtr card;
+                Cred::RFIDCardPtr card;
                 schema_version v = database_->schema_version("core");
                 if (v == 0)
                 {
@@ -580,14 +580,14 @@ void Kernel::configure_database()
                     {
                         transaction t(database_->begin());
 
-                        card = std::make_shared<Cred::WiegandCard>();
+                        card = std::make_shared<Cred::RFIDCard>();
                         card->owner(admin);
                         card->alias(std::string("BestCardEver"));
                         card->card_id("00:11:22:33");
                         card->nb_bits(32);
                         database_->persist(card);
 
-                        Cred::WiegandCard card2;
+                        Cred::RFIDCard card2;
                         card2.alias(std::string("Ownerless"));
                         card2.card_id("aa:bb:cc:dd");
                         card2.nb_bits(32);

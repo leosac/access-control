@@ -31,6 +31,14 @@ using json = nlohmann::json;
 
 /**
  * Acknowledge a pending update.
+ *
+ * Request:
+ *    {
+ *      update_id: 42
+ *    }
+ *
+ * Response:
+ *   The serialized update.
  */
 class AckUpdate : public MethodHandler
 {

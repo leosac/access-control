@@ -37,10 +37,10 @@ using CredentialPtr   = std::shared_ptr<Credential>;
 using CredentialLWPtr = odb::lazy_weak_ptr<Credential>;
 using CredentialLPtr  = odb::lazy_shared_ptr<Credential>;
 
-class IWiegandCard;
-using IWiegandCardPtr = std::shared_ptr<IWiegandCard>;
-class WiegandCard;
-using WiegandCardPtr = std::shared_ptr<WiegandCard>;
+class IRFIDCard;
+using IRFIDCardPtr = std::shared_ptr<IRFIDCard>;
+class RFIDCard;
+using RFIDCardPtr = std::shared_ptr<RFIDCard>;
 
 class IPinCode;
 class PinCode;
