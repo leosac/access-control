@@ -200,6 +200,7 @@ class SecurityContext
     };
 
     SecurityContext(DBServicePtr dbsrv);
+    virtual ~SecurityContext() = default;
 
     /**
      * Check for the permission to perform action `a` with parameters
