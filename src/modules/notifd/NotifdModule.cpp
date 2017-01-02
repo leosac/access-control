@@ -39,6 +39,10 @@ NotifdModule::~NotifdModule()
 {
     ASSERT_LOG(io_service_.stopped(), "io_service not stopped.");
 }
+
+void NotifdModule::on_service_event(const service_event::Event &event)
+{
+}
 }
 }
 }

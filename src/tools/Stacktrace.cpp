@@ -20,7 +20,12 @@
 #include "Stacktrace.hpp"
 #include "Colorize.hpp"
 #include "log.hpp"
+
+#if defined(__GNUG__) && !defined(__clang__)
+#define LEOSAC_STACKTRACE_ENABLED
 #include <backtrace.h>
+#endif
+
 #include <boost/core/demangle.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -29,6 +34,7 @@ using namespace Leosac::Tools;
 
 Stacktrace::Stacktrace(uint skip /* = 0 */)
 {
+#ifdef LEOSAC_STACKTRACE_ENABLED
     auto cb_error = [](void * /*data*/, const char *msg, int errnum) {
         ERROR("Problem when generating stacktrace: " << msg
                                                      << ". Error code: " << errnum);
@@ -55,6 +61,7 @@ Stacktrace::Stacktrace(uint skip /* = 0 */)
     struct backtrace_state *bt =
         backtrace_create_state(nullptr, 0, nullptr, nullptr);
     backtrace_full(bt, skip, cb_full, cb_error, &stack_);
+#endif
 }
 
 std::string Stacktrace::str(int max_frames /* = 10 */) const

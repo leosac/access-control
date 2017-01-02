@@ -69,9 +69,7 @@ class AsioModule : public BaseModule
      * @note This function MUST be thread safe because it will be
      * invoked from whichever thread triggered the event.
      */
-    virtual void on_service_event(const service_event::Event &)
-    {
-    }
+    virtual void on_service_event(const service_event::Event &) = 0;
 
   private:
     std::unique_ptr<boost::asio::io_service::work> work_;

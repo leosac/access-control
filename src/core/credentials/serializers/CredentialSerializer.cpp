@@ -94,7 +94,7 @@ void CredentialJSONSerializer::unserialize(Cred::ICredential &out, const json &i
         }
         else
         {
-            out.owner(nullptr);
+            out.owner(std::shared_ptr<Auth::User>());
         }
     }
 }

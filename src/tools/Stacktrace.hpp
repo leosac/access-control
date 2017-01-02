@@ -30,12 +30,14 @@ namespace Tools
  * Store information about a stacktrace at a given point in the program
  * execution.
  *
- * The stacktrace representes the states at the time the object
+ * The stacktrace represents the states at the time the object
  * was instancied. This object can then be moved around or copied.
  *
  *
  * The reason for this class to be is because `struct backtrace_state *` from
  * GCC's libbacktrace cannot be moved around.
+ *
+ * @warning This class will be a no-op if its not compiled with GCC.
  */
 class Stacktrace
 {

@@ -34,6 +34,10 @@ class NotifdModule : public AsioModule
     NotifdModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                  const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
+  protected:
+    void on_service_event(const service_event::Event &event) override;
+
+  public:
     ~NotifdModule();
 };
 }

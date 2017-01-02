@@ -29,20 +29,22 @@ AsioModule::AsioModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                        const boost::property_tree::ptree &cfg, CoreUtilsPtr utils)
     : BaseModule(ctx, pipe, cfg, utils)
 {
-    service_event_listener_ = get_service_registry().register_event_listener(
-        [this](const service_event::Event &e) { on_service_event(e); });
 }
 
 AsioModule::~AsioModule()
 {
-    service_event_listener_.disconnect();
 }
 
 void AsioModule::run()
 {
+    service_event_listener_ = get_service_registry().register_event_listener(
+        [this](const service_event::Event &e) { on_service_event(e); });
+
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
     install_async_handlers();
     io_service_.run();
+
+    service_event_listener_.disconnect();
 }
 
 void AsioModule::install_async_handlers()

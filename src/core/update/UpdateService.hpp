@@ -182,7 +182,6 @@ class UpdateService
     AckUpdateT ack_update_sig_;
     CancelUpdateT cancel_update_sig_;
 
-
     std::map<std::string, UpdateDescriptorPtr> published_descriptors_;
 };
 }

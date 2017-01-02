@@ -84,7 +84,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
     srv_.set_reuse_addr(true);
     // clear all logs.
-    // srv_.clear_access_channels(websocketpp::log::alevel::all);
+    srv_.clear_access_channels(websocketpp::log::alevel::all);
 
 
     // Register internal handlers, ie handler that are managed by the Websocket
@@ -216,6 +216,8 @@ void WSServer::run(const std::string &interface, uint16_t port)
         boost::asio::ip::address::from_string(interface), port);
     srv_.listen(endpoint);
     srv_.start_accept();
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     get_service_registry().register_service<Service>(
         std::make_unique<Service>(*this));

@@ -45,9 +45,7 @@ struct MailInfo
 class SMTPService
 {
   public:
-    virtual ~SMTPService()
-    {
-    }
+    virtual ~SMTPService() = default;
 
     /**
      * Send a message to the mailer service (if any) to enqueue
