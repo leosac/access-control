@@ -78,6 +78,9 @@ class Factory
     static IUpdateEventPtr UpdateEvent(const DBPtr &database,
                                        update::IUpdatePtr target_update,
                                        IAuditEntryPtr parent);
+
+    static IZoneEventPtr ZoneEvent(const DBPtr &database, Auth::IZonePtr target_zone,
+                                   IAuditEntryPtr parent);
 };
 }
 }

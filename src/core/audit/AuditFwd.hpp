@@ -69,6 +69,9 @@ using IAccessPointEventPtr = std::shared_ptr<IAccessPointEvent>;
 class IUpdateEvent;
 using IUpdateEventPtr = std::shared_ptr<IUpdateEvent>;
 
+class IZoneEvent;
+using IZoneEventPtr = std::shared_ptr<IZoneEvent>;
+
 /**
  * Forward declaration of implementation class.
  */
@@ -109,6 +112,9 @@ using AccessPointEventPtr = std::shared_ptr<AccessPointEvent>;
 
 class UpdateEvent;
 using UpdateEventPtr = std::shared_ptr<UpdateEvent>;
+
+class ZoneEvent;
+using ZoneEventPtr = std::shared_ptr<ZoneEvent>;
 
 enum class EventType
 {
@@ -153,6 +159,10 @@ enum class EventType
     UPDATE_CREATED,
     UPDATE_ACKED,
     UPDATE_CANCELLED,
+
+    ZONE_CREATED,
+    ZONE_UPDATED,
+    ZONE_DELETED,
 
     LAST__
 };

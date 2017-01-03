@@ -27,9 +27,11 @@
 #include "core/audit/UserEvent.hpp"
 #include "core/audit/UserGroupMembershipEvent.hpp"
 #include "core/audit/WSAPICall.hpp"
+#include "core/audit/ZoneEvent.hpp"
 #include "core/auth/AccessPoint.hpp"
 #include "core/auth/Door.hpp"
 #include "core/auth/Group.hpp"
+#include "core/auth/IZone.hpp"
 #include "core/auth/User.hpp"
 #include "core/update/IUpdate.hpp"
 #include "tools/AssertCast.hpp"
@@ -164,4 +166,19 @@ IUpdateEventPtr Factory::UpdateEvent(const DBPtr &database,
     ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
 
     return Audit::UpdateEvent::create(database, target_update, parent_odb);
+}
+
+IZoneEventPtr Factory::ZoneEvent(const DBPtr &database, Auth::IZonePtr target_zone,
+                                 IAuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(target_zone, "Target zone must be non null.");
+    ASSERT_LOG(target_zone->id(), "Target zone must be already persisted.");
+    ASSERT_LOG(parent, "Parent must be non null.");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+
+    AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+    ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+
+    return Audit::ZoneEvent::create(database, target_zone, parent_odb);
 }

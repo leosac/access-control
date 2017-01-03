@@ -17,32 +17,32 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "NotifdModule.hpp"
-#include "core/GetServiceRegistry.hpp"
-#include <boost/asio.hpp>
+#pragma once
+
+#include "core/SecurityContext.hpp"
+#include "core/auth/AuthFwd.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
+using json = nlohmann::json;
 
-namespace Module
+/**
+ * A serializer that handle `Auth::Zone` object.
+ */
+struct ZoneJSONSerializer
 {
-namespace Notifd
-{
-NotifdModule::NotifdModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                           const boost::property_tree::ptree &cfg,
-                           CoreUtilsPtr utils)
-    : AsioModule(ctx, pipe, cfg, utils)
-{
-}
+    static json serialize(const Auth::IZone &Zone, const SecurityContext &sc);
 
-NotifdModule::~NotifdModule()
-{
-    ASSERT_LOG(io_service_.stopped(), "io_service not stopped.");
-}
+    static void unserialize(Auth::IZone &out, const json &in,
+                            const SecurityContext &sc);
+};
 
-void NotifdModule::on_service_event(const service_event::Event &)
+struct ZoneJSONStringSerializer
 {
-}
-}
-}
+    static std::string serialize(const Auth::IZone &in, const SecurityContext &sc);
+
+    static void unserialize(Auth::IZone &out, const std::string &in,
+                            const SecurityContext &sc);
+};
 }

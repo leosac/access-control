@@ -27,6 +27,7 @@
 #include "OptionalTransaction.hpp"
 #include "Schedule_odb.h"
 #include "User_odb.h"
+#include "Zone_odb.h"
 #include "core/audit/AuditEntry.hpp"
 #include "exception/EntityNotFound.hpp"
 #include "tools/AssertCast.hpp"
@@ -120,6 +121,18 @@ Auth::IDoorPtr DBService::find_door_by_id(const Auth::DoorId &id,
         throw EntityNotFound(id, "door");
     return door;
 }
+
+Auth::IZonePtr DBService::find_zone_by_id(const Auth::ZoneId &id,
+                                          DBService::Flag flags)
+{
+    db::OptionalTransaction t(database_->begin());
+    auto zone = database_->find<Auth::Zone>(id);
+    t.commit();
+    if (!zone && flags & Flag::THROW_IF_NOT_FOUND)
+        throw EntityNotFound(id, "zone");
+    return zone;
+}
+
 
 Audit::IAuditEntryPtr DBService::find_audit_by_id(const Audit::AuditEntryId &id,
                                                   Flag flags)

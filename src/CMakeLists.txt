@@ -34,6 +34,7 @@ set(LEOSAC_LIB_SRCS
     core/auth/serializers/UserGroupMembershipSerializer.cpp
     core/auth/serializers/DoorSerializer.cpp
     core/auth/serializers/AccessPointSerializer.cpp
+    core/auth/serializers/ZoneSerializer.cpp
     core/auth/Token.cpp
     core/auth/UserGroupMembership.cpp
     core/auth/AuthSourceBuilder.cpp
@@ -42,12 +43,13 @@ set(LEOSAC_LIB_SRCS
     core/auth/AccessPoint.cpp
     core/auth/AccessPointUpdate.cpp
     core/auth/AccessPointService.cpp
+    core/auth/Zone.cpp
     core/credentials/Credential.cpp
     core/credentials/CredentialValidator.cpp
     core/credentials/RFIDCard.cpp
     core/credentials/PinCode.cpp
     core/credentials/serializers/CredentialSerializer.cpp
-        core/credentials/serializers/RFIDCardSerializer.cpp
+    core/credentials/serializers/RFIDCardSerializer.cpp
     core/credentials/serializers/PolymorphicCredentialSerializer.cpp
     core/credentials/serializers/PinCodeSerializer.cpp
     core/UserSecurityContext.cpp
@@ -114,6 +116,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/UpdateEvent.cpp
     core/audit/AccessPointEvent.cpp
     core/audit/AuditTracker.cpp
+    core/audit/ZoneEvent.cpp
     core/audit/serializers/AuditSerializer.cpp
     core/audit/serializers/UserEventSerializer.cpp
     core/audit/serializers/PolymorphicAuditSerializer.cpp
@@ -124,6 +127,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/DoorEventSerializer.cpp
     core/audit/serializers/UserGroupMembershipEventSerializer.cpp
     core/audit/serializers/AccessPointEventSerializer.cpp
+    core/audit/serializers/ZoneEventSerializer.cpp
     core/update/UpdateService.cpp
     core/update/Update.cpp
     core/update/serializers/AccessPointUpdateSerializer.cpp
@@ -131,7 +135,8 @@ set(LEOSAC_LIB_SRCS
     core/update/serializers/UpdateDescriptorSerializer.cpp
     tools/db/PGSQLTracer.cpp
     core/SecurityContext.cpp
-        core/audit/serializers/UpdateEventSerializer.cpp core/audit/serializers/UpdateEventSerializer.hpp)
+    core/audit/serializers/UpdateEventSerializer.cpp
+    )
 
 # Rule for ODB code generation.
 # Build a shared library: leosac_db
@@ -167,14 +172,14 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O0 -Wextra -g3 -Wl,-z,now")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O0 -Wextra -g3")
     endif()
 endif()
 
 ## Add optimization flags
 if (CMAKE_BUILD_TYPE MATCHES "Release")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2 -Wl,-z,now")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2")
     endif()
 endif()
 
@@ -197,7 +202,7 @@ set_target_properties(${LEOSAC_LIB} PROPERTIES
 
 target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
-        ${ODB_LIBRARIES} odb-boost odb-mysql odb-pgsql backtrace scrypt stdc++
+        ${ODB_LIBRARIES} odb-boost odb-mysql odb-pgsql backtrace scrypt
         leosac_db)
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)

@@ -20,12 +20,8 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
-#include "core/auth/Interfaces/IAccessProfile.hpp"
-#include "core/auth/UserGroupMembership.hpp"
-#include "core/auth/ValidityInfo.hpp"
-#include "core/credentials/CredentialFwd.hpp"
-#include "tools/db/database.hpp"
 #include <memory>
+#include <string>
 
 namespace Leosac
 {
@@ -33,30 +29,44 @@ namespace Auth
 {
 
 /**
- * A door.
+ * A Zone.
  */
-class IDoor : public std::enable_shared_from_this<IDoor>
+class IZone : public std::enable_shared_from_this<IZone>
 {
   public:
-    virtual DoorId id() const = 0;
+    /**
+     * Zone's type
+     */
+    enum Type
+    {
+        PHYSICAL,
+        LOGICAL
+    };
+    virtual ZoneId id() const = 0;
 
     virtual std::string alias() const       = 0;
     virtual std::string description() const = 0;
+    virtual Type type() const               = 0;
 
     virtual void alias(const std::string &alias)      = 0;
     virtual void description(const std::string &desc) = 0;
+    virtual void type(Type t)                         = 0;
 
-    virtual IAccessPointPtr access_point() const = 0;
+    virtual void clear_children() = 0;
+    virtual void clear_doors()    = 0;
 
-    virtual AccessPointId access_point_id() const = 0;
-
-    virtual void access_point(IAccessPointPtr) = 0;
+    virtual void add_door(DoorLPtr door)  = 0;
+    virtual void add_child(ZoneLPtr zone) = 0;
 
     /**
-     * Retrieve the lazy pointers to the ScheduleMapping objects that
-     * map this door.
+     * Retrieve the children zones.
      */
-    virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const = 0;
+    virtual std::vector<ZoneLPtr> children() const = 0;
+
+    /**
+     * Retrieve the doors associated with the zones.
+     */
+    virtual std::vector<DoorLPtr> doors() const = 0;
 };
 }
 }

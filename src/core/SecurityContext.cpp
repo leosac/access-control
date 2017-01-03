@@ -116,6 +116,13 @@ SecurityContext::AccessPointActionParam::operator ActionParam()
     return result;
 }
 
+SecurityContext::ZoneActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.zone = *this;
+    return result;
+}
+
 ExecutionContext::ExecutionContext(SecurityContext &sc)
     : sec(sc)
 {

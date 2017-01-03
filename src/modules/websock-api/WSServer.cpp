@@ -34,6 +34,7 @@
 #include "api/PasswordChange.hpp"
 #include "api/ScheduleCRUD.hpp"
 #include "api/UserCRUD.hpp"
+#include "api/ZoneCRUD.hpp"
 #include "api/search/AccessPointSearch.hpp"
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
@@ -120,6 +121,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     register_crud_handler("schedule", &WebSockAPI::ScheduleCRUD::instanciate);
     register_crud_handler("door", &WebSockAPI::DoorCRUD::instanciate);
     register_crud_handler("access_point", &WebSockAPI::AccessPointCRUD::instanciate);
+    register_crud_handler("zone", &WebSockAPI::ZoneCRUD::instanciate);
 }
 
 WSServer::~WSServer()

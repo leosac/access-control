@@ -108,6 +108,18 @@ using DoorLWPtr = odb::lazy_weak_ptr<Door>;
 using DoorLPtr  = odb::lazy_shared_ptr<Door>;
 using DoorPtr   = std::shared_ptr<Door>;
 
+
+class IZone;
+using IZonePtr   = std::shared_ptr<IZone>;
+using IZoneLPtr  = odb::lazy_shared_ptr<IZone>;
+using IZoneLWPtr = odb::lazy_weak_ptr<IZone>;
+using ZoneId     = unsigned long;
+
+class Zone;
+using ZoneLWPtr = odb::lazy_weak_ptr<Zone>;
+using ZoneLPtr  = odb::lazy_shared_ptr<Zone>;
+using ZonePtr   = std::shared_ptr<Zone>;
+
 class IAccessPoint;
 using IAccessPointPtr = std::shared_ptr<IAccessPoint>;
 using AccessPointId   = unsigned long;

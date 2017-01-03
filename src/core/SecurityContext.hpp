@@ -109,6 +109,12 @@ class SecurityContext
         ACCESS_POINT_DELETE,
         ACCESS_POINT_SEARCH,
 
+        ZONE_READ,
+        ZONE_UPDATE,
+        ZONE_CREATE,
+        ZONE_DELETE,
+        ZONE_SEARCH,
+
         /**
          * Retrieve SMTP configuration
          */
@@ -182,6 +188,13 @@ class SecurityContext
         operator ActionParam();
     };
 
+    struct ZoneActionParam
+    {
+        Auth::ZoneId zone_id;
+
+        operator ActionParam();
+    };
+
     struct AccessPointActionParam
     {
         Auth::AccessPointId ap_id;
@@ -197,6 +210,7 @@ class SecurityContext
         ScheduleActionParam sched;
         DoorActionParam door;
         AccessPointActionParam access_point;
+        ZoneActionParam zone;
     };
 
     SecurityContext(DBServicePtr dbsrv);

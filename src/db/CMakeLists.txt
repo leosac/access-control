@@ -53,6 +53,7 @@ set(OdbCMake_ODB_HEADERS_AUTH
         ${CMAKE_SOURCE_DIR}/src/core/auth/Door.hpp
         ${CMAKE_SOURCE_DIR}/src/core/auth/AccessPoint.hpp
         ${CMAKE_SOURCE_DIR}/src/core/auth/AccessPointUpdate.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/auth/Zone.hpp
         )
 
 set(OdbCMake_SOURCES_AUTH "")
@@ -95,6 +96,7 @@ set(OdbCMake_ODB_HEADERS_AUDITLOG
         ${CMAKE_SOURCE_DIR}/src/core/audit/DoorEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/AccessPointEvent.hpp
         ${CMAKE_SOURCE_DIR}/src/core/audit/UpdateEvent.hpp
+        ${CMAKE_SOURCE_DIR}/src/core/audit/ZoneEvent.hpp
         )
 
 set(OdbCMake_SOURCES_AUDITLOG "")

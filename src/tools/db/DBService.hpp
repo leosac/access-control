@@ -75,6 +75,8 @@ class DBService
 
     Auth::IDoorPtr find_door_by_id(const Auth::DoorId &id, Flag f = Flag::DEFAULT);
 
+    Auth::IZonePtr find_zone_by_id(const Auth::ZoneId &id, Flag f = Flag::DEFAULT);
+
     Audit::IAuditEntryPtr find_audit_by_id(const Audit::AuditEntryId &id,
                                            Flag f = Flag::DEFAULT);
 

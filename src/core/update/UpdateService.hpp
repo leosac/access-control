@@ -63,7 +63,7 @@ struct UpdateDescriptor
   private:
     /**
      * Just to make UpdateDescriptor abstract so module have to provide their own
-     * subclass. (needed for dynamic caster in create_update)
+     * subclass. (needed for dynamic cast in create_update)
      */
     virtual void implement_me_() = 0;
 };

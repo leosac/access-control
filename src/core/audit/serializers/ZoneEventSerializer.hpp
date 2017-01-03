@@ -17,32 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "NotifdModule.hpp"
-#include "core/GetServiceRegistry.hpp"
-#include <boost/asio.hpp>
+#pragma once
+
+#include "LeosacFwd.hpp"
+#include "core/audit/AuditFwd.hpp"
+#include <json.hpp>
+#include <string>
 
 namespace Leosac
 {
+using json = nlohmann::json;
 
-namespace Module
+namespace Audit
 {
-namespace Notifd
+namespace Serializer
 {
-NotifdModule::NotifdModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                           const boost::property_tree::ptree &cfg,
-                           CoreUtilsPtr utils)
-    : AsioModule(ctx, pipe, cfg, utils)
+struct ZoneEventJSON
 {
-}
-
-NotifdModule::~NotifdModule()
-{
-    ASSERT_LOG(io_service_.stopped(), "io_service not stopped.");
-}
-
-void NotifdModule::on_service_event(const service_event::Event &)
-{
-}
+    static json serialize(const Audit::IZoneEvent &in, const SecurityContext &sc);
+};
 }
 }
 }
