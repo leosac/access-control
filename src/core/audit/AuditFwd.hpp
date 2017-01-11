@@ -151,6 +151,15 @@ enum class EventType
     DOOR_CREATED,
     DOOR_UPDATED,
     DOOR_DELETED,
+    /**
+     * This event is linked to door. It is generated
+     * by the Schedule CRUD manager. It's used to let a door
+     * know that it may have been removed from a mapping.
+     *
+     * Fixme: Currently this event is triggered for every door in a mapping
+     * everytime a schedule is updated.
+     */
+    MAPPING_MAY_HAVE_CHANGED,
 
     ACCESS_POINT_CREATED,
     ACCESS_POINT_UPDATED,

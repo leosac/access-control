@@ -20,13 +20,15 @@
 #include "api/ScheduleCRUD.hpp"
 #include "Schedule_odb.h"
 #include "core/audit/AuditFactory.hpp"
+#include "core/audit/IDoorEvent.hpp"
 #include "core/audit/IScheduleEvent.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/ISchedule.hpp"
 #include "tools/Schedule.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/enforce.hpp"
+#include "tools/serializers/ScheduleMappingSerializer.hpp"
 #include "tools/serializers/ScheduleSerializer.hpp"
-#include <tools/serializers/ScheduleMappingSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -176,6 +178,15 @@ boost::optional<json> ScheduleCRUD::update_impl(const json &req)
 
     for (const auto &mapping : schedule->mapping())
     {
+        // fixme: A bit hackish -- Generate an event for the door to let it knows its
+        // mapping may have changed.
+        for (const auto &lazy_weak_door : mapping->doors())
+        {
+            auto lazy_door = LEOSAC_ENFORCE(lazy_weak_door.load(), "Failed to load");
+            auto door_event = Audit::Factory::DoorEvent(db, lazy_door, audit);
+            door_event->event_mask(Audit::EventType::MAPPING_MAY_HAVE_CHANGED);
+            door_event->finalize();
+        }
         db->erase(mapping);
     }
     schedule->clear_mapping();
