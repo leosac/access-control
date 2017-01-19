@@ -60,7 +60,7 @@ void AsioModule::StopWatcher::wait(const boost::system::error_code &ec)
 {
     if (ec)
     {
-        WARN("SMTPModule StopWatcher timer has errored: " << ec.message());
+        WARN("AsioModule StopWatcher timer has errored: " << ec.message());
         ASSERT_LOG(0, "Failed.");
     }
     if (!self_.is_running_)
