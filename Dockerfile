@@ -33,11 +33,11 @@ RUN apt-get install python3 python3-pip -y
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 RUN pip3 install pyzmq
 
-RUN apt-get install -y libscrypt-dev
+RUN apt-get install -y libscrypt-dev libssl-dev
 
 RUN git clone git://github.com/zeromq/libzmq.git; \
 cd libzmq; \
-git checkout 511d701de35377ff64d2fde9b594afc8800589ca; \
+git checkout v4.2.1; \
 ./autogen.sh; \
 ./configure --with-libsodium; \
 make check || echo ${Red}"Warning: ZeroMQ tests failed. The build will continue but may fail."${RCol}; \
