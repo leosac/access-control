@@ -60,8 +60,8 @@ json AuditGet::process_impl(const json &req)
 
         if (page == 0)
             throw LEOSACException("Cannot request page 0.");
-        if (page_size == 0)
-            throw LEOSACException("Cannot request a pagesize of 0.");
+        if (page_size <= 0)
+            throw LEOSACException("Cannot request a pagesize <= 0.");
 
         odb::transaction t(db->begin());
         Audit::AuditEntryCount view(
