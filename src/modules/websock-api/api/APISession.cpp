@@ -44,7 +44,6 @@ using namespace Leosac::Module::WebSockAPI;
 APISession::APISession(WSServer &server)
     : server_(server)
     , auth_status_(AuthStatus::NONE)
-    , connection_identifier_(gen_uuid())
 {
 }
 
@@ -208,9 +207,4 @@ SecurityContext &APISession::security_context() const
     if (security_)
         return *security_.get();
     return sc;
-}
-
-const std::string &APISession::connection_identifier() const
-{
-    return connection_identifier_;
 }

@@ -21,9 +21,9 @@
 #include "GenGuid.h"
 #include "LogEntry_odb.h"
 #include "log.hpp"
-#include <tools/DateTimeConverter.hpp>
-#include <tools/LogEntry.hpp>
-#include <tools/db/database.hpp>
+#include "tools/DateTimeConverter.hpp"
+#include "tools/LogEntry.hpp"
+#include "tools/db/database.hpp"
 
 using namespace Leosac;
 using namespace Leosac::Tools;

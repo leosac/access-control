@@ -68,9 +68,11 @@ ADD CMakeLists.txt /leosac_src/
 
 RUN /docker_scripts/build_leosac.sh
 
+RUN apt-get install postgresql-client-9.6 -y
 
 CMD [""]
 
 ENTRYPOINT ["/docker_scripts/entry.sh"]
 
 ADD test_helper /leosac_src/test_helper
+EXPOSE 8888

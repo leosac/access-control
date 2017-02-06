@@ -170,11 +170,6 @@ class APISession
 
     SecurityContext &security_context() const;
 
-    /**
-     * Retrieve the identifier for this connection.
-              */
-    const std::string &connection_identifier() const;
-
   private:
     void mark_authenticated(Auth::TokenPtr token);
     void clear_authentication();
@@ -191,11 +186,6 @@ class APISession
     Auth::TokenPtr current_auth_token_;
 
     std::unique_ptr<SecurityContext> security_;
-
-    /**
-     * A unique identifier for the current connection.
-     */
-    std::string connection_identifier_;
 };
 }
 }
