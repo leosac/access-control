@@ -206,6 +206,7 @@ target_include_directories(leosac_db PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
         ${ZEROMQ_INCLUDE_DIR}
+        ${ODB_INCLUDE_DIRS}
         )
 
 

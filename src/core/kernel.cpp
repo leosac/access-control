@@ -52,9 +52,12 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <fstream>
-#include <odb/mysql/database.hxx>
 #include <odb/pgsql/database.hxx>
+
+#ifndef LEOSAC_PGSQL_ONLY
+#include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
+#endif
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -491,9 +494,13 @@ void Kernel::configure_database()
             std::string db_type = db_cfg_node->get<std::string>("type", "");
             if (db_type == "sqlite")
             {
+#ifndef LEOSAC_PGSQL_ONLY
                 std::string db_path = db_cfg_node->get<std::string>("path");
                 database_           = std::make_shared<odb::sqlite::database>(
                     db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+#else
+                throw LEOSACException("SQLite support disabled at compile time.");
+#endif
             }
             else if (db_type == "mysql" || db_type == "pgsql")
             {
@@ -502,10 +509,15 @@ void Kernel::configure_database()
                 std::string db_dbname = db_cfg_node->get<std::string>("dbname");
                 std::string db_host   = db_cfg_node->get<std::string>("host", "");
                 uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
+
                 if (db_type == "mysql")
                 {
+#ifndef LEOSAC_PGSQL_ONLY
                     database_ = std::make_shared<odb::mysql::database>(
                         db_user, db_pw, db_dbname, db_host, db_port);
+#else
+                    throw LEOSACException("MySQL support disabled at compile time.");
+#endif
                 }
                 else
                 {

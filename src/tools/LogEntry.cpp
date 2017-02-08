@@ -21,10 +21,13 @@
 #include "LogEntry_odb.h"
 #include "LogEntry_odb_pgsql.h"
 #include "tools/db/database.hpp"
-#include <exception/leosacexception.hpp>
-#include <odb/mysql/database.hxx>
+#include "exception/leosacexception.hpp"
 #include <odb/pgsql/database.hxx>
+
+#ifndef LEOSAC_PGSQL_ONLY
+#include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
+#endif
 
 using namespace Leosac;
 using namespace Leosac::Tools;

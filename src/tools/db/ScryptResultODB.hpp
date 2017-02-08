@@ -20,10 +20,7 @@
 #pragma once
 
 #include "tools/scrypt/Scrypt.hpp"
-#include <odb/mysql/traits.hxx>
 #include <odb/pgsql/traits.hxx>
-#include <odb/sqlite/traits.hxx>
-
 
 /**
  * Provide ODB magic to be able to store a ScryptResult (password salt + hash)

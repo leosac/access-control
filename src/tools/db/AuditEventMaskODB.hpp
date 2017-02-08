@@ -20,10 +20,12 @@
 #pragma once
 
 #include "core/audit/AuditFwd.hpp"
-#include <odb/mysql/traits.hxx>
 #include <odb/pgsql/traits.hxx>
-#include <odb/sqlite/traits.hxx>
 
+#ifndef LEOSAC_PGSQL_ONLY
+#include <odb/mysql/traits.hxx>
+#include <odb/sqlite/traits.hxx>
+#endif
 
 /**
  * Provide ODB magic to be able to store an Leosac::Audit::EventType
@@ -32,6 +34,8 @@
 
 namespace odb
 {
+
+#ifndef LEOSAC_PGSQL_ONLY
 
 // For MySQL
 
@@ -109,6 +113,8 @@ class value_traits<Leosac::Audit::EventMask, id_text>
     }
 };
 }
+
+#endif
 
 // For PGSql
 

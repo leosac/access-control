@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 2.8.8 FATAL_ERROR)
 project(LEOSAC)
 
+set(LEOSAC_CROSS_COMPILE 0)
+if (CMAKE_TOOLCHAIN_FILE)
+# a bit hacky -- if a toolchain file si present, assume
+# cross compilation to raspberry pi
+set(LEOSAC_CROSS_COMPILE 1)
+endif()
+
 # Avoid source tree pollution
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(WARNING "In-source builds are not encouraged. Make a separate folder for building:\nmkdir build; cd build; cmake ..;cd ..\nBefore that, remove the files already created:\nrm -rf CMakeCache.txt CMakeFiles")
@@ -23,7 +30,12 @@ find_package(TCLAP REQUIRED)
 find_package(Boost 1.55 REQUIRED date_time system serialization regex filesystem)
 
 # ODB stuff
-find_package(ODB REQUIRED COMPONENTS sqlite mysql pgsql)
+if (LEOSAC_CROSS_COMPILE)
+    find_package(ODB REQUIRED COMPONENTS pgsql boost)
+else()
+    find_package(ODB REQUIRED COMPONENTS pgsql mysql sqlite boost)
+endif()
+
 include(${ODB_USE_FILE})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wno-undef -Wno-shadow -Wno-unknown-pragmas")
