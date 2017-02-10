@@ -1,0 +1,110 @@
+# Build an image with all the required infrastructure
+# To cross-compile Leosac for Raspberry Pi.
+
+FROM debian:stretch
+
+RUN echo 'deb-src http://deb.debian.org/debian stretch main' >> /etc/apt/sources.list
+
+RUN apt-get update && apt-get install emacs24-nox wget git cmake build-essential -y
+RUN apt-get update && apt-get install g++-arm-linux-gnueabihf libtool-bin -y
+RUN apt-get update && apt-get install autoconf automake pkg-config python3 -y
+
+ADD docker_scripts /docker_scripts
+
+# Boost libraries.
+
+# Create custom configuration to be able to use the cross compiling toolchain
+RUN echo 'using gcc : arm : arm-linux-gnueabihf-g++ ;' > /root/user-config.jam
+
+# Extract configure build and install
+RUN (cd tmp && cp /docker_scripts/boost_1_63_0.tar.gz . && tar xvfz boost_1_63_0.tar.gz && \
+    cd boost_1_63_0 && ./bootstrap.sh && \
+    ./b2 --without-coroutine --without-coroutine2 --without-fiber --without-context --reconfigure  \
+         toolset=gcc-arm cxxflags='-std=c++14' -j6 \
+    ./b2 --prefix=/opt/rpi_fakeroot install)
+
+# ZeroMQ
+RUN (cd /opt/rpi_fakeroot && git clone https://github.com/zeromq/libzmq.git && \
+    cd libzmq && \
+    ./autogen.sh && \
+    ./configure --prefix=/opt/rpi_fakeroot  --host=arm-linux-gnueabihf && \
+    make -j6 && make install)
+
+# TClap
+RUN (cd /tmp && apt-get update && apt-get source libtclap-dev && \
+     cd tclap-1.2.1 && \
+     ./configure --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
+     make -j6 && make install)
+
+#PostgreSQL native library
+RUN (cd /tmp && wget https://ftp.postgresql.org/pub/source/v9.4.10/postgresql-9.4.10.tar.gz && \
+     tar xvfz postgresql-9.4.10.tar.gz && cd postgresql-9.4.10 && \
+     ./configure --without-readline --without-zlib --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
+     make -j6 && make install)
+
+
+
+######################################################
+#     ODB - Database Object Relational Mapper        #
+######################################################
+
+# ODB compiler (amd64 version as code generation is run using a native
+# odb binary).
+RUN (cd /tmp && wget http://www.codesynthesis.com/download/odb/2.4/odb_2.4.0-1_amd64.deb && \
+     dpkg -i odb_2.4.0-1_amd64.deb)
+
+
+# ODB common runtime
+RUN (cd /tmp &&  wget http://www.codesynthesis.com/download/odb/2.4/libodb-2.4.0.tar.gz && \
+     tar xvf libodb-2.4.0.tar.gz && cd libodb-2.4.0 && \
+     ./configure --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
+     make -j6 && make install)
+
+
+# ODB Boost Profile
+RUN (cd /tmp &&  wget http://www.codesynthesis.com/download/odb/2.4/libodb-boost-2.4.0.tar.gz && \
+     tar xvf libodb-boost-2.4.0.tar.gz && cd libodb-boost-2.4.0 && \
+     ./configure CPPFLAGS="-I/opt/rpi_fakeroot/include" LDFLAGS="-L/opt/rpi_fakeroot/lib" \
+        --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
+     make -j6 && make install)
+
+# ODB PGSQL runtime
+RUN (cd /tmp &&  wget http://www.codesynthesis.com/download/odb/2.4/libodb-pgsql-2.4.0.tar.gz && \
+     tar xvf libodb-pgsql-2.4.0.tar.gz && cd libodb-pgsql-2.4.0 && \
+     ./configure CPPFLAGS="-I/opt/rpi_fakeroot/include" LDFLAGS="-L/opt/rpi_fakeroot/lib" \
+        --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
+     make -j6 && make install)
+
+# LibScrypt
+RUN (cd /tmp && git clone https://github.com/technion/libscrypt.git && cd libscrypt && \
+     CC=arm-linux-gnueabihf-gcc make && cp libscrypt.h /opt/rpi_fakeroot/include && \
+     cp libscrypt.so.0 /opt/rpi_fakeroot/lib && \
+     ln -s /opt/rpi_fakeroot/lib/libscrypt.so.0 /opt/rpi_fakeroot/lib/libscrypt.so)
+
+# CURL
+RUN (cd /tmp &&  wget https://curl.haxx.se/download/curl-7.52.1.tar.gz && \
+    tar xvfz curl-7.52.1.tar.gz && cd curl-7.52.1 && \
+    ./configure --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
+    make -j6 && make install)
+
+# OpenSSL
+RUN (cd /tmp && wget https://www.openssl.org/source/openssl-1.1.0d.tar.gz && \
+    tar xvfz openssl-1.1.0d.tar.gz && cd openssl-1.1.0d && \
+    export cross=arm-linux-gnueabihf- && \
+    ./Configure linux-generic32 shared --prefix=/opt/rpi_fakeroot && \
+    make CC="${cross}gcc" AR="${cross}ar r" RANLIB="${cross}ranlib" -j6 && \
+    make install)
+
+# Volume where the root of the Leosac repository lives.
+# This let us run a container rather than having to build
+# it everytime.
+VOLUME /leosac
+
+# Volume where we perform the build. Using a volume here
+# allows us to run the container and continue a compilation
+# rather than having to perform a complete build everytime.
+VOLUME /leosac_arm_build
+
+ADD entrypoint.py /entrypoint.py
+
+ENTRYPOINT ["/entrypoint.py"]

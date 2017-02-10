@@ -209,6 +209,9 @@ target_include_directories(leosac_db PRIVATE
         ${ODB_INCLUDE_DIRS}
         )
 
+if (LEOSAC_CROSS_COMPILE)
+    set(__LEOSAC_SQL_GENERATION_ADDITIONAL_INCLUDES -I ${CMAKE_SYSROOT}/include)
+endif()
 
 ## This generate a leosac.sql file
 ## for creating the database structure.
@@ -218,6 +221,7 @@ add_custom_command(TARGET leosac_db
         -I ${CMAKE_SOURCE_DIR}/deps/flagset
         -I ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         -I ${CMAKE_SOURCE_DIR}/src
+        ${__LEOSAC_SQL_GENERATION_ADDITIONAL_INCLUDES}
         --generate-schema-only --at-once
         --input-name leosac
         --generate-query
