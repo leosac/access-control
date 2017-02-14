@@ -21,8 +21,9 @@
 #include "Colorize.hpp"
 #include "log.hpp"
 
-#if defined(__GNUG__) && !defined(__clang__)
-#define LEOSAC_STACKTRACE_ENABLED
+#if (!defined(__GNUG__) && defined(__clang__)) || defined(LEOSAC_STACKTRACE_DISABLED)
+#define LEOSAC_STACKTRACE_DISABLED
+#else
 #include <backtrace.h>
 #endif
 
@@ -34,7 +35,7 @@ using namespace Leosac::Tools;
 
 Stacktrace::Stacktrace(uint skip /* = 0 */)
 {
-#ifdef LEOSAC_STACKTRACE_ENABLED
+#ifndef LEOSAC_STACKTRACE_DISABLED
     auto cb_error = [](void * /*data*/, const char *msg, int errnum) {
         ERROR("Problem when generating stacktrace: " << msg
                                                      << ". Error code: " << errnum);

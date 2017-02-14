@@ -43,6 +43,12 @@ enum class SourceType : uint8_t
     * When reading both a card an a PIN code.
     */
     WIEGAND_CARD_PIN = 3,
+
+    /**
+     * A simple Card Serial Number. It is represented as an
+     * hexadecimal string.
+     */
+    SIMPLE_CSN = 4,
 };
 
 enum class AccessStatus : uint8_t

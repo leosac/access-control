@@ -22,9 +22,30 @@
 #include "PINCode.hpp"
 #include "WiegandCard.hpp"
 #include "WiegandCardPin.hpp"
+#include "tools/enforce.hpp"
 #include "tools/log.hpp"
+#include <boost/algorithm/string.hpp>
 
 using namespace Leosac::Auth;
+
+// Need refactoring....
+IAuthenticationSourcePtr create_fake_simple_wiegand(const std::string &name,
+                                                    zmqpp::message *msg)
+{
+    // card id
+    assert(msg && msg->remaining() == 1);
+
+    std::string card_id;
+
+    *msg >> card_id;
+    INFO("Building an AuthSource object (FAKE Wiegand Card):" << card_id);
+    auto raw_csn = boost::replace_all_copy(card_id, ":", "");
+    LEOSAC_ENFORCE(raw_csn.length() % 2 == 0, "CSN has invalid length.");
+    BaseAuthSourcePtr auth_source(new WiegandCard(card_id, raw_csn.length() * 8));
+    auth_source->name(name);
+
+    return auth_source;
+}
 
 IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
 {
@@ -46,8 +67,11 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
         return create_wiegand_pin(source_name, msg);
     else if (type == SourceType::WIEGAND_CARD_PIN)
         return create_wiegand_card_pin(source_name, msg);
-    ASSERT_LOG(0, "Unknown auth source type.");
-    exit(-1);
+    else if (type == SourceType::SIMPLE_CSN)
+        return create_fake_simple_wiegand(source_name, msg);
+    LEOSAC_ENFORCE(0, "Unknown auth source type.");
+
+    return nullptr;
 }
 
 bool AuthSourceBuilder::extract_source_name(const std::string &input,

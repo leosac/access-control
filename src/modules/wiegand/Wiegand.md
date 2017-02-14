@@ -65,7 +65,7 @@ swiping your card.
 Example {#mod_wiegand_example}
 ------------------------------
 
-This is a example of Rpleth possible configuration for Rpleth module into Leosac:
+This is a example of configuration for the Wiegand module.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <module>

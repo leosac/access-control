@@ -74,6 +74,9 @@ Currently we are lucky, we only define a few.
   1. An hexadecimal *string* that contain the card id that was read, for example: "40:a0:83:80"
   2. An *integer* that holds the number of bits in the card id.
   3. A *string* that contains the PIN code.
+4. **SIMPLE_CSN**: A Card Serial Number in hexadecimal string format, separated by ":"
+  1. This Auth::SourceType requires a single frame. Example: "aa:bb:42:cd"
+ 
 
 Message Passing Specifications {#auth_specc}
 ============================================

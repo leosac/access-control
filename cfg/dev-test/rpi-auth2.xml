@@ -133,14 +133,15 @@
                         <default_blink_duration>2000</default_blink_duration>
                         <default_blink_speed>100</default_blink_speed>
                     </led>
-
-                    <led>
+                </leds>
+                <buzzers>
+                    <buzzer>
                         <name>WIEGAND1_BUZZER</name>
                         <gpio>wiegand_buzzer</gpio>
                         <default_blink_duration>2000</default_blink_duration>
                         <default_blink_speed>100</default_blink_speed>
-                    </led>
-                </leds>
+                    </buzzer>
+                </buzzers>
             </module_config>
         </module>
 

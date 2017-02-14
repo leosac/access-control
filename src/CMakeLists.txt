@@ -162,7 +162,12 @@ target_compile_definitions(${LEOSAC_LIB}
         PRIVATE
         )
 
-set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+target_compile_definitions(${LEOSAC_BIN}
+        PUBLIC
+        -DUNIX=1 #LLA flags'
+        )
+
+set(LEOSAC_COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -Wno-deprecated-declarations")
 
 #Add GProf compile flag
 if(LEOSAC_GPROF)
@@ -204,12 +209,18 @@ target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
         ${ODB_LIBRARIES} backtrace scrypt
         leosac_db
+        logicalaccess
         )
 
 # Somehow, cross compile requires us to link against libcrypto
 # and librt
 if (LEOSAC_CROSS_COMPILE)
     target_link_libraries(${LEOSAC_LIB} crypto rt)
+
+    # We disable per-exception stacktrace generation when cross compiling
+    # because that is a debug feature that takes a lot of ram and can't
+    # be properly freed.
+    target_compile_definitions(${LEOSAC_LIB} PUBLIC -DLEOSAC_STACKTRACE_DISABLED=1)
 endif()
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)

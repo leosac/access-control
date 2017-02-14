@@ -142,6 +142,7 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
     }
     catch (std::exception &e)
     {
+        WARN("Exception when handling authentication request.");
         log_exception(e);
     }
     return {false, nullptr, nullptr};

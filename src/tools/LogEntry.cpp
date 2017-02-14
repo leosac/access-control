@@ -20,8 +20,8 @@
 #include "LogEntry.hpp"
 #include "LogEntry_odb.h"
 #include "LogEntry_odb_pgsql.h"
-#include "tools/db/database.hpp"
 #include "exception/leosacexception.hpp"
+#include "tools/db/database.hpp"
 #include <odb/pgsql/database.hxx>
 
 #ifndef LEOSAC_PGSQL_ONLY

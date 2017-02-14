@@ -22,6 +22,7 @@
 #include "exception/gpioexception.hpp"
 #include "mcp23s17.h"
 #include "pifacedigital.h"
+#include "tools/enforce.hpp"
 #include "tools/log.hpp"
 #include "tools/timeout.hpp"
 #include <boost/iterator/transform_iterator.hpp>
@@ -57,10 +58,13 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
     std::string path_to_gpio =
         "/sys/class/gpio/gpio" + std::to_string(GPIO_INTERRUPT_PIN) + "/value";
     interrupt_fd_ = open(path_to_gpio.c_str(), O_RDONLY | O_NONBLOCK);
-    ASSERT_LOG(interrupt_fd_, "Failed to open GPIO file");
+    LEOSAC_ENFORCE(interrupt_fd_ > 0, "Failed to open GPIO file");
     pifacedigital_read_reg(0x11, 0); // flush
+
+    // Somehow it was required poll with "poll_pri" and "poll_errror". It used to
+    // work with poll_pri alone before. Need to investigate more. todo !
     reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this),
-                 zmqpp::poller::poll_pri);
+                 zmqpp::poller::poll_pri | zmqpp::poller::poll_error);
 }
 
 void PFDigitalModule::run()
