@@ -30,13 +30,6 @@ RUN (cd /opt/rpi_fakeroot && git clone https://github.com/zeromq/libzmq.git && \
     ./configure --prefix=/opt/rpi_fakeroot  --host=arm-linux-gnueabihf && \
     make -j6 && make install)
 
-## ZeroMQ old
-#RUN (cd /opt/rpi_fakeroot && git clone https://github.com/zeromq/libzmq.git && \
-#    cd libzmq && git checkout 511d701de35377ff64d2fde9b594afc8800589ca && \
-#    ./autogen.sh && \
-#    ./configure --prefix=/opt/rpi_fakeroot  --host=arm-linux-gnueabihf && \
-#    make -j6 && make install)
-
 # TClap
 RUN (cd /tmp && apt-get update && apt-get source libtclap-dev && \
      cd tclap-1.2.1 && \
@@ -48,7 +41,6 @@ RUN (cd /tmp && cp /cross-compile-resources/postgresql-9.4.10.tar.gz . && \
      tar xvfz postgresql-9.4.10.tar.gz && cd postgresql-9.4.10 && \
      ./configure --without-readline --without-zlib --prefix=/opt/rpi_fakeroot --host=arm-linux-gnueabihf && \
      make -j6 && make install)
-
 
 
 ######################################################
@@ -122,8 +114,7 @@ ADD docker_scripts /docker_scripts
 VOLUME /leosac
 
 # Volume where we perform the build. Using a volume here
-# allows us to run the container and continue a compilation
-# rather than having to perform a complete build everytime.
+# allows us to perform incremental compilation.
 VOLUME /leosac_arm_build
 
 ENTRYPOINT ["/docker_scripts/cross_compile_entrypoint.py"]

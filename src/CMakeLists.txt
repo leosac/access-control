@@ -209,7 +209,6 @@ target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
 target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
         ${ODB_LIBRARIES} backtrace scrypt
         leosac_db
-        logicalaccess
         )
 
 # Somehow, cross compile requires us to link against libcrypto
