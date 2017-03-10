@@ -18,7 +18,6 @@
 */
 
 #include "ProtocolHandler.hpp"
-#include "protocols/Megasoft.hpp"
 #include "protocols/PushSimpleCardNumber.hpp"
 
 using namespace Leosac;
@@ -31,8 +30,6 @@ ProtocolHandlerUPtr ProtocolHandler::create(int protocol_id)
     {
     case SIMPLE_CARD_NUMBER:
         return std::make_unique<PushSimpleCardNumber>();
-    case MEGASOFT:
-        return std::make_unique<MegasoftProtocol>();
     default:
         return nullptr;
     }

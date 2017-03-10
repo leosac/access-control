@@ -6,7 +6,6 @@ set(TCP_NOTIFIER_SRCS
     NotifierInstance.cpp
     ProtocolHandler.cpp
     protocols/PushSimpleCardNumber.cpp
-    protocols/Megasoft.cpp
 )
 
 add_library(${TCP_NOTIFIER_BIN} SHARED ${TCP_NOTIFIER_SRCS})

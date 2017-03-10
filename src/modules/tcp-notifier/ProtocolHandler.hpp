@@ -32,7 +32,6 @@ namespace TCPNotifier
 enum Protocol
 {
     SIMPLE_CARD_NUMBER,
-    MEGASOFT
 };
 
 class ProtocolHandler;
