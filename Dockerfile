@@ -8,32 +8,24 @@ RUN cp /etc/apt/sources.list /etc/apt/sources.list.back
 RUN echo 'deb http://ftp.fr.debian.org/debian/ stretch main contrib' >> /etc/apt/sources.list
 RUN echo 'deb-src http://ftp.fr.debian.org/debian/ stretch main contrib' >> /etc/apt/sources.list
 
-RUN apt-get update
-
 ## Tools
-RUN apt-get install emacs24-nox wget -y
-
-RUN apt-get install -y libboost-serialization-dev libboost-regex-dev \
-libboost-system-dev libboost-filesystem-dev libboost-date-time-dev 
-
-RUN apt-get install build-essential git libtool-bin -y
-
-RUN apt-get install libtclap-dev cmake -y
-RUN apt-get install autotools-dev automake pkg-config libsodium-dev -y
-
-RUN apt-get install libgtest-dev python valgrind python-pip libpython2.7-dev -y
-RUN apt-get install -y libcurl4-openssl-dev
+RUN apt-get update && apt-get install -y emacs24-nox wget \
+libboost-serialization-dev libboost-regex-dev \
+libboost-system-dev libboost-filesystem-dev libboost-date-time-dev \
+build-essential git libtool-bin \
+libtclap-dev cmake -y \
+autotools-dev automake pkg-config libsodium-dev \
+libgtest-dev python valgrind python-pip libpython2.7-dev \
+libcurl4-openssl-dev
 
 # Database runtime libraries. Required by ODB.
-RUN apt-get install -y libsqlite3-dev libmysqlclient-dev libpq-dev -y
+RUN apt-get update && apt-get install -y libsqlite3-dev libmysqlclient-dev libpq-dev -y
 
-RUN pip install pyzmq
-
-RUN apt-get install python3 python3-pip -y
+RUN apt-get update && apt-get install python3 python3-pip -y
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 RUN pip3 install pyzmq
 
-RUN apt-get install -y libscrypt-dev libssl-dev
+RUN apt-get update && apt-get install -y libscrypt-dev libssl-dev
 
 RUN git clone git://github.com/zeromq/libzmq.git; \
 cd libzmq; \
@@ -68,7 +60,7 @@ ADD CMakeLists.txt /leosac_src/
 
 RUN /docker_scripts/build_leosac.sh
 
-RUN apt-get install postgresql-client-9.6 -y
+RUN apt-get update && apt-get install postgresql-client-9.6 -y
 
 CMD [""]
 
