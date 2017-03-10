@@ -28,7 +28,7 @@ PGSQLTracer::PGSQLTracer(bool count_only)
 {
 }
 
-void PGSQLTracer::execute(odb::connection &connection, const char *statement)
+void PGSQLTracer::execute(odb::connection &, const char *statement)
 {
     if (!count_only_)
         DEBUG("SQL: " << statement);

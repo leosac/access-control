@@ -27,7 +27,7 @@ namespace Leosac
 namespace update
 {
 json UpdateJSONSerializer::serialize(const update::IUpdate &in,
-                                     const SecurityContext &sc)
+                                     const SecurityContext &)
 {
     json serialized;
     serialized["type"] = "update";
