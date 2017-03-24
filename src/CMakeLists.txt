@@ -88,6 +88,7 @@ set(LEOSAC_LIB_SRCS
     tools/db/MultiplexedSession.cpp
     tools/db/MultiplexedTransaction.cpp
     tools/db/OptionalTransaction.cpp
+    tools/db/Savepoint.cpp
     tools/scrypt/Random.cpp
     tools/scrypt/Scrypt.cpp
     tools/registry/ThreadLocalRegistry.cpp

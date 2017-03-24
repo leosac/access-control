@@ -17,12 +17,14 @@
       <w>informations</w>
       <w>inotify</w>
       <w>inproc</w>
+      <w>instancied</w>
       <w>leds</w>
       <w>leosac</w>
       <w>netmask</w>
       <w>passthrough</w>
       <w>piface</w>
       <w>ptree</w>
+      <w>raii</w>
       <w>realtime</w>
       <w>rpleth</w>
       <w>smtp</w>

@@ -23,6 +23,7 @@
 #include "exception/ModelException.hpp"
 #include "exception/PermissionDenied.hpp"
 #include "tools/log.hpp"
+#include <boost/type_index.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -38,13 +39,33 @@ ServerMessage ExceptionConverter::convert_merge(const std::exception_ptr &ptr,
     return converted_msg;
 }
 
-ServerMessage ExceptionConverter::convert_impl(const std::exception_ptr &ptr)
+/**
+ * Pretty exception name from eptr or empty string if no exception.
+ */
+static std::string exception_name(const std::exception_ptr &ptr)
 {
-    ServerMessage response;
     try
     {
         if (ptr)
             std::rethrow_exception(ptr);
+        return "";
+    }
+    catch (const std::exception &e)
+    {
+        auto type_index = boost::typeindex::type_id_runtime(e);
+        return type_index.pretty_name();
+    }
+}
+
+ServerMessage ExceptionConverter::convert_impl(const std::exception_ptr &ptr)
+{
+    ServerMessage response;
+    std::string ename = exception_name(ptr);
+    try
+    {
+        if (ptr)
+            std::rethrow_exception(ptr);
+        return response;
     }
     catch (const InvalidCall &e)
     {
@@ -99,5 +120,9 @@ ServerMessage ExceptionConverter::convert_impl(const std::exception_ptr &ptr)
         response.status_code   = APIStatusCode::GENERAL_FAILURE;
         response.status_string = e.what();
     }
+    // If we're here, we had an exception. Prepend the status_string
+    // with the type of the exception.
+    response.status_string =
+        BUILD_STR("[" << ename << "]: " << response.status_string);
     return response;
 }
