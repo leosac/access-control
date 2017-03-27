@@ -9,6 +9,10 @@ set -e
 mkdir -p /tmp/leosac_build;
 pushd /tmp/leosac_build;
 
-(cmake -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=1 -DZMQ_BUILD_TESTS=off -DZMQPP_LIBZMQ_CMAKE=0 /leosac_src && make -j5 && make install)
+# We disable Stacktrace cause its a big memory leak
+# right now.
+(cmake -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=1 -DZMQ_BUILD_TESTS=off \
+       -DLEOSAC_STACKTRACE_DISABLED=2 \
+       -DZMQPP_LIBZMQ_CMAKE=0 /leosac_src && make -j5 && make install)
 
 popd;

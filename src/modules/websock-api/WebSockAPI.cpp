@@ -36,6 +36,10 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 {
     port_      = cfg.get<uint16_t>("module_config.port", 8976);
     interface_ = cfg.get<std::string>("module_config.interface", "127.0.0.1");
+
+    auto endpoint_colorized = Colorize::green(
+        Colorize::underline(fmt::format("{}:{}", interface_, port_)));
+    INFO(Colorize::green("WEBSOCKET_API") << " module binding to " << endpoint_colorized);
 }
 
 void WebSockAPIModule::run()

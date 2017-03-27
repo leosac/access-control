@@ -223,6 +223,11 @@ if (LEOSAC_CROSS_COMPILE)
     target_compile_definitions(${LEOSAC_LIB} PUBLIC -DLEOSAC_STACKTRACE_DISABLED=1)
 endif()
 
+if (${LEOSAC_STACKTRACE_DISABLED})
+    # Disable stacktrace generation.
+    target_compile_definitions(${LEOSAC_LIB} PUBLIC -DLEOSAC_STACKTRACE_DISABLED=1)
+endif()
+
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)
 install(TARGETS ${LEOSAC_LIB} DESTINATION lib)
 
