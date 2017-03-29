@@ -21,6 +21,8 @@ libcurl4-openssl-dev
 # Database runtime libraries. Required by ODB.
 RUN apt-get update && apt-get install -y libsqlite3-dev libmysqlclient-dev libpq-dev -y
 
+RUN pip install pyzmq
+
 RUN apt-get update && apt-get install python3 python3-pip -y
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 RUN pip3 install pyzmq
@@ -35,6 +37,11 @@ git checkout v4.2.1; \
 make check || echo ${Red}"Warning: ZeroMQ tests failed. The build will continue but may fail."${RCol}; \
 make install; \
 ldconfig;
+
+# Container config
+CMD [""]
+ENTRYPOINT ["/docker_scripts/entry.sh"]
+EXPOSE 8888
 
 ## we mount leosac source dir in read only
 VOLUME /leosac_src
@@ -61,10 +68,4 @@ ADD CMakeLists.txt /leosac_src/
 RUN /docker_scripts/build_leosac.sh
 
 RUN apt-get update && apt-get install postgresql-client-9.6 -y
-
-CMD [""]
-
-ENTRYPOINT ["/docker_scripts/entry.sh"]
-
 ADD test_helper /leosac_src/test_helper
-EXPOSE 8888
