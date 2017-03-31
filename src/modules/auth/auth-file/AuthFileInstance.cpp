@@ -127,7 +127,7 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         if (!profile)
         {
             NOTICE("No profile was created from this auth source message.");
-            assert(auth_source->owner() == nullptr);
+            //assert(auth_source->owner() == nullptr);
             return {false, nullptr, nullptr};
         }
         if (target_name_.empty())

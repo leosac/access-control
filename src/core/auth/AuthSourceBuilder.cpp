@@ -43,11 +43,10 @@ Cred::ICredentialPtr AuthSourceBuilder::create_simple_csn(const std::string &nam
     auto raw_csn = boost::replace_all_copy(card_id, ":", "");
     LEOSAC_ENFORCE(raw_csn.length() % 2 == 0, "CSN has invalid length.");
 
-    auto c(std::make_shared<Cred::RFIDCard>());
-    c->nb_bits(raw_csn.length() * 8);
-    c->card_id(card_id);
+    auto bits = raw_csn.length() * 8;
+    ASSERT_LOG(bits < std::numeric_limits<int>::max(), "Too many bits.");
 
-    return c;
+    return std::make_shared<Cred::RFIDCard>(card_id, bits);
 }
 
 Cred::ICredentialPtr AuthSourceBuilder::create(zmqpp::message *msg)
@@ -106,11 +105,7 @@ AuthSourceBuilder::create_simple_wiegand(const std::string &name,
     INFO("Building a Credential object (RFIDCard): "
          << card_id << " with " << bits
          << " significant bits. Source name = " << name);
-    auto c(std::make_shared<Cred::RFIDCard>());
-
-    c->card_id(card_id);
-    c->nb_bits(bits);
-    return c;
+    return std::make_shared<Cred::RFIDCard>(card_id, bits);
 }
 
 Cred::ICredentialPtr AuthSourceBuilder::create_pincode(const std::string &name,
@@ -141,13 +136,10 @@ AuthSourceBuilder::create_wiegand_card_pin(const std::string &name,
     std::string pin_code;
 
     *msg >> card_id >> bits >> pin_code;
-    INFO("Building a Credential object (RFIDCard + Pin):"
+    INFO("Building a Credential object (RFIDCardPin):"
          << card_id << ", " << pin_code << ". Source name = " << name);
 
-    auto c = std::make_shared<Cred::RFIDCard>();
-    c->card_id(card_id);
-    c->nb_bits(bits);
-
+    auto c = std::make_shared<Cred::RFIDCard>(card_id,bits);
     auto p = std::make_shared<Cred::PinCode>();
     p->pin_code(pin_code);
 

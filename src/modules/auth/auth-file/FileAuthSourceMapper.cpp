@@ -93,7 +93,6 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file)
 void FileAuthSourceMapper::visit(::Leosac::Cred::RFIDCard &src)
 {
     auto it = rfid_cards_.find(src.card_id());
-    DEBUG("VISITING CARD" << src.card_id() << "");
     if (it != rfid_cards_.end())
     {
         auto cred = it->second;

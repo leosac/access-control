@@ -33,7 +33,7 @@ namespace Cred
 class PinCode : public virtual IPinCode, public Credential
 {
   public:
-    MAKE_VISITABLE();
+    MAKE_VISITABLE_FALLBACK(IPinCode);
     PinCode() = default;
 
     const std::string &pin_code() const override;

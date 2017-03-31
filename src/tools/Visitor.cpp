@@ -30,7 +30,7 @@ namespace Tools
 void BaseVisitor::cannot_visit(const IVisitable &obj)
 {
     auto type_index_visitable = boost::typeindex::type_id_runtime(obj);
-    auto type_index_visitor   = boost::typeindex::type_id_runtime(this);
+    auto type_index_visitor   = boost::typeindex::type_id_runtime(*this);
     ERROR("Cannot visit object of type " << type_index_visitable
                                          << " from visitor of type "
                                          << type_index_visitor.pretty_name());

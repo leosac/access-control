@@ -32,7 +32,7 @@ namespace Cred
 class IPinCode : public virtual ICredential
 {
   public:
-    MAKE_VISITABLE();
+    MAKE_VISITABLE_FALLBACK(ICredential);
 
     virtual const std::string &pin_code() const = 0;
     virtual void pin_code(const std::string &)  = 0;

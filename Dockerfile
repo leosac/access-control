@@ -51,6 +51,8 @@ ADD docker_scripts /docker_scripts
 RUN /docker_scripts/odb_install.sh
 RUN /docker_scripts/gtest_install.sh
 
+RUN apt-get update && apt-get install postgresql-client-9.6 -y
+
 ## This is way too verbose, but we don't have a choice...
 ## We want the necessary files to build, not the tests scripts and all.
 ## Otherwise, just editing a test-script would cause full rebuild ...
@@ -66,6 +68,5 @@ ADD src /leosac_src/src/
 ADD CMakeLists.txt /leosac_src/
 
 RUN /docker_scripts/build_leosac.sh
-
-RUN apt-get update && apt-get install postgresql-client-9.6 -y
 ADD test_helper /leosac_src/test_helper
+

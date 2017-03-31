@@ -33,7 +33,7 @@ namespace Cred
 class RFIDCard : public virtual IRFIDCard, public Credential
 {
   public:
-    MAKE_VISITABLE();
+    MAKE_VISITABLE_FALLBACK(IRFIDCard);
     RFIDCard() = default;
 
     /**
@@ -44,6 +44,7 @@ class RFIDCard : public virtual IRFIDCard, public Credential
      * @param nb_bits
      */
     RFIDCard(const std::string &card_id, int nb_bits);
+
     virtual const std::string &card_id() const override;
 
     virtual int nb_bits() const override;

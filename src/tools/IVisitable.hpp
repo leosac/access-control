@@ -55,19 +55,25 @@ class IVisitable
 
   protected:
     template <class T>
-    static void visitor_dispatch(T &visited, BaseVisitor &visitor)
+    static bool visitor_dispatch(T &visited, BaseVisitor &visitor,
+                                 bool abort_on_failure)
     {
         using VisitedT = std::remove_reference_t<std::remove_const_t<T>>;
         if (Visitor<VisitedT> *p = dynamic_cast<Visitor<VisitedT> *>(&visitor))
         {
             p->visit(visited);
-            return;
+            return true;
         }
         else
         {
-            visitor.cannot_visit(static_cast<const IVisitable &>(visited));
+            if (abort_on_failure)
+            {
+                visitor.cannot_visit(static_cast<const IVisitable &>(visited));
+            }
+            return false;
         }
     }
+};
 
 /**
  * Provide the object calling this macro in its definition with an
@@ -79,12 +85,36 @@ class IVisitable
 #define MAKE_VISITABLE()                                                            \
     virtual void accept(::Leosac::Tools::BaseVisitor &v) override                   \
     {                                                                               \
-        visitor_dispatch(*this, v);                                                 \
+        visitor_dispatch(*this, v, true);                                           \
     }                                                                               \
     virtual void accept(::Leosac::Tools::BaseVisitor &v) const override             \
     {                                                                               \
-        visitor_dispatch(*this, v);                                                 \
+        visitor_dispatch(*this, v, true);                                           \
     }
-};
+
+/**
+ * Similar to the MAKE_VISITABLE() macro, with 1 major difference.
+ *
+ * If the visitor object is not able to visit an object of type (*this),
+ * then this->accept() will call PARENT_CLASS->accept() to try again.
+ *
+ * This allows to us to visit an object mid hierarchy instead of having to
+ * handle each concrete implementation.
+ */
+#define MAKE_VISITABLE_FALLBACK(PARENT_CLASS)                                       \
+    virtual void accept(::Leosac::Tools::BaseVisitor &v) override                   \
+    {                                                                               \
+        if (!visitor_dispatch(*this, v, false))                                     \
+        {                                                                           \
+            PARENT_CLASS::accept(v);                                                \
+        }                                                                           \
+    }                                                                               \
+    virtual void accept(::Leosac::Tools::BaseVisitor &v) const override             \
+    {                                                                               \
+        if (!visitor_dispatch(*this, v, false))                                     \
+        {                                                                           \
+            PARENT_CLASS::accept(v);                                                \
+        }                                                                           \
+    }
 }
 }

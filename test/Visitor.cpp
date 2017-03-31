@@ -38,8 +38,6 @@ struct DummyVisitable : public virtual IVisitable
 struct DummyVisitor : public Visitor<DummyVisitable>
 {
     DummyVisitor()
-        : visited_non_const_(false)
-        , visited_const_(false)
     {
     }
 
@@ -53,8 +51,8 @@ struct DummyVisitor : public Visitor<DummyVisitable>
         visited_const_ = true;
     }
 
-    bool visited_non_const_;
-    bool visited_const_;
+    bool visited_non_const_{false};
+    bool visited_const_{false};
 };
 
 TEST(TestVisitor, simple_non_const)
@@ -104,6 +102,39 @@ TEST(TestVisitor, const_visit_accept_const_visitable)
     DummyConstOnlyVisitor visitor;
     visitable.accept(visitor);
     ASSERT_TRUE(visitor.visited_const_);
+}
+
+/**
+ * Visitor2 that is ready to visit object
+ * of type DummyVisitable, but not of type
+ * DummyChildVisitable. Yet, we try to
+ * pass it a DummyChildVisitable
+ */
+struct DummyVisitor2 : public Visitor<DummyVisitable>
+{
+    DummyVisitor2() = default;
+
+    void visit(const DummyVisitable &) override
+    {
+        visited_ = true;
+    }
+
+    bool visited_{false};
+};
+
+struct DummyChildVisitable : public virtual DummyVisitable
+{
+    DummyChildVisitable() = default;
+
+    MAKE_VISITABLE_FALLBACK(DummyVisitable);
+};
+
+TEST(TestVisitor, test_class_hierarchy)
+{
+    DummyChildVisitable visitable;
+    DummyVisitor2 visitor;
+    visitable.accept(visitor);
+    ASSERT_TRUE(visitor.visited_);
 }
 }
 }
