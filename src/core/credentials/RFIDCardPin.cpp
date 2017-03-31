@@ -17,40 +17,45 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include "core/credentials/Credential.hpp"
-#include "core/credentials/IPinCode.hpp"
+#include "core/credentials/RFIDCardPin.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {
 namespace Cred
 {
-/**
- * A PinCode credential.
- */
-#pragma db object polymorphic optimistic
-class PinCode : public virtual IPinCode, public Credential
+
+RFIDCardPin::RFIDCardPin()
+    : RFIDCardPin(std::make_shared<RFIDCard>(), std::make_shared<PinCode>())
 {
-  public:
-    MAKE_VISITABLE();
-    PinCode() = default;
+}
 
-    const std::string &pin_code() const override;
-
-    void pin_code(const std::string &string) override;
-
-  protected:
-    std::string pin_code_;
-
-    friend class odb::access;
-};
-
-class PinCodeValidator
+RFIDCardPin::RFIDCardPin(RFIDCardPtr card, PinCodePtr pin)
+    : card_(card)
+    , pin_(pin)
 {
-  public:
-    static void validate(const IPinCode &card);
-    static void validate_pin_code(const std::string &);
-};
+    ASSERT_LOG(card, "Cannot create an RFIDCardPin with null RFIDCard");
+    ASSERT_LOG(pin, "Cannot create an RFIDCardPin with null PinCode");
+}
+
+const PinCode &RFIDCardPin::pin() const
+{
+    return *pin_;
+}
+
+const RFIDCard &RFIDCardPin::card() const
+{
+    return *card_;
+}
+
+RFIDCard &RFIDCardPin::card()
+{
+    return *card_;
+}
+
+PinCode &RFIDCardPin::pin()
+{
+    return *pin_;
+}
 }
 }

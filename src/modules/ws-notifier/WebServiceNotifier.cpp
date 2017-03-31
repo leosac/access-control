@@ -19,7 +19,7 @@
 
 #include "WebServiceNotifier.hpp"
 #include "core/auth/Auth.hpp"
-#include "core/auth/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include <curl/curl.h>
 
 using namespace Leosac;
@@ -108,7 +108,10 @@ void WebServiceNotifier::process_config()
 void WebServiceNotifier::send_card_info_to_remote(const std::string &card_hex,
                                                   int nb_bits)
 {
-    auto card = Auth::WiegandCard(card_hex, nb_bits);
+    auto card = Cred::RFIDCard();
+    card.card_id(card_hex);
+    card.nb_bits(nb_bits);
+
     for (const auto &target : targets_)
     {
         auto curl = curl_easy_init();
@@ -142,7 +145,7 @@ static size_t write_callback(char * /*ptr*/, size_t size, size_t nmemb,
 }
 
 void WebServiceNotifier::send_to_target(
-    void *curl, const Auth::WiegandCard &card,
+    void *curl, const Cred::RFIDCard &card,
     const WebServiceNotifier::TargetInfo &target) noexcept
 {
     assert(curl);

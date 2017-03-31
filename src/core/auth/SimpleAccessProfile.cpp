@@ -72,3 +72,8 @@ SimpleAccessProfile::defaultSchedules() const
 {
     return default_schedule_;
 }
+
+size_t SimpleAccessProfile::schedule_count() const
+{
+    return default_schedule_.size() + schedules_.size();
+}

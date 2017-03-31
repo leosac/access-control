@@ -21,10 +21,11 @@
 #include "FileAuthSourceMapper.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/Scheduler.hpp"
+#include "core/SecurityContext.hpp"
 #include "core/auth/Auth.hpp"
 #include "core/auth/AuthSourceBuilder.hpp"
 #include "core/auth/User.hpp"
-#include "core/auth/WiegandCard.hpp"
+#include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/Colorize.hpp"
 #include "tools/log.hpp"
@@ -112,12 +113,15 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         std::lock_guard<std::mutex> guard(mutex_);
 
         AuthSourceBuilder build;
-        IAuthenticationSourcePtr auth_source = build.create(msg);
+        Cred::ICredentialPtr auth_source = build.create(msg);
         DEBUG("Auth source OK... will map");
         mapper_->mapToUser(auth_source);
         DEBUG("Mapping done");
         assert(auth_source);
-        INFO("Using AuthSource: " << auth_source->to_string());
+
+        auto cred_serialized = PolymorphicCredentialJSONStringSerializer::serialize(
+            *auth_source, SystemSecurityContext::instance());
+        INFO("Using Credential: " << cred_serialized);
         auto profile = mapper_->buildProfile(auth_source);
 
         if (!profile)
@@ -131,13 +135,13 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
             // check against default target
             return {
                 profile->isAccessGranted(std::chrono::system_clock::now(), nullptr),
-                profile, auth_source->owner()};
+                profile, auth_source->owner().get_eager()};
         }
         else
         {
             AuthTargetPtr t(new AuthTarget(target_name_));
             return {profile->isAccessGranted(std::chrono::system_clock::now(), t),
-                    profile, auth_source->owner()};
+                    profile, auth_source->owner().get_eager()};
         }
     }
     catch (std::exception &e)

@@ -18,8 +18,7 @@
 */
 
 #include "TcpNotifier.hpp"
-#include "core/auth/WiegandCard.hpp"
-#include <core/auth/Auth.hpp>
+#include "core/auth/Auth.hpp"
 #include <tools/PropertyTreeExtractor.hpp>
 
 using namespace Leosac;

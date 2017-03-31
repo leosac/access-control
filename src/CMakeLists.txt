@@ -23,8 +23,6 @@ set(LEOSAC_LIB_SRCS
     core/auth/Auth.cpp
     core/auth/Group.cpp
     core/auth/ProfileMerger.cpp
-    core/auth/WiegandCard.cpp
-    core/auth/WiegandCardPin.cpp
     core/auth/SimpleAccessProfile.cpp
     core/auth/BaseAuthSource.cpp
     core/auth/AuthTarget.cpp
@@ -48,6 +46,7 @@ set(LEOSAC_LIB_SRCS
     core/credentials/CredentialValidator.cpp
     core/credentials/RFIDCard.cpp
     core/credentials/PinCode.cpp
+    core/credentials/RFIDCardPin.cpp
     core/credentials/serializers/CredentialSerializer.cpp
     core/credentials/serializers/RFIDCardSerializer.cpp
     core/credentials/serializers/PolymorphicCredentialSerializer.cpp
@@ -135,6 +134,7 @@ set(LEOSAC_LIB_SRCS
     core/update/serializers/UpdateSerializer.cpp
     core/update/serializers/UpdateDescriptorSerializer.cpp
     tools/db/PGSQLTracer.cpp
+    tools/Visitor.cpp
     core/SecurityContext.cpp
     core/audit/serializers/UpdateEventSerializer.cpp
     )

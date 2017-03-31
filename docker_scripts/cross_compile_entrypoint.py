@@ -78,7 +78,7 @@ def main():
         elif sys.argv[1] == 'build':
             build()
         else:
-            print("Usage ./entrypoint.py deploy_all|build_fresh|build")
+            print("Usage ./entrypoint.py build_and_deploy|deploy_all|build_fresh|build")
     else:
          print("Usage ./entrypoint.py deploy_all|build_fresh|build")   
 

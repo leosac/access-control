@@ -25,8 +25,10 @@
 */
 
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
-#include "core/auth/PINCode.hpp"
 #include "core/auth/User.hpp"
+#include "core/credentials/PinCode.hpp"
+#include "core/credentials/RFIDCard.hpp"
+#include "core/credentials/RFIDCardPin.hpp"
 #include "modules/auth/auth-file/FileAuthSourceMapper.hpp"
 #include "tools/unixshellscript.hpp"
 #include <chrono>
@@ -58,12 +60,27 @@ class AuthFileMapperTest : public ::testing::Test
         : doorA_(new AuthTarget("doorA"))
         , doorB_(new AuthTarget("doorB"))
         , doorC_(new AuthTarget("doorC"))
-        , my_card_(new WiegandCard("aa:bb:cc:dd", 32))
-        , my_card2_(new WiegandCard("cc:dd:ee:ff", 32))
-        , unknown_card_(new WiegandCard("00:00:00:00", 32))
-        , my_pin_(new PINCode("1234"))
-        , card_and_pin_(new WiegandCardPin("cc:dd:ee:ff", 32, "1234"))
+        , my_card_(new Cred::RFIDCard())
+        , my_card2_(new Cred::RFIDCard())
+        , unknown_card_(new Cred::RFIDCard())
+        , my_pin_(new Cred::PinCode())
     {
+        my_card_->card_id("aa:bb:cc:dd");
+        my_card_->nb_bits(32);
+
+        my_card2_->card_id("cc:dd:ee:ff");
+        my_card2_->nb_bits(32);
+
+        unknown_card_->card_id("00:00:00:00");
+        unknown_card_->nb_bits(32);
+
+        my_pin_->pin_code("1234");
+
+        card_and_pin_ = std::make_shared<Cred::RFIDCardPin>();
+        card_and_pin_->card().card_id("cc:dd:ee:ff");
+        card_and_pin_->card().nb_bits(32);
+        card_and_pin_->pin().pin_code("1234");
+
         mapper_  = new FileAuthSourceMapper(gl_data_path + "AuthFile-1.xml");
         mapper2_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-3.xml");
         mapper3_ = new FileAuthSourceMapper(gl_data_path + "AuthFile-4.xml");
@@ -167,11 +184,11 @@ class AuthFileMapperTest : public ::testing::Test
     IAuthSourceMapper *mapper6_;
     // per-credentials schedules.
     IAuthSourceMapper *mapper7_;
-    IAuthenticationSourcePtr my_card_;
-    IAuthenticationSourcePtr my_card2_;
-    IAuthenticationSourcePtr unknown_card_;
-    IAuthenticationSourcePtr my_pin_;
-    IAuthenticationSourcePtr card_and_pin_;
+    Cred::RFIDCardPtr my_card_;
+    Cred::RFIDCardPtr my_card2_;
+    Cred::RFIDCardPtr unknown_card_;
+    Cred::PinCodePtr my_pin_;
+    Cred::RFIDCardPinPtr card_and_pin_;
 };
 
 /**
@@ -205,12 +222,6 @@ TEST_F(AuthFileMapperTest, TimeFrameMapping)
     mapper_->mapToUser(my_card_);
     ASSERT_TRUE(my_card_->owner().get());
     IAccessProfilePtr profile = mapper_->buildProfile(my_card_);
-
-    // same profile. but using a PIN code instead.
-    mapper_->mapToUser(my_pin_);
-    ASSERT_TRUE(my_pin_->owner().get());
-    IAccessProfilePtr profile_from_pin = mapper_->buildProfile(my_pin_);
-
     // with wiegand card
     ASSERT_TRUE(profile.get());
 
@@ -225,6 +236,10 @@ TEST_F(AuthFileMapperTest, TimeFrameMapping)
     ASSERT_TRUE(profile->isAccessGranted(date_sunday_18_50, doorA_));
     ASSERT_TRUE(profile->isAccessGranted(date_sunday_18_50, doorB_));
 
+    // same profile. but using a PIN code instead.
+    mapper_->mapToUser(my_pin_);
+    ASSERT_TRUE(my_pin_->owner().get());
+    IAccessProfilePtr profile_from_pin = mapper_->buildProfile(my_pin_);
     // with pin code.
     ASSERT_TRUE(profile_from_pin.get());
 
@@ -451,7 +466,7 @@ TEST_F(AuthFileMapperTest, TestCredentialsValidityLimit)
     mapper6_->mapToUser(my_card_);
     mapper6_->mapToUser(my_card2_);
     mapper6_->mapToUser(my_pin_);
-    // this user is disabled. should have a NULL profile.
+    // this user is disabled. shouldn't have a profile.
     auto profile_llamasticot = mapper6_->buildProfile(my_card_);
     ASSERT_FALSE(profile_llamasticot.get());
 

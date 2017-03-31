@@ -87,6 +87,11 @@ GroupId Group::id() const
     return id_;
 }
 
+void Group::id(const GroupId &new_id)
+{
+    id_ = new_id;
+}
+
 std::vector<UserLPtr> Group::lazy_members() const
 {
     std::vector<UserLPtr> members;

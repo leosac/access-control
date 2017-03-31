@@ -65,6 +65,12 @@ class Group : public std::enable_shared_from_this<Group>
      */
     GroupId id() const;
 
+    /**
+     * Manually set the ID of a group.
+     *
+     * @note This is generally not recommended.
+     */
+    void id(const GroupId &new_id);
 
     const std::string &name() const;
     void name(const std::string &name);

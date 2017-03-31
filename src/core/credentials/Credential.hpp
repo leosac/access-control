@@ -46,6 +46,8 @@ class Credential : public virtual ICredential
 
     virtual CredentialId id() const override;
 
+    virtual void id(const CredentialId &new_id) override;
+
     virtual size_t odb_version() const override;
 
     virtual Auth::UserId owner_id() const override;

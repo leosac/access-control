@@ -17,40 +17,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include "core/credentials/Credential.hpp"
-#include "core/credentials/IPinCode.hpp"
+#include "tools/Visitor.hpp"
+#include "tools/IVisitable.hpp"
+#include "tools/log.hpp"
+#include <boost/type_index.hpp>
 
 namespace Leosac
 {
-namespace Cred
+
+namespace Tools
 {
-/**
- * A PinCode credential.
- */
-#pragma db object polymorphic optimistic
-class PinCode : public virtual IPinCode, public Credential
+void BaseVisitor::cannot_visit(const IVisitable &obj)
 {
-  public:
-    MAKE_VISITABLE();
-    PinCode() = default;
-
-    const std::string &pin_code() const override;
-
-    void pin_code(const std::string &string) override;
-
-  protected:
-    std::string pin_code_;
-
-    friend class odb::access;
-};
-
-class PinCodeValidator
-{
-  public:
-    static void validate(const IPinCode &card);
-    static void validate_pin_code(const std::string &);
-};
+    auto type_index_visitable = boost::typeindex::type_id_runtime(obj);
+    auto type_index_visitor   = boost::typeindex::type_id_runtime(this);
+    ERROR("Cannot visit object of type " << type_index_visitable
+                                         << " from visitor of type "
+                                         << type_index_visitor.pretty_name());
+    assert(0 && "Cannot visit");
+}
 }
 }

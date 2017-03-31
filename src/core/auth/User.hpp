@@ -50,6 +50,13 @@ class User : public std::enable_shared_from_this<User>
      */
     User(const std::string &username);
     User();
+
+    /**
+     * Create a user with a predefined UserId.
+     * @param id
+     */
+    User(const UserId &id);
+
     virtual ~User() = default;
 
     /**

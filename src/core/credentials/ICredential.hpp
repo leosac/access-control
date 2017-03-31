@@ -43,6 +43,14 @@ class ICredential : public virtual Tools::IVisitable
     virtual CredentialId id() const = 0;
 
     /**
+     * Manually set the identifier of a credential.
+     *
+     * This should generally not be use when database interaction
+     * may happen.
+     */
+    virtual void id(const CredentialId &new_id) = 0;
+
+    /**
      * Retrieve the owner of the credential.
      */
     virtual Auth::UserLPtr owner() const = 0;

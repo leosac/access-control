@@ -25,6 +25,11 @@
 using namespace Leosac;
 using namespace Leosac::Cred;
 
+RFIDCard::RFIDCard(const std::string &new_card_id, int new_nb_bits)
+{
+    card_id(new_card_id);
+    nb_bits(new_nb_bits);
+}
 
 const std::string &RFIDCard::card_id() const
 {

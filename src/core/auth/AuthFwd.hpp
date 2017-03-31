@@ -40,6 +40,9 @@ using GroupLWPtr = odb::lazy_weak_ptr<Group>;
 using GroupLPtr  = odb::lazy_shared_ptr<Group>;
 using GroupId    = unsigned long;
 
+class SimpleAccessProfile;
+using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
+
 /**
  * The rank of an User inside a Group.
  */

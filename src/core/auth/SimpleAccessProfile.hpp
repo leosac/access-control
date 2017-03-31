@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "core/auth/AuthFwd.hpp"
 #include "core/auth/AuthTarget.hpp"
 #include "core/auth/Interfaces/IAccessProfile.hpp"
 #include "tools/SingleTimeFrame.hpp"
@@ -31,8 +32,6 @@ namespace Leosac
 {
 namespace Auth
 {
-class SimpleAccessProfile;
-using SimpleAccessProfilePtr = std::shared_ptr<SimpleAccessProfile>;
 
 /**
 * Concrete implementation of a simple access control class.
@@ -56,6 +55,11 @@ class SimpleAccessProfile : public IAccessProfile
     */
     virtual const std::map<std::string, std::vector<Tools::IScheduleCPtr>> &
     schedules() const;
+
+    /**
+     * Returns the number of schedule associated with the profile.
+     */
+    virtual size_t schedule_count() const override;
 
   protected:
     /**

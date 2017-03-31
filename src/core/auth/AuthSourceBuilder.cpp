@@ -19,18 +19,19 @@
 
 #include "AuthSourceBuilder.hpp"
 #include "Auth.hpp"
-#include "PINCode.hpp"
-#include "WiegandCard.hpp"
-#include "WiegandCardPin.hpp"
+#include "core/credentials/PinCode.hpp"
+#include "core/credentials/RFIDCard.hpp"
+#include "core/credentials/RFIDCardPin.hpp"
 #include "tools/enforce.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
 
-using namespace Leosac::Auth;
-
-// Need refactoring....
-IAuthenticationSourcePtr create_fake_simple_wiegand(const std::string &name,
-                                                    zmqpp::message *msg)
+namespace Leosac
+{
+namespace Auth
+{
+Cred::ICredentialPtr AuthSourceBuilder::create_simple_csn(const std::string &name,
+                                                          zmqpp::message *msg)
 {
     // card id
     assert(msg && msg->remaining() == 1);
@@ -41,13 +42,15 @@ IAuthenticationSourcePtr create_fake_simple_wiegand(const std::string &name,
     INFO("Building an AuthSource object (FAKE Wiegand Card):" << card_id);
     auto raw_csn = boost::replace_all_copy(card_id, ":", "");
     LEOSAC_ENFORCE(raw_csn.length() % 2 == 0, "CSN has invalid length.");
-    BaseAuthSourcePtr auth_source(new WiegandCard(card_id, raw_csn.length() * 8));
-    auth_source->name(name);
 
-    return auth_source;
+    auto c(std::make_shared<Cred::RFIDCard>());
+    c->nb_bits(raw_csn.length() * 8);
+    c->card_id(card_id);
+
+    return c;
 }
 
-IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
+Cred::ICredentialPtr AuthSourceBuilder::create(zmqpp::message *msg)
 {
     // Auth spec say at least 2 frames: source and type.
     assert(msg && msg->parts() >= 2);
@@ -62,13 +65,15 @@ IAuthenticationSourcePtr AuthSourceBuilder::create(zmqpp::message *msg)
             << "Source name was {" << source_name << "}");
 
     if (type == SourceType::SIMPLE_WIEGAND)
+    {
         return create_simple_wiegand(source_name, msg);
+    }
     else if (type == SourceType::WIEGAND_PIN)
-        return create_wiegand_pin(source_name, msg);
+        return create_pincode(source_name, msg);
     else if (type == SourceType::WIEGAND_CARD_PIN)
         return create_wiegand_card_pin(source_name, msg);
     else if (type == SourceType::SIMPLE_CSN)
-        return create_fake_simple_wiegand(source_name, msg);
+        return create_simple_csn(source_name, msg);
     LEOSAC_ENFORCE(0, "Unknown auth source type.");
 
     return nullptr;
@@ -86,7 +91,7 @@ bool AuthSourceBuilder::extract_source_name(const std::string &input,
     return false;
 }
 
-IAuthenticationSourcePtr
+Cred::ICredentialPtr
 AuthSourceBuilder::create_simple_wiegand(const std::string &name,
                                          zmqpp::message *msg)
 {
@@ -98,17 +103,18 @@ AuthSourceBuilder::create_simple_wiegand(const std::string &name,
 
     *msg >> card_id >> bits;
 
-    INFO("Building an AuthSource object (WiegandCard): "
+    INFO("Building a Credential object (RFIDCard): "
          << card_id << " with " << bits
-         << " significants bits. Source name = " << name);
-    BaseAuthSourcePtr auth_source(new WiegandCard(card_id, bits));
-    auth_source->name(name);
+         << " significant bits. Source name = " << name);
+    auto c(std::make_shared<Cred::RFIDCard>());
 
-    return auth_source;
+    c->card_id(card_id);
+    c->nb_bits(bits);
+    return c;
 }
 
-IAuthenticationSourcePtr
-AuthSourceBuilder::create_wiegand_pin(const std::string &name, zmqpp::message *msg)
+Cred::ICredentialPtr AuthSourceBuilder::create_pincode(const std::string &name,
+                                                       zmqpp::message *msg)
 {
     // pin code only
     assert(msg && msg->remaining() == 1);
@@ -116,15 +122,14 @@ AuthSourceBuilder::create_wiegand_pin(const std::string &name, zmqpp::message *m
     std::string pin;
     *msg >> pin;
 
-    INFO("Building an AuthSource object (PINCode): " << pin
-                                                     << ". Source name = " << name);
-    BaseAuthSourcePtr auth_source(new PINCode(pin));
-    auth_source->name(name);
-
-    return auth_source;
+    INFO("Building a Credential object (PinCode): " << pin
+                                                    << ". Source name = " << name);
+    auto p = std::make_shared<Cred::PinCode>();
+    p->pin_code(pin);
+    return p;
 }
 
-IAuthenticationSourcePtr
+Cred::ICredentialPtr
 AuthSourceBuilder::create_wiegand_card_pin(const std::string &name,
                                            zmqpp::message *msg)
 {
@@ -136,10 +141,17 @@ AuthSourceBuilder::create_wiegand_card_pin(const std::string &name,
     std::string pin_code;
 
     *msg >> card_id >> bits >> pin_code;
-    INFO("Building an AuthSource object (Wiegand Card + Pin):"
+    INFO("Building a Credential object (RFIDCard + Pin):"
          << card_id << ", " << pin_code << ". Source name = " << name);
-    BaseAuthSourcePtr auth_source(new WiegandCardPin(card_id, bits, pin_code));
-    auth_source->name(name);
 
-    return auth_source;
+    auto c = std::make_shared<Cred::RFIDCard>();
+    c->card_id(card_id);
+    c->nb_bits(bits);
+
+    auto p = std::make_shared<Cred::PinCode>();
+    p->pin_code(pin_code);
+
+    return std::make_shared<Cred::RFIDCardPin>(c, p);
+}
+}
 }

@@ -45,5 +45,8 @@ using RFIDCardPtr = std::shared_ptr<RFIDCard>;
 class IPinCode;
 class PinCode;
 using PinCodePtr = std::shared_ptr<PinCode>;
+
+class RFIDCardPin;
+using RFIDCardPinPtr = std::shared_ptr<RFIDCardPin>;
 }
 }

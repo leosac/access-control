@@ -53,6 +53,8 @@ int main(int argc, const char **argv)
     RuntimeOptions options;
     int relaunch = 1;
 
+    std::cout << "Running Leosac version " << Leosac::getVersionString() << std::endl;
+
     try
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ',

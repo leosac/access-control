@@ -22,6 +22,7 @@
 #include "LeosacFwd.hpp"
 #include "ProtocolHandler.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 #include <zmqpp/reactor.hpp>
 #include <zmqpp/socket.hpp>
 
@@ -90,7 +91,7 @@ class NotifierInstance
     /**
      * Notify the peers of the `card` credential.
      */
-    void handle_credential(Auth::WiegandCard &card);
+    void handle_credential(Cred::RFIDCard &card);
 
     void handle_one(zmqpp::message &msg);
 

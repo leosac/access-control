@@ -39,7 +39,8 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 
     auto endpoint_colorized = Colorize::green(
         Colorize::underline(fmt::format("{}:{}", interface_, port_)));
-    INFO(Colorize::green("WEBSOCKET_API") << " module binding to " << endpoint_colorized);
+    INFO(Colorize::green("WEBSOCKET_API") << " module binding to "
+                                          << endpoint_colorized);
 }
 
 void WebSockAPIModule::run()

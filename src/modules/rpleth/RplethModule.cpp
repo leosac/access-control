@@ -19,7 +19,7 @@
 
 #include "RplethModule.hpp"
 #include "core/auth/Auth.hpp"
-#include "core/auth/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include "hardware/FWiegandReader.hpp"
 #include "rplethprotocol.hpp"
 #include "tools/log.hpp"
@@ -385,7 +385,9 @@ static uint64_t htonll(uint64_t value)
 std::vector<uint8_t>
 RplethModule::card_convert_from_text(const std::pair<std::string, int> &card_info)
 {
-    Auth::WiegandCard wc(card_info.first, card_info.second);
+    Cred::RFIDCard wc;
+    wc.card_id(card_info.first);
+    wc.nb_bits(card_info.second);
     std::vector<uint8_t> ret;
 
     auto num = wc.to_raw_int();

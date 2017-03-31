@@ -21,6 +21,7 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "modules/BaseModule.hpp"
+#include <core/credentials/RFIDCard.hpp>
 
 namespace Leosac
 {
@@ -83,7 +84,7 @@ class WebServiceNotifier : public BaseModule
 
     std::vector<TargetInfo> targets_;
 
-    void send_to_target(void *curl, const Auth::WiegandCard &card,
+    void send_to_target(void *curl, const Cred::RFIDCard &card,
                         const TargetInfo &target) noexcept;
 };
 }

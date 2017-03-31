@@ -19,14 +19,22 @@
 
 #include "FileAuthSourceMapper.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/Door.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/ProfileMerger.hpp"
 #include "core/auth/User.hpp"
+#include "core/credentials/ICredential.hpp"
+#include "core/credentials/PinCode.hpp"
+#include "core/credentials/RFIDCard.hpp"
+#include "core/credentials/RFIDCardPin.hpp"
 #include "exception/moduleexception.hpp"
+#include "tools/AssertCast.hpp"
+#include "tools/Schedule.hpp"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string.hpp>
+#include <tools/enforce.hpp>
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
@@ -82,59 +90,57 @@ FileAuthSourceMapper::FileAuthSourceMapper(const std::string &auth_file)
     }
 }
 
-void FileAuthSourceMapper::visit(WiegandCard &src)
+void FileAuthSourceMapper::visit(::Leosac::Cred::RFIDCard &src)
 {
-    auto it = wiegand_cards_.find(src.card_id());
-    if (it != wiegand_cards_.end())
+    auto it = rfid_cards_.find(src.card_id());
+    DEBUG("VISITING CARD" << src.card_id() << "");
+    if (it != rfid_cards_.end())
     {
+        auto cred = it->second;
+
         // By copying our instance of the credential to the
         // caller credential object, we store additional info we gathered
-        // (like owner) and made them accessible to them.
-        auto cred = it->second;
-        // the auth source name is only set in the original credential object
-        cred->name(src.name());
+        // (like owner, id, or validity) and made them accessible to them.
         src = *cred;
     }
 }
 
-void FileAuthSourceMapper::visit(::Leosac::Auth::PINCode &src)
+void FileAuthSourceMapper::visit(::Leosac::Cred::PinCode &src)
 {
     auto it = pin_codes_.find(src.pin_code());
     if (it != pin_codes_.end())
     {
+        auto cred = it->second;
+
         // By copying our instance of the credential to the
         // caller credential object, we store additional info we gathered
-        // (like owner) and made them accessible to them.
-        auto cred = it->second;
-        // the auth source name is only set in the original credential object
-        cred->name(src.name());
+        // (like owner, id, or validity) and made them accessible to them.
         src = *cred;
     }
 }
 
-void FileAuthSourceMapper::visit(::Leosac::Auth::WiegandCardPin &src)
+void FileAuthSourceMapper::visit(::Leosac::Cred::RFIDCardPin &src)
 {
     auto key = std::make_pair(src.card().card_id(), src.pin().pin_code());
 
-    auto it = wiegand_cards_pins_.find(key);
-    if (it != wiegand_cards_pins_.end())
+    auto it = rfid_cards_pin.find(key);
+    if (it != rfid_cards_pin.end())
     {
+        auto cred = it->second;
+
         // By copying our instance of the credential to the
         // caller credential object, we store additional info we gathered
         // (like owner) and made them accessible to them.
-        auto cred = it->second;
-        // the auth source name is only set in the original credential object
-        cred->name(src.name());
         src = *cred;
     }
 }
 
-void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
+void FileAuthSourceMapper::mapToUser(Cred::ICredentialPtr cred)
 {
-    assert(auth_source);
+    ASSERT_LOG(cred, "Credential is null.");
     try
     {
-        auth_source->accept(*this);
+        cred->accept(*this);
     }
     catch (...)
     {
@@ -143,48 +149,11 @@ void FileAuthSourceMapper::mapToUser(IAuthenticationSourcePtr auth_source)
     }
 }
 
-IAccessProfilePtr
-FileAuthSourceMapper::buildProfile(IAuthenticationSourcePtr auth_source)
-{
-    assert(auth_source);
-    std::vector<GroupPtr> grps;
-    std::vector<IAccessProfilePtr> profiles; // profiles that apply to the user.
-
-    if (!auth_source->validity().is_valid())
-    {
-        NOTICE("Credentials is invalid. It was disabled or out of its validity "
-               "period.");
-        return nullptr;
-    }
-
-    if (!auth_source->owner())
-    {
-        NOTICE("No owner for this auth source.");
-        return nullptr;
-    }
-
-    if (!auth_source->owner()->is_valid())
-    {
-        NOTICE("The user (" << auth_source->owner()->username()
-                            << ") is disabled or out of its validity period.");
-        return nullptr;
-    }
-
-    grps = get_user_groups(auth_source->owner());
-    for (auto &grp : grps)
-        profiles.push_back(grp->profile());
-
-    profiles.push_back(auth_source->owner()->profile());
-    if (auth_source->profile())
-    {
-        profiles.push_back(auth_source->profile());
-    }
-    return merge_profiles(profiles);
-}
-
 void FileAuthSourceMapper::load_groups(
     const boost::property_tree::ptree &group_mapping)
 {
+    GroupId group_id =
+        1; // Similar to user, we need ID to identify group in mapping.
     for (const auto &group_info : group_mapping)
     {
         const boost::property_tree::ptree &node = group_info.second;
@@ -193,6 +162,7 @@ void FileAuthSourceMapper::load_groups(
         xmlnne_("map", group_info.first);
 
         GroupPtr grp = groups_[group_name] = GroupPtr(new Group(group_name));
+        grp->id(group_id++);
         grp->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
 
         for (const auto &membership : node)
@@ -256,12 +226,15 @@ FileAuthSourceMapper::merge_profiles(const std::vector<IAccessProfilePtr> profil
         if (profile)
             result = merger.merge(result, profile);
     }
-    return result;
+    if (result->schedule_count())
+        return result;
+    return nullptr;
 }
 
 void FileAuthSourceMapper::load_credentials(
     const boost::property_tree::ptree &credentials)
 {
+    Cred::CredentialId cred_id = 1;
     for (const auto &mapping : credentials)
     {
         const std::string &node_name            = mapping.first;
@@ -276,7 +249,7 @@ void FileAuthSourceMapper::load_credentials(
                 config_file_, "Credentials defined for undefined user " + user_id);
         assert(user);
 
-        IAuthenticationSourcePtr credential;
+        Cred::ICredentialPtr credential;
 
         // does this entry map a wiegand card?
         auto opt_child = node.get_child_optional("WiegandCard");
@@ -285,17 +258,21 @@ void FileAuthSourceMapper::load_credentials(
             std::string card_id = opt_child->get<std::string>("card_id");
             int bits            = opt_child->get<int>("bits");
 
-            credential = std::make_shared<WiegandCard>(card_id, bits);
-            wiegand_cards_[card_id] =
-                std::static_pointer_cast<WiegandCard>(credential);
+            Cred::RFIDCardPtr c = std::make_shared<Cred::RFIDCard>();
+            c->card_id(card_id);
+            c->nb_bits(bits);
+            rfid_cards_[card_id] = c;
+            credential           = c;
         }
         else if (opt_child = node.get_child_optional("PINCode"))
         {
             // or to a PIN code ?
             std::string pin = opt_child->get<std::string>("pin");
 
-            credential      = std::make_shared<PINCode>(pin);
-            pin_codes_[pin] = std::static_pointer_cast<PINCode>(credential);
+            Cred::PinCodePtr p = std::make_shared<Cred::PinCode>();
+            p->pin_code(pin);
+            pin_codes_[pin] = p;
+            credential      = p;
         }
         else if (opt_child = node.get_child_optional("WiegandCardPin"))
         {
@@ -303,15 +280,26 @@ void FileAuthSourceMapper::load_credentials(
             std::string pin     = opt_child->get<std::string>("pin");
             int bits            = opt_child->get<int>("bits");
 
-            credential = std::make_shared<WiegandCardPin>(card_id, bits, pin);
-            wiegand_cards_pins_[std::make_pair(card_id, pin)] =
-                std::static_pointer_cast<WiegandCardPin>(credential);
+            auto c = std::make_shared<Cred::RFIDCard>();
+            c->id(cred_id++);
+            c->card_id(card_id);
+            c->nb_bits(bits);
+
+            auto p = std::make_shared<Cred::PinCode>();
+            p->id(cred_id++);
+            p->pin_code(pin);
+            credential = std::make_shared<Cred::RFIDCardPin>(c, p);
+            rfid_cards_pin[std::make_pair(card_id, pin)] =
+                assert_cast<Cred::RFIDCardPinPtr>(credential);
         }
         assert(opt_child);
+        credential->id(cred_id++);
         credential->validity(extract_credentials_validity(*opt_child));
         credential->owner(user);
-        credential->id(opt_child->get<std::string>("id", ""));
-        credential->profile(SimpleAccessProfilePtr(new SimpleAccessProfile()));
+
+        // Alias in place of id, so that it can be a string (making it easier to
+        // configure from the a XML file)
+        credential->alias(opt_child->get<std::string>("id", ""));
         add_cred_to_id_map(credential);
     }
 }
@@ -340,6 +328,9 @@ void FileAuthSourceMapper::map_schedules(
         std::list<std::string> credential_names;
         std::string target_door;
         target_door = node.get<std::string>("door", "");
+        auto door(std::make_shared<Leosac::Auth::Door>());
+        door->alias(target_door);
+        doors_.push_back(door);
 
         // lets loop over all the info we have
         for (const auto &mapping_data : node)
@@ -359,57 +350,43 @@ void FileAuthSourceMapper::map_schedules(
         // now build object based on what we extracted.
         for (const auto &schedule_name : schedule_names)
         {
+            // Each schedule can be mapped once per ScheduleMapping, but can be
+            // referenced by multiple schedule mapping. What we do here is for each
+            // schedule in the mapping entry, we create a ScheduleMapping object.
+            Tools::ScheduleMappingPtr sm(std::make_shared<Tools::ScheduleMapping>());
+            xml_schedules_.schedules().at(schedule_name)->add_mapping(sm);
+
+            if (!door->alias().empty())
+                sm->add_door(door);
+
             for (const auto &user_name : user_names)
             {
                 UserPtr user = users_[user_name];
-                assert(user);
-                assert(user->profile());
-                SimpleAccessProfilePtr profile =
-                    std::dynamic_pointer_cast<SimpleAccessProfile>(user->profile());
-                assert(profile);
-                add_schedule_to_profile(schedule_name, profile, target_door);
+                sm->add_user(user);
             }
             // now for groups
             for (const auto &group_name : group_names)
             {
                 GroupPtr grp = groups_[group_name];
-                assert(grp);
-                assert(grp->profile());
-                SimpleAccessProfilePtr profile =
-                    std::dynamic_pointer_cast<SimpleAccessProfile>(grp->profile());
-                assert(profile);
-                add_schedule_to_profile(schedule_name, profile, target_door);
+                sm->add_group(grp);
             }
             for (const auto &cred_id : credential_names)
             {
                 DEBUG("CRED  = " << cred_id);
-                IAuthenticationSourcePtr auth_src = find_cred_by_id(cred_id);
-                assert(auth_src);
-                SimpleAccessProfilePtr profile =
-                    std::dynamic_pointer_cast<SimpleAccessProfile>(
-                        auth_src->profile());
-                add_schedule_to_profile(schedule_name, profile, target_door);
+                Cred::ICredentialPtr cred = find_cred_by_alias(cred_id);
+                sm->add_credential(assert_cast<Cred::CredentialPtr>(cred));
             }
+
+            mappings_.push_back(sm);
         }
     }
 }
 
-void FileAuthSourceMapper::add_schedule_to_profile(
-    const std::string &schedule_name, ::Leosac::Auth::SimpleAccessProfilePtr profile,
-    const std::string &door_name)
-{
-    assert(xml_schedules_.schedules().count(schedule_name));
-    const auto &sched = xml_schedules_.schedules().at(schedule_name);
-
-    // auth target is hacky
-    if (!door_name.empty())
-        profile->addAccessSchedule(AuthTargetPtr(new AuthTarget(door_name)), sched);
-    else
-        profile->addAccessSchedule(nullptr, sched);
-}
-
 void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
 {
+    // We use the user id internally to uniquely identify user
+    // through ScheduleMapping.
+    UserId user_id = 1;
     for (const auto &user : users)
     {
         const std::string &node_name            = user.first;
@@ -426,7 +403,8 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
             throw ConfigException(config_file_,
                                   "'UNKNOWN_USER' is a reserved name. Do not use.");
 
-        UserPtr uptr(new User(username));
+        UserPtr uptr(std::make_unique<User>(user_id++));
+        uptr->username(username);
         uptr->firstname(firstname);
         uptr->lastname(lastname);
         uptr->email(email);
@@ -455,25 +433,190 @@ Leosac::Auth::ValidityInfo FileAuthSourceMapper::extract_credentials_validity(
     return v;
 }
 
-IAuthenticationSourcePtr FileAuthSourceMapper::find_cred_by_id(const std::string &id)
+Leosac::Cred::ICredentialPtr
+FileAuthSourceMapper::find_cred_by_alias(const std::string &alias)
 {
-    auto &&itr = id_to_cred_.find(id);
+    auto &&itr = id_to_cred_.find(alias);
     if (itr != id_to_cred_.end())
         return itr->second;
     return nullptr;
 }
 
 void FileAuthSourceMapper::add_cred_to_id_map(
-    Leosac::Auth::IAuthenticationSourcePtr credential)
+    Leosac::Cred::ICredentialPtr credential)
 {
-    if (!credential->id().empty())
+    if (!credential->alias().empty())
     {
-        if (id_to_cred_.count(credential->id()))
+        if (id_to_cred_.count(credential->alias()))
         {
-            NOTICE("Credential with ID = " << credential->id()
+            NOTICE("Credential with ID = " << credential->alias()
                                            << " already exist and "
                                               "will be overwritten.");
         }
-        id_to_cred_[credential->id()] = credential;
+        id_to_cred_[credential->alias()] = credential;
     }
+}
+
+Leosac::Auth::IAccessProfilePtr
+FileAuthSourceMapper::buildProfile(Leosac::Cred::ICredentialPtr cred)
+{
+    assert(cred);
+    std::vector<GroupPtr> grps;
+    std::vector<IAccessProfilePtr> profiles; // profiles that apply to the user.
+
+    // Sanity check
+    if (cred->owner())
+        ASSERT_LOG(cred->owner().get_eager(), "Sanity check failed.");
+
+    auto cred_owner = cred->owner().get_eager();
+    if (!cred->validity().is_valid())
+    {
+        NOTICE("Credentials is invalid. It was disabled or out of its validity "
+               "period.");
+        return nullptr;
+    }
+
+    if (cred_owner && !cred_owner->is_valid())
+    {
+        NOTICE("The user (" << cred_owner->username()
+                            << ") is disabled or out of its validity period.");
+        return nullptr;
+    }
+
+    // First, create the profile for the user, if any
+    if (cred_owner)
+    {
+        profiles.push_back(build_user_profile(cred_owner));
+
+        // Profile for user's groups.
+        grps = get_user_groups(cred_owner);
+        for (auto &grp : grps)
+            profiles.push_back(build_group_profile(grp));
+    }
+
+    profiles.push_back(build_cred_profile(cred));
+
+    return merge_profiles(profiles);
+}
+
+SimpleAccessProfilePtr FileAuthSourceMapper::build_user_profile(UserPtr u)
+{
+    ASSERT_LOG(u, "User is null");
+
+    auto profile(std::make_shared<SimpleAccessProfile>());
+    for (const auto &mapping : mappings_)
+    {
+        if (mapping->has_user(u->id()))
+        {
+            auto schedule = mapping->schedule().get_eager().lock();
+            if (!schedule)
+            {
+                WARN("Schedule is null in FileAuthSourceMapper::build_user_profile");
+                continue;
+            }
+            if (mapping->doors().size())
+            {
+                // If we have doors, add the schedule against each door (AuthTarget)
+                for (auto lazy_weak_door : mapping->doors())
+                {
+                    auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
+                                                   "Cannot get Door from mapping");
+                    profile->addAccessSchedule(
+                        std::make_shared<AuthTarget>(door_ptr->alias()),
+                        std::static_pointer_cast<const Tools::ISchedule>(schedule));
+                }
+            }
+            else
+            {
+                // No specific door, add with nullptr as a target.
+                profile->addAccessSchedule(
+                    nullptr,
+                    std::static_pointer_cast<const Tools::ISchedule>(schedule));
+            }
+        }
+    }
+    return profile;
+}
+
+SimpleAccessProfilePtr FileAuthSourceMapper::build_group_profile(GroupPtr g)
+{
+    ASSERT_LOG(g, "Group is null");
+
+    auto profile(std::make_shared<SimpleAccessProfile>());
+    for (const auto &mapping : mappings_)
+    {
+        DEBUG("MAPPING HAS " << mapping->groups().size() << " GROUPS");
+        if (mapping->has_group(g->id()))
+        {
+            auto schedule = mapping->schedule().get_eager().lock();
+            if (!schedule)
+            {
+                WARN(
+                    "Schedule is null in FileAuthSourceMapper::build_group_profile");
+                continue;
+            }
+            if (mapping->doors().size())
+            {
+                // If we have doors, add the schedule against each door (AuthTarget)
+                for (auto lazy_weak_door : mapping->doors())
+                {
+                    auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
+                                                   "Cannot get Door from mapping");
+                    profile->addAccessSchedule(
+                        std::make_shared<AuthTarget>(door_ptr->alias()),
+                        std::static_pointer_cast<const Tools::ISchedule>(schedule));
+                }
+            }
+            else
+            {
+                // No specific door, add with nullptr as a target.
+                profile->addAccessSchedule(
+                    nullptr,
+                    std::static_pointer_cast<const Tools::ISchedule>(schedule));
+            }
+        }
+    }
+    return profile;
+}
+
+Leosac::Auth::SimpleAccessProfilePtr
+FileAuthSourceMapper::build_cred_profile(Leosac::Cred::ICredentialPtr c)
+{
+    ASSERT_LOG(c, "Credential is null");
+
+    auto profile(std::make_shared<SimpleAccessProfile>());
+    for (const auto &mapping : mappings_)
+    {
+        if (mapping->has_cred(c->id()))
+        {
+            auto schedule = mapping->schedule().get_eager().lock();
+            if (!schedule)
+            {
+                WARN("Schedule is null in FileAuthSourceMapper::build_cred_profile");
+                continue;
+            }
+            if (mapping->doors().size())
+            {
+                // If we have doors, add the schedule against each door (AuthTarget)
+                for (auto lazy_weak_door : mapping->doors())
+                {
+                    auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
+                                                   "Cannot get Door from mapping");
+                    profile->addAccessSchedule(
+                        std::make_shared<AuthTarget>(door_ptr->alias()),
+                        std::static_pointer_cast<const Tools::ISchedule>(schedule));
+                }
+            }
+            else
+            {
+                // No specific door, add with nullptr as a target.
+                profile->addAccessSchedule(
+                    nullptr,
+                    std::static_pointer_cast<const Tools::ISchedule>(schedule));
+            }
+        }
+    }
+    if (profile->schedule_count() == 0)
+        return nullptr;
+    return profile;
 }

@@ -49,6 +49,11 @@ CredentialId Credential::id() const
     return id_;
 }
 
+void Credential::id(const CredentialId &new_id)
+{
+    id_ = new_id;
+}
+
 size_t Credential::odb_version() const
 {
     return odb_version_;

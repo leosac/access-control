@@ -19,42 +19,47 @@
 
 #pragma once
 
-#include "core/auth/BaseAuthSource.hpp"
-#include "core/auth/PINCode.hpp"
-#include "core/auth/WiegandCard.hpp"
+#include "core/credentials/PinCode.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include <string>
 
 namespace Leosac
 {
-namespace Auth
+namespace Cred
 {
-class WiegandCardPin;
-using WiegandCardPinPtr = std::shared_ptr<WiegandCardPin>;
 
 /**
-* Credentials composed of a Wiegand card and a PIN code.
+* Credentials composed of an RFIDCard and a PIN code.
+ *
+ * Todo: Consider making this class database aware so we can
+ * configure those type of credential on the Web interface.
 */
-class WiegandCardPin : public BaseAuthSource
+class RFIDCardPin : public Credential
 {
   public:
     MAKE_VISITABLE();
 
     /**
-    * Create a WiegandCardPin object.
-    *
-    * @param pin the code in string format.
+    * Create a RFIDCardPin object and assigned RFIDCard and
+     * PinCode object to the RFIDCardPin credential
     */
-    WiegandCardPin(const std::string &card_id, int nb_bits,
-                   const std::string &pin_code);
+    RFIDCardPin(RFIDCardPtr card, PinCodePtr pin);
 
-    const WiegandCard &card() const;
-    const PINCode &pin() const;
+    /**
+     * Create an RFIDCardPin object with default
+     * initialized RFIDCard and PinCode object.
+     */
+    RFIDCardPin();
 
-    virtual std::string to_string() const override;
+    const RFIDCard &card() const;
+    const PinCode &pin() const;
+
+    RFIDCard &card();
+    PinCode &pin();
 
   protected:
-    WiegandCard card_;
-    PINCode pin_;
+    RFIDCardPtr card_;
+    PinCodePtr pin_;
 };
 }
 }

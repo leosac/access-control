@@ -19,7 +19,7 @@
 
 #include "NotifierInstance.hpp"
 #include "core/auth/Auth.hpp"
-#include "core/auth/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 #include "tools/Colorize.hpp"
 #include "tools/log.hpp"
 #include <zmqpp/message.hpp>
@@ -55,7 +55,7 @@ NotifierInstance::NotifierInstance(zmqpp::context &ctx, zmqpp::reactor &reactor,
     reactor.add(tcp_, std::bind(&NotifierInstance::handle_tcp_msg, this));
 }
 
-void NotifierInstance::handle_credential(Leosac::Auth::WiegandCard &card)
+void NotifierInstance::handle_credential(Leosac::Cred::RFIDCard &card)
 {
     for (const auto &target : targets_)
     {
@@ -172,9 +172,11 @@ void NotifierInstance::handle_msg_bus()
         INFO("TCP-Notifier cannot handle this type of credential yet.");
         return;
     }
-    auto wiegand_card = Auth::WiegandCard(card, bits);
+    auto wiegand_card = std::make_shared<Cred::RFIDCard>();
+    wiegand_card->card_id(card);
+    wiegand_card->nb_bits(bits);
 
-    handle_credential(wiegand_card);
+    handle_credential(*wiegand_card);
 }
 
 void NotifierInstance::configure_tcp_socket(

@@ -18,6 +18,7 @@
 */
 
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
+#include <core/credentials/ICredential.hpp>
 #include <zmqpp/message.hpp>
 
 #pragma once
@@ -44,11 +45,11 @@ class AuthSourceBuilder
     AuthSourceBuilder &operator=(AuthSourceBuilder &&) = delete;
 
     /**
-    * Create an AuthenticationSource object from a message.
+    * Create a Credential object from a message.
     *
     * @param msg message from auth source module, CANNOT BE NULL.
     */
-    virtual IAuthenticationSourcePtr create(zmqpp::message *msg);
+    virtual Cred::ICredentialPtr create(zmqpp::message *msg);
 
     /**
     * Extract the source name from the frame.
@@ -64,20 +65,23 @@ class AuthSourceBuilder
     * @param msg the message first frame shall be wiegand data (ie previous should be
     * pop'd).
     */
-    IAuthenticationSourcePtr create_simple_wiegand(const std::string &name,
-                                                   zmqpp::message *msg);
+    Cred::ICredentialPtr create_simple_wiegand(const std::string &name,
+                                               zmqpp::message *msg);
 
     /**
     * Create an auth source from WIEGAND_PIN data type.
     */
-    IAuthenticationSourcePtr create_wiegand_pin(const std::string &name,
-                                                zmqpp::message *msg);
+    Cred::ICredentialPtr create_pincode(const std::string &name,
+                                        zmqpp::message *msg);
 
     /**
     * Create an auth source from a WiegandCard and PIN Code.
     */
-    IAuthenticationSourcePtr create_wiegand_card_pin(const std::string &name,
-                                                     zmqpp::message *msg);
+    Cred::ICredentialPtr create_wiegand_card_pin(const std::string &name,
+                                                 zmqpp::message *msg);
+
+    Cred::ICredentialPtr create_simple_csn(const std::string &name,
+                                           zmqpp::message *msg);
 };
 }
 }

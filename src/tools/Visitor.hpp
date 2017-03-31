@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <type_traits>
 
 namespace Leosac
@@ -43,10 +42,7 @@ class BaseVisitor
     /**
      * Invoked when the visitable cannot be visited by the visitor.
      */
-    virtual void cannot_visit(const IVisitable &)
-    {
-        assert(0 && "Cannot visit");
-    }
+    virtual void cannot_visit(const IVisitable &);
 };
 
 class IVisitable;

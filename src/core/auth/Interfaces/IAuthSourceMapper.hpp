@@ -48,24 +48,25 @@ class IAuthSourceMapper : public Leosac::Tools::Visitor<WiegandCard>,
     virtual ~IAuthSourceMapper() = default;
 
     /**
-    * Must map the AuthenticationSource data to a User.
+    * Must map the ICredential data to a User.
     *
     * This is done by calling the `owner()` method on the auth source
     * object. In case it fails, the field shall be set to `nullptr`.
     *
     * @note The User may be `new`ed.
     */
-    virtual void mapToUser(IAuthenticationSourcePtr auth_source) = 0;
+    virtual void mapToUser(Cred::ICredentialPtr cred) = 0;
 
     /**
-    * Build an AccessProfile object given a AuthenticationSource.
+    * Build an AccessProfile object given a Credential.
     *
     * How the profile is built (ie, based only on user-id, based on auth source and
     * user-id, group membership, etc) is implementation-defined.
     *
-    * The caller expect a valid profile object that will behave correctly.
+    * The caller expect a valid profile object that will behave correctly or
+    * nullptr if no profile could be built.
     */
-    virtual IAccessProfilePtr buildProfile(IAuthenticationSourcePtr auth_source) = 0;
+    virtual IAccessProfilePtr buildProfile(Cred::ICredentialPtr auth_source) = 0;
 
     /**
     * Return the groups this mapper is aware of.

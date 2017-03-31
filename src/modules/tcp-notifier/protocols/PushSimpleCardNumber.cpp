@@ -18,7 +18,7 @@
 */
 
 #include "PushSimpleCardNumber.hpp"
-#include "core/auth/WiegandCard.hpp"
+#include "core/credentials/RFIDCard.hpp"
 
 // fixme zmqpp include problem
 #include <cstring>
@@ -27,7 +27,7 @@
 #include <zmqpp/zmqpp.hpp>
 
 Leosac::ByteVector Leosac::Module::TCPNotifier::PushSimpleCardNumber::build_cred_msg(
-    const Auth::WiegandCard &card)
+    const Cred::RFIDCard &card)
 {
     ByteVector data(8);
     uint64_t network_card_id = zmqpp::htonll(card.to_int());

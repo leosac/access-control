@@ -20,7 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
-#include "core/auth/AuthFwd.hpp"
+#include "core/credentials/CredentialFwd.hpp"
 #include <stdexcept>
 
 namespace Leosac
@@ -77,7 +77,7 @@ class ProtocolHandler
      * that shall be sent over the network to notify
      * the client.
      */
-    virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) = 0;
+    virtual ByteVector build_cred_msg(const Cred::RFIDCard &card) = 0;
 
     /**
      * Create an instance of a protocol handler depending

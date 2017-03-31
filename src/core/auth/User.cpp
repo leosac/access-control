@@ -35,9 +35,7 @@ static bool is_valid_username_character(char c)
 }
 
 User::User()
-    : id_(0)
-    , rank_(UserRank::USER)
-    , version_(0)
+    : User(0)
 {
 }
 
@@ -47,6 +45,13 @@ User::User(const std::string &uname)
     , version_(0)
 {
     username(uname);
+}
+
+User::User(const UserId &id)
+    : id_(id)
+    , rank_(UserRank::USER)
+    , version_(0)
+{
 }
 
 const std::string &User::username() const noexcept

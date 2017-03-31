@@ -18,6 +18,7 @@
 */
 
 #include "tools/ScheduleMapping.hpp"
+#include "AssertCast.hpp"
 #include "Credential_odb.h"
 #include "Group_odb.h"
 #include "ScheduleMapping_odb.h"
@@ -149,7 +150,7 @@ void ScheduleMapping::add_group(const Auth::GroupLPtr &group)
 
 void ScheduleMapping::add_credential(const Cred::CredentialLPtr &cred)
 {
-    ASSERT_LOG(cred, "Cannot add a null creential to a ScheduleMapping.");
+    ASSERT_LOG(cred, "Cannot add a null credential to a ScheduleMapping.");
 
     creds_.push_back(cred);
     if (cred.get_eager())

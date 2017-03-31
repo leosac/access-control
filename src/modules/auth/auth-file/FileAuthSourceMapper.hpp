@@ -20,12 +20,12 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "core/auth/Interfaces/IAuthSourceMapper.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"
-#include "core/auth/SimpleAccessProfile.hpp"
-#include "core/auth/WiegandCard.hpp"
-#include "core/auth/WiegandCardPin.hpp"
+#include "core/credentials/CredentialFwd.hpp"
+#include "tools/ScheduleMapping.hpp"
 #include "tools/SingleTimeFrame.hpp"
 #include "tools/XmlNodeNameEnforcer.hpp"
 #include "tools/XmlScheduleLoader.hpp"
@@ -44,7 +44,11 @@ namespace Auth
 /**
 * Use a file to map auth source (card, PIN, etc) to user.
 */
-class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
+class FileAuthSourceMapper
+    : public ::Leosac::Auth::IAuthSourceMapper,
+      public ::Leosac::Tools::Visitor<::Leosac::Cred::RFIDCard>,
+      public ::Leosac::Tools::Visitor<::Leosac::Cred::PinCode>,
+      public ::Leosac::Tools::Visitor<::Leosac::Cred::RFIDCardPin>
 {
   public:
     FileAuthSourceMapper(const std::string &auth_file);
@@ -52,22 +56,22 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     /**
     * Try to map a wiegand card_id to a user.
     */
-    virtual void visit(::Leosac::Auth::WiegandCard &src) override;
+    virtual void visit(::Leosac::Cred::RFIDCard &src) override;
 
     /**
     * Try to map a PIN code to a user.
     */
-    virtual void visit(::Leosac::Auth::PINCode &src) override;
+    virtual void visit(::Leosac::Cred::PinCode &src) override;
 
     /**
-    * Try to map a Wiegand card id + a PIN code to a user.
+    * Try to map a card id + a PIN code to a user.
     */
-    virtual void visit(::Leosac::Auth::WiegandCardPin &src) override;
+    virtual void visit(::Leosac::Cred::RFIDCardPin &src) override;
 
-    virtual void mapToUser(Leosac::Auth::IAuthenticationSourcePtr auth_source);
+    virtual void mapToUser(Leosac::Cred::ICredentialPtr auth_source);
 
     virtual Leosac::Auth::IAccessProfilePtr
-    buildProfile(Leosac::Auth::IAuthenticationSourcePtr auth_source) override;
+    buildProfile(Leosac::Cred::ICredentialPtr cred);
 
     std::vector<Leosac::Auth::GroupPtr> groups() const override;
 
@@ -75,13 +79,27 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     /**
     * Lookup a credentials by ID.
     */
-    Leosac::Auth::IAuthenticationSourcePtr find_cred_by_id(const std::string &id);
+    Cred::ICredentialPtr find_cred_by_alias(const std::string &alias);
+
+    /**
+     * Build an access for a user.
+     *
+     * This simply check for mapping which are linked directly to
+     * the given user.
+     */
+    Leosac::Auth::SimpleAccessProfilePtr build_user_profile(Leosac::Auth::UserPtr u);
+
+    Leosac::Auth::SimpleAccessProfilePtr
+    build_group_profile(Leosac::Auth::GroupPtr g);
+
+    Leosac::Auth::SimpleAccessProfilePtr
+    build_cred_profile(Leosac::Cred::ICredentialPtr c);
 
     /**
     * Store the credential to the id <-> credential map if the id is
     * non-empty.
     */
-    void add_cred_to_id_map(Leosac::Auth::IAuthenticationSourcePtr cred);
+    void add_cred_to_id_map(Leosac::Cred::ICredentialPtr credential);
 
     /**
     * Load users from configuration tree, storing them
@@ -100,14 +118,6 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     * This effectively build access profile for user.
     */
     void map_schedules(const boost::property_tree::ptree &schedules_mapping);
-
-    /**
-    * This add a schedule to a profile.
-    * This is used by map_schedules.
-    */
-    void add_schedule_to_profile(const std::string &schedule_name,
-                                 ::Leosac::Auth::SimpleAccessProfilePtr profile,
-                                 const std::string &door_name);
 
     /**
     * Extract group membership.
@@ -131,6 +141,9 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
 
     /**
     * Merge a bunch of profiles together and returns a new profile.
+     *
+     * If the resulting profile contains the schedule, this method
+     * will return nullptr.
     */
     Leosac::Auth::IAccessProfilePtr
     merge_profiles(const std::vector<Leosac::Auth::IAccessProfilePtr> profiles);
@@ -154,34 +167,41 @@ class FileAuthSourceMapper : public ::Leosac::Auth::IAuthSourceMapper
     std::map<std::string, Leosac::Auth::GroupPtr> groups_;
 
     /**
-    * Maps target (eg door) name to object.
-    */
-    std::map<std::string, Leosac::Auth::AuthTargetPtr> targets_;
-
-    /**
     * Maps card_id to object.
     */
-    std::unordered_map<std::string, Leosac::Auth::WiegandCardPtr> wiegand_cards_;
+    std::unordered_map<std::string, Leosac::Cred::RFIDCardPtr> rfid_cards_;
+
 
     /**
     * Maps PIN code to object.
     */
-    std::unordered_map<std::string, Leosac::Auth::PINCodePtr> pin_codes_;
+    std::unordered_map<std::string, Leosac::Cred::PinCodePtr> pin_codes_;
 
     /**
     * Maps WiegandCard + PIN code to object.
     */
-    std::map<std::pair<std::string, std::string>, Leosac::Auth::WiegandCardPinPtr>
-        wiegand_cards_pins_;
+    std::map<std::pair<std::string, std::string>, Leosac::Cred::RFIDCardPinPtr>
+        rfid_cards_pin;
 
     /**
-    * Maps credentials ID to object.
+    * Maps credentials ID (from XML) to object.
     * If id is empty, the cred wont end up is this list.
     */
-    std::unordered_map<std::string, Leosac::Auth::IAuthenticationSourcePtr>
-        id_to_cred_;
+    std::unordered_map<std::string, Leosac::Cred::ICredentialPtr> id_to_cred_;
 
     Tools::XmlScheduleLoader xml_schedules_;
+
+    /**
+     * List of mappings defined in the configuration file.
+     */
+    std::vector<Tools::ScheduleMappingPtr> mappings_;
+
+    /**
+     * We store doors object, but really we only use the name
+     * property.
+     * On door object is created for each mapping that specify a door.
+     */
+    std::vector<Leosac::Auth::DoorPtr> doors_;
 
     Tools::XmlNodeNameEnforcer xmlnne_;
 };

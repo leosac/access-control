@@ -46,6 +46,8 @@ class IAccessProfile
     */
     virtual bool isAccessGranted(const std::chrono::system_clock::time_point &date,
                                  AuthTargetPtr target) = 0;
+
+    virtual size_t schedule_count() const = 0;
 };
 }
 }

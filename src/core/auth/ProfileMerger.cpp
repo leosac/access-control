@@ -35,7 +35,7 @@ IAccessProfilePtr ProfileMerger::merge(std::shared_ptr<const IAccessProfile> p1,
         dynamic_cast<const SimpleAccessProfile *>(p2.get());
     assert(t_p1 && t_p2);
 
-    SimpleAccessProfilePtr result(new SimpleAccessProfile());
+    Leosac::Auth::SimpleAccessProfilePtr result(new SimpleAccessProfile());
 
     // merge strategy: simply add all schedule from both profile.
 

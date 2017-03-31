@@ -34,7 +34,7 @@ class PushSimpleCardNumber : public ProtocolHandler
 {
 
   public:
-    virtual ByteVector build_cred_msg(const Auth::WiegandCard &card) override;
+    virtual ByteVector build_cred_msg(const Cred::RFIDCard &card) override;
 };
 }
 }
