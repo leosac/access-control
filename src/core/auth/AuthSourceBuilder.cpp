@@ -39,7 +39,7 @@ Cred::ICredentialPtr AuthSourceBuilder::create_simple_csn(const std::string &nam
     std::string card_id;
 
     *msg >> card_id;
-    INFO("Building an AuthSource object (FAKE Wiegand Card):" << card_id);
+    INFO("Building an AuthSource object (SIMPLE_CSN):" << card_id);
     auto raw_csn = boost::replace_all_copy(card_id, ":", "");
     LEOSAC_ENFORCE(raw_csn.length() % 2 == 0, "CSN has invalid length.");
 
@@ -64,9 +64,7 @@ Cred::ICredentialPtr AuthSourceBuilder::create(zmqpp::message *msg)
             << "Source name was {" << source_name << "}");
 
     if (type == SourceType::SIMPLE_WIEGAND)
-    {
         return create_simple_wiegand(source_name, msg);
-    }
     else if (type == SourceType::WIEGAND_PIN)
         return create_pincode(source_name, msg);
     else if (type == SourceType::WIEGAND_CARD_PIN)
@@ -139,7 +137,7 @@ AuthSourceBuilder::create_wiegand_card_pin(const std::string &name,
     INFO("Building a Credential object (RFIDCardPin):"
          << card_id << ", " << pin_code << ". Source name = " << name);
 
-    auto c = std::make_shared<Cred::RFIDCard>(card_id,bits);
+    auto c = std::make_shared<Cred::RFIDCard>(card_id, bits);
     auto p = std::make_shared<Cred::PinCode>();
     p->pin_code(pin_code);
 

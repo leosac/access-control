@@ -498,6 +498,37 @@ FileAuthSourceMapper::buildProfile(Leosac::Cred::ICredentialPtr cred)
     return merge_profiles(profiles);
 }
 
+static void
+add_schedule_from_mapping_to_profile(Leosac::Tools::ScheduleMappingPtr mapping,
+                                     SimpleAccessProfilePtr profile)
+{
+    ASSERT_LOG(mapping, "Mapping cannot be null");
+    ASSERT_LOG(profile, "Profile cannot be null");
+
+    auto schedule = LEOSAC_ENFORCE(mapping->schedule().get_eager().lock(),
+                                   "Cannot retrieve schedule from mapping");
+
+    if (mapping->doors().size())
+    {
+        // If we have doors, add the schedule against each door (AuthTarget)
+        for (auto lazy_weak_door : mapping->doors())
+        {
+            auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
+                                           "Cannot get Door from mapping");
+            profile->addAccessSchedule(
+                std::make_shared<AuthTarget>(door_ptr->alias()),
+                std::static_pointer_cast<const Leosac::Tools::ISchedule>(schedule));
+        }
+    }
+    else
+    {
+        // No specific door, add with nullptr as a target.
+        profile->addAccessSchedule(
+            nullptr,
+            std::static_pointer_cast<const Leosac::Tools::ISchedule>(schedule));
+    }
+}
+
 SimpleAccessProfilePtr FileAuthSourceMapper::build_user_profile(UserPtr u)
 {
     ASSERT_LOG(u, "User is null");
@@ -507,31 +538,7 @@ SimpleAccessProfilePtr FileAuthSourceMapper::build_user_profile(UserPtr u)
     {
         if (mapping->has_user(u->id()))
         {
-            auto schedule = mapping->schedule().get_eager().lock();
-            if (!schedule)
-            {
-                WARN("Schedule is null in FileAuthSourceMapper::build_user_profile");
-                continue;
-            }
-            if (mapping->doors().size())
-            {
-                // If we have doors, add the schedule against each door (AuthTarget)
-                for (auto lazy_weak_door : mapping->doors())
-                {
-                    auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
-                                                   "Cannot get Door from mapping");
-                    profile->addAccessSchedule(
-                        std::make_shared<AuthTarget>(door_ptr->alias()),
-                        std::static_pointer_cast<const Tools::ISchedule>(schedule));
-                }
-            }
-            else
-            {
-                // No specific door, add with nullptr as a target.
-                profile->addAccessSchedule(
-                    nullptr,
-                    std::static_pointer_cast<const Tools::ISchedule>(schedule));
-            }
+            add_schedule_from_mapping_to_profile(mapping, profile);
         }
     }
     return profile;
@@ -544,35 +551,9 @@ SimpleAccessProfilePtr FileAuthSourceMapper::build_group_profile(GroupPtr g)
     auto profile(std::make_shared<SimpleAccessProfile>());
     for (const auto &mapping : mappings_)
     {
-        DEBUG("MAPPING HAS " << mapping->groups().size() << " GROUPS");
         if (mapping->has_group(g->id()))
         {
-            auto schedule = mapping->schedule().get_eager().lock();
-            if (!schedule)
-            {
-                WARN(
-                    "Schedule is null in FileAuthSourceMapper::build_group_profile");
-                continue;
-            }
-            if (mapping->doors().size())
-            {
-                // If we have doors, add the schedule against each door (AuthTarget)
-                for (auto lazy_weak_door : mapping->doors())
-                {
-                    auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
-                                                   "Cannot get Door from mapping");
-                    profile->addAccessSchedule(
-                        std::make_shared<AuthTarget>(door_ptr->alias()),
-                        std::static_pointer_cast<const Tools::ISchedule>(schedule));
-                }
-            }
-            else
-            {
-                // No specific door, add with nullptr as a target.
-                profile->addAccessSchedule(
-                    nullptr,
-                    std::static_pointer_cast<const Tools::ISchedule>(schedule));
-            }
+            add_schedule_from_mapping_to_profile(mapping, profile);
         }
     }
     return profile;
@@ -588,31 +569,7 @@ FileAuthSourceMapper::build_cred_profile(Leosac::Cred::ICredentialPtr c)
     {
         if (mapping->has_cred(c->id()))
         {
-            auto schedule = mapping->schedule().get_eager().lock();
-            if (!schedule)
-            {
-                WARN("Schedule is null in FileAuthSourceMapper::build_cred_profile");
-                continue;
-            }
-            if (mapping->doors().size())
-            {
-                // If we have doors, add the schedule against each door (AuthTarget)
-                for (auto lazy_weak_door : mapping->doors())
-                {
-                    auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager().lock(),
-                                                   "Cannot get Door from mapping");
-                    profile->addAccessSchedule(
-                        std::make_shared<AuthTarget>(door_ptr->alias()),
-                        std::static_pointer_cast<const Tools::ISchedule>(schedule));
-                }
-            }
-            else
-            {
-                // No specific door, add with nullptr as a target.
-                profile->addAccessSchedule(
-                    nullptr,
-                    std::static_pointer_cast<const Tools::ISchedule>(schedule));
-            }
+            add_schedule_from_mapping_to_profile(mapping, profile);
         }
     }
     if (profile->schedule_count() == 0)
