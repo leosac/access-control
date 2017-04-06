@@ -91,7 +91,7 @@ class User : public std::enable_shared_from_this<User>
      * Set a new username.
      *
      * A few rules regarding usernames:
-     *     + Username are always case insentive, and are store in lower case.
+     *     + Username are always case insensitive, and are store in lower case.
      *     + Only alphanumeric ASCII characters, "_", "." and "-" are allowed.
      *
      * @note This function will throw if the username is invalid.

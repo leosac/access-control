@@ -572,7 +572,5 @@ FileAuthSourceMapper::build_cred_profile(Leosac::Cred::ICredentialPtr c)
             add_schedule_from_mapping_to_profile(mapping, profile);
         }
     }
-    if (profile->schedule_count() == 0)
-        return nullptr;
     return profile;
 }

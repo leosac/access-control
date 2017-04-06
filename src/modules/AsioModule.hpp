@@ -76,7 +76,7 @@ class AsioModule : public BaseModule
     bs2::connection service_event_listener_;
 
     /**
-     * Install handlers that periodically for activity on the
+     * Install handlers that periodically poll for activity on the
      * ZMQ reactor from BaseModule.
      *
      * While this impedes reactivity, it is the less complicated
