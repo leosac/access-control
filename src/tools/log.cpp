@@ -18,7 +18,7 @@
 */
 
 #include "log.hpp"
-#include "gettid.hpp"
+#include "ThreadUtils.hpp"
 #include <boost/regex.hpp>
 
 namespace

@@ -20,6 +20,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace Leosac
 {
@@ -27,4 +28,15 @@ namespace Leosac
  * Return the Linux thread ID.
  */
 uint64_t gettid();
+
+/**
+ * Set the name of the current thread.
+ *
+ * The maximum length of the name is 15 bytes. If the
+ * size of `name` exceed 15 bytes, the name is
+ * silently truncated.
+ *
+ * Throws on failure.
+ */
+void set_thread_name(const std::string &name);
 }

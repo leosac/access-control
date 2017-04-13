@@ -22,7 +22,7 @@
 #include "LeosacFwd.hpp"
 #include "core/config/ConfigChecker.hpp"
 #include "core/config/ConfigManager.hpp"
-#include "tools/gettid.hpp"
+#include "tools/ThreadUtils.hpp"
 #include "tools/log.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/zmqpp.hpp>
@@ -47,6 +47,7 @@ bool start_module_helper(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
 {
     try
     {
+        set_thread_name(fmt::format("mod_{}", get_module_name()));
         UserModule module(zmq_ctx, pipe, cfg, utils);
         INFO("Module " << get_module_name()
                        << " is now initialized. Thread id = " << Leosac::gettid());

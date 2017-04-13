@@ -19,7 +19,7 @@
 
 #include "GetLocalConfigVersion.hpp"
 #include "core/kernel.hpp"
-#include "tools/gettid.hpp"
+#include "tools/ThreadUtils.hpp"
 #include "tools/log.hpp"
 
 Leosac::Tasks::GetLocalConfigVersion::GetLocalConfigVersion(Kernel &k)

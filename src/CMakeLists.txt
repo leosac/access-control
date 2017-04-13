@@ -74,7 +74,7 @@ set(LEOSAC_LIB_SRCS
     tools/Schedule.cpp
     tools/XmlPropertyTree.cpp
     tools/XmlScheduleLoader.cpp
-    tools/gettid.cpp
+    tools/ThreadUtils.cpp
     tools/GenGuid.cpp
     tools/PropertyTreeExtractor.cpp
     tools/log.cpp

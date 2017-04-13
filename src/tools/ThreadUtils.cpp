@@ -17,9 +17,13 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "gettid.hpp"
+#include "ThreadUtils.hpp"
+#include "enforce.hpp"
+#include <errno.h>
+#include <spdlog/details/format.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/prctl.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -28,5 +32,12 @@ namespace Leosac
 uint64_t gettid()
 {
     return static_cast<uint64_t>(syscall(SYS_gettid));
+}
+
+void set_thread_name(const std::string &name)
+{
+    int ret = prctl(PR_SET_NAME, name.c_str(), NULL, NULL, NULL);
+    LEOSAC_ENFORCE(ret == 0,
+                   fmt::format("Failed to set thread name. Errno {}", errno));
 }
 }

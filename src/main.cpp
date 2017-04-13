@@ -25,6 +25,7 @@
 
 #include "core/kernel.hpp"
 #include "exception/ExceptionsTools.hpp"
+#include "tools/ThreadUtils.hpp"
 #include "tools/leosac.hpp"
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
@@ -56,6 +57,7 @@ int main(int argc, const char **argv)
     std::cout << "Running Leosac version " << Leosac::getVersionString()
               << std::endl;
 
+    Leosac::set_thread_name("main");
     try
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ',

@@ -18,6 +18,7 @@
 */
 
 #include "MessageBus.hpp"
+#include "tools/ThreadUtils.hpp"
 
 MessageBus::MessageBus(zmqpp::context &ctx)
     : ctx_(ctx)
@@ -36,6 +37,7 @@ MessageBus::~MessageBus()
 
 bool MessageBus::run(zmqpp::socket *pipe)
 {
+    Leosac::set_thread_name("message_bus");
     try
     {
         pub_ = new zmqpp::socket(ctx_, zmqpp::socket_type::pub);
