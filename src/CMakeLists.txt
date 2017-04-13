@@ -161,6 +161,7 @@ target_include_directories(${LEOSAC_LIB}
 
 target_compile_definitions(${LEOSAC_LIB}
         PRIVATE
+        -DBOOST_USE_VALGRIND=1
         )
 
 target_compile_definitions(${LEOSAC_BIN}
@@ -178,14 +179,14 @@ endif()
 # Add debug flags
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O0 -Wextra -g3")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -O0 -g3 -Wextra")
     endif()
 endif()
 
 ## Add optimization flags
 if (CMAKE_BUILD_TYPE MATCHES "Release")
     if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O2")
+        set(LEOSAC_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS} -Wall -Wextra -Wshadow -Wundef -O3")
     endif()
 endif()
 

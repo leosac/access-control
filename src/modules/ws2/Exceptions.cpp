@@ -17,14 +17,16 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Exceptions.hpp"
+#include "modules/ws2/Exceptions.hpp"
 #include "core/auth/Token.hpp"
 #include "core/auth/User.hpp"
 
-using namespace Leosac;
-using namespace Leosac::Module;
-using namespace Leosac::Module::WebSockAPI;
-
+namespace Leosac
+{
+namespace Module
+{
+namespace WS2
+{
 SessionAborted::SessionAborted()
     : LEOSACException("Websocket session has been aborted.")
 {
@@ -70,4 +72,7 @@ std::string MalformedMessage::build_msg(const std::string &detail) const
         ss << ".";
 
     return ss.str();
+}
+}
+}
 }

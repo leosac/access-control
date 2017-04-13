@@ -26,7 +26,7 @@ namespace Leosac
 {
 namespace Module
 {
-namespace WebSockAPI
+namespace WS2
 {
 
 class MalformedMessage : public LEOSACException

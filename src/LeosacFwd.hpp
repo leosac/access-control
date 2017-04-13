@@ -37,6 +37,8 @@ using CoreUtilsPtr = std::shared_ptr<CoreUtils>;
 using ByteVector = std::vector<uint8_t>;
 
 class SecurityContext;
+using SecurityContextPtr  = std::shared_ptr<SecurityContext>;
+using SecurityContextCPtr = std::shared_ptr<const SecurityContext>;
 class UserSecurityContext;
 
 namespace Tasks

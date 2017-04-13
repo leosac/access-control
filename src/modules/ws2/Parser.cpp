@@ -17,7 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/ws2/api/Common.hpp"
+#include "modules/ws2/Parser.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
@@ -25,27 +26,29 @@ namespace Module
 {
 namespace WS2
 {
-namespace API
+ClientMessage Parser::parse(const Parser::MessagePtr &msg)
 {
-boost::optional<json> get_leosac_version(const json &, ReqCtx)
-{
-    json ret;
-    ret["version"] = getVersionString();
-    return ret;
-}
+    ClientMessage out;
+    json req = json::parse(msg->get_payload());
 
-boost::optional<json> get_leosac_version_coro(const json &, ReqCtx rctx,
-                                              boost::asio::yield_context yc)
-{
-    json ret;
-    ret["version"] = getVersionString();
-    boost::asio::steady_timer t(rctx.io_service_);
-
-    t.expires_from_now(std::chrono::milliseconds(1000));
-    t.async_wait(yc);
-
-    return ret;
-}
+    try
+    {
+        // Extract general message argument.
+        out.uuid    = req.at("uuid");
+        out.type    = req.at("type");
+        out.content = req.at("content");
+    }
+    catch (const std::out_of_range &e)
+    {
+        throw std::runtime_error("Malformed");
+        // throw MalformedMessage();
+    }
+    catch (const std::domain_error &e)
+    {
+        throw std::runtime_error("Malformed");
+        // throw MalformedMessage();
+    }
+    return out;
 }
 }
 }

@@ -17,7 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/ws2/api/Common.hpp"
+#include "modules/ws2/ConnectionMetadata.hpp"
+#include "core/SecurityContext.hpp"
+#include "tools/GenGuid.h"
 
 namespace Leosac
 {
@@ -25,27 +27,31 @@ namespace Module
 {
 namespace WS2
 {
-namespace API
+Leosac::Module::WS2::ConnectionMetadata::ConnectionMetadata()
+    : uuid_(gen_uuid())
 {
-boost::optional<json> get_leosac_version(const json &, ReqCtx)
-{
-    json ret;
-    ret["version"] = getVersionString();
-    return ret;
 }
 
-boost::optional<json> get_leosac_version_coro(const json &, ReqCtx rctx,
-                                              boost::asio::yield_context yc)
+bool ConnectionMetadata::has_pending_messages() const
 {
-    json ret;
-    ret["version"] = getVersionString();
-    boost::asio::steady_timer t(rctx.io_service_);
-
-    t.expires_from_now(std::chrono::milliseconds(1000));
-    t.async_wait(yc);
-
-    return ret;
+    return messages_.size() > 0;
 }
+
+void ConnectionMetadata::enqueue(const ClientMessage &msg)
+{
+    messages_.push(msg);
+}
+
+ClientMessage ConnectionMetadata::dequeue()
+{
+    ClientMessage cp = messages_.front();
+    messages_.pop();
+    return cp;
+}
+
+bool ConnectionMetadata::busy_with_queued_msg() const
+{
+    return busy_handling_queued_message_;
 }
 }
 }

@@ -22,7 +22,7 @@
     </log>
 
     <modules>
-        <module>
+<!--        <module>
             <name>WEBSOCK_API</name>
             <file>libwebsock-api.so</file>
             <level>1</level>
@@ -31,9 +31,9 @@
               <port>8888</port>
               <interface>10.2.1.5</interface>
             </module_config>
-        </module>
+        </module>-->
 
-        <module>
+<!--        <module>
             <name>SMTP</name>
             <file>libsmtp.so</file>
             <level>2</level>
@@ -47,6 +47,17 @@
             <name>EVOXS</name>
             <file>libevoxs.so</file>
             <level>3</level>
+        </module>-->
+
+        <module>
+            <name>WS2</name>
+            <file>libws2.so</file>
+            <level>1</level>
+
+            <module_config>
+                <port>8888</port>
+                <interface>10.2.1.5</interface>
+            </module_config>
         </module>
 
     </modules>

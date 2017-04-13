@@ -63,6 +63,8 @@ class AsioModule : public BaseModule
   protected:
     boost::asio::io_service io_service_;
 
+    boost::asio::io_service &get_io_service();
+
     /**
      * Function invoked when a service event is triggered.
      *
@@ -70,6 +72,16 @@ class AsioModule : public BaseModule
      * invoked from whichever thread triggered the event.
      */
     virtual void on_service_event(const service_event::Event &) = 0;
+
+    /**
+     * A hook that is post()'ed into the io_service.
+     *
+     * As opposed to the module's constructor, code in this
+     * function will be invoked on the module's thread.
+     */
+    virtual void on_startup()
+    {
+    }
 
   private:
     std::unique_ptr<boost::asio::io_service::work> work_;

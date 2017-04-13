@@ -27,7 +27,7 @@ set(Boost_USE_MULTITHREADED ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
-find_package(Boost 1.55 REQUIRED date_time system serialization regex filesystem)
+find_package(Boost REQUIRED date_time system serialization regex filesystem coroutine)
 
 # ODB stuff
 if (LEOSAC_CROSS_COMPILE)

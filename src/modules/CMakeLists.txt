@@ -3,6 +3,9 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(MODULE_COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 endif()
 
+set(MODULE_COMPILE_DEFINITIONS
+        -DBOOST_USE_VALGRIND=1)
+
 set(LEOSAC_MODULE_INSTALL_DIR lib/leosac)
 
 add_subdirectory(rpleth)
@@ -24,3 +27,4 @@ add_subdirectory(tcp-notifier)
 add_subdirectory(websock-api)
 add_subdirectory(smtp)
 add_subdirectory(notifd)
+add_subdirectory(ws2)

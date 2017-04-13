@@ -19,13 +19,13 @@
 
 #pragma once
 
-#include "modules/websock-api/Messages.hpp"
+#include "modules/ws2/Parser.hpp"
 
 namespace Leosac
 {
 namespace Module
 {
-namespace WebSockAPI
+namespace WS2
 {
 /**
  * This class is dedicated to converting exception thrown
@@ -49,11 +49,11 @@ class ExceptionConverter
      * Create a ServerMessage response object from an exception.
      *
      * The UUID of the ServerMessage returned by this function
-     * is always "00000000-0000-0000-0000-000000000000".
-     * Indeed, this is because if this function is called, it means we failed
-     * to read the source message from a client, or something similar.
+     * is set "00000000-0000-0000-0000-000000000000" if the ClientMessage
+     * wasn't properly parsed.
      */
-    ServerMessage create_response_from_error(const std::exception_ptr &ptr);
+    ServerMessage create_response_from_error(const std::exception_ptr &ptr,
+                                             const ClientMessage &msg);
 
   private:
     virtual ServerMessage convert_impl(const std::exception_ptr &ptr);

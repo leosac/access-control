@@ -17,36 +17,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/ws2/api/Common.hpp"
+#include "modules/ws2/WS2.hpp"
+#include "tools/log.hpp"
 
-namespace Leosac
+using namespace Leosac::Module::WS2;
+
+extern "C" {
+const char *get_module_name()
 {
-namespace Module
-{
-namespace WS2
-{
-namespace API
-{
-boost::optional<json> get_leosac_version(const json &, ReqCtx)
-{
-    json ret;
-    ret["version"] = getVersionString();
-    return ret;
+    return "WS2";
+}
 }
 
-boost::optional<json> get_leosac_version_coro(const json &, ReqCtx rctx,
-                                              boost::asio::yield_context yc)
+/**
+* Entry point for the Websocket API module.
+*/
+extern "C" __attribute__((visibility("default"))) bool
+start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
+             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
 {
-    json ret;
-    ret["version"] = getVersionString();
-    boost::asio::steady_timer t(rctx.io_service_);
-
-    t.expires_from_now(std::chrono::milliseconds(1000));
-    t.async_wait(yc);
-
-    return ret;
-}
-}
-}
-}
+    return Leosac::Module::start_module_helper<WS2Module>(pipe, cfg, zmq_ctx, utils);
 }

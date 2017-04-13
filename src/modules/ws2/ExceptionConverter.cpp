@@ -17,18 +17,20 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ExceptionConverter.hpp"
-#include "Exceptions.hpp"
+#include "modules/ws2/ExceptionConverter.hpp"
 #include "exception/EntityNotFound.hpp"
 #include "exception/ModelException.hpp"
 #include "exception/PermissionDenied.hpp"
+#include "modules/ws2/Exceptions.hpp"
 #include "tools/log.hpp"
 #include <boost/type_index.hpp>
 
-using namespace Leosac;
-using namespace Leosac::Module;
-using namespace Leosac::Module::WebSockAPI;
-
+namespace Leosac
+{
+namespace Module
+{
+namespace WS2
+{
 ServerMessage ExceptionConverter::convert_merge(const std::exception_ptr &ptr,
                                                 const ServerMessage &msg)
 {
@@ -127,13 +129,34 @@ ServerMessage ExceptionConverter::convert_impl(const std::exception_ptr &ptr)
     return response;
 }
 
-ServerMessage ExceptionConverter::create_response_from_error(const std::exception_ptr &ptr)
+ServerMessage
+ExceptionConverter::create_response_from_error(const std::exception_ptr &ptr,
+                                               const ClientMessage &msg)
 {
     ServerMessage response;
     response.status_code = APIStatusCode::UNKNOWN;
     response.content     = {};
-response.uuid = "00000000-0000-0000-0000-000000000000";
-response.type = "none";
+
+    if (!msg.uuid.empty())
+    {
+        response.uuid = msg.uuid;
+    }
+    else
+    {
+        response.uuid = "00000000-0000-0000-0000-000000000000";
+    }
+
+    if (!msg.type.empty())
+    {
+        response.type = msg.type;
+    }
+    else
+    {
+        response.type = "none";
+    }
 
     return convert_merge(ptr, response);
+}
+}
+}
 }

@@ -40,6 +40,8 @@ void AsioModule::run()
     service_event_listener_ = get_service_registry().register_event_listener(
         [this](const service_event::Event &e) { on_service_event(e); });
 
+    io_service_.post([this]() { on_startup(); });
+
     work_ = std::make_unique<boost::asio::io_service::work>(io_service_);
     install_async_handlers();
     io_service_.run();
@@ -54,6 +56,11 @@ void AsioModule::install_async_handlers()
 
     auto reactor_poller(std::make_shared<AsyncReactorPoller>(*this));
     reactor_poller->schedule_wait();
+}
+
+boost::asio::io_service &AsioModule::get_io_service()
+{
+    return io_service_;
 }
 
 void AsioModule::StopWatcher::wait(const boost::system::error_code &ec)

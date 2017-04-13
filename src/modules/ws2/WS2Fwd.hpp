@@ -17,7 +17,11 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/ws2/api/Common.hpp"
+#pragma once
+
+#include <boost/optional.hpp>
+#include <json.hpp>
+#include <memory>
 
 namespace Leosac
 {
@@ -25,28 +29,11 @@ namespace Module
 {
 namespace WS2
 {
-namespace API
-{
-boost::optional<json> get_leosac_version(const json &, ReqCtx)
-{
-    json ret;
-    ret["version"] = getVersionString();
-    return ret;
-}
+class ConnectionMetadata;
+using ConnectionMetadataPtr = std::shared_ptr<ConnectionMetadata>;
+class MyWSServer;
 
-boost::optional<json> get_leosac_version_coro(const json &, ReqCtx rctx,
-                                              boost::asio::yield_context yc)
-{
-    json ret;
-    ret["version"] = getVersionString();
-    boost::asio::steady_timer t(rctx.io_service_);
-
-    t.expires_from_now(std::chrono::milliseconds(1000));
-    t.async_wait(yc);
-
-    return ret;
-}
-}
+using json = nlohmann::json;
 }
 }
 }

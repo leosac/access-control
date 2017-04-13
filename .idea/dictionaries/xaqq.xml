@@ -5,6 +5,8 @@
       <w>asio</w>
       <w>bruteforce</w>
       <w>concat</w>
+      <w>coroutine</w>
+      <w>coroutines</w>
       <w>deserialize</w>
       <w>dhcp</w>
       <w>didn</w>
