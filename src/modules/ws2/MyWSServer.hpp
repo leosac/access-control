@@ -77,52 +77,86 @@ class ReqCtx
     boost::asio::io_service &io_service_;
 };
 
+/**
+ * The available threading policies wrt message handle.
+ *
+ * Each message type can force a message policy onto
+ * its handler. If no policy is forced, we fallback
+ * on the connection-level processing policy (whose default
+ * is SERIAL).
+ */
 enum class MessageProcessingPolicy
 {
     /**
-     * Message are enqueue on the source connection's
-     * queue.
-     * This means that no two coroutines processing a message
-     * with QUEUED policy for the connection can be alive simultaneously.
+     * Message are enqueued on the source connection's queue.
+     * This means that no two coroutines or handler processing a message
+     * with SERIAL policy for the connection can *exist* simultaneously.
      *
-     * The coroutine handling the message runs on the connection's strand.
+     * The coroutine or handler responsible for the message runs
+     * on the connection's strand.
+     *
+     * Messages with this policy are therefore processed in the order
+     * in which they are read from the socket.
      */
-    QUEUED,
+    SERIAL,
 
     /**
-     * The message shall be processed asynchronously. It may be processed
-     * concurrently (but not in parallel) with a QUEUED message or
-     * other ASYNC for a given connection.
+     * The message can be processed concurrently to other messages
+     * with a CONCURRENT policy.
      *
-     * The coroutine handling the message runs on the connection's strand.
+     * It may be processed concurrently (but not in parallel) with a message
+     * having a SERIAL processing policy.
+     *
+     * Handlers with CONCURRENT policy executes on the strand of the connection
+     * from which the message originates. This means that no two CONCURRENT
+     * handler (from a given connection) can *run* at the same time on multiple threads.
      */
     CONCURRENT,
 
     /**
-     * Message processed with this policy must not require any information,
-     * metadata or otherwise, from the connection the message originates from.
+     * The PARALLEL policy doesn't impose additional constraints (such
+     * as strand or queueing) to the messages that use it.
      *
-     * The handler is run WITHOUT ANY strand.
-     * The handler may block the thread.
+     * The originating connection's metadatas ARE NOT available to
+     * handlers running in PARALLEL mode. This is because ConnectionMetadata
+     * objects are not thread-safe.
+     *
+     * The handler runs in any of the worker threads and DOES NOT
+     * use a strand.
      */
     PARALLEL
 };
 
+/**
+ * This enum describe the "type" of message handlers.
+ *
+ * Simply put, a message handler can either be a normal
+ * callable (FUNCTION), or a coroutine.
+ */
 enum class HandlerType
 {
+    /**
+     * Any normal callable object.
+     */
     FUNCTION,
+
+    /**
+     * A callable that can behave like a coroutine.
+     * COROUTINE handlers accept an additional parameter,
+     * the yield context.
+     */
     COROUTINE
 };
 
 class MyWSServer;
 
 /**
- * Manage message handler for the Websocket Server.
+ * Manage message handlers for the Websocket Server.
  *
- * This class must be thread safe because handler are looked up
- * by the worker thread.
- *
- * This class is tightly coupled with the MyWSServer class.
+ * The class provides public facilities to register handlers
+ * for given message types.
+ * It also provides facilities (destined to the MyWSServer)
+ * to invoke handler based on a predetermined type and policy.
  */
 class HandlerManager
 {
@@ -135,75 +169,62 @@ class HandlerManager
   public:
     HandlerManager(MyWSServer &s);
 
-    struct HandlerInfo
+    /**
+     * Register a function backed handler using a forced processing
+     * policy, `policy`.
+     */
+    bool register_handler(const std::string &message_type, RequestHandler handler,
+                          MessageProcessingPolicy policy)
     {
-        RequestHandler handler_;
+        HandlerManager::HandlerInfo hi;
+        hi.handler_                 = handler;
+        hi.force_processing_policy_ = true;
+        hi.mpp_                     = policy;
 
-        /**
-         * If true, the `mpp_` always apply for this handler.
-         */
-        bool force_processing_policy_;
+        return register_handler(message_type, hi);
+    }
 
-        /**
-         * The processing policy to use for the message.
-         * If force_processing_policy_ is true, always apply
-         * this policy.
-         */
-        MessageProcessingPolicy mpp_;
-    };
-
-    struct CoroutineHandlerInfo
+    /**
+     * Register a function backed handler.
+     * The handler doesn't force the processing policy.
+     */
+    bool register_handler(const std::string &message_type, RequestHandler handler)
     {
-
-        CoroutineRequestHandler handler_;
-
-        /**
-         * If true, the `mpp_` always apply for this handler.
-         */
-        bool force_processing_policy_;
-
-        /**
-         * The processing policy to use for the message.
-         * If force_processing_policy_ is true, always apply
-         * this policy.
-         */
-        MessageProcessingPolicy mpp_;
-    };
-
-    bool register_handler(const std::string &message_type, HandlerInfo hi);
-
-    template <typename HandlerT>
-    bool register_handler(const std::string &message_type, HandlerT handler)
-    {
-        std::lock_guard<decltype(mutex_)> lg(mutex_);
         HandlerManager::HandlerInfo hi;
         hi.handler_                 = handler;
         hi.force_processing_policy_ = false;
 
-        if (has_handler(message_type))
-            return false;
-
-        handlers_[message_type] = hi;
-        return true;
+        return register_handler(message_type, hi);
     }
 
+    /**
+     * Register a coroutine based handler for the message.
+     * The handler will run with the processing policy `policy`.
+     */
     bool register_coroutine_handler(const std::string &message_type,
-                                    CoroutineHandlerInfo chi);
-
-    template <typename HandlerT>
-    bool register_coroutine_handler(const std::string &message_type,
-                                    HandlerT handler)
+                                    CoroutineRequestHandler handler,
+                                    MessageProcessingPolicy policy)
     {
-        std::lock_guard<decltype(mutex_)> lg(mutex_);
+        HandlerManager::CoroutineHandlerInfo hi;
+        hi.handler_                 = handler;
+        hi.force_processing_policy_ = true;
+        hi.mpp_                     = policy;
+
+        return register_coroutine_handler(message_type, hi);
+    }
+
+    /**
+     * Register a coroutine based handler for the message.
+     * The handler doesn't force the processing policy.
+     */
+    bool register_coroutine_handler(const std::string &message_type,
+                                    CoroutineRequestHandler handler)
+    {
         HandlerManager::CoroutineHandlerInfo hi;
         hi.handler_                 = handler;
         hi.force_processing_policy_ = false;
 
-        if (has_handler(message_type))
-            return false;
-
-        coroutine_handlers_[message_type] = hi;
-        return true;
+        return register_coroutine_handler(message_type, hi);
     }
 
     /**
@@ -224,22 +245,46 @@ class HandlerManager
                                       MessageProcessingPolicy &out_policy) const;
 
     /**
-     * Invoked a function based handler for a message whose policy
-     * is parallel.
+     * Below are handlers invocations methods.
+     * We have a total of 6 methods, one per combination
+     * of HandlerType and MessageProcessingPolicy.
      */
-    void InvokeParallelFunctionHandler(ReqCtx rctx, const ClientMessage &msg);
 
     /**
- * Invoked a coroutine based handler for a message whose policy
- * is parallel.
- */
-    void InvokeParallelCoroutineHandler(ReqCtx rctx, const ClientMessage &msg);
+     * Invoke a function based handler for a message whose policy
+     * is PARALLEL.
+     */
+    void invoke_parallel_fct_handler(ReqCtx rctx, const ClientMessage &msg);
 
-    void InvokeConcurrentCoroutineHandler(ReqCtx rctx, const ClientMessage &msg);
-    void InvokeConcurrentFunctionHandler(ReqCtx rctx, const ClientMessage &msg);
+    /**
+     * Invoke a coroutine based handler for a message whose policy
+     * is PARALLEL.
+     */
+    void invoked_parallel_coro_handler(ReqCtx rctx, const ClientMessage &msg);
 
-    void InvokeQueuedFunctionHandler(ReqCtx rctx, const ClientMessage &msg);
-    void InvokeQueuedCoroutineHandler(ReqCtx rctx, const ClientMessage &msg);
+    /**
+     * Invoke a function handler for a message processed with
+     * CONCURRENT policy.
+     */
+    void invoke_concurrent_fct_handler(ReqCtx rctx, const ClientMessage &msg);
+
+    /**
+     * Invoke a coroutine handler for a message processed with
+     * CONCURRENT policy.
+     */
+    void invoke_concurrent_coro_handler(ReqCtx rctx, const ClientMessage &msg);
+
+    /**
+     * Invoke a function handler for a message processed using a SERIAL
+     * policy
+     */
+    void invoke_serial_fct_handler(ReqCtx rctx, const ClientMessage &msg);
+
+    /**
+     * Invoke a coroutine handler for a message processed using a SERIAL
+     * policy
+     */
+    void invoke_serial_coro_handler(ReqCtx rctx, const ClientMessage &msg);
 
   private:
     /**
@@ -248,6 +293,73 @@ class HandlerManager
      * @warning This method must be called with the lock held.
      */
     bool has_handler(const std::string &message_type) const;
+
+    /**
+     * Store information wrt a function backed handler.
+     */
+    struct HandlerInfo
+    {
+        RequestHandler handler_;
+
+        /**
+         * If true, the `mpp_` always apply for this handler.
+         */
+        bool force_processing_policy_;
+
+        /**
+         * The processing policy to use for the message.
+         * If force_processing_policy_ is true, always apply
+         * this policy.
+         */
+        MessageProcessingPolicy mpp_;
+    };
+
+    /**
+     * Store information wrt coroutine backed handler.
+     */
+    struct CoroutineHandlerInfo
+    {
+        CoroutineRequestHandler handler_;
+
+        /**
+         * If true, the `mpp_` always apply for this handler.
+         */
+        bool force_processing_policy_;
+
+        /**
+         * The processing policy to use for the message.
+         * If force_processing_policy_ is true, always apply
+         * this policy.
+         */
+        MessageProcessingPolicy mpp_;
+    };
+
+    /**
+     * Register a handler for `message_type`.
+     */
+    bool register_handler(const std::string &message_type, HandlerInfo hi);
+
+    /**
+     * Register a coroutine handler for `message_type`.
+     */
+    bool register_coroutine_handler(const std::string &message_type,
+                                    CoroutineHandlerInfo chi);
+
+    /**
+     * Call the user handler, and wrap its invokation in try catch
+     * that will convert exception into WebSocket message to report
+     * the error to the end-user.
+     */
+    void do_invoke_coro_handler(ReqCtx rctx, const ClientMessage &msg,
+                                CoroutineRequestHandler handler,
+                                boost::asio::yield_context yc);
+
+    /**
+     * @see do_invoke_coro_handler
+     */
+    void do_invoke_fct_handler(ReqCtx rctx, const ClientMessage &msg,
+                               RequestHandler handler);
+
 
     std::map<std::string, HandlerInfo> handlers_;
     std::map<std::string, CoroutineHandlerInfo> coroutine_handlers_;
@@ -264,7 +376,7 @@ class HandlerManager
  * websocket implementation.
  *
  * This server class provide parallelism to the server by
- * owning multiple thread that processs requests.
+ * owning multiple thread that process requests.
  *
  * This object lives in its parent thread but doesn't perform activity
  * in that thread.
@@ -315,14 +427,15 @@ class MyWSServer
                                 const ClientMessage &in) const;
 
     /**
-     * For for QUEUED message on the connection, and starts
-     * processing the next one, if any.
+     * Mark the connection as ready for the next SERIAL message
+     * and schedule a callable to process the next pending SERIAL
+     * message, if any.
      *
      * @warning This MUST be called from within the strand
      * of the connection (because it access the ConnectionMetadata,
      * and it is not thread safe).
      */
-    void process_next_queued_msg(ReqCtx rctx);
+    void process_next_serial_msg(const ConnectionMetadataPtr &md);
 
     /**
      * Send a ServerMessage to a client.
@@ -343,8 +456,8 @@ class MyWSServer
      * If this boolean in true, it means the message was already queued and
      * so we don't check and try to put it in the queue again.
      */
-    void ProcessMessage(websocketpp::connection_hdl hdl, const ClientMessage &msg,
-                        MessageProcessingPolicy policy, bool serial_next);
+    void process_msg(websocketpp::connection_hdl hdl, const ClientMessage &msg,
+                     MessageProcessingPolicy policy, bool serial_next);
 
     /**
      * Retrieve our metadata associated with the connection handle.

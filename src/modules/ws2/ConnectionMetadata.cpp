@@ -49,9 +49,19 @@ ClientMessage ConnectionMetadata::dequeue()
     return cp;
 }
 
-bool ConnectionMetadata::busy_with_queued_msg() const
+bool ConnectionMetadata::is_busy_for_serial() const
 {
-    return busy_handling_queued_message_;
+    return !ready_for_serial_;
+}
+
+void ConnectionMetadata::mark_ready_for_serial()
+{
+    ready_for_serial_ = true;
+}
+
+void ConnectionMetadata::mark_busy_for_serial()
+{
+    ready_for_serial_ = false;
 }
 }
 }

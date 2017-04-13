@@ -36,6 +36,8 @@ namespace WS2
 
 struct ClientMessage
 {
+    ClientMessage() = default;
+
     std::string uuid;
     std::string type;
     nlohmann::json content;

@@ -52,7 +52,7 @@ struct ConnectionMetadata
      * object has pending messages (store in this metadata object)
      * that needs to be processed.
      *
-     * This apply for message whose processing policy is QUEUE.
+     * This apply for message whose processing policy is SERIAL.
      */
     bool has_pending_messages() const;
 
@@ -64,28 +64,40 @@ struct ConnectionMetadata
     ClientMessage dequeue();
 
     /**
-     * Are we busy handling any queued message at this point ?
-     * @return
+     * Are we busy handling any serial message at this point ?
      */
-    bool busy_with_queued_msg() const;
+    bool is_busy_for_serial() const;
 
     /**
-     * A boolean to keep track of wether or not
-     * we are currently handling a message with
-     * QUEUE processing policy.
+     * Mark the connection as ready to process a SERIAL message.
      *
-     * This is not related to parallelism, if a sleeping
-     * coroutine is working on a message, this flag
-     * shall be true.
+     * This means that no handler with SERIAL policy are alive
+     * at this time.
      */
-    bool busy_handling_queued_message_{false};
+    void mark_ready_for_serial();
+
+    /**
+     * Mark the connection as busy handling message with SERIAL
+     * policy.
+     */
+    void mark_busy_for_serial();
 
     SecurityContextCPtr security_;
     std::shared_ptr<boost::asio::strand> connection_strand_;
 
-    MessageProcessingPolicy processing_policy{MessageProcessingPolicy::QUEUED};
+    MessageProcessingPolicy processing_policy{MessageProcessingPolicy::SERIAL};
 
     size_t request_count_{0};
+
+    websocketpp::connection_hdl connection_hdl_;
+
+  private:
+    /**
+     * A boolean to keep track of wether or not
+     * we are currently handling a message with
+     * SERIAL processing policy.
+     */
+    bool ready_for_serial_{true};
 };
 }
 }
