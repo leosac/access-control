@@ -18,7 +18,6 @@
 */
 
 #include "modules/ws2/MyWSServer.hpp"
-#include "modules/ws2/Parser.hpp"
 #include "api/Common.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/SecurityContext.hpp"
@@ -27,11 +26,13 @@
 #include "modules/ws2/ConnectionMetadata.hpp"
 #include "modules/ws2/ExceptionConverter.hpp"
 #include "modules/ws2/Exceptions.hpp"
+#include "modules/ws2/Parser.hpp"
+#include "tools/ThreadUtils.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/enforce.hpp"
 #include "tools/log.hpp"
 #include <boost/asio/spawn.hpp>
 #include <future>
-#include "tools/enforce.hpp"
 
 namespace Leosac
 {
@@ -71,18 +72,21 @@ MyWSServer::MyWSServer(const std::string &interface, uint16_t port,
 
     for (int i = 0; i < nb_worked_thread; ++i)
     {
-        worker_thread_.push_back(
-            std::make_unique<std::thread>([this]() { io_service_.run(); }));
+        worker_thread_.push_back(std::make_unique<std::thread>([this]() {
+            set_thread_name("mod_WS2_worker");
+            io_service_.run();
+        }));
     }
 
     // HandlerManager::CoroutineHandlerInfo hi;
     HandlerManager::CoroutineHandlerInfo hi;
     hi.handler_                 = &API::get_leosac_version_coro;
     hi.force_processing_policy_ = true;
-    hi.mpp_                     = MessageProcessingPolicy::QUEUED;
+    hi.mpp_                     = MessageProcessingPolicy::PARALLEL;
 
     handler_manager_.register_coroutine_handler("get_leosac_version", hi);
-   // handler_manager_.register_coroutine_handler("get_leosac_version", &API::get_leosac_version_coro);
+    // handler_manager_.register_coroutine_handler("get_leosac_version",
+    // &API::get_leosac_version_coro);
 }
 
 MyWSServer::~MyWSServer()
@@ -194,7 +198,8 @@ ConnectionMetadataPtr
 MyWSServer::metadata_from_connection_hdl(websocketpp::connection_hdl hdl)
 {
     std::lock_guard<std::mutex> lg(metadata_mutex_);
-    LEOSAC_ENFORCE(metadatas_.count(hdl), "No metadata for connection. Connection is probably dead.");
+    LEOSAC_ENFORCE(metadatas_.count(hdl),
+                   "No metadata for connection. Connection is probably dead.");
     return metadatas_.at(hdl);
 }
 

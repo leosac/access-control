@@ -57,7 +57,7 @@ int main(int argc, const char **argv)
     std::cout << "Running Leosac version " << Leosac::getVersionString()
               << std::endl;
 
-    Leosac::set_thread_name("main");
+    Leosac::set_thread_name("leosac");
     try
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ',
