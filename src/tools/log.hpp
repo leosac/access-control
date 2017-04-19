@@ -231,3 +231,30 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
         }                                                                           \
     } while (0)
 #endif
+
+#ifdef NDEBUG
+#define ASSERT_CANNOT_BE_HERE(msg)                                                  \
+    do                                                                              \
+    {                                                                               \
+        (void)sizeof(msg);                                                          \
+    } while (0)
+#else
+/**
+ * Macro to make sure a code path is not taken.
+ * This macro will both raise SIGABRT and throw
+ * an exception.
+ *
+ * The reason for throwing is to avoid warning about
+ * not returning when this macro is called from non
+ * void function.
+ */
+#define ASSERT_CANNOT_BE_HERE(msg)                                                  \
+    do                                                                              \
+    {                                                                               \
+        ERROR("Cannot-be-here assertion failed in "                                 \
+              << __FILE__ << " --> " << FUNCTION_NAME_MACRO << ":" << __LINE__      \
+              << ". Aborting.");                                                    \
+        raise(SIGABRT);                                                             \
+        throw std::runtime_error("Cannot be here.");                                \
+    } while (0)
+#endif

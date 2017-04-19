@@ -109,7 +109,8 @@ enum class MessageProcessingPolicy
      *
      * Handlers with CONCURRENT policy executes on the strand of the connection
      * from which the message originates. This means that no two CONCURRENT
-     * handler (from a given connection) can *run* at the same time on multiple threads.
+     * handler (from a given connection) can *run* at the same time on multiple
+     * threads.
      */
     CONCURRENT,
 
@@ -260,7 +261,7 @@ class HandlerManager
      * Invoke a coroutine based handler for a message whose policy
      * is PARALLEL.
      */
-    void invoked_parallel_coro_handler(ReqCtx rctx, const ClientMessage &msg);
+    void invoke_parallel_coro_handler(ReqCtx rctx, const ClientMessage &msg);
 
     /**
      * Invoke a function handler for a message processed with

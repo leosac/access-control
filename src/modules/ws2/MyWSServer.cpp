@@ -126,10 +126,9 @@ void MyWSServer::on_open(websocketpp::connection_hdl hdl)
 {
     {
         std::lock_guard<std::mutex> lg(metadata_mutex_);
-        auto metadata                = std::make_shared<ConnectionMetadata>();
-        metadata->connection_strand_ = srv_.get_con_from_hdl(hdl)->get_strand();
-        metadata->connection_hdl_    = hdl;
-        metadatas_[hdl]              = metadata;
+        auto metadata = std::make_shared<ConnectionMetadata>(
+            srv_.get_con_from_hdl(hdl)->get_strand(), hdl);
+        metadatas_[hdl] = metadata;
     }
     auto path = srv_.get_con_from_hdl(hdl)->get_resource();
 
@@ -143,7 +142,7 @@ void MyWSServer::on_close(websocketpp::connection_hdl hdl)
         std::lock_guard<std::mutex> lg(metadata_mutex_);
         metadatas_.erase(hdl);
 
-        DEBUG("CONNECTION CLOSED. Handled " << md->request_count_ << " requests.");
+        DEBUG("CONNECTION CLOSED. Handled " << md->msg_count() << " requests.");
     }
 }
 
@@ -173,13 +172,13 @@ void MyWSServer::on_message(websocketpp::connection_hdl hdl,
                                      std::current_exception(), client_message));
         return;
     }
-    metadata->request_count_++;
+    metadata->incr_msg_count();
     // Now that we know the message is valid-json and has been parsed,
     // we can continue. We'll build a ReqCtx.
     ReqCtx request_context(io_service_);
     request_context.audit_          = audit; // May be null.
     request_context.metadata_       = metadata;
-    request_context.sc_             = request_context.metadata_->security_;
+    request_context.sc_             = request_context.metadata_->security_context();
     request_context.connection_hdl_ = hdl;
 
     auto policy = determine_processing_policy(metadata, client_message);
@@ -237,7 +236,7 @@ void MyWSServer::process_msg(websocketpp::connection_hdl hdl,
         ReqCtx request_context(io_service_);
         request_context.audit_          = nullptr;
         request_context.metadata_       = metadata;
-        request_context.sc_             = metadata->security_;
+        request_context.sc_             = metadata->security_context();
         request_context.connection_hdl_ = hdl;
 
         HandlerType ht = handler_manager_.get_handler_type(msg.type);
@@ -248,7 +247,7 @@ void MyWSServer::process_msg(websocketpp::connection_hdl hdl,
             if (ht == HandlerType::FUNCTION)
                 handler_manager_.invoke_parallel_fct_handler(request_context, msg);
             else
-                handler_manager_.invoked_parallel_coro_handler(request_context, msg);
+                handler_manager_.invoke_parallel_coro_handler(request_context, msg);
         }
         else if (policy == MessageProcessingPolicy::CONCURRENT)
         {
@@ -274,7 +273,7 @@ void MyWSServer::process_msg(websocketpp::connection_hdl hdl,
                 // If the connection's already busy processing a queued message,
                 // we enqueue the message onto the connection's metadata's queue.
                 DEBUG("QUEUEING MESSAGE FOR CONNECTION");
-                metadata->messages_.push(msg);
+                metadata->enqueue(msg);
                 return;
             }
             if (ht == HandlerType::FUNCTION)
@@ -292,15 +291,15 @@ void MyWSServer::process_msg(websocketpp::connection_hdl hdl,
 void MyWSServer::process_next_serial_msg(const ConnectionMetadataPtr &md)
 {
     md->mark_ready_for_serial();
-    md->connection_strand_->post([this, md]() {
+    md->strand()->post([this, md]() {
         // Process next queue message.
         DEBUG("WILL CHECK FOR PENDING MESSAGE");
         if (md->has_pending_messages())
         {
             DEBUG("FOUND SOME (BUSY ? " << md->is_busy_for_serial());
             ClientMessage next_message = md->dequeue();
-            process_msg(md->connection_hdl_, next_message,
-                        MessageProcessingPolicy::SERIAL, true);
+            process_msg(md->handle(), next_message, MessageProcessingPolicy::SERIAL,
+                        true);
         }
     });
 }
@@ -359,7 +358,8 @@ HandlerType HandlerManager::get_handler_type(const std::string &message_type) co
                    "Cannot have multiple handler for a single type.");
         return HandlerType::COROUTINE;
     }
-    ASSERT_LOG(0, "Cannot be here.");
+    ASSERT_CANNOT_BE_HERE(
+        "Cannot find handler at a point we are garanteed to find one.");
 }
 
 bool HandlerManager::get_forced_processing_policy(
@@ -418,8 +418,8 @@ void HandlerManager::invoke_parallel_fct_handler(ReqCtx rctx,
 }
 
 
-void HandlerManager::invoked_parallel_coro_handler(ReqCtx rctx,
-                                                   const ClientMessage &msg)
+void HandlerManager::invoke_parallel_coro_handler(ReqCtx rctx,
+                                                  const ClientMessage &msg)
 {
     std::lock_guard<decltype(mutex_)> lg(mutex_);
     ASSERT_LOG(rctx.metadata_ == nullptr,
@@ -432,11 +432,11 @@ void HandlerManager::invoked_parallel_coro_handler(ReqCtx rctx,
     LEOSAC_ENFORCE(itr != coroutine_handlers_.end(), "Cannot find handler");
     CoroutineHandlerInfo hi = itr->second;
 
-    boost::asio::spawn(server_.io_service_,
-                       [ this, rctx, msg, handler(hi.handler_) ](
-                           boost::asio::yield_context yc) {
-                           do_invoke_coro_handler(rctx, msg, handler, yc);
-                       });
+    boost::asio::spawn(
+        server_.io_service_,
+        [ this, rctx, msg, handler(hi.handler_) ](boost::asio::yield_context yc) {
+            do_invoke_coro_handler(rctx, msg, handler, yc);
+        });
 }
 
 void HandlerManager::invoke_concurrent_coro_handler(ReqCtx rctx,
@@ -451,11 +451,11 @@ void HandlerManager::invoke_concurrent_coro_handler(ReqCtx rctx,
     LEOSAC_ENFORCE(itr != coroutine_handlers_.end(), "Cannot find handler");
     CoroutineHandlerInfo hi = itr->second;
 
-    boost::asio::spawn(*rctx.metadata_->connection_strand_,
-                       [ this, rctx, msg, handler(hi.handler_) ](
-                           boost::asio::yield_context yc) {
-                           do_invoke_coro_handler(rctx, msg, handler, yc);
-                       });
+    boost::asio::spawn(
+        *rctx.metadata_->strand(),
+        [ this, rctx, msg, handler(hi.handler_) ](boost::asio::yield_context yc) {
+            do_invoke_coro_handler(rctx, msg, handler, yc);
+        });
 }
 
 void HandlerManager::invoke_concurrent_fct_handler(ReqCtx rctx,
@@ -471,10 +471,9 @@ void HandlerManager::invoke_concurrent_fct_handler(ReqCtx rctx,
 
     HandlerInfo hi = itr->second;
 
-    rctx.metadata_->connection_strand_->post(
-        [ this, rctx, msg, handler(hi.handler_) ]() {
-            do_invoke_fct_handler(rctx, msg, handler);
-        });
+    rctx.metadata_->strand()->post([ this, rctx, msg, handler(hi.handler_) ]() {
+        do_invoke_fct_handler(rctx, msg, handler);
+    });
 }
 
 void HandlerManager::invoke_serial_fct_handler(ReqCtx rctx, const ClientMessage &msg)
@@ -492,11 +491,10 @@ void HandlerManager::invoke_serial_fct_handler(ReqCtx rctx, const ClientMessage 
     ASSERT_LOG(!rctx.metadata_->is_busy_for_serial(), "Connection already busy");
     rctx.metadata_->mark_busy_for_serial();
 
-    rctx.metadata_->connection_strand_->post(
-        [ this, rctx, msg, handler(hi.handler_) ]() {
-            do_invoke_fct_handler(rctx, msg, handler);
-            server_.process_next_serial_msg(rctx.metadata_);
-        });
+    rctx.metadata_->strand()->post([ this, rctx, msg, handler(hi.handler_) ]() {
+        do_invoke_fct_handler(rctx, msg, handler);
+        server_.process_next_serial_msg(rctx.metadata_);
+    });
 }
 
 void HandlerManager::invoke_serial_coro_handler(ReqCtx rctx,
@@ -514,12 +512,12 @@ void HandlerManager::invoke_serial_coro_handler(ReqCtx rctx,
     ASSERT_LOG(!rctx.metadata_->is_busy_for_serial(), "Connection already busy");
     rctx.metadata_->mark_busy_for_serial();
 
-    boost::asio::spawn(*rctx.metadata_->connection_strand_,
-                       [ this, rctx, msg, handler(hi.handler_) ](
-                           boost::asio::yield_context yc) {
-                           do_invoke_coro_handler(rctx, msg, handler, yc);
-                           server_.process_next_serial_msg(rctx.metadata_);
-                       });
+    boost::asio::spawn(
+        *rctx.metadata_->strand(),
+        [ this, rctx, msg, handler(hi.handler_) ](boost::asio::yield_context yc) {
+            do_invoke_coro_handler(rctx, msg, handler, yc);
+            server_.process_next_serial_msg(rctx.metadata_);
+        });
 }
 
 void HandlerManager::do_invoke_coro_handler(ReqCtx rctx, const ClientMessage &msg,

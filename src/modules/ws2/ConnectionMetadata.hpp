@@ -42,10 +42,17 @@ namespace WS2
  */
 struct ConnectionMetadata
 {
-    ConnectionMetadata();
-    std::string uuid_;
-
-    std::queue<ClientMessage> messages_;
+    /**
+     * Create a ConnectionMetadata, definitively associating an
+     * ASIO's strand and a Websocketpp connection handle
+     * to it.
+     *
+     * @param connection_strand The ASIO strand in which the connection's handler
+     * executes. MUST NOT BE NULL.
+     * @param connection_handle The Websocketpp handle to the connection.
+     */
+    ConnectionMetadata(std::shared_ptr<boost::asio::strand> connection_strand,
+                       websocketpp::connection_hdl connection_handle);
 
     /**
      * Check if the connection associated with this metadata
@@ -61,7 +68,22 @@ struct ConnectionMetadata
      */
     void enqueue(const ClientMessage &msg);
 
+    /**
+     * Retrieve the next queued message.
+     *
+     * You MUST make sure that such message exists. Call has_pending_messages()
+     * before.
+     */
     ClientMessage dequeue();
+
+    /**
+     * Retrieve the SecurityContext associated with this connection.
+     *
+     * This function will never return nullptr. If no context is
+     * associated to the connection, it will return a fresh instance
+     * of a NullSecurityContext.
+     */
+    SecurityContextCPtr security_context() const;
 
     /**
      * Are we busy handling any serial message at this point ?
@@ -82,22 +104,51 @@ struct ConnectionMetadata
      */
     void mark_busy_for_serial();
 
-    SecurityContextCPtr security_;
-    std::shared_ptr<boost::asio::strand> connection_strand_;
+    const MessageProcessingPolicy processing_policy{MessageProcessingPolicy::SERIAL};
 
-    MessageProcessingPolicy processing_policy{MessageProcessingPolicy::SERIAL};
+    /**
+     * Increment the count of message received on this connection.
+     */
+    void incr_msg_count();
 
-    size_t request_count_{0};
+    /**
+     * Return the number of message received on this connection.
+     */
+    size_t msg_count() const;
 
-    websocketpp::connection_hdl connection_hdl_;
+    /**
+     * Retrieve the strand associated to the connection.
+     */
+    const std::shared_ptr<boost::asio::strand> &strand() const;
+
+    /**
+     * Retrieve the connection handle of the connection this
+     * metadata object represents.
+     */
+    const websocketpp::connection_hdl &handle() const;
 
   private:
+    std::string uuid_;
+
     /**
      * A boolean to keep track of wether or not
      * we are currently handling a message with
      * SERIAL processing policy.
      */
     bool ready_for_serial_{true};
+
+    /**
+     * Total of message received by the connection.
+     */
+    size_t msg_count_{0};
+
+    std::queue<ClientMessage> messages_;
+
+    std::shared_ptr<boost::asio::strand> connection_strand_;
+
+    websocketpp::connection_hdl connection_hdl_;
+
+    SecurityContextCPtr security_;
 };
 }
 }
