@@ -38,8 +38,8 @@ json UserEventJSON::serialize(const Audit::IUserEvent &in, const SecurityContext
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-user-event";
 
-    serialized["relationships"]["target"] = {
-        {{"id", in.target_id()}, {"type", "user"}}};
+    serialized["relationships"]
+              ["target"] = {{{"id", in.target_id()}, {"type", "user"}}};
 
     if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {

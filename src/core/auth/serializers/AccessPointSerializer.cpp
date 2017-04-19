@@ -41,8 +41,8 @@ json AccessPointJSONSerializer::serialize(const Auth::IAccessPoint &ap,
 
     if (ap.door_id())
     {
-        serialized["relationships"]["door"] = {
-            {"data", {{"id", ap.door_id()}, {"type", "door"}}}};
+        serialized["relationships"]
+                  ["door"] = {{"data", {{"id", ap.door_id()}, {"type", "door"}}}};
     }
     return serialized;
 }

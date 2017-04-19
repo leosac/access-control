@@ -37,8 +37,8 @@ json ZoneEventJSON::serialize(const Audit::IZoneEvent &in, const SecurityContext
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-zone-event";
 
-    serialized["relationships"]["target"] = {
-        {{"id", in.target_id()}, {"type", "zone"}}};
+    serialized["relationships"]
+              ["target"] = {{{"id", in.target_id()}, {"type", "zone"}}};
 
     if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {

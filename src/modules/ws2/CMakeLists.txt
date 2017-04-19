@@ -8,6 +8,8 @@ set(WS2_SRCS
         Parser.cpp
         ExceptionConverter.cpp
         Exceptions.cpp
+        WS2Service.cpp
+        HandlerManager.cpp
         api/Common.cpp
         )
 
@@ -44,7 +46,8 @@ target_include_directories(${WS2_BIN}
 target_compile_definitions(${WS2_BIN}
         PRIVATE
         DATABASE_MYSQL
-        -DBOOST_COROUTINES_NO_DEPRECATION_WARNING
+        BOOST_COROUTINE_NO_DEPRECATION_WARNING
+        BOOST_COROUTINES_NO_DEPRECATION_WARNING
         ${MODULE_COMPILE_DEFINITIONS}
         )
 

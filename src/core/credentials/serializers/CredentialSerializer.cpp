@@ -63,8 +63,8 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
 
     if (in.owner_id())
     {
-        serialized["relationships"]["owner"] = {
-            {"data", {{"id", in.owner_id()}, {"type", "user"}}}};
+        serialized["relationships"]
+                  ["owner"] = {{"data", {{"id", in.owner_id()}, {"type", "user"}}}};
     }
     serialized["relationships"]["schedules"] = {{"data", schedules}};
     return serialized;

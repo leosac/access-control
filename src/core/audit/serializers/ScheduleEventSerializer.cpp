@@ -38,8 +38,8 @@ json ScheduleEventJSON::serialize(const Audit::IScheduleEvent &in,
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-schedule-event";
 
-    serialized["relationships"]["target"] = {
-        {{"id", in.target_id()}, {"type", "schedule"}}};
+    serialized["relationships"]
+              ["target"] = {{{"id", in.target_id()}, {"type", "schedule"}}};
 
     if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {

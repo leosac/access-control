@@ -37,8 +37,8 @@ json DoorEventJSON::serialize(const Audit::IDoorEvent &in, const SecurityContext
                "Base audit serialization did something unexpected.");
     serialized["type"] = "audit-door-event";
 
-    serialized["relationships"]["target"] = {
-        {{"id", in.target_id()}, {"type", "door"}}};
+    serialized["relationships"]
+              ["target"] = {{{"id", in.target_id()}, {"type", "door"}}};
 
     if (sc.check_permission(SecurityContext::Action::AUDIT_READ_FULL))
     {

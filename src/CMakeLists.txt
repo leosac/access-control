@@ -207,10 +207,15 @@ set_target_properties(${LEOSAC_BIN} PROPERTIES
 set_target_properties(${LEOSAC_LIB} PROPERTIES
     COMPILE_FLAGS "${LEOSAC_COMPILE_FLAGS}")
 
-target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB} backtrace)
-target_link_libraries(${LEOSAC_LIB} dl pthread zmqpp ${Boost_LIBRARIES}
-        ${ODB_LIBRARIES} backtrace scrypt
+target_link_libraries(${LEOSAC_BIN} ${LEOSAC_LIB})
+target_link_libraries(${LEOSAC_LIB}
+        dl
+        pthread
+        zmqpp
+        ${Boost_LIBRARIES}
+        ${ODB_LIBRARIES}
         leosac_db
+        scrypt
         )
 
 # Somehow, cross compile requires us to link against libcrypto
@@ -221,12 +226,15 @@ if (LEOSAC_CROSS_COMPILE)
     # We disable per-exception stacktrace generation when cross compiling
     # because that is a debug feature that takes a lot of ram and can't
     # be properly freed.
-    target_compile_definitions(${LEOSAC_LIB} PUBLIC -DLEOSAC_STACKTRACE_DISABLED=1)
+    set (LEOSAC_STACKTRACE_DISABLED true)
 endif()
 
 if (${LEOSAC_STACKTRACE_DISABLED})
     # Disable stacktrace generation.
     target_compile_definitions(${LEOSAC_LIB} PUBLIC -DLEOSAC_STACKTRACE_DISABLED=1)
+else()
+    target_link_libraries(${LEOSAC_BIN} backtrace)
+    target_link_libraries(${LEOSAC_LIB} backtrace)
 endif()
 
 install(TARGETS ${LEOSAC_BIN} DESTINATION bin)

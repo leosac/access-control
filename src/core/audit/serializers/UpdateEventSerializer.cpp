@@ -40,8 +40,8 @@ json UpdateEventJSON::serialize(const Audit::IUpdateEvent &in,
     serialized["type"] = "audit-update-event";
 
     // fixme need concrete type.
-    serialized["relationships"]["target"] = {
-        {{"id", in.target_id()}, {"type", "update"}}};
+    serialized["relationships"]
+              ["target"] = {{{"id", in.target_id()}, {"type", "update"}}};
     return serialized;
 }
 }

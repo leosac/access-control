@@ -79,8 +79,7 @@ boost::optional<json> ICRUDResourceHandler::process(const ClientMessage &msg)
         enforce_permission(perms);
         return delete_impl(msg.content);
     }
-    ASSERT_LOG(0, "Should not be here.");
-    throw LEOSACException("Should not be here");
+    ASSERT_CANNOT_BE_HERE(".");
 }
 
 CRUDResourceHandler::CRUDResourceHandler(RequestContext ctx)

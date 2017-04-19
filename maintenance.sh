@@ -3,9 +3,10 @@
 #     + It reformats the source code using clang-format
 #     + It checks for source files that may miss license information
 
+CLANG_FORMAT=clang-format-3.8
 
 # Format source code
-find -L src test -name "*.cpp" -or -name "*.hpp" | xargs clang-format-3.9 -i -style=file 
+find -L src test -name "*.cpp" -or -name "*.hpp" | xargs $CLANG_FORMAT -i -style=file 
 
 
 # Find files missing license header
@@ -14,7 +15,8 @@ do
     # get line 2 of the files. 
     COPYRIGHT=`head -n2 $f | tail -n1`
     EXPECTED="    Copyright (C) 2014-2016 Leosac"
-    if [ "$COPYRIGHT" != "$EXPECTED" ]
+    EXPECTED2="    Copyright (C) 2014-2017 Leosac"
+    if [ "$COPYRIGHT" != "$EXPECTED" ] && [ "$COPYRIGHT" != "$EXPECTED2" ]
     then
         echo "File $f doesn't have license information."
     fi

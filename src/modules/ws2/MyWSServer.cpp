@@ -296,7 +296,7 @@ void MyWSServer::process_next_serial_msg(const ConnectionMetadataPtr &md)
         DEBUG("WILL CHECK FOR PENDING MESSAGE");
         if (md->has_pending_messages())
         {
-            DEBUG("FOUND SOME (BUSY ? " << md->is_busy_for_serial());
+            ASSERT_LOG(!md->is_busy_for_serial(), "Shouldn't be busy.");
             ClientMessage next_message = md->dequeue();
             process_msg(md->handle(), next_message, MessageProcessingPolicy::SERIAL,
                         true);
