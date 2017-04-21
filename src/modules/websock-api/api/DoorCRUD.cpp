@@ -28,6 +28,8 @@
 #include "exception/ModelException.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/db/OptionalTransaction.hpp"
+#include "tools/enforce.hpp"
 
 
 using namespace Leosac;
@@ -54,6 +56,7 @@ boost::optional<json> DoorCRUD::create_impl(const json &req)
     Auth::DoorPtr new_door = std::make_shared<Auth::Door>();
     DoorJSONSerializer::unserialize(*new_door, req.at("attributes"),
                                     security_context());
+    enforce_ap_not_already_referenced(new_door->access_point_id());
     db->persist(new_door);
 
     auto audit = Audit::Factory::DoorEvent(db, new_door, ctx_.audit);
@@ -121,6 +124,7 @@ boost::optional<json> DoorCRUD::update_impl(const json &req)
     audit->access_point_id_before(door->access_point_id());
 
     DoorJSONSerializer::unserialize(*door, req.at("attributes"), security_context());
+    enforce_ap_not_already_referenced(door->access_point_id());
 
     db->update(door_odb);
     audit->after(DoorJSONStringSerializer::serialize(
@@ -184,4 +188,24 @@ DoorCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
         break;
     }
     return ret;
+}
+
+void DoorCRUD::enforce_ap_not_already_referenced(Auth::AccessPointId apid)
+{
+    if (apid == 0)
+        return;
+
+    db::OptionalTransaction t(ctx_.dbsrv->db()->begin());
+    auto ret = ctx_.dbsrv->db()->query<Auth::Door>(
+        odb::query<Auth::Door>::access_point == apid);
+
+    if (!ret.empty())
+    {
+        Auth::DoorPtr door = LEOSAC_ENFORCE(ret.begin().load(), "Failed to load");
+        throw LEOSACException(fmt::format(
+            "The AccessPoint with id {} is already referenced by door with id {}.",
+            apid, door->id()));
+    }
+
+    t.commit();
 }

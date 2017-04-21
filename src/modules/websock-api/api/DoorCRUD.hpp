@@ -52,6 +52,15 @@ class DoorCRUD : public CRUDResourceHandler
     virtual boost::optional<json> update_impl(const json &req) override;
 
     virtual boost::optional<json> delete_impl(const json &req) override;
+
+    /**
+     * Make sure that the AccessPoint with id `apid` is not
+     * already referenced by a door.
+     *
+     * If it is, we'll throw an exception to notify the user of the
+     * error rather than rely on the database constraint.
+     */
+    void enforce_ap_not_already_referenced(Auth::AccessPointId apid);
 };
 }
 }
