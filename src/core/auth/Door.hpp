@@ -74,6 +74,7 @@ class Door : public virtual IDoor
      * The access point that controls the door.
      * May be null.
      */
+#pragma db unique
     std::shared_ptr<AccessPoint> access_point_;
 
 /**
