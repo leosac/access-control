@@ -101,20 +101,27 @@ void SMTPModule::process_config()
 {
     if ((use_database_ = config_.get<bool>("module_config.use_database", false)))
     {
-        setup_database();
-        // Load config from database.
-        int count = 0;
-        odb::transaction t(utils_->database()->begin());
-        odb::result<SMTPConfig> result(utils_->database()->query<SMTPConfig>());
-        for (const auto &cfg : result)
+        try
         {
-            smtp_config_ = std::make_unique<SMTPConfig>(cfg);
-            count++;
+            setup_database();
+            // Load config from database.
+            int count = 0;
+            odb::transaction t(utils_->database()->begin());
+            odb::result<SMTPConfig> result(utils_->database()->query<SMTPConfig>());
+            for (const auto &cfg : result)
+            {
+                smtp_config_ = std::make_unique<SMTPConfig>(cfg);
+                count++;
+            }
+            t.commit();
+            ASSERT_LOG(count == 0 || count == 1,
+                       "We have more than one SMTPConfig entry in the database.");
+            INFO("SMTP module using SQL database for configuration.");
         }
-        t.commit();
-        ASSERT_LOG(count == 0 || count == 1,
-                   "We have more than one SMTPConfig entry in the database.");
-        INFO("SMTP module using SQL database for configuration.");
+        catch (const odb::exception &e)
+        {
+            WARN("SMTP module failed to load database configure. Using default config.");
+        }
         if (!smtp_config_)
             smtp_config_ = std::make_unique<SMTPConfig>();
     }
