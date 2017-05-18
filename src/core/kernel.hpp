@@ -230,6 +230,10 @@ class Kernel
 
     void configure_database();
 
+    void populate_default_db();
+
+    void connect_to_db(const boost::property_tree::ptree &db_cfg_node);
+
     void configure_logger();
 
     /**

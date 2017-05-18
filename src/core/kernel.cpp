@@ -489,154 +489,40 @@ void Kernel::configure_database()
     auto db_cfg_node = config_manager_.kconfig().get_child_optional("database");
     if (db_cfg_node)
     {
-        try
+        ElapsedTimeCounter etc;
+        int wait_time = 1;
+        while (etc.elapsed() < db_cfg_node->get<uint64_t>("startup_abort_time", 60 * 5) * 1000)
         {
-            std::string db_type = db_cfg_node->get<std::string>("type", "");
-            if (db_type == "sqlite")
+            try
             {
-#ifndef LEOSAC_PGSQL_ONLY
-                std::string db_path = db_cfg_node->get<std::string>("path");
-                database_           = std::make_shared<odb::sqlite::database>(
-                    db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
-#else
-                throw LEOSACException("SQLite support disabled at compile time.");
-#endif
-            }
-            else if (db_type == "mysql" || db_type == "pgsql")
-            {
-                std::string db_user   = db_cfg_node->get<std::string>("username");
-                std::string db_pw     = db_cfg_node->get<std::string>("password");
-                std::string db_dbname = db_cfg_node->get<std::string>("dbname");
-                std::string db_host   = db_cfg_node->get<std::string>("host", "");
-                uint16_t db_port      = db_cfg_node->get<uint16_t>("port", 0);
-
-                if (db_type == "mysql")
-                {
-#ifndef LEOSAC_PGSQL_ONLY
-                    database_ = std::make_shared<odb::mysql::database>(
-                        db_user, db_pw, db_dbname, db_host, db_port);
-#else
-                    throw LEOSACException("MySQL support disabled at compile time.");
-#endif
-                }
-                else
-                {
-                    auto pg_db = std::make_shared<odb::pgsql::database>(
-                        db_user, db_pw, db_dbname, db_host, db_port);
-                    // todo: care about leak
-                    pg_db->tracer(new db::PGSQLTracer(true));
-                    database_ = pg_db;
-                }
-            }
-            else
-            {
-                throw ConfigException(config_file_path(),
-                                      "Unsupported database type: " +
-                                          Colorize::underline(db_type));
-            }
-
-            // Create or update database.
-            // Very simple, for now. No migration.
-            {
-                using namespace odb;
-                using namespace odb::core;
-
-                Auth::UserPtr admin;
-                Auth::GroupPtr users;
-                Cred::RFIDCardPtr card;
-                schema_version v = database_->schema_version("core");
+                connect_to_db(*db_cfg_node);
+                ASSERT_LOG(database_, "Database pointer is null");
+                // Check if schema already exists.
+                DEBUG("Getting database schema version...");
+                odb::schema_version v = database_->schema_version("core");
+                DEBUG("Database schema version: " << v);
                 if (v == 0)
                 {
-
-                    // Create the core schema.
-                    {
-                        transaction t(database_->begin());
-                        schema_catalog::create_schema(*database_, "core");
-                        t.commit();
-                    }
-
-                    // Default users / groups
-                    {
-                        transaction t(database_->begin());
-
-                        admin = std::make_shared<Auth::User>();
-                        admin->firstname("Admin");
-                        admin->lastname("ADMIN");
-                        admin->username("admin");
-                        admin->password("admin");
-                        admin->rank(Auth::UserRank::ADMIN);
-                        database_->persist(admin);
-
-                        Auth::UserPtr demo = std::make_shared<Auth::User>();
-                        demo->firstname("Demo");
-                        demo->lastname("Demo");
-                        demo->username("demo");
-                        demo->password("demo");
-                        database_->persist(demo);
-
-                        Auth::GroupPtr administrators =
-                            std::make_shared<Auth::Group>();
-                        administrators->name("Administrator");
-                        administrators->member_add(admin);
-                        database_->persist(administrators);
-
-                        users = std::make_shared<Auth::Group>();
-                        users->name("Users");
-                        users->member_add(demo);
-                        users->member_add(admin);
-                        database_->persist(users);
-                        t.commit();
-                    }
-
-                    // Credentials stuff
-                    {
-                        transaction t(database_->begin());
-
-                        card = std::make_shared<Cred::RFIDCard>();
-                        card->owner(admin);
-                        card->alias(std::string("BestCardEver"));
-                        card->card_id("00:11:22:33");
-                        card->nb_bits(32);
-                        database_->persist(card);
-
-                        Cred::RFIDCard card2;
-                        card2.alias(std::string("Ownerless"));
-                        card2.card_id("aa:bb:cc:dd");
-                        card2.nb_bits(32);
-                        database_->persist(card2);
-                        t.commit();
-                    }
-
-                    // Schedules stuff
-                    {
-                        transaction t(database_->begin());
-
-                        Tools::SchedulePtr sched =
-                            std::make_shared<Tools::Schedule>();
-                        sched->name("DummySchedule");
-                        sched->description("A test schedule, with mapping.");
-                        Tools::ScheduleMappingPtr map0 =
-                            std::make_shared<ScheduleMapping>();
-                        map0->add_user(admin);
-                        map0->add_group(users);
-                        map0->add_credential(card);
-                        map0->alias("My first mapping");
-                        database_->persist(map0);
-                        sched->add_mapping(map0);
-                        database_->persist(sched);
-
-                        t.commit();
-                    }
+                    // If not, create and populate default db
+                    populate_default_db();
                 }
+                return;
+            }
+            catch (const odb::exception &e)
+            {
+                if (utils_->is_strict())
+                    throw;
+                WARN("Cannot connect to or initialize database at this point. "
+                     "Leosac will now start until it can reach the database. "
+                     "Error was: "
+                     << e.what());
+                INFO("WIll now wait " << wait_time << " seconds.");
+                std::this_thread::sleep_for(std::chrono::seconds(wait_time));
+                wait_time = std::min(wait_time * 2, 60);
             }
         }
-        catch (const odb::exception &e)
-        {
-            if (utils_->is_strict())
-                throw;
-            WARN("Skipping potential database update due to database error: "
-                 << e.what());
-        }
+        throw LEOSACException("Startup failed. Couldn't correctly "
+                                      "connect to / initialize the database");
     }
 }
 
@@ -723,4 +609,139 @@ ServiceRegistry &Kernel::service_registry()
 {
     ASSERT_LOG(service_registry_, "Service registry is null.");
     return *service_registry_;
+}
+
+void Kernel::populate_default_db()
+{
+    using namespace odb;
+    using namespace odb::core;
+
+    Auth::UserPtr admin;
+    Auth::GroupPtr users;
+    Cred::RFIDCardPtr card;
+
+    // Create the core schema.
+    {
+        transaction t(database_->begin());
+        schema_catalog::create_schema(*database_, "core");
+        INFO("Creating core database schema.");
+        t.commit();
+    }
+
+    // Default users / groups
+    {
+        transaction t(database_->begin());
+
+        admin = std::make_shared<Auth::User>();
+        admin->firstname("Admin");
+        admin->lastname("ADMIN");
+        admin->username("admin");
+        admin->password("admin");
+        admin->rank(Auth::UserRank::ADMIN);
+        database_->persist(admin);
+
+        Auth::UserPtr demo = std::make_shared<Auth::User>();
+        demo->firstname("Demo");
+        demo->lastname("Demo");
+        demo->username("demo");
+        demo->password("demo");
+        database_->persist(demo);
+
+        Auth::GroupPtr administrators = std::make_shared<Auth::Group>();
+        administrators->name("Administrator");
+        administrators->member_add(admin);
+        database_->persist(administrators);
+
+        users = std::make_shared<Auth::Group>();
+        users->name("Users");
+        users->member_add(demo);
+        users->member_add(admin);
+        database_->persist(users);
+        t.commit();
+    }
+
+    // Credentials stuff
+    {
+        transaction t(database_->begin());
+
+        card = std::make_shared<Cred::RFIDCard>();
+        card->owner(admin);
+        card->alias(std::string("BestCardEver"));
+        card->card_id("00:11:22:33");
+        card->nb_bits(32);
+        database_->persist(card);
+
+        Cred::RFIDCard card2;
+        card2.alias(std::string("Ownerless"));
+        card2.card_id("aa:bb:cc:dd");
+        card2.nb_bits(32);
+        database_->persist(card2);
+        t.commit();
+    }
+
+    // Schedules stuff
+    {
+        transaction t(database_->begin());
+
+        Tools::SchedulePtr sched = std::make_shared<Tools::Schedule>();
+        sched->name("DummySchedule");
+        sched->description("A test schedule, with mapping.");
+        Tools::ScheduleMappingPtr map0 = std::make_shared<ScheduleMapping>();
+        map0->add_user(admin);
+        map0->add_group(users);
+        map0->add_credential(card);
+        map0->alias("My first mapping");
+        database_->persist(map0);
+        sched->add_mapping(map0);
+        database_->persist(sched);
+
+        t.commit();
+    }
+}
+
+void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
+{
+    std::string db_type = db_cfg_node.get<std::string>("type", "");
+    if (db_type == "sqlite")
+    {
+#ifndef LEOSAC_PGSQL_ONLY
+        std::string db_path = db_cfg_node.get<std::string>("path");
+        database_           = std::make_shared<odb::sqlite::database>(
+            db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+#else
+        throw LEOSACException("SQLite support disabled at compile time.");
+#endif
+    }
+    else if (db_type == "mysql" || db_type == "pgsql")
+    {
+        std::string db_user   = db_cfg_node.get<std::string>("username");
+        std::string db_pw     = db_cfg_node.get<std::string>("password");
+        std::string db_dbname = db_cfg_node.get<std::string>("dbname");
+        std::string db_host   = db_cfg_node.get<std::string>("host", "");
+        uint16_t db_port      = db_cfg_node.get<uint16_t>("port", 0);
+
+        if (db_type == "mysql")
+        {
+#ifndef LEOSAC_PGSQL_ONLY
+            database_ = std::make_shared<odb::mysql::database>(
+                db_user, db_pw, db_dbname, db_host, db_port);
+#else
+            throw LEOSACException("MySQL support disabled at compile time.");
+#endif
+        }
+        else
+        {
+            INFO("Connecting to PGSQL database.");
+            auto pg_db = std::make_shared<odb::pgsql::database>(
+                db_user, db_pw, db_dbname, db_host, db_port);
+            // todo: care about leak
+            pg_db->tracer(new db::PGSQLTracer(true));
+            database_ = pg_db;
+        }
+    }
+    else
+    {
+        throw ConfigException(config_file_path(), "Unsupported database type: " +
+                                                      Colorize::underline(db_type));
+    }
 }

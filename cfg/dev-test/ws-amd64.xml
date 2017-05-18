@@ -7,6 +7,7 @@
       <password>postgres</password>
       <dbname>leosac</dbname>
       <host>127.0.0.1</host>
+        <startup_abort_time>30</startup_abort_time>
     </database>
 
     <plugin_directories>
