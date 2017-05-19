@@ -1,11 +1,10 @@
-import json
-import unittest
-
-import time
-
 import asyncio
-import websockets
+import inspect
+import json
 import logging
+import time
+import unittest
+import websockets
 
 from leosacpy.runner import LeosacFullRunner, RunnerConfig
 
@@ -32,6 +31,38 @@ class LeosacWSClient:
         return await self.ws.recv()
 
 
+def with_leosac_infrastructure(f):
+    """
+    Arrange for the test to be run alongside an available and clean
+    leosac infrastructure.
+    
+    An additional parameter is passed to the test function, an instance
+    of LeosacFullRunner that allows the test to retrieve information about
+    the infrastructure (docker containers) setup for it.
+    
+    Note: The def must be defined with "async def".
+    Note: This adds huge overhead of starting container etc.    
+    """
+    assert inspect.iscoroutinefunction(f), 'Function is not a coroutine.'
+
+    def wrap(self):
+        # TestCase class name + current function name
+        full_test_name = '{}/{}'.format(self.__class__.__name__,
+                                        f.__name__)
+
+        # We patch the runner config to specify the fully qualified name
+        # of the test. This will allows good location of log file.
+        self.runner_cfg.fully_qualified_test_name = full_test_name
+        async def _run_test():
+            async with LeosacFullRunner(self.runner_cfg) as r:
+                self.runner = r
+                await f(self, r)
+
+        self.loop.run_until_complete(_run_test())
+
+    return wrap
+
+
 class WSGeneral(unittest.TestCase):
     def setUp(self):
         super().setUp()
@@ -46,21 +77,21 @@ class WSGeneral(unittest.TestCase):
 
         self.runner_cfg = RunnerConfig(loop=self.loop)
 
-    def test_get_version(self):
-        async def run_test():
-            async with LeosacFullRunner(self.runner_cfg) as r:
-                url = r.get_ws_address()
-                self.logger.debug('Connection to {}'.format(url))
-                ws = LeosacWSClient()
-                await ws.connect(r.get_ws_address())
-                self.logger.debug('Connected to leosac WS')
-                await ws.send({})
-                ret = await ws.recv()
-                print(ret)
-                self.logger.info('Will stop')
+    @with_leosac_infrastructure
+    async def test_get_version(self, runner: LeosacFullRunner):
+        url = runner.get_ws_address()
+        self.logger.debug('Connection to {}'.format(url))
+        ws = LeosacWSClient()
+        await ws.connect(runner.get_ws_address())
+        self.logger.debug('Connected to leosac WS')
+        await ws.send({})
+        ret = await ws.recv()
+        print(ret)
+        self.logger.info('Will stop')
 
-        self.loop.run_until_complete(run_test())
-        self.logger.info('Loop done')
+    @with_leosac_infrastructure
+    async def test_get_version2(self, runner: LeosacFullRunner):
+        await asyncio.sleep(5)
 
 
 if __name__ == '__main__':

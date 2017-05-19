@@ -1,6 +1,6 @@
 import logging
+import os
 import time
-
 import asyncio
 import docker
 import functools
@@ -13,13 +13,21 @@ class RunnerConfig:
     Hold some configuration for the runner objects.
     """
 
-    def __init__(self, loop: asyncio.AbstractEventLoop = None, log_dir='/tmp'):
+    def __init__(self,
+                 loop: asyncio.AbstractEventLoop = None,
+                 log_dir='/tmp',
+                 leosac_config_file: str = '/tmp/test.xml'):
         self.log_dir = log_dir
 
         # Write container stderr/stdout to file.
         self.log_containers = True
 
+        self.leosac_config_file = leosac_config_file
+
         self.loop = loop
+
+        # Used to put log in a subdirectory of log_dir.
+        self.fully_qualified_test_name = ''
 
 
 class LeosacFullRunner:
@@ -63,7 +71,15 @@ class LeosacFullRunner:
 
             # Configure Python logger to log to file.
             logger = logging.getLogger('container.{}'.format(container_type))
-            target_log_file = '{}/{}'.format(self.cfg.log_dir, container_type)
+
+            target_log_file = '{}/{}/{}'.format(self.cfg.log_dir,
+                                                self.cfg.fully_qualified_test_name,
+                                                container_type)
+            complete_log_directory = os.path.dirname(target_log_file)
+            # Create log directory if needed
+            if not os.path.exists(complete_log_directory):
+                os.makedirs(complete_log_directory, exist_ok=True)
+
             logging_handler = logging.FileHandler(target_log_file)
             logging_handler.setLevel(logging.DEBUG)
             logger.addHandler(logging_handler)
@@ -96,7 +112,7 @@ class LeosacFullRunner:
 
         self.logger.info('Starting Leosac container')
         leosac = self.docker.containers.run("leosac_server",
-                                            volumes={'/tmp/test.xml': {
+                                            volumes={self.cfg.leosac_config_file: {
                                                 'bind': '/leosac_config/config.xml',
                                                 'mode': 'rw'}},
                                             links={
