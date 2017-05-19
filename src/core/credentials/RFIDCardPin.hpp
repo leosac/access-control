@@ -37,11 +37,11 @@ namespace Cred
 class RFIDCardPin : public Credential
 {
   public:
-    MAKE_VISITABLE();
+    MAKE_VISITABLE_FALLBACK(ICredential);
 
     /**
-    * Create a RFIDCardPin object and assigned RFIDCard and
-     * PinCode object to the RFIDCardPin credential
+    * Create a RFIDCardPin object and assign RFIDCard and
+    * PinCode object to the RFIDCardPin credential
     */
     RFIDCardPin(RFIDCardPtr card, PinCodePtr pin);
 

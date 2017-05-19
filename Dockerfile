@@ -67,6 +67,7 @@ ADD cmake /leosac_src/cmake/
 ADD src /leosac_src/src/
 ADD CMakeLists.txt /leosac_src/
 
+RUN apt-get update && apt-get install libboost-coroutine-dev -y
 RUN /docker_scripts/build_leosac.sh
 ADD test_helper /leosac_src/test_helper
 

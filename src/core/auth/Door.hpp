@@ -70,10 +70,10 @@ class Door : public virtual IDoor
     std::string alias_;
     std::string desc_;
 
-    /**
-     * The access point that controls the door.
-     * May be null.
-     */
+/**
+ * The access point that controls the door.
+ * May be null.
+ */
 #pragma db unique
     std::shared_ptr<AccessPoint> access_point_;
 

@@ -491,7 +491,8 @@ void Kernel::configure_database()
     {
         ElapsedTimeCounter etc;
         int wait_time = 1;
-        while (etc.elapsed() < db_cfg_node->get<uint64_t>("startup_abort_time", 60 * 5) * 1000)
+        while (etc.elapsed() <
+               db_cfg_node->get<uint64_t>("startup_abort_time", 60 * 5) * 1000)
         {
             try
             {
@@ -522,7 +523,7 @@ void Kernel::configure_database()
             }
         }
         throw LEOSACException("Startup failed. Couldn't correctly "
-                                      "connect to / initialize the database");
+                              "connect to / initialize the database");
     }
 }
 

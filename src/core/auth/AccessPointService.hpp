@@ -82,7 +82,7 @@ class AccessPointService
         std::lock_guard<std::mutex> lg(mutex_);
 
         ASSERT_LOG(backends_.count(controller_module) == 0,
-                   "A backend for this serializer is already registered.");
+                   "A backend for this module is already registered.");
         backends_[controller_module] = backend;
     }
 
