@@ -13,7 +13,7 @@ setup(name='leoascpy',
           'click-repl',
           'Pygments',
           'docker',
-          'websocket-client'
+          'websockets',
       ],
       entry_points='''
         [console_scripts]

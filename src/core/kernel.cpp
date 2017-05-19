@@ -514,10 +514,10 @@ void Kernel::configure_database()
                 if (utils_->is_strict())
                     throw;
                 WARN("Cannot connect to or initialize database at this point. "
-                     "Leosac will now start until it can reach the database. "
+                     "Leosac will not start until it can reach the database. "
                      "Error was: "
                      << e.what());
-                INFO("WIll now wait " << wait_time << " seconds.");
+                INFO("Will now wait " << wait_time << " seconds.");
                 std::this_thread::sleep_for(std::chrono::seconds(wait_time));
                 wait_time = std::min(wait_time * 2, 60);
             }
