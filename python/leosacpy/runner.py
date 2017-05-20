@@ -148,3 +148,15 @@ class LeosacFullRunner:
         if self.containers_log_future:
             await self.containers_log_future
         self.docker = None
+
+    def get_return_code(self):
+        """
+        Retrieve the return code of the leosac container.
+        
+        If the container is not exited, raise an error.
+        """
+        assert self.leosac_container, 'No leosac container'
+        if not self.leosac_container.status == 'exited':
+            raise RuntimeError('Container not exited.')
+        self.leosac_container.reload()
+        return self.leosac_container.attrs['State']['ExitCode']

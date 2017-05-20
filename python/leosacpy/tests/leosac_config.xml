@@ -7,7 +7,7 @@
       <password>postgres</password>
       <dbname>postgres</dbname>
       <host>postgres</host>
-      <startup_abort_time>30</startup_abort_time>
+      <startup_abort_time>45</startup_abort_time>
     </database>
 
     <plugin_directories>

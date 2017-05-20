@@ -3,46 +3,13 @@ import time
 import logging
 import asyncio
 import uuid
-from enum import Enum, unique
 from types import SimpleNamespace
 from typing import Union
 
 import websockets
 
-from leosacpy.exception import InvalidMessageException
-
-
-@unique
-class APIStatusCode(Enum):
-    SUCCESS = 0x00
-    GENERAL_FAILURE = 0x01
-    PERMISSION_DENIED = 0x02
-    RATE_LIMITED = 0x03
-    MALFORMED = 0x04
-    INVALID_CALL = 0x05
-    TIMEOUT = 0x06
-    SESSION_ABORTED = 0x07
-    ENTITY_NOT_FOUND = 0x08
-    DATABASE_ERROR = 0x09
-    UNKNOWN = 0x0A
-    MODEL_EXCEPTION = 0x0B
-
-
-class LeosacMessage:
-    def __init__(self, message_type: str = '', content=None):
-        self.type = message_type  # type: str
-        self.content = content or {}  # type: dict
-        self.uuid = ''  # type: str
-
-        self.status_code = 0  # type: APIStatusCode
-        self.status_string = ''  # for incoming msg
-
-    def to_json(self):
-        return json.dumps({
-            'type': self.type,
-            'content': self.content or {},
-            'uuid': self.uuid
-        })
+from leosacpy.exception import InvalidMessageException, APIError
+from leosacpy.ws import LeosacMessage, APIStatusCode
 
 
 def _message_from_dict(payload: dict) -> LeosacMessage:
@@ -84,9 +51,14 @@ def _message_from_dict(payload: dict) -> LeosacMessage:
     return msg
 
 
-class LeosacWSClient:
+class LowLevelWSClient:
     """
-    Implementation of Leosac client websocket API
+    Implementation of a low level Leosac client.
+    
+    Provide method to send and receive websocket message.
+        
+    In default mode, you can asynchronously get the response to a message
+    by calling `await()` on the future returned by send().
     """
 
     def __init__(self):
@@ -99,7 +71,11 @@ class LeosacWSClient:
         # when the response arrives.
         self.uuid_to_future = {}
 
-    async def connect(self, target, timeout=25, autoread=True):
+    @property
+    def connected(self):
+        return self.ws is not None
+
+    async def connect(self, target, timeout=45, autoread=True):
         """
         Connect to target.
         :param target: URL to connect to ('ws://blah:1234')
@@ -114,14 +90,20 @@ class LeosacWSClient:
         
         Don't call recv() yourself if autoread is True.
         """
+        last_ex = None
         start_time = time.time()
         while time.time() < start_time + timeout:
             try:
                 self.ws = await websockets.connect(target)
+                last_ex = None
                 break
             except ConnectionError as e:
                 logging.debug('Failed to connected: {}'.format(e))
+                last_ex = e
                 await asyncio.sleep(2)
+
+        if last_ex:
+            raise last_ex
 
         if autoread:
             self.autoread = asyncio.ensure_future(self.read_and_dispatch())
@@ -188,6 +170,13 @@ class LeosacWSClient:
 
         return future
 
+    async def req_rep(self, msg: LeosacMessage) -> LeosacMessage:
+        """
+        Send the ``msg`` and wait for the response.
+        """
+        fut = await self.send(msg)
+        return await fut
+
     def dispatch_message(self, msg: LeosacMessage):
         """
         Dispatch the message by resolving the future associated
@@ -230,3 +219,52 @@ class LeosacWSClient:
         """
         payload = await self.ws.recv()
         return _message_from_dict(json.loads(payload))
+
+
+class LeosacAPI:
+    """
+    A high level API to leosac
+    """
+
+    def __init__(self, target):
+        self.client = LowLevelWSClient()
+        self.target = target
+
+    async def _send(self, msg: LeosacMessage):
+        if not self.client.connected:
+            await self.client.connect(self.target)
+
+        assert self.client.connected, 'Still not connected'
+        return await self.client.send(msg)
+
+    async def _req_rep(self, msg: LeosacMessage, require_success=True) -> LeosacMessage:
+        """
+        Send and wait for response.
+        
+        Is require_success is True, then an APIError is raised if the status
+        code is not SUCCESS
+        """
+        fut = await self._send(msg)
+        msg = await fut
+        if require_success and not msg.status_code == APIStatusCode.SUCCESS:
+            raise APIError(msg)
+        return msg
+
+    async def get_version(self):
+        """
+        Retrieve version of leosac server
+        """
+        rep = await self._req_rep(LeosacMessage(message_type='get_leosac_version'))
+        return rep.content.version
+
+    async def close(self):
+        """
+        When done using the API object, call close() to clean
+        resource.
+        
+        todo: Alternatively, use with context manager
+        """
+        if self.client:
+            await self.client.close()
+        self.client = None
+

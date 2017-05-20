@@ -11,7 +11,3 @@ def get_docker_client():
     # todo use from_env()
     client = docker.DockerClient(base_url='unix://var/run/docker.sock')
     return client
-
-@contextmanager
-def timeout(duration):
-    pass
