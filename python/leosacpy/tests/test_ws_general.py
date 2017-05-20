@@ -1,34 +1,11 @@
 import asyncio
 import inspect
-import json
 import logging
-import time
+import os
 import unittest
-import websockets
 
 from leosacpy.runner import LeosacFullRunner, RunnerConfig
-
-
-class LeosacWSClient:
-    def __init__(self):
-        self.ws = None
-
-    async def connect(self, target, timeout=25):
-        start_time = time.time()
-        while time.time() < start_time + timeout:
-            try:
-                self.ws = await websockets.connect(target)
-                break
-            except ConnectionError as e:
-                logging.debug('Failed to connected: {}'.format(e))
-                await asyncio.sleep(2)
-
-    async def send(self, obj):
-        c = json.dumps(obj)
-        await self.ws.send(c)
-
-    async def recv(self):
-        return await self.ws.recv()
+from leosacpy.wsclient import LeosacWSClient, APIStatusCode, LeosacMessage
 
 
 def with_leosac_infrastructure(f):
@@ -53,6 +30,7 @@ def with_leosac_infrastructure(f):
         # We patch the runner config to specify the fully qualified name
         # of the test. This will allows good location of log file.
         self.runner_cfg.fully_qualified_test_name = full_test_name
+
         async def _run_test():
             async with LeosacFullRunner(self.runner_cfg) as r:
                 self.runner = r
@@ -75,24 +53,46 @@ class WSGeneral(unittest.TestCase):
         self.logger = logging.getLogger('WSGeneral')
         self.logger.setLevel(logging.DEBUG)
 
-        self.runner_cfg = RunnerConfig(loop=self.loop)
+        leosac_cfg_file = '{}/leosac_config.xml' \
+            .format(os.path.dirname(os.path.abspath(__file__)))
+        self.runner_cfg = RunnerConfig(loop=self.loop,
+                                       leosac_config_file=leosac_cfg_file)
+
+        # Available for test using with_leosac_infrastructure decorator
+        self.runner = None
+
+    async def _get_ws_to_leosac(self, autoread=True) -> LeosacWSClient:
+        """
+        Return a connected LeosacWSClient.
+        :return: LeosacWSClient
+        """
+        assert self.runner, 'No Runner'
+        c = LeosacWSClient()
+
+        url = self.runner.get_ws_address()
+        self.logger.debug('Connecting to {}'.format(url))
+        await c.connect(url, autoread=autoread)
+        return c
+
+    @with_leosac_infrastructure
+    async def test_malformed_messaged(self, runner: LeosacFullRunner):
+        wsclient = await self._get_ws_to_leosac(autoread=False)
+        await wsclient.send_raw({})
+        ret = await wsclient.recv()
+
+        self.assertEqual(APIStatusCode.MALFORMED, ret.status_code)
 
     @with_leosac_infrastructure
     async def test_get_version(self, runner: LeosacFullRunner):
-        url = runner.get_ws_address()
-        self.logger.debug('Connection to {}'.format(url))
-        ws = LeosacWSClient()
-        await ws.connect(runner.get_ws_address())
-        self.logger.debug('Connected to leosac WS')
-        await ws.send({})
-        ret = await ws.recv()
-        print(ret)
-        self.logger.info('Will stop')
+        wsclient = await self._get_ws_to_leosac()
+        msg = LeosacMessage(message_type='get_leosac_version')
 
-    @with_leosac_infrastructure
-    async def test_get_version2(self, runner: LeosacFullRunner):
-        await asyncio.sleep(5)
+        response_future = await wsclient.send(msg)
+        rep = await response_future
 
+        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
+        self.assertEqual('0.6.3', rep.content.version)
+        await wsclient.close()
 
 if __name__ == '__main__':
     unittest.main()
