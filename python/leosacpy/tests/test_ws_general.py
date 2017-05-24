@@ -5,61 +5,11 @@ import os
 import unittest
 from functools import wraps
 
-from leosacpy.runner import LeosacFullRunner, RunnerConfig
+from leosacpy.runner import LeosacFullRunner, RunnerConfig, Runner, \
+    LeosacCachedDBRunner, LeosacCachedDBRunnerFactory
+from leosacpy.utils import LogMixin
 from leosacpy.wsclient import LowLevelWSClient, APIStatusCode, LeosacMessage, \
     LeosacAPI
-
-
-def with_leosac_infrastructure(f):
-    """
-    Arrange for the test to be run alongside an available and clean
-    leosac infrastructure.
-    
-    An additional parameter is passed to the test function, an instance
-    of LeosacFullRunner that allows the test to retrieve information about
-    the infrastructure (docker containers) setup for it.
-    
-    Note: The def must be defined with "async def".
-    Note: This adds huge overhead of starting container etc.    
-    """
-    assert inspect.iscoroutinefunction(f), 'Function is not a coroutine.'
-
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        test_case = args[0]
-        assert isinstance(test_case, unittest.TestCase)
-        # TestCase class name + current function name
-        full_test_name = '{}/{}'.format(test_case.__class__.__name__,
-                                        f.__name__)
-
-        # We patch the runner config to specify the fully qualified name
-        # of the test. This will allows good location of log file.
-        test_case.runner_cfg.fully_qualified_test_name = full_test_name
-
-        async def _run_test():
-            async with LeosacFullRunner(test_case.runner_cfg) as r:
-                test_case.runner = r
-                kwargs['runner'] = r
-                await f(*args, **kwargs)
-
-        test_case.loop.run_until_complete(_run_test())
-
-    wrap.with_leosac_infrastructure__ = True
-    return wrap
-
-
-def with_leosac_ws_client(f):
-    @wraps(f)
-    async def wrap(*args, **kwargs):
-        test_case = args[0]
-        assert isinstance(test_case, WSGeneral), 'Wrong type'
-
-        c = await test_case._get_ws_to_leosac()
-        kwargs['wsclient'] = c
-        await f(*args, **kwargs)
-        await c.close()
-
-    return wrap
 
 
 def check_return_code(expected_exit_code: int):
@@ -77,30 +27,59 @@ def check_return_code(expected_exit_code: int):
     return decorator
 
 
-class WSGeneral(unittest.TestCase):
-    def setUp(self):
-        super().setUp()
+class ParametrizedTestCase(unittest.TestCase):
+    """ TestCase classes that want to be parametrized should
+        inherit from this class.
+        
+        A `param` attribute will be set in the constructor.
+    """
+
+    def __init__(self, methodName='runTest', param=None):
+        super(ParametrizedTestCase, self).__init__(methodName)
+        self.param = param
+
+    @staticmethod
+    def create_suite(testcase_klass, param=None):
+        """ Create a suite containing all tests taken from the given
+            subclass, passing them the parameter 'param'.
+        """
+        testloader = unittest.TestLoader()
+        testnames = testloader.getTestCaseNames(testcase_klass)
+        suite = unittest.TestSuite()
+        for name in testnames:
+            suite.addTest(testcase_klass(name, param=param))
+        return suite
+
+
+class WSTestBase(ParametrizedTestCase, LogMixin):
+    """
+    The base class to use when writing tests that will
+    use Leosac websocket API.
+    
+    WSTestBase inherits from ParametrizedTestCase and expects
+    an a factory function for runner to be stored in self.param['runner_factory']
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.runner = None  # type: Runner
+        self.runner_config = None  # type: RunnerConfig
+        self.loop = None
+
+        self.runner_factory = self.param['runner_factory']
+
         logging.basicConfig(level=logging.INFO)
         logging.getLogger().setLevel(logging.DEBUG)
 
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(None)
+    def get_runner_config(self) -> RunnerConfig:
+        c = RunnerConfig()
+        c.loop = self.loop
+        return c
 
-        self.logger = logging.getLogger('WSGeneral')
-        self.logger.setLevel(logging.DEBUG)
-
-        leosac_cfg_file = '{}/leosac_config.xml' \
-            .format(os.path.dirname(os.path.abspath(__file__)))
-        self.runner_cfg = RunnerConfig(loop=self.loop,
-                                       leosac_config_file=leosac_cfg_file)
-
-        # Available for test using with_leosac_infrastructure decorator
-        self.runner = None
-
-    async def _get_ws_to_leosac(self, autoread=True) -> LowLevelWSClient:
+    async def get_ws_to_leosac(self, autoread=True) -> LowLevelWSClient:
         """
-        Return a connected LeosacWSClient.
-        :return: LeosacWSClient
+        Return a connected LowLevelWSClient.
+        :return: LowLevelWSClient
         """
         assert self.runner, 'No Runner'
         c = LowLevelWSClient()
@@ -110,17 +89,108 @@ class WSGeneral(unittest.TestCase):
         await c.connect(url, autoread=autoread)
         return c
 
+    def setUp(self):
+        super().setUp()
+        # Setup a new asyncio loop.
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(None)
+
+        if not self.runner_config:
+            self.runner_config = self.get_runner_config()
+        if not self.runner:
+            self.runner = self.runner_factory(self.runner_config)
+
+    def tearDown(self):
+        # Clear runner and runner_config to get a fresh one
+        # for next test
+        self.runner = None
+        self.runner_config = None
+
+
+def with_leosac_infrastructure(f):
+    """
+    Arrange for the test to be run alongside an available and clean
+    leosac infrastructure.
+
+    This decorator MUST be used on a method of a subclass of WSTestBase, otherwise
+    it will assert.
+    
+    This decorator will invoke the test method after turner the
+    runner into a Context Manager.    
+    """
+    assert inspect.iscoroutinefunction(f), 'Function is not a coroutine.'
+
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        test_case = args[0]
+        assert isinstance(test_case, WSTestBase)
+        # TestCase class name + current function name
+        full_test_name = '{}/{}'.format(test_case.__class__.__name__,
+                                        f.__name__)
+
+        # We patch the runner config to specify the fully qualified name
+        # of the test. This will allows good location of log file.
+        test_case.runner_config.fully_qualified_test_name = full_test_name
+
+        async def _run_test():
+            assert isinstance(test_case.runner, Runner), 'No runner !'
+            async with test_case.runner as r:
+                await f(*args, **kwargs)
+
+        test_case.loop.run_until_complete(_run_test())
+
+    wrap.with_leosac_infrastructure__ = True
+    return wrap
+
+
+def with_leosac_ws_client(autoread=True):
+    """
+    Method decorator to add a `wsclient` argument to the test method.
+    
+    The wsclient will be a connected LowLevelWSClient().
+    :param autoread: See LowLevelWSClient
+    """
+
+    def decorator(f):
+        @wraps(f)
+        async def wrap(*args, **kwargs):
+            test_case = args[0]
+            assert isinstance(test_case, WSTestBase), 'Wrong type'
+
+            c = await test_case.get_ws_to_leosac(autoread=autoread)
+            kwargs['wsclient'] = c
+            await f(*args, **kwargs)
+            await c.close()
+
+        return wrap
+
+    return decorator
+
+
+class WSGeneral(WSTestBase):
+    def setUp(self):
+        super().setUp()
+
+    def get_runner_config(self):
+        cfg = super().get_runner_config()
+
+        leosac_cfg_file = '{}/leosac_config.xml' \
+            .format(os.path.dirname(os.path.abspath(__file__)))
+        cfg.leosac_config_file = leosac_cfg_file
+        cfg.stream_log = False
+        return cfg
+
     @check_return_code(0)
     @with_leosac_infrastructure
-    async def test_get_version2(self, runner: LeosacFullRunner=None):
-        api = LeosacAPI(target=runner.get_ws_address())
+    async def test_get_version2(self):
+        api = LeosacAPI(target=self.runner.get_ws_address())
         self.assertEqual('0.6.3', await api.get_version())
         await api.close()
 
     @check_return_code(0)
     @with_leosac_infrastructure
-    @with_leosac_ws_client
-    async def test_get_version(self, runner=None, wsclient: LowLevelWSClient=None):
+    @with_leosac_ws_client()
+    async def test_get_version(self, wsclient: LowLevelWSClient = None):
         msg = LeosacMessage(message_type='get_leosac_version')
         rep = await wsclient.req_rep(msg)
 
@@ -129,8 +199,8 @@ class WSGeneral(unittest.TestCase):
 
     @check_return_code(0)
     @with_leosac_infrastructure
-    async def test_malformed_messaged(self, runner: LeosacFullRunner = None):
-        wsclient = await self._get_ws_to_leosac(autoread=False)
+    @with_leosac_ws_client(autoread=False)
+    async def test_malformed_message(self, wsclient: LowLevelWSClient):
         await wsclient.send_raw({})
         ret = await wsclient.recv()
 
@@ -138,4 +208,8 @@ class WSGeneral(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    suite = unittest.TestSuite()
+    suite.addTest(WSGeneral.create_suite(WSGeneral,
+                                         {'runner_factory': LeosacCachedDBRunnerFactory()}
+                                         ))
+    unittest.TextTestRunner(verbosity=2).run(suite)

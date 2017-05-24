@@ -7,7 +7,7 @@ setup(name='leoascpy',
       description='Leosac Python Libray',
       author='xaqq',
       author_email='kapp.arno@gmail.com',
-      packages=['leosacpy'],
+      packages=['leosacpy', 'leosacpy.cli', 'leosacpy.tools'],
       install_requires=[
           'Click',
           'click-repl',
@@ -17,6 +17,6 @@ setup(name='leoascpy',
       ],
       entry_points='''
         [console_scripts]
-        leosaccli=leosacpy.scripts.cli:cli
+        leosaccli=leosacpy.scripts.cli:cli_entry_point
     ''',
       )

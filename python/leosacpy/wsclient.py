@@ -143,7 +143,7 @@ class LowLevelWSClient:
             try:
                 await self.read_and_dispatch_once()
             except Exception as e:
-                logging.error('Error when reading and dispatching: '.format(e))
+                logging.error('Error when reading and dispatching: {}'.format(e))
                 raise e
 
     async def send(self, msg: LeosacMessage) -> asyncio.Future:
@@ -226,8 +226,12 @@ class LeosacAPI:
     A high level API to leosac
     """
 
-    def __init__(self, target):
-        self.client = LowLevelWSClient()
+    def __init__(self, target, client:LowLevelWSClient = None):
+        if isinstance(client, LowLevelWSClient):
+            self.client = client
+        else:
+            self.client = LowLevelWSClient()
+
         self.target = target
 
     async def _send(self, msg: LeosacMessage):
@@ -237,7 +241,8 @@ class LeosacAPI:
         assert self.client.connected, 'Still not connected'
         return await self.client.send(msg)
 
-    async def _req_rep(self, msg: LeosacMessage, require_success=True) -> LeosacMessage:
+    async def _req_rep(self, msg: LeosacMessage,
+                       require_success=True) -> LeosacMessage:
         """
         Send and wait for response.
         
@@ -267,4 +272,3 @@ class LeosacAPI:
         if self.client:
             await self.client.close()
         self.client = None
-
