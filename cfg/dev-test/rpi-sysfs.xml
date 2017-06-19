@@ -30,9 +30,7 @@
 
                         <!-- Device we watch as input source -->
                         <auth_source>MY_WIEGAND_1</auth_source>
-                        <!-- File that contains (1 per line) the textual data that is valid.
-With a wiegand reader, it could be something like this "ab:0f:fa:12" -->
-                        <valid_input_file>valid-cards.txt</valid_input_file>
+                        <config_file>valid-cards.txt</config_file>
                     </instance>
                 </instances>
             </module_config>
