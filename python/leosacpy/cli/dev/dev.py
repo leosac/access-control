@@ -3,7 +3,7 @@ import unittest
 import click
 from click import UsageError
 
-from leosacpy.cli.dev import run_tests
+from leosacpy.cli.dev import run_tests, docker
 from leosacpy.tools.source_formatter import SourceFormatter
 from leosacpy.utils import guess_root_dir
 
@@ -36,4 +36,6 @@ def dev_format_source(ctx, clang_format, exclude_dirs):
     fmt.format(guess_root_dir() + '/src', exclude_dirs=exclude_dirs)
     print(ctx.obj)
 
+
 dev_cmd_group.add_command(run_tests.run_tests)
+dev_cmd_group.add_command(docker.docker)

@@ -9,6 +9,7 @@ from typing import Union
 import websockets
 
 from leosacpy.exception import InvalidMessageException, APIError
+from leosacpy.utils import LogMixin
 from leosacpy.ws import LeosacMessage, APIStatusCode
 
 
@@ -221,7 +222,7 @@ class LowLevelWSClient:
         return _message_from_dict(json.loads(payload))
 
 
-class LeosacAPI:
+class LeosacAPI(LogMixin):
     """
     A high level API to leosac
     """
@@ -233,6 +234,7 @@ class LeosacAPI:
             self.client = LowLevelWSClient()
 
         self.target = target
+        self.logger.info('LeosacAPI target: {}'.format(self.target))
 
     async def _send(self, msg: LeosacMessage):
         if not self.client.connected:

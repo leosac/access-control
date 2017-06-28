@@ -24,6 +24,15 @@ def get_docker_client():
     return client
 
 
+def get_docker_api_client():
+    """
+    Retrieve a low level docker API client.
+
+    """
+    client = docker.APIClient(base_url='unix://var/run/docker.sock')
+    return client
+
+
 def assert_isinstance(obj, types):
     assert isinstance(obj, types), '{} is not a {}'.format(obj, types)
 
@@ -42,4 +51,3 @@ class LogMixin:
         e = etype(*args)
         self.logger.error('An error occured: {}'.format(e))
         raise e
-
