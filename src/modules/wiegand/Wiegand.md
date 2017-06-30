@@ -1,3 +1,5 @@
+@page page_module_wiegand Module: Wiegand
+
 Wiegand Module Documentation {#mod_wiegand_main}
 ================================================
 

@@ -1,3 +1,5 @@
+@page page_test_helper
+
 @namespace Leosac::Test::Helper
 @brief Unit testing utility class that helps writing test.
 

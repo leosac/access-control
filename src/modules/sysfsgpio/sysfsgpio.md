@@ -1,3 +1,5 @@
+@page page_module_sysfs_gpio Module: SysFS GPIO
+
 SysFsGpio Module Documentation {#mod_sysfsgpio_main}
 ====================================================
 

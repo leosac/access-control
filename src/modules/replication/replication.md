@@ -1,3 +1,5 @@
+@page page_module_replication Module: Replication
+
 Replication Module Documentation {#mod_replication_main}
 ========================================================
 

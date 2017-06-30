@@ -1,3 +1,5 @@
+@page page_module_event_publish Module: Event Publish
+
 EventPublish documentation {#mod_event_publish_main}
 =====================================================
 

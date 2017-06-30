@@ -1,3 +1,5 @@
+@page page_module_smtp Module: SMTP
+
 SMTP {#mod_SMTP_main}
 =====================
 

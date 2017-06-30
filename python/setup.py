@@ -18,5 +18,6 @@ setup(name='leoascpy',
       entry_points='''
         [console_scripts]
         leosaccli=leosacpy.scripts.cli:cli_entry_point
+        leosacws=leosacpy.scripts.ws_shell:cli
     ''',
       )

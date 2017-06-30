@@ -1,3 +1,5 @@
+@page page_auth Authentication
+
 Authentication Documentation {#auth_main}
 ============================================
 

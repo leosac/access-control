@@ -1,3 +1,5 @@
+@page page_module_websock_api Module: WebSocket API
+
 WebSocket API {#mod_websock-api_main}
 =====================================
 

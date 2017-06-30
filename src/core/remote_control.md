@@ -1,3 +1,5 @@
+@page page_remote_control Remote Control
+
 Remote Control Documentation {#remote_control_main}
 ====================================================
 

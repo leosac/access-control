@@ -1,3 +1,5 @@
+@page page_module_piface Module: Piface Digital GPIO
+
 PifaceDigital Module Documentation {#mod_piface_main}
 =====================================================
 

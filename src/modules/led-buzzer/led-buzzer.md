@@ -1,3 +1,5 @@
+@page page_module_led_buzzer Module: Led-Buzzer
+
 Led Module Documentation {#mod_ledbuzzer_main}
 ==============================================
 

@@ -1,3 +1,5 @@
+@page page_module_test_and_reset Module: Test And Reset
+
 TestAndReset Module Documentation {#mod_testandreset_main}
 ==========================================================
 

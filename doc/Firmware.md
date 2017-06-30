@@ -1,3 +1,5 @@
+@page page_firmware Firmware note
+
 Leosac Firmware {#firmware_main}
 ================================
 
