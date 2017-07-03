@@ -33,7 +33,7 @@ find_package(Boost 1.62 REQUIRED date_time system serialization regex filesystem
 if (LEOSAC_CROSS_COMPILE)
     find_package(ODB REQUIRED COMPONENTS pgsql boost)
 else()
-    find_package(ODB REQUIRED COMPONENTS pgsql mysql sqlite boost)
+    find_package(ODB REQUIRED COMPONENTS pgsql sqlite boost)
 endif()
 
 include(${ODB_USE_FILE})

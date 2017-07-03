@@ -1,4 +1,5 @@
 import click
+import logging
 
 from leosacpy.utils import guess_root_dir, get_docker_api_client
 
@@ -21,9 +22,14 @@ def clean_output_build_line(raw_line):
     Line is a dict. We returns its "stream" key and 
     remove its last \n
     """
-    line = raw_line['stream']
-    if line.endswith('\n'):
-        return line[:-1]
+    if 'stream' in raw_line:
+        line = raw_line['stream']
+        if line.endswith('\n'):
+            return line[:-1]
+    else:
+        errcode = raw_line['errorDetail']['code']
+        errstr = raw_line['errorDetail']['message']
+        line = 'An error occurred: CODE: {}. MESSAGE: {}'.format(errcode, errstr)
     return line
 
 
