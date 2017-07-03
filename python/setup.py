@@ -14,6 +14,7 @@ setup(name='leoascpy',
           'Pygments',
           'docker',
           'websockets',
+          'colorama'
       ],
       entry_points='''
         [console_scripts]

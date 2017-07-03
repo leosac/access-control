@@ -327,7 +327,10 @@ class LeosacFullRunner(Runner):
             # Iterate on log entries.
             while True:
                 for log_line in docker_log_generator:
-                    logger.info(log_line)
+                    decoded = log_line.decode('utf-8')
+                    if decoded.endswith('\n'):
+                        decoded = decoded[:-1]
+                    logger.info(decoded)
                 time.sleep(2)
                 container.reload()
                 self.logger.info('Current status {}'.format(container.status))

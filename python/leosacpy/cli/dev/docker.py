@@ -1,6 +1,9 @@
+import asyncio
 import click
+import colorama
 import logging
 
+from leosacpy.runner import RunnerConfig, LeosacFullRunner
 from leosacpy.utils import guess_root_dir, get_docker_api_client
 
 
@@ -61,3 +64,39 @@ def build(ctx, images, nocache):
                                            clean_output_build_line(line)))
         print('Built {}'.format(image))
     pass
+
+
+@docker.command()
+@click.option('--with-pgsql',
+              is_flag=True,
+              help='Run a PGSQL container alongside the Leosac container. '
+                   'This is required for now.')
+@click.argument('config_file')
+@click.pass_context
+def run(ctx, with_pgsql, config_file):
+    """
+    Run the server Leosac container.
+
+    Optionally, this server container can be started alongside
+    a PostgreSQL container in order to run a full Leosac stack.
+    """
+    asyncio.get_event_loop().run_until_complete(_run(with_pgsql,
+                                                     config_file))
+
+
+async def _run(with_pgsql, config_file):
+    loop = asyncio.get_event_loop()
+    if with_pgsql:
+        cfg = RunnerConfig(loop=loop,
+                           leosac_config_file=config_file)
+        async with LeosacFullRunner(cfg) as r:
+            print(colorama.Fore.RED +
+                  'Leosac server WS address: {}'.format(r.get_ws_address()))
+            while True:
+                # Just hit CTRL+C at some point to quit.
+                try:
+                    await asyncio.sleep(10)
+                except KeyboardInterrupt:
+                    break
+    else:
+        print('Sorry not supported yet.')

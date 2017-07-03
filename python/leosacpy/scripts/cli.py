@@ -1,6 +1,7 @@
 import logging
 from types import SimpleNamespace
 import click
+import colorama
 from click_repl import register_repl
 import leosacpy.cli.dev.dev
 from leosacpy.utils import guess_root_dir
@@ -17,6 +18,7 @@ sticky_debug_flag = None
 @click.option('--root-dir', '-r', help='Leosac root directory')
 @click.pass_context
 def cli_entry_point(ctx, debug, root_dir):
+    colorama.init(autoreset=True)
     ctx.obj = SimpleNamespace()
 
     global sticky_debug_flag
