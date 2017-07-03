@@ -25,7 +25,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional"
         INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX tools
         INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
@@ -65,7 +65,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional"
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/auth/
@@ -108,7 +108,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional"
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/audit/
@@ -142,7 +142,7 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/credentials/
         INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
@@ -174,7 +174,7 @@ odb_compile(OdbCMake_SOURCES_UPDATES
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional"
         INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
         INCLUDE_PREFIX core/update/
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp

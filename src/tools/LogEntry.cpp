@@ -25,7 +25,6 @@
 #include <odb/pgsql/database.hxx>
 
 #ifndef LEOSAC_PGSQL_ONLY
-#include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
 #endif
 

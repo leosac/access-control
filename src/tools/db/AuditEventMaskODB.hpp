@@ -23,7 +23,6 @@
 #include <odb/pgsql/traits.hxx>
 
 #ifndef LEOSAC_PGSQL_ONLY
-#include <odb/mysql/traits.hxx>
 #include <odb/sqlite/traits.hxx>
 #endif
 
@@ -38,7 +37,7 @@ namespace odb
 #ifndef LEOSAC_PGSQL_ONLY
 
 // For MySQL
-
+/*
 namespace mysql
 {
 template <>
@@ -74,7 +73,7 @@ class value_traits<Leosac::Audit::EventMask, id_string>
     }
 };
 }
-
+*/
 
 // For SQLite
 

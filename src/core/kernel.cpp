@@ -55,7 +55,6 @@
 #include <odb/pgsql/database.hxx>
 
 #ifndef LEOSAC_PGSQL_ONLY
-#include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
 #endif
 
@@ -713,7 +712,7 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
         throw LEOSACException("SQLite support disabled at compile time.");
 #endif
     }
-    else if (db_type == "mysql" || db_type == "pgsql")
+    else if (db_type == "pgsql")
     {
         std::string db_user   = db_cfg_node.get<std::string>("username");
         std::string db_pw     = db_cfg_node.get<std::string>("password");
@@ -721,24 +720,12 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
         std::string db_host   = db_cfg_node.get<std::string>("host", "");
         uint16_t db_port      = db_cfg_node.get<uint16_t>("port", 0);
 
-        if (db_type == "mysql")
-        {
-#ifndef LEOSAC_PGSQL_ONLY
-            database_ = std::make_shared<odb::mysql::database>(
-                db_user, db_pw, db_dbname, db_host, db_port);
-#else
-            throw LEOSACException("MySQL support disabled at compile time.");
-#endif
-        }
-        else
-        {
             INFO("Connecting to PGSQL database.");
             auto pg_db = std::make_shared<odb::pgsql::database>(
                 db_user, db_pw, db_dbname, db_host, db_port);
             // todo: care about leak
             pg_db->tracer(new db::PGSQLTracer(true));
             database_ = pg_db;
-        }
     }
     else
     {

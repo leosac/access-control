@@ -13,14 +13,13 @@ def docker(ctx):
     pass
 
 
-AVAILABLE_IMAGES = ['main', 'server', 'cross_compile']
+AVAILABLE_IMAGES = ['main', 'main2', 'server', 'cross_compile']
 
 
 def clean_output_build_line(raw_line):
     """
     Line is a dict. We returns its "stream" key and 
     remove its last \n
-    :return: 
     """
     line = raw_line['stream']
     if line.endswith('\n'):
@@ -39,7 +38,7 @@ def clean_output_build_line(raw_line):
 def build(ctx, images, nocache):
     """
     
-    Build the specified ('main', 'server', or 'cross_compile'), or all
+    Build the specified ('main', 'main2', 'server', or 'cross_compile'), or all
     leosac related images.
     """
     dc = get_docker_api_client()
