@@ -56,6 +56,7 @@ def build(ctx, images, nocache):
         dockerfile = 'docker/Dockerfile.{}'.format(image)
         build_output = dc.build(path=guess_root_dir(),
                                 dockerfile=dockerfile,
+                                tag='leosac_{}'.format(image),
                                 decode=True,  # Better stream output
                                 nocache=nocache)
 
