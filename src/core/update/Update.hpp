@@ -71,7 +71,6 @@ class Update : virtual public IUpdate
 #pragma db id auto
     UpdateId id_;
 
-#pragma db type("TIMESTAMP")
     TimePoint generated_at_;
 
     /**
@@ -80,12 +79,11 @@ class Update : virtual public IUpdate
      */
     Audit::AuditTracker checkpoint_;
 
-/**
- * Last timepoint when status was updated.
- *
- * Normally we should only change status once.
- */
-#pragma db type("TIMESTAMP")
+    /**
+     * Last timepoint when status was updated.
+     *
+     * Normally we should only change status once.
+     */
     TimePoint status_updated_at_;
 
     /**

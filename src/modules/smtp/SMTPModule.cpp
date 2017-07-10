@@ -120,8 +120,8 @@ void SMTPModule::process_config()
         }
         catch (const odb::exception &e)
         {
-            WARN("SMTP module failed to load database configuration. "
-                 "Using default config.");
+            WARN("SMTP module failed to load database configure. Using default "
+                 "config.");
         }
         if (!smtp_config_)
             smtp_config_ = std::make_unique<SMTPConfig>();

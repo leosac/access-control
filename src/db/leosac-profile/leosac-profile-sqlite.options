@@ -1,0 +1,2 @@
+--odb-prologue '#include "tools/db/leosac-profile-mapping-sqlite.hpp"'
+--hxx-prologue '#include "tools/db/leosac-profile-mapping-sqlite.hpp"'

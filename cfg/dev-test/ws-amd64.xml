@@ -2,11 +2,16 @@
 <kernel>
     <instance_name>fixe</instance_name>
     <database>
+<!--
       <type>pgsql</type>
+
       <username>postgres</username>
       <password>postgres</password>
       <dbname>leosac</dbname>
       <host>127.0.0.1</host>
+-->
+<type>sqlite</type>
+<path>/tmp/db</path>
         <startup_abort_time>30</startup_abort_time>
     </database>
 

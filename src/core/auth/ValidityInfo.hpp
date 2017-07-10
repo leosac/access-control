@@ -96,9 +96,9 @@ class ValidityInfo
 
   private:
     friend class odb::access;
-#pragma db type("TIMESTAMP")
+
     TimePoint start_;
-#pragma db type("TIMESTAMP")
+
     TimePoint end_;
 
     bool enabled_;

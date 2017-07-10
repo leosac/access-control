@@ -508,6 +508,13 @@ void Kernel::configure_database()
                 }
                 return;
             }
+            catch (odb::unknown_schema &ex)
+            {
+                INFO("Database schema unknown: "
+                     << ex.what() << ". Leosac will attempt to create the schema "
+                                     "and populate the database.");
+                populate_default_db();
+            }
             catch (const odb::exception &e)
             {
                 if (utils_->is_strict())
@@ -720,12 +727,12 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
         std::string db_host   = db_cfg_node.get<std::string>("host", "");
         uint16_t db_port      = db_cfg_node.get<uint16_t>("port", 0);
 
-            INFO("Connecting to PGSQL database.");
-            auto pg_db = std::make_shared<odb::pgsql::database>(
-                db_user, db_pw, db_dbname, db_host, db_port);
-            // todo: care about leak
-            pg_db->tracer(new db::PGSQLTracer(true));
-            database_ = pg_db;
+        INFO("Connecting to PGSQL database.");
+        auto pg_db = std::make_shared<odb::pgsql::database>(
+            db_user, db_pw, db_dbname, db_host, db_port);
+        // todo: care about leak
+        pg_db->tracer(new db::PGSQLTracer(true));
+        database_ = pg_db;
     }
     else
     {

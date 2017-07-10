@@ -19,11 +19,13 @@
 
 #pragma once
 
+#include "tools/Conversion.hpp"
 #include "tools/MyTime.hpp"
 #include <cassert>
 #include <chrono>
 #include <iomanip>
 #include <odb/pgsql/traits.hxx>
+#include <odb/sqlite/traits.hxx>
 
 namespace odb
 {
@@ -108,6 +110,47 @@ class value_traits<std::chrono::system_clock::time_point, id_timestamp>
         tm.tm_isdst = 0;
 
         return std::chrono::system_clock::from_time_t(Leosac::my_timegm(&tm));
+    }
+};
+}
+
+
+// For SQLite
+
+namespace sqlite
+{
+/**
+ * Store as string.
+ */
+template <>
+class value_traits<std::chrono::system_clock::time_point, id_text>
+{
+  public:
+    using TimePoint = std::chrono::system_clock::time_point;
+    typedef TimePoint value_type;
+    typedef value_type query_type;
+    typedef details::buffer image_type;
+
+    static void set_value(TimePoint &v, const details::buffer &b, std::size_t n,
+                          bool is_null)
+    {
+        assert(!is_null);
+        std::tm tm;
+        std::string str_rep(b.data(), n);
+        Leosac::my_gettime(&tm, str_rep, "%FT%T%z");
+        v = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    }
+
+    static void set_image(details::buffer &b, std::size_t &n, bool &is_null,
+                          const TimePoint &v)
+    {
+        is_null             = false;
+        std::string str_rep = Leosac::Conversion<std::string>(v);
+
+        n = str_rep.size();
+        if (str_rep.size() > b.capacity())
+            b.capacity(str_rep.length());
+        std::memcpy(b.data(), str_rep.data(), str_rep.length());
     }
 };
 }
