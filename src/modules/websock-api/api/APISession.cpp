@@ -32,7 +32,7 @@
 #include "tools/GenGuid.h"
 #include "tools/LogEntry.hpp"
 #include "tools/db/MultiplexedSession.hpp"
-#include "tools/leosac.hpp"
+#include "tools/version.hpp"
 #include <odb/session.hxx>
 
 using namespace Leosac;
@@ -48,7 +48,7 @@ APISession::APISession(WSServer &server)
 APISession::json APISession::get_leosac_version(const json &)
 {
     json ret;
-    ret["version"] = getVersionString();
+    ret["version"] = Tools::Version::get_full_version();
     return ret;
 }
 

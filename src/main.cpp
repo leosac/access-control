@@ -26,9 +26,9 @@
 #include "core/kernel.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include "tools/ThreadUtils.hpp"
-#include "tools/leosac.hpp"
 #include "tools/log.hpp"
 #include "tools/unixshellscript.hpp"
+#include "tools/version.hpp"
 #include <iostream>
 #include <tclap/CmdLine.h> // Could be replaced by boost::program_options
 #include <unistd.h>
@@ -54,14 +54,14 @@ int main(int argc, const char **argv)
     RuntimeOptions options;
     int relaunch = 1;
 
-    std::cout << "Running Leosac version " << Leosac::getVersionString()
+    std::cout << "Running Leosac version " << Version::get_full_version()
               << std::endl;
 
     Leosac::set_thread_name("main");
     try
     {
         TCLAP::CmdLine cmd("Open Source Access Controller", ' ',
-                           Leosac::getVersionString());
+                           Version::get_full_version());
         TCLAP::SwitchArg strict("s", "strict",
                                 "Be strict regarding configuration error",
                                 false); // assert on configuration error.

@@ -34,6 +34,10 @@ namespace Tools
 {
 class Version
 {
+    static const int Major = LEOSAC_VERSION_MAJOR;
+    static const int Minor = LEOSAC_VERSION_MINOR;
+    static const int Patch = LEOSAC_VERSION_PATCH;
+
     Version() = delete;
 
   public:
@@ -42,7 +46,8 @@ class Version
     * @see getVersionString()
     * @return version string
     */
-    static std::string buildVersionString(int major, int minor, int patch);
+    static std::string buildVersionString(int major, int minor, int patch,
+                                          std::string git_sha1 = "");
 
     /**
     * compare two version strings using semver v2.0.0
@@ -57,6 +62,19 @@ class Version
     * @return true if the version is valid
     */
     static bool isVersionValid(const std::string &v);
+
+
+    /**
+     * Retrieve the short (X.Y.Z) version of Leosac.
+     */
+    static std::string get_short_version();
+
+    /**
+     * Returns the complete version string.
+     *
+     * Something like: X.Y.Z-GIT_SHA1
+     */
+    static std::string get_full_version();
 
   private:
     static const std::string validChars;

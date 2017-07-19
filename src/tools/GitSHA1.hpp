@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -17,26 +17,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
+#include <string>
+
 /**
- * \file leosac.cpp
- * \author Thibault Schueller <ryp.sqrt@gmail.com>
- * \brief version and platform handling
+ * This is the header file for a generated source file,
+ * GitSHA1.cpp. CMake generates that file from
+ * the GitSHA1.cpp.in file.
  */
 
-#include "leosac.hpp"
-#include "tools/version.hpp"
-
-using namespace Leosac::Tools;
-static std::string vstring = std::string();
-
-std::string &Leosac::getVersionString()
+namespace Leosac
 {
-    if (vstring.empty())
-        vstring = Version::buildVersionString(Major, Minor, Patch);
-    return (vstring);
+namespace Tools
+{
+/**
+ * Retrieve the SHA1 of the HEAD commit when
+ * Leosac was built.
+ */
+const std::string &get_git_sha1();
 }
-
-int Leosac::versionCompare(const std::string &v)
-{
-    return (Version::versionCompare(v, getVersionString()));
 }
