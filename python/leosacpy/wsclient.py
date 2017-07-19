@@ -1,9 +1,8 @@
-import json
-import time
-import logging
 import asyncio
+import json
+import logging
+import time
 import uuid
-from types import SimpleNamespace
 from typing import Union
 
 import websockets
@@ -29,17 +28,7 @@ def _message_from_dict(payload: dict) -> LeosacMessage:
         raise InvalidMessageException(payload)
 
     if 'content' in payload and isinstance(payload['content'], (dict, type(None))):
-        root = payload.get('content') or {}
-
-        def convert(d):
-            target = SimpleNamespace(**d)
-            for k, v in d.items():
-                if isinstance(v, dict):
-                    target[k] = convert(v)
-            return target
-
-        ns = convert(root)
-        msg.content = ns
+        msg.content = payload.get('content') or {}
     else:
         raise InvalidMessageException(payload)
 
@@ -99,7 +88,7 @@ class LowLevelWSClient:
                 last_ex = None
                 break
             except ConnectionError as e:
-                logging.debug('Failed to connected: {}'.format(e))
+                logging.debug('Failed to connect: {}'.format(e))
                 last_ex = e
                 await asyncio.sleep(2)
 
@@ -144,7 +133,7 @@ class LowLevelWSClient:
             try:
                 await self.read_and_dispatch_once()
             except Exception as e:
-                logging.error('Error when reading and dispatching: {}'.format(e))
+                logging.exception('Error when reading and dispatching')
                 raise e
 
     async def send(self, msg: LeosacMessage) -> asyncio.Future:
@@ -227,7 +216,7 @@ class LeosacAPI(LogMixin):
     A high level API to leosac
     """
 
-    def __init__(self, target, client:LowLevelWSClient = None):
+    def __init__(self, target, client: LowLevelWSClient = None):
         if isinstance(client, LowLevelWSClient):
             self.client = client
         else:
@@ -257,12 +246,15 @@ class LeosacAPI(LogMixin):
             raise APIError(msg)
         return msg
 
-    async def get_version(self):
+    async def get_version(self, short=False):
         """
         Retrieve version of leosac server
+        :bool short: Returns the short version if true.
         """
         rep = await self._req_rep(LeosacMessage(message_type='get_leosac_version'))
-        return rep.content.version
+        if short:
+            return rep.content['version_short']
+        return rep.content['version']
 
     async def close(self):
         """

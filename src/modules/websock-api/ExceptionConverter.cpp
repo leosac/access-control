@@ -20,6 +20,7 @@
 #include "ExceptionConverter.hpp"
 #include "Exceptions.hpp"
 #include "exception/EntityNotFound.hpp"
+#include "exception/InvalidArgument.hpp"
 #include "exception/ModelException.hpp"
 #include "exception/PermissionDenied.hpp"
 #include "tools/log.hpp"
@@ -100,6 +101,11 @@ ServerMessage ExceptionConverter::convert_impl(const std::exception_ptr &ptr)
         response.status_code       = APIStatusCode::MODEL_EXCEPTION;
         response.status_string     = e.what();
         response.content["errors"] = e.json_errors();
+    }
+    catch (const InvalidArgument &e)
+    {
+        response.status_code   = APIStatusCode::INVALID_ARGUMENT;
+        response.status_string = e.what();
     }
     catch (const LEOSACException &e)
     {

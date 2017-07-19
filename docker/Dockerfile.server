@@ -1,4 +1,4 @@
-FROM leosac
+FROM leosac_main
 
 RUN mkdir /leosac_config
 VOLUME /leosac_config

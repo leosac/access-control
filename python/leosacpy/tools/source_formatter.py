@@ -37,7 +37,7 @@ class SourceFormatter(LogMixin):
         Directories in exclude_dirs will excluded.
         """
         if extensions is None:
-            extensions = ['.hpp', 'cpp']
+            extensions = ['.hpp', 'cpp', 'cpp.in']
         if exclude_dirs is None:
             exclude_dirs = []
 

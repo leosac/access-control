@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "exception/InvalidArgument.hpp"
 #include "exception/leosacexception.hpp"
 #include <utility>
 
@@ -45,3 +46,15 @@ inline auto enforce(Assessable &&value, Args &&... args)
  */
 #define LEOSAC_ENFORCE(cond, ...)                                                   \
     ::details::enforce<LEOSACException>((cond), __VA_ARGS__)
+
+/**
+ * A macro to perform argument checking that results in an exception
+ * being thrown on failure.
+ *
+ * @param cond: The condition to evaluates
+ * @param var: The variable being checked.
+ * @param msg: An optional message describing the expectation in a human
+ * friendly language.
+ */
+#define LEOSAC_ENFORCE_ARGUMENT(cond, var, msg)                                     \
+    ::details::enforce<InvalidArgument>((cond), #var, var, msg, #cond)

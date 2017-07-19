@@ -49,6 +49,7 @@ APISession::json APISession::get_leosac_version(const json &)
 {
     json ret;
     ret["version"] = Tools::Version::get_full_version();
+    ret["version_short"] = Tools::Version::get_short_version();
     return ret;
 }
 

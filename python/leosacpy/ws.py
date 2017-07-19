@@ -17,6 +17,7 @@ class APIStatusCode(Enum):
     DATABASE_ERROR = 0x09
     UNKNOWN = 0x0A
     MODEL_EXCEPTION = 0x0B
+    INVALID_ARGUMENT = 0x0C
 
 
 class LeosacMessage:

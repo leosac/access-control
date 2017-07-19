@@ -3,6 +3,7 @@ import unittest
 import click
 
 from leosacpy.runner import LeosacCachedDBRunnerFactory, LeosacFullRunner
+from leosacpy.tests.test_ws_audit import WSAudit
 from leosacpy.tests.test_ws_general import WSGeneral
 
 
@@ -17,11 +18,13 @@ def run_tests(ctx, runner):
     suite = unittest.TestSuite()
 
     if runner == 'full' or runner is None:
-        def runner_factory(cfg): return LeosacFullRunner(cfg)
+        def runner_factory(cfg):
+            return LeosacFullRunner(cfg)
     elif runner == 'shareddb':
         runner_factory = LeosacCachedDBRunnerFactory()
 
-    suite.addTest(WSGeneral.create_suite(WSGeneral,
-                                         {'runner_factory': runner_factory}
-                                         ))
+    create_param = {'runner_factory': runner_factory}
+
+    suite.addTest(WSGeneral.create_suite(WSGeneral, create_param))
+    suite.addTest(WSAudit.create_suite(WSAudit, create_param))
     unittest.TextTestRunner(verbosity=2).run(suite)
