@@ -1,4 +1,4 @@
-@page page_guid_install_from_source Building Leosac
+@page page_guide_install_from_source Building Leosac
 
 @brief Describe how to build Leosac from source.
 

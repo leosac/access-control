@@ -30,11 +30,7 @@ find_package(TCLAP REQUIRED)
 find_package(Boost 1.62 REQUIRED date_time system serialization regex filesystem)
 
 # ODB stuff
-if (LEOSAC_CROSS_COMPILE)
-    find_package(ODB REQUIRED COMPONENTS pgsql boost)
-else()
-    find_package(ODB REQUIRED COMPONENTS pgsql sqlite boost)
-endif()
+find_package(ODB REQUIRED COMPONENTS pgsql sqlite boost)
 
 include(${ODB_USE_FILE})
 

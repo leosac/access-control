@@ -53,10 +53,7 @@
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <fstream>
 #include <odb/pgsql/database.hxx>
-
-#ifndef LEOSAC_PGSQL_ONLY
 #include <odb/sqlite/database.hxx>
-#endif
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;

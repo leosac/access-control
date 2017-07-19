@@ -20,13 +20,11 @@
 #include "LogEntry.hpp"
 #include "LogEntry_odb.h"
 #include "LogEntry_odb_pgsql.h"
+#include "LogEntry_odb_sqlite.h"
 #include "exception/leosacexception.hpp"
 #include "tools/db/database.hpp"
 #include <odb/pgsql/database.hxx>
-
-#ifndef LEOSAC_PGSQL_ONLY
 #include <odb/sqlite/database.hxx>
-#endif
 
 using namespace Leosac;
 using namespace Leosac::Tools;
@@ -38,31 +36,16 @@ LogEntry::LogEntry()
 using Query  = odb::query<Tools::LogEntry>;
 using Result = odb::result<Tools::LogEntry>;
 
-/*
 static Result fetch_sqlite(DBPtr database, const std::string &order_by,
                            int page_size, int offset)
 {
-     using SQLiteQuery = odb::sqlite::query<Tools::LogEntry>;
-     auto sl_db = std::static_pointer_cast<odb::sqlite::database>(database);
-     odb::sqlite::query<Tools::LogEntry> sl_q(
-         "ORDER BY" + Query::id + order_by + "LIMIT" +
-             SQLiteQuery::_val(page_size) + "OFFSET" + SQLiteQuery::_val(offset));
-     return sl_db->query<Tools::LogEntry>(sl_q);
+    using SQLiteQuery = odb::sqlite::query<Tools::LogEntry>;
+    auto sl_db        = std::static_pointer_cast<odb::sqlite::database>(database);
+    odb::sqlite::query<Tools::LogEntry> sl_q("ORDER BY" + Query::id + order_by +
+                                             "LIMIT" + SQLiteQuery::_val(page_size) +
+                                             "OFFSET" + SQLiteQuery::_val(offset));
+    return sl_db->query<Tools::LogEntry>(sl_q);
 }
-*/
-
-/*
-static Result fetch_mysql(DBPtr database, const std::string &order_by, int page_size,
-                          int offset)
-{
-   using MySQLQuery  = odb::mysql::query<Tools::LogEntry>;
-   auto my_db = std::static_pointer_cast<odb::mysql::database>(database);
-   odb::mysql::query<Tools::LogEntry> my_q(
-       "ORDER BY" + Query::id + order_by + "LIMIT" +
-           MySQLQuery::_val(page_size) + "OFFSET" + MySQLQuery::_val(offset));
-   return my_db->query<Tools::LogEntry>(my_q);
-}
- */
 
 static Result fetch_pgsql(DBPtr database, const std::string &order_by, int page_size,
                           int offset)
@@ -91,11 +74,7 @@ LogEntry::QueryResult LogEntry::retrieve(DBPtr database, int page_number,
         // LIMIT needs to be database specific.
         if (database->id() == odb::database_id::id_sqlite)
         {
-            // res = fetch_sqlite(database, order_by, page_size, offset);
-        }
-        else if (database->id() == odb::database_id::id_mysql)
-        {
-            // res = fetch_mysql(database, order_by, page_size, offset);
+            res = fetch_sqlite(database, order_by, page_size, offset);
         }
         else if (database->id() == odb::database_id::id_pgsql)
         {

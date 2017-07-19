@@ -21,10 +21,7 @@
 
 #include "core/audit/AuditFwd.hpp"
 #include <odb/pgsql/traits.hxx>
-
-#ifndef LEOSAC_PGSQL_ONLY
 #include <odb/sqlite/traits.hxx>
-#endif
 
 /**
  * Provide ODB magic to be able to store an Leosac::Audit::EventType
@@ -33,50 +30,7 @@
 
 namespace odb
 {
-
-#ifndef LEOSAC_PGSQL_ONLY
-
-// For MySQL
-/*
-namespace mysql
-{
-template <>
-class value_traits<Leosac::Audit::EventMask, id_string>
-{
-  public:
-    typedef Leosac::Audit::EventMask value_type;
-    typedef value_type query_type;
-    typedef details::buffer image_type;
-
-    static void set_value(Leosac::Audit::EventMask &v, const details::buffer &b,
-                          std::size_t n, bool is_null)
-    {
-        if (!is_null)
-        {
-            std::string bitset_rep(b.data(), n);
-            v = Leosac::Audit::EventMask(bitset_rep);
-        }
-        else
-            v.reset();
-    }
-
-    static void set_image(details::buffer &b, std::size_t &n, bool &is_null,
-                          const Leosac::Audit::EventMask &v)
-    {
-        is_null                = false;
-        std::string bitset_rep = v.get_bitset().to_string();
-
-        n = bitset_rep.size();
-        if (bitset_rep.length() > b.capacity())
-            b.capacity(bitset_rep.length());
-        std::memcpy(b.data(), bitset_rep.data(), bitset_rep.length());
-    }
-};
-}
-*/
-
 // For SQLite
-
 namespace sqlite
 {
 template <>
@@ -113,10 +67,7 @@ class value_traits<Leosac::Audit::EventMask, id_text>
 };
 }
 
-#endif
-
 // For PGSql
-
 namespace pgsql
 {
 template <>

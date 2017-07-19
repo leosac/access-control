@@ -3,6 +3,7 @@
 import os
 import sys
 
+
 def throw_on_error(st):
     if os.WIFEXITED(st) and os.WEXITSTATUS(st) == 0:
         return
@@ -13,15 +14,21 @@ def throw_on_error(st):
         raise RuntimeError("Error when executing script. Killed by signal {}".format(
             os.WSTOPSIG(st)))
 
+
 def copy_libstdcxx(target_ip):
     """
     We copy libstdc++ to the fakeroot on the raspberry
     """
     opt = '-o StrictHostKeyChecking=no -i /cross-compile-resources/deploykey'
-    st = os.system("scp {} /usr/arm-linux-gnueabihf/lib/libstdc++.so.6.0.22 root@{}:/opt/leosac_fakeroot/lib".format(opt, target_ip))
+    st = os.system(
+        "scp {} /usr/arm-linux-gnueabihf/lib/libstdc++.so.6.0.22 root@{}:/opt/leosac_fakeroot/lib".format(
+            opt, target_ip))
     throw_on_error(st)
-    st = os.system("ssh {} root@{} 'ln -f -s /opt/leosac_fakeroot/lib/libstdc++.so.6.0.22 /opt/leosac_fakeroot/lib/libstdc++.so.6'".format(opt, target_ip))
+    st = os.system(
+        "ssh {} root@{} 'ln -f -s /opt/leosac_fakeroot/lib/libstdc++.so.6.0.22 /opt/leosac_fakeroot/lib/libstdc++.so.6'".format(
+            opt, target_ip))
     throw_on_error(st)
+
 
 def build_fresh():
     st = os.system("cd /leosac_arm_build  && \
@@ -30,21 +37,26 @@ def build_fresh():
     make -j6")
     throw_on_error(st)
 
+
 def build():
     st = os.system("cd /leosac_arm_build && make -j6")
     throw_on_error(st)
-    
+
+
 def deploy_all(target_ip):
     """
     Deploy both the complete leosac build output along with the fakeroot
     containing cross compiled dependencies.
     """
     opt = '-a --delete -r -v -e "ssh -o StrictHostKeyChecking=no -i /cross-compile-resources/deploykey" '
-    st = os.system("rsync {} /leosac_arm_build/ root@{}:/opt/leosac".format(opt, target_ip))
+    st = os.system(
+        "rsync {} /leosac_arm_build/ root@{}:/opt/leosac".format(opt, target_ip))
     throw_on_error(st)
-    os.system("rsync {} /opt/rpi_fakeroot/ root@{}:/opt/leosac_fakeroot".format(opt, target_ip))
+    os.system("rsync {} /opt/rpi_fakeroot/ root@{}:/opt/leosac_fakeroot".format(opt,
+                                                                                target_ip))
     throw_on_error(st)
     copy_libstdcxx(target_ip)
+
 
 def build_and_deploy(target_ip):
     """
@@ -52,14 +64,34 @@ def build_and_deploy(target_ip):
     of the Leosac build output. Leosac's libraries and binary are
     deployed but not other artefacts such as object files.
     
-    The 'environement' (fakeroot folder) is NOT deployed
+    The 'environment' (fakeroot folder) is NOT deployed
     """
     build()
-    opt= '-a --delete -r -v -e "ssh -o StrictHostKeyChecking=no -i /cross-compile-resources/deploykey" '
+    deploy(target_ip)
+
+
+def deploy(target_ip):
+    """
+    Deploy the build artifact required to run the program (leosac library, leosac
+    binary). Do not deploy object file or fakeroot libraries.
+    """
+    opt = '-a --delete -r -v -e "ssh -o StrictHostKeyChecking=no -i /cross-compile-resources/deploykey" '
     opt += "--exclude '*.o'"
-    st = os.system("rsync {} /leosac_arm_build/ root@{}:/opt/leosac".format(opt, target_ip))
+    st = os.system(
+        "rsync {} /leosac_arm_build/ root@{}:/opt/leosac".format(opt, target_ip))
     throw_on_error(st)
     copy_libstdcxx(target_ip)
+
+
+def cmake():
+    """
+    Prepare the build by calling cmake.
+    """
+    st = os.system("cd /leosac_arm_build  && \
+    cmake -DCMAKE_SYSROOT=/opt/rpi_fakeroot -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_TOOLCHAIN_FILE=/leosac/cmake/rpi-cross.cmake /leosac")
+    throw_on_error(st)
+
 
 def main():
     if len(sys.argv) >= 2:
@@ -73,14 +105,23 @@ def main():
                 deploy_all(sys.argv[2])
             else:
                 print("Usage ./entrypoint deploy_all IP")
+        elif sys.argv[1] == 'deploy':
+            if len(sys.argv) >= 3:
+                deploy(sys.argv[2])
+            else:
+                print("Usage ./entrypoint deploy IP")
         elif sys.argv[1] == 'build_fresh':
             build_fresh()
         elif sys.argv[1] == 'build':
             build()
+        elif sys.argv[1] == 'cmake':
+            cmake()
         else:
-            print("Usage ./entrypoint.py build_and_deploy|deploy_all|build_fresh|build")
+            print(
+                "Usage ./entrypoint.py deploy|build_and_deploy|deploy_all|build_fresh|build|cmake")
     else:
-         print("Usage ./entrypoint.py deploy_all|build_fresh|build")   
+        print("Usage ./entrypoint.py deploy|deploy_all|build_fresh|build|cmake")
+
 
 if __name__ == "__main__":
     main()

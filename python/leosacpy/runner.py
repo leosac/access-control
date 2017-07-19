@@ -180,7 +180,6 @@ class LeosacContainer(DockerContainerWrapper):
         
         :param pg_container: An optional container object that will be --bind
          to the leosac container as the 'postgres' container.
-        :return: 
         """
         kw = {'volumes': {self.config_file_path: {
             'bind': '/leosac_config/config.xml',
