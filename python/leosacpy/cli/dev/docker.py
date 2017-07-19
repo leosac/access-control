@@ -30,7 +30,7 @@ def clean_output_build_line(raw_line):
         if line.endswith('\n'):
             return line[:-1]
     else:
-        errcode = raw_line['errorDetail']['code']
+        errcode = raw_line['errorDetail'].get('code', 'N/A')
         errstr = raw_line['errorDetail']['message']
         line = 'An error occurred: CODE: {}. MESSAGE: {}'.format(errcode, errstr)
     return line
