@@ -132,6 +132,10 @@ class LowLevelWSClient:
         while True:
             try:
                 await self.read_and_dispatch_once()
+            except websockets.ConnectionClosed as e:
+                # May be normal.
+                logging.info('Websocket connection closed')
+                raise e
             except Exception as e:
                 logging.exception('Error when reading and dispatching')
                 raise e
@@ -255,6 +259,24 @@ class LeosacAPI(LogMixin):
         if short:
             return rep.content['version_short']
         return rep.content['version']
+
+    async def authenticate(self, username, password):
+        """
+        Attempt to authenticate the user with username/password credentials
+        """
+        assert isinstance(username, str)
+        assert isinstance(password, str)
+
+        try:
+            rep = await self._req_rep(LeosacMessage(message_type='create_auth_token',
+                                                    content={
+                                                        'username': username,
+                                                        'password': password
+                                                    }))
+            if rep.content['status'] == 0:
+                return True
+        except APIError as e:
+            return False
 
     async def close(self):
         """

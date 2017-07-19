@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:testing
 
 ## Add 'contrib' repository
 RUN  sed -i 's/main/main contrib/' /etc/apt/sources.list
@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y libboost-all-dev
 
 ADD . /leosac_root
 
-RUN (cd /tmp && mkdir build &&                    \
-cmake /leosac_root/ &&                            \
-make -j10)
+RUN (cd /tmp && mkdir build                    && \
+cmake /leosac_root/                            && \
+make -j10                                      && \
+make install)
