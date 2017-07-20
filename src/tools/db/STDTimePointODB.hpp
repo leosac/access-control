@@ -131,21 +131,39 @@ class value_traits<std::chrono::system_clock::time_point, id_text>
     typedef value_type query_type;
     typedef details::buffer image_type;
 
+    static constexpr const char *const TIME_POINT_MIN = "TIME_POINT_MIN";
+    static constexpr const char *const TIME_POINT_MAX = "TIME_POINT_MAX";
+
     static void set_value(TimePoint &v, const details::buffer &b, std::size_t n,
                           bool is_null)
     {
         assert(!is_null);
-        std::tm tm;
         std::string str_rep(b.data(), n);
-        Leosac::my_gettime(&tm, str_rep, "%FT%T%z");
-        v = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+
+        if (str_rep == TIME_POINT_MAX)
+            v = TimePoint::max();
+        else if (str_rep == TIME_POINT_MIN)
+            v = TimePoint::min();
+        else
+        {
+            std::tm tm;
+            Leosac::my_gettime(&tm, str_rep, "%FT%T%z");
+            v = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+        }
     }
 
     static void set_image(details::buffer &b, std::size_t &n, bool &is_null,
                           const TimePoint &v)
     {
-        is_null             = false;
-        std::string str_rep = Leosac::Conversion<std::string>(v);
+        is_null = false;
+        std::string str_rep;
+
+        if (v == TimePoint::max())
+            str_rep = TIME_POINT_MAX;
+        else if (v == TimePoint::min())
+            str_rep = TIME_POINT_MIN;
+        else
+            str_rep = Leosac::Conversion<std::string>(v);
 
         n = str_rep.size();
         if (str_rep.size() > b.capacity())
