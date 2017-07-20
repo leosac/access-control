@@ -150,15 +150,7 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
 bool Kernel::run()
 {
     module_manager_init();
-
-    SignalHandler::registerCallback(Signal::SigInt,
-                                    [this](Signal) { this->is_running_ = false; });
-
-    SignalHandler::registerCallback(Signal::SigTerm,
-                                    [this](Signal) { this->is_running_ = false; });
-
-    SignalHandler::registerCallback(Signal::SigHup,
-                                    [this](Signal) { this->send_sighup_ = true; });
+    configure_signal_handler();
 
     // At this point all module should have properly initialized.
     bus_push_.send(zmqpp::message() << "KERNEL"
@@ -736,4 +728,26 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
         throw ConfigException(config_file_path(), "Unsupported database type: " +
                                                       Colorize::underline(db_type));
     }
+}
+
+void Kernel::configure_signal_handler()
+{
+    SignalHandler::registerCallback(Signal::SigInt, [this](Signal) {
+        if (!this->is_running_)
+        {
+            std::cerr << "SIGINT received a second time. Exiting abruptly."
+                      << std::endl;
+            _exit(-1);
+        }
+        else
+        {
+            this->is_running_ = false;
+        }
+    });
+
+    SignalHandler::registerCallback(Signal::SigTerm,
+                                    [this](Signal) { this->is_running_ = false; });
+
+    SignalHandler::registerCallback(Signal::SigHup,
+                                    [this](Signal) { this->send_sighup_ = true; });
 }

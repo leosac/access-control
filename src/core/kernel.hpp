@@ -237,6 +237,11 @@ class Kernel
     void configure_logger();
 
     /**
+     * Setup signal handling for the process.
+     */
+    void configure_signal_handler();
+
+    /**
      * Register some important services to the service registry.
      */
     void register_core_services();
