@@ -21,5 +21,5 @@ def build(ctx):
     Build Leosac documentation.
     """
 
-    call('cd {} && doxygen doc/Doxyfile'.format(guess_root_dir()),
+    call('cd {} && doxygen doc/Doxyfile'.format(ctx.obj.root_dir),
          shell=True)

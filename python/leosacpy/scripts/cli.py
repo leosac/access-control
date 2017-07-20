@@ -20,8 +20,10 @@ sticky_debug_flag = None
 @click.group()
 @click.option('--debug/--no-debug', help='Debug mode', default=False)
 @click.option('--root-dir', '-r', help='Leosac root directory')
+@click.option('--server', '-s', help='Leosac server endpoint. Default to '
+                                     '127.0.0.1:8888')
 @click.pass_context
-def cli_entry_point(ctx, debug, root_dir):
+def cli_entry_point(ctx, debug, root_dir, server):
     colorama.init(autoreset=True)
     ctx.obj = SimpleNamespace()
 
@@ -32,22 +34,22 @@ def cli_entry_point(ctx, debug, root_dir):
 
     ctx.obj.DEBUG = sticky_debug_flag
     logging.info('DEBUG mode: {}'.format(ctx.obj.DEBUG))
+    ctx.obj.server_endpoint = server or '127.0.0.1:8888'
 
     ctx.obj.root_dir = root_dir or guess_root_dir()
     if not ctx.obj.root_dir:
         logging.warning('Running without a Leosac root directory.')
+
 
 @cli_entry_point.command(name='test-credentials')
 @click.argument('username')
 @click.argument('password')
 @click.pass_context
 def test_credential(ctx, username, password):
-    c = LeosacAPI(target='ws://127.0.0.1:8888')
+    c = LeosacAPI(target='ws://{}'.format(ctx.obj.server_endpoint))
 
-    def r():
-        c.authenticate(username, password)
-
-    v = asyncio.get_event_loop().run_until_complete(c.authenticate(username, password))
+    v = asyncio.get_event_loop().run_until_complete(
+        c.authenticate(username, password))
     asyncio.get_event_loop().run_until_complete(c.close())
 
     print('Auth result: {}'.format(v))
