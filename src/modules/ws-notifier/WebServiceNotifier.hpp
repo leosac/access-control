@@ -52,7 +52,8 @@ class WebServiceNotifier : public BaseModule
      * Send an HTTP request to the remote webservice
      * to let it know a card was read.
      */
-    void send_card_info_to_remote(const std::string &card, int nb_bits);
+    void send_card_info_to_remote(const std::string &auth_source,
+                                  const std::string &card, int nb_bits);
 
 
     /**
@@ -84,7 +85,8 @@ class WebServiceNotifier : public BaseModule
 
     std::vector<TargetInfo> targets_;
 
-    void send_to_target(void *curl, const Cred::RFIDCard &card,
+    void send_to_target(void *curl, const std::string &auth_source,
+                        const Cred::RFIDCard &card,
                         const TargetInfo &target) noexcept;
 };
 }

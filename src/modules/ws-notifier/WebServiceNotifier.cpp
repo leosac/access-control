@@ -73,7 +73,7 @@ void WebServiceNotifier::handle_msg_bus()
         return;
     }
 
-    send_card_info_to_remote(card, bits);
+    send_card_info_to_remote(src, card, bits);
 }
 
 void WebServiceNotifier::process_config()
@@ -105,7 +105,8 @@ void WebServiceNotifier::process_config()
     }
 }
 
-void WebServiceNotifier::send_card_info_to_remote(const std::string &card_hex,
+void WebServiceNotifier::send_card_info_to_remote(const std::string &auth_source,
+                                                  const std::string &card_hex,
                                                   int nb_bits)
 {
     auto card = Cred::RFIDCard();
@@ -123,7 +124,7 @@ void WebServiceNotifier::send_card_info_to_remote(const std::string &card_hex,
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
             if (!target.verify_peer_)
                 curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-            send_to_target(curl, card, target);
+            send_to_target(curl, auth_source, card, target);
             curl_easy_cleanup(curl);
         }
         else
@@ -145,12 +146,14 @@ static size_t write_callback(char * /*ptr*/, size_t size, size_t nmemb,
 }
 
 void WebServiceNotifier::send_to_target(
-    void *curl, const Cred::RFIDCard &card,
+    void *curl, const std::string &auth_source, const Cred::RFIDCard &card,
     const WebServiceNotifier::TargetInfo &target) noexcept
 {
     assert(curl);
 
-    std::string post_fields = "card_id=" + std::to_string(card.to_int());
+    std::string post_fields =
+        fmt::format("card_id={}&auth_source={}&card_id_raw={}", card.to_int(),
+                    auth_source, card.to_raw_int());
 
     curl_easy_setopt(curl, CURLOPT_URL, target.url_.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
