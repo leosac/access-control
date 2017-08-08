@@ -18,7 +18,7 @@
 */
 
 #include "UpdateEvent.hpp"
-#include "UpdateEvent_odb.h"
+#include "core/audit/UpdateEvent_odb.h"
 #include "tools/AssertCast.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"

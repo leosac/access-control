@@ -18,10 +18,10 @@
 */
 
 #include "LogEntry.hpp"
-#include "LogEntry_odb.h"
-#include "LogEntry_odb_pgsql.h"
-#include "LogEntry_odb_sqlite.h"
 #include "exception/leosacexception.hpp"
+#include "tools/LogEntry_odb.h"
+#include "tools/LogEntry_odb_pgsql.h"
+#include "tools/LogEntry_odb_sqlite.h"
 #include "tools/db/database.hpp"
 #include <odb/pgsql/database.hxx>
 #include <odb/sqlite/database.hxx>

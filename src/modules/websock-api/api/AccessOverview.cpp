@@ -18,9 +18,9 @@
 */
 
 #include "AccessOverview.hpp"
-#include "Door_odb.h"
-#include "User_odb.h"
 #include "core/auth/Door.hpp"
+#include "core/auth/Door_odb.h"
+#include "core/auth/User_odb.h"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/DBService.hpp"
 

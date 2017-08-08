@@ -18,9 +18,9 @@
 */
 
 #include "tools/serializers/ScheduleMappingSerializer.hpp"
-#include "Door_odb.h"
-#include "User_odb.h"
 #include "core/GetServiceRegistry.hpp"
+#include "core/auth/Door_odb.h"
+#include "core/auth/User_odb.h"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/ScheduleMapping.hpp"

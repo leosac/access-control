@@ -19,13 +19,7 @@
 
 #pragma once
 
-// Prevent the AuditTracker header from including
-// required header in the end of the file. Instead we'll include
-// them at the end of this file.
-#define LEOSAC_AUDIT_TRACKER_NO_ODB_CYCLE
 #include "core/audit/AuditTracker.hpp"
-#undef LEOSAC_AUDIT_TRACKER_NO_ODB_CYCLE
-
 #include "core/update/IUpdate.hpp"
 #include <odb/core.hxx>
 #include <string>
@@ -108,9 +102,3 @@ class Update : virtual public IUpdate
 };
 }
 }
-
-// This is required by AuditTracker.hpp, but we have to include
-// it here, otherwise we hit cyclic dependencies.
-#if defined(ODB_COMPILER)
-#include "core/audit/AuditEntry.hpp"
-#endif

@@ -5,7 +5,7 @@ PROJECT(DATABASELIB CXX)
 ## compilation flag (most notably the INCLUDE_PREFIX variable).
 ##
 ## All those compilation are part of the same ODB schema: "core".
-## This schema old database structure information for the leosac
+## This schema hold database structure information for the leosac
 ## core system. Modules can create additional schema.
 
 # ODB configuration for tools/db (LogEntry).
@@ -36,18 +36,10 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX tools
-        INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/tools/
         )
 
 
@@ -77,18 +69,10 @@ odb_compile(OdbCMake_SOURCES_AUTH
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/auth/
-        INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/auth
         )
 
 # ODB configuration for Audit log
@@ -120,18 +104,10 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/audit/
-        INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/audit
         )
 
 # ODB configuration for Credentials
@@ -153,18 +129,10 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/credentials/
-        INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/credentials
         )
 
 
@@ -186,19 +154,10 @@ odb_compile(OdbCMake_SOURCES_UPDATES
         INCLUDE  ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/update/
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
-        INCLUDE_REGEX
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/update
         )
 
 add_library(leosac_db SHARED
@@ -213,6 +172,7 @@ target_include_directories(leosac_db PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_BINARY_DIR}/odb_gen
         ${ZEROMQ_INCLUDE_DIR}
         ${ODB_INCLUDE_DIRS}
         )

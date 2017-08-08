@@ -18,16 +18,16 @@
 */
 
 #include "AuditGet.hpp"
-#include "AuditEntry_odb.h"
 #include "Exceptions.hpp"
-#include "LogEntry_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/audit/AuditEntry.hpp"
+#include "core/audit/AuditEntry_odb.h"
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "exception/InvalidArgument.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/LogEntry_odb.h"
 #include "tools/db/DBService.hpp"
 #include "tools/enforce.hpp"
 #include "tools/log.hpp"

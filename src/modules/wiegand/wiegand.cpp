@@ -18,10 +18,9 @@
 */
 
 #include "wiegand.hpp"
-#include "WiegandConfig.hpp"
-#include "WiegandConfig_odb.h"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
+#include "modules/wiegand/WiegandConfig_odb.h"
 #include "modules/wiegand/strategies/Autodetect.hpp"
 #include "tools/log.hpp"
 #include <boost/property_tree/ptree.hpp>

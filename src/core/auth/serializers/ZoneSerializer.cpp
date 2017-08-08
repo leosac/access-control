@@ -18,10 +18,9 @@
 */
 
 #include "ZoneSerializer.hpp"
-#include "Door_odb.h"
-#include "Zone_odb.h"
 #include "core/GetServiceRegistry.hpp"
-#include "core/auth/Zone.hpp"
+#include "core/auth/Door_odb.h"
+#include "core/auth/Zone_odb.h"
 #include "tools/JSONUtils.hpp"
 #include "tools/service/ServiceRegistry.hpp"
 

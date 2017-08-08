@@ -19,11 +19,11 @@
 
 #include "api/UserCRUD.hpp"
 #include "Exceptions.hpp"
-#include "User_odb.h"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
 #include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
 #include "core/auth/serializers/UserSerializer.hpp"
 #include "exception/ModelException.hpp"
 #include "tools/db/DBService.hpp"

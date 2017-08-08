@@ -18,8 +18,8 @@
 */
 
 #include "DoorEvent.hpp"
-#include "DoorEvent_odb.h"
 #include "LeosacFwd.hpp"
+#include "core/audit/DoorEvent_odb.h"
 #include "core/auth/Door.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"

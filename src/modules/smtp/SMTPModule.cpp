@@ -18,11 +18,7 @@
 */
 
 #include "SMTPModule.hpp"
-#include "SMTPAudit.hpp"
 #include "SMTPAuditSerializer.hpp"
-#include "SMTPAudit_odb.h"
-#include "SMTPConfig.hpp"
-#include "SMTPConfig_odb.h"
 #include "SMTPServerInfoSerializer.hpp"
 #include "SMTPServiceImpl.hpp"
 #include "core/CoreUtils.hpp"
@@ -31,6 +27,8 @@
 #include "core/audit/IWSAPICall.hpp"
 #include "core/audit/serializers/JSONService.hpp"
 #include "core/auth/Auth.hpp"
+#include "modules/smtp/SMTPAudit_odb.h"
+#include "modules/smtp/SMTPConfig_odb.h"
 #include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
 #include "modules/websock-api/Service.hpp"

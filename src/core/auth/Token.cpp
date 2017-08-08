@@ -17,9 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Token.hpp"
-#include "User_odb.h"
-#include "core/auth/User.hpp"
+#include "core/auth/Token.hpp"
+#include "core/auth/User_odb.h"
 #include "tools/log.hpp"
 
 using namespace Leosac;

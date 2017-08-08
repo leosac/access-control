@@ -18,7 +18,7 @@
 */
 
 #include "GroupEvent.hpp"
-#include "GroupEvent_odb.h"
+#include "core/audit/GroupEvent_odb.h"
 #include "core/auth/Group.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"

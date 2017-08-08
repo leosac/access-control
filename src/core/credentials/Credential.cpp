@@ -18,7 +18,7 @@
 */
 
 #include "core/credentials/Credential.hpp"
-#include "User_odb.h"
+#include "core/auth/User_odb.h"
 #include "core/credentials/CredentialValidator.hpp"
 
 using namespace Leosac;

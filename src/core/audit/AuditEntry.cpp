@@ -18,12 +18,12 @@
 */
 
 #include "AuditEntry.hpp"
-#include "AuditEntry_odb.h"
-#include "User_odb.h"
+#include "core/audit/AuditEntry_odb.h"
 #include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
+#include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 #include <odb/query.hxx>
-#include <tools/db/OptionalTransaction.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Audit;

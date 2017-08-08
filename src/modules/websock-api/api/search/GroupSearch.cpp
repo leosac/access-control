@@ -19,9 +19,9 @@
 
 #include "api/search/GroupSearch.hpp"
 #include "Exceptions.hpp"
-#include "Group_odb.h"
 #include "api/APISession.hpp"
 #include "core/auth/Group.hpp"
+#include "core/auth/Group_odb.h"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
 

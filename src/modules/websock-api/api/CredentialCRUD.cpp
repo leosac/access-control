@@ -18,10 +18,10 @@
 */
 
 #include "api/CredentialCRUD.hpp"
-#include "Credential_odb.h"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/ICredentialEvent.hpp"
 #include "core/credentials/Credential.hpp"
+#include "core/credentials/Credential_odb.h"
 #include "core/credentials/PinCode.hpp"
 #include "core/credentials/RFIDCard.hpp"
 #include "core/credentials/serializers/CredentialSerializer.hpp"

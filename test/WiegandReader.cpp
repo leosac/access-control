@@ -21,6 +21,7 @@
 #include "core/auth/Auth.hpp"
 #include "helper/TestHelper.hpp"
 #include "modules/wiegand/wiegand.hpp"
+#include "modules/wiegand/WiegandConfig.hpp"
 #include "tools/runtimeoptions.hpp"
 
 using namespace Leosac::Module::Wiegand;

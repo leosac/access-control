@@ -39,8 +39,8 @@ class IZone : public std::enable_shared_from_this<IZone>
      */
     enum Type
     {
-        PHYSICAL,
-        LOGICAL
+        PHYSICAL = 0x00,
+        LOGICAL  = 0x01
     };
     virtual ZoneId id() const = 0;
 

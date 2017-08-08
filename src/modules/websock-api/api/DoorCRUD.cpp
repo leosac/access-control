@@ -18,11 +18,11 @@
 */
 
 #include "api/DoorCRUD.hpp"
-#include "Door_odb.h"
 #include "Exceptions.hpp"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IDoorEvent.hpp"
+#include "core/auth/Door_odb.h"
 #include "core/auth/User.hpp"
 #include "core/auth/serializers/DoorSerializer.hpp"
 #include "exception/ModelException.hpp"

@@ -18,8 +18,8 @@
 */
 
 #include "DoorSerializer.hpp"
-#include "AccessPoint_odb.h"
 #include "core/GetServiceRegistry.hpp"
+#include "core/auth/AccessPoint_odb.h"
 #include "core/auth/Door.hpp"
 #include "core/auth/IAccessPoint.hpp"
 #include "tools/JSONUtils.hpp"

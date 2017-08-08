@@ -19,11 +19,11 @@
 
 #include "PasswordChange.hpp"
 #include "Exceptions.hpp"
-#include "User_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
+#include "core/auth/User_odb.h"
 #include "exception/EntityNotFound.hpp"
 #include "exception/PermissionDenied.hpp"
 #include "tools/db/DBService.hpp"

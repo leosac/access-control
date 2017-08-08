@@ -37,18 +37,9 @@ odb_compile(OdbCMake_SOURCES
         PROFILE "boost/date-time" "boost/optional" "leosac-profile"
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
-        INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/modules/wiegand
         )
 
 

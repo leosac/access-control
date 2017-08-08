@@ -18,19 +18,19 @@
 */
 
 #include "DBService.hpp"
-#include "AccessPoint_odb.h"
-#include "AuditEntry_odb.h"
-#include "Credential_odb.h"
 #include "DatabaseTracer.hpp"
-#include "Door_odb.h"
-#include "Group_odb.h"
 #include "OptionalTransaction.hpp"
-#include "Schedule_odb.h"
-#include "User_odb.h"
-#include "Zone_odb.h"
 #include "core/audit/AuditEntry.hpp"
+#include "core/audit/AuditEntry_odb.h"
+#include "core/auth/AccessPoint_odb.h"
+#include "core/auth/Door_odb.h"
+#include "core/auth/Group_odb.h"
+#include "core/auth/User_odb.h"
+#include "core/auth/Zone_odb.h"
+#include "core/credentials/Credential_odb.h"
 #include "exception/EntityNotFound.hpp"
 #include "tools/AssertCast.hpp"
+#include "tools/Schedule_odb.h"
 #include "tools/log.hpp"
 #include <odb/database.hxx>
 

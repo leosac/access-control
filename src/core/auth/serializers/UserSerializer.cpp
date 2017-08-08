@@ -18,14 +18,14 @@
 */
 
 #include "core/auth/serializers/UserSerializer.hpp"
-#include "Credential_odb.h"
-#include "Schedule_odb.h"
 #include "core/SecurityContext.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "core/credentials/Credential_odb.h"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/Schedule_odb.h"
 #include "tools/log.hpp"
 
 using namespace Leosac;

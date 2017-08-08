@@ -18,9 +18,8 @@
 */
 
 #include "api/search/ScheduleSearch.hpp"
-
-#include "Schedule_odb.h"
 #include "api/search/SearchBase.hpp"
+#include "tools/Schedule_odb.h"
 
 
 using namespace Leosac;

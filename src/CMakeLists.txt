@@ -166,7 +166,7 @@ add_library(${LEOSAC_LIB} SHARED
 target_include_directories(${LEOSAC_LIB}
         PUBLIC
         ${ODB_INCLUDE_DIRS}
-        ${ODB_COMPILE_OUTPUT_DIR}
+        ${CMAKE_BINARY_DIR}/odb_gen/
         ${CMAKE_SOURCE_DIR}/deps/flagset
         )
 

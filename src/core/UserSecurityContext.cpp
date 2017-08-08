@@ -18,16 +18,14 @@
 */
 
 #include "UserSecurityContext.hpp"
-#include "Group_odb.h"
-#include "User_odb.h"
-#include "core/auth/Group.hpp"
+#include "core/auth/Group_odb.h"
 #include "core/auth/IDoor.hpp"
-#include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
 #include "tools/ScheduleMapping.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
-#include <tools/db/MultiplexedTransaction.hpp>
 
 using namespace Leosac;
 

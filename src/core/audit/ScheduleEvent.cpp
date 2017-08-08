@@ -18,11 +18,11 @@
 */
 
 #include "core/audit/ScheduleEvent.hpp"
-#include "ScheduleEvent_odb.h"
-#include "Schedule_odb.h"
+#include "core/audit/ScheduleEvent_odb.h"
 #include "tools/AssertCast.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/Schedule.hpp"
+#include "tools/Schedule_odb.h"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 

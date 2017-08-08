@@ -18,8 +18,8 @@
 */
 
 #include "UpdateService.hpp"
-#include "Update_odb.h"
 #include "core/GetServiceRegistry.hpp"
+#include "core/update/Update_odb.h"
 #include "tools/GenGuid.h"
 #include "tools/db/OptionalTransaction.hpp"
 
