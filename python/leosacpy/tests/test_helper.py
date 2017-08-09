@@ -7,6 +7,7 @@ from functools import wraps
 from leosacpy.runner import RunnerConfig, Runner, \
     LeosacCachedDBRunnerFactory
 from leosacpy.utils import LogMixin
+from leosacpy.ws import LeosacMessage, APIStatusCode
 from leosacpy.wsclient import LowLevelWSClient
 
 
@@ -166,3 +167,33 @@ def with_leosac_ws_client(autoread=True):
         return wrap
 
     return decorator
+
+
+def ws_authenticated_as_admin(f):
+    """
+    Requires @with_leosac_ws_client().
+
+    This decorator will authenticate the ws_client as admin before
+    letting the test run.
+    """
+
+    @wraps(f)
+    async def wrap(*args, **kwargs):
+        test_case = args[0]
+        assert isinstance(test_case, WSTestBase), 'Wrong type'
+
+        ws_client = kwargs['wsclient']
+        assert isinstance(ws_client, LowLevelWSClient)
+
+        # Authenticate as administrator, and asserts that it worked.
+        msg = LeosacMessage(message_type='create_auth_token', content={
+            'username': 'admin',
+            'password': 'admin'
+        })
+        rep = await ws_client.req_rep(msg)
+        if rep.status_code != APIStatusCode.SUCCESS:
+            raise RuntimeError('@ws_authenticated_as_admin failed.')
+
+        await f(*args, **kwargs)
+
+    return wrap

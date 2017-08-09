@@ -3,7 +3,7 @@ import unittest
 
 from leosacpy.runner import LeosacCachedDBRunnerFactory
 from leosacpy.tests.test_helper import WSTestBase, check_return_code, \
-    with_leosac_infrastructure, with_leosac_ws_client
+    with_leosac_infrastructure, with_leosac_ws_client, ws_authenticated_as_admin
 from leosacpy.wsclient import LowLevelWSClient, APIStatusCode, LeosacMessage
 
 
@@ -27,17 +27,8 @@ class WSAudit(WSTestBase):
     @check_return_code(0)
     @with_leosac_infrastructure
     @with_leosac_ws_client()
+    @ws_authenticated_as_admin
     async def test_get_audit_negative_page(self, wsclient: LowLevelWSClient = None):
-        # Manually authenticate. Should be improved, but setUp() works
-        # at another level...
-
-        msg = LeosacMessage(message_type='create_auth_token', content={
-            'username': 'admin',
-            'password': 'admin'
-        })
-        rep = await wsclient.req_rep(msg)
-        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
-
         msg = LeosacMessage(message_type='audit.get', content={
             'p': -1,
             'ps': 25,
