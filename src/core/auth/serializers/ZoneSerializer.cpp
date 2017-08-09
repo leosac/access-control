@@ -73,7 +73,7 @@ void ZoneJSONSerializer::unserialize(Auth::IZone &out, const json &in,
         out.add_door(door);
     }
 
-    auto children_ids = in.at("doors");
+    auto children_ids = in.at("children");
     out.clear_children();
     for (const auto &child_id : children_ids)
     {

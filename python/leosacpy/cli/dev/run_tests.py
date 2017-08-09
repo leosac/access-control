@@ -9,6 +9,7 @@ from leosacpy.tests.test_ws_general import WSGeneral
 
 # Commands in this file are added manually
 # in dev.py
+from leosacpy.tests.test_ws_zone import WSZone
 
 
 @click.command(name='run-tests')
@@ -25,6 +26,7 @@ def run_tests(ctx, runner):
 
     create_param = {'runner_factory': runner_factory}
 
-    suite.addTest(WSGeneral.create_suite(WSGeneral, create_param))
-    suite.addTest(WSAudit.create_suite(WSAudit, create_param))
+    #suite.addTest(WSGeneral.create_suite(WSGeneral, create_param))
+    #suite.addTest(WSAudit.create_suite(WSAudit, create_param))
+    suite.addTest(WSZone.create_suite(WSZone, create_param))
     unittest.TextTestRunner(verbosity=2).run(suite)
