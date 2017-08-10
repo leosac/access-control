@@ -278,6 +278,15 @@ class LeosacAPI(LogMixin):
         except APIError as e:
             return False
 
+    async def restart(self):
+        """
+        Request that the Leosac server perform a restart.
+        """
+        rep = await self._req_rep(LeosacMessage(message_type='restart',
+                                                content={}))
+        if rep.content['status'] == 0:
+            return True
+
     async def close(self):
         """
         When done using the API object, call close() to clean

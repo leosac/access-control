@@ -55,6 +55,15 @@ def test_credential(ctx, username, password):
     print('Auth result: {}'.format(v))
 
 
+@cli_entry_point.command(name='restart')
+@click.pass_context
+def restart(ctx):
+    c = LeosacAPI(target='ws://{}'.format(ctx.obj.server_endpoint))
+
+    asyncio.get_event_loop().run_until_complete(c.authenticate('admin', 'admin'))
+    asyncio.get_event_loop().run_until_complete(c.restart())
+    asyncio.get_event_loop().run_until_complete(c.close())
+
 cli_entry_point.add_command(leosacpy.cli.dev.dev.dev_cmd_group)
 
 logging.basicConfig(level=logging.DEBUG)

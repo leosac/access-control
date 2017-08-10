@@ -32,6 +32,7 @@
 #include "api/LogGet.hpp"
 #include "api/MembershipCRUD.hpp"
 #include "api/PasswordChange.hpp"
+#include "api/Restart.hpp"
 #include "api/ScheduleCRUD.hpp"
 #include "api/UserCRUD.hpp"
 #include "api/ZoneCRUD.hpp"
@@ -112,6 +113,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["get_update_history"]        = &UpdateHistory::create;
     individual_handlers_["get_pending_update"]        = &PendingUpdateGet::create;
     individual_handlers_["get_update"]                = &UpdateGet::create;
+    individual_handlers_["restart"]                   = &Restart::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);

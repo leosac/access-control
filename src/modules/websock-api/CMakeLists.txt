@@ -9,6 +9,7 @@ set(WEBSOCK_API_SRCS
         Service.cpp
         api/APISession.cpp
         api/MethodHandler.cpp
+        api/Restart.cpp
         api/APIAuth.cpp
         api/LogGet.cpp
         api/PasswordChange.cpp

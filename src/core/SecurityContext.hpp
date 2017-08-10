@@ -140,7 +140,12 @@ class SecurityContext
         /**
          * Overview of users/doors access permission.
          */
-        ACCESS_OVERVIEW
+        ACCESS_OVERVIEW,
+
+        /**
+         * Perform to restart the Leosac server.
+         */
+        RESTART_SERVER
     };
 
     struct GroupActionParam
