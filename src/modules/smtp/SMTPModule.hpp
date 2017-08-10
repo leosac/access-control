@@ -19,9 +19,9 @@
 
 #pragma once
 
-#include "SMTPFwd.hpp"
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "modules/AsioModule.hpp"
+#include "modules/smtp/SMTPFwd.hpp"
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/WebSockFwd.hpp"
 #include "tools/ToolsFwd.hpp"

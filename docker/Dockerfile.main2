@@ -32,6 +32,9 @@ RUN apt-get update && apt-get install -y libboost-all-dev
 
 ADD . /leosac_root
 
+RUN (cd /leosac_root/python                    && \
+pip3 install -e .)
+
 RUN (cd /tmp && mkdir build                    && \
 cmake /leosac_root/                            && \
 make -j10                                      && \

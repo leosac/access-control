@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -17,8 +17,39 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "modules/wiegand/WiegandConfig.hpp"
 
-#include "tools/db/STDDurationODB.hpp"
-#include "tools/db/STDTimePointODB.hpp"
-#include "tools/db/ScryptResultODB.hpp"
+namespace Leosac
+{
+namespace Module
+{
+namespace Wiegand
+{
+
+WiegandConfig::WiegandConfig()
+    : id_(0)
+{
+}
+
+void WiegandConfig::add_reader(WiegandReaderConfig reader)
+{
+    readers_.push_back(reader);
+}
+
+void WiegandConfig::clear_reader()
+{
+    readers_.clear();
+}
+
+const std::vector<WiegandReaderConfig> &WiegandConfig::readers() const
+{
+    return readers_;
+}
+
+WiegandConfigId WiegandConfig::id() const
+{
+    return id_;
+}
+}
+}
+}

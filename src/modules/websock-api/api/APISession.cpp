@@ -48,7 +48,7 @@ APISession::APISession(WSServer &server)
 APISession::json APISession::get_leosac_version(const json &)
 {
     json ret;
-    ret["version"] = Tools::Version::get_full_version();
+    ret["version"]       = Tools::Version::get_full_version();
     ret["version_short"] = Tools::Version::get_short_version();
     return ret;
 }
@@ -72,7 +72,8 @@ APISession::json APISession::create_auth_token(const APISession::json &req)
     }
     else
     {
-        rep["status"] = -1;
+        rep["status"]  = -1;
+        rep["message"] = "Invalid credentials";
     }
 
     return rep;
@@ -93,7 +94,8 @@ APISession::json APISession::authenticate_with_token(const APISession::json &req
     }
     else
     {
-        rep["status"] = -1;
+        rep["status"]  = -1;
+        rep["message"] = "Invalid credentials";
     }
 
     return rep;

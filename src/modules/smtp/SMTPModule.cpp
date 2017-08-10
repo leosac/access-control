@@ -30,23 +30,14 @@
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
 #include "core/audit/serializers/JSONService.hpp"
-#include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "core/auth/Auth.hpp"
 #include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
-#include "modules/websock-api/Messages.hpp"
-#include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/Service.hpp"
-#include "tools/AssertCast.hpp"
 #include "tools/Conversion.hpp"
-#include "tools/Mail.hpp"
 #include "tools/MyTime.hpp"
-#include "tools/db/database.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include <boost/asio.hpp>
-#include <boost/asio/steady_timer.hpp>
-#include <curl/curl.h>
-#include <json.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
