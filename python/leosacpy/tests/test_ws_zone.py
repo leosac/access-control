@@ -55,6 +55,7 @@ class WSZone(WSTestBase):
         self.assertEqual(1, len(rep.content['data']))
 
         self.assertEqual('My Zone', rep.content['data'][0]['attributes']['alias'])
+        self.assertEqual(0, rep.content['data'][0]['attributes']['type'])
 
 
 if __name__ == '__main__':
