@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -31,7 +31,7 @@ namespace WebSockAPI
 using json = nlohmann::json;
 
 /**
- * Search schedules by name.
+ * Search zones by name.
  *
  * Request:
  *     + 'partial_name': A part of the name we are looking for.
@@ -39,15 +39,15 @@ using json = nlohmann::json;
  * Response:
  *     A list of {id,name} for doors that match the partial name.
  *     [
- *       {id: $SCHEDULE_ID,
- *       name: $SCHEDULE_NAME},
+ *       {id: $ZONE_ID,
+ *       alias: $ZONE_ALIAS},
  *       {...}
  *     ]
  */
-class ScheduleSearch : public MethodHandler
+class ZoneSearch : public MethodHandler
 {
   public:
-    explicit ScheduleSearch(RequestContext ctx);
+    explicit ZoneSearch(RequestContext ctx);
 
     static MethodHandlerUPtr create(RequestContext);
 

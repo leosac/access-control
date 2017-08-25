@@ -24,6 +24,18 @@ class WSZone(WSTestBase):
         cfg.stream_log = True
         return cfg
 
+    @staticmethod
+    def get_create_zone_msg():
+        return LeosacMessage(message_type='zone.create', content={
+            'attributes': {
+                'alias': 'My Zone',
+                'type': 0,
+                'description': 'A very nice zone',
+                'doors': [],
+                'children': []
+            }
+        })
+
     @check_return_code(0)
     @with_leosac_infrastructure
     @with_leosac_ws_client()
@@ -35,15 +47,7 @@ class WSZone(WSTestBase):
         # We should have 0 zones.
         self.assertEqual(0, len(rep.content['data']))
 
-        msg = LeosacMessage(message_type='zone.create', content={
-            'attributes': {
-                'alias': 'My Zone',
-                'type': 0,
-                'description': 'A very nice zone',
-                'doors': [],
-                'children': []
-            }
-        })
+        msg = self.get_create_zone_msg()
         rep = await wsclient.req_rep(msg)
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
 
@@ -57,6 +61,27 @@ class WSZone(WSTestBase):
         self.assertEqual('My Zone', rep.content['data'][0]['attributes']['alias'])
         self.assertEqual(0, rep.content['data'][0]['attributes']['type'])
 
+    @check_return_code(0)
+    @with_leosac_infrastructure
+    @with_leosac_ws_client()
+    @ws_authenticated_as_admin
+    async def test_search_zone(self, wsclient: LowLevelWSClient = None):
+        msg = LeosacMessage('search.zone_alias', content={'partial_name': '%'})
+        rep = await wsclient.req_rep(msg)
+        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
+        # This should return an empty array as we have no zone.
+        self.assertEqual(0, len(rep.content))
+
+        # Create a dummy zone.
+        msg = self.get_create_zone_msg()
+        rep = await wsclient.req_rep(msg)
+        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
+
+        # Search again
+        msg = LeosacMessage('search.zone_alias', content={'partial_name': '%'})
+        rep = await wsclient.req_rep(msg)
+        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
+        self.assertEqual(1, len(rep.content))
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

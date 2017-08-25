@@ -27,7 +27,7 @@ def _message_from_dict(payload: dict) -> LeosacMessage:
     else:
         raise InvalidMessageException(payload)
 
-    if 'content' in payload and isinstance(payload['content'], (dict, type(None))):
+    if 'content' in payload and isinstance(payload['content'], (dict, list, type(None))):
         msg.content = payload.get('content') or {}
     else:
         raise InvalidMessageException(payload)

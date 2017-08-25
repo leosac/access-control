@@ -117,6 +117,14 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
     case Action::ACCESS_POINT_SEARCH:
         return is_manager();
 
+    // Zone management is for manager.
+    case Action::ZONE_READ:
+    case Action::ZONE_CREATE:
+    case Action::ZONE_UPDATE:
+    case Action::ZONE_DELETE:
+    case Action::ZONE_SEARCH:
+        return is_manager();
+
     case Action::SMTP_GETCONFIG:
     case Action::SMTP_SETCONFIG:
     case Action::SMTP_SENDMAIL:
