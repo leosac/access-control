@@ -1,10 +1,14 @@
+import logging
 import os
 import unittest
 
+from leosacpy.exception import APIError, APIModelException
 from leosacpy.runner import LeosacCachedDBRunnerFactory
 from leosacpy.tests.test_helper import WSTestBase, check_return_code, \
     with_leosac_infrastructure, with_leosac_ws_client, ws_authenticated_as_admin
-from leosacpy.wsclient import LowLevelWSClient, APIStatusCode, LeosacMessage
+from leosacpy.ws import ZoneType
+from leosacpy.wsclient import LowLevelWSClient, APIStatusCode, LeosacMessage, \
+    LeosacAPI
 
 
 class WSZone(WSTestBase):
@@ -29,7 +33,7 @@ class WSZone(WSTestBase):
         return LeosacMessage(message_type='zone.create', content={
             'attributes': {
                 'alias': 'My Zone',
-                'type': 0,
+                'type': ZoneType.PHYSICAL,
                 'description': 'A very nice zone',
                 'doors': [],
                 'children': []
@@ -82,6 +86,26 @@ class WSZone(WSTestBase):
         rep = await wsclient.req_rep(msg)
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
         self.assertEqual(1, len(rep.content))
+
+    @check_return_code(0)
+    @with_leosac_infrastructure
+    @with_leosac_ws_client()
+    @ws_authenticated_as_admin
+    async def test_zone_invalid_type(self, wsclient: LowLevelWSClient = None):
+        api = LeosacAPI(client=wsclient)
+
+        with self.assertRaises(APIModelException):
+            await api.zone_create('My Zone', 42, 'A bugged zone')
+        await api.close()
+
+#    @check_return_code(0)
+#    @with_leosac_infrastructure
+#    @with_leosac_ws_client()
+#    @ws_authenticated_as_admin
+#    async def test_zone_multi_physical_parent(self, wsclient: LowLevelWSClient = None):
+#        api = LeosacAPI(client=wsclient)
+#        x = await api.zone_create('Parent Zone', ZoneType.PHYSICAL, 'My parent zone')
+
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()

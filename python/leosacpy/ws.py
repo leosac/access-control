@@ -1,5 +1,5 @@
 import json
-from enum import unique, Enum
+from enum import unique, Enum, IntEnum
 from types import SimpleNamespace
 
 
@@ -20,6 +20,11 @@ class APIStatusCode(Enum):
     INVALID_ARGUMENT = 0x0C
 
 
+class ZoneType(IntEnum):
+    PHYSICAL = 0x00
+    LOGICAL = 0x01
+
+
 class LeosacMessage:
     def __init__(self, message_type: str = '', content=None):
         self.type = message_type  # type: str
@@ -35,4 +40,3 @@ class LeosacMessage:
             'content': self.content or {},
             'uuid': self.uuid
         })
-

@@ -17,7 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/Zone.hpp"
+#include "core/auth/Zone_odb.h"
+#include "exception/ModelException.hpp"
+#include "tools/log.hpp"
 
 namespace Leosac
 {
@@ -93,6 +95,50 @@ void Zone::add_door(DoorLPtr door)
 void Zone::add_child(ZoneLPtr zone)
 {
     children_.push_back(zone);
+}
+
+void Zone::validation_callback(odb::callback_event e, odb::database &) const
+{
+    if (e == odb::callback_event::pre_update ||
+        e == odb::callback_event::pre_persist)
+    {
+        ZoneValidator::validate(*this);
+    }
+}
+
+void ZoneValidator::validate(const Zone &z)
+{
+    bool has_physical_parent = false;
+
+    validate_type(z.type());
+
+    for (auto &lazy_parent : z.parents_)
+    {
+        auto parent(lazy_parent.load());
+        ASSERT_LOG(parent, "Failed to load object.");
+        if (parent->type() == IZone::Type::PHYSICAL)
+        {
+            if (has_physical_parent)
+            {
+                throw ModelException(
+                    "data", "A zone cannot have more than one physical parent.");
+            }
+            has_physical_parent = true;
+        }
+    }
+}
+
+void ZoneValidator::validate_type(IZone::Type value)
+{
+    switch (value)
+    {
+    case IZone::Type::PHYSICAL:
+    case IZone::Type::LOGICAL:
+        return;
+
+    default:
+        throw ModelException("data/attributes/type", "Invalid zone type.");
+    }
 }
 }
 }

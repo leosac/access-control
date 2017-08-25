@@ -11,7 +11,7 @@
     </database>
 
     <plugin_directories>
-      <plugindir>/usr/local/lib/leosac/</plugindi>
+      <plugindir>/usr/local/lib/leosac/</plugindir>
       <plugindir>/usr/local/lib/leosac/auth</plugindir>
     </plugin_directories>
 

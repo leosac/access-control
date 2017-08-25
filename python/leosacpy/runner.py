@@ -256,14 +256,13 @@ class LeosacCachedDBRunner(Runner, LogMixin):
     def _clean_db_if_needed(self):
         # First make sure we have proper permission to perform operation
         # against database.
-        exec_info = self.db_container.do_exec(['su', '-c', 'createuser -s root',
-                                               'postgres'])
-        if exec_info['return_code'] != 0:
-            self.log_and_raise(RuntimeError,
-                               'Failed to give ourself permission to drop database',
-                               exec_info)
+        self.db_container.do_exec(['su', '-c', 'createuser -s root',
+                                   'postgres'])
+        # This may fail if we already have the required permission. We can
+        # ignore the return code check for this command because next one
+        # will fail anyway if we lack permission.
 
-        # Drop database
+        # Now we can attempt to drop database
         exec_info = self.db_container.do_exec(['dropdb', 'postgres'])
         if exec_info['return_code'] != 0:
             self.log_and_raise(RuntimeError,

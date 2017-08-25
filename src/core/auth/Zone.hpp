@@ -21,18 +21,39 @@
 
 #include "LeosacFwd.hpp"
 #include "core/auth/IZone.hpp"
+#include <odb/callback.hxx>
 
 namespace Leosac
 {
 namespace Auth
 {
+
+class ZoneValidator
+{
+  public:
+    /**
+     * Perform validation of the zone.
+     *
+     * The function will make sure that the zone do not
+     * have 2 physical's zone as parent.
+     */
+    static void validate(const Zone &z);
+
+    /**
+     * Validate that the integer value of the type is a correct
+     * type for a zone.
+     *
+     * This is mostly useful when unserializing from an untrusted source.
+     */
+    static void validate_type(IZone::Type value);
+};
+
 /**
  * A Zone is a container for doors and other zone.
  *
- * Its a way to regroup element together, either in a physical
- * or logical way.
-*/
-#pragma db object optimistic
+ * This is the ODB-aware implementation.
+ */
+#pragma db object callback(validation_callback) optimistic
 class Zone : public virtual IZone
 {
   public:
@@ -63,6 +84,15 @@ class Zone : public virtual IZone
 
     virtual void add_child(ZoneLPtr zone) override;
 
+    /**
+     * Callback function called by ODB before/after database
+     * operation against a Zone object.
+     *
+     * This function will perform some validation wrt parent/child
+     * relationship of the object.
+     */
+    void validation_callback(odb::callback_event e, odb::database &) const;
+
   protected:
 #pragma db id auto
     ZoneId id_;
@@ -77,12 +107,16 @@ class Zone : public virtual IZone
 #pragma db value_not_null
     std::vector<DoorLPtr> doors_;
 
+#pragma db value_not_null inverse(children_)
+    std::vector<ZoneLWPtr> parents_;
+
 #pragma db version
     const size_t version_;
 
   private:
     friend class odb::access;
     friend class Leosac::TestAccess;
+    friend class ZoneValidator;
 };
 }
 }

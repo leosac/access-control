@@ -25,10 +25,10 @@
 /**
  * An exception class for general API error.
  *
- * The particulary of this class is that it accepts a JSON object
+ * The particularity of this class is that it accepts a JSON object
  * as a parameters.
  *
- * The APIException accepts APIException::ModelError objects as parameter.
+ * The ModelException accepts ModelException::ModelError objects as parameter.
  */
 class ModelException : public LEOSACException
 {
@@ -60,6 +60,7 @@ class ModelException : public LEOSACException
     /**
      * This is an helper constructor that will instanciate a ModelError
      * object from the 2 parameters.
+     *
      * @param source_pointer
      * @param msg
      */

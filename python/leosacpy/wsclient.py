@@ -7,8 +7,8 @@ from typing import Union
 
 import websockets
 
-from leosacpy.exception import InvalidMessageException, APIError
-from leosacpy.utils import LogMixin
+from leosacpy.exception import InvalidMessageException, APIError, APIModelException
+from leosacpy.utils import LogMixin, assert_isinstance
 from leosacpy.ws import LeosacMessage, APIStatusCode
 
 
@@ -27,7 +27,8 @@ def _message_from_dict(payload: dict) -> LeosacMessage:
     else:
         raise InvalidMessageException(payload)
 
-    if 'content' in payload and isinstance(payload['content'], (dict, list, type(None))):
+    if 'content' in payload and isinstance(payload['content'],
+                                           (dict, list, type(None))):
         msg.content = payload.get('content') or {}
     else:
         raise InvalidMessageException(payload)
@@ -220,12 +221,14 @@ class LeosacAPI(LogMixin):
     A high level API to leosac
     """
 
-    def __init__(self, target, client: LowLevelWSClient = None):
+    def __init__(self, target: str = None, client: LowLevelWSClient = None):
         if isinstance(client, LowLevelWSClient):
             self.client = client
         else:
             self.client = LowLevelWSClient()
 
+        if target:
+            assert_isinstance(target, str)
         self.target = target
         self.logger.info('LeosacAPI target: {}'.format(self.target))
 
@@ -247,7 +250,10 @@ class LeosacAPI(LogMixin):
         fut = await self._send(msg)
         msg = await fut
         if require_success and not msg.status_code == APIStatusCode.SUCCESS:
-            raise APIError(msg)
+            if msg.status_code == APIStatusCode.MODEL_EXCEPTION:
+                raise APIModelException(msg)
+            else:
+                raise APIError(msg)
         return msg
 
     async def get_version(self, short=False):
@@ -277,6 +283,24 @@ class LeosacAPI(LogMixin):
                 return True
         except APIError as e:
             return False
+
+    async def zone_create(self, alias, zone_type, desc,
+                          doors=None, children=None):
+        if doors is None:
+            doors = []
+        if children is None:
+            children = []
+        rep = await self._req_rep(LeosacMessage(message_type='zone.create',
+                                                content={
+                                                    'attributes': {
+                                                        'alias': alias,
+                                                        'type': zone_type,
+                                                        'description': desc,
+                                                        'doors': doors,
+                                                        'children': children
+                                                    }
+                                                }))
+        return rep
 
     async def restart(self):
         """

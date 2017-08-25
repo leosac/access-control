@@ -14,8 +14,10 @@ from leosacpy.tests.test_ws_zone import WSZone
 
 @click.command(name='run-tests')
 @click.option('--runner', '-r', type=click.Choice(['full', 'shareddb']))
+@click.option('--test', '-t', type=str,
+              help='Name of the test to run')
 @click.pass_context
-def run_tests(ctx, runner):
+def run_tests(ctx, runner, test):
     suite = unittest.TestSuite()
 
     if runner == 'full' or runner is None:
@@ -28,5 +30,5 @@ def run_tests(ctx, runner):
 
     #suite.addTest(WSGeneral.create_suite(WSGeneral, create_param))
     #suite.addTest(WSAudit.create_suite(WSAudit, create_param))
-    suite.addTest(WSZone.create_suite(WSZone, create_param))
+    suite.addTest(WSZone.create_suite(WSZone, create_param, test))
     unittest.TextTestRunner(verbosity=2).run(suite)

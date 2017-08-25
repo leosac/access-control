@@ -23,12 +23,15 @@ class ParametrizedTestCase(unittest.TestCase):
         self.param = param
 
     @staticmethod
-    def create_suite(testcase_klass, param=None):
+    def create_suite(testcase_klass, param=None, test_name=None):
         """ Create a suite containing all tests taken from the given
             subclass, passing them the parameter 'param'.
         """
         testloader = unittest.TestLoader()
-        testnames = testloader.getTestCaseNames(testcase_klass)
+        if test_name is None:
+            testnames = testloader.getTestCaseNames(testcase_klass)
+        else:
+            testnames = [test_name]
         suite = unittest.TestSuite()
         for name in testnames:
             suite.addTest(testcase_klass(name, param=param))
@@ -161,9 +164,14 @@ def with_leosac_ws_client(autoread=True):
 
             c = await test_case.get_ws_to_leosac(autoread=autoread)
             kwargs['wsclient'] = c
-            await f(*args, **kwargs)
-            await c.close()
-
+            try:
+                await f(*args, **kwargs)
+            finally:
+                try:
+                    # Now attempt to close, ignoring exception.
+                    await c.close()
+                except Exception:
+                    pass
         return wrap
 
     return decorator

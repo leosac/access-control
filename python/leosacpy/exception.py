@@ -23,3 +23,12 @@ class APIError(LeosacException):
                                                                msg.status_string)
         self.message = msg
         super().__init__(str_msg)
+
+
+class APIModelException(APIError):
+    """
+    A Leosac API Error that came from a MODEL_EXCEPTION error code
+    """
+
+    def __init__(self, msg: LeosacMessage):
+        super().__init__(msg)
