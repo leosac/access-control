@@ -1,8 +1,6 @@
 import logging
 import os
-
 import docker
-import logging
 
 
 def guess_root_dir() -> str:
@@ -49,5 +47,5 @@ class LogMixin:
 
     def log_and_raise(self, etype, *args):
         e = etype(*args)
-        self.logger.error('An error occured: {}'.format(e))
+        self.logger.error('An error occurred: {}'.format(e))
         raise e

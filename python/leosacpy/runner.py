@@ -7,7 +7,7 @@ from threading import Thread
 import docker
 import functools
 
-from leosacpy.utils import get_docker_client, LogMixin
+from leosacpy.utils import get_docker_client, LogMixin, get_docker_api_client
 
 
 class RunnerConfig:
@@ -95,6 +95,25 @@ class DockerContainerWrapper(LogMixin):
 
         if stream_log:
             self._stream_log()
+
+    def do_exec(self, cmd):
+        """
+        Execute a command in a running container.
+
+        :returns: A dict containing 'output' and 'inspect' key, where
+        'output' is the raw output while 'inspect' is the dict returned
+        by `exec_inspect` docker command.
+        """
+        docker_api = get_docker_api_client()
+
+        exec_info = docker_api.exec_create(self.container.id, cmd)
+        output = docker_api.exec_start(exec_info['Id'])
+        inspect = docker_api.exec_inspect(exec_info['Id'])
+
+        return {'output': output,
+                'inspect': inspect,
+                'return_code': inspect['ExitCode']
+                }
 
     def stop(self):
         """
@@ -235,21 +254,46 @@ class LeosacCachedDBRunner(Runner, LogMixin):
             self.cache['db_container'] = db_container
 
     def _clean_db_if_needed(self):
-        pass
+        # First make sure we have proper permission to perform operation
+        # against database.
+        exec_info = self.db_container.do_exec(['su', '-c', 'createuser -s root',
+                                               'postgres'])
+        if exec_info['return_code'] != 0:
+            self.log_and_raise(RuntimeError,
+                               'Failed to give ourself permission to drop database',
+                               exec_info)
+
+        # Drop database
+        exec_info = self.db_container.do_exec(['dropdb', 'postgres'])
+        if exec_info['return_code'] != 0:
+            self.log_and_raise(RuntimeError,
+                               'Failed to drop the database between tests',
+                               exec_info)
+
+        # Then recreate
+        exec_info = self.db_container.do_exec(['createdb', 'postgres'])
+        if exec_info['return_code'] != 0:
+            self.log_and_raise(RuntimeError,
+                               'Failed to recreate the database between tests',
+                               exec_info)
 
     async def __aenter__(self):
         if self.db_container is None:
-            self.logger.info('Will create the Postgres container for the first time.')
+            self.logger.info(
+                'Will create the Postgres container for the first time.')
             self.db_container = DockerContainerWrapper('Postgres', self.docker)
-            self.db_container.do_run_detach('postgres:latest', stream_log=self.cfg.stream_log)
+            self.db_container.do_run_detach('postgres:latest',
+                                            stream_log=self.cfg.stream_log)
             self._cache_db_container(self.db_container)
         else:
             # Reused from cache. Need to clean DB.
             self.logger.info('Reusing Postgres container from cache.')
             self._clean_db_if_needed()
 
-        self.leosac_container = LeosacContainer(self.cfg.leosac_config_file, self.docker)
-        self.leosac_container.run_detach(self.db_container, stream_log=self.cfg.stream_log)
+        self.leosac_container = LeosacContainer(self.cfg.leosac_config_file,
+                                                self.docker)
+        self.leosac_container.run_detach(self.db_container,
+                                         stream_log=self.cfg.stream_log)
 
         return self
 
