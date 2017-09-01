@@ -25,6 +25,7 @@
 #include "ScheduleEventSerializer.hpp"
 #include "UpdateEventSerializer.hpp"
 #include "WSAPICallSerializer.hpp"
+#include "ZoneEventSerializer.hpp"
 #include "core/GetServiceRegistry.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/audit/serializers/UserEventSerializer.hpp"
@@ -102,6 +103,11 @@ void PolymorphicAuditJSON::HelperSerialize::visit(
 void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IUpdateEvent &t)
 {
     result_ = UpdateEventJSON::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IZoneEvent &t)
+{
+    result_ = ZoneEventJSON::serialize(t, security_context_);
 }
 
 void PolymorphicAuditJSON::HelperSerialize::cannot_visit(
