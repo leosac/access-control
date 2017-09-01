@@ -98,7 +98,31 @@ class WSZone(WSTestBase):
             await api.zone_create('My Zone', 42, 'A bugged zone')
         await api.close()
 
-#    @check_return_code(0)
+    @check_return_code(0)
+    @with_leosac_infrastructure
+    @with_leosac_ws_client()
+    @ws_authenticated_as_admin
+    async def test_zone_multiple_physical_parent(self,
+                                                 wsclient: LowLevelWSClient = None):
+        """
+        A zone cannot have multiple physical parent. Test that the server
+        refuse those.
+        """
+        api = LeosacAPI(client=wsclient)
+
+        child_id = await api.zone_create('Child', ZoneType.PHYSICAL, '')
+        parent_id = await api.zone_create('Parent', ZoneType.PHYSICAL, '',
+                                          children=[child_id])
+
+        with self.assertRaises(APIModelException):
+            # This will add a second parent to Child zone, and should fail.
+            await api.zone_create('SecondParent', ZoneType.PHYSICAL, '',
+                                  children=[child_id])
+
+        await api.close()
+
+
+# @check_return_code(0)
 #    @with_leosac_infrastructure
 #    @with_leosac_ws_client()
 #    @ws_authenticated_as_admin

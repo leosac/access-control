@@ -286,6 +286,9 @@ class LeosacAPI(LogMixin):
 
     async def zone_create(self, alias, zone_type, desc,
                           doors=None, children=None):
+        """
+        Create a zone and returns its id on success.
+        """
         if doors is None:
             doors = []
         if children is None:
@@ -300,7 +303,7 @@ class LeosacAPI(LogMixin):
                                                         'children': children
                                                     }
                                                 }))
-        return rep
+        return rep.content['data']['id']
 
     async def restart(self):
         """

@@ -99,8 +99,8 @@ void Zone::add_child(ZoneLPtr zone)
 
 void Zone::validation_callback(odb::callback_event e, odb::database &) const
 {
-    if (e == odb::callback_event::pre_update ||
-        e == odb::callback_event::pre_persist)
+    if (e == odb::callback_event::post_update ||
+        e == odb::callback_event::post_persist)
     {
         ZoneValidator::validate(*this);
     }
@@ -108,7 +108,7 @@ void Zone::validation_callback(odb::callback_event e, odb::database &) const
 
 void ZoneValidator::validate(const Zone &z)
 {
-    bool has_physical_parent = false;
+    unsigned int physical_parent_count = 0;
 
     validate_type(z.type());
 
@@ -118,13 +118,31 @@ void ZoneValidator::validate(const Zone &z)
         ASSERT_LOG(parent, "Failed to load object.");
         if (parent->type() == IZone::Type::PHYSICAL)
         {
-            if (has_physical_parent)
-            {
-                throw ModelException(
-                    "data", "A zone cannot have more than one physical parent.");
-            }
-            has_physical_parent = true;
+            ++physical_parent_count;
         }
+    }
+
+    // Todo: prevent cycle.
+
+    // Physical zone can have at most one physical parent.
+    if (z.type() == IZone::Type::PHYSICAL && physical_parent_count > 1)
+    {
+        throw ModelException(
+            "data", "A physical zone cannot have more than one physical parent.");
+    }
+    // Logical zone cannot have physical parent.
+    else if (z.type() == IZone::Type::LOGICAL && physical_parent_count != 0)
+    {
+        throw ModelException("data",
+                             "A logical zone cannot have physical zone as a parent");
+    }
+
+    // Recursively validate children.
+    for (auto &lazy_children : z.children_)
+    {
+        auto child(lazy_children.load());
+        ASSERT_LOG(child, "Failed to load object");
+        ZoneValidator::validate(*child);
     }
 }
 
