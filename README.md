@@ -31,5 +31,4 @@ Please report issues [here](https://github.com/leosac/leosac/issues).
 This project is released under the GNU Affero GPLv3 license.
 A copy of the license can be found in the root folder.
 
-![alt text][logo]
-[logo]: https://raw.githubusercontent.com/leosac/leosac/master/rc/AGPLv3.png  "AGPL Logo"
+![logo](https://raw.githubusercontent.com/leosac/leosac/master/rc/AGPLv3.png  "AGPL Logo")
