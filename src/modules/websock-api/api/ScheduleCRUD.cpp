@@ -18,13 +18,13 @@
 */
 
 #include "api/ScheduleCRUD.hpp"
-#include "Schedule_odb.h"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IDoorEvent.hpp"
 #include "core/audit/IScheduleEvent.hpp"
 #include "tools/AssertCast.hpp"
 #include "tools/ISchedule.hpp"
 #include "tools/Schedule.hpp"
+#include "tools/Schedule_odb.h"
 #include "tools/db/DBService.hpp"
 #include "tools/enforce.hpp"
 #include "tools/serializers/ScheduleMappingSerializer.hpp"

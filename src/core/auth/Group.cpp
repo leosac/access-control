@@ -17,10 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Group.hpp"
-#include "Group_odb.h"
-#include "UserGroupMembership_odb.h"
-#include "core/auth/UserGroupMembership.hpp"
+#include "core/auth/Group_odb.h"
+#include "core/auth/UserGroupMembership_odb.h"
 #include "tools/log.hpp"
 #include <exception/ModelException.hpp>
 

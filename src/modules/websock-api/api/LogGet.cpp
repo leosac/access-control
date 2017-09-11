@@ -19,9 +19,9 @@
 
 #include "LogGet.hpp"
 #include "Exceptions.hpp"
-#include "LogEntry_odb.h"
 #include "api/APISession.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/LogEntry_odb.h"
 #include "tools/db/DBService.hpp"
 
 using namespace Leosac;

@@ -19,14 +19,14 @@
 
 #include "tools/ScheduleMapping.hpp"
 #include "AssertCast.hpp"
-#include "Credential_odb.h"
-#include "Group_odb.h"
-#include "ScheduleMapping_odb.h"
-#include "User_odb.h"
 #include "core/auth/Door.hpp"
 #include "core/auth/Group.hpp"
+#include "core/auth/Group_odb.h"
 #include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
 #include "core/credentials/Credential.hpp"
+#include "core/credentials/Credential_odb.h"
+#include "tools/ScheduleMapping_odb.h"
 #include "tools/log.hpp"
 
 using namespace Leosac;

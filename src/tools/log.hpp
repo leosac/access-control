@@ -229,5 +229,5 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
                                          << ". Aborting.");                         \
             raise(SIGABRT);                                                         \
         }                                                                           \
-    } while (0)
+    } while (false)
 #endif

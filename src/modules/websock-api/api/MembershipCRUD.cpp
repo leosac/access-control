@@ -19,8 +19,6 @@
 
 #include "api/MembershipCRUD.hpp"
 #include "Exceptions.hpp"
-#include "UserGroupMembership_odb.h"
-#include "User_odb.h"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IUserGroupMembershipEvent.hpp"
@@ -28,6 +26,8 @@
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
+#include "core/auth/UserGroupMembership_odb.h"
+#include "core/auth/User_odb.h"
 #include "core/auth/serializers/UserGroupMembershipSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"

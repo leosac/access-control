@@ -1,3 +1,5 @@
+@page page_module_ws_notifier Module: Web Service Notifier
+
 Web Service Notifier {#mod_ws-notifier_main}
 =====================================================
 

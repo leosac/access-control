@@ -19,20 +19,20 @@
 
 #include "APISession.hpp"
 #include "Exceptions.hpp"
-#include "Group_odb.h"
-#include "Token_odb.h"
-#include "UserGroupMembership_odb.h"
-#include "User_odb.h"
 #include "WSServer.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/UserSecurityContext.hpp"
 #include "core/auth/Group.hpp"
+#include "core/auth/Group_odb.h"
+#include "core/auth/Token_odb.h"
 #include "core/auth/User.hpp"
+#include "core/auth/UserGroupMembership_odb.h"
+#include "core/auth/User_odb.h"
 #include "core/kernel.hpp"
 #include "tools/GenGuid.h"
 #include "tools/LogEntry.hpp"
 #include "tools/db/MultiplexedSession.hpp"
-#include "tools/leosac.hpp"
+#include "tools/version.hpp"
 #include <odb/session.hxx>
 
 using namespace Leosac;
@@ -48,7 +48,8 @@ APISession::APISession(WSServer &server)
 APISession::json APISession::get_leosac_version(const json &)
 {
     json ret;
-    ret["version"] = getVersionString();
+    ret["version"]       = Tools::Version::get_full_version();
+    ret["version_short"] = Tools::Version::get_short_version();
     return ret;
 }
 
@@ -71,7 +72,8 @@ APISession::json APISession::create_auth_token(const APISession::json &req)
     }
     else
     {
-        rep["status"] = -1;
+        rep["status"]  = -1;
+        rep["message"] = "Invalid credentials";
     }
 
     return rep;
@@ -92,7 +94,8 @@ APISession::json APISession::authenticate_with_token(const APISession::json &req
     }
     else
     {
-        rep["status"] = -1;
+        rep["status"]  = -1;
+        rep["message"] = "Invalid credentials";
     }
 
     return rep;

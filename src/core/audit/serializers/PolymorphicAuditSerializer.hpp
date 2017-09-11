@@ -41,10 +41,10 @@ namespace Serializer
  * namespace, is able to serialize core Audit objects.
  *
  * However, the audit system being extensible, we need to be able to use
- * externally registered serializer. This is why the `serialize()` method
- * takes an additional ServiceRegistry parameter: in the case where the
- * to-be-serialized entry is not part of the core, we'll attempt to serialize
- * it through the Audit::Serializer::JSONService class.
+ * externally registered serializer.
+ * In the case where the to-be-serialized entry is not part of the core,
+ * - meaning its not supported by PolymorphicAuditJSON - we'll attempt
+ * to serialize it through the Audit::Serializer::JSONService service.
  */
 struct PolymorphicAuditJSON
 {
@@ -71,7 +71,8 @@ struct PolymorphicAuditJSON
                              public Tools::Visitor<Audit::ICredentialEvent>,
                              public Tools::Visitor<Audit::IDoorEvent>,
                              public Tools::Visitor<Audit::IUserGroupMembershipEvent>,
-                             public Tools::Visitor<Audit::IUpdateEvent>
+                             public Tools::Visitor<Audit::IUpdateEvent>,
+                             public Tools::Visitor<Audit::IZoneEvent>
     {
         HelperSerialize(const SecurityContext &sc);
 
@@ -83,6 +84,7 @@ struct PolymorphicAuditJSON
         virtual void visit(const Audit::IDoorEvent &t) override;
         virtual void visit(const Audit::IUserGroupMembershipEvent &t) override;
         virtual void visit(const Audit::IUpdateEvent &t) override;
+        virtual void visit(const Audit::IZoneEvent &t) override;
 
         /**
          * Called when no "hardcoded" audit type match, this method

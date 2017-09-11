@@ -18,8 +18,8 @@
 */
 
 #include "SMTPAudit.hpp"
-#include "SMTPAudit_odb.h"
 #include "core/audit/AuditEntry.hpp"
+#include "modules/smtp/SMTPAudit_odb.h"
 #include "tools/AssertCast.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"

@@ -1,3 +1,5 @@
+@page page_module_rpleth Module: Rpleth
+
 Rpleth Module Documentation {#mod_rpleth_main}
 ==============================================
 

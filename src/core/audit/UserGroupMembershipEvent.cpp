@@ -18,7 +18,7 @@
 */
 
 #include "UserGroupMembershipEvent.hpp"
-#include "UserGroupMembershipEvent_odb.h"
+#include "core/audit/UserGroupMembershipEvent_odb.h"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 #include <tools/JSONUtils.hpp>

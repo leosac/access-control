@@ -18,16 +18,14 @@
 */
 
 #include "UserSecurityContext.hpp"
-#include "Group_odb.h"
-#include "User_odb.h"
-#include "core/auth/Group.hpp"
+#include "core/auth/Group_odb.h"
 #include "core/auth/IDoor.hpp"
-#include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
 #include "tools/ScheduleMapping.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
-#include <tools/db/MultiplexedTransaction.hpp>
 
 using namespace Leosac;
 
@@ -119,6 +117,14 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
     case Action::ACCESS_POINT_SEARCH:
         return is_manager();
 
+    // Zone management is for manager.
+    case Action::ZONE_READ:
+    case Action::ZONE_CREATE:
+    case Action::ZONE_UPDATE:
+    case Action::ZONE_DELETE:
+    case Action::ZONE_SEARCH:
+        return is_manager();
+
     case Action::SMTP_GETCONFIG:
     case Action::SMTP_SETCONFIG:
     case Action::SMTP_SENDMAIL:
@@ -133,6 +139,9 @@ bool UserSecurityContext::check_permission_impl(SecurityContext::Action action,
         return is_admin();
     case Action::ACCESS_OVERVIEW:
         return is_manager();
+
+    case Action::RESTART_SERVER:
+        return is_admin();
     default:
         ASSERT_LOG(0, "Not handled.");
     }

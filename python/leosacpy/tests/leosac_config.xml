@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<kernel>
+    <instance_name>fixe</instance_name>
+    <database>
+      <type>pgsql</type>
+      <username>postgres</username>
+      <password>postgres</password>
+      <dbname>postgres</dbname>
+      <host>postgres</host>
+      <startup_abort_time>45</startup_abort_time>
+    </database>
+
+    <plugin_directories>
+      <plugindir>/usr/local/lib/leosac/</plugindir>
+      <plugindir>/usr/local/lib/leosac/auth</plugindir>
+    </plugin_directories>
+
+    <network>
+        <enabled>false</enabled>
+    </network>
+
+    <log>
+      <enable_database>false</enable_database>
+    </log>
+
+    <modules>
+        <module>
+            <name>WEBSOCK_API</name>
+            <file>libwebsock-api.so</file>
+            <level>1</level>
+
+            <module_config>
+              <port>8888</port>
+              <interface>0.0.0.0</interface>
+            </module_config>
+        </module>
+
+        <module>
+            <name>SMTP</name>
+            <file>libsmtp.so</file>
+            <level>2</level>
+
+            <module_config>
+              <use_database>true</use_database>
+            </module_config>
+        </module>
+    </modules>
+</kernel>

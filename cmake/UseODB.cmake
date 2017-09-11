@@ -18,14 +18,14 @@ function(odb_compile outvar)
   set(oneValueParams SCHEMA_FORMAT SCHEMA_NAME TABLE_PREFIX
     STANDARD SLOC_LIMIT
     HXX_PROLOGUE HEADER_PROLOGUE INLINE_PROLOGUE SOURCE_PROLOGUE
-    HEADER_EPILOGUE INLINE_EPILOGUE SOURCE_EPILOGUE
+    HEADER_EPILOGUE INLINE_EPILOGUE SOURCE_EPILOGUE ODB_EPILOGUE
     MULTI_DATABASE
-    PROFILE
     INCLUDE_PREFIX
     DEFAULT_POINTER
     PGSQL_SERVER_VERSION
+          OUTPUT_DIR
           )
-  set(multiValueParams FILES INCLUDE DB INCLUDE_REGEX)
+  set(multiValueParams FILES INCLUDE DB INCLUDE_REGEX PROFILE)
 
   cmake_parse_arguments(PARAM "${options}" "${oneValueParams}" "${multiValueParams}" ${ARGN})
 
@@ -120,8 +120,18 @@ function(odb_compile outvar)
     list(APPEND ODB_ARGS --cxx-epilogue-file "${PARAM_SOURCE_EPILOGUE}")
   endif()
 
+  if(PARAM_ODB_EPILOGUE)
+    list(APPEND ODB_ARGS --odb-epilogue "${PARAM_ODB_EPILOGUE}")
+  endif()
+
+  if(PARAM_OUTPUT_DIR)
+    set(ODB_COMPILE_OUTPUT_DIR "${PARAM_OUTPUT_DIR}")
+  endif()
+
   if(PARAM_PROFILE)
-    list(APPEND ODB_ARGS --profile "${PARAM_PROFILE}")
+    foreach(p ${PARAM_PROFILE})
+      list(APPEND ODB_ARGS --profile "${p}")
+    endforeach()
   endif()
 
   if(PARAM_INCLUDE_PREFIX)

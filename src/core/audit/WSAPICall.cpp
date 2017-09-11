@@ -18,7 +18,7 @@
 */
 
 #include "WSAPICall.hpp"
-#include "WSAPICall_odb.h"
+#include "core/audit/WSAPICall_odb.h"
 #include "core/auth/User.hpp"
 #include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/log.hpp"

@@ -18,7 +18,7 @@
 */
 
 #include "AccessPointUpdate.hpp"
-#include "AccessPoint_odb.h"
+#include "core/auth/AccessPoint_odb.h"
 
 namespace Leosac
 {

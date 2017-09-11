@@ -1,3 +1,5 @@
+@page page_module_instrumentation Module: Instrumentation
+
 Instrumentation Module Documentation {#mod_instrumentation_main}
 ================================================================
 

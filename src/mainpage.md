@@ -1,5 +1,4 @@
-Leosac Documentation Mainpage {#mainpage}
-=========================================
+@mainpage Leosac Manual
 
 [TOC]
 
@@ -34,7 +33,7 @@ We recommend you read through the [related pages](pages.html) informations, ther
 each module and how to configure and use them.
 
 Interesting stuff (for end user):
-   + [General configuration information](@ref general_config_main) (logger / network / remote control).
+   + [General configuration information](@ref page_general_config) (logger / network / remote control).
    + [Install guide](@ref install_guide) for a simple setup: Raspberry Pi + Piface + Wiegand + Door.
 
 Interesting stuff (for devs):
@@ -46,7 +45,8 @@ Interesting stuff (for devs):
    + Overview of the [Remote Control](@ref remote_control_main) interface.
 
 Usage {#usage}
-==============
+--------------
+
 
 `./leosac [-d <working_directory>] -k <config_file> [-s] [-v] [--] [--version] [-h]`
 
@@ -59,21 +59,25 @@ Short | Long                   | Description
 N/A   | `--version`            | Display version informations and exit
 
 Notes {#notes}
-===============
+--------------
 
 `boost::serialization` version shall be the same on all your Leosac unit.
 This is to prevent problem when synchronizing configuration between Leosac unit.
 
 Issues {#issues}
-================
+----------------
 
 Please report issues (and ask questions) [here](https://github.com/leosac/leosac/issues).
 
 License {#license}
-==================
+------------------
 
 This project is released under the GNU Affero GPLv3 license.
 A copy of the license can be found in the root folder.
 
 ![alt text][logo]
 [logo]: https://raw.githubusercontent.com/leosac/leosac/master/rc/AGPLv3.png  "AGPL Logo"
+
+
+Subpages:
+  * @subpage page_doc_content

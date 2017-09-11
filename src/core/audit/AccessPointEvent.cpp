@@ -18,8 +18,8 @@
 */
 
 #include "AccessPointEvent.hpp"
-#include "AccessPointEvent_odb.h"
 #include "LeosacFwd.hpp"
+#include "core/audit/AccessPointEvent_odb.h"
 #include "core/auth/AccessPoint.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"

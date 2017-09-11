@@ -19,11 +19,11 @@
 
 #include "api/GroupCRUD.hpp"
 #include "Exceptions.hpp"
-#include "Group_odb.h"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IGroupEvent.hpp"
 #include "core/audit/IUserGroupMembershipEvent.hpp"
+#include "core/auth/Group_odb.h"
 #include "core/auth/User.hpp"
 #include "core/auth/serializers/GroupSerializer.hpp"
 #include "exception/ModelException.hpp"

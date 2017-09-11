@@ -1,5 +1,4 @@
-General Configuration Information {#general_config_main}
-========================================================
+@page page_general_config General Configuration
 
 @brief Global configuration option.
 

@@ -18,14 +18,14 @@
 */
 
 #include "APIAuth.hpp"
-#include "Token_odb.h"
-#include "User_odb.h"
 #include "WSServer.hpp"
 #include "core/CoreAPI.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/GetServiceRegistry.hpp"
+#include "core/auth/Token_odb.h"
 #include "core/auth/User.hpp"
 #include "core/auth/UserGroupMembership.hpp"
+#include "core/auth/User_odb.h"
 #include "tools/GenGuid.h"
 #include "tools/Mail.hpp"
 #include "tools/db/MultiplexedSession.hpp"

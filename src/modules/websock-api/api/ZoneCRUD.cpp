@@ -18,10 +18,10 @@
 */
 
 #include "modules/websock-api/api/ZoneCRUD.hpp"
-#include "Zone_odb.h"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IZoneEvent.hpp"
 #include "core/auth/Zone.hpp"
+#include "core/auth/Zone_odb.h"
 #include "core/auth/serializers/ZoneSerializer.hpp"
 #include "modules/websock-api/api/APISession.hpp"
 #include "tools/AssertCast.hpp"
@@ -106,9 +106,9 @@ boost::optional<json> ZoneCRUD::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto did = req.at("zone_id").get<Auth::ZoneId>();
+    auto zid = req.at("zone_id").get<Auth::ZoneId>();
 
-    auto zone     = ctx_.dbsrv->find_zone_by_id(did, DBService::THROW_IF_NOT_FOUND);
+    auto zone     = ctx_.dbsrv->find_zone_by_id(zid, DBService::THROW_IF_NOT_FOUND);
     auto zone_odb = assert_cast<Auth::ZonePtr>(zone);
     auto audit    = Audit::Factory::ZoneEvent(db, zone, ctx_.audit);
     audit->event_mask(Audit::EventType::ZONE_UPDATED);
@@ -152,7 +152,7 @@ std::vector<CRUDResourceHandler::ActionActionParam>
 ZoneCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
-    SecurityContext::ZoneActionParam zap;
+    SecurityContext::ZoneActionParam zap{};
     try
     {
         zap.zone_id = req.at("zone_id").get<Auth::ZoneId>();
@@ -164,16 +164,16 @@ ZoneCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::ZONE_READ, zap));
+        ret.emplace_back(SecurityContext::Action::ZONE_READ, zap);
         break;
     case Verb::CREATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::ZONE_CREATE, zap));
+        ret.emplace_back(SecurityContext::Action::ZONE_CREATE, zap);
         break;
     case Verb::UPDATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::ZONE_UPDATE, zap));
+        ret.emplace_back(SecurityContext::Action::ZONE_UPDATE, zap);
         break;
     case Verb::DELETE:
-        ret.push_back(std::make_pair(SecurityContext::Action::ZONE_DELETE, zap));
+        ret.emplace_back(SecurityContext::Action::ZONE_DELETE, zap);
         break;
     }
     return ret;

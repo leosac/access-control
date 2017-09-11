@@ -18,10 +18,10 @@
 */
 
 #include "UpdateHistory.hpp"
-#include "Update_odb.h"
 #include "core/GetServiceRegistry.hpp"
 #include "core/update/IUpdate.hpp"
 #include "core/update/UpdateService.hpp"
+#include "core/update/Update_odb.h"
 #include "tools/db/DBService.hpp"
 
 namespace Leosac

@@ -37,6 +37,9 @@ namespace Module
 */
 namespace Wiegand
 {
+class WiegandConfig;
+class WiegandReaderConfig;
+
 /**
 * This simply is the main class for the Wiegand module.
 */
@@ -59,17 +62,33 @@ class WiegandReaderModule : public BaseModule
     void process_config();
 
     /**
+     * Load the module configuration from the database.
+     */
+    void load_db_config();
+
+    /**
+     * Load the module configuration from the XML configuration
+     * object.
+     */
+    void load_xml_config(const boost::property_tree::ptree &module_config);
+
+    /**
     * Internal factory that build a strategy object based upon a reader
     * configuration.
     */
     Strategy::WiegandStrategyUPtr
-    create_strategy(const boost::property_tree::ptree &reader_config,
+    create_strategy(const WiegandReaderConfig &reader_config,
                     WiegandReaderImpl *reader);
 
     /**
     * Vector of wiegand reader managed by this module.
     */
     std::vector<WiegandReaderImpl> readers_;
+
+    /**
+     * Configuration object for the module.
+     */
+    std::unique_ptr<WiegandConfig> wiegand_config_;
 };
 }
 }

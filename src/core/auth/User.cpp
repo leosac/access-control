@@ -17,10 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/auth/User.hpp"
-#include "Group_odb.h"
-#include "User_odb.h"
-#include "core/auth/Group.hpp"
+#include "core/auth/Group_odb.h"
+#include "core/auth/User_odb.h"
 #include "core/credentials/ICredential.hpp"
 #include "exception/leosacexception.hpp"
 #include "tools/AssertCast.hpp"

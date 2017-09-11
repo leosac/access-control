@@ -47,7 +47,7 @@ using json = nlohmann::json;
 class ScheduleSearch : public MethodHandler
 {
   public:
-    ScheduleSearch(RequestContext ctx);
+    explicit ScheduleSearch(RequestContext ctx);
 
     static MethodHandlerUPtr create(RequestContext);
 

@@ -1,3 +1,5 @@
+@page page_module_monitor Module: Monitor
+
 Monitor Module Documentation {#mod_monitor_main}
 ============================================
 

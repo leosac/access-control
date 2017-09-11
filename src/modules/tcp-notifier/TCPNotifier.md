@@ -1,5 +1,7 @@
+@page page_module_tcp_notifier Module: TCP Notifier
+
 TCP Notifier {#mod_tcp-notifier_main}
-=====================================================
+=====================================
 
 @brief A module that can notify, over TCP, remote server of local events.
 

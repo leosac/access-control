@@ -1,3 +1,5 @@
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
 set(LEOSAC_BIN leosac)
 set(LEOSAC_LIB leosac_lib)
 
@@ -63,7 +65,6 @@ set(LEOSAC_LIB_SRCS
     hardware/FGPIO.cpp
     hardware/FLED.cpp
     hardware/FWiegandReader.cpp
-    tools/leosac.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
     tools/unixshellscript.cpp
@@ -139,11 +140,21 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/UpdateEventSerializer.cpp
     )
 
+# Include mode to extract Git Revision.
+include(GetGitRevisionDescription)
+
+# Store revision in GIT_SHA1 var.
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
+
+# Automatically generates a file to store the GIT SHA1 version.
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/tools/GitSHA1.cpp.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp" @ONLY)
+list(APPEND LEOSAC_LIB_SRCS "${CMAKE_CURRENT_BINARY_DIR}/GitSHA1.cpp")
+
 # Rule for ODB code generation.
 # Build a shared library: leosac_db
 add_subdirectory(db)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 add_executable(${LEOSAC_BIN} ${LEOSAC_SRCS})
 
 add_library(${LEOSAC_LIB} SHARED
@@ -155,7 +166,7 @@ add_library(${LEOSAC_LIB} SHARED
 target_include_directories(${LEOSAC_LIB}
         PUBLIC
         ${ODB_INCLUDE_DIRS}
-        ${ODB_COMPILE_OUTPUT_DIR}
+        ${CMAKE_BINARY_DIR}/odb_gen/
         ${CMAKE_SOURCE_DIR}/deps/flagset
         )
 

@@ -19,11 +19,11 @@
 
 #include "PasswordChange.hpp"
 #include "Exceptions.hpp"
-#include "User_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/UserEvent.hpp"
+#include "core/auth/User_odb.h"
 #include "exception/EntityNotFound.hpp"
 #include "exception/PermissionDenied.hpp"
 #include "tools/db/DBService.hpp"
@@ -87,10 +87,10 @@ json PasswordChange::process_impl(const json &req)
 std::vector<ActionActionParam>
 PasswordChange::required_permission(const json &req) const
 {
-    std::vector<ActionActionParam> perm_;
-    SecurityContext::UserActionParam uap;
+    std::vector<ActionActionParam> perm;
+    SecurityContext::UserActionParam uap{};
     uap.user_id = req.at("user_id").get<Auth::UserId>();
 
-    perm_.push_back({SecurityContext::Action::USER_CHANGE_PASSWORD, uap});
-    return perm_;
+    perm.emplace_back(SecurityContext::Action::USER_CHANGE_PASSWORD, uap);
+    return perm;
 }

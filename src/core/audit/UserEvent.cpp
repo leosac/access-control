@@ -18,7 +18,7 @@
 */
 
 #include "UserEvent.hpp"
-#include "UserEvent_odb.h"
+#include "core/audit/UserEvent_odb.h"
 #include "core/auth/User.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"

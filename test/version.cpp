@@ -44,6 +44,8 @@ TEST(VersionTest, versionCompare)
 TEST(VersionTest, isVersionValid)
 {
     EXPECT_TRUE(Version::isVersionValid("42.2.85"));
+    EXPECT_TRUE(Version::isVersionValid("42.2.85-c1953908880a88d8131b6782ae8ff4da89826959"));
+    EXPECT_FALSE(Version::isVersionValid("42.2.85-lama"));
     EXPECT_FALSE(Version::isVersionValid(".42.2.85"));
     EXPECT_FALSE(Version::isVersionValid("42.2."));
     EXPECT_FALSE(Version::isVersionValid("42.200.11.00"));

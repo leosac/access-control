@@ -1,3 +1,5 @@
+@page page_hardware Hardware Management
+
 Hardware Management {#hardware_management}
 ==========================================
 

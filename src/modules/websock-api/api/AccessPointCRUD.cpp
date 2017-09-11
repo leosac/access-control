@@ -18,7 +18,6 @@
 */
 
 #include "api/AccessPointCRUD.hpp"
-#include "AccessPoint_odb.h"
 #include "Exceptions.hpp"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
@@ -26,6 +25,7 @@
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/IAccessPointEvent.hpp"
 #include "core/auth/AccessPoint.hpp"
+#include "core/auth/AccessPoint_odb.h"
 #include "core/auth/User.hpp"
 #include "core/auth/serializers/AccessPointSerializer.hpp"
 #include "exception/ModelException.hpp"

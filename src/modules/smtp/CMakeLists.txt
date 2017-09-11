@@ -16,29 +16,30 @@ set(OdbCMake_ODB_HEADERS
         ${CMAKE_CURRENT_SOURCE_DIR}/SMTPAudit.hpp
         )
 
+
+set(LEOSAC_ODB_INCLUDE_DIRS
+        ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${ZEROMQ_INCLUDE_DIR}
+        ${CMAKE_SOURCE_DIR}/src/db
+        )
+
 set(OdbCMake_SOURCES "")
 odb_compile(OdbCMake_SOURCES
         FILES ${OdbCMake_ODB_HEADERS}
         MULTI_DATABASE dynamic
-        DB pgsql
+        DB pgsql sqlite
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME module_smtp
-        PROFILE "boost/date-time"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
-        INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
+        PROFILE "boost/date-time" "boost/optional" "leosac-profile"
+        INCLUDE_PREFIX modules/smtp
+        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/modules/smtp
         )
 
 add_library(${SMTP_BIN} SHARED

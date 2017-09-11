@@ -19,11 +19,11 @@
 
 #pragma once
 
+#include "core/audit/AuditFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
-#include <core/audit/AuditFwd.hpp>
 
 namespace Leosac
 {
@@ -140,7 +140,12 @@ class SecurityContext
         /**
          * Overview of users/doors access permission.
          */
-        ACCESS_OVERVIEW
+        ACCESS_OVERVIEW,
+
+        /**
+         * Perform to restart the Leosac server.
+         */
+        RESTART_SERVER
     };
 
     struct GroupActionParam

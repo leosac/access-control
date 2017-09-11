@@ -18,11 +18,7 @@
 */
 
 #include "SMTPModule.hpp"
-#include "SMTPAudit.hpp"
 #include "SMTPAuditSerializer.hpp"
-#include "SMTPAudit_odb.h"
-#include "SMTPConfig.hpp"
-#include "SMTPConfig_odb.h"
 #include "SMTPServerInfoSerializer.hpp"
 #include "SMTPServiceImpl.hpp"
 #include "core/CoreUtils.hpp"
@@ -30,23 +26,16 @@
 #include "core/UserSecurityContext.hpp"
 #include "core/audit/IWSAPICall.hpp"
 #include "core/audit/serializers/JSONService.hpp"
-#include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "core/auth/Auth.hpp"
+#include "modules/smtp/SMTPAudit_odb.h"
+#include "modules/smtp/SMTPConfig_odb.h"
 #include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
-#include "modules/websock-api/Messages.hpp"
-#include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/Service.hpp"
-#include "tools/AssertCast.hpp"
 #include "tools/Conversion.hpp"
-#include "tools/Mail.hpp"
 #include "tools/MyTime.hpp"
-#include "tools/db/database.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include <boost/asio.hpp>
-#include <boost/asio/steady_timer.hpp>
-#include <curl/curl.h>
-#include <json.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;
@@ -120,8 +109,8 @@ void SMTPModule::process_config()
         }
         catch (const odb::exception &e)
         {
-            WARN("SMTP module failed to load database configuration. "
-                 "Using default config.");
+            WARN("SMTP module failed to load database configure. Using default "
+                 "config.");
         }
         if (!smtp_config_)
             smtp_config_ = std::make_unique<SMTPConfig>();

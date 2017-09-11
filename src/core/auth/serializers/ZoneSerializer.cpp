@@ -18,10 +18,9 @@
 */
 
 #include "ZoneSerializer.hpp"
-#include "Door_odb.h"
-#include "Zone_odb.h"
 #include "core/GetServiceRegistry.hpp"
-#include "core/auth/Zone.hpp"
+#include "core/auth/Door_odb.h"
+#include "core/auth/Zone_odb.h"
 #include "tools/JSONUtils.hpp"
 #include "tools/service/ServiceRegistry.hpp"
 
@@ -30,13 +29,12 @@ using namespace Leosac::Auth;
 
 json ZoneJSONSerializer::serialize(const Auth::IZone &zone, const SecurityContext &)
 {
-    json serialized = {
-        {"id", zone.id()},
-        {"type", "zone"},
-        {"attributes",
-         {
-             {"alias", zone.alias()}, {"description", zone.description()},
-         }}};
+    json serialized = {{"id", zone.id()},
+                       {"type", "zone"},
+                       {"attributes",
+                        {{"alias", zone.alias()},
+                         {"description", zone.description()},
+                         {"type", static_cast<int>(zone.type())}}}};
 
     json children = json::array();
     for (const Auth::ZoneLPtr &lazy_zone : zone.children())
@@ -65,6 +63,8 @@ void ZoneJSONSerializer::unserialize(Auth::IZone &out, const json &in,
 
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
+    out.type(static_cast<Zone::Type>(
+        extract_with_default(in, "type", static_cast<int>(Zone::Type::LOGICAL))));
 
     auto doors_ids = in.at("doors");
     out.clear_doors();
@@ -74,7 +74,7 @@ void ZoneJSONSerializer::unserialize(Auth::IZone &out, const json &in,
         out.add_door(door);
     }
 
-    auto children_ids = in.at("doors");
+    auto children_ids = in.at("children");
     out.clear_children();
     for (const auto &child_id : children_ids)
     {

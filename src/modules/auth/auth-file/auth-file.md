@@ -1,3 +1,5 @@
+@page page_module_authfile Module: Authfile
+
 AuthFile Module Documentation {#mod_auth_file_main}
 ==============================================================
 

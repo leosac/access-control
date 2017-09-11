@@ -100,3 +100,14 @@ std::vector<std::string> CoreAPI::modules_names() const
 
     return out;
 }
+
+void CoreAPI::restart_server() const
+{
+    auto task = Tasks::GenericTask::build([&]() {
+        kernel_.restart_later();
+        return true;
+    });
+    kernel_.core_utils()->scheduler().enqueue(task, TargetThread::MAIN);
+    task->wait();
+    ASSERT_LOG(task->succeed(), "Requesting server restart failed.");
+}

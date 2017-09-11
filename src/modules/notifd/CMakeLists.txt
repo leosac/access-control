@@ -31,6 +31,7 @@ odb_compile(OdbCMake_SOURCES
         %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/modules/notifd
         )
 
 add_library(${NOTIFD_BIN} SHARED

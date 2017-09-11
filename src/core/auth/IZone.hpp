@@ -29,7 +29,20 @@ namespace Auth
 {
 
 /**
- * A Zone.
+ * The interface for zones.
+ *
+ * A zone is a hierarchical container for doors and other zones.
+ * It allows users to better organize their doors and allows
+ * easier schedule management.
+ *
+ * A zone have one of two @ref Type and any number of doors and
+ * child zones.
+ *
+ * There is a few rules to respect:
+ *   - Cycles are forbidden in parent/children relationship.
+ *   - While a zone can have multiple Type::LOGICAL parent, it can
+ *     only have one Type::PHYSICAL parent.
+ *
  */
 class IZone : public std::enable_shared_from_this<IZone>
 {
@@ -37,10 +50,10 @@ class IZone : public std::enable_shared_from_this<IZone>
     /**
      * Zone's type
      */
-    enum Type
+    enum class Type
     {
-        PHYSICAL,
-        LOGICAL
+        PHYSICAL = 0x00,
+        LOGICAL  = 0x01
     };
     virtual ZoneId id() const = 0;
 

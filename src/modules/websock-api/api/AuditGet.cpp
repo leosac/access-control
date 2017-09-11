@@ -18,16 +18,18 @@
 */
 
 #include "AuditGet.hpp"
-#include "AuditEntry_odb.h"
 #include "Exceptions.hpp"
-#include "LogEntry_odb.h"
 #include "WSServer.hpp"
 #include "api/APISession.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/audit/AuditEntry.hpp"
+#include "core/audit/AuditEntry_odb.h"
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
+#include "exception/InvalidArgument.hpp"
 #include "tools/JSONUtils.hpp"
+#include "tools/LogEntry_odb.h"
 #include "tools/db/DBService.hpp"
+#include "tools/enforce.hpp"
 #include "tools/log.hpp"
 #include <odb/pgsql/query.hxx>
 
@@ -58,10 +60,8 @@ json AuditGet::process_impl(const json &req)
         int page      = extract_with_default(req, "p", 1);
         int page_size = extract_with_default(req, "ps", 20);
 
-        if (page == 0)
-            throw LEOSACException("Cannot request page 0.");
-        if (page_size <= 0)
-            throw LEOSACException("Cannot request a pagesize <= 0.");
+        LEOSAC_ENFORCE_ARGUMENT(page > 0, page, "Page must be >0");
+        LEOSAC_ENFORCE_ARGUMENT(page_size > 0, page_size, "Page size must be >0");
 
         odb::transaction t(db->begin());
         Audit::AuditEntryCount view(

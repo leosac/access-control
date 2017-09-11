@@ -18,13 +18,13 @@
 */
 
 #include "core/audit/CredentialEvent.hpp"
-#include "CredentialEvent_odb.h"
-#include "Credential_odb.h"
+#include "core/audit/CredentialEvent_odb.h"
 #include "core/credentials/Credential.hpp"
+#include "core/credentials/Credential_odb.h"
+#include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
-#include <core/credentials/serializers/PolymorphicCredentialSerializer.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Audit;

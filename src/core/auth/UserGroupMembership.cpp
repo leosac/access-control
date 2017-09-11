@@ -18,8 +18,8 @@
 */
 
 #include "core/auth/UserGroupMembership.hpp"
-#include "Group_odb.h"
-#include "User_odb.h"
+#include "core/auth/Group_odb.h"
+#include "core/auth/User_odb.h"
 #include "tools/log.hpp"
 
 using namespace Leosac;

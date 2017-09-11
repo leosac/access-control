@@ -18,10 +18,10 @@
 */
 
 #include "api/search/DoorSearch.hpp"
-#include "Door_odb.h"
 #include "Exceptions.hpp"
 #include "api/APISession.hpp"
 #include "core/auth/Door.hpp"
+#include "core/auth/Door_odb.h"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
 

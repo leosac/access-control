@@ -13,7 +13,7 @@ install
 
 ## This is generated Doxygen doc.
 ## Or files attached to release
-doc/html
+doc/output
 
 ## IDE stuff
 .idea/dictionaries/*
@@ -21,3 +21,6 @@ doc/html
 # For now we don't care about ODB xml file.
 # Later we'll need them tho.
 src/*/*/*.xml
+
+# Python cache
+**/__pycache__

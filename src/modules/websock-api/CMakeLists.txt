@@ -9,6 +9,7 @@ set(WEBSOCK_API_SRCS
         Service.cpp
         api/APISession.cpp
         api/MethodHandler.cpp
+        api/Restart.cpp
         api/APIAuth.cpp
         api/LogGet.cpp
         api/PasswordChange.cpp
@@ -27,6 +28,7 @@ set(WEBSOCK_API_SRCS
         api/search/DoorSearch.cpp
         api/search/AccessPointSearch.cpp
         api/search/ScheduleSearch.cpp
+        api/search/ZoneSearch.cpp
         api/update-management/CheckUpdate.cpp
         api/update-management/CreateUpdate.cpp
         api/update-management/PendingUpdateGet.cpp

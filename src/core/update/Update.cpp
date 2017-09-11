@@ -27,6 +27,7 @@ namespace update
 Update::Update()
     : id_(0)
     , generated_at_(std::chrono::system_clock::now())
+    , status_(Status::TRANSIENT)
     , odb_version_(0)
 {
 }

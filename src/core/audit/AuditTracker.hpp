@@ -61,7 +61,3 @@ class AuditTracker // : virtual public IAuditTracker
 };
 }
 }
-
-#if defined(ODB_COMPILER) && !defined(LEOSAC_AUDIT_TRACKER_NO_ODB_CYCLE)
-#include "core/audit/AuditEntry.hpp"
-#endif

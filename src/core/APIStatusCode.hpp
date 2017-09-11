@@ -98,5 +98,11 @@ enum class APIStatusCode
      * This is likely to model validation.
      */
     MODEL_EXCEPTION = 0x0B,
+
+    /**
+     * One of the argument of the call had a invalid
+     * value / type.
+     */
+    INVALID_ARGUMENT = 0x0C
 };
 }

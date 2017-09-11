@@ -1,3 +1,5 @@
+@page page_guide_rpi_piface_wiegand Installation Guide: Rpi + Piface + Wiegand Reader
+
 Installation guide {#install_guide}
 =====================================
 

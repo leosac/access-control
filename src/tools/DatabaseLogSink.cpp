@@ -19,10 +19,10 @@
 
 #include "DatabaseLogSink.hpp"
 #include "GenGuid.h"
-#include "LogEntry_odb.h"
 #include "log.hpp"
 #include "tools/DateTimeConverter.hpp"
-#include "tools/LogEntry.hpp"
+#include "tools/LogEntry_odb.h"
+#include "tools/db/MultiplexedTransaction.hpp"
 #include "tools/db/database.hpp"
 
 using namespace Leosac;
@@ -51,7 +51,7 @@ void DatabaseLogSink::log(const spdlog::details::log_msg &msg)
     {
         using namespace odb;
         using namespace odb::core;
-        transaction t(database_->begin());
+        db::MultiplexedTransaction t(database_->begin());
 
         database_->persist(entry);
         t.commit();

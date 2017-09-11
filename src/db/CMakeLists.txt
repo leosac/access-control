@@ -5,7 +5,7 @@ PROJECT(DATABASELIB CXX)
 ## compilation flag (most notably the INCLUDE_PREFIX variable).
 ##
 ## All those compilation are part of the same ODB schema: "core".
-## This schema old database structure information for the leosac
+## This schema hold database structure information for the leosac
 ## core system. Modules can create additional schema.
 
 # ODB configuration for tools/db (LogEntry).
@@ -16,30 +16,30 @@ set(OdbCMake_ODB_HEADERS_TOOLS
         ${CMAKE_SOURCE_DIR}/src/tools/ScheduleMapping.hpp
         )
 
+set(LEOSAC_ODB_INCLUDE_DIRS
+        ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${ZEROMQ_INCLUDE_DIR}
+        ${CMAKE_SOURCE_DIR}/src/db
+        )
+
 set(OdbCMake_SOURCES_TOOLS "")
 odb_compile(OdbCMake_SOURCES_TOOLS
         FILES ${OdbCMake_ODB_HEADERS_TOOLS}
         MULTI_DATABASE dynamic
-        DB pgsql
+        DB pgsql sqlite 
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
-        INCLUDE ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
+        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX tools
-        INCLUDE_REGEX %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/tools/
         )
 
 
@@ -60,27 +60,19 @@ set(OdbCMake_SOURCES_AUTH "")
 odb_compile(OdbCMake_SOURCES_AUTH
         FILES ${OdbCMake_ODB_HEADERS_AUTH}
         MULTI_DATABASE dynamic
-        DB pgsql
+        DB pgsql sqlite
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional" leosac-profile
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
+        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/auth/
-        INCLUDE_REGEX %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/auth
         )
 
 # ODB configuration for Audit log
@@ -103,27 +95,19 @@ set(OdbCMake_SOURCES_AUDITLOG "")
 odb_compile(OdbCMake_SOURCES_AUDITLOG
         FILES ${OdbCMake_ODB_HEADERS_AUDITLOG}
         MULTI_DATABASE dynamic
-        DB pgsql
+        DB pgsql sqlite
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
+        PROFILE "boost/date-time" "boost/optional" leosac-profile
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
+        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/audit/
-        INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/audit
         )
 
 # ODB configuration for Credentials
@@ -137,26 +121,18 @@ set(OdbCMake_SOURCES_CREDENTIALS "")
 odb_compile(OdbCMake_SOURCES_CREDENTIALS
         FILES ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         MULTI_DATABASE dynamic
-        DB pgsql
+        DB pgsql sqlite
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
+        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/credentials/
-        INCLUDE_REGEX %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/credentials
         )
 
 
@@ -169,28 +145,19 @@ set(OdbCMake_SOURCES_UPDATES "")
 odb_compile(OdbCMake_SOURCES_UPDATES
         FILES ${OdbCMake_ODB_HEADERS_UPDATES}
         MULTI_DATABASE dynamic
-        DB pgsql
+        DB pgsql sqlite
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME core
-        PROFILE "boost"
-        INCLUDE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/ ${CMAKE_SOURCE_DIR}/deps/flagset ${ZEROMQ_INCLUDE_DIR}
+        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        INCLUDE  ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/update/
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
-        INCLUDE_REGEX
-        %core/update/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/update/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/audit/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/audit/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/credentials/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/credentials/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %core/auth/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %core/auth/\(.+\)_odb\(.*\).h%$1_odb$2.h%
-        %tools/\(.+\)_odb_inline\(.*\).h%$1_odb_inline$2.h%
-        %tools/\(.+\)_odb\(.*\).h%$1_odb$2.h%
         DEFAULT_POINTER "std::shared_ptr"
         PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/update
         )
 
 add_library(leosac_db SHARED
@@ -205,6 +172,7 @@ target_include_directories(leosac_db PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_BINARY_DIR}/odb_gen
         ${ZEROMQ_INCLUDE_DIR}
         ${ODB_INCLUDE_DIRS}
         )
@@ -215,9 +183,14 @@ endif()
 
 ## This generate a leosac.sql file
 ## for creating the database structure.
-add_custom_command(TARGET leosac_db
+#[[add_custom_command(TARGET leosac_db
         POST_BUILD
-        COMMAND odb --profile boost --std c++14 --database pgsql
+        COMMAND odb
+        --profile boost/date-time
+        --profile boost/optional
+        --profile leosac-profile
+        --database pgsql
+        --std c++14
         -I ${CMAKE_SOURCE_DIR}/deps/flagset
         -I ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         -I ${CMAKE_SOURCE_DIR}/src
@@ -230,6 +203,6 @@ add_custom_command(TARGET leosac_db
         ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         ${OdbCMake_ODB_HEADERS_UPDATES}
-        )
+        )]]
 
 install(TARGETS leosac_db DESTINATION lib)

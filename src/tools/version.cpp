@@ -24,22 +24,21 @@
  */
 
 #include "version.hpp"
-
+#include "tools/GitSHA1.hpp"
 #include <algorithm>
-#include <sstream>
-#include <string>
+#include <boost/regex.hpp>
+#include <spdlog/details/format.h>
 
 using namespace Leosac::Tools;
 
-const std::string Version::validChars = "0123456789.-";
-
-static std::string vstring = std::string();
-
-std::string Version::buildVersionString(int major, int minor, int patch)
+std::string Version::buildVersionString(int major, int minor, int patch,
+                                        std::string git_sha1)
 {
     std::ostringstream oss;
 
     oss << major << '.' << minor << '.' << patch;
+    if (!git_sha1.empty())
+        oss << "-" << git_sha1;
     return (oss.str());
 }
 
@@ -74,15 +73,16 @@ int Version::versionCompare(std::string a, std::string b)
 
 bool Version::isVersionValid(const std::string &v)
 {
-    if (v.find_first_not_of(validChars) != std::string::npos)
-        return (false);
-    if (v.empty())
-        return (false);
-    if (v.front() == '.' || v.back() == '.')
-        return (false);
-    if (std::count_if(v.begin(), v.end(), [](char a) { return (a == '.'); }) != 2)
-        return (false);
-    if (v.find_first_of('.') + 1 == v.find_last_of('.'))
-        return (false);
-    return (true);
+    boost::regex r("[0-9]+\\.[0-9]+\\.[0-9]+($|\\-[a-f0-9]{40}$)");
+    return boost::regex_match(v, r);
+}
+
+std::string Version::get_full_version()
+{
+    return buildVersionString(Major, Minor, Patch, get_git_sha1());
+}
+
+std::string Version::get_short_version()
+{
+    return buildVersionString(Major, Minor, Patch);
 }

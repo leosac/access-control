@@ -1,3 +1,5 @@
+@page page_module_doorman Module: Doorman
+
 Doorman Module Documentation {#mod_doorman_main}
 ================================================
 

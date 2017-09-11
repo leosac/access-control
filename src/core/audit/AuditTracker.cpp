@@ -18,7 +18,7 @@
 */
 
 #include "AuditTracker.hpp"
-#include "AuditEntry_odb.h"
+#include "core/audit/AuditEntry_odb.h"
 #include "tools/log.hpp"
 
 using namespace Leosac;

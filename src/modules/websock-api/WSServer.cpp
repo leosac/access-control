@@ -21,7 +21,6 @@
 #include "ExceptionConverter.hpp"
 #include "Exceptions.hpp"
 #include "Service.hpp"
-#include "Token_odb.h"
 #include "WebSockAPI.hpp"
 #include "api/AccessOverview.hpp"
 #include "api/AccessPointCRUD.hpp"
@@ -32,6 +31,7 @@
 #include "api/LogGet.hpp"
 #include "api/MembershipCRUD.hpp"
 #include "api/PasswordChange.hpp"
+#include "api/Restart.hpp"
 #include "api/ScheduleCRUD.hpp"
 #include "api/UserCRUD.hpp"
 #include "api/ZoneCRUD.hpp"
@@ -39,6 +39,7 @@
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
 #include "api/search/ScheduleSearch.hpp"
+#include "api/search/ZoneSearch.hpp"
 #include "api/update-management/AckUpdate.hpp"
 #include "api/update-management/CancelUpdate.hpp"
 #include "api/update-management/CheckUpdate.hpp"
@@ -50,6 +51,7 @@
 #include "core/GetServiceRegistry.hpp"
 #include "core/audit/AuditFactory.hpp"
 #include "core/audit/WSAPICall.hpp"
+#include "core/auth/Token_odb.h"
 #include "core/auth/User.hpp"
 #include "exception/EntityNotFound.hpp"
 #include "exception/ExceptionsTools.hpp"
@@ -104,6 +106,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["search.door_alias"]         = &DoorSearch::create;
     individual_handlers_["search.access_point_alias"] = &AccessPointSearch::create;
     individual_handlers_["search.schedule_name"]      = &ScheduleSearch::create;
+    individual_handlers_["search.zone_alias"]         = &ZoneSearch::create;
     individual_handlers_["access_overview"]           = &AccessOverview::create;
     individual_handlers_["check_update"]              = &CheckUpdate::create;
     individual_handlers_["create_update"]             = &CreateUpdate::create;
@@ -112,6 +115,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["get_update_history"]        = &UpdateHistory::create;
     individual_handlers_["get_pending_update"]        = &PendingUpdateGet::create;
     individual_handlers_["get_update"]                = &UpdateGet::create;
+    individual_handlers_["restart"]                   = &Restart::create;
 
     register_crud_handler("group", &WebSockAPI::GroupCRUD::instanciate);
     register_crud_handler("user", &WebSockAPI::UserCRUD::instanciate);

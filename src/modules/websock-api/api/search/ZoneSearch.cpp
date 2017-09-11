@@ -1,0 +1,50 @@
+/*
+    Copyright (C) 2014-2017 Leosac
+
+    This file is part of Leosac.
+
+    Leosac is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Leosac is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "api/search/ZoneSearch.hpp"
+#include "api/search/SearchBase.hpp"
+#include "core/auth/Zone_odb.h"
+
+
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
+
+ZoneSearch::ZoneSearch(RequestContext ctx)
+    : MethodHandler(ctx)
+{
+}
+
+MethodHandlerUPtr ZoneSearch::create(RequestContext ctx)
+{
+    return std::make_unique<ZoneSearch>(ctx);
+}
+
+json ZoneSearch::process_impl(const json &req)
+{
+    return EntitySearchTool<Auth::Zone, use_alias_tag>().search_json(
+        ctx_.dbsrv->db(), req.at("partial_name").get<std::string>());
+}
+
+std::vector<ActionActionParam> ZoneSearch::required_permission(const json &) const
+{
+    std::vector<ActionActionParam> perm_;
+    perm_.push_back({SecurityContext::Action::ZONE_SEARCH, {}});
+    return perm_;
+}

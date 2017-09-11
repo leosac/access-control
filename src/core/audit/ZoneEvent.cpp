@@ -19,9 +19,9 @@
 
 #include "core/audit/ZoneEvent.hpp"
 #include "LeosacFwd.hpp"
-#include "ZoneEvent_odb.h"
-#include "Zone_odb.h"
+#include "core/audit/ZoneEvent_odb.h"
 #include "core/auth/Zone.hpp"
+#include "core/auth/Zone_odb.h"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"

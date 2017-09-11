@@ -18,16 +18,14 @@
 */
 
 #include "kernel.hpp"
-#include "RFIDCard_odb.h"
-#include "ScheduleMapping_odb.h"
-#include "Schedule_odb.h"
-#include "User_odb.h"
 #include "core/audit/serializers/JSONService.hpp"
 #include "core/auth/AccessPointService.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
 #include "core/auth/serializers/AccessPointSerializer.hpp"
 #include "core/credentials/RFIDCard.hpp"
+#include "core/credentials/RFIDCard_odb.h"
 #include "core/update/UpdateService.hpp"
 #include "core/update/serializers/AccessPointUpdateSerializer.hpp"
 #include "exception/ExceptionsTools.hpp"
@@ -36,6 +34,8 @@
 #include "tools/GenGuid.h"
 #include "tools/Mail.hpp"
 #include "tools/Schedule.hpp"
+#include "tools/ScheduleMapping_odb.h"
+#include "tools/Schedule_odb.h"
 #include "tools/XmlPropertyTree.hpp"
 #include "tools/db/PGSQLTracer.hpp"
 #include "tools/db/database.hpp"
@@ -53,11 +53,7 @@
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <fstream>
 #include <odb/pgsql/database.hxx>
-
-#ifndef LEOSAC_PGSQL_ONLY
-#include <odb/mysql/database.hxx>
 #include <odb/sqlite/database.hxx>
-#endif
 
 using boost::property_tree::ptree;
 using boost::property_tree::ptree_error;
@@ -154,15 +150,7 @@ boost::property_tree::ptree Kernel::make_config(const RuntimeOptions &opt)
 bool Kernel::run()
 {
     module_manager_init();
-
-    SignalHandler::registerCallback(Signal::SigInt,
-                                    [this](Signal) { this->is_running_ = false; });
-
-    SignalHandler::registerCallback(Signal::SigTerm,
-                                    [this](Signal) { this->is_running_ = false; });
-
-    SignalHandler::registerCallback(Signal::SigHup,
-                                    [this](Signal) { this->send_sighup_ = true; });
+    configure_signal_handler();
 
     // At this point all module should have properly initialized.
     bus_push_.send(zmqpp::message() << "KERNEL"
@@ -509,15 +497,22 @@ void Kernel::configure_database()
                 }
                 return;
             }
+            catch (odb::unknown_schema &ex)
+            {
+                INFO("Database schema unknown: "
+                     << ex.what() << ". Leosac will attempt to create the schema "
+                                     "and populate the database.");
+                populate_default_db();
+            }
             catch (const odb::exception &e)
             {
                 if (utils_->is_strict())
                     throw;
                 WARN("Cannot connect to or initialize database at this point. "
-                     "Leosac will now start until it can reach the database. "
+                     "Leosac will not start until it can reach the database. "
                      "Error was: "
                      << e.what());
-                INFO("WIll now wait " << wait_time << " seconds.");
+                INFO("Will now wait " << wait_time << " seconds.");
                 std::this_thread::sleep_for(std::chrono::seconds(wait_time));
                 wait_time = std::min(wait_time * 2, 60);
             }
@@ -713,7 +708,7 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
         throw LEOSACException("SQLite support disabled at compile time.");
 #endif
     }
-    else if (db_type == "mysql" || db_type == "pgsql")
+    else if (db_type == "pgsql")
     {
         std::string db_user   = db_cfg_node.get<std::string>("username");
         std::string db_pw     = db_cfg_node.get<std::string>("password");
@@ -721,28 +716,38 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
         std::string db_host   = db_cfg_node.get<std::string>("host", "");
         uint16_t db_port      = db_cfg_node.get<uint16_t>("port", 0);
 
-        if (db_type == "mysql")
-        {
-#ifndef LEOSAC_PGSQL_ONLY
-            database_ = std::make_shared<odb::mysql::database>(
-                db_user, db_pw, db_dbname, db_host, db_port);
-#else
-            throw LEOSACException("MySQL support disabled at compile time.");
-#endif
-        }
-        else
-        {
-            INFO("Connecting to PGSQL database.");
-            auto pg_db = std::make_shared<odb::pgsql::database>(
-                db_user, db_pw, db_dbname, db_host, db_port);
-            // todo: care about leak
-            pg_db->tracer(new db::PGSQLTracer(true));
-            database_ = pg_db;
-        }
+        INFO("Connecting to PGSQL database.");
+        auto pg_db = std::make_shared<odb::pgsql::database>(
+            db_user, db_pw, db_dbname, db_host, db_port);
+        // todo: care about leak
+        pg_db->tracer(new db::PGSQLTracer(true));
+        database_ = pg_db;
     }
     else
     {
         throw ConfigException(config_file_path(), "Unsupported database type: " +
                                                       Colorize::underline(db_type));
     }
+}
+
+void Kernel::configure_signal_handler()
+{
+    SignalHandler::registerCallback(Signal::SigInt, [this](Signal) {
+        if (!this->is_running_)
+        {
+            std::cerr << "SIGINT received a second time. Exiting abruptly."
+                      << std::endl;
+            _exit(-1);
+        }
+        else
+        {
+            this->is_running_ = false;
+        }
+    });
+
+    SignalHandler::registerCallback(Signal::SigTerm,
+                                    [this](Signal) { this->is_running_ = false; });
+
+    SignalHandler::registerCallback(Signal::SigHup,
+                                    [this](Signal) { this->send_sighup_ = true; });
 }

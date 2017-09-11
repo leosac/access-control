@@ -19,5 +19,6 @@
 
 #pragma once
 
+#include "tools/db/STDDurationODB.hpp"
 #include "tools/db/STDTimePointODB.hpp"
 #include "tools/db/ScryptResultODB.hpp"
