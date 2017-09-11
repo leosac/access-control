@@ -144,7 +144,6 @@ def with_leosac_infrastructure(f):
 
         test_case.loop.run_until_complete(_run_test())
 
-    wrap.with_leosac_infrastructure__ = True
     return wrap
 
 

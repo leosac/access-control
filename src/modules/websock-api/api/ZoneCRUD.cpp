@@ -106,9 +106,9 @@ boost::optional<json> ZoneCRUD::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto did = req.at("zone_id").get<Auth::ZoneId>();
+    auto zid = req.at("zone_id").get<Auth::ZoneId>();
 
-    auto zone     = ctx_.dbsrv->find_zone_by_id(did, DBService::THROW_IF_NOT_FOUND);
+    auto zone     = ctx_.dbsrv->find_zone_by_id(zid, DBService::THROW_IF_NOT_FOUND);
     auto zone_odb = assert_cast<Auth::ZonePtr>(zone);
     auto audit    = Audit::Factory::ZoneEvent(db, zone, ctx_.audit);
     audit->event_mask(Audit::EventType::ZONE_UPDATED);

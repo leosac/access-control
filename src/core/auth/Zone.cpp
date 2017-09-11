@@ -102,14 +102,29 @@ void Zone::validation_callback(odb::callback_event e, odb::database &) const
     if (e == odb::callback_event::post_update ||
         e == odb::callback_event::post_persist)
     {
-        ZoneValidator::validate(*this);
+        std::set<ZoneId> ids;
+        ZoneValidator::validate(*this, ids);
     }
 }
 
-void ZoneValidator::validate(const Zone &z)
+static void insert_enforce_unique(std::set<ZoneId> &zone_ids, ZoneId id)
+{
+    auto inserted = zone_ids.insert(id);
+    if (!inserted.second)
+    {
+        // Already was inserted. We have a cycle.
+        throw ModelException("data",
+                             "There cannot be cycle in parent/child relationship.");
+    }
+}
+
+void ZoneValidator::validate(const Zone &z, std::set<ZoneId> &zone_ids)
 {
     unsigned int physical_parent_count = 0;
 
+    // Add current zone id to iterated zones. This will throw if zone
+    // was already inserted.
+    insert_enforce_unique(zone_ids, z.id());
     validate_type(z.type());
 
     for (auto &lazy_parent : z.parents_)
@@ -121,8 +136,6 @@ void ZoneValidator::validate(const Zone &z)
             ++physical_parent_count;
         }
     }
-
-    // Todo: prevent cycle.
 
     // Physical zone can have at most one physical parent.
     if (z.type() == IZone::Type::PHYSICAL && physical_parent_count > 1)
@@ -142,7 +155,7 @@ void ZoneValidator::validate(const Zone &z)
     {
         auto child(lazy_children.load());
         ASSERT_LOG(child, "Failed to load object");
-        ZoneValidator::validate(*child);
+        ZoneValidator::validate(*child, zone_ids);
     }
 }
 

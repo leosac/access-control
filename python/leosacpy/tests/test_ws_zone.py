@@ -121,14 +121,32 @@ class WSZone(WSTestBase):
 
         await api.close()
 
+    @check_return_code(0)
+    @with_leosac_infrastructure
+    @with_leosac_ws_client()
+    @ws_authenticated_as_admin
+    async def test_zone_no_cycle(self,
+                                 wsclient: LowLevelWSClient = None):
+        """
+        A zone hierarchy cannot have cycle.
 
-# @check_return_code(0)
-#    @with_leosac_infrastructure
-#    @with_leosac_ws_client()
-#    @ws_authenticated_as_admin
-#    async def test_zone_multi_physical_parent(self, wsclient: LowLevelWSClient = None):
-#        api = LeosacAPI(client=wsclient)
-#        x = await api.zone_create('Parent Zone', ZoneType.PHYSICAL, 'My parent zone')
+        The following should be rejected:
+            Z0 parentOf Z1
+            Z1 parentOf Z2
+            Z2 parentOf Z0
+        """
+        api = LeosacAPI(client=wsclient)
+
+        z2 = await api.zone_create('Zone2', ZoneType.LOGICAL, '')
+        z1 = await api.zone_create('Zone1', ZoneType.LOGICAL, '', children=[z2])
+        z0 = await api.zone_create('Zone0', ZoneType.LOGICAL, '',
+                                   children=[z1])
+
+        with self.assertRaises(APIModelException):
+            # This will add a second parent to Child zone, and should fail.
+            await api.zone_edit(z2, 'Zone2', ZoneType.LOGICAL, '',
+                                children=[z0])
+        await api.close()
 
 
 if __name__ == '__main__':

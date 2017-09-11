@@ -36,8 +36,11 @@ class ZoneValidator
      *
      * The function will make sure that the zone do not
      * have 2 physical's zone as parent.
+     *
+     * @param zone_ids Set of zone ids that were iterated over
+     * during the validation. This is to prevent cycle in parent/child relationship.
      */
-    static void validate(const Zone &z);
+    static void validate(const Zone &z, std::set<ZoneId> &zone_ids);
 
     /**
      * Validate that the integer value of the type is a correct

@@ -445,3 +445,29 @@ class LeosacFullRunner(Runner):
             raise RuntimeError('Container not exited.')
         self.leosac_container.reload()
         return self.leosac_container.attrs['State']['ExitCode']
+
+
+class LeosacDummyRunner(Runner):
+    """
+    Dummy runner that do NOT run Leosac.
+
+    This runner is used when we run tests against a live Leosac
+    instance. Mostly used for debugging tests.
+    """
+
+    def get_return_code(self) -> int:
+        # Always returns as we have no control over the leosac daemon.
+        return 0
+
+    def __init__(self, server_address: str):
+        assert isinstance(server_address, str)
+        self.server_address = server_address
+
+    def get_ws_address(self) -> str:
+        return self.server_address
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    async def __aenter__(self):
+        pass

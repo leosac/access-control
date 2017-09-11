@@ -305,6 +305,28 @@ class LeosacAPI(LogMixin):
                                                 }))
         return rep.content['data']['id']
 
+    async def zone_edit(self, zone_id, alias, zone_type, desc,
+    doors=None, children=None):
+        """
+        Create a zone and returns its id on success.
+        """
+        if doors is None:
+            doors = []
+        if children is None:
+            children = []
+        rep = await self._req_rep(LeosacMessage(message_type='zone.update',
+                                                content={
+                                                    'zone_id': zone_id,
+                                                    'attributes': {
+                                                        'alias': alias,
+                                                        'type': zone_type,
+                                                        'description': desc,
+                                                        'doors': doors,
+                                                        'children': children
+                                                    }
+                                                }))
+        return rep.content['data']['id']
+
     async def restart(self):
         """
         Request that the Leosac server perform a restart.
