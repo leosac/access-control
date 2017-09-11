@@ -1,5 +1,7 @@
-# Build an image with all the required infrastructure
-# To cross-compile Leosac for Raspberry Pi.
+# Build an image with all the required compiler infrastructure
+# to cross-compile Leosac for Raspberry Pi.
+
+# We recommend you use leosaccli to use this container.
 
 FROM debian:stretch
 
@@ -127,4 +129,7 @@ VOLUME /leosac
 # this volume allows for incremental compilation.
 VOLUME /leosac_arm_build
 
-ENTRYPOINT ["/docker_scripts/cross_compile_entrypoint.py"]
+# A volume that can be mounted to specify a private key to use
+# when using `leosaccli dev cc dev-push` to push development build
+# to raspberry pi
+VOLUME /ssh_deploy_key

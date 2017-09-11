@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 from types import SimpleNamespace
@@ -33,19 +34,8 @@ def cc(ctx, build_dir):
     ctx.obj.cc.build_dir = abs_build_dir
 
 
-def start_cc_container(build_dir, repo_root_dir, command,
-                       bash_entrypoint=False):
-    """
-    Helper function that start an instance of the Leosac
-    Cross Compile container and return an handle to it.
-
-    :param bash_entrypoint: If true, use /bin/bash as entrypoint instead of
-    the default script.
-    :param build_dir: Directory on the host where to perform the build.
-    :param repo_root_dir: Directory where the root of Leosac repository lives.
-    :param command: The command to pass to the container
-    """
-
+def run_in_container(build_dir, repo_root_dir, command,
+                     deploy_key=None):
     assert isinstance(build_dir, str)
     assert isinstance(repo_root_dir, str)
     assert isinstance(command, (list, str)), 'Is {} instead'.format(type(command))
@@ -60,17 +50,21 @@ def start_cc_container(build_dir, repo_root_dir, command,
             'mode': 'ro'
         }
     }
-    if not bash_entrypoint:
-        return get_docker_client().containers.run('leosac_cross_compile',
-                                                  command,
-                                                  volumes=volumes_cfg,
-                                                  detach=True)
-    else:
-        return get_docker_client().containers.run('leosac_cross_compile',
-                                                  command,
-                                                  volumes=volumes_cfg,
-                                                  detach=True,
-                                                  entrypoint=['/bin/bash', '-c'])
+
+    if deploy_key:
+        volumes_cfg[deploy_key] = {
+            'bind': '/ssh_deploy_key',
+            'mode': 'ro'
+        }
+
+    c = get_docker_client().containers.run('leosac_cross_compile',
+                                           '"' + command + '"',
+                                           volumes=volumes_cfg,
+                                           detach=True,
+                                           entrypoint=['/bin/bash', '-c'])
+    print('Build output:')
+    for log_line in c.logs(stream=True, stdout=True, stderr=True):
+        print(log_line.decode('utf8'), end='')
 
 
 @cc.command()
@@ -83,10 +77,11 @@ def cmake(ctx):
     build_dir = ctx.obj.cc.build_dir
     assert isinstance(build_dir, str)
 
-    c = start_cc_container(build_dir, guess_root_dir(), 'cmake')
-    print('Build output:')
-    for log_line in c.logs(stream=True, stdout=True, stderr=True):
-        print(log_line.decode('utf8'), end='')
+    run_in_container(build_dir, guess_root_dir(),
+                     'cd /leosac_arm_build; '
+                     'cmake -DCMAKE_SYSROOT=/opt/rpi_fakeroot '
+                     '-DCMAKE_BUILD_TYPE=Debug  '
+                     '-DCMAKE_TOOLCHAIN_FILE=/leosac/cmake/rpi-cross.cmake /leosac')
 
 
 @cc.command()
@@ -98,51 +93,50 @@ def make(ctx):
     build_dir = ctx.obj.cc.build_dir
     assert isinstance(build_dir, str)
 
-    c = start_cc_container(build_dir, guess_root_dir(), 'build')
-    print('Build output:')
-    for log in c.logs(stream=True, stdout=True, stderr=True):
-        print(log.decode('utf8'), end='')
+    run_in_container(build_dir, guess_root_dir(),
+                     'cd /leosac_arm_build && make -j6')
 
 
-@cc.command()
-@click.option('--host', '-h', required=True)
-@click.option('--all', '-a',
-              help='Deploy everything (leosac + fakeroot)',
-              default=False)
+@cc.command(name='dev-push',
+            short_help='Deploy build to remote host.')
+@click.option('--host', '-h', required=True,
+              help='Address of the remote host')
+@click.option('--directory', '-d', required=True,
+              help='Target directory on the remote host.')
+@click.option('--key', '-k', required=True,
+              help='Path to the SSH key to connect to host.')
 @click.pass_context
-def deploy(ctx, host, all):
+def dev_push(ctx, host, directory, key):
     """
+    Deploy (SCP) the build binaries to a given host.
+    Note that only Leosac binary and libraries are pushed, not cross-compiled
+    system libraries.
+    """
+    build_dir = ctx.obj.cc.build_dir
+    opt = '-a --delete -r -v -e \\"ssh -o StrictHostKeyChecking=no -i /ssh_deploy_key\\" '
+    cmd = "rsync {} /leosac_arm_build/*.so /leosac_arm_build/leosac root@{}:{}".format(opt, host, directory)
+    logging.debug('BOAP CMD: {}'.format(cmd))
+    run_in_container(build_dir, guess_root_dir(), cmd, deploy_key=key)
 
-    Deploy (SCP) the build to a given host.
-    The build will be SCP'd into /opt/leosac_fakeroot (for libraries)
-    and /opt/leosac for leosac.
+
+@cc.command('fakeroot-package')
+@click.pass_context
+def fakeroot(ctx):
+    """
+    Make a tarball of fakeroot (fixed after container is built)
     """
     build_dir = ctx.obj.cc.build_dir
     assert isinstance(build_dir, str)
 
-    if all:
-        cmd = ['deploy_all', host]
-    else:
-        cmd = ['deploy', host]
-    c = start_cc_container(build_dir, guess_root_dir(), cmd)
-    print('Build output:')
-    for log_line in c.logs(stream=True, stdout=True, stderr=True):
-        print(log_line.decode('utf8'), end='')
+    tar_cmd = "'tar cvf /leosac_arm_build/fakeroot.tar /opt/rpi_fakeroot'"
+    run_in_container(build_dir, guess_root_dir(),
+                     tar_cmd)
 
 
-@cc.command('make-tarball')
+@cc.command('package')
 @click.pass_context
-def make_tarball(ctx):
-    """
-    Make a tarball of the build output.
-    """
+def package(ctx):
     build_dir = ctx.obj.cc.build_dir
-    assert isinstance(build_dir, str)
 
-    tar_cmd = "'tar cvf /leosac_arm_build/release_fakeroot.tar /opt/rpi_fakeroot'"
-    c = start_cc_container(build_dir, guess_root_dir(),
-                           tar_cmd,
-                           bash_entrypoint=True)
-    print('Build output:')
-    for log in c.logs(stream=True, stdout=True, stderr=True):
-        print(log.decode('utf8'), end='')
+    run_in_container(build_dir, guess_root_dir(),
+                     'cd /leosac_arm_build && make package')

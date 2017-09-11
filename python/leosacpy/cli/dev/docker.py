@@ -22,18 +22,20 @@ AVAILABLE_IMAGES = ['main', 'main2', 'server', 'cross_compile']
 
 def clean_output_build_line(raw_line):
     """
-    Line is a dict. We returns its "stream" key and 
-    remove its last \n
+    Line is a dict.
+
+    We returns a tuple of (bool, str) that means: (hasError, cleanString)
     """
     if 'stream' in raw_line:
         line = raw_line['stream']
         if line.endswith('\n'):
-            return line[:-1]
+            return True, line[:-1]
+        return True, line
     else:
         errcode = raw_line['errorDetail'].get('code', 'N/A')
         errstr = raw_line['errorDetail']['message']
         line = 'An error occurred: CODE: {}. MESSAGE: {}'.format(errcode, errstr)
-    return line
+        return False, line
 
 
 @docker.command(name='build')
@@ -60,10 +62,18 @@ def build(ctx, images, nocache):
                                 decode=True,  # Better stream output
                                 nocache=nocache)
 
+        success = True
         for line in build_output:
+            has_error, clean_line = clean_output_build_line(line)
+            if not has_error:
+                success = False
             print('Building {}: {}'.format(image,
-                                           clean_output_build_line(line)))
-        print('Built {}'.format(image))
+                                           clean_line))
+
+        if success:
+            print('Built {}'.format(image))
+        else:
+            print('Error building {}'.format(image))
     pass
 
 
