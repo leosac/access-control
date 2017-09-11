@@ -31,11 +31,18 @@ def clean_output_build_line(raw_line):
         if line.endswith('\n'):
             return True, line[:-1]
         return True, line
-    else:
+    elif 'errorDetail' in raw_line:
+        print(raw_line)
         errcode = raw_line['errorDetail'].get('code', 'N/A')
         errstr = raw_line['errorDetail']['message']
         line = 'An error occurred: CODE: {}. MESSAGE: {}'.format(errcode, errstr)
         return False, line
+    elif 'status' in raw_line:
+        line = raw_line['status']
+        if line.endswith('\n'):
+            line = line[:-1]
+        return False, line
+    return True, "LEOSAC_DOCKER_UNKNOWN_MESSAGE"
 
 
 @docker.command(name='build')

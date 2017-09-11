@@ -7,6 +7,8 @@ import click
 
 # The "cc" command requires a build-dir parameter
 # that it adds to the context for subcommand to use.
+from click import UsageError
+
 from leosacpy.utils import get_docker_client, guess_root_dir
 
 
@@ -18,8 +20,9 @@ from leosacpy.utils import get_docker_client, guess_root_dir
 @click.pass_context
 @click.option('--build-dir',
               type=str,
-              required=True,
-              nargs=1)
+              nargs=1,
+              help='Directory that will be mounted as build root. '
+                   'Defaults to /tmp/leosac_cc_build')
 def cc(ctx, build_dir):
     """
     The cc (cross-compile) command is a frontend to the
@@ -27,10 +30,18 @@ def cc(ctx, build_dir):
     """
     ctx.obj.cc = SimpleNamespace()
 
+    if build_dir is None:
+        build_dir = '/tmp/leosac_cc_build'
+        try:
+            os.mkdir(build_dir)
+        except FileExistsError:
+            pass
+
     abs_build_dir = os.path.abspath(build_dir)
     if not os.path.isdir(build_dir):
-        print('Specified build directory {} is not valid.'.format(abs_build_dir))
-        return
+        raise UsageError(
+            'Specified build directory {} is not valid.'.format(abs_build_dir))
+
     ctx.obj.cc.build_dir = abs_build_dir
 
 
@@ -85,16 +96,20 @@ def cmake(ctx):
 
 
 @cc.command()
+@click.option('--job', '-j',
+              type=int,
+              help='Number of make job.')
 @click.pass_context
-def make(ctx):
+def make(ctx, job):
     """
     Run `make` to build Leosac.
     """
     build_dir = ctx.obj.cc.build_dir
     assert isinstance(build_dir, str)
 
+    nb_job = job or 4
     run_in_container(build_dir, guess_root_dir(),
-                     'cd /leosac_arm_build && make -j6')
+                     'cd /leosac_arm_build && make -j{}'.format(nb_job))
 
 
 @cc.command(name='dev-push',
@@ -105,8 +120,10 @@ def make(ctx):
               help='Target directory on the remote host.')
 @click.option('--key', '-k', required=True,
               help='Path to the SSH key to connect to host.')
+@click.option('--user', '-u', required=True,
+              help='SSH user to log with.')
 @click.pass_context
-def dev_push(ctx, host, directory, key):
+def dev_push(ctx, host, directory, key, user):
     """
     Deploy (SCP) the build binaries to a given host.
     Note that only Leosac binary and libraries are pushed, not cross-compiled
@@ -114,8 +131,8 @@ def dev_push(ctx, host, directory, key):
     """
     build_dir = ctx.obj.cc.build_dir
     opt = '-a --delete -r -v -e \\"ssh -o StrictHostKeyChecking=no -i /ssh_deploy_key\\" '
-    cmd = "rsync {} /leosac_arm_build/*.so /leosac_arm_build/leosac root@{}:{}".format(opt, host, directory)
-    logging.debug('BOAP CMD: {}'.format(cmd))
+    cmd = 'rsync {} /leosac_arm_build/*.so /leosac_arm_build/leosac {}@{}:{}'. \
+        format(opt, user, host, directory)
     run_in_container(build_dir, guess_root_dir(), cmd, deploy_key=key)
 
 
@@ -128,9 +145,14 @@ def fakeroot(ctx):
     build_dir = ctx.obj.cc.build_dir
     assert isinstance(build_dir, str)
 
-    tar_cmd = "'tar cvf /leosac_arm_build/fakeroot.tar /opt/rpi_fakeroot'"
-    run_in_container(build_dir, guess_root_dir(),
-                     tar_cmd)
+    # Copy current libstdc++ to the fakeroot
+    add_libstd_cmd = 'cp /usr/arm-linux-gnueabihf/lib/libstdc++.so.6.0.22 ' \
+                     '/opt/rpi_fakeroot/lib && ' \
+                     'ln -s /opt/rpi_fakeroot/lib/libstdc++.so.6.0.22 ' \
+                     '/opt/rpi_fakeroot/lib/libstdc++.so.6 '
+    tar_cmd = 'tar cvf /leosac_arm_build/fakeroot.tar /opt/rpi_fakeroot'
+    cmd = add_libstd_cmd + ' && ' + tar_cmd
+    run_in_container(build_dir, guess_root_dir(), cmd)
 
 
 @cc.command('package')
