@@ -34,6 +34,7 @@
       <w>sysfsgpio</w>
       <w>unexport</w>
       <w>uptime</w>
+      <w>versioning</w>
       <w>websock</w>
       <w>websocket</w>
       <w>wiegand</w>
