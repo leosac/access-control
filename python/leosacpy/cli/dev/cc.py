@@ -118,10 +118,11 @@ def make(ctx, job):
               help='Address of the remote host')
 @click.option('--directory', '-d', required=True,
               help='Target directory on the remote host.')
-@click.option('--key', '-k', required=True,
-              help='Path to the SSH key to connect to host.')
-@click.option('--user', '-u', required=True,
-              help='SSH user to log with.')
+@click.option('--key', '-k',
+              help='Path to the SSH key to connect to host. Defaults to '
+                   '$HOME/.ssh/id_rsa')
+@click.option('--user', '-u',
+              help='SSH user to log with. Defaults to root.')
 @click.pass_context
 def dev_push(ctx, host, directory, key, user):
     """
@@ -130,6 +131,12 @@ def dev_push(ctx, host, directory, key, user):
     system libraries.
     """
     build_dir = ctx.obj.cc.build_dir
+
+    if not key:
+        key = '{}/.ssh/id_rsa'.format(os.environ['HOME'])
+    if not user:
+        user = 'root'
+
     opt = '-a --delete -r -v -e \\"ssh -o StrictHostKeyChecking=no -i /ssh_deploy_key\\" '
     cmd = 'rsync {} /leosac_arm_build/*.so /leosac_arm_build/leosac {}@{}:{}'. \
         format(opt, user, host, directory)

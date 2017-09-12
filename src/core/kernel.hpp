@@ -232,6 +232,11 @@ class Kernel
 
     void populate_default_db();
 
+    /**
+     * Create and/or update the database schema.
+     */
+    void create_update_schema();
+
     void connect_to_db(const boost::property_tree::ptree &db_cfg_node);
 
     void configure_logger();

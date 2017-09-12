@@ -30,8 +30,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         MULTI_DATABASE dynamic
         DB pgsql sqlite 
         STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
@@ -62,8 +61,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         MULTI_DATABASE dynamic
         DB pgsql sqlite
         STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
@@ -97,8 +95,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         MULTI_DATABASE dynamic
         DB pgsql sqlite
         STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
@@ -123,8 +120,7 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         MULTI_DATABASE dynamic
         DB pgsql sqlite
         STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
@@ -147,8 +143,7 @@ odb_compile(OdbCMake_SOURCES_UPDATES
         MULTI_DATABASE dynamic
         DB pgsql sqlite
         STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
+        GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
         PROFILE "boost/date-time" "boost/optional" leosac-profile
         INCLUDE  ${LEOSAC_ODB_INCLUDE_DIRS}
@@ -166,6 +161,8 @@ add_library(leosac_db SHARED
         ${OdbCMake_SOURCES_AUDITLOG} ${OdbCMake_ODB_HEADERS_AUDITLOG}
         ${OdbCMake_SOURCES_CREDENTIALS} ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         ${OdbCMake_SOURCES_UPDATES} ${OdbCMake_ODB_HEADERS_UPDATES}
+        ${CMAKE_BINARY_DIR}/src/db/core-schema-sqlite.cxx
+        ${CMAKE_BINARY_DIR}/src/db/core-schema-pgsql.cxx
         )
 
 target_include_directories(leosac_db PRIVATE
@@ -183,26 +180,37 @@ endif()
 
 ## This generate a leosac.sql file
 ## for creating the database structure.
-#[[add_custom_command(TARGET leosac_db
-        POST_BUILD
+##
+## Also generate changelog and database schema as separate C++ source file.
+add_custom_command(
+        OUTPUT ${CMAKE_BINARY_DIR}/src/db/core-schema-sqlite.cxx ${CMAKE_BINARY_DIR}/src/db/core-schema-pgsql.cxx
+#        TARGET leosac_db
+#        PRE_BUILD
         COMMAND odb
+        --multi-database dynamic
         --profile boost/date-time
         --profile boost/optional
         --profile leosac-profile
         --database pgsql
+        --database sqlite
         --std c++14
         -I ${CMAKE_SOURCE_DIR}/deps/flagset
         -I ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         -I ${CMAKE_SOURCE_DIR}/src
+        -I ${CMAKE_SOURCE_DIR}/src/db
         ${__LEOSAC_SQL_GENERATION_ADDITIONAL_INCLUDES}
-        --generate-schema-only --at-once
-        --input-name leosac
+        --schema-format separate
+        --schema-format sql
+        --generate-schema-only
+        --at-once
+        --input-name core
         --generate-query
+        --schema-name core
         ${OdbCMake_ODB_HEADERS_AUDITLOG}
         ${OdbCMake_ODB_HEADERS_AUTH}
         ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         ${OdbCMake_ODB_HEADERS_UPDATES}
-        )]]
+        )
 
 install(TARGETS leosac_db DESTINATION lib)

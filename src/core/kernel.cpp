@@ -486,15 +486,7 @@ void Kernel::configure_database()
             {
                 connect_to_db(*db_cfg_node);
                 ASSERT_LOG(database_, "Database pointer is null");
-                // Check if schema already exists.
-                DEBUG("Getting database schema version...");
-                odb::schema_version v = database_->schema_version("core");
-                DEBUG("Database schema version: " << v);
-                if (v == 0)
-                {
-                    // If not, create and populate default db
-                    populate_default_db();
-                }
+                create_update_schema();
                 return;
             }
             catch (odb::unknown_schema &ex)
@@ -502,7 +494,7 @@ void Kernel::configure_database()
                 INFO("Database schema unknown: "
                      << ex.what() << ". Leosac will attempt to create the schema "
                                      "and populate the database.");
-                populate_default_db();
+                create_update_schema();
             }
             catch (const odb::exception &e)
             {
@@ -616,14 +608,6 @@ void Kernel::populate_default_db()
     Auth::GroupPtr users;
     Cred::RFIDCardPtr card;
 
-    // Create the core schema.
-    {
-        transaction t(database_->begin());
-        schema_catalog::create_schema(*database_, "core");
-        INFO("Creating core database schema.");
-        t.commit();
-    }
-
     // Default users / groups
     {
         transaction t(database_->begin());
@@ -700,13 +684,9 @@ void Kernel::connect_to_db(const boost::property_tree::ptree &db_cfg_node)
     std::string db_type = db_cfg_node.get<std::string>("type", "");
     if (db_type == "sqlite")
     {
-#ifndef LEOSAC_PGSQL_ONLY
         std::string db_path = db_cfg_node.get<std::string>("path");
         database_           = std::make_shared<odb::sqlite::database>(
             db_path, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
-#else
-        throw LEOSACException("SQLite support disabled at compile time.");
-#endif
     }
     else if (db_type == "pgsql")
     {
@@ -750,4 +730,31 @@ void Kernel::configure_signal_handler()
 
     SignalHandler::registerCallback(Signal::SigHup,
                                     [this](Signal) { this->send_sighup_ = true; });
+}
+
+void Kernel::create_update_schema()
+{
+    ASSERT_LOG(database_, "Database pointer is null");
+
+    odb::schema_version v = database_->schema_version("core");
+    odb::schema_version cv(odb::schema_catalog::current_version(*database_, "core"));
+
+    DEBUG("Database schema version: " << v);
+    if (v == 0)
+    {
+        {
+            odb::transaction t(database_->begin());
+            odb::schema_catalog::create_schema(*database_, "core");
+            t.commit();
+        }
+        populate_default_db();
+    }
+    else if (v < cv)
+    {
+        INFO("Leosac performing database migration. Going from version "
+             << v << " to version " << cv);
+        odb::transaction t(database_->begin());
+        odb::schema_catalog::migrate(*database_, cv, "core");
+        t.commit();
+    }
 }
