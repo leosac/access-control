@@ -155,12 +155,36 @@ odb_compile(OdbCMake_SOURCES_UPDATES
         OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/update
         )
 
+# ODB configuration for Hardware devices
+set(OdbCMake_ODB_HEADERS_HARDWARE
+        ${CMAKE_SOURCE_DIR}/src/hardware/GPIO.hpp
+        )
+
+set(OdbCMake_SOURCES_HARDWARE "")
+odb_compile(OdbCMake_SOURCES_HARDWARE
+        FILES ${OdbCMake_ODB_HEADERS_HARDWARE}
+        MULTI_DATABASE dynamic
+        DB pgsql sqlite
+        STANDARD "c++14"
+        GENERATE_QUERY GENERATE_SESSION
+        SCHEMA_NAME core
+        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        INCLUDE  ${LEOSAC_ODB_INCLUDE_DIRS}
+        INCLUDE_PREFIX hardware/
+        HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
+        DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION "9.1"
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/hardware
+        )
+
+# leosac_db library that contains database support code
 add_library(leosac_db SHARED
         ${OdbCMake_SOURCES_TOOLS} ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_SOURCES_AUTH} ${OdbCMake_ODB_HEADERS_AUTH}
         ${OdbCMake_SOURCES_AUDITLOG} ${OdbCMake_ODB_HEADERS_AUDITLOG}
         ${OdbCMake_SOURCES_CREDENTIALS} ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         ${OdbCMake_SOURCES_UPDATES} ${OdbCMake_ODB_HEADERS_UPDATES}
+        ${OdbCMake_SOURCES_HARDWARE} ${OdbCMake_ODB_HEADERS_HARDWARE}
         ${CMAKE_BINARY_DIR}/src/db/core-schema-sqlite.cxx
         ${CMAKE_BINARY_DIR}/src/db/core-schema-pgsql.cxx
         )
@@ -178,14 +202,23 @@ if (LEOSAC_CROSS_COMPILE)
     set(__LEOSAC_SQL_GENERATION_ADDITIONAL_INCLUDES -I ${CMAKE_SYSROOT}/include)
 endif()
 
+set(LEOSAC_DATABASE_CORE_HEADERS
+        ${OdbCMake_ODB_HEADERS_TOOLS}
+        ${OdbCMake_ODB_HEADERS_AUTH}
+        ${OdbCMake_ODB_HEADERS_AUDITLOG}
+        ${OdbCMake_ODB_HEADERS_CREDENTIALS}
+        ${OdbCMake_ODB_HEADERS_UPDATES}
+        ${OdbCMake_ODB_HEADERS_HARDWARE}
+        ${CMAKE_SOURCE_DIR}/src/tools/db/database.hpp
+        )
+
 ## This generate a leosac.sql file
 ## for creating the database structure.
 ##
 ## Also generate changelog and database schema as separate C++ source file.
 add_custom_command(
         OUTPUT ${CMAKE_BINARY_DIR}/src/db/core-schema-sqlite.cxx ${CMAKE_BINARY_DIR}/src/db/core-schema-pgsql.cxx
-#        TARGET leosac_db
-#        PRE_BUILD
+        DEPENDS ${LEOSAC_DATABASE_CORE_HEADERS}
         COMMAND odb
         --multi-database dynamic
         --profile boost/date-time
@@ -206,11 +239,7 @@ add_custom_command(
         --input-name core
         --generate-query
         --schema-name core
-        ${OdbCMake_ODB_HEADERS_AUDITLOG}
-        ${OdbCMake_ODB_HEADERS_AUTH}
-        ${OdbCMake_ODB_HEADERS_TOOLS}
-        ${OdbCMake_ODB_HEADERS_CREDENTIALS}
-        ${OdbCMake_ODB_HEADERS_UPDATES}
+        ${LEOSAC_DATABASE_CORE_HEADERS}
         )
 
 install(TARGETS leosac_db DESTINATION lib)
