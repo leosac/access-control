@@ -17,37 +17,23 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+#include "LeosacFwd.hpp"
 #include "hardware/GPIO.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
+using json = nlohmann::json;
+
 namespace Hardware
 {
-
-GPIO::GPIO()
-    : id_(0)
-    , version_(0)
+struct GPIOSerializer
 {
-}
+    static json serialize(const Hardware::GPIO &in, const SecurityContext &sc);
 
-const std::string &GPIO::name() const
-{
-    return name_;
-}
-
-void GPIO::name(const std::string &name)
-{
-    name_ = name;
-}
-
-GPIOId GPIO::id() const
-{
-    return id_;
-}
-
-uint64_t GPIO::version() const
-{
-    return version_;
-}
+    static void unserialize(Hardware::GPIO &out, const json &in,
+                            const SecurityContext &sc);
+};
 }
 }

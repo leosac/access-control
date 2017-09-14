@@ -66,6 +66,8 @@ set(LEOSAC_LIB_SRCS
     hardware/FLED.cpp
     hardware/FWiegandReader.cpp
     hardware/GPIO.cpp
+    hardware/HardwareService.cpp
+    hardware/serializers/GPIOSerializer.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
     tools/unixshellscript.cpp

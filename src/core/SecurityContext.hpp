@@ -22,6 +22,7 @@
 #include "core/audit/AuditFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "core/credentials/CredentialFwd.hpp"
+#include "hardware/HardwareFwd.hpp"
 #include "tools/ToolsFwd.hpp"
 #include "tools/db/db_fwd.hpp"
 
@@ -145,7 +146,13 @@ class SecurityContext
         /**
          * Perform to restart the Leosac server.
          */
-        RESTART_SERVER
+        RESTART_SERVER,
+
+        HARDWARE_GPIO_READ,
+        HARDWARE_GPIO_UPDATE,
+        HARDWARE_GPIO_CREATE,
+        HARDWARE_GPIO_DELETE,
+        HARDWARE_GPIO_SEARCH,
     };
 
     struct GroupActionParam
@@ -207,6 +214,13 @@ class SecurityContext
         operator ActionParam();
     };
 
+    struct HardwareGPIOActionParam
+    {
+        Hardware::GPIOId gpio_id;
+
+        operator ActionParam();
+    };
+
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
@@ -216,6 +230,7 @@ class SecurityContext
         DoorActionParam door;
         AccessPointActionParam access_point;
         ZoneActionParam zone;
+        HardwareGPIOActionParam hardware_gpio;
     };
 
     SecurityContext(DBServicePtr dbsrv);

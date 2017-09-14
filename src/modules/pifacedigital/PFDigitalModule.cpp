@@ -19,18 +19,26 @@
 
 #include "PFDigitalModule.hpp"
 #include "core/CoreUtils.hpp"
+#include "core/GetServiceRegistry.hpp"
 #include "exception/gpioexception.hpp"
 #include "mcp23s17.h"
+#include "modules/pifacedigital/CRUDHandler.hpp"
+#include "modules/websock-api/Service.hpp"
 #include "pifacedigital.h"
+#include "tools/AssertCast.hpp"
 #include "tools/enforce.hpp"
 #include "tools/log.hpp"
 #include "tools/timeout.hpp"
 #include <boost/iterator/transform_iterator.hpp>
 #include <fcntl.h>
+#include <odb/schema-catalog.hxx>
 
-using namespace Leosac;
-using namespace Leosac::Module;
-using namespace Leosac::Module::Piface;
+namespace Leosac
+{
+namespace Module
+{
+namespace Piface
+{
 
 PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
                                  zmqpp::socket *module_manager_pipe,
@@ -38,17 +46,21 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
                                  CoreUtilsPtr utils)
     : BaseModule(ctx, module_manager_pipe, config, utils)
     , bus_push_(ctx_, zmqpp::socket_type::push)
+    , degraded_mode_(false)
 {
     if (pifacedigital_open(0) == -1)
     {
-        ERROR("Cannot open PifaceDigital device");
-        throw LEOSACException(
-            "Cannot open PifaceDigital device (is SPI module enabled ?)");
+        // Failed to init piface device. Run module in degraded mode (only WS api)
+        degraded_mode_ = true;
+        ERROR("Cannot open PifaceDigital device. Are you running on device with SPI "
+              "bus and have SPI linux kernel module enabled ?");
+        process_config();
+        return;
     }
     int ret = pifacedigital_enable_interrupts();
     ASSERT_LOG(ret == 0, "Failed to enable interrupt on piface board");
 
-    process_config(config);
+    process_config();
     bus_push_.connect("inproc://zmq-bus-pull");
     for (auto &gpio : gpios_)
     {
@@ -61,7 +73,7 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
     LEOSAC_ENFORCE(interrupt_fd_ > 0, "Failed to open GPIO file");
     pifacedigital_read_reg(0x11, 0); // flush
 
-    // Somehow it was required poll with "poll_pri" and "poll_errror". It used to
+    // Somehow it was required poll with "poll_pri" and "poll_error". It used to
     // work with poll_pri alone before. Need to investigate more. todo !
     reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this),
                  zmqpp::poller::poll_pri | zmqpp::poller::poll_error);
@@ -86,12 +98,13 @@ void PFDigitalModule::run()
                 gpio_pin.update();
         }
     }
+    remove_ws_handlers();
 }
 
 void PFDigitalModule::handle_interrupt()
 {
     // get interrupt state.
-    std::array<char, 64> buffer;
+    std::array<char, 64> buffer{};
     ssize_t ret;
 
     ret = ::read(interrupt_fd_, &buffer[0], buffer.size());
@@ -130,7 +143,7 @@ bool PFDigitalModule::get_input_pin_name(std::string &dest, int idx)
     return false;
 }
 
-void PFDigitalModule::process_config(const boost::property_tree::ptree &cfg)
+void PFDigitalModule::process_xml_config(const boost::property_tree::ptree &cfg)
 {
     boost::property_tree::ptree module_config = cfg.get_child("module_config");
 
@@ -157,4 +170,123 @@ void PFDigitalModule::process_config(const boost::property_tree::ptree &cfg)
         utils_->config_checker().register_object(gpio_name,
                                                  ConfigChecker::ObjectType::GPIO);
     }
+}
+
+void PFDigitalModule::process_config()
+{
+    bool use_db = config_.get<bool>("module_config.use_database", false);
+    if (!use_db && degraded_mode_)
+    {
+        throw LEOSACException("We failed to open piface digital device and wont "
+                              "enable database support. There is nothing to do but "
+                              "exit.");
+    }
+    else if (!use_db)
+    {
+        // Process XML based config.
+        process_xml_config(config_);
+    }
+    else
+    {
+        // Database enabled configuration.
+        setup_database();
+
+        WSHelperThread::ModuleParameters parameters{};
+        parameters.degraded_mode = degraded_mode_;
+        helper_thread_.set_parameter(parameters);
+
+        helper_thread_.register_ws_handlers();
+    }
+}
+
+void PFDigitalModule::remove_ws_handlers()
+{
+    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+    if (ws_service)
+    {
+        ws_service->unregister_handler("pfdigital.is_degraded_mode");
+
+        // Remove 4 handlers, one for each CRUD operation
+        ws_service->unregister_handler("pfdigital.gpio.create");
+        ws_service->unregister_handler("pfdigital.gpio.read");
+        ws_service->unregister_handler("pfdigital.gpio.update");
+        ws_service->unregister_handler("pfdigital.gpio.delete");
+    }
+}
+
+void PFDigitalModule::setup_database()
+{
+    using namespace odb;
+    using namespace odb::core;
+    auto db          = utils_->database();
+    schema_version v = db->schema_version("module_pifacedigital");
+    schema_version cv(schema_catalog::current_version(*db, "module_pifacedigital"));
+    if (v == 0)
+    {
+        transaction t(db->begin());
+        schema_catalog::create_schema(*db, "module_pifacedigital");
+        t.commit();
+    }
+    else if (v < cv)
+    {
+        INFO("PIFACEDIGITAL_GPIO Module performing database migration. Going from "
+             "version "
+             << v << " to version " << cv);
+        transaction t(db->begin());
+        schema_catalog::migrate(*db, cv, "module_pifacedigital");
+        t.commit();
+    }
+}
+
+void WSHelperThread::run_io_service()
+{
+    work_ = std::make_unique<boost::asio::io_service::work>(io_);
+    io_.run();
+}
+
+void WSHelperThread::on_service_event(const service_event::Event &e)
+{
+    if (e.type() == service_event::REGISTERED)
+    {
+        auto &service_registered_event =
+            assert_cast<const service_event::ServiceRegistered &>(e);
+        if (service_registered_event.interface_type() ==
+            boost::typeindex::type_id<WebSockAPI::Service>())
+        {
+            // request registration of handler from our helper thread.
+            io_.post([this]() { register_ws_handlers(); });
+        }
+    }
+}
+
+void WSHelperThread::register_ws_handlers()
+{
+    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+    if (ws_service)
+    {
+        std::lock_guard<decltype(mutex_)> lg(mutex_);
+        ws_service->register_handler(
+            [mode = parameters_.degraded_mode](const WebSockAPI::RequestContext rc) {
+                json j{{"mode", mode}};
+                return j;
+            },
+            "pfdigital.is_degraded_mode");
+
+        ws_service->register_crud_handler("pfdigital.gpio",
+                                          &CRUDHandler::instanciate);
+    }
+    else
+    {
+        service_event_listener_ = get_service_registry().register_event_listener(
+            [this](const service_event::Event &e) { on_service_event(e); });
+    }
+}
+
+void WSHelperThread::set_parameter(WSHelperThread::ModuleParameters param)
+{
+    std::lock_guard<decltype(mutex_)> lg(mutex_);
+    parameters_ = param;
+}
+}
+}
 }

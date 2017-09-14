@@ -29,6 +29,7 @@
 #include "core/update/UpdateService.hpp"
 #include "core/update/serializers/AccessPointUpdateSerializer.hpp"
 #include "exception/ExceptionsTools.hpp"
+#include "hardware/HardwareService.hpp"
 #include "tools/DatabaseLogSink.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
 #include "tools/GenGuid.h"
@@ -559,11 +560,20 @@ void Kernel::register_core_services()
             service_registry_->register_service<update::UpdateService>(
                 std::move(update_srv));
         }
+
+        // Hardware
+        {
+            auto hardware_srv = std::make_unique<Hardware::HardwareService>();
+            service_registry_->register_service(std::move(hardware_srv));
+        }
     }
 }
 
 void Kernel::unregister_core_services()
 {
+    // Todo: Shall we unregister in the reverse order of serialization,
+    // similarly to ctor/dtor mechanism ?
+
     // Audit serializers
     {
         bool ret =
@@ -590,6 +600,13 @@ void Kernel::unregister_core_services()
     {
         bool ret = service_registry_->unregister_service<update::UpdateService>();
         ASSERT_LOG(ret, "Failed to unregister update::UpdateService");
+    }
+
+    // Hardware service
+    {
+        bool ret =
+            service_registry_->unregister_service<Hardware::HardwareService>();
+        ASSERT_LOG(ret, "Failed to unregister HardwareService");
     }
 }
 

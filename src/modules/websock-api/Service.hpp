@@ -23,6 +23,7 @@
 #include "LeosacFwd.hpp"
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/WebSockFwd.hpp"
+#include "modules/websock-api/api/CRUDResourceHandler.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
 #include <boost/asio/io_service.hpp>
@@ -79,19 +80,33 @@ class Service
     }
 
     /**
-     * Remove an asio handler by name.
+     * Register a handler for a websocket message.
+     *
+     * The handler will be invoked as-is in the websocket thread.
+     */
+    template <typename HandlerT>
+    bool register_handler(HandlerT &&handler, const std::string &type)
+    {
+        return register_typed_handler(handler, type);
+    }
+
+    bool register_crud_handler(const std::string &resource_name,
+                               CRUDResourceHandler::Factory factory);
+
+    /**
+     * Remove an handler by name.
      *
      * This should be called by module that register handlers before
-     * the module is destroyed in order to avoid crash / race condition.
+     * the module is destroyed in order to avoid a potential crash / race condition.
      *
-     * If you still have registered handler when the module goes out of
+     * If you still have a registered asio-handler when the module goes out of
      * scope, the websocket module will attempt to `post()` to a dangling
      * io_service, causing a crash.
      *
      * @note We assume everyone is nice and module won't remove each-other
      * handler.
      */
-    void remove_asio_handler(const std::string &name);
+    void unregister_handler(const std::string &name);
 
     template <typename HandlerT>
     bool register_asio_handler_permission(HandlerT &&handler,

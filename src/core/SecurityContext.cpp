@@ -123,6 +123,13 @@ SecurityContext::ZoneActionParam::operator ActionParam()
     return result;
 }
 
+SecurityContext::HardwareGPIOActionParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.hardware_gpio = *this;
+    return result;
+}
+
 ExecutionContext::ExecutionContext(SecurityContext &sc)
     : sec(sc)
 {

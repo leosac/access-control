@@ -45,7 +45,6 @@ def dev_format_source(ctx, clang_format, exclude_dirs):
 @click.argument('msg_content')
 @click.pass_context
 def dev_send_ws_msg(ctx, host, msg_type, msg_content):
-    print('lol {} --> {}'.format(msg_type, msg_content))
     loop = asyncio.new_event_loop()
     client = LowLevelWSClient()
     loop.run_until_complete(client.connect(host))

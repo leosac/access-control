@@ -496,13 +496,29 @@ bool WSServer::register_asio_handler(const Service::WSHandler &handler,
     return future.get();
 }
 
-void WSServer::remove_asio_handler(const std::string &name)
+void WSServer::unregister_handler(const std::string &name)
 {
     DEBUG("Scheduling removal of ASIO-based-handler (name " << name << ')');
     std::promise<void> p;
 
     srv_.get_io_service().post([&]() {
         asio_handlers_.erase(name);
+        handlers_.erase(name);
+        individual_handlers_.erase(name);
+        crud_handlers_.erase(name);
+        p.set_value();
+    });
+
+    return p.get_future().get();
+}
+
+void WSServer::register_crud_handler_external(const std::string &resource_name,
+                                              CRUDResourceHandler::Factory factory)
+{
+    std::promise<void> p;
+
+    srv_.get_io_service().post([&]() {
+        register_crud_handler(resource_name, factory);
         p.set_value();
     });
 

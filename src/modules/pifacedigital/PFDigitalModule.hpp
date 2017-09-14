@@ -21,6 +21,8 @@
 
 #include "PFDigitalPin.hpp"
 #include "modules/BaseModule.hpp"
+#include "tools/service/ServiceRegistry.hpp"
+#include <boost/asio/io_service.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <zmqpp/reactor.hpp>
 #include <zmqpp/socket.hpp>
@@ -31,11 +33,82 @@ namespace Module
 {
 /**
 * Provide support for the piface digital device.
+ *
+ * This module can be started on a device that is not compatible
+ * with a Piface device just to be able to configure Piface backed
+ * GPIO.
+ *
+ * If database is enabled, this module use one helper thread to listen
+ * to websocket request and to perform database operation.
 *
 * @see @ref mod_piface_main for documentation
 */
 namespace Piface
 {
+
+class PFDigitalModule;
+/**
+ * Thread to perform websocket related operation.
+ *
+ * This is an helper thread of the PFDigitalModule.
+ */
+class WSHelperThread
+{
+  public:
+    /**
+     * Some ~const parameter that are required
+     * to process websocket requests.
+     */
+    struct ModuleParameters
+    {
+        bool degraded_mode;
+    };
+
+    explicit WSHelperThread()
+    {
+        thread_ = std::make_unique<std::thread>([this]() { run_io_service(); });
+    }
+
+    ~WSHelperThread()
+    {
+        clear_work();
+        try
+        {
+            thread_->join();
+        }
+        catch (const std::exception &e)
+        {
+            ERROR("Failed to join WSHelperThread");
+        }
+    }
+
+    void register_ws_handlers();
+
+    void on_service_event(const service_event::Event &);
+
+    /**
+     * Set required parameters.
+     *
+     * Call this before calling register_ws_handlers();
+     */
+    void set_parameter(ModuleParameters param);
+
+  private:
+    void run_io_service();
+
+    void clear_work()
+    {
+        work_ = nullptr;
+    }
+
+    bs2::scoped_connection service_event_listener_;
+    std::unique_ptr<std::thread> thread_;
+    boost::asio::io_service io_;
+    std::unique_ptr<boost::asio::io_service::work> work_;
+    ModuleParameters parameters_;
+    std::mutex mutex_;
+};
+
 /**
 * Main class for the piface digital module.
 */
@@ -57,9 +130,21 @@ class PFDigitalModule : public BaseModule
     void handle_interrupt();
 
     /**
-    * Process the configuration, preparing configured GPIO pin.
+    * Process the XML configuration, preparing configured GPIO pin.
     */
-    void process_config(const boost::property_tree::ptree &cfg);
+    void process_xml_config(const boost::property_tree::ptree &cfg);
+
+    /**
+     * Explicitely deregister websocket handler.
+     */
+    void remove_ws_handlers();
+
+    /**
+     * Process configuration.
+     */
+    void process_config();
+
+    void setup_database();
 
     /**
     * Socket to push event to the bus.
@@ -84,6 +169,14 @@ class PFDigitalModule : public BaseModule
     * change.
     */
     int interrupt_fd_;
+
+    WSHelperThread helper_thread_;
+
+    /**
+     * True if we are running in "degraded" mode (ie, not on a device
+     * that support the PifaceDigital).
+     */
+    bool degraded_mode_;
 };
 }
 }

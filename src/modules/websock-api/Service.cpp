@@ -33,9 +33,15 @@ bool Service::register_typed_handler(const Service::WSHandler &handler,
     return server_.register_asio_handler(handler, type);
 }
 
-void Service::remove_asio_handler(const std::string &name)
+void Service::unregister_handler(const std::string &name)
 {
-    server_.remove_asio_handler(name);
+    server_.unregister_handler(name);
+}
+
+bool Service::register_crud_handler(const std::string &resource_name,
+                                    CRUDResourceHandler::Factory factory)
+{
+    server_.register_crud_handler_external(resource_name, factory);
 }
 }
 }

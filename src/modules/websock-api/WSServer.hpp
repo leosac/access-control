@@ -95,13 +95,25 @@ class WSServer
     bool register_asio_handler(const Service::WSHandler &handler,
                                const std::string &name);
 
+
+    /**
+     * Register a CRUD handler from an external thread.
+     * The handler will be invoked on the Websocket thread.
+     *
+     * This method should only be called by WebSockAPI::Service.
+     *
+     * @note This method is thread-safe and will block the calling
+     * thread until the registration is done.
+     */
+    void register_crud_handler_external(const std::string &resource_name,
+                                        CRUDResourceHandler::Factory factory);
     /**
      * Remove an Asio based handler.
      *
      * @note This method is thread-safe and runs the removal code
      * into the WSServer's io_service.
      */
-    void remove_asio_handler(const std::string &name);
+    void unregister_handler(const std::string &name);
 
     /**
      * Retrieve the authentication helper.

@@ -17,37 +17,31 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/GPIO.hpp"
+
+#include "hardware/serializers/GPIOSerializer.hpp"
+#include "tools/JSONUtils.hpp"
 
 namespace Leosac
 {
 namespace Hardware
 {
-
-GPIO::GPIO()
-    : id_(0)
-    , version_(0)
+json GPIOSerializer::serialize(const Hardware::GPIO &in, const SecurityContext &sc)
 {
+    json serialized = {{"id", in.id()},
+                       {"type", "gpio"},
+                       {"attributes",
+                        {
+                            {"name", in.name()},
+                        }}};
+    return serialized;
 }
 
-const std::string &GPIO::name() const
+void GPIOSerializer::unserialize(Hardware::GPIO &out, const json &in,
+                                 const SecurityContext &sc)
 {
-    return name_;
-}
+    using namespace JSONUtil;
 
-void GPIO::name(const std::string &name)
-{
-    name_ = name;
-}
-
-GPIOId GPIO::id() const
-{
-    return id_;
-}
-
-uint64_t GPIO::version() const
-{
-    return version_;
+    out.name(extract_with_default(in, "name", out.name()));
 }
 }
 }

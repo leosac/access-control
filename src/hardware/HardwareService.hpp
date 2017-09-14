@@ -17,37 +17,22 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/GPIO.hpp"
+#pragma once
 
 namespace Leosac
 {
 namespace Hardware
 {
-
-GPIO::GPIO()
-    : id_(0)
-    , version_(0)
+/**
+ * Database aware Hardware Service.
+ *
+ * @note This is a core service and it shall always
+ * be available to modules.
+ */
+class HardwareService
 {
-}
-
-const std::string &GPIO::name() const
-{
-    return name_;
-}
-
-void GPIO::name(const std::string &name)
-{
-    name_ = name;
-}
-
-GPIOId GPIO::id() const
-{
-    return id_;
-}
-
-uint64_t GPIO::version() const
-{
-    return version_;
-}
+  public:
+    HardwareService() = default;
+};
 }
 }

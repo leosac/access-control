@@ -19,47 +19,58 @@
 
 #pragma once
 
-#include "hardware/HardwareFwd.hpp"
-#include <cstdint>
-#include <odb/core.hxx>
-#include <string>
+#define ODB_NO_BASE_VERSION
+#pragma db model version(1, 1)
+
+#include "LeosacFwd.hpp"
+#include "hardware/GPIO.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
-namespace Hardware
+namespace Module
 {
 
+namespace Piface
+{
+using json = nlohmann::json;
 /**
- *  Abstraction of a GPIO object property.
+ * Piface Module GPIO descriptor.
  *
- *  Modules that provides GPIO support may subclass
- *  this to provide additional settings.
+ * It inherits Hardware::GPIO and adds Piface specific
+ * data.
  */
 #pragma db object optimistic polymorphic
-class GPIO
+class PFGPIO : public Hardware::GPIO
 {
   public:
-    explicit GPIO();
-    virtual ~GPIO() = default;
+    explicit PFGPIO()
+    {
+    }
 
-    const std::string &name() const;
+    int hwaddr() const
+    {
+        return hwaddr_;
+    }
 
-    void name(const std::string &name);
-
-    GPIOId id() const;
-
-    uint64_t version() const;
+    void hwaddr(int addr)
+    {
+        hwaddr_ = addr;
+    }
 
   private:
-    std::string name_;
-
-#pragma db id auto
-    GPIOId id_;
-
-#pragma db version
-    uint64_t version_;
+    // Not used for now. Maybe later when supporting
+    // stacked piface. Really a dummy data for now.
+    int hwaddr_;
 
     friend odb::access;
 };
+
+struct PFGPIOSerializer
+{
+    static json serialize(const PFGPIO &in, const SecurityContext &sc);
+    static json unserialize(PFGPIO &out, const json &in, const SecurityContext &sc);
+};
+}
 }
 }

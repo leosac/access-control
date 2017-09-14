@@ -201,6 +201,8 @@ void ModuleManager::stopModules(bool soft)
          itr != modules_.rend(); ++itr)
     {
         stopModule(const_cast<ModuleInfo *>(&(*itr)), soft);
+        DEBUG("Will now sleep before stoping next module...");
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
     if (!soft)
     {
