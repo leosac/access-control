@@ -1,9 +1,13 @@
+import asyncio
+
 import click
 from click import UsageError
 
 from leosacpy.cli.dev import run_tests, docker, doc, cc
 from leosacpy.tools.source_formatter import SourceFormatter
 from leosacpy.utils import guess_root_dir
+from leosacpy.ws import LeosacMessage
+from leosacpy.wsclient import LowLevelWSClient
 
 
 @click.group('dev')
@@ -33,6 +37,23 @@ def dev_format_source(ctx, clang_format, exclude_dirs):
     fmt = SourceFormatter(clang_format, guess_root_dir() + '/.clang-format')
     fmt.format(guess_root_dir() + '/src', exclude_dirs=exclude_dirs)
     print(ctx.obj)
+
+
+@dev_cmd_group.command('ws-msg')
+@click.option('--host', '-h')
+@click.argument('msg_type')
+@click.argument('msg_content')
+@click.pass_context
+def dev_send_ws_msg(ctx, host, msg_type, msg_content):
+    print('lol {} --> {}'.format(msg_type, msg_content))
+    loop = asyncio.new_event_loop()
+    client = LowLevelWSClient()
+    loop.run_until_complete(client.connect(host))
+    msg = LeosacMessage(msg_type, msg_content)
+    rep_fut = loop.run_until_complete(client.send(msg))
+    rep = loop.run_until_complete(rep_fut)
+    print('Response: CODE: {}. CONTENT: {}'.format(rep.status_code, rep.content))
+    loop.run_until_complete(client.close())
 
 
 dev_cmd_group.add_command(run_tests.run_tests)

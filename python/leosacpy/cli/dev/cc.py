@@ -47,6 +47,10 @@ def cc(ctx, build_dir):
 
 def run_in_container(build_dir, repo_root_dir, command,
                      deploy_key=None):
+    """
+    Run `command` in cross_compile container.
+    :return: The return code of the container.
+    """
     assert isinstance(build_dir, str)
     assert isinstance(repo_root_dir, str)
     assert isinstance(command, (list, str)), 'Is {} instead'.format(type(command))
@@ -76,6 +80,11 @@ def run_in_container(build_dir, repo_root_dir, command,
     print('Build output:')
     for log_line in c.logs(stream=True, stdout=True, stderr=True):
         print(log_line.decode('utf8'), end='')
+
+    # Wait for container to stop, and return container's return code
+    while not c.status == 'exited':
+        c.reload()
+    return c.attrs['State']['ExitCode']
 
 
 @cc.command()
@@ -108,8 +117,10 @@ def make(ctx, job):
     assert isinstance(build_dir, str)
 
     nb_job = job or 4
-    run_in_container(build_dir, guess_root_dir(),
-                     'cd /leosac_arm_build && make -j{}'.format(nb_job))
+    x = run_in_container(build_dir, guess_root_dir(),
+                         'cd /leosac_arm_build && make -j{}'.format(nb_job))
+    if x != 0:
+        raise SystemExit("Docker container exited with return code {}".format(x))
 
 
 @cc.command(name='dev-push',
