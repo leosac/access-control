@@ -44,24 +44,22 @@ using json = nlohmann::json;
 class PFGPIO : public Hardware::GPIO
 {
   public:
-    explicit PFGPIO()
+    PFGPIO();
+
+    int hardware_address() const
     {
+        return hardware_address_;
     }
 
-    int hwaddr() const
+    void hardware_address(int addr)
     {
-        return hwaddr_;
-    }
-
-    void hwaddr(int addr)
-    {
-        hwaddr_ = addr;
+        hardware_address_ = addr;
     }
 
   private:
     // Not used for now. Maybe later when supporting
     // stacked piface. Really a dummy data for now.
-    int hwaddr_;
+    int hardware_address_;
 
     friend odb::access;
 };

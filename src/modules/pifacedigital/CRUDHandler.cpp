@@ -73,7 +73,27 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
 
 boost::optional<json> CRUDHandler::create_impl(const json &req)
 {
-    return json{};
+    json rep;
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+
+    auto new_gpio = std::make_shared<PFGPIO>();
+    PFGPIOSerializer::unserialize(*new_gpio, req.at("attributes"),
+                                  security_context());
+    db->persist(new_gpio);
+
+    /*
+        auto audit = Audit::Factory::ZoneEvent(db, new_zone, ctx_.audit);
+        audit->event_mask(Audit::EventType::ZONE_CREATED);
+        audit->after(ZoneJSONStringSerializer::serialize(
+                *new_zone, SystemSecurityContext::instance()));
+
+        audit->finalize();
+    */
+
+    rep["data"] = PFGPIOSerializer::serialize(*new_gpio, security_context());
+    t.commit();
+    return rep;
 }
 
 auto find_gpio_by_id(const Hardware::GPIOId &id, DBPtr db)
@@ -124,11 +144,30 @@ boost::optional<json> CRUDHandler::read_impl(const json &req)
 
 boost::optional<json> CRUDHandler::update_impl(const json &req)
 {
-    return json{};
+    json rep;
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+    auto gpio_id = req.at("gpio_id").get<Hardware::GPIOId>();
+    auto gpio    = find_gpio_by_id(gpio_id, db);
+
+    PFGPIOSerializer::unserialize(*gpio, req.at("attributes"), security_context());
+
+    db->update(gpio);
+    rep["data"] = PFGPIOSerializer::serialize(*gpio, security_context());
+    t.commit();
+    return rep;
 }
 
 boost::optional<json> CRUDHandler::delete_impl(const json &req)
 {
+    auto did = req.at("gpio_id").get<Auth::ZoneId>();
+    DBPtr db = ctx_.dbsrv->db();
+    odb::transaction t(db->begin());
+
+    auto gpio = find_gpio_by_id(did, db);
+    db->erase(gpio);
+    t.commit();
+
     return json{};
 }
 

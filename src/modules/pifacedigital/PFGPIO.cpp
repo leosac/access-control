@@ -29,6 +29,11 @@ namespace Module
 namespace Piface
 {
 
+PFGPIO::PFGPIO()
+    : hardware_address_(0)
+{
+}
+
 json PFGPIOSerializer::serialize(const PFGPIO &in, const SecurityContext &sc)
 {
     auto serialized = Hardware::GPIOSerializer::serialize(in, sc);
@@ -37,7 +42,7 @@ json PFGPIOSerializer::serialize(const PFGPIO &in, const SecurityContext &sc)
                "Base GPIO serialization did something unexpected.");
     serialized["type"] = "pfdigital.gpio";
 
-    serialized["attributes"]["hwaddr"] = in.hwaddr();
+    serialized["attributes"]["hardware_address"] = in.hardware_address();
     return serialized;
 }
 
@@ -47,7 +52,8 @@ json PFGPIOSerializer::unserialize(PFGPIO &out, const json &in,
     using namespace JSONUtil;
     Hardware::GPIOSerializer::unserialize(out, in, sc);
 
-    //        out.h
+    out.hardware_address(
+        extract_with_default(in, "hardware_address", out.hardware_address()));
 }
 }
 }

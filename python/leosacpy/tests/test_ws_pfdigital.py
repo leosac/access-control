@@ -23,32 +23,52 @@ class WSPifaceDigital(WSTestBase):
         cfg.stream_log = True
         return cfg
 
+    async def assert_n_gpio(self, n, wsclient):
+        msg = LeosacMessage(message_type='pfdigital.gpio.read',
+                            content={'gpio_id': 0})
+        rep = await wsclient.req_rep(msg)
+        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
+        # We should have N GPIOs.
+        self.assertEqual(n, len(rep.content['data']))
+
     @check_return_code(0)
     @with_leosac_infrastructure
     @with_leosac_ws_client()
     @ws_authenticated_as_admin
-    async def test_create_gpio(self, wsclient: LowLevelWSClient = None):
-        msg = LeosacMessage(message_type='pfdigital.gpio.read', content={'gpio_id': 0})
-        rep = await wsclient.req_rep(msg)
-        self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
-        # We should have 0 GPIOs.
-        self.assertEqual(0, len(rep.content['data']))
+    async def test_CRUD_gpio(self, wsclient: LowLevelWSClient = None):
+        await self.assert_n_gpio(0, wsclient)
 
+        # Create
         msg = LeosacMessage('pfdigital.gpio.create', content={
             'attributes':
                 {
-                    'name': 'My GPIO'
+                    'name': 'My GPIO',
+                    'hardware_address': 0
                 }
         })
         rep = await wsclient.req_rep(msg)
+        gpio_id = rep.content['data']['id']
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
 
-        msg = LeosacMessage(message_type='pfdigital.gpio.read', content={'gpio_id': 0})
+        await self.assert_n_gpio(1, wsclient)
+
+        # Read back and make sure
+        msg = LeosacMessage(message_type='pfdigital.gpio.read', content={'gpio_id': gpio_id})
         rep = await wsclient.req_rep(msg)
-
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
-        # Now we should have one zone.
-        self.assertEqual(1, len(rep.content['data']))
 
-        self.assertEqual('My GPIO', rep.content['data'][0]['attributes']['name'])
-        self.assertEqual(0, rep.content['data'][0]['attributes']['type'])
+        # Check attributes values
+        self.assertEqual('My GPIO', rep.content['data']['attributes']['name'])
+        self.assertEqual(0, rep.content['data']['attributes']['hardware_address'])
+
+        rep = await wsclient.req_rep(LeosacMessage('pfdigital.gpio.update',
+                                     content={'gpio_id': gpio_id,
+                                              'attributes': {
+                                                  'hardware_address': 42
+                                              }}))
+        self.assertEqual('My GPIO', rep.content['data']['attributes']['name'])
+        self.assertEqual(42, rep.content['data']['attributes']['hardware_address'])
+
+        # Delete
+        rep = await wsclient.req_rep(LeosacMessage('pfdigital.gpio.delete', {'gpio_id': gpio_id}))
+        await self.assert_n_gpio(0, wsclient)
