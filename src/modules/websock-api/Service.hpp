@@ -67,7 +67,8 @@ class Service
         // We wrap the user handler into a packaged task that will be `post()`ed
         // onto the io_service (`io`) queue.
 
-        WSHandler wrapped_handler = [&, handler](const RequestContext &req_ctx) {
+        WSHandler wrapped_handler =
+            [&, handler](const RequestContext &req_ctx) -> boost::optional<json> {
             std::packaged_task<boost::optional<json>(const RequestContext &)> pt(
                 [&](const RequestContext &req_ctx) { return handler(req_ctx); });
             auto future = pt.get_future();
@@ -76,6 +77,21 @@ class Service
         };
         return register_typed_handler(wrapped_handler, type);
     }
+
+    /**
+     * Remove an asio handler by name.
+     *
+     * This should be called by module that register handlers before
+     * the module is destroyed in order to avoid crash / race condition.
+     *
+     * If you still have registered handler when the module goes out of
+     * scope, the websocket module will attempt to `post()` to a dangling
+     * io_service, causing a crash.
+     *
+     * @note We assume everyone is nice and module won't remove each-other
+     * handler.
+     */
+    void remove_asio_handler(const std::string &name);
 
     template <typename HandlerT>
     bool register_asio_handler_permission(HandlerT &&handler,

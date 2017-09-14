@@ -32,6 +32,11 @@ bool Service::register_typed_handler(const Service::WSHandler &handler,
 {
     return server_.register_asio_handler(handler, type);
 }
+
+void Service::remove_asio_handler(const std::string &name)
+{
+    server_.remove_asio_handler(name);
+}
 }
 }
 }

@@ -96,6 +96,14 @@ class WSServer
                                const std::string &name);
 
     /**
+     * Remove an Asio based handler.
+     *
+     * @note This method is thread-safe and runs the removal code
+     * into the WSServer's io_service.
+     */
+    void remove_asio_handler(const std::string &name);
+
+    /**
      * Retrieve the authentication helper.
      */
     APIAuth &auth();
