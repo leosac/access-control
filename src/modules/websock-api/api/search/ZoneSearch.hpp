@@ -37,7 +37,7 @@ using json = nlohmann::json;
  *     + 'partial_name': A part of the name we are looking for.
  *
  * Response:
- *     A list of {id,name} for doors that match the partial name.
+ *     A list of {id,name} for zones that match the partial name.
  *     [
  *       {id: $ZONE_ID,
  *       alias: $ZONE_ALIAS},

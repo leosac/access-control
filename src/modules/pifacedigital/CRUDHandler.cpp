@@ -52,7 +52,7 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
     switch (verb)
     {
     case Verb::READ:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_GPIO_CREATE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_GPIO_READ,
                          gpio_action_param);
         break;
     case Verb::CREATE:

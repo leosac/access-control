@@ -39,6 +39,7 @@
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
 #include "api/search/ScheduleSearch.hpp"
+#include "api/search/UserSearch.hpp"
 #include "api/search/ZoneSearch.hpp"
 #include "api/update-management/AckUpdate.hpp"
 #include "api/update-management/CancelUpdate.hpp"
@@ -107,6 +108,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["search.access_point_alias"] = &AccessPointSearch::create;
     individual_handlers_["search.schedule_name"]      = &ScheduleSearch::create;
     individual_handlers_["search.zone_alias"]         = &ZoneSearch::create;
+    individual_handlers_["search.user_username"]      = &UserSearch::create;
     individual_handlers_["access_overview"]           = &AccessOverview::create;
     individual_handlers_["check_update"]              = &CheckUpdate::create;
     individual_handlers_["create_update"]             = &CreateUpdate::create;

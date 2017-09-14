@@ -90,7 +90,7 @@ class Service
         return register_typed_handler(handler, type);
     }
 
-    bool register_crud_handler(const std::string &resource_name,
+    void register_crud_handler(const std::string &resource_name,
                                CRUDResourceHandler::Factory factory);
 
     /**

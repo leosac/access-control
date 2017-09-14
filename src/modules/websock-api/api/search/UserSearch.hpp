@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -17,8 +17,10 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/websock-api/Service.hpp"
-#include "modules/websock-api/WSServer.hpp"
+#pragma once
+
+#include "api/MethodHandler.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
@@ -26,23 +28,36 @@ namespace Module
 {
 namespace WebSockAPI
 {
+using json = nlohmann::json;
 
-bool Service::register_typed_handler(const Service::WSHandler &handler,
-                                     const std::string &type)
+/**
+ * Search Users by username.
+ *
+ * Request:
+ *     + 'partial_name': A part of the name we are looking for.
+ *
+ * Response:
+ *     A list of {id,username} for users that match the partial name.
+ *     [
+ *       {id: $USER_ID,
+ *       username: $USERNAME},
+ *       {...}
+ *     ]
+ */
+class UserSearch : public MethodHandler
 {
-    return server_.register_asio_handler(handler, type);
-}
+  public:
+    explicit UserSearch(RequestContext ctx);
 
-void Service::unregister_handler(const std::string &name)
-{
-    server_.unregister_handler(name);
-}
+    static MethodHandlerUPtr create(RequestContext);
 
-void Service::register_crud_handler(const std::string &resource_name,
-                                    CRUDResourceHandler::Factory factory)
-{
-    server_.register_crud_handler_external(resource_name, factory);
-}
+  protected:
+    std::vector<ActionActionParam>
+    required_permission(const json &req) const override;
+
+  private:
+    virtual json process_impl(const json &req) override;
+};
 }
 }
 }

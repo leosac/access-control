@@ -59,6 +59,7 @@ class SecurityContext
         USER_READ_EMAIL,
         USER_UPDATE,
         USER_CHANGE_PASSWORD,
+        USER_SEARCH,
 
         /**
          * Editing rank means being able to become administrator.
@@ -233,7 +234,7 @@ class SecurityContext
         HardwareGPIOActionParam hardware_gpio;
     };
 
-    SecurityContext(DBServicePtr dbsrv);
+    explicit SecurityContext(DBServicePtr dbsrv);
     virtual ~SecurityContext() = default;
 
     /**
@@ -280,7 +281,7 @@ class SecurityContext
 class SystemSecurityContext : public SecurityContext
 {
   public:
-    SystemSecurityContext(DBServicePtr dbsrv);
+    explicit SystemSecurityContext(DBServicePtr dbsrv);
 
     static SecurityContext &instance();
     virtual bool check_permission_impl(Action a,
@@ -293,7 +294,7 @@ class SystemSecurityContext : public SecurityContext
  */
 struct ExecutionContext
 {
-    ExecutionContext(SecurityContext &sc);
+    explicit ExecutionContext(SecurityContext &sc);
 
     ExecutionContext(SecurityContext &sc, const Audit::IAuditEntryPtr &);
 

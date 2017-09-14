@@ -29,6 +29,7 @@ set(WEBSOCK_API_SRCS
         api/search/AccessPointSearch.cpp
         api/search/ScheduleSearch.cpp
         api/search/ZoneSearch.cpp
+        api/search/UserSearch.cpp
         api/update-management/CheckUpdate.cpp
         api/update-management/CreateUpdate.cpp
         api/update-management/PendingUpdateGet.cpp

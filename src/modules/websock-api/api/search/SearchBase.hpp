@@ -30,10 +30,24 @@ namespace Module
 namespace WebSockAPI
 {
 
+/**
+ * Use this tag to search for entities with an "alias" field
+ */
 struct use_alias_tag
 {
 };
+/**
+ * Use this tag to search for entities with a "name"
+ */
 struct use_name_tag
+{
+};
+
+/**
+ * Use this tag to search for entities with a "username" tag
+ * (Most likely only "User" for now ...
+ */
+struct use_username_tag
 {
 };
 
@@ -77,6 +91,14 @@ struct EntitySearchTool
     build_query(const std::string &partial)
     {
         Query q(Query::name.like("%" + partial + "%"));
+        return std::move(q);
+    }
+
+    template <typename T>
+    std::enable_if_t<std::is_same<T, use_username_tag>::value, Query>
+    build_query(const std::string &partial)
+    {
+        Query q(Query::username.like("%" + partial + "%"));
         return std::move(q);
     }
 
@@ -129,13 +151,21 @@ struct EntitySearchTool
         return result_json;
     }
 
+    template <typename T>
+    std::enable_if_t<std::is_same<T, use_username_tag>::value, json>
+    build_json_entry(const DatabaseEntity entity)
+    {
+        json result_json = {{"id", entity.id()}, {"username", entity.username()}};
+        return result_json;
+    }
+
   public:
     /**
      * Returns a JSON array with the result from the search.
      *
      * The JSON looks like this:
      *     [ {id: ${ENTITY_ID}},
-     *       {name|alias: ${ENTITY_NAME_OR_ALIAS}}
+     *       {name|alias|username: ${ENTITY_NAME_OR_ALIAS}}
      *     ]
      */
     json search_json(DBPtr db, const std::string &partial)

@@ -17,39 +17,34 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/websock-api/api/Restart.hpp"
-#include "core/CoreAPI.hpp"
-#include "core/CoreUtils.hpp"
-#include "modules/websock-api/WSServer.hpp"
+#include "api/search/UserSearch.hpp"
+#include "core/auth/User_odb.h"
+#include "modules/websock-api/api/search/SearchBase.hpp"
 
-namespace Leosac
-{
-namespace Module
-{
-namespace WebSockAPI
-{
-Restart::Restart(RequestContext ctx)
+
+using namespace Leosac;
+using namespace Leosac::Module;
+using namespace Leosac::Module::WebSockAPI;
+
+UserSearch::UserSearch(RequestContext ctx)
     : MethodHandler(ctx)
 {
 }
 
-MethodHandlerUPtr Restart::create(RequestContext rc)
+MethodHandlerUPtr UserSearch::create(RequestContext ctx)
 {
-    return std::make_unique<Restart>(rc);
+    return std::make_unique<UserSearch>(ctx);
 }
 
-std::vector<ActionActionParam> Restart::required_permission(const json &) const
+json UserSearch::process_impl(const json &req)
 {
-    std::vector<ActionActionParam> perm;
-    perm.push_back({SecurityContext::Action::RESTART_SERVER, {}});
-    return perm;
+    return EntitySearchTool<Auth::User, use_username_tag>().search_json(
+        ctx_.dbsrv->db(), req.at("partial_name").get<std::string>());
 }
 
-json Restart::process_impl(const json &)
+std::vector<ActionActionParam> UserSearch::required_permission(const json &) const
 {
-    ctx_.server.core_utils()->core_api().restart_server();
-    return json{};
-}
-}
-}
+    std::vector<ActionActionParam> perm_;
+    perm_.push_back({SecurityContext::Action::USER_SEARCH, {}});
+    return perm_;
 }
