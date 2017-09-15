@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "tools/db/db_fwd.hpp"
+
 namespace Leosac
 {
 namespace Hardware
@@ -26,13 +28,17 @@ namespace Hardware
 /**
  * Database aware Hardware Service.
  *
- * @note This is a core service and it shall always
- * be available to modules.
+ * @note This is a core service that requires a database
+ * to function. Therefore it'll be available only if Leosac is
+ * configured to use a database.
  */
 class HardwareService
 {
   public:
-    HardwareService() = default;
+    explicit HardwareService(DBServicePtr dbservice);
+
+  private:
+    DBServicePtr dbservice_;
 };
 }
 }

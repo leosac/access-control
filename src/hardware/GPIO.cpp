@@ -18,7 +18,7 @@
 */
 
 #include "hardware/GPIO.hpp"
-#include <exception/ModelException.hpp>
+#include "exception/ModelException.hpp"
 
 namespace Leosac
 {

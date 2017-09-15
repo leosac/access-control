@@ -530,15 +530,17 @@ void Kernel::register_core_services()
     ASSERT_LOG(!service_registry_, "ServiceRegistry is already created.");
     service_registry_ = std::make_unique<ServiceRegistry>();
     {
+        // Database service
+        if (database_)
+        {
+            service_registry_->register_service<DBService>(
+                std::make_unique<DBService>(database_));
+        }
+
         // Audit serializers
         {
             service_registry_->register_service<Audit::Serializer::JSONService>(
                 std::make_unique<Audit::Serializer::JSONService>());
-            if (database_)
-            {
-                service_registry_->register_service<DBService>(
-                    std::make_unique<DBService>(database_));
-            }
         }
 
         // AccessPoint
@@ -561,9 +563,11 @@ void Kernel::register_core_services()
                 std::move(update_srv));
         }
 
-        // Hardware
+        // Hardware service (required database service)
+        if (database_)
         {
-            auto hardware_srv = std::make_unique<Hardware::HardwareService>();
+            auto hardware_srv = std::make_unique<Hardware::HardwareService>(
+                service_registry_->get_service<DBService>());
             service_registry_->register_service(std::move(hardware_srv));
         }
     }

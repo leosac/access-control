@@ -40,9 +40,10 @@ with multiple Leosac system. This field is mandatory.
 Database {#general_database}
 ============================
 
-Leosac can work with a SQLite database. The database in mandatory to provide
+Leosac can work with either an SQLite or PostgreSQL database. The database is mandatory to provide
 support for some features. For example, the WebSocket API needs access to the
-database to store users, permissions, etc.
+database to store users, permissions, etc. Similarly, the HardwareService needs the 
+DBService to operate.
 
 The `database` tag holds various information about the database.
 
@@ -50,11 +51,11 @@ Options       | Options  | Description                                          
 --------------|----------|--------------------------------------------------------|-----------
 type          |          | Underlying database type. Either "sqlite" or "mysql".  | YES
 path          |          | **SQLite only**: Path to the database file.            | YES if SQLite
-username      |          | **MySQL only**: Database username.                     | YES if MySQL
-password      |          | **MySQL only**: Password for the database user.        | YES if MySQL
-dbname        |          | **MySQL only**: Database name to use.                  | YES if MySQL
-host          |          | **MySQL only**: Database hostname / IP.                | NO
-port          |          | **MySQL only**: Port the database listens to           | NO
+username      |          | **PGSQL only**: Database username.                     | YES if MySQL
+password      |          | **PGSQL only**: Password for the database user.        | YES if MySQL
+dbname        |          | **PGSQL only**: Database name to use.                  | YES if MySQL
+host          |          | **PGSQL only**: Database hostname / IP.                | NO
+port          |          | **PGSQL only**: Port the database listens to           | NO
 
 Example {#database_example}
 --------------------------
@@ -67,10 +68,10 @@ Below is an example for SQLite.
 </database>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-An one for MySQL / MariaDB.
+An one for PGSQL.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
 <database>
-      <type>mysql</type>
+      <type>pgsql</type>
       <username>root</username>
 	  <password></password>
       <dbname>leosac</dbname>

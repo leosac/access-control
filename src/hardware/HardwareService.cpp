@@ -18,3 +18,14 @@
 */
 
 #include "hardware/HardwareService.hpp"
+
+namespace Leosac
+{
+namespace Hardware
+{
+HardwareService::HardwareService(Leosac::DBServicePtr dbservice)
+    : dbservice_(dbservice)
+{
+}
+}
+}
