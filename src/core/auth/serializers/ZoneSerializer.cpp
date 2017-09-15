@@ -63,8 +63,7 @@ void ZoneJSONSerializer::unserialize(Auth::IZone &out, const json &in,
 
     out.alias(extract_with_default(in, "alias", out.alias()));
     out.description(extract_with_default(in, "description", out.description()));
-    out.type(static_cast<Zone::Type>(
-        extract_with_default(in, "type", static_cast<int>(Zone::Type::LOGICAL))));
+    out.type(extract_with_default(in, "type", Zone::Type::LOGICAL));
 
     auto doors_ids = in.at("doors");
     out.clear_doors();

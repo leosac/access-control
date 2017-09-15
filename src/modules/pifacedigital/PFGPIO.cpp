@@ -46,7 +46,7 @@ json PFGPIOSerializer::serialize(const PFGPIO &in, const SecurityContext &sc)
     return serialized;
 }
 
-json PFGPIOSerializer::unserialize(PFGPIO &out, const json &in,
+void PFGPIOSerializer::unserialize(PFGPIO &out, const json &in,
                                    const SecurityContext &sc)
 {
     using namespace JSONUtil;

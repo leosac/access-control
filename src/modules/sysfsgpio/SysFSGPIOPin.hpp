@@ -20,6 +20,7 @@
 #pragma once
 
 #include "SysFsGpioModule.hpp"
+#include "hardware/GPIO.hpp"
 #include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
@@ -40,11 +41,7 @@ class SysFsGpioConfig;
 class SysFsGpioPin
 {
   public:
-    enum class Direction
-    {
-        In = 0,
-        Out
-    };
+    using Direction = Hardware::GPIO::Direction;
 
     enum class InterruptMode
     {

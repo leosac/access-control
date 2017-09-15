@@ -144,7 +144,12 @@ class PFDigitalModule : public BaseModule
      */
     void process_config();
 
+    /**
+     * Create / update database schema for the module
+     */
     void setup_database();
+
+    void load_config_from_database();
 
     /**
     * Socket to push event to the bus.

@@ -23,6 +23,7 @@
 #include "exception/leosacexception.hpp"
 #include <chrono>
 #include <json.hpp>
+#include <type_traits>
 
 namespace Leosac
 {
@@ -45,7 +46,8 @@ namespace JSONUtil
 template <typename T>
 typename std::enable_if<!std::is_same<const char *, T>::value &&
                             !std::is_same<std::chrono::system_clock::time_point,
-                                          std::remove_reference_t<T>>::value,
+                                          std::remove_reference_t<T>>::value &&
+                            !std::is_enum<T>::value,
                         T>::type
 extract_with_default(const nlohmann::json &obj, const std::string &key,
                      T default_value)
@@ -55,6 +57,26 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
     {
         if (!obj.at(key).is_null())
             ret = obj.at(key).get<T>();
+    }
+    catch (const std::out_of_range &e)
+    {
+    }
+    return ret;
+}
+
+template <typename T>
+typename std::enable_if<std::is_enum<T>::value, T>::type
+extract_with_default(const nlohmann::json &obj, const std::string &key,
+                     T default_value)
+{
+    T ret = default_value;
+    try
+    {
+        if (!obj.at(key).is_null())
+        {
+            // Extract using enum's underlying type, then case back.
+            ret = static_cast<T>(obj.at(key).get<std::underlying_type_t<T>>());
+        }
     }
     catch (const std::out_of_range &e)
     {

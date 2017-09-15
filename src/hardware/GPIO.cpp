@@ -18,6 +18,7 @@
 */
 
 #include "hardware/GPIO.hpp"
+#include <exception/ModelException.hpp>
 
 namespace Leosac
 {
@@ -26,6 +27,9 @@ namespace Hardware
 
 GPIO::GPIO()
     : id_(0)
+    , default_value_(false)
+    , direction_(Direction::In)
+    , number_(0)
     , version_(0)
 {
 }
@@ -48,6 +52,49 @@ GPIOId GPIO::id() const
 uint64_t GPIO::version() const
 {
     return version_;
+}
+
+uint16_t GPIO::number() const
+{
+    return number_;
+}
+
+void GPIO::number(uint16_t number)
+{
+    number_ = number;
+}
+
+GPIO::Direction GPIO::direction() const
+{
+    return direction_;
+}
+
+void GPIO::direction(GPIO::Direction direction)
+{
+    direction_ = direction;
+}
+
+bool GPIO::default_value() const
+{
+    return default_value_;
+}
+
+void GPIO::default_value(bool default_value)
+{
+    default_value_ = default_value;
+}
+
+void GPIO::validation_callback(odb::callback_event e, odb::database &) const
+{
+    if (e == odb::callback_event::post_persist ||
+        e == odb::callback_event::post_update)
+    {
+        if (name().empty())
+        {
+            throw ModelException("data/attributes/name",
+                                 "GPIO name must be non empty");
+        }
+    }
 }
 }
 }

@@ -21,6 +21,7 @@
 
 #include "hardware/HardwareFwd.hpp"
 #include <cstdint>
+#include <odb/callback.hxx>
 #include <odb/core.hxx>
 #include <string>
 
@@ -35,10 +36,16 @@ namespace Hardware
  *  Modules that provides GPIO support may subclass
  *  this to provide additional settings.
  */
-#pragma db object optimistic polymorphic
+#pragma db object optimistic polymorphic callback(validation_callback)
 class GPIO
 {
   public:
+    enum class Direction
+    {
+        In = 0,
+        Out
+    };
+
     explicit GPIO();
     virtual ~GPIO() = default;
 
@@ -50,8 +57,38 @@ class GPIO
 
     uint64_t version() const;
 
+    uint16_t number() const;
+
+    void number(uint16_t number);
+
+    Direction direction() const;
+
+    void direction(Direction direction);
+
+    bool default_value() const;
+
+    void default_value(bool default_value);
+
+    void validation_callback(odb::callback_event e, odb::database &) const;
+
   private:
+/**
+ * Name of a GPIO must be unique.
+ *
+ * This is due an implementation details where GPIO object bind a ZMQ socket
+ * that is tied to their name.
+ */
+#pragma db unique
     std::string name_;
+
+    uint16_t number_;
+
+    Direction direction_;
+
+    /**
+     * True to default to ON, false otherwise.
+     */
+    bool default_value_;
 
 #pragma db id auto
     GPIOId id_;

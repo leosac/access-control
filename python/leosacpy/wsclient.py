@@ -333,7 +333,7 @@ class LeosacAPI(LogMixin):
         """
         rep = await self._req_rep(LeosacMessage(message_type='restart',
                                                 content={}))
-        if rep.content['status'] == 0:
+        if rep.status_code == 0:
             return True
 
     async def close(self):

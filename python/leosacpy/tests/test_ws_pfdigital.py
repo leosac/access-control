@@ -43,7 +43,8 @@ class WSPifaceDigital(WSTestBase):
             'attributes':
                 {
                     'name': 'My GPIO',
-                    'hardware_address': 0
+                    'hardware_address': 0,
+                    'number': 12
                 }
         })
         rep = await wsclient.req_rep(msg)
@@ -60,6 +61,7 @@ class WSPifaceDigital(WSTestBase):
         # Check attributes values
         self.assertEqual('My GPIO', rep.content['data']['attributes']['name'])
         self.assertEqual(0, rep.content['data']['attributes']['hardware_address'])
+        self.assertEqual(12, rep.content['data']['attributes']['number'])
 
         rep = await wsclient.req_rep(LeosacMessage('pfdigital.gpio.update',
                                      content={'gpio_id': gpio_id,

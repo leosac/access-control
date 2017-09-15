@@ -40,7 +40,7 @@ using json = nlohmann::json;
  * It inherits Hardware::GPIO and adds Piface specific
  * data.
  */
-#pragma db object optimistic polymorphic
+#pragma db object optimistic polymorphic callback(validation_callback)
 class PFGPIO : public Hardware::GPIO
 {
   public:
@@ -67,7 +67,7 @@ class PFGPIO : public Hardware::GPIO
 struct PFGPIOSerializer
 {
     static json serialize(const PFGPIO &in, const SecurityContext &sc);
-    static json unserialize(PFGPIO &out, const json &in, const SecurityContext &sc);
+    static void unserialize(PFGPIO &out, const json &in, const SecurityContext &sc);
 };
 }
 }

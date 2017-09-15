@@ -23,6 +23,7 @@
 #include "exception/gpioexception.hpp"
 #include "mcp23s17.h"
 #include "modules/pifacedigital/CRUDHandler.hpp"
+#include "modules/pifacedigital/PFGPIO_odb.h"
 #include "modules/websock-api/Service.hpp"
 #include "pifacedigital.h"
 #include "tools/AssertCast.hpp"
@@ -196,6 +197,8 @@ void PFDigitalModule::process_config()
         helper_thread_.set_parameter(parameters);
 
         helper_thread_.register_ws_handlers();
+
+        load_config_from_database();
     }
 }
 
@@ -236,6 +239,30 @@ void PFDigitalModule::setup_database()
         schema_catalog::migrate(*db, cv, "module_pifacedigital");
         t.commit();
     }
+}
+
+void PFDigitalModule::load_config_from_database()
+{
+    using Result = odb::result<PFGPIO>;
+    DBPtr db     = utils_->database();
+    odb::transaction t(db->begin());
+    Result result = db->query<PFGPIO>();
+
+    for (const auto &gpio : result)
+    {
+        // For each PFGPIO object in the database, create a PFDigitalPin
+
+        INFO("Creating GPIO "
+             << gpio.name() << ", with no " << gpio.number() << ". direction = "
+             << (gpio.direction() == PFDigitalPin::Direction::In ? "in" : "out"));
+        PFDigitalPin pin(ctx_, gpio.name(), gpio.number(), gpio.direction(),
+                         gpio.default_value());
+        gpios_.push_back(std::move(pin));
+        utils_->config_checker().register_object(gpio.name(),
+                                                 ConfigChecker::ObjectType::GPIO);
+    }
+
+    t.commit();
 }
 
 void WSHelperThread::run_io_service()

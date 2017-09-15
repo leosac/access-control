@@ -23,19 +23,33 @@ Configuration Options {#mod_piface_user_config}
 See below for various configuration options.
 
 
-Options    | Options   | Description                                            | Mandatory
------------|-----------|--------------------------------------------------------|-----------
-gpios      |           | GPIOS definitions                                      | YES
---->       | name      | A name for the GPIO device                             | YES
---->       | no        | The GPIO number of the piface. Range from 0 to 7       | YES
---->       | direction | Direction of the PIN. in or out                        | YES
---->       | value     | Only for out PIN. The default value of the PIN         | YES for output pin
+Options      | Options   | Description                                            | Mandatory
+-------------|-----------|--------------------------------------------------------|-----------
+use_database |           | If true, use database-backed configuration.            | NO (defaults to false)
+gpios        |           | GPIOS definitions                                      | YES
+--->         | name      | A name for the GPIO device                             | YES
+--->         | no        | The GPIO number of the piface. Range from 0 to 7       | YES
+--->         | direction | Direction of the PIN. in or out                        | YES
+--->         | value     | Only for out PIN. The default value of the PIN         | YES for output pin
 
 Notes:
++ If `use_database` is true, the module will expose its configuration API over
+  websocket (provided that a Websocket module is available). All other XML configuration
+  option are ignored.
 + `value` is a boolean. It's only for output GPIO and represents the default value.
 
 
-Example {#mod_piface_example}
+Database Configuration Notes
+----------------------------
+
+It is not possible to mix both database configuration and XML configuration.
+If the XML configuration set `use_database` to `true`, then all other XML
+configuration values are ignored.
+
+When configuration is updated (create/update/delete gpio objects) is not
+loaded by the module. Restarting Leosac is required to apply new configuration.
+
+XML Config Example {#mod_piface_example}
 ------------------------------
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml

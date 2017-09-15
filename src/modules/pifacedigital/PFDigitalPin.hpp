@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "hardware/GPIO.hpp"
 #include <chrono>
 #include <string>
 #include <zmqpp/zmqpp.hpp>
@@ -31,11 +32,7 @@
 */
 struct PFDigitalPin
 {
-    enum class Direction
-    {
-        In = 0,
-        Out
-    };
+    using Direction = Leosac::Hardware::GPIO::Direction;
 
     /**
     * Create a new GPIO pin.
