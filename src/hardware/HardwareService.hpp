@@ -35,7 +35,7 @@ namespace Hardware
 class HardwareService
 {
   public:
-    explicit HardwareService(DBServicePtr dbservice);
+    explicit HardwareService(const Leosac::DBServicePtr &dbservice);
 
   private:
     DBServicePtr dbservice_;

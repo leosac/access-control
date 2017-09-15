@@ -2,6 +2,7 @@ import asyncio
 
 import click
 
+from leosacpy.utils import AWAIT
 from leosacpy.ws import LeosacMessage, APIStatusCode
 from leosacpy.wsclient import LowLevelWSClient, LeosacAPI
 
@@ -16,11 +17,6 @@ def pfdigital_cmd_group(ctx, host):
     """
     if host:
         ctx.obj.config.host = host
-
-
-def AWAIT(call, loop):
-    return loop.run_until_complete(call)
-
 
 @pfdigital_cmd_group.command('gpio-list')
 @click.pass_context

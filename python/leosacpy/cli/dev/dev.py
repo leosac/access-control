@@ -1,13 +1,14 @@
 import asyncio
+import json
 
 import click
 from click import UsageError
 
 from leosacpy.cli.dev import run_tests, docker, doc, cc
 from leosacpy.tools.source_formatter import SourceFormatter
-from leosacpy.utils import guess_root_dir
+from leosacpy.utils import guess_root_dir, AWAIT, pretty_dict
 from leosacpy.ws import LeosacMessage
-from leosacpy.wsclient import LowLevelWSClient
+from leosacpy.wsclient import LowLevelWSClient, LeosacAPI
 
 
 @click.group('dev')
@@ -40,19 +41,32 @@ def dev_format_source(ctx, clang_format, exclude_dirs):
 
 
 @dev_cmd_group.command('ws-msg')
-@click.option('--host', '-h')
+@click.option('--authenticate',
+              is_flag=True,
+              help='Authenticate using available credential')
 @click.argument('msg_type')
 @click.argument('msg_content')
 @click.pass_context
-def dev_send_ws_msg(ctx, host, msg_type, msg_content):
+def dev_send_ws_msg(ctx, authenticate, msg_type, msg_content):
+    host = ctx.obj.config.host
+    username = ctx.obj.config.username
+    password = ctx.obj.config.password
+
     loop = asyncio.new_event_loop()
-    client = LowLevelWSClient()
-    loop.run_until_complete(client.connect(host))
-    msg = LeosacMessage(msg_type, msg_content)
-    rep_fut = loop.run_until_complete(client.send(msg))
-    rep = loop.run_until_complete(rep_fut)
-    print('Response: CODE: {}. CONTENT: {}'.format(rep.status_code, rep.content))
-    loop.run_until_complete(client.close())
+    c = LeosacAPI(target=host)
+    if authenticate:
+        AWAIT(c.authenticate(username, password),
+              loop)
+
+    json_content = json.loads(msg_content)
+    rep = AWAIT(c._req_rep(LeosacMessage(msg_type, json_content)),
+                loop)
+    click.echo('Status code: {}. Status string: {}'
+               .format(rep.status_code, rep.status_string))
+    click.echo('Response body:')
+    click.echo(pretty_dict(rep.content))
+
+    AWAIT(c.close(), loop)
 
 
 dev_cmd_group.add_command(run_tests.run_tests)

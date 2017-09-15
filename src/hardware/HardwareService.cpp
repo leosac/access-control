@@ -23,7 +23,7 @@ namespace Leosac
 {
 namespace Hardware
 {
-HardwareService::HardwareService(Leosac::DBServicePtr dbservice)
+HardwareService::HardwareService(const Leosac::DBServicePtr &dbservice)
     : dbservice_(dbservice)
 {
 }

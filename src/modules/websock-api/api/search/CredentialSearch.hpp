@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -31,7 +31,7 @@ namespace WebSockAPI
 using json = nlohmann::json;
 
 /**
- * Search doors by name.
+ * Search Credentials by alias.
  *
  * This API call is useful to provide type-ahead/autocomplete
  * feature in the client.
@@ -42,17 +42,19 @@ using json = nlohmann::json;
  *     + 'partial_name': A part of the name we are looking for.
  *
  * Response:
- *     A list of {id,alias} for doors that match the partial name.
+ *     A list of {id,alias} for credentials that match the partial name.
  *     [
- *       {id: $DOOR_ID,
- *       alias: $DOOR_ALIAS},
+ *       {id: $CREDENTIAL_ID,
+ *       alias: $CREDENTIAL_ALIAS
+ *       type: $CRENDETIAL_TYPE (Pin code / rfid card)
+ *       },
  *       {...}
  *     ]
  */
-class DoorSearch : public MethodHandler
+class CredentialSearch : public MethodHandler
 {
   public:
-    DoorSearch(RequestContext ctx);
+    CredentialSearch(RequestContext ctx);
 
     static MethodHandlerUPtr create(RequestContext);
 

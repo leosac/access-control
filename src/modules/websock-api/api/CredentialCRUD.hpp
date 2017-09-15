@@ -53,8 +53,8 @@ class CredentialCRUD : public CRUDResourceHandler
      *
      * Request:
      *     + `credential-type`: The type of the credential we wish to create.
-     *        Can be `wiegand-card`.
-     *     + `attributes`: Dictionnary of attributes for the credential.
+     *        Can be `rfid-card`.
+     *     + `attributes`: Dictionary of attributes for the credential.
      *
      * @param req
      * @return

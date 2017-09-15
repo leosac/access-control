@@ -1,6 +1,12 @@
+import json
 import logging
 import os
+import typing
+
 import docker
+from pygments import highlight
+from pygments.formatters.terminal import TerminalFormatter
+from pygments.lexers.data import JsonLexer
 
 
 def guess_root_dir() -> str:
@@ -49,3 +55,25 @@ class LogMixin:
         e = etype(*args)
         self.logger.error('An error occurred: {}'.format(e))
         raise e
+
+
+def AWAIT(call, loop):
+    """
+    Simple helper function to make asynchronous code synchronous
+    :param call: A future to await. Basically your normal async function call.
+    :param loop: The event loop on which the call shall run
+    """
+    return loop.run_until_complete(call)
+
+
+def pretty_dict(d) -> str:
+    """
+    Return a string representation of a dict that is
+    beautified to be displayed in a terminal.
+    """
+    if type(d) == str:
+        s = d
+    else:
+        s = json.dumps(d, default=str, indent=4)
+    s = highlight(s, JsonLexer(), TerminalFormatter(bg='dark'))
+    return s
