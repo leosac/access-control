@@ -42,7 +42,7 @@ json PFGPIOSerializer::serialize(const PFGPIO &in, const SecurityContext &sc)
                "Base GPIO serialization did something unexpected.");
     serialized["type"] = "pfdigital.gpio";
 
-    serialized["attributes"]["hardware_address"] = in.hardware_address();
+    serialized["attributes"]["hardware-address"] = in.hardware_address();
     return serialized;
 }
 
@@ -53,7 +53,7 @@ void PFGPIOSerializer::unserialize(PFGPIO &out, const json &in,
     Hardware::GPIOSerializer::unserialize(out, in, sc);
 
     out.hardware_address(
-        extract_with_default(in, "hardware_address", out.hardware_address()));
+        extract_with_default(in, "hardware-address", out.hardware_address()));
 }
 }
 }

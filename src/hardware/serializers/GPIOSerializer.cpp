@@ -33,7 +33,7 @@ json GPIOSerializer::serialize(const Hardware::GPIO &in, const SecurityContext &
                         {{"name", in.name()},
                          {"number", in.number()},
                          {"direction", static_cast<int>(in.direction())},
-                         {"default_value", in.default_value()}}}};
+                         {"default-value", in.default_value()}}}};
     return serialized;
 }
 
@@ -46,7 +46,7 @@ void GPIOSerializer::unserialize(Hardware::GPIO &out, const json &in,
     out.number(extract_with_default(in, "number", out.number()));
     out.direction(extract_with_default(in, "direction", out.direction()));
     out.default_value(
-        extract_with_default(in, "default_value", out.default_value()));
+        extract_with_default(in, "default-value", out.default_value()));
 }
 }
 }
