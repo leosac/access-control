@@ -19,10 +19,10 @@
 
 #pragma once
 
-#include "tools/Conversion.hpp"
 #include "tools/MyTime.hpp"
 #include <cassert>
 #include <chrono>
+#include <date/date.h>
 #include <iomanip>
 #include <odb/pgsql/traits.hxx>
 #include <odb/sqlite/traits.hxx>
@@ -105,11 +105,12 @@ class value_traits<std::chrono::system_clock::time_point, id_timestamp>
         std::tm tm;
         bzero(&tm, sizeof(tm));
         std::string epoch = "2000-01-01T00:00:00Z";
-        bool ret          = Leosac::my_gettime(&tm, epoch, "%Y-%m-%dT%H:%M:%SZ");
-        assert(ret);
-        tm.tm_isdst = 0;
 
-        return std::chrono::system_clock::from_time_t(Leosac::my_timegm(&tm));
+        std::chrono::system_clock::time_point tp;
+        auto x = date::parse("%FT%T%Z", tp);
+        std::istringstream iss(epoch);
+        iss >> x;
+        return tp;
     }
 };
 }
@@ -146,9 +147,10 @@ class value_traits<std::chrono::system_clock::time_point, id_text>
             v = TimePoint::min();
         else
         {
-            std::tm tm;
-            Leosac::my_gettime(&tm, str_rep, "%FT%T%z");
-            v = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+            auto x = date::parse("%FT%T%z", v);
+            std::istringstream iss(str_rep);
+            iss >> x;
+            assert(iss.good());
         }
     }
 
@@ -163,7 +165,7 @@ class value_traits<std::chrono::system_clock::time_point, id_text>
         else if (v == TimePoint::min())
             str_rep = TIME_POINT_MIN;
         else
-            str_rep = Leosac::Conversion<std::string>(v);
+            str_rep = date::format("%FT%T%z", v);
 
         n = str_rep.size();
         if (str_rep.size() > b.capacity())

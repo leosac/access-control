@@ -23,7 +23,6 @@
 #include "core/credentials/CredentialFwd.hpp"
 #include "core/credentials/Credential_odb.h"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
-#include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/Schedule_odb.h"
 #include "tools/log.hpp"
@@ -86,8 +85,8 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
              {"lastname", user.lastname()},
              {"rank", static_cast<int>(user.rank())},
              {"validity-enabled", user.validity().is_enabled()},
-             {"validity-start", Conversion<std::string>(user.validity().start())},
-             {"validity-end", Conversion<std::string>(user.validity().end())},
+             {"validity-start", date::format("%FT%T%z", user.validity().start())},
+             {"validity-end", date::format("%FT%T%z", user.validity().start())},
          }},
         {"relationships",
          {{"memberships", {{"data", memberships}}},

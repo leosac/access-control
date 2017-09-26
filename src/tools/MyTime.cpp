@@ -26,44 +26,6 @@
 
 namespace Leosac
 {
-time_t my_timegm(struct tm *tm)
-{
-    time_t ret;
-    char *tz;
-
-    tz = getenv("TZ");
-    if (tz)
-        tz = strdup(tz);
-    setenv("TZ", "", 1);
-    tzset();
-    ret = mktime(tm);
-    if (tz)
-    {
-        setenv("TZ", tz, 1);
-        free(tz);
-    }
-    else
-        unsetenv("TZ");
-    tzset();
-    return ret;
-}
-
-bool my_gettime(std::tm *out, const std::string &date_str, const char *fmt)
-{
-    /*
-        std::istringstream iss(date_str);
-        iss >> std::get_time(out, "%Y-%m-%dT%H:%M:%SZ");
-        if (!iss.good())
-            throw ::LEOSACException("Failed to parse date.");
-
-        return true;
-    */
-    char *ret = strptime(date_str.c_str(), fmt, out);
-    if (ret != date_str.c_str() + date_str.length())
-        return false;
-    return true;
-}
-
 bool my_puttime(std::string &out, const std::tm *tt, const char *fmt)
 { /*
      std::stringstream ss;

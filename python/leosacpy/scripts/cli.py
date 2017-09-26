@@ -26,7 +26,7 @@ sticky_debug_flag = None
 @click.pass_context
 def cli_entry_point(ctx, debug, root_dir, host):
     # Default log level to warning
-    logging.getLogger().setLevel(logging.WARNING)
+    #logging.getLogger().setLevel(logging.WARNING)
 
     colorama.init(autoreset=True)
     ctx.obj = SimpleNamespace()

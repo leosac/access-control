@@ -20,6 +20,7 @@ set(LEOSAC_ODB_INCLUDE_DIRS
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_SOURCE_DIR}/deps/date
         ${ZEROMQ_INCLUDE_DIR}
         ${CMAKE_SOURCE_DIR}/src/db
         )
@@ -193,6 +194,7 @@ target_include_directories(leosac_db PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_SOURCE_DIR}/deps/date
         ${CMAKE_BINARY_DIR}/odb_gen
         ${ZEROMQ_INCLUDE_DIR}
         ${ODB_INCLUDE_DIRS}
@@ -228,6 +230,7 @@ add_custom_command(
         --database sqlite
         --std c++14
         -I ${CMAKE_SOURCE_DIR}/deps/flagset
+        -I ${CMAKE_SOURCE_DIR}/deps/date
         -I ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         -I ${CMAKE_SOURCE_DIR}/src
         -I ${CMAKE_SOURCE_DIR}/src/db

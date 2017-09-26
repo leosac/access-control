@@ -32,7 +32,6 @@
 #include "modules/websock-api/ExceptionConverter.hpp"
 #include "modules/websock-api/Exceptions.hpp"
 #include "modules/websock-api/Service.hpp"
-#include "tools/Conversion.hpp"
 #include "tools/MyTime.hpp"
 #include "tools/registry/GlobalRegistry.hpp"
 #include <boost/asio.hpp>

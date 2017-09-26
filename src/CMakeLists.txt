@@ -96,7 +96,6 @@ set(LEOSAC_LIB_SRCS
     tools/scrypt/Scrypt.cpp
     tools/registry/ThreadLocalRegistry.cpp
     tools/registry/GlobalRegistry.cpp
-    tools/Conversion.cpp
     tools/JSONUtils.cpp
     tools/MyTime.cpp
     tools/SingleTimeFrame.cpp
@@ -171,6 +170,7 @@ target_include_directories(${LEOSAC_LIB}
         ${ODB_INCLUDE_DIRS}
         ${CMAKE_BINARY_DIR}/odb_gen/
         ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_SOURCE_DIR}/deps/date
         )
 
 target_compile_definitions(${LEOSAC_LIB}

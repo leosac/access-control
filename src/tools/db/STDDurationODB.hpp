@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "tools/Conversion.hpp"
 #include "tools/MyTime.hpp"
 #include <cassert>
 #include <chrono>

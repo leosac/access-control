@@ -19,8 +19,8 @@
 
 #include "UpdateSerializer.hpp"
 #include "core/update/IUpdate.hpp"
-#include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
+#include <date/date.h>
 
 namespace Leosac
 {
@@ -36,9 +36,9 @@ json UpdateJSONSerializer::serialize(const update::IUpdate &in,
     serialized["attributes"]["status"]     = static_cast<int>(in.status());
     serialized["attributes"]["checkpoint"] = in.get_checkpoint();
     serialized["attributes"]["generated-at"] =
-        Conversion<std::string>(in.generated_at());
+        date::format("%FT%T%z", in.generated_at());
     serialized["attributes"]["status-updated-at"] =
-        Conversion<std::string>(in.status_updated_at());
+        date::format("%FT%T%z", in.status_updated_at());
 
     serialized["attributes"]["source-module"] = in.source_module();
     serialized["attributes"]["description"]   = in.description();

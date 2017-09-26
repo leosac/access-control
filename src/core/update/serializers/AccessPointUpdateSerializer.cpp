@@ -20,7 +20,6 @@
 #include "AccessPointUpdateSerializer.hpp"
 #include "UpdateSerializer.hpp"
 #include "core/auth/AccessPointUpdate.hpp"
-#include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 
 namespace Leosac

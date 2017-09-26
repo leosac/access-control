@@ -17,6 +17,7 @@ set(LEOSAC_ODB_INCLUDE_DIRS
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_SOURCE_DIR}/deps/date
         ${CMAKE_SOURCE_DIR}/deps/json/src/
         ${ZEROMQ_INCLUDE_DIR}
         ${CMAKE_SOURCE_DIR}/src/db

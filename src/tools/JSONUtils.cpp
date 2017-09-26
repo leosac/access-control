@@ -20,6 +20,7 @@
 #include "tools/JSONUtils.hpp"
 #include "core/auth/ValidityInfo.hpp"
 #include "tools/MyTime.hpp"
+#include <date/date.h>
 
 namespace Leosac
 {
@@ -47,15 +48,26 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
     std::string date_str = extract_with_default(obj, key, "");
     if (date_str.length())
     {
-        std::tm t = {};
+        std::chrono::system_clock::time_point lama =
+            std::chrono::system_clock::time_point::max();
+        auto x = date::parse("%Y-%m-%dT%H:%M:%SZ", lama);
+        std::istringstream iss(date_str);
+        iss >> x;
+        assert(iss.good());
+        return lama;
+        // x >> date_str;
+        assert(lama == x.tp_);
+        return lama;
+        /*        std::tm t = {};
 
-        if (!my_gettime(&t, date_str, "%Y-%m-%dT%H:%M:%SZ"))
-            throw ::LEOSACException("Failed to parse date.");
+                if (!my_gettime(&t, date_str, "%Y-%m-%dT%H:%M:%SZ"))
+                    throw ::LEOSACException("Failed to parse date.");
 
-        // Input date should already be adjusted for DST.
-        t.tm_isdst     = 0;
-        std::time_t tt = my_timegm(&t);
-        return std::chrono::system_clock::from_time_t(tt);
+                // Input date should already be adjusted for DST.
+                t.tm_isdst     = 0;
+                std::time_t tt = my_timegm(&t);
+                return std::chrono::system_clock::from_time_t(tt);
+                */
     }
     return tp;
 }

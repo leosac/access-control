@@ -22,3 +22,9 @@
 [submodule "deps/flagset"]
 	path = deps/flagset
 	url = https://github.com/xaqq/flagset.git
+[submodule "deps/date"]
+	path = deps/date
+	url = https://github.com/HowardHinnant/date
+[submodule "deps/date/date"]
+	path = deps/date/date
+	url = https://github.com/HowardHinnant/date

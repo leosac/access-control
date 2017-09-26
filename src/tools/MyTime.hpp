@@ -27,15 +27,6 @@
 
 namespace Leosac
 {
-
-/**
- * This is a portable implementation of the timegm() function.
- *
- * It converts a `tm` tp a `time_t` in UTC.
- */
-time_t my_timegm(struct tm *tm);
-
-bool my_gettime(std::tm *out, const std::string &date_str, const char *fmt);
 bool my_puttime(std::string &out, const std::tm *tt, const char *fmt);
 
 /**

@@ -17,7 +17,8 @@ class CLIConfig:
         self.username = ''
         self.password = ''
 
-        self._parse_config(config_content)
+        if config_content:
+            self._parse_config(config_content)
 
     def _parse_config(self, config_content):
         cp = ConfigParser()
@@ -65,3 +66,4 @@ def load_config_file():
             return cfg
     else:
         logging.warning('Couldn\'t locate configuration file')
+    return CLIConfig('')

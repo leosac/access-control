@@ -23,10 +23,10 @@
 #include "core/auth/User_odb.h"
 #include "core/auth/ValidityInfo.hpp"
 #include "core/credentials/ICredential.hpp"
-#include "tools/Conversion.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/Schedule_odb.h"
 #include "tools/registry/ThreadLocalRegistry.hpp"
+#include <date/date.h>
 
 using namespace Leosac;
 using namespace Leosac::Cred;
@@ -52,14 +52,12 @@ json CredentialJSONSerializer::serialize(const Cred::ICredential &in,
         {"id", in.id()},
         {"type", "credential"},
         {"attributes",
-         {
-             {"version", in.odb_version()},
-             {"alias", in.alias()},
-             {"description", in.description()},
-             {"validity-enabled", in.validity().is_enabled()},
-             {"validity-start", Conversion<std::string>(in.validity().start())},
-             {"validity-end", Conversion<std::string>(in.validity().end())},
-         }}};
+         {{"version", in.odb_version()},
+          {"alias", in.alias()},
+          {"description", in.description()},
+          {"validity-enabled", in.validity().is_enabled()},
+          {"validity-start", date::format("%FT%T%z", in.validity().start())},
+          {"validity-end", date::format("%FT%T%z", in.validity().end())}}}};
 
     if (in.owner_id())
     {

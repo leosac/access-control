@@ -113,7 +113,7 @@ static void insert_enforce_unique(std::set<ZoneId> &zone_ids, ZoneId id)
     if (!inserted.second)
     {
         // Already was inserted. We have a cycle.
-        throw ModelException("data",
+        throw ModelException("",
                              "There cannot be cycle in parent/child relationship.");
     }
 }
@@ -141,12 +141,12 @@ void ZoneValidator::validate(const Zone &z, std::set<ZoneId> &zone_ids)
     if (z.type() == IZone::Type::PHYSICAL && physical_parent_count > 1)
     {
         throw ModelException(
-            "data", "A physical zone cannot have more than one physical parent.");
+            "", "A physical zone cannot have more than one physical parent.");
     }
     // Logical zone cannot have physical parent.
     else if (z.type() == IZone::Type::LOGICAL && physical_parent_count != 0)
     {
-        throw ModelException("data",
+        throw ModelException("",
                              "A logical zone cannot have physical zone as a parent");
     }
 
