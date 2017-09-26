@@ -24,6 +24,12 @@ class APIError(LeosacException):
         self.message = msg
         super().__init__(str_msg)
 
+    def status_code(self):
+        return self.message.status_code
+
+    def status_string(self):
+        return self.message.status_string
+
 
 class APIModelException(APIError):
     """

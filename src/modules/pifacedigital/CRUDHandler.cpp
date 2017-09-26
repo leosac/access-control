@@ -102,7 +102,7 @@ auto find_gpio_by_id(const Hardware::GPIOId &id, DBPtr db)
     auto gpio = db->find<PFGPIO>(id);
     t.commit();
     if (!gpio)
-        throw EntityNotFound(id, "credential");
+        throw EntityNotFound(id, "pfdigital.gpio");
     return gpio;
 }
 

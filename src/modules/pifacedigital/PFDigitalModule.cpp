@@ -18,21 +18,29 @@
 */
 
 #include "PFDigitalModule.hpp"
+#include "PFGPIO.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/GetServiceRegistry.hpp"
+#include "exception/EntityNotFound.hpp"
+#include "exception/ModelException.hpp"
 #include "exception/gpioexception.hpp"
+#include "hardware/FGPIO.hpp"
+#include "hardware/GPIO_odb.h"
 #include "mcp23s17.h"
 #include "modules/pifacedigital/CRUDHandler.hpp"
 #include "modules/pifacedigital/PFGPIO_odb.h"
+#include "modules/websock-api/Messages.hpp"
 #include "modules/websock-api/Service.hpp"
 #include "pifacedigital.h"
 #include "tools/AssertCast.hpp"
+#include "tools/db/DBService.hpp"
 #include "tools/enforce.hpp"
 #include "tools/log.hpp"
 #include "tools/timeout.hpp"
 #include <boost/iterator/transform_iterator.hpp>
 #include <fcntl.h>
 #include <odb/schema-catalog.hxx>
+#include <thread>
 
 namespace Leosac
 {
@@ -47,6 +55,7 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
                                  CoreUtilsPtr utils)
     : BaseModule(ctx, module_manager_pipe, config, utils)
     , bus_push_(ctx_, zmqpp::socket_type::push)
+    , helper_thread_(ctx_, utils->config_checker())
     , degraded_mode_(false)
 {
     if (pifacedigital_open(0) == -1)
@@ -208,6 +217,7 @@ void PFDigitalModule::remove_ws_handlers()
     if (ws_service)
     {
         ws_service->unregister_handler("pfdigital.is_degraded_mode");
+        ws_service->unregister_handler("pfdigital.test_output_pin");
 
         // Remove 4 handlers, one for each CRUD operation
         ws_service->unregister_handler("pfdigital.gpio.create");
@@ -299,6 +309,17 @@ void WSHelperThread::register_ws_handlers()
             },
             "pfdigital.is_degraded_mode");
 
+        ws_service->register_handler(
+            [this](const WebSockAPI::RequestContext rc) {
+                rc.security_ctx.enforce_permission(SecurityContext::Action::IS_ADMIN,
+                                                   {});
+
+                int gpio_id = rc.original_msg.content.at("gpio_id").get<int>();
+                this->test_output_pin(gpio_id);
+                return json{};
+            },
+            "pfdigital.test_output_pin");
+
         ws_service->register_crud_handler("pfdigital.gpio",
                                           &CRUDHandler::instanciate);
     }
@@ -313,6 +334,45 @@ void WSHelperThread::set_parameter(WSHelperThread::ModuleParameters param)
 {
     std::lock_guard<decltype(mutex_)> lg(mutex_);
     parameters_ = param;
+}
+
+void WSHelperThread::test_output_pin(int gpio_id)
+{
+    // We want to make the target output pin blink.
+    // We must first make sure a few assumptions hold:
+    //    + The GPIO exists in our database (so we can retrieve its name)
+    //    + The GPIO is an output GPIO.
+    //    + The GPIO exists in the ConfigChecker (ie, the server
+    //      up-to-date with regards to what the database stores).
+
+    DBPtr db = get_service_registry().get_service<DBService>()->db();
+    odb::transaction t(db->begin());
+    auto gpio = db->find<PFGPIO>(gpio_id);
+    t.commit();
+
+    if (!gpio)
+        throw EntityNotFound(gpio_id, "pfdigital.gpio");
+
+    if (gpio->direction() != Hardware::GPIO::Direction::Out)
+        throw ModelException("", "GPIO is not an output GPIO.");
+
+    if (!config_checker_.has_object(gpio->name(), ConfigChecker::ObjectType::GPIO))
+    {
+        throw ModelException(
+            "", "GPIO doesn't exist in the runtime configuration checker. "
+                "This probably means that you need to restart Leosac to load the "
+                "new configuration");
+    }
+
+    // We have to use the ZMQ based messaging infrastructure.
+    Hardware::FGPIO gpio_facade(zmq_context_, gpio->name());
+    // This will block the Piface GPIO module from responding
+    // to WS message. This is fine for now...
+    for (int i = 0; i < 8; ++i)
+    {
+        gpio_facade.toggle();
+        std::this_thread::sleep_for(std::chrono::milliseconds(750));
+    }
 }
 }
 }

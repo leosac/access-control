@@ -178,6 +178,7 @@ void WiegandReaderModule::load_db_config()
     if (v == 0)
     {
         transaction t(db->begin());
+        INFO("Attempt to create module_wiegand SQL schema.");
         schema_catalog::create_schema(*db, "module_wiegand");
 
         WiegandConfig cfg;

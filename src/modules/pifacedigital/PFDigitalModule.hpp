@@ -64,7 +64,9 @@ class WSHelperThread
         bool degraded_mode;
     };
 
-    explicit WSHelperThread()
+    explicit WSHelperThread(zmqpp::context &c, ConfigChecker &config_checker)
+        : config_checker_(config_checker)
+        , zmq_context_(c)
     {
         thread_ = std::make_unique<std::thread>([this]() { run_io_service(); });
     }
@@ -96,6 +98,11 @@ class WSHelperThread
   private:
     void run_io_service();
 
+    /**
+     * Implements the "pfdigital.test_output_pin" API call.
+     */
+    void test_output_pin(int gpio_id);
+
     void clear_work()
     {
         work_ = nullptr;
@@ -106,6 +113,9 @@ class WSHelperThread
     boost::asio::io_service io_;
     std::unique_ptr<boost::asio::io_service::work> work_;
     ModuleParameters parameters_;
+    ConfigChecker &config_checker_;
+    zmqpp::context &zmq_context_;
+
     std::mutex mutex_;
 };
 
@@ -135,7 +145,7 @@ class PFDigitalModule : public BaseModule
     void process_xml_config(const boost::property_tree::ptree &cfg);
 
     /**
-     * Explicitely deregister websocket handler.
+     * Explicitly deregister websocket handler.
      */
     void remove_ws_handlers();
 
