@@ -20,6 +20,9 @@
 #pragma once
 
 #define ODB_NO_BASE_VERSION
+#include "hardware/GPIO.hpp"
+#include "hardware/HardwareFwd.hpp"
+#include "modules/wiegand/WiegandFwd.hpp"
 #include "tools/db/database.hpp"
 #include <chrono>
 
@@ -31,23 +34,66 @@ namespace Module
 {
 namespace Wiegand
 {
-using WiegandConfigId = unsigned long;
 
-
-#pragma db value
+/**
+ * An instance of this class represents the configuration
+ * of one Wiegand reader.
+ */
+#pragma db object callback(validation_callback)
 struct WiegandReaderConfig
 {
     WiegandReaderConfig()
-        : mode("SIMPLE_WIEGAND")
+        : id(0)
+        , mode("SIMPLE_WIEGAND")
         , pin_timeout(2500)
         , pin_key_end('#')
         , enabled(true){};
 
     WiegandReaderConfig(const WiegandReaderConfig &) = default;
 
+    /**
+     * Returns the name of a device, or the empty string.
+     */
+    template <typename DevicePtrT>
+    std::string device_name(const DevicePtrT &dev) const
+    {
+        if (dev)
+            return dev->name();
+        return "";
+    }
+
+    std::string gpio_high_name() const
+    {
+        return device_name(gpio_high_);
+    }
+
+    std::string gpio_low_name() const
+    {
+        return device_name(gpio_low_);
+    }
+
+    std::string green_led_name() const
+    {
+        return green_led;
+        // return device_name(green_led);
+    }
+
+    std::string buzzer_name() const
+    {
+        return buzzer;
+    }
+
+    /**
+     * ODB callback wrt database operation.
+     */
+    void validation_callback(odb::callback_event, odb::database &) const;
+
+#pragma db id auto
+    WiegandReaderConfigId id;
+
     std::string name;
-    std::string gpio_high;
-    std::string gpio_low;
+    Hardware::GPIOPtr gpio_high_;
+    Hardware::GPIOPtr gpio_low_;
     std::string green_led;
     std::string buzzer;
     std::string mode;
@@ -59,33 +105,43 @@ struct WiegandReaderConfig
      * Is this reader configuration active?
      */
     bool enabled;
+
+    /**
+     * List of valid operation mode for a reader.
+     */
+    constexpr static std::array<const char *const, 8> valid_operation_modes{
+        "SIMPLE_WIEGAND",
+        "WIEGAND_PIN_4BITS",
+        "WIEGAND_PIN_8BITS",
+        "WIEGAND_PIN_BUFFERED",
+        "WIEGAND_CARD_PIN_4BITS",
+        "WIEGAND_CARD_PIN_8BITS",
+        "WIEGAND_CARD_PIN_BUFFERED",
+        "AUTODETECT"};
 };
 
 /**
+ * Transient configuration object that stores the list of
+ * reader use/configure.
  *
- * Database backed configuration for the WIEGAND module.
+ * This object is either populated from the database or from
+ * the XML configuration.
  **/
-#pragma db object table("WIEGAND_Config")
 class WiegandConfig
 {
   public:
-    WiegandConfig();
+    WiegandConfig() = default;
 
-    WiegandConfigId id() const;
-
-    void add_reader(WiegandReaderConfig);
-    void clear_reader();
-    const std::vector<WiegandReaderConfig> &readers() const;
+    void add_reader(WiegandReaderConfigPtr);
+    const std::vector<WiegandReaderConfigPtr> &readers() const;
 
   private:
-#pragma db id auto
-    WiegandConfigId id_;
-
-#pragma db value_not_null id_column("readerconfig_id")
-    std::vector<WiegandReaderConfig> readers_;
-
-    friend class odb::access;
+    std::vector<WiegandReaderConfigPtr> readers_;
 };
 }
 }
 }
+
+#ifdef ODB_COMPILER
+#include "hardware/GPIO.hpp"
+#endif

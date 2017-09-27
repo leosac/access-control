@@ -65,5 +65,5 @@ def load_config_file():
             cfg = CLIConfig(file.read())
             return cfg
     else:
-        logging.warning('Couldn\'t locate configuration file')
+        logging.warning('Could not locate CLI configuration file')
     return CLIConfig('')

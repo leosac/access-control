@@ -154,6 +154,19 @@ class SecurityContext
         HARDWARE_GPIO_CREATE,
         HARDWARE_GPIO_DELETE,
         HARDWARE_GPIO_SEARCH,
+
+        /**
+         * Permissions for hardware auth source device.
+         * For now this includes Wiegand Reader devices.
+         *
+         * todo: Permission should probably redesigned in a more extensible way.
+         */
+
+        HARDWARE_AUTH_SOURCE_READ,
+        HARDWARE_AUTH_SOURCE_UPDATE,
+        HARDWARE_AUTH_SOURCE_CREATE,
+        HARDWARE_AUTH_SOURCE_DELETE,
+        HARDWARE_AUTH_SOURCE_SEARCH,
     };
 
     struct GroupActionParam
@@ -222,6 +235,16 @@ class SecurityContext
         operator ActionParam();
     };
 
+    struct HardwareAuthSourceParam
+    {
+        // fixme Cannot use proper typedef since we dont have
+        // fixme: a parent class for hardware devices / a way to group them together.
+        unsigned long long hardware_id;
+
+        operator ActionParam();
+    };
+
+
     union ActionParam {
         GroupActionParam group;
         MembershipActionParam membership;
@@ -232,6 +255,7 @@ class SecurityContext
         AccessPointActionParam access_point;
         ZoneActionParam zone;
         HardwareGPIOActionParam hardware_gpio;
+        HardwareAuthSourceParam hardware_auth_source;
     };
 
     explicit SecurityContext(DBServicePtr dbsrv);

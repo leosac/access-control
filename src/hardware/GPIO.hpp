@@ -42,8 +42,8 @@ class GPIO
   public:
     enum class Direction
     {
-        In = 0,
-        Out
+        In  = 0,
+        Out = 1
     };
 
     explicit GPIO();

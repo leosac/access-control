@@ -19,10 +19,14 @@
 
 #pragma once
 
+#include <memory>
+
 namespace Leosac
 {
 namespace Hardware
 {
 using GPIOId = unsigned long long;
+class GPIO;
+using GPIOPtr = std::shared_ptr<GPIO>;
 }
 }

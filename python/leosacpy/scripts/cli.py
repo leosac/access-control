@@ -7,6 +7,7 @@ import colorama
 from click_repl import register_repl
 import leosacpy.cli.dev.dev
 import leosacpy.cli.pfdigital.pfdigital
+import leosacpy.cli.wiegand_reader.wiegand_reader
 from leosacpy.cli.cli_config import load_config_file
 from leosacpy.utils import guess_root_dir
 
@@ -78,6 +79,7 @@ def restart(ctx):
 
 cli_entry_point.add_command(leosacpy.cli.dev.dev.dev_cmd_group)
 cli_entry_point.add_command(leosacpy.cli.pfdigital.pfdigital.pfdigital_cmd_group)
+cli_entry_point.add_command(leosacpy.cli.wiegand_reader.wiegand_reader.wiegand_reader_cmd_group)
 
 logging.basicConfig(level=logging.DEBUG)
 register_repl(cli_entry_point, name='shell')

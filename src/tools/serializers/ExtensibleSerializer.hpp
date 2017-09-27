@@ -46,7 +46,7 @@ template <typename SerializedT, typename ObjectT, typename... AdditionalArgs>
 class ExtensibleSerializer
 {
   public:
-    SerializedT serialize(const ObjectT &input, AdditionalArgs &&... args)
+    SerializedT serialize(const ObjectT &input, AdditionalArgs &&... args) const
     {
         std::lock_guard<std::mutex> lg(mutex_);
 

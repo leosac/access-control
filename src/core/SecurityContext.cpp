@@ -130,6 +130,13 @@ SecurityContext::HardwareGPIOActionParam::operator ActionParam()
     return result;
 }
 
+SecurityContext::HardwareAuthSourceParam::operator ActionParam()
+{
+    SecurityContext::ActionParam result;
+    result.hardware_auth_source = *this;
+    return result;
+}
+
 ExecutionContext::ExecutionContext(SecurityContext &sc)
     : sec(sc)
 {

@@ -17,25 +17,26 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/HardwareService.hpp"
-#include <core/SecurityContext.hpp>
+#pragma once
+
+#include "modules/websock-api/WSHelperThread.hpp"
 
 namespace Leosac
 {
-namespace Hardware
+namespace Module
 {
-HardwareService::HardwareService(const Leosac::DBServicePtr &dbservice)
-    : dbservice_(dbservice)
+namespace Wiegand
 {
-}
+class WSHelperThread : public WebSockAPI::BaseModuleSupportThread<int>
+{
+  public:
+    explicit WSHelperThread(const CoreUtilsPtr &core_utils);
+    void unregister_ws_handlers(WebSockAPI::Service &ws_service) override;
 
-std::string HardwareService::hardware_device_type(Hardware::GPIO &device) const
-{
-    auto serialized = serialize(device, SystemSecurityContext::instance());
-    ASSERT_LOG(serialized.at("type").is_string(),
-               "Underlying serialization did something incorrect.");
 
-    return serialized.at("type").get<std::string>();
+  private:
+    void register_ws_handlers(WebSockAPI::Service &ws_service) override;
+};
 }
 }
 }

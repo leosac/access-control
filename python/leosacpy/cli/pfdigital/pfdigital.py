@@ -4,7 +4,7 @@ import click
 
 from leosacpy.exception import APIError
 from leosacpy.utils import AWAIT
-from leosacpy.ws import LeosacMessage, APIStatusCode
+from leosacpy.ws import LeosacMessage, APIStatusCode, GPIODirection
 from leosacpy.wsclient import LowLevelWSClient, LeosacAPI
 
 
@@ -41,9 +41,9 @@ def list_gpio(ctx):
 
 @pfdigital_cmd_group.command('gpio-create')
 @click.option('--name', required=True)
-@click.option('--number')
+@click.option('--number', type=int)
 @click.option('--default')
-@click.option('--direction')
+@click.option('--direction', type=click.Choice(['out', 'in']))
 @click.option('--hardware_address')
 @click.pass_context
 def create_gpio(ctx, name, number, default, direction, hardware_address):
@@ -55,6 +55,7 @@ def create_gpio(ctx, name, number, default, direction, hardware_address):
     api = LeosacAPI(host)
     AWAIT(api.authenticate(username, password), loop)
 
+    direction = GPIODirection.IN if direction == 'in' else GPIODirection.OUT
     msg = LeosacMessage('pfdigital.gpio.create',
                         {'attributes': {
                             'name': name,

@@ -39,6 +39,7 @@
 #include "tools/timeout.hpp"
 #include <boost/iterator/transform_iterator.hpp>
 #include <fcntl.h>
+#include <hardware/HardwareService.hpp>
 #include <odb/schema-catalog.hxx>
 #include <thread>
 
@@ -87,6 +88,14 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
     // work with poll_pri alone before. Need to investigate more. todo !
     reactor_.add(interrupt_fd_, std::bind(&PFDigitalModule::handle_interrupt, this),
                  zmqpp::poller::poll_pri | zmqpp::poller::poll_error);
+}
+
+PFDigitalModule::~PFDigitalModule()
+{
+    auto hwd_service =
+        get_service_registry().get_service<Hardware::HardwareService>();
+    if (hwd_service)
+        hwd_service->unregister_serializer<PFGPIO>();
 }
 
 void PFDigitalModule::run()
@@ -204,6 +213,12 @@ void PFDigitalModule::process_config()
         // Database enabled configuration.
         setup_database();
 
+        // Register serializer for our GPIO object.
+        auto hwd_service =
+            get_service_registry().get_service<Hardware::HardwareService>();
+        ASSERT_LOG(hwd_service, "No hardware service but we have database.");
+        hwd_service->register_serializer<PFGPIO>(&PFGPIOSerializer::serialize);
+
         ModuleParameters parameters{};
         parameters.degraded_mode = degraded_mode_;
         ws_helper_thread_.set_parameter(parameters);
@@ -245,7 +260,11 @@ void PFDigitalModule::load_config_from_database()
 
     // Don't attempt to configure GPIO when running in degraded mode.
     if (degraded_mode_)
+    {
+        INFO("Not creating GPIO object because the module is running in degraded "
+             "mode.");
         return;
+    }
     for (const auto &gpio : result)
     {
         // For each PFGPIO object in the database, create a PFDigitalPin
@@ -273,7 +292,8 @@ void WSHelperThread::test_output_pin(int gpio_id)
     //      up-to-date with regards to what the database stores).
 
     if (parameters_.degraded_mode)
-        throw LEOSACException("Cannot test Piface Digital GPIO when running in degraded mode.");
+        throw LEOSACException(
+            "Cannot test Piface Digital GPIO when running in degraded mode.");
 
     DBPtr db = get_service_registry().get_service<DBService>()->db();
     odb::transaction t(db->begin());

@@ -17,7 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/wiegand/WiegandConfig.hpp"
+#include "exception/ModelException.hpp"
+#include "modules/wiegand/WiegandConfig_odb.h"
+#include <odb/pgsql/query.hxx>
 
 namespace Leosac
 {
@@ -25,30 +27,50 @@ namespace Module
 {
 namespace Wiegand
 {
+constexpr std::array<const char *const, 8>
+    WiegandReaderConfig::valid_operation_modes;
 
-WiegandConfig::WiegandConfig()
-    : id_(0)
-{
-}
-
-void WiegandConfig::add_reader(WiegandReaderConfig reader)
+void WiegandConfig::add_reader(WiegandReaderConfigPtr reader)
 {
     readers_.push_back(reader);
 }
 
-void WiegandConfig::clear_reader()
-{
-    readers_.clear();
-}
-
-const std::vector<WiegandReaderConfig> &WiegandConfig::readers() const
+const std::vector<WiegandReaderConfigPtr> &WiegandConfig::readers() const
 {
     return readers_;
 }
 
-WiegandConfigId WiegandConfig::id() const
+void WiegandReaderConfig::validation_callback(odb::callback_event e,
+                                              odb::database &db) const
 {
-    return id_;
+    // We make sure that:
+    //   1. The name is unique
+    //   2. The mode is valid
+
+    if (e == odb::callback_event::post_update ||
+        e == odb::callback_event::post_persist)
+    {
+        using QueryT = odb::query<WiegandReaderConfig>;
+        QueryT q(QueryT::name == name);
+        auto results        = db.query(q);
+        size_t count_result = 0;
+        for (auto &&unused : results)
+        {
+            (void)unused;
+            ++count_result;
+            if (count_result > 1)
+            {
+                throw ModelException("data/attributes/name", "Name is not unique");
+            }
+        }
+
+        if (std::find(valid_operation_modes.begin(), valid_operation_modes.end(),
+                      mode) == valid_operation_modes.end())
+        {
+            throw ModelException("data/attributes/mode",
+                                 "Invalid wiegand-reader mode.");
+        }
+    }
 }
 }
 }

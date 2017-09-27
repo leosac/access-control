@@ -17,25 +17,50 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #pragma once
 
-#include "modules/websock-api/WSHelperThread.hpp"
+#include "api/MethodHandler.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
 namespace Module
 {
-namespace Wiegand
+namespace WebSockAPI
 {
-class WSHelperThread : public WebSockAPI::BaseModuleSupportThread<int>
+using json = nlohmann::json;
+
+/**
+ * Search hardware devices by name.
+ *
+ * todo: This is limited to GPIO (for now)
+ *
+ * Request:
+ *     + 'partial_name': A part of the name we are looking for.
+ *
+ * Response:
+ *     A list of {id,alias} for doors that match the partial name.
+ *     [
+ *       {id: $HARDWARE_DEVICE_ID,
+ *       name: $HARDWARE_DEVICE_NAME,
+ *       type: $HARDWARE_DEVICE_TYPE
+ *       {...}
+ *     ]
+ */
+class HardwareSearch : public MethodHandler
 {
   public:
-    WSHelperThread(const CoreUtilsPtr &core_utils);
-    void unregister_ws_handlers(WebSockAPI::Service &ws_service) override;
+    HardwareSearch(RequestContext ctx);
 
+    static MethodHandlerUPtr create(RequestContext);
+
+  protected:
+    std::vector<ActionActionParam>
+    required_permission(const json &req) const override;
 
   private:
-    void register_ws_handlers(WebSockAPI::Service &ws_service) override;
+    virtual json process_impl(const json &req) override;
 };
 }
 }

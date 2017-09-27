@@ -26,6 +26,7 @@ using namespace Leosac::Cred;
 
 Credential::Credential()
     : id_(0)
+    , odb_version_(0)
 {
 }
 

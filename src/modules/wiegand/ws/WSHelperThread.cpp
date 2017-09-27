@@ -17,25 +17,35 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/HardwareService.hpp"
-#include <core/SecurityContext.hpp>
+#include "WSHelperThread.hpp"
+#include "CRUDHandler.hpp"
+#include "LeosacFwd.hpp"
+#include "modules/websock-api/Service.hpp"
 
 namespace Leosac
 {
-namespace Hardware
+namespace Module
 {
-HardwareService::HardwareService(const Leosac::DBServicePtr &dbservice)
-    : dbservice_(dbservice)
+namespace Wiegand
+{
+
+WSHelperThread::WSHelperThread(const CoreUtilsPtr &core_utils)
+    : BaseModuleSupportThread(core_utils, 0)
 {
 }
 
-std::string HardwareService::hardware_device_type(Hardware::GPIO &device) const
+void WSHelperThread::unregister_ws_handlers(WebSockAPI::Service &ws_service)
 {
-    auto serialized = serialize(device, SystemSecurityContext::instance());
-    ASSERT_LOG(serialized.at("type").is_string(),
-               "Underlying serialization did something incorrect.");
+    ws_service.unregister_handler("wiegand-reader.create");
+    ws_service.unregister_handler("wiegand-reader.read");
+    ws_service.unregister_handler("wiegand-reader.update");
+    ws_service.unregister_handler("wiegand-reader.delete");
+}
 
-    return serialized.at("type").get<std::string>();
+void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
+{
+    ws_service.register_crud_handler("wiegand-reader", &CRUDHandler::instanciate);
+}
 }
 }
 }

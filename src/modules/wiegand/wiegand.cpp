@@ -17,12 +17,12 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "wiegand.hpp"
+#include "modules/wiegand/wiegand.hpp"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
-#include "modules/wiegand/WSHelperThread.hpp"
 #include "modules/wiegand/WiegandConfig_odb.h"
 #include "modules/wiegand/strategies/Autodetect.hpp"
+#include "modules/wiegand/ws/WSHelperThread.hpp"
 #include "tools/log.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <memory>
@@ -86,16 +86,18 @@ void WiegandReaderModule::process_config()
     {
         using namespace Colorize;
         INFO("Creating WiegandReader: "
-             << green(underline(reader_config.name))
-             << "\n\t Green Led: " << green(underline(reader_config.green_led))
-             << "\n\t Buzzer: " << green(underline(reader_config.buzzer))
-             << "\n\t GPIO Low: " << green(underline(reader_config.gpio_low))
-             << "\n\t GPIO High: " << green(underline(reader_config.gpio_high)));
+             << green(underline(reader_config->name)) << "\n\t Green Led: "
+             << green(underline(reader_config->green_led_name()))
+             << "\n\t Buzzer: " << green(underline(reader_config->buzzer_name()))
+             << "\n\t GPIO Low: " << green(underline(reader_config->gpio_low_name()))
+             << "\n\t GPIO High: "
+             << green(underline(reader_config->gpio_high_name()))
+             << "\n\t Mode: " << green(underline(reader_config->mode)));
 
-        WiegandReaderImpl reader(ctx_, reader_config.name, reader_config.gpio_high,
-                                 reader_config.gpio_low, reader_config.green_led,
-                                 reader_config.buzzer,
-                                 create_strategy(reader_config, &reader));
+        WiegandReaderImpl reader(
+            ctx_, reader_config->name, reader_config->gpio_high_name(),
+            reader_config->gpio_low_name(), reader_config->green_led,
+            reader_config->buzzer, create_strategy(*reader_config, &reader));
         utils_->config_checker().register_object(reader.name(),
                                                  ConfigChecker::ObjectType::READER);
         readers_.push_back(std::move(reader));
@@ -104,7 +106,11 @@ void WiegandReaderModule::process_config()
 
 void WiegandReaderModule::run()
 {
-    ws_helper_thread_ = std::make_unique<WSHelperThread>(utils_);
+    if (config_.get_child("module_config").get<bool>("use_database", false))
+    {
+        ws_helper_thread_ = std::make_unique<WSHelperThread>(utils_);
+        ws_helper_thread_->start_running();
+    }
     while (is_running_)
     {
         if (!reactor_.poll(50))
@@ -114,7 +120,7 @@ void WiegandReaderModule::run()
         }
     }
     auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
-    if (ws_service)
+    if (ws_service && ws_helper_thread_)
         ws_helper_thread_->unregister_ws_handlers(*ws_service);
 }
 
@@ -187,10 +193,6 @@ void WiegandReaderModule::load_db_config()
         transaction t(db->begin());
         INFO("Attempt to create module_wiegand SQL schema.");
         schema_catalog::create_schema(*db, "module_wiegand");
-
-        WiegandConfig cfg;
-        db->persist(cfg);
-
         t.commit();
     }
     else if (v < cv)
@@ -202,18 +204,21 @@ void WiegandReaderModule::load_db_config()
         t.commit();
     }
 
-    // Now we load configuration
-    int count = 0;
+    // Create empty configuration object...
+    wiegand_config_ = std::make_unique<WiegandConfig>();
+
+    // ... then loads reader from database.
     odb::transaction t(utils_->database()->begin());
-    odb::result<WiegandConfig> result(utils_->database()->query<WiegandConfig>());
-    for (const auto &cfg : result)
+    odb::result<WiegandReaderConfig> result(
+        utils_->database()->query<WiegandReaderConfig>());
+    for (const auto &reader : result)
     {
-        wiegand_config_ = std::make_unique<WiegandConfig>(cfg);
-        count++;
+        WiegandReaderConfigPtr reader_ptr = db->load<WiegandReaderConfig>(reader.id);
+        ASSERT_LOG(reader_ptr, "Loading from database/cache failed");
+        if (reader_ptr->enabled)
+            wiegand_config_->add_reader(reader_ptr);
     }
     t.commit();
-    ASSERT_LOG(count == 0 || count == 1,
-               "We have more than one SMTPConfig entry in the database.");
     INFO("SMTP module using SQL database for configuration.");
 }
 
@@ -223,28 +228,42 @@ void WiegandReaderModule::load_xml_config(
     wiegand_config_ = std::make_unique<WiegandConfig>();
     for (auto &node : module_config.get_child("readers"))
     {
-        WiegandReaderConfig reader_config;
+        auto reader_config = std::make_shared<WiegandReaderConfig>();
         boost::property_tree::ptree xml_reader_cfg = node.second;
 
-        reader_config.name      = xml_reader_cfg.get_child("name").data();
-        reader_config.gpio_high = xml_reader_cfg.get_child("high").data();
-        reader_config.gpio_low  = xml_reader_cfg.get_child("low").data();
-        reader_config.buzzer    = xml_reader_cfg.get<std::string>("buzzer", "");
-        reader_config.green_led = xml_reader_cfg.get<std::string>("green_led", "");
+        // For GPIO object, we instanciate a "dummy" GPIO object that would
+        // normally be fetched from the database. The only goal of the GPIO
+        // object is to hold the device's name
 
-        reader_config.mode =
+        auto gpio_high = std::make_shared<Hardware::GPIO>();
+        gpio_high->name(xml_reader_cfg.get_child("high").data());
+
+        auto gpio_low = std::make_shared<Hardware::GPIO>();
+        gpio_low->name(xml_reader_cfg.get_child("low").data());
+
+        reader_config->name       = xml_reader_cfg.get_child("name").data();
+        reader_config->gpio_high_ = gpio_high;
+        reader_config->gpio_low_  = gpio_low;
+        reader_config->buzzer     = xml_reader_cfg.get<std::string>("buzzer", "");
+        reader_config->green_led  = xml_reader_cfg.get<std::string>("green_led", "");
+
+        reader_config->mode =
             xml_reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");
-        reader_config.pin_timeout =
+        reader_config->pin_timeout =
             std::chrono::milliseconds(xml_reader_cfg.get<int>("pin_timeout", 2500));
-        reader_config.pin_key_end = xml_reader_cfg.get<char>("pin_key_end", '#');
+        reader_config->pin_key_end = xml_reader_cfg.get<char>("pin_key_end", '#');
 
-        config_check(reader_config.gpio_low, ConfigChecker::ObjectType::GPIO);
-        config_check(reader_config.gpio_high, ConfigChecker::ObjectType::GPIO);
+        config_check(reader_config->gpio_low_name(),
+                     ConfigChecker::ObjectType::GPIO);
+        config_check(reader_config->gpio_high_name(),
+                     ConfigChecker::ObjectType::GPIO);
 
-        if (!reader_config.green_led.empty())
-            config_check(reader_config.green_led, ConfigChecker::ObjectType::LED);
-        if (!reader_config.buzzer.empty())
-            config_check(reader_config.buzzer, ConfigChecker::ObjectType::BUZZER);
+        if (!reader_config->green_led_name().empty())
+            config_check(reader_config->green_led_name(),
+                         ConfigChecker::ObjectType::LED);
+        if (!reader_config->buzzer_name().empty())
+            config_check(reader_config->buzzer_name(),
+                         ConfigChecker::ObjectType::BUZZER);
 
         wiegand_config_->add_reader(reader_config);
     }

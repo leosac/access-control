@@ -5,7 +5,9 @@ set(WIEGAND_SRCS
     WiegandReaderImpl.cpp
     WiegandConfig.cpp
     WiegandConfigManager.cpp
-    WSHelperThread.cpp
+    ws/WSHelperThread.cpp
+    ws/CRUDHandler.cpp
+    ws/WiegandConfigSerializer.cpp
     strategies/SimpleWiegandStrategy.cpp
     strategies/WiegandPinNBitsOnly.cpp
     strategies/WiegandPinBuffered.cpp
@@ -57,5 +59,7 @@ target_include_directories(${WIEGAND_BIN} PUBLIC
         ${ODB_INCLUDE_DIRS}
         ${ODB_COMPILE_OUTPUT_DIR}
         )
+
+target_link_libraries(${WIEGAND_BIN} websock-api)
 
 install(TARGETS ${WIEGAND_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})

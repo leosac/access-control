@@ -19,7 +19,11 @@
 
 #pragma once
 
+#include "GPIO.hpp"
+#include "LeosacFwd.hpp"
+#include "tools/JSONUtils.hpp"
 #include "tools/db/db_fwd.hpp"
+#include "tools/serializers/ExtensibleSerializer.hpp"
 
 namespace Leosac
 {
@@ -33,9 +37,15 @@ namespace Hardware
  * configured to use a database.
  */
 class HardwareService
+    : public ExtensibleSerializer<json, Hardware::GPIO, const SecurityContext &>
 {
   public:
     explicit HardwareService(const Leosac::DBServicePtr &dbservice);
+
+    /**
+     * Return the name of real type of a device.
+     */
+    std::string hardware_device_type(Hardware::GPIO &device) const;
 
   private:
     DBServicePtr dbservice_;

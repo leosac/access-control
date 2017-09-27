@@ -17,25 +17,25 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/HardwareService.hpp"
-#include <core/SecurityContext.hpp>
+#pragma once
+
+#include "LeosacFwd.hpp"
+#include "modules/wiegand/WiegandConfig.hpp"
+#include <json.hpp>
 
 namespace Leosac
 {
-namespace Hardware
+namespace Module
 {
-HardwareService::HardwareService(const Leosac::DBServicePtr &dbservice)
-    : dbservice_(dbservice)
+namespace Wiegand
 {
-}
-
-std::string HardwareService::hardware_device_type(Hardware::GPIO &device) const
+using json = nlohmann::json;
+struct WiegandReaderConfigSerializer
 {
-    auto serialized = serialize(device, SystemSecurityContext::instance());
-    ASSERT_LOG(serialized.at("type").is_string(),
-               "Underlying serialization did something incorrect.");
-
-    return serialized.at("type").get<std::string>();
+    static json serialize(const WiegandReaderConfig &in, const SecurityContext &sc);
+    static void unserialize(WiegandReaderConfig &out, const json &in,
+                            const SecurityContext &sc);
+};
 }
 }
 }

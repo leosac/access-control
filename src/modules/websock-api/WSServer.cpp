@@ -39,6 +39,7 @@
 #include "api/search/CredentialSearch.hpp"
 #include "api/search/DoorSearch.hpp"
 #include "api/search/GroupSearch.hpp"
+#include "api/search/HardwareSearch.hpp"
 #include "api/search/ScheduleSearch.hpp"
 #include "api/search/UserSearch.hpp"
 #include "api/search/ZoneSearch.hpp"
@@ -111,6 +112,7 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     individual_handlers_["search.zone_alias"]         = &ZoneSearch::create;
     individual_handlers_["search.user_username"]      = &UserSearch::create;
     individual_handlers_["search.credential_alias"]   = &CredentialSearch::create;
+    individual_handlers_["search.hardware_name"]      = &HardwareSearch::create;
     individual_handlers_["access_overview"]           = &AccessOverview::create;
     individual_handlers_["check_update"]              = &CheckUpdate::create;
     individual_handlers_["create_update"]             = &CreateUpdate::create;
@@ -438,6 +440,9 @@ void WSServer::clear_user_sessions(Auth::UserPtr user, APIPtr exception)
 void WSServer::register_crud_handler(const std::string &resource_name,
                                      CRUDResourceHandler::Factory factory)
 {
+    using namespace Colorize;
+    DEBUG("Performing registration of CRUD handler for resource "
+          << green(resource_name));
     crud_handlers_[resource_name + ".read"]   = factory;
     crud_handlers_[resource_name + ".update"] = factory;
     crud_handlers_[resource_name + ".create"] = factory;

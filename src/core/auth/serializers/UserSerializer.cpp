@@ -93,7 +93,7 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
           {"credentials", {{"data", credentials}}},
           {"schedules", {{"data", schedules}}}}}};
 
-    SecurityContext::ActionParam ap;
+    SecurityContext::ActionParam ap{};
     ap.user.user_id = user.id();
     if (sc.check_permission(SecurityContext::Action::USER_READ_EMAIL, ap))
     {
@@ -115,14 +115,11 @@ void UserJSONSerializer::unserialize(Auth::User &out, const json &in,
         out.password(in.at("password"));
     }
 
-    SecurityContext::ActionParam ap;
+    SecurityContext::ActionParam ap{};
     ap.user.user_id = out.id();
     if (sc.check_permission(SecurityContext::Action::USER_UPDATE_RANK, ap))
     {
-        // cast to int for json extraction to work, then back to UserRank for
-        // setter to work.
-        out.rank(static_cast<Auth::UserRank>(
-            extract_with_default(in, "rank", static_cast<int>(out.rank()))));
+        out.rank(extract_with_default(in, "rank", out.rank()));
     }
     if (sc.check_permission(SecurityContext::Action::USER_MANAGE_VALIDITY, ap))
     {

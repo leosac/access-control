@@ -85,6 +85,9 @@ class PFDigitalModule : public BaseModule
     PFDigitalModule(zmqpp::context &ctx, zmqpp::socket *module_manager_pipe,
                     const boost::property_tree::ptree &config, CoreUtilsPtr utils);
 
+
+    ~PFDigitalModule();
+
     /**
     * Module's main loop.
     */

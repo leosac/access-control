@@ -25,6 +25,11 @@ class ZoneType(IntEnum):
     LOGICAL = 0x01
 
 
+class GPIODirection(IntEnum):
+    IN = 0
+    OUT = 1
+
+
 class LeosacMessage:
     def __init__(self, message_type: str = '', content=None):
         self.type = message_type  # type: str

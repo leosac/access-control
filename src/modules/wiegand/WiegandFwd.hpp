@@ -17,9 +17,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "modules/wiegand/WSHelperThread.hpp"
-#include "LeosacFwd.hpp"
-#include "modules/websock-api/Service.hpp"
+#pragma once
+
+#include <memory>
 
 namespace Leosac
 {
@@ -27,19 +27,11 @@ namespace Module
 {
 namespace Wiegand
 {
+using WiegandConfigId       = unsigned long;
+using WiegandReaderConfigId = unsigned long;
 
-WSHelperThread::WSHelperThread(const CoreUtilsPtr &core_utils)
-    : BaseModuleSupportThread(core_utils, 0)
-{
-}
-
-void WSHelperThread::unregister_ws_handlers(WebSockAPI::Service &ws_service)
-{
-}
-
-void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
-{
-}
+struct WiegandReaderConfig;
+using WiegandReaderConfigPtr = std::shared_ptr<WiegandReaderConfig>;
 }
 }
 }
