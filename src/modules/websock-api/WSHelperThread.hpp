@@ -41,7 +41,8 @@ namespace WebSockAPI
  * can "easily" make use of the WebSockAPI module.
  *
  * When this object is created and its internal io_service runs,
- * it will attmpted to locate a WS service object. If available,
+ * (after start_running() is called), it will attempt to
+ * locate a WS service object. If available,
  * `register_ws_handler()` will be called. Otherwise, it will be
  * called when (if) a WS Service object becomes registered.
  *
@@ -65,7 +66,6 @@ class BaseModuleSupportThread
         : core_utils_(core_utils)
         , parameters_(param)
     {
-        thread_ = std::make_unique<std::thread>([this]() { run_io_service(); });
     }
 
     virtual ~BaseModuleSupportThread()
@@ -73,12 +73,25 @@ class BaseModuleSupportThread
         work_ = nullptr;
         try
         {
-            thread_->join();
+            if (thread_)
+                thread_->join();
         }
         catch (const std::exception &e)
         {
             ERROR("Failed to join WebSockAPI::BaseModuleSupportThread");
         }
+    }
+
+    /**
+     * Effectively starts an helper thread and run its io_service.
+     *
+     * Using this function is required because it wasn't possible to safely
+     * start running from the constructor (risk of calling virtual method on
+     * a not-yet fully initialised object).
+     */
+    void start_running()
+    {
+        thread_ = std::make_unique<std::thread>([this]() { run_io_service(); });
     }
 
     void set_parameter(const ParameterT &p)

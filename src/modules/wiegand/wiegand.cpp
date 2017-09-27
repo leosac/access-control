@@ -20,6 +20,7 @@
 #include "wiegand.hpp"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
+#include "modules/wiegand/WSHelperThread.hpp"
 #include "modules/wiegand/WiegandConfig_odb.h"
 #include "modules/wiegand/strategies/Autodetect.hpp"
 #include "tools/log.hpp"
@@ -65,6 +66,8 @@ WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx, zmqpp::socket *pip
     }
 }
 
+WiegandReaderModule::~WiegandReaderModule() = default;
+
 void WiegandReaderModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
@@ -101,6 +104,7 @@ void WiegandReaderModule::process_config()
 
 void WiegandReaderModule::run()
 {
+    ws_helper_thread_ = std::make_unique<WSHelperThread>(utils_);
     while (is_running_)
     {
         if (!reactor_.poll(50))
@@ -109,6 +113,9 @@ void WiegandReaderModule::run()
                 reader.timeout();
         }
     }
+    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+    if (ws_service)
+        ws_helper_thread_->unregister_ws_handlers(*ws_service);
 }
 
 Strategy::WiegandStrategyUPtr

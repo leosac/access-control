@@ -39,6 +39,7 @@ namespace Wiegand
 {
 class WiegandConfig;
 class WiegandReaderConfig;
+class WSHelperThread;
 
 /**
 * This simply is the main class for the Wiegand module.
@@ -48,6 +49,8 @@ class WiegandReaderModule : public BaseModule
   public:
     WiegandReaderModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                         const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+
+    ~WiegandReaderModule() override;
 
     /**
     * Module's main loop. Will exit upon reception of signal::stop from module
@@ -89,6 +92,8 @@ class WiegandReaderModule : public BaseModule
      * Configuration object for the module.
      */
     std::unique_ptr<WiegandConfig> wiegand_config_;
+
+    std::unique_ptr<WSHelperThread> ws_helper_thread_;
 };
 }
 }

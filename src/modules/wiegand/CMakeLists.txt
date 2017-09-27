@@ -5,6 +5,7 @@ set(WIEGAND_SRCS
     WiegandReaderImpl.cpp
     WiegandConfig.cpp
     WiegandConfigManager.cpp
+    WSHelperThread.cpp
     strategies/SimpleWiegandStrategy.cpp
     strategies/WiegandPinNBitsOnly.cpp
     strategies/WiegandPinBuffered.cpp

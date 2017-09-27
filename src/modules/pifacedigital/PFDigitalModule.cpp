@@ -207,8 +207,8 @@ void PFDigitalModule::process_config()
         ModuleParameters parameters{};
         parameters.degraded_mode = degraded_mode_;
         ws_helper_thread_.set_parameter(parameters);
-
         load_config_from_database();
+        ws_helper_thread_.start_running();
     }
 }
 
@@ -243,6 +243,9 @@ void PFDigitalModule::load_config_from_database()
     odb::transaction t(db->begin());
     Result result = db->query<PFGPIO>();
 
+    // Don't attempt to configure GPIO when running in degraded mode.
+    if (degraded_mode_)
+        return;
     for (const auto &gpio : result)
     {
         // For each PFGPIO object in the database, create a PFDigitalPin
@@ -268,6 +271,9 @@ void WSHelperThread::test_output_pin(int gpio_id)
     //    + The GPIO is an output GPIO.
     //    + The GPIO exists in the ConfigChecker (ie, the server
     //      up-to-date with regards to what the database stores).
+
+    if (parameters_.degraded_mode)
+        throw LEOSACException("Cannot test Piface Digital GPIO when running in degraded mode.");
 
     DBPtr db = get_service_registry().get_service<DBService>()->db();
     odb::transaction t(db->begin());
