@@ -40,6 +40,11 @@ namespace WebSockAPI
  * be extended by subclass- so that non-boost-asio based module
  * can "easily" make use of the WebSockAPI module.
  *
+ * When this object is created and its internal io_service runs,
+ * it will attmpted to locate a WS service object. If available,
+ * `register_ws_handler()` will be called. Otherwise, it will be
+ * called when (if) a WS Service object becomes registered.
+ *
  * The class provide extensions points that are called to
  * register and unregister websocket handler.
  * The function register_ws_handlers() is called when a
@@ -51,12 +56,12 @@ namespace WebSockAPI
  *
  * @note A new thread is create in this class's constructor.
  */
-template <typename Parameter>
+template <typename ParameterT>
 class BaseModuleSupportThread
 {
   public:
     explicit BaseModuleSupportThread(const CoreUtilsPtr &core_utils,
-                                     const Parameter &param)
+                                     const ParameterT &param)
         : core_utils_(core_utils)
         , parameters_(param)
     {
@@ -76,7 +81,7 @@ class BaseModuleSupportThread
         }
     }
 
-    void set_parameter(const Parameter &p)
+    void set_parameter(const ParameterT &p)
     {
         std::lock_guard<decltype(mutex_)> lg(mutex_);
         parameters_ = p;
@@ -143,7 +148,7 @@ class BaseModuleSupportThread
     std::unique_ptr<std::thread> thread_;
     boost::asio::io_service io_;
     std::unique_ptr<boost::asio::io_service::work> work_;
-    Parameter parameters_;
+    ParameterT parameters_;
     std::mutex mutex_;
 };
 }

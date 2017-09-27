@@ -170,7 +170,7 @@ target_include_directories(${LEOSAC_LIB}
         ${ODB_INCLUDE_DIRS}
         ${CMAKE_BINARY_DIR}/odb_gen/
         ${CMAKE_SOURCE_DIR}/deps/flagset
-        ${CMAKE_SOURCE_DIR}/deps/date
+        ${CMAKE_SOURCE_DIR}/deps/date/include
         )
 
 target_compile_definitions(${LEOSAC_LIB}

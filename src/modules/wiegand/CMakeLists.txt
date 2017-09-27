@@ -21,7 +21,7 @@ set(LEOSAC_ODB_INCLUDE_DIRS
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
-        ${CMAKE_SOURCE_DIR}/deps/date
+        ${CMAKE_SOURCE_DIR}/deps/date/include
         ${ZEROMQ_INCLUDE_DIR}
         ${CMAKE_SOURCE_DIR}/src/db
         )
@@ -52,7 +52,7 @@ set_target_properties(${WIEGAND_BIN} PROPERTIES
 
 target_include_directories(${WIEGAND_BIN} PUBLIC
         ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/deps/date
+        ${CMAKE_SOURCE_DIR}/deps/date/include
         ${ODB_INCLUDE_DIRS}
         ${ODB_COMPILE_OUTPUT_DIR}
         )
