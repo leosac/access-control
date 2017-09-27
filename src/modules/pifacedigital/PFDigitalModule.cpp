@@ -55,7 +55,7 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
                                  CoreUtilsPtr utils)
     : BaseModule(ctx, module_manager_pipe, config, utils)
     , bus_push_(ctx_, zmqpp::socket_type::push)
-    , helper_thread_(ctx_, utils->config_checker())
+    , ws_helper_thread_(utils)
     , degraded_mode_(false)
 {
     if (pifacedigital_open(0) == -1)
@@ -108,7 +108,10 @@ void PFDigitalModule::run()
                 gpio_pin.update();
         }
     }
-    remove_ws_handlers();
+
+    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+    if (ws_service)
+        ws_helper_thread_.unregister_ws_handlers(*ws_service);
 }
 
 void PFDigitalModule::handle_interrupt()
@@ -142,7 +145,7 @@ void PFDigitalModule::handle_interrupt()
 
 bool PFDigitalModule::get_input_pin_name(std::string &dest, int idx)
 {
-    for (auto &gpio : gpios_)
+    for (const auto &gpio : gpios_)
     {
         if (gpio.gpio_no_ == idx && gpio.direction_ == PFDigitalPin::Direction::In)
         {
@@ -201,29 +204,11 @@ void PFDigitalModule::process_config()
         // Database enabled configuration.
         setup_database();
 
-        WSHelperThread::ModuleParameters parameters{};
+        ModuleParameters parameters{};
         parameters.degraded_mode = degraded_mode_;
-        helper_thread_.set_parameter(parameters);
-
-        helper_thread_.register_ws_handlers();
+        ws_helper_thread_.set_parameter(parameters);
 
         load_config_from_database();
-    }
-}
-
-void PFDigitalModule::remove_ws_handlers()
-{
-    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
-    if (ws_service)
-    {
-        ws_service->unregister_handler("pfdigital.is_degraded_mode");
-        ws_service->unregister_handler("pfdigital.test_output_pin");
-
-        // Remove 4 handlers, one for each CRUD operation
-        ws_service->unregister_handler("pfdigital.gpio.create");
-        ws_service->unregister_handler("pfdigital.gpio.read");
-        ws_service->unregister_handler("pfdigital.gpio.update");
-        ws_service->unregister_handler("pfdigital.gpio.delete");
     }
 }
 
@@ -275,67 +260,6 @@ void PFDigitalModule::load_config_from_database()
     t.commit();
 }
 
-void WSHelperThread::run_io_service()
-{
-    work_ = std::make_unique<boost::asio::io_service::work>(io_);
-    io_.run();
-}
-
-void WSHelperThread::on_service_event(const service_event::Event &e)
-{
-    if (e.type() == service_event::REGISTERED)
-    {
-        auto &service_registered_event =
-            assert_cast<const service_event::ServiceRegistered &>(e);
-        if (service_registered_event.interface_type() ==
-            boost::typeindex::type_id<WebSockAPI::Service>())
-        {
-            // request registration of handler from our helper thread.
-            io_.post([this]() { register_ws_handlers(); });
-        }
-    }
-}
-
-void WSHelperThread::register_ws_handlers()
-{
-    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
-    if (ws_service)
-    {
-        std::lock_guard<decltype(mutex_)> lg(mutex_);
-        ws_service->register_handler(
-            [mode = parameters_.degraded_mode](const WebSockAPI::RequestContext rc) {
-                json j{{"mode", mode}};
-                return j;
-            },
-            "pfdigital.is_degraded_mode");
-
-        ws_service->register_handler(
-            [this](const WebSockAPI::RequestContext rc) {
-                rc.security_ctx.enforce_permission(SecurityContext::Action::IS_ADMIN,
-                                                   {});
-
-                int gpio_id = rc.original_msg.content.at("gpio_id").get<int>();
-                this->test_output_pin(gpio_id);
-                return json{};
-            },
-            "pfdigital.test_output_pin");
-
-        ws_service->register_crud_handler("pfdigital.gpio",
-                                          &CRUDHandler::instanciate);
-    }
-    else
-    {
-        service_event_listener_ = get_service_registry().register_event_listener(
-            [this](const service_event::Event &e) { on_service_event(e); });
-    }
-}
-
-void WSHelperThread::set_parameter(WSHelperThread::ModuleParameters param)
-{
-    std::lock_guard<decltype(mutex_)> lg(mutex_);
-    parameters_ = param;
-}
-
 void WSHelperThread::test_output_pin(int gpio_id)
 {
     // We want to make the target output pin blink.
@@ -356,7 +280,8 @@ void WSHelperThread::test_output_pin(int gpio_id)
     if (gpio->direction() != Hardware::GPIO::Direction::Out)
         throw ModelException("", "GPIO is not an output GPIO.");
 
-    if (!config_checker_.has_object(gpio->name(), ConfigChecker::ObjectType::GPIO))
+    if (!core_utils_->config_checker().has_object(gpio->name(),
+                                                  ConfigChecker::ObjectType::GPIO))
     {
         throw ModelException(
             "", "GPIO doesn't exist in the runtime configuration checker. "
@@ -365,7 +290,7 @@ void WSHelperThread::test_output_pin(int gpio_id)
     }
 
     // We have to use the ZMQ based messaging infrastructure.
-    Hardware::FGPIO gpio_facade(zmq_context_, gpio->name());
+    Hardware::FGPIO gpio_facade(core_utils_->zmqpp_context(), gpio->name());
     // This will block the Piface GPIO module from responding
     // to WS message. This is fine for now...
     for (int i = 0; i < 8; ++i)
@@ -373,6 +298,41 @@ void WSHelperThread::test_output_pin(int gpio_id)
         gpio_facade.toggle();
         std::this_thread::sleep_for(std::chrono::milliseconds(750));
     }
+}
+
+void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
+{
+    ws_service.register_handler(
+        [mode = parameters_.degraded_mode](const WebSockAPI::RequestContext rc) {
+            json j{{"mode", mode}};
+            return j;
+        },
+        "pfdigital.is_degraded_mode");
+
+    ws_service.register_handler(
+        [this](const WebSockAPI::RequestContext rc) {
+            rc.security_ctx.enforce_permission(SecurityContext::Action::IS_ADMIN,
+                                               {});
+
+            int gpio_id = rc.original_msg.content.at("gpio_id").get<int>();
+            this->test_output_pin(gpio_id);
+            return json{};
+        },
+        "pfdigital.test_output_pin");
+
+    ws_service.register_crud_handler("pfdigital.gpio", &CRUDHandler::instanciate);
+}
+
+void WSHelperThread::unregister_ws_handlers(WebSockAPI::Service &ws_service)
+{
+    ws_service.unregister_handler("pfdigital.is_degraded_mode");
+    ws_service.unregister_handler("pfdigital.test_output_pin");
+
+    // Remove 4 handlers, one for each CRUD operation
+    ws_service.unregister_handler("pfdigital.gpio.create");
+    ws_service.unregister_handler("pfdigital.gpio.read");
+    ws_service.unregister_handler("pfdigital.gpio.update");
+    ws_service.unregister_handler("pfdigital.gpio.delete");
 }
 }
 }

@@ -24,6 +24,7 @@
 #include "tools/service/ServiceRegistry.hpp"
 #include <boost/asio/io_service.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <modules/websock-api/WSHelperThread.hpp>
 #include <zmqpp/reactor.hpp>
 #include <zmqpp/socket.hpp>
 
@@ -48,75 +49,31 @@ namespace Piface
 
 class PFDigitalModule;
 /**
- * Thread to perform websocket related operation.
- *
- * This is an helper thread of the PFDigitalModule.
- */
-class WSHelperThread
+* Some ~const parameter that are required
+* to process websocket requests.
+*/
+struct ModuleParameters
+{
+    bool degraded_mode;
+};
+
+class WSHelperThread : public WebSockAPI::BaseModuleSupportThread<ModuleParameters>
 {
   public:
-    /**
-     * Some ~const parameter that are required
-     * to process websocket requests.
-     */
-    struct ModuleParameters
+    explicit WSHelperThread(const CoreUtilsPtr &core_utils)
+        : BaseModuleSupportThread(core_utils, {})
     {
-        bool degraded_mode;
-    };
-
-    explicit WSHelperThread(zmqpp::context &c, ConfigChecker &config_checker)
-        : config_checker_(config_checker)
-        , zmq_context_(c)
-    {
-        thread_ = std::make_unique<std::thread>([this]() { run_io_service(); });
     }
-
-    ~WSHelperThread()
-    {
-        clear_work();
-        try
-        {
-            thread_->join();
-        }
-        catch (const std::exception &e)
-        {
-            ERROR("Failed to join WSHelperThread");
-        }
-    }
-
-    void register_ws_handlers();
-
-    void on_service_event(const service_event::Event &);
-
-    /**
-     * Set required parameters.
-     *
-     * Call this before calling register_ws_handlers();
-     */
-    void set_parameter(ModuleParameters param);
-
-  private:
-    void run_io_service();
 
     /**
      * Implements the "pfdigital.test_output_pin" API call.
      */
     void test_output_pin(int gpio_id);
 
-    void clear_work()
-    {
-        work_ = nullptr;
-    }
+    void unregister_ws_handlers(WebSockAPI::Service &ws_service) override;
 
-    bs2::scoped_connection service_event_listener_;
-    std::unique_ptr<std::thread> thread_;
-    boost::asio::io_service io_;
-    std::unique_ptr<boost::asio::io_service::work> work_;
-    ModuleParameters parameters_;
-    ConfigChecker &config_checker_;
-    zmqpp::context &zmq_context_;
-
-    std::mutex mutex_;
+  private:
+    void register_ws_handlers(WebSockAPI::Service &ws_service) override;
 };
 
 /**
@@ -143,11 +100,6 @@ class PFDigitalModule : public BaseModule
     * Process the XML configuration, preparing configured GPIO pin.
     */
     void process_xml_config(const boost::property_tree::ptree &cfg);
-
-    /**
-     * Explicitly deregister websocket handler.
-     */
-    void remove_ws_handlers();
 
     /**
      * Process configuration.
@@ -185,7 +137,10 @@ class PFDigitalModule : public BaseModule
     */
     int interrupt_fd_;
 
-    WSHelperThread helper_thread_;
+    /**
+     * Support thread for processing websocket requests.
+     */
+    WSHelperThread ws_helper_thread_;
 
     /**
      * True if we are running in "degraded" mode (ie, not on a device

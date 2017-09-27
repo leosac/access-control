@@ -58,10 +58,10 @@ WiegandReaderImpl::WiegandReaderImpl(zmqpp::context &ctx,
     std::fill(buffer_.begin(), buffer_.end(), 0);
 
     if (!green_led_name.empty())
-        green_led_ = std::unique_ptr<FLED>(new FLED(ctx, green_led_name));
+        green_led_ = std::make_unique<FLED>(ctx, green_led_name);
 
     if (!buzzer_name.empty())
-        buzzer_ = std::unique_ptr<FBuzzer>(new FBuzzer(ctx, buzzer_name));
+        buzzer_ = std::make_unique<FBuzzer>(ctx, buzzer_name);
 }
 
 WiegandReaderImpl::~WiegandReaderImpl()

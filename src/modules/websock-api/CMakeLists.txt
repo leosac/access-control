@@ -7,6 +7,7 @@ set(WEBSOCK_API_SRCS
         Exceptions.cpp
         ExceptionConverter.cpp
         Service.cpp
+        WSHelperThread.cpp
         api/APISession.cpp
         api/MethodHandler.cpp
         api/Restart.cpp
