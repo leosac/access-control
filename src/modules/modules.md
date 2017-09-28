@@ -5,6 +5,7 @@ We recommend that your first read  @subpage page_module_intro.
 Below is a list of documented modules:
 
   * @subpage page_module_authfile
+  * @subpage page_module_authdb
   * @subpage page_module_doorman
   * @subpage page_module_event_publish
   * @subpage page_module_instrumentation

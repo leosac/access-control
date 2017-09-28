@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -19,8 +19,7 @@
 
 #pragma once
 
-#include "AuthFileInstance.hpp"
-#include "modules/BaseModule.hpp"
+#include "modules/AsioModule.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
@@ -31,42 +30,34 @@ namespace Module
 {
 namespace Auth
 {
-class AuthFileInstance;
+class AuthDBInstance;
 
 /**
-* This implements a authentication module that use files to store access permissions.
-*
-* This module conforms to @ref auth_specc.
-* @see @ref mod_auth_file_user_config for end user doc
+* This implements a authentication module that uses Leosac database
+* to validate access.
 */
-class AuthFileModule : public BaseModule
+class AuthDBModule : public AsioModule
 {
   public:
-    AuthFileModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                   const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+    AuthDBModule(zmqpp::context &ctx, zmqpp::socket *pipe,
+                 const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-    AuthFileModule(const AuthFileModule &) = delete;
+    AuthDBModule(const AuthDBModule &) = delete;
 
-    ~AuthFileModule();
+    ~AuthDBModule();
 
   protected:
-    /**
-    * We have one config file per authenticator object.
-    */
-    virtual void dump_additional_config(zmqpp::message *out) const override;
+    void on_service_event(const service_event::Event &event) override;
 
   private:
-    /**
-    * Processing the configuration tree, spawning AuthFileInstance object as
-    * described in the
-    * configuration file.
-    */
     void process_config();
+
+    void setup_database();
 
     /**
     * Authenticator instance.
     */
-    std::vector<AuthFileInstancePtr> authenticators_;
+    // std::vector<AuthDBInstancePtr> authenticators_;
 };
 }
 }

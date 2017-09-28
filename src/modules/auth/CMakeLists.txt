@@ -6,3 +6,4 @@ endif()
 set(LEOSAC_MODULE_INSTALL_DIR lib/leosac/auth)
 
 add_subdirectory(auth-file)
+add_subdirectory(auth-db)
