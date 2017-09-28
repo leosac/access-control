@@ -62,9 +62,9 @@ set(LEOSAC_LIB_SRCS
     exception/ModelException.cpp
     exception/EntityNotFound.cpp
     exception/PermissionDenied.cpp
-    hardware/FGPIO.cpp
-    hardware/FLED.cpp
-    hardware/FWiegandReader.cpp
+    hardware/facades/FGPIO.cpp
+    hardware/facades/FLED.cpp
+    hardware/facades/FWiegandReader.cpp
     hardware/GPIO.cpp
     hardware/HardwareService.cpp
     hardware/serializers/GPIOSerializer.cpp

@@ -24,7 +24,7 @@
 #include "exception/EntityNotFound.hpp"
 #include "exception/ModelException.hpp"
 #include "exception/gpioexception.hpp"
-#include "hardware/FGPIO.hpp"
+#include "hardware/facades/FGPIO.hpp"
 #include "hardware/GPIO_odb.h"
 #include "mcp23s17.h"
 #include "modules/pifacedigital/CRUDHandler.hpp"

@@ -18,7 +18,7 @@
 */
 
 #include "LeosacFwd.hpp"
-#include "hardware/FLED.hpp"
+#include "hardware/facades/FLED.hpp"
 #include "helper/TestHelper.hpp"
 #include "modules/led-buzzer/LEDBuzzerModule.hpp"
 #include "tools/runtimeoptions.hpp"

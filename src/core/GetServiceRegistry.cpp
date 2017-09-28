@@ -24,7 +24,13 @@ namespace Leosac
 {
 ServiceRegistry &get_service_registry()
 {
-    ASSERT_LOG(Kernel::instance_, "No kernel instance.");
-    return Kernel::instance_->service_registry();
+    // Normal mode. Kernel instance should have be available
+    // when leosac runs.
+    if (Kernel::instance_)
+        return Kernel::instance_->service_registry();
+
+    // This is a case we can hit when running unit-test tests.
+    static ServiceRegistry dummy_registry;
+    return dummy_registry;
 }
 }

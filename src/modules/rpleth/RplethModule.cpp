@@ -20,7 +20,7 @@
 #include "RplethModule.hpp"
 #include "core/auth/Auth.hpp"
 #include "core/credentials/RFIDCard.hpp"
-#include "hardware/FWiegandReader.hpp"
+#include "hardware/facades/FWiegandReader.hpp"
 #include "rplethprotocol.hpp"
 #include "tools/log.hpp"
 #include <boost/archive/binary_iarchive.hpp>

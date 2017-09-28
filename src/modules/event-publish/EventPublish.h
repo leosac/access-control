@@ -24,7 +24,7 @@
 #include <vector>
 #include <memory>
 #include "modules/BaseModule.hpp"
-#include "hardware/FGPIO.hpp"
+#include "hardware/facades/FGPIO.hpp"
 #include "tools/XmlScheduleLoader.hpp"
 #include "core/auth/AuthTarget.hpp"
 

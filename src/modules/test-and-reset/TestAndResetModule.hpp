@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "hardware/FLED.hpp"
+#include "hardware/facades/FLED.hpp"
 #include "modules/BaseModule.hpp"
 
 namespace Leosac

@@ -17,7 +17,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/FGPIO.hpp"
+#include "hardware/facades/FGPIO.hpp"
 #include "tools/log.hpp"
 #include "zmqpp/zmqpp.hpp"
 #include <boost/property_tree/ptree.hpp>

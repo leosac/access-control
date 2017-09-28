@@ -17,8 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/FGPIO.hpp"
-#include "hardware/FLED.hpp"
+#include "hardware/facades/FGPIO.hpp"
+#include "hardware/facades/FLED.hpp"
 #include "tools/log.hpp"
 #include <boost/msm/back/state_machine.hpp>
 #include <boost/msm/front/functor_row.hpp>

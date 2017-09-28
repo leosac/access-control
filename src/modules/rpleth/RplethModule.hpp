@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "hardware/FWiegandReader.hpp"
+#include "hardware/facades/FWiegandReader.hpp"
 #include "modules/BaseModule.hpp"
 #include "modules/rpleth/network/circularbuffer.hpp"
 #include "rplethpacket.hpp"

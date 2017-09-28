@@ -20,7 +20,7 @@
 #pragma once
 
 #include "core/auth/AuthTarget.hpp"
-#include "hardware/FGPIO.hpp"
+#include "hardware/facades/FGPIO.hpp"
 #include "modules/BaseModule.hpp"
 #include "tools/XmlScheduleLoader.hpp"
 #include <boost/property_tree/ptree.hpp>

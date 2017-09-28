@@ -20,8 +20,8 @@
 #pragma once
 
 #include "core/auth/Auth.hpp"
-#include "hardware/FBuzzer.hpp"
-#include "hardware/FLED.hpp"
+#include "hardware/facades/FBuzzer.hpp"
+#include "hardware/facades/FLED.hpp"
 #include "modules/wiegand/strategies/WiegandStrategy.hpp"
 #include "zmqpp/zmqpp.hpp"
 #include <chrono>

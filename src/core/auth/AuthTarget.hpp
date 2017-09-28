@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "hardware/FGPIO.hpp"
+#include "hardware/facades/FGPIO.hpp"
 #include "tools/ISchedule.hpp"
 #include <memory>
 #include <string>

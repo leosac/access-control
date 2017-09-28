@@ -20,7 +20,7 @@
 #pragma once
 
 #include "LedBuzzerSM.hpp"
-#include "hardware/FGPIO.hpp"
+#include "hardware/facades/FGPIO.hpp"
 #include "tools/log.hpp"
 #include <chrono>
 #include <zmqpp/zmqpp.hpp>
