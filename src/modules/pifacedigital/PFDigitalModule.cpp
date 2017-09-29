@@ -283,7 +283,7 @@ void PFDigitalModule::load_config_from_database()
     t.commit();
 }
 
-void WSHelperThread::test_output_pin(boost::uuids::uuid gpio_id)
+void WSHelperThread::test_output_pin(const UUID &gpio_id)
 {
     // We want to make the target output pin blink.
     // We must first make sure a few assumptions hold:
@@ -341,10 +341,7 @@ void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
             rc.security_ctx.enforce_permission(SecurityContext::Action::IS_ADMIN,
                                                {});
 
-            std::string uuid_str =
-                rc.original_msg.content.at("gpio_id").get<std::string>();
-            boost::uuids::uuid gpio_id =
-                boost::lexical_cast<boost::uuids::uuid>(uuid_str);
+            UUID gpio_id = rc.original_msg.content.at("gpio_id").get<UUID>();
             this->test_output_pin(gpio_id);
             return json{};
         },

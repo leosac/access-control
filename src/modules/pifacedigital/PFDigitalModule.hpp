@@ -68,7 +68,7 @@ class WSHelperThread : public WebSockAPI::BaseModuleSupportThread<ModuleParamete
     /**
      * Implements the "pfdigital.test_output_pin" API call.
      */
-    void test_output_pin(boost::uuids::uuid gpio_id);
+    void test_output_pin(const UUID &gpio_id);
 
     void unregister_ws_handlers(WebSockAPI::Service &ws_service) override;
 

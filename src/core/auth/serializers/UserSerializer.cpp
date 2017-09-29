@@ -35,7 +35,7 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
     json memberships = {};
     for (const auto &membership : user.group_memberships())
     {
-        SecurityContext::ActionParam ap;
+        SecurityContext::ActionParam ap{};
         ap.membership.membership_id = membership->id();
         if (sc.check_permission(SecurityContext::Action::MEMBERSHIP_READ, ap))
         {

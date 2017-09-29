@@ -14,6 +14,7 @@ set(OdbCMake_ODB_HEADERS_TOOLS
         ${CMAKE_SOURCE_DIR}/src/tools/SingleTimeFrame.hpp
         ${CMAKE_SOURCE_DIR}/src/tools/Schedule.hpp
         ${CMAKE_SOURCE_DIR}/src/tools/ScheduleMapping.hpp
+        ${CMAKE_SOURCE_DIR}/src/tools/Uuid.hpp
         )
 
 set(LEOSAC_ODB_INCLUDE_DIRS

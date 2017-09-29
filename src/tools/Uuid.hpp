@@ -19,14 +19,62 @@
 
 #pragma once
 
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <odb/core.hxx>
+#include <string>
 
+namespace Leosac
+{
+/**
+ * Thin wrapper around boost::uuids::uuid.
+ */
+#pragma db value
 class UUID
 {
+  public:
+    UUID() = default;
+
+    UUID(const UUID &) = default;
+
+    explicit UUID(const boost::uuids::uuid &uuid)
+        : uuid_(uuid)
+    {
+    }
+
+    bool is_nil() const
+    {
+        return uuid_.is_nil();
+    }
+
     std::string to_string() const
     {
         return boost::lexical_cast<std::string>(uuid_);
     }
+
+    static UUID null_uuid()
+    {
+        UUID u{};
+        assert(u.uuid_.is_nil());
+        return u;
+    }
+
+    static UUID random_uuid()
+    {
+        boost::uuids::uuid uuid = boost::uuids::random_generator()();
+        return UUID(uuid);
+    }
+
+    bool operator<(const UUID &o) const
+    {
+        return uuid_ < o.uuid_;
+    }
+
+  private:
     boost::uuids::uuid uuid_;
+
+    friend class odb::access;
 };
+}

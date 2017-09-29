@@ -46,7 +46,7 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
     }
     catch (json::out_of_range &e)
     {
-        gpio_action_param.gpio_id = boost::uuids::uuid{};
+        gpio_action_param.gpio_id = UUID{};
     }
 
     switch (verb)

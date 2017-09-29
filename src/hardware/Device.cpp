@@ -22,14 +22,13 @@
 
 namespace Leosac
 {
-    namespace Hardware
-    {
+namespace Hardware
+{
 
-        Device::Device() :
-                id_(boost::uuids::random_generator()()),
-                version_(0)
-        {
-
-        }
-    }
+Device::Device()
+    : id_(UUID::random_uuid())
+    , version_(0)
+{
+}
+}
 }

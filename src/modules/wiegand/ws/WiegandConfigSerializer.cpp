@@ -77,9 +77,8 @@ void WiegandReaderConfigSerializer::unserialize(WiegandReaderConfig &out,
     out.buzzer    = extract_with_default(in, "buzzer", out.buzzer_name());
 
     // High GPIO
-    Hardware::DeviceId gpio_id =
-        extract_with_default(in, "gpio_high_id", boost::uuids::uuid{});
-    auto db = get_service_registry().get_service<DBService>();
+    Hardware::DeviceId gpio_id = extract_with_default(in, "gpio_high_id", UUID{});
+    auto db                    = get_service_registry().get_service<DBService>();
     if (!gpio_id.is_nil())
     {
         out.gpio_high_ =
@@ -87,7 +86,7 @@ void WiegandReaderConfigSerializer::unserialize(WiegandReaderConfig &out,
     }
 
     // Low GPIO
-    gpio_id = extract_with_default(in, "gpio_low_id", boost::uuids::uuid{});
+    gpio_id = extract_with_default(in, "gpio_low_id", UUID{});
     if (!gpio_id.is_nil())
     {
         out.gpio_low_ =

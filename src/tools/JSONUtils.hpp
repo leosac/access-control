@@ -21,9 +21,8 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "exception/leosacexception.hpp"
+#include "tools/Uuid.hpp"
 #include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
 #include <chrono>
 #include <json.hpp>
 #include <type_traits>
@@ -31,7 +30,7 @@
 
 /**
  * Below we add a serializer into the `nlohmann` namespace to serialize
- * the boost::uuids::uuid type. Through ADL our function will be called.
+ * the Leosac::UUID ype. Through ADL our function will be called.
  *
  * This is documented at https://github.com/nlohmann/json#arbitrary-types-conversions
  */
@@ -39,20 +38,18 @@
 namespace nlohmann
 {
 
-    template<>
-struct adl_serializer<boost::uuids::uuid>
+template <>
+struct adl_serializer<Leosac::UUID>
 {
-    static void to_json(json &j, const boost::uuids::uuid &opt)
+    static void to_json(json &j, const Leosac::UUID &uuid)
     {
-        if (opt.is_nil())
+        if (uuid.is_nil())
         {
             j = nullptr;
         }
         else
         {
-            std::stringstream ss;
-            ss << opt;
-            j = ss.str();
+            j = uuid.to_string();
         }
     }
 
@@ -60,21 +57,22 @@ struct adl_serializer<boost::uuids::uuid>
      * For unserialization we expect either a string representing the
      * UUID, or a number.
      */
-    static void from_json(const json &j, boost::uuids::uuid &opt)
+    static void from_json(const json &j, Leosac::UUID &uuid)
     {
         if (j.is_null())
         {
-            opt = {};
+            uuid = Leosac::UUID::null_uuid();
         }
         else
         {
-            if (j.is_string()) {
+            if (j.is_string())
+            {
                 std::string str = j.get<std::string>();
-                opt = boost::lexical_cast<boost::uuids::uuid>(str);
+                uuid = Leosac::UUID(boost::lexical_cast<boost::uuids::uuid>(str));
             }
             else if (j.is_number_unsigned() && j.get<uint64_t>() == 0)
             {
-                opt = {};
+                uuid = Leosac::UUID::null_uuid();
             }
             else
             {
@@ -138,7 +136,7 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
             ret = static_cast<T>(obj.at(key).get<std::underlying_type_t<T>>());
         }
     }
-    catch (const json::out_of_range  &e)
+    catch (const json::out_of_range &e)
     {
     }
     return ret;

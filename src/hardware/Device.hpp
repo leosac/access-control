@@ -20,6 +20,7 @@
 #pragma once
 
 #include "hardware/HardwareFwd.hpp"
+#include "tools/Uuid.hpp"
 #include <cstdint>
 #include <odb/callback.hxx>
 #include <odb/core.hxx>
@@ -49,10 +50,10 @@ class Device
         RFID_READERS,
     };
 
-    explicit Device();
+    Device();
     virtual ~Device() = default;
 
-    boost::uuids::uuid id() const
+    UUID id() const
     {
         return id_;
     }
@@ -64,7 +65,7 @@ class Device
 
   private:
 #pragma db id
-    boost::uuids::uuid id_;
+    DeviceId id_;
 
 #pragma db version
     uint64_t version_;

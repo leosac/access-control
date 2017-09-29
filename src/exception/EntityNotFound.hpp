@@ -20,7 +20,7 @@
 #pragma once
 
 #include "exception/leosacexception.hpp"
-#include <boost/uuid/uuid.hpp>
+#include "tools/Uuid.hpp"
 
 namespace Leosac
 {
@@ -39,7 +39,7 @@ class EntityNotFound : public LEOSACException
 
     EntityNotFound(const std::string &id, const std::string &type);
 
-    EntityNotFound(const boost::uuids::uuid &id, const std::string &type);
+    EntityNotFound(const UUID &id, const std::string &type);
 
     const std::string &entity_id() const;
     const std::string &entity_type() const;
