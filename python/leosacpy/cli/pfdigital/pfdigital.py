@@ -53,23 +53,26 @@ def create_gpio(ctx, name, number, default, direction, hardware_address):
 
     loop = asyncio.new_event_loop()
     api = LeosacAPI(host)
-    AWAIT(api.authenticate(username, password), loop)
+    try:
+        AWAIT(api.authenticate(username, password), loop)
 
-    direction = GPIODirection.IN if direction == 'in' else GPIODirection.OUT
-    msg = LeosacMessage('pfdigital.gpio.create',
-                        {'attributes': {
-                            'name': name,
-                            'number': number,
-                            'default': default,
-                            'direction': direction,
-                            'hardware_address': hardware_address
-                        }})
-    rep = AWAIT(api._req_rep(msg), loop)
-    if rep.status_code == APIStatusCode.SUCCESS:
-        click.echo('Created GPIO {}'.format(rep.content['data']['id']))
-    else:
-        click.echo('Failed to create GPIO ! Status code: {}'.format(rep.status_code))
-    AWAIT(api.close(), loop)
+        direction = GPIODirection.IN if direction == 'in' else GPIODirection.OUT
+        msg = LeosacMessage('pfdigital.gpio.create',
+                            {'attributes': {
+                                'name': name,
+                                'number': number,
+                                'default': default,
+                                'direction': direction,
+                                'hardware_address': hardware_address
+                            }})
+        rep = AWAIT(api._req_rep(msg), loop)
+        if rep.status_code == APIStatusCode.SUCCESS:
+            click.echo('Created GPIO {}'.format(rep.content['data']['id']))
+    except APIError as e:
+        click.echo('API Error: Status Code: {}. Message: {}'.format(
+                e.status_code(), e.status_string()))
+    finally:
+        AWAIT(api.close(), loop)
 
 
 @pfdigital_cmd_group.command('gpio-test')

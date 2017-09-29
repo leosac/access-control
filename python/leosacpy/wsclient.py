@@ -113,6 +113,8 @@ class LowLevelWSClient:
                 except ConnectionError:
                     # Excepted since we just closed the connection
                     pass
+                except websockets.ConnectionClosed:
+                    pass
                 except Exception as e:
                     logging.warning('Exception when awaiting autoread '
                                     'coroutine: {}'.format(e))
@@ -306,7 +308,7 @@ class LeosacAPI(LogMixin):
         return rep.content['data']['id']
 
     async def zone_edit(self, zone_id, alias, zone_type, desc,
-    doors=None, children=None):
+                        doors=None, children=None):
         """
         Create a zone and returns its id on success.
         """

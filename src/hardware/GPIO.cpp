@@ -26,7 +26,8 @@ namespace Hardware
 {
 
 GPIO::GPIO()
-    : number_(0)
+    : Device(DeviceClass::GPIO)
+    , number_(0)
     , direction_(Direction::In)
     , default_value_(false)
 {

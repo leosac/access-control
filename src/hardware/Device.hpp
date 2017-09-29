@@ -41,31 +41,22 @@ namespace Hardware
 class Device
 {
   public:
-    // Type of devices supported by leosac.
-    // While support comes through module, the "type" of devices
-    // we support is defined by leosac core.
-    enum Type
-    {
-        GPIO,
-        RFID_READERS,
-    };
-
     Device();
+    explicit Device(DeviceClass device_class);
+
     virtual ~Device() = default;
 
-    UUID id() const
-    {
-        return id_;
-    }
+    UUID id() const;
 
-    uint64_t odb_version() const
-    {
-        return version_;
-    }
+    DeviceClass device_class() const;
+
+    uint64_t odb_version() const;
 
   private:
 #pragma db id
     DeviceId id_;
+
+    DeviceClass device_class_;
 
 #pragma db version
     uint64_t version_;

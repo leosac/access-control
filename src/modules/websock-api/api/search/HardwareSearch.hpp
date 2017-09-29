@@ -44,9 +44,14 @@ using json = nlohmann::json;
  *     [
  *       {id: $HARDWARE_DEVICE_ID,
  *       name: $HARDWARE_DEVICE_NAME,
+ *       device_class: $HARDWARE_DEVICE_CLASS
  *       type: $HARDWARE_DEVICE_TYPE
  *       {...}
  *     ]
+ *
+ * @note Here, `$HARDWARE_DEVICE_TYPE` is the type of the model (eg
+ * `pfdigital.gpio`) while `$HARDWARE_DEVICE_CLASS` is the
+ * Leosac::Hardware::DeviceClass of a device.
  */
 class HardwareSearch : public MethodHandler
 {

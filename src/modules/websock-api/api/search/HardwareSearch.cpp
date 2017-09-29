@@ -97,6 +97,7 @@ json HardwareSearch::process_impl(const json &req)
         ASSERT_LOG(dev, "Hardware is null.");
         json result_json = {{"id", dev->id()},
                             {"name", dev->name()},
+                            {"device_class", dev->device_class()},
                             {"type", hardware_service->hardware_device_type(*dev)}};
         rep.push_back(result_json);
     }

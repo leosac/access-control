@@ -26,9 +26,30 @@ namespace Hardware
 {
 
 Device::Device()
+    : Device(DeviceClass::UNKNOWN)
+{
+}
+
+Device::Device(DeviceClass device_class)
     : id_(UUID::random_uuid())
+    , device_class_(device_class)
     , version_(0)
 {
+}
+
+uint64_t Device::odb_version() const
+{
+    return version_;
+}
+
+UUID Device::id() const
+{
+    return id_;
+}
+
+DeviceClass Device::device_class() const
+{
+    return device_class_;
 }
 }
 }
