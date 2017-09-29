@@ -42,29 +42,28 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
     SecurityContext::HardwareDeviceActionParam gpio_action_param;
     try
     {
-        gpio_action_param.gpio_id = req.at("gpio_id").get<Hardware::DeviceId>();
+        gpio_action_param.device_id = req.at("gpio_id").get<Hardware::DeviceId>();
     }
     catch (json::out_of_range &e)
     {
-        gpio_action_param.gpio_id = UUID{};
+        gpio_action_param.device_id = UUID{};
     }
 
     switch (verb)
     {
     case Verb::READ:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_GPIO_READ,
-                         gpio_action_param);
+        ret.emplace_back(SecurityContext::Action::HARDWARE_READ, gpio_action_param);
         break;
     case Verb::CREATE:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_GPIO_CREATE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_CREATE,
                          gpio_action_param);
         break;
     case Verb::UPDATE:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_GPIO_UPDATE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_UPDATE,
                          gpio_action_param);
         break;
     case Verb::DELETE:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_GPIO_DELETE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_DELETE,
                          gpio_action_param);
         break;
     }
@@ -120,9 +119,9 @@ boost::optional<json> CRUDHandler::read_impl(const json &req)
         // fixme: may be rather slow.
         for (const auto &gpio : result)
         {
-            SecurityContext::HardwareDeviceActionParam ap{.gpio_id = gpio.id()};
+            SecurityContext::HardwareDeviceActionParam ap{.device_id = gpio.id()};
             if (ctx_.session->security_context().check_permission(
-                    SecurityContext::Action::HARDWARE_GPIO_READ, ap))
+                    SecurityContext::Action::HARDWARE_READ, ap))
             {
                 rep["data"].push_back(
                     PFGPIOSerializer::serialize(gpio, security_context()));

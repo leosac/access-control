@@ -76,7 +76,7 @@ def create_gpio(ctx, name, number, default, direction, hardware_address):
 
 
 @pfdigital_cmd_group.command('gpio-test')
-@click.option('--id', required=True, type=int)
+@click.option('--id', required=True, type=str)
 @click.pass_context
 def test_gpio(ctx, id):
     """

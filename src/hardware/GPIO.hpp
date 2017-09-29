@@ -32,12 +32,12 @@ namespace Hardware
 {
 
 /**
- *  Abstraction of a GPIO object property.
+ *  Abstraction of a GPIO device attributes.
  *
  *  Modules that provides GPIO support may subclass
- *  this to provide additional settings.
+ *  this to provide additional configuration options.
  */
-#pragma db object callback(validation_callback)
+#pragma db object callback(validation_callback) table("HARDWARE_GPIO")
 class GPIO : public Device
 {
   public:
@@ -49,10 +49,6 @@ class GPIO : public Device
 
     explicit GPIO();
     virtual ~GPIO() = default;
-
-    const std::string &name() const;
-
-    void name(const std::string &name);
 
     uint16_t number() const;
 
@@ -69,15 +65,6 @@ class GPIO : public Device
     void validation_callback(odb::callback_event e, odb::database &) const;
 
   private:
-/**
- * Name of a GPIO must be unique.
- *
- * This is due an implementation details where GPIO object bind a ZMQ socket
- * that is tied to their name.
- */
-#pragma db unique
-    std::string name_;
-
     uint16_t number_;
 
     Direction direction_;

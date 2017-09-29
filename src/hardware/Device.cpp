@@ -33,6 +33,7 @@ Device::Device()
 Device::Device(DeviceClass device_class)
     : id_(UUID::random_uuid())
     , device_class_(device_class)
+    , enabled_(true)
     , version_(0)
 {
 }
@@ -47,9 +48,35 @@ UUID Device::id() const
     return id_;
 }
 
+
+const std::string &Device::name() const
+{
+    return name_;
+}
+
+void Device::name(const std::string &name)
+{
+    name_ = name;
+}
+
 DeviceClass Device::device_class() const
 {
     return device_class_;
+}
+
+void Device::device_class(DeviceClass d)
+{
+    device_class_ = d;
+}
+
+bool Device::enabled() const
+{
+    return enabled_;
+}
+
+void Device::enabled(bool e)
+{
+    enabled_ = e;
 }
 }
 }

@@ -33,16 +33,6 @@ GPIO::GPIO()
 {
 }
 
-const std::string &GPIO::name() const
-{
-    return name_;
-}
-
-void GPIO::name(const std::string &name)
-{
-    name_ = name;
-}
-
 uint16_t GPIO::number() const
 {
     return number_;

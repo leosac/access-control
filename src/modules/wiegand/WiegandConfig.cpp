@@ -51,7 +51,7 @@ void WiegandReaderConfig::validation_callback(odb::callback_event e,
         e == odb::callback_event::post_persist)
     {
         using QueryT = odb::query<WiegandReaderConfig>;
-        QueryT q(QueryT::name == name);
+        QueryT q(QueryT::name == name());
         auto results        = db.query(q);
         size_t count_result = 0;
         for (auto &&unused : results)

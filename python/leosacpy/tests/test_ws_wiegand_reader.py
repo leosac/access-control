@@ -5,7 +5,7 @@ from leosacpy.tests.test_helper import WSTestBase, check_return_code, \
 from leosacpy.wsclient import LowLevelWSClient, APIStatusCode, LeosacMessage
 
 
-class WSPifaceDigital(WSTestBase):
+class WSWiegandReader(WSTestBase):
     """
     Test the Websocket API of the Piface Digital module.
     """
@@ -22,9 +22,9 @@ class WSPifaceDigital(WSTestBase):
         cfg.stream_log = True
         return cfg
 
-    async def assert_n_gpio(self, n, wsclient):
-        msg = LeosacMessage(message_type='pfdigital.gpio.read',
-                            content={'gpio_id': 0})
+    async def assert_n_reader(self, n, wsclient):
+        msg = LeosacMessage(message_type='wiegand-reader.read',
+                            content={'reader_id': 0})
         rep = await wsclient.req_rep(msg)
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
         # We should have N GPIOs.
@@ -34,42 +34,42 @@ class WSPifaceDigital(WSTestBase):
     @with_leosac_infrastructure
     @with_leosac_ws_client()
     @ws_authenticated_as_admin
-    async def test_CRUD_gpio(self, wsclient: LowLevelWSClient = None):
-        await self.assert_n_gpio(0, wsclient)
+    async def test_naked_reader(self, wsclient: LowLevelWSClient = None):
+        """
+        Test creating a reader with no GPIO assigned to it.
+        """
+        await self.assert_n_reader(0, wsclient)
 
         # Create
-        msg = LeosacMessage('pfdigital.gpio.create', content={
+        msg = LeosacMessage('wiegand-reader.create', content={
             'attributes':
                 {
-                    'name': 'My GPIO',
-                    'hardware-address': 0,
-                    'number': 12
+                    'name': 'My Reader',
                 }
         })
         rep = await wsclient.req_rep(msg)
-        gpio_id = rep.content['data']['id']
+        reader_id = rep.content['data']['id']
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
 
-        await self.assert_n_gpio(1, wsclient)
+        await self.assert_n_reader(1, wsclient)
 
         # Read back and make sure
-        msg = LeosacMessage(message_type='pfdigital.gpio.read', content={'gpio_id': gpio_id})
+        msg = LeosacMessage(message_type='wiegand-reader.read', content={
+            'reader_id': reader_id})
         rep = await wsclient.req_rep(msg)
         self.assertEqual(APIStatusCode.SUCCESS, rep.status_code)
 
         # Check attributes values
-        self.assertEqual('My GPIO', rep.content['data']['attributes']['name'])
-        self.assertEqual(0, rep.content['data']['attributes']['hardware-address'])
-        self.assertEqual(12, rep.content['data']['attributes']['number'])
+        self.assertEqual('My Reader', rep.content['data']['attributes']['name'])
 
-        rep = await wsclient.req_rep(LeosacMessage('pfdigital.gpio.update',
-                                     content={'gpio_id': gpio_id,
+        rep = await wsclient.req_rep(LeosacMessage('wiegand-reader.update',
+                                     content={'reader_id': reader_id,
                                               'attributes': {
-                                                  'hardware-address': 42
+                                                  'name': 'New Name'
                                               }}))
-        self.assertEqual('My GPIO', rep.content['data']['attributes']['name'])
-        self.assertEqual(42, rep.content['data']['attributes']['hardware-address'])
+        self.assertEqual('New Name', rep.content['data']['attributes']['name'])
 
         # Delete
-        rep = await wsclient.req_rep(LeosacMessage('pfdigital.gpio.delete', {'gpio_id': gpio_id}))
-        await self.assert_n_gpio(0, wsclient)
+        rep = await wsclient.req_rep(LeosacMessage('wiegand-reader.delete',
+                                                   {'reader_id': reader_id}))
+        await self.assert_n_reader(0, wsclient)

@@ -18,7 +18,7 @@
 */
 
 
-#include "hardware/serializers/GPIOSerializer.hpp"
+#include "hardware/serializers/RFIDReaderSerializer.hpp"
 #include "hardware/serializers/DeviceSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
@@ -27,33 +27,23 @@ namespace Leosac
 {
 namespace Hardware
 {
-json GPIOSerializer::serialize(const Hardware::GPIO &in, const SecurityContext &sc)
+json RFIDReaderSerializer::serialize(const Hardware::RFIDReader &in,
+                                     const SecurityContext &sc)
 {
     json serialized = DeviceSerializer::serialize(in, sc);
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base device serialization did something unexpected.");
 
     // Override object type
-    serialized["type"] = "gpio";
-
-    // Add GPIO specific attributes
-    serialized["attributes"]["number"]        = in.number();
-    serialized["attributes"]["direction"]     = in.direction();
-    serialized["attributes"]["default-value"] = in.default_value();
-
+    serialized["type"] = "rfid-reader";
     return serialized;
 }
 
-void GPIOSerializer::unserialize(Hardware::GPIO &out, const json &in,
-                                 const SecurityContext &sc)
+void RFIDReaderSerializer::unserialize(Hardware::RFIDReader &out, const json &in,
+                                       const SecurityContext &sc)
 {
     using namespace JSONUtil;
     DeviceSerializer::unserialize(out, in, sc);
-
-    out.number(extract_with_default(in, "number", out.number()));
-    out.direction(extract_with_default(in, "direction", out.direction()));
-    out.default_value(
-        extract_with_default(in, "default-value", out.default_value()));
 }
 }
 }

@@ -149,24 +149,17 @@ class SecurityContext
          */
         RESTART_SERVER,
 
-        HARDWARE_GPIO_READ,
-        HARDWARE_GPIO_UPDATE,
-        HARDWARE_GPIO_CREATE,
-        HARDWARE_GPIO_DELETE,
-        HARDWARE_GPIO_SEARCH,
-
         /**
-         * Permissions for hardware auth source device.
-         * For now this includes Wiegand Reader devices.
-         *
+         * Permissions for hardware devices.
+         * For now all hardware devices share the same permission set.
          * todo: Permission should probably redesigned in a more extensible way.
          */
 
-        HARDWARE_AUTH_SOURCE_READ,
-        HARDWARE_AUTH_SOURCE_UPDATE,
-        HARDWARE_AUTH_SOURCE_CREATE,
-        HARDWARE_AUTH_SOURCE_DELETE,
-        HARDWARE_AUTH_SOURCE_SEARCH,
+        HARDWARE_READ,
+        HARDWARE_UPDATE,
+        HARDWARE_CREATE,
+        HARDWARE_DELETE,
+        HARDWARE_SEARCH,
     };
 
     struct GroupActionParam
@@ -230,20 +223,10 @@ class SecurityContext
 
     struct HardwareDeviceActionParam
     {
-        Hardware::DeviceId gpio_id;
+        Hardware::DeviceId device_id;
 
         operator ActionParam();
     };
-
-    struct HardwareAuthSourceParam
-    {
-        // fixme Cannot use proper typedef since we dont have
-        // fixme: a parent class for hardware devices / a way to group them together.
-        unsigned long long hardware_id;
-
-        operator ActionParam();
-    };
-
 
     union ActionParam {
         GroupActionParam group;
@@ -254,8 +237,7 @@ class SecurityContext
         DoorActionParam door;
         AccessPointActionParam access_point;
         ZoneActionParam zone;
-        HardwareDeviceActionParam hardware_gpio;
-        HardwareAuthSourceParam hardware_auth_source;
+        HardwareDeviceActionParam device;
     };
 
     explicit SecurityContext(DBServicePtr dbsrv);

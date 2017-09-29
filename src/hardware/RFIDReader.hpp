@@ -19,37 +19,34 @@
 
 #pragma once
 
-#include "tools/Uuid.hpp"
+#include "hardware/Device.hpp"
+#include "hardware/HardwareFwd.hpp"
+#include <cstdint>
+#include <odb/callback.hxx>
+#include <odb/core.hxx>
+#include <string>
 
 namespace Leosac
 {
 namespace Hardware
 {
+
 /**
- * An enumeration describing the class of the device.
+ *  Abstraction of a RFID Reader device.
  *
- * Devices are grouped together based on what they are.
- *
- * The DeviceClass represents the type of device that leosac
- * is aware of and can deal with. Modules provides implementation
- * for supporting existing DeviceClass.
- *
- * If new type of hardware would become supported (biometric reader),
- * a new entry in the DeviceClass enumeration should be added before
- * a module can provide proper support for the device.
+ *  For now we have no attributes. Probably will change
+ *  when WiegandReader module works correctly with database.
+ *  todo: move some common attributes here
  */
-enum class DeviceClass
+#pragma db object callback(validation_callback) table("HARDWARE_RFIDReader")
+class RFIDReader : public Device
 {
-    UNKNOWN      = 0,
-    GPIO         = 1,
-    RFID_READERS = 2,
+  public:
+    RFIDReader();
+
+    void validation_callback(odb::callback_event, odb::database &) const {};
+
+    friend odb::access;
 };
-
-class Device;
-using DeviceId  = UUID;
-using DevicePtr = std::shared_ptr<Device>;
-
-class GPIO;
-using GPIOPtr = std::shared_ptr<GPIO>;
 }
 }

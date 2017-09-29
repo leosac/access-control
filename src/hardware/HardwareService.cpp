@@ -29,7 +29,7 @@ HardwareService::HardwareService(const Leosac::DBServicePtr &dbservice)
 {
 }
 
-std::string HardwareService::hardware_device_type(Hardware::GPIO &device) const
+std::string HardwareService::hardware_device_type(Hardware::Device &device) const
 {
     auto serialized = serialize(device, SystemSecurityContext::instance());
     ASSERT_LOG(serialized.at("type").is_string(),

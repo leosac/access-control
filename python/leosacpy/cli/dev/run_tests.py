@@ -12,6 +12,7 @@ from leosacpy.tests.test_ws_general import WSGeneral
 # Commands in this file are added manually
 # in dev.py
 from leosacpy.tests.test_ws_pfdigital import WSPifaceDigital
+from leosacpy.tests.test_ws_wiegand_reader import WSWiegandReader
 from leosacpy.tests.test_ws_zone import WSZone
 
 
@@ -47,5 +48,6 @@ def run_tests(ctx, runner, test, server):
     #suite.addTest(WSGeneral.create_suite(WSGeneral, create_param))
     #suite.addTest(WSAudit.create_suite(WSAudit, create_param))
     #suite.addTest(WSZone.create_suite(WSZone, create_param, test))
-    suite.addTest(WSPifaceDigital.create_suite(WSPifaceDigital, create_param, test))
+    #suite.addTest(WSPifaceDigital.create_suite(WSPifaceDigital, create_param, test))
+    suite.addTest(WSWiegandReader.create_suite(WSWiegandReader, create_param, test))
     unittest.TextTestRunner(verbosity=2).run(suite)

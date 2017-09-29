@@ -46,8 +46,8 @@ def list_gpio(ctx):
 @wiegand_reader_cmd_group.command('create')
 @click.option('--name', required=True)
 @click.option('--mode')
-@click.option('--gpio-high', type=int)
-@click.option('--gpio-low', type=int)
+@click.option('--gpio-high', type=str)
+@click.option('--gpio-low', type=str)
 @click.option('--enabled', is_flag=True)
 @click.pass_context
 def create_reader(ctx, name, mode, gpio_high, gpio_low, enabled):

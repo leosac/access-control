@@ -67,8 +67,11 @@ set(LEOSAC_LIB_SRCS
     hardware/facades/FWiegandReader.cpp
     hardware/Device.cpp
     hardware/GPIO.cpp
+    hardware/RFIDReader.cpp
     hardware/HardwareService.cpp
+    hardware/serializers/RFIDReaderSerializer.cpp
     hardware/serializers/GPIOSerializer.cpp
+    hardware/serializers/DeviceSerializer.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
     tools/unixshellscript.cpp

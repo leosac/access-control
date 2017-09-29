@@ -21,6 +21,7 @@
 #include "core/GetServiceRegistry.hpp"
 #include "hardware/GPIO_odb.h"
 #include "hardware/HardwareService.hpp"
+#include "hardware/serializers/RFIDReaderSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 
 namespace Leosac
@@ -46,16 +47,17 @@ static json serialize_gpio_metadata(const Hardware::GPIOPtr &gpio)
 }
 
 json WiegandReaderConfigSerializer::serialize(const WiegandReaderConfig &in,
-                                              const SecurityContext &)
+                                              const SecurityContext &sc)
 {
-    json serialized = {{"id", in.id},
-                       {"type", "wiegand-reader"},
-                       {"attributes",
-                        {{"name", in.name},
-                         {"mode", in.mode},
-                         {"enabled", in.enabled},
-                         {"green_led", in.green_led_name()},
-                         {"buzzer", in.buzzer_name()}}}};
+    json serialized = Hardware::RFIDReaderSerializer::serialize(in, sc);
+    // Now we override the type.
+    ASSERT_LOG(serialized.at("type").is_string(),
+               "Base GPIO serialization did something unexpected.");
+
+    serialized["type"]                    = "wiegand-reader";
+    serialized["attributes"]["green_led"] = in.green_led_name();
+    serialized["attributes"]["buzzer"]    = in.buzzer_name();
+    serialized["attributes"]["mode"]      = in.mode;
 
     serialized["relationships"] = json{};
     serialized["relationships"]["gpio_high"] =
@@ -67,12 +69,12 @@ json WiegandReaderConfigSerializer::serialize(const WiegandReaderConfig &in,
 
 void WiegandReaderConfigSerializer::unserialize(WiegandReaderConfig &out,
                                                 const json &in,
-                                                const SecurityContext &)
+                                                const SecurityContext &sc)
 {
     using namespace JSONUtil;
-    out.name      = extract_with_default(in, "name", out.name);
+    Hardware::RFIDReaderSerializer::unserialize(out, in, sc);
+
     out.mode      = extract_with_default(in, "mode", out.mode);
-    out.enabled   = extract_with_default(in, "enabled", out.enabled);
     out.green_led = extract_with_default(in, "green_led", out.green_led_name());
     out.buzzer    = extract_with_default(in, "buzzer", out.buzzer_name());
 

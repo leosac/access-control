@@ -40,7 +40,7 @@ using json = nlohmann::json;
  * It inherits Hardware::GPIO and adds Piface specific
  * data.
  */
-#pragma db object callback(validation_callback)
+#pragma db object callback(validation_callback) table("HARDWARE_GPIO_Piface")
 class PFGPIO : public Hardware::GPIO
 {
   public:

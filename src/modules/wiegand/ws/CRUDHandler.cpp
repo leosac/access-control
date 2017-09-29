@@ -39,33 +39,33 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
 
-    SecurityContext::HardwareAuthSourceParam hardware_action_param;
+    SecurityContext::HardwareDeviceActionParam hardware_action_param{};
     try
     {
-        hardware_action_param.hardware_id =
-            req.at("reader_id").get<WiegandReaderConfigId>();
+        hardware_action_param.device_id =
+            req.at("reader_id").get<Hardware::DeviceId>();
     }
     catch (json::out_of_range &e)
     {
-        hardware_action_param.hardware_id = 0;
+        hardware_action_param.device_id = Hardware::DeviceId{};
     }
 
     switch (verb)
     {
     case Verb::READ:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_AUTH_SOURCE_READ,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_READ,
                          hardware_action_param);
         break;
     case Verb::CREATE:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_AUTH_SOURCE_CREATE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_CREATE,
                          hardware_action_param);
         break;
     case Verb::UPDATE:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_AUTH_SOURCE_UPDATE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_UPDATE,
                          hardware_action_param);
         break;
     case Verb::DELETE:
-        ret.emplace_back(SecurityContext::Action::HARDWARE_AUTH_SOURCE_DELETE,
+        ret.emplace_back(SecurityContext::Action::HARDWARE_DELETE,
                          hardware_action_param);
         break;
     }
@@ -89,7 +89,7 @@ boost::optional<json> CRUDHandler::create_impl(const json &req)
     return rep;
 }
 
-auto find_reader_by_id(const WiegandReaderConfigId &id, DBPtr db)
+auto find_reader_by_id(const Hardware::DeviceId &id, DBPtr db)
 {
     db::OptionalTransaction t(db->begin());
     auto reader = db->find<WiegandReaderConfig>(id);
@@ -106,9 +106,9 @@ boost::optional<json> CRUDHandler::read_impl(const json &req)
     using Result = odb::result<WiegandReaderConfig>;
     DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto reader_id = req.at("reader_id").get<WiegandReaderConfigId>();
+    auto reader_id = req.at("reader_id").get<Hardware::DeviceId>();
 
-    if (reader_id != 0)
+    if (!reader_id.is_nil())
     {
         auto reader = find_reader_by_id(reader_id, db);
         rep["data"] =
@@ -123,9 +123,9 @@ boost::optional<json> CRUDHandler::read_impl(const json &req)
         // fixme: may be rather slow.
         for (const auto &reader : result)
         {
-            SecurityContext::HardwareAuthSourceParam hap{.hardware_id = reader.id};
+            SecurityContext::HardwareDeviceActionParam hap{.device_id = reader.id()};
             if (ctx_.session->security_context().check_permission(
-                    SecurityContext::Action::HARDWARE_AUTH_SOURCE_READ, hap))
+                    SecurityContext::Action::HARDWARE_READ, hap))
             {
                 rep["data"].push_back(WiegandReaderConfigSerializer::serialize(
                     reader, security_context()));
@@ -141,7 +141,7 @@ boost::optional<json> CRUDHandler::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto reader_id = req.at("reader_id").get<WiegandReaderConfigId>();
+    auto reader_id = req.at("reader_id").get<Hardware::DeviceId>();
     auto reader    = find_reader_by_id(reader_id, db);
 
     WiegandReaderConfigSerializer::unserialize(*reader, req.at("attributes"),
@@ -156,7 +156,7 @@ boost::optional<json> CRUDHandler::update_impl(const json &req)
 
 boost::optional<json> CRUDHandler::delete_impl(const json &req)
 {
-    auto did = req.at("reader_id").get<WiegandReaderConfigId>();
+    auto did = req.at("reader_id").get<Hardware::DeviceId>();
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 

@@ -20,10 +20,12 @@
 #include "modules/wiegand/wiegand.hpp"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
+#include "hardware/HardwareService.hpp"
 #include "modules/wiegand/WiegandConfig_odb.h"
 #include "modules/wiegand/strategies/Autodetect.hpp"
 #include "modules/wiegand/ws/WSHelperThread.hpp"
 #include "tools/log.hpp"
+#include "ws/WiegandConfigSerializer.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <memory>
 #include <zmqpp/context.hpp>
@@ -66,7 +68,13 @@ WiegandReaderModule::WiegandReaderModule(zmqpp::context &ctx, zmqpp::socket *pip
     }
 }
 
-WiegandReaderModule::~WiegandReaderModule() = default;
+WiegandReaderModule::~WiegandReaderModule()
+{
+    auto hwd_service =
+        get_service_registry().get_service<Hardware::HardwareService>();
+    if (hwd_service)
+        hwd_service->unregister_serializer<WiegandReaderConfig>();
+}
 
 void WiegandReaderModule::process_config()
 {
@@ -74,6 +82,11 @@ void WiegandReaderModule::process_config()
 
     if (module_config.get<bool>("use_database", false))
     {
+        auto hwd_service =
+            get_service_registry().get_service<Hardware::HardwareService>();
+        ASSERT_LOG(hwd_service, "No hardware service but we have database.");
+        hwd_service->register_serializer<WiegandReaderConfig>(
+            &WiegandReaderConfigSerializer::serialize);
         load_db_config();
     }
     else
@@ -86,7 +99,7 @@ void WiegandReaderModule::process_config()
     {
         using namespace Colorize;
         INFO("Creating WiegandReader: "
-             << green(underline(reader_config->name)) << "\n\t Green Led: "
+             << green(underline(reader_config->name())) << "\n\t Green Led: "
              << green(underline(reader_config->green_led_name()))
              << "\n\t Buzzer: " << green(underline(reader_config->buzzer_name()))
              << "\n\t GPIO Low: " << green(underline(reader_config->gpio_low_name()))
@@ -95,7 +108,7 @@ void WiegandReaderModule::process_config()
              << "\n\t Mode: " << green(underline(reader_config->mode)));
 
         WiegandReaderImpl reader(
-            ctx_, reader_config->name, reader_config->gpio_high_name(),
+            ctx_, reader_config->name(), reader_config->gpio_high_name(),
             reader_config->gpio_low_name(), reader_config->green_led,
             reader_config->buzzer, create_strategy(*reader_config, &reader));
         utils_->config_checker().register_object(reader.name(),
@@ -213,9 +226,10 @@ void WiegandReaderModule::load_db_config()
         utils_->database()->query<WiegandReaderConfig>());
     for (const auto &reader : result)
     {
-        WiegandReaderConfigPtr reader_ptr = db->load<WiegandReaderConfig>(reader.id);
+        WiegandReaderConfigPtr reader_ptr =
+            db->load<WiegandReaderConfig>(reader.id());
         ASSERT_LOG(reader_ptr, "Loading from database/cache failed");
-        if (reader_ptr->enabled)
+        if (reader_ptr->enabled())
             wiegand_config_->add_reader(reader_ptr);
     }
     t.commit();
@@ -241,7 +255,7 @@ void WiegandReaderModule::load_xml_config(
         auto gpio_low = std::make_shared<Hardware::GPIO>();
         gpio_low->name(xml_reader_cfg.get_child("low").data());
 
-        reader_config->name       = xml_reader_cfg.get_child("name").data();
+        reader_config->name(xml_reader_cfg.get_child("name").data());
         reader_config->gpio_high_ = gpio_high;
         reader_config->gpio_low_  = gpio_low;
         reader_config->buzzer     = xml_reader_cfg.get<std::string>("buzzer", "");

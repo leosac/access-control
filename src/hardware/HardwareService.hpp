@@ -37,7 +37,7 @@ namespace Hardware
  * configured to use a database.
  */
 class HardwareService
-    : public ExtensibleSerializer<json, Hardware::GPIO, const SecurityContext &>
+    : public ExtensibleSerializer<json, Hardware::Device, const SecurityContext &>
 {
   public:
     explicit HardwareService(const Leosac::DBServicePtr &dbservice);
@@ -45,7 +45,7 @@ class HardwareService
     /**
      * Return the name of real type of a device.
      */
-    std::string hardware_device_type(Hardware::GPIO &device) const;
+    std::string hardware_device_type(Hardware::Device &device) const;
 
   private:
     DBServicePtr dbservice_;

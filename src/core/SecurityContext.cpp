@@ -69,71 +69,64 @@ SecurityContext &SystemSecurityContext::instance()
 
 SecurityContext::GroupActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.group = *this;
     return result;
 }
 
 SecurityContext::UserActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.user = *this;
     return result;
 }
 
 SecurityContext::MembershipActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.membership = *this;
     return result;
 }
 
 SecurityContext::CredentialActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.cred = *this;
     return result;
 }
 
 SecurityContext::ScheduleActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.sched = *this;
     return result;
 }
 
 SecurityContext::DoorActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.door = *this;
     return result;
 }
 
 SecurityContext::AccessPointActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.access_point = *this;
     return result;
 }
 
 SecurityContext::ZoneActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
+    SecurityContext::ActionParam result{};
     result.zone = *this;
     return result;
 }
 
 SecurityContext::HardwareDeviceActionParam::operator ActionParam()
 {
-    SecurityContext::ActionParam result;
-    result.hardware_gpio = *this;
-    return result;
-}
-
-SecurityContext::HardwareAuthSourceParam::operator ActionParam()
-{
-    SecurityContext::ActionParam result;
-    result.hardware_auth_source = *this;
+    SecurityContext::ActionParam result{};
+    result.device = *this;
     return result;
 }
 

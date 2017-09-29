@@ -35,9 +35,11 @@ namespace Hardware
  * Base class for hardware devices.
  *
  * Device is an abstraction around GPIOs, RFID-readers,
- * and possibly other devices.
+ * and possibly other device classes.
+ *
+ *  @note This class hierarchy provide no behavior, simply data storage.
  */
-#pragma db object optimistic polymorphic
+#pragma db object optimistic polymorphic table("HARDWARE_Device")
 class Device
 {
   public:
@@ -48,7 +50,16 @@ class Device
 
     UUID id() const;
 
+    const std::string &name() const;
+
+    void name(const std::string &name);
+
     DeviceClass device_class() const;
+
+    void device_class(DeviceClass d);
+
+    bool enabled() const;
+    void enabled(bool e);
 
     uint64_t odb_version() const;
 
@@ -56,7 +67,25 @@ class Device
 #pragma db id
     DeviceId id_;
 
+/**
+ * Name of an hardware device must be unique due to an implementation details.
+ * Most object bind a ZMQ socket at an address based on their name.
+ *
+ * Todo: This restriction should be lifted in the future, when device will
+ * Todo: bind to their id rather name.
+ */
+#pragma db unique
+    std::string name_;
+
     DeviceClass device_class_;
+
+    /**
+     * Is this device supposed to be enabled?
+     *
+     * This allows module to know if they should process a device
+     * or just ignore it.
+     */
+    bool enabled_;
 
 #pragma db version
     uint64_t version_;

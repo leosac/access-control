@@ -42,7 +42,7 @@ MethodHandlerUPtr HardwareSearch::create(RequestContext ctx)
 
 struct HardwareComparator
 {
-    bool operator()(const Hardware::GPIOPtr &c1, const Hardware::GPIOPtr &c2)
+    bool operator()(const Hardware::DevicePtr &c1, const Hardware::DevicePtr &c2)
     {
         ASSERT_LOG(c1, "Hardware c1 is null");
         ASSERT_LOG(c2, "Hardware c2 is null");
@@ -57,9 +57,9 @@ json HardwareSearch::process_impl(const json &req)
     json rep = json::array();
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    using Query              = odb::query<Hardware::GPIO>;
+    using Query              = odb::query<Hardware::Device>;
     std::string partial_name = req.at("partial_name");
-    std::set<Hardware::GPIOPtr, HardwareComparator> hardware_devices;
+    std::set<Hardware::DevicePtr, HardwareComparator> hardware_devices;
 
     // We want a case insensitive search. However, there is no portable
     // way to do this. So for now we'll rely on a naive, potentially slow
@@ -72,11 +72,11 @@ json HardwareSearch::process_impl(const json &req)
         partial_name_copy[i]   = std::toupper(partial_name[i]);
         Query q(Query::name.like("%" + partial_name_copy + "%"));
         auto results = db->query(q);
-        for (const auto &cred : results)
+        for (const auto &device : results)
         {
             // We want shared_ptr to store in set. Call load, this should load from
             // the cache anyway.
-            hardware_devices.insert(db->load<Hardware::GPIO>(cred.id()));
+            hardware_devices.insert(db->load<Hardware::Device>(device.id()));
         }
     }
 
@@ -86,7 +86,7 @@ json HardwareSearch::process_impl(const json &req)
     {
         // We want shared_ptr to store in set. Call load, this should load from the
         // cache anyway.
-        hardware_devices.insert(db->load<Hardware::GPIO>(dev.id()));
+        hardware_devices.insert(db->load<Hardware::Device>(dev.id()));
     }
 
     auto hardware_service =
@@ -97,7 +97,7 @@ json HardwareSearch::process_impl(const json &req)
         ASSERT_LOG(dev, "Hardware is null.");
         json result_json = {{"id", dev->id()},
                             {"name", dev->name()},
-                            {"device_class", dev->device_class()},
+                            {"device-class", dev->device_class()},
                             {"type", hardware_service->hardware_device_type(*dev)}};
         rep.push_back(result_json);
     }
@@ -111,6 +111,6 @@ HardwareSearch::required_permission(const json &) const
     std::vector<ActionActionParam> perm_;
     SecurityContext::ActionParam ap{};
 
-    perm_.push_back({SecurityContext::Action::HARDWARE_GPIO_SEARCH, ap});
+    perm_.emplace_back(SecurityContext::Action::HARDWARE_SEARCH, ap);
     return perm_;
 }

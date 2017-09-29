@@ -22,6 +22,7 @@
 #define ODB_NO_BASE_VERSION
 #include "hardware/GPIO.hpp"
 #include "hardware/HardwareFwd.hpp"
+#include "hardware/RFIDReader.hpp"
 #include "modules/wiegand/WiegandFwd.hpp"
 #include "tools/db/database.hpp"
 #include <chrono>
@@ -39,15 +40,13 @@ namespace Wiegand
  * An instance of this class represents the configuration
  * of one Wiegand reader.
  */
-#pragma db object callback(validation_callback)
-struct WiegandReaderConfig
+#pragma db object callback(validation_callback) table("HARDWARE_RFIDReader_Wiegand")
+struct WiegandReaderConfig : public Hardware::RFIDReader
 {
     WiegandReaderConfig()
-        : id(0)
-        , mode("SIMPLE_WIEGAND")
+        : mode("SIMPLE_WIEGAND")
         , pin_timeout(2500)
-        , pin_key_end('#')
-        , enabled(true){};
+        , pin_key_end('#'){};
 
     WiegandReaderConfig(const WiegandReaderConfig &) = default;
 
@@ -88,10 +87,6 @@ struct WiegandReaderConfig
      */
     void validation_callback(odb::callback_event, odb::database &) const;
 
-#pragma db id auto
-    WiegandReaderConfigId id;
-
-    std::string name;
     Hardware::GPIOPtr gpio_high_;
     Hardware::GPIOPtr gpio_low_;
     std::string green_led;
@@ -100,11 +95,6 @@ struct WiegandReaderConfig
 
     std::chrono::milliseconds pin_timeout;
     char pin_key_end;
-
-    /**
-     * Is this reader configuration active?
-     */
-    bool enabled;
 
     /**
      * List of valid operation mode for a reader.

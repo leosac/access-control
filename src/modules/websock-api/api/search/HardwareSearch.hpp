@@ -34,8 +34,6 @@ using json = nlohmann::json;
 /**
  * Search hardware devices by name.
  *
- * todo: This is limited to GPIO (for now)
- *
  * Request:
  *     + 'partial_name': A part of the name we are looking for.
  *
@@ -44,7 +42,7 @@ using json = nlohmann::json;
  *     [
  *       {id: $HARDWARE_DEVICE_ID,
  *       name: $HARDWARE_DEVICE_NAME,
- *       device_class: $HARDWARE_DEVICE_CLASS
+ *       device-class: $HARDWARE_DEVICE_CLASS
  *       type: $HARDWARE_DEVICE_TYPE
  *       {...}
  *     ]
