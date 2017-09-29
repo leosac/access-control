@@ -3,7 +3,7 @@ import asyncio
 import click
 
 from leosacpy.exception import APIError
-from leosacpy.utils import AWAIT
+from leosacpy.utils import AWAIT, pretty_dict
 from leosacpy.ws import LeosacMessage, APIStatusCode, GPIODirection
 from leosacpy.wsclient import LowLevelWSClient, LeosacAPI
 
@@ -34,7 +34,7 @@ def list_gpio(ctx):
     msg = LeosacMessage('pfdigital.gpio.read', {'gpio_id': 0})
     rep = AWAIT(api._req_rep(msg), loop)
     for gpio in rep.content['data']:
-        print(gpio)
+        click.echo(pretty_dict(gpio))
 
     AWAIT(api.close(), loop)
 

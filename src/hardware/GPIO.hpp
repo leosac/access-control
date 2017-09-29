@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "hardware/Device.hpp"
 #include "hardware/HardwareFwd.hpp"
 #include <cstdint>
 #include <odb/callback.hxx>
@@ -36,8 +37,8 @@ namespace Hardware
  *  Modules that provides GPIO support may subclass
  *  this to provide additional settings.
  */
-#pragma db object optimistic polymorphic callback(validation_callback)
-class GPIO
+#pragma db object callback(validation_callback)
+class GPIO : public Device
 {
   public:
     enum class Direction
@@ -52,10 +53,6 @@ class GPIO
     const std::string &name() const;
 
     void name(const std::string &name);
-
-    GPIOId id() const;
-
-    uint64_t version() const;
 
     uint16_t number() const;
 
@@ -89,12 +86,6 @@ class GPIO
      * True to default to ON, false otherwise.
      */
     bool default_value_;
-
-#pragma db id auto
-    GPIOId id_;
-
-#pragma db version
-    uint64_t version_;
 
     friend odb::access;
 };

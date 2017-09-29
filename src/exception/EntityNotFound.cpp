@@ -17,6 +17,8 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include "exception/EntityNotFound.hpp"
 
 using namespace Leosac;
@@ -25,6 +27,11 @@ EntityNotFound::EntityNotFound(const std::string &id, const std::string &type)
     : LEOSACException(build_msg(id, type))
     , entity_id_(id)
     , entity_type_(type)
+{
+}
+
+EntityNotFound::EntityNotFound(const boost::uuids::uuid &id, const std::string &type)
+        : EntityNotFound(boost::lexical_cast<std::string>(id), type)
 {
 }
 

@@ -19,12 +19,12 @@
 
 #include "modules/wiegand/ws/CRUDHandler.hpp"
 #include "WiegandConfigSerializer.hpp"
+#include "exception/EntityNotFound.hpp"
 #include "modules/websock-api/api/APISession.hpp"
 #include "modules/wiegand/WiegandConfig_odb.h"
 #include "tools/JSONUtils.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/db/OptionalTransaction.hpp"
-#include <exception/EntityNotFound.hpp>
 
 namespace Leosac
 {
@@ -45,7 +45,7 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
         hardware_action_param.hardware_id =
             req.at("reader_id").get<WiegandReaderConfigId>();
     }
-    catch (std::out_of_range &e)
+    catch (json::out_of_range &e)
     {
         hardware_action_param.hardware_id = 0;
     }

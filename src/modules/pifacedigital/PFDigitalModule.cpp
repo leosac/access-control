@@ -24,8 +24,8 @@
 #include "exception/EntityNotFound.hpp"
 #include "exception/ModelException.hpp"
 #include "exception/gpioexception.hpp"
-#include "hardware/facades/FGPIO.hpp"
 #include "hardware/GPIO_odb.h"
+#include "hardware/facades/FGPIO.hpp"
 #include "mcp23s17.h"
 #include "modules/pifacedigital/CRUDHandler.hpp"
 #include "modules/pifacedigital/PFGPIO_odb.h"
@@ -38,6 +38,7 @@
 #include "tools/log.hpp"
 #include "tools/timeout.hpp"
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <fcntl.h>
 #include <hardware/HardwareService.hpp>
 #include <odb/schema-catalog.hxx>
@@ -282,7 +283,7 @@ void PFDigitalModule::load_config_from_database()
     t.commit();
 }
 
-void WSHelperThread::test_output_pin(int gpio_id)
+void WSHelperThread::test_output_pin(boost::uuids::uuid gpio_id)
 {
     // We want to make the target output pin blink.
     // We must first make sure a few assumptions hold:
@@ -340,7 +341,10 @@ void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
             rc.security_ctx.enforce_permission(SecurityContext::Action::IS_ADMIN,
                                                {});
 
-            int gpio_id = rc.original_msg.content.at("gpio_id").get<int>();
+            std::string uuid_str =
+                rc.original_msg.content.at("gpio_id").get<std::string>();
+            boost::uuids::uuid gpio_id =
+                boost::lexical_cast<boost::uuids::uuid>(uuid_str);
             this->test_output_pin(gpio_id);
             return json{};
         },

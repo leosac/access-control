@@ -26,11 +26,9 @@ namespace Hardware
 {
 
 GPIO::GPIO()
-    : id_(0)
-    , default_value_(false)
+    : number_(0)
     , direction_(Direction::In)
-    , number_(0)
-    , version_(0)
+    , default_value_(false)
 {
 }
 
@@ -42,16 +40,6 @@ const std::string &GPIO::name() const
 void GPIO::name(const std::string &name)
 {
     name_ = name;
-}
-
-GPIOId GPIO::id() const
-{
-    return id_;
-}
-
-uint64_t GPIO::version() const
-{
-    return version_;
 }
 
 uint16_t GPIO::number() const

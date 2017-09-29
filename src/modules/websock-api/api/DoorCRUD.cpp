@@ -168,7 +168,7 @@ DoorCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
     {
         dap.door_id = req.at("door_id").get<Auth::DoorId>();
     }
-    catch (std::out_of_range &e)
+    catch (json::out_of_range &e)
     {
         dap.door_id = 0;
     }

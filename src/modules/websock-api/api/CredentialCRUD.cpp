@@ -52,31 +52,28 @@ CredentialCRUD::required_permission(CRUDResourceHandler::Verb verb,
                                     const json &req) const
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
-    SecurityContext::GroupActionParam gap;
+    SecurityContext::GroupActionParam gap{};
     try
     {
         gap.group_id = req.at("credential_id").get<Auth::GroupId>();
     }
-    catch (std::out_of_range &e)
+    catch (json::out_of_range &e)
     {
         gap.group_id = 0;
     }
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::CREDENTIAL_READ, gap));
+        ret.emplace_back(SecurityContext::Action::CREDENTIAL_READ, gap);
         break;
     case Verb::CREATE:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::CREDENTIAL_CREATE, gap));
+        ret.emplace_back(SecurityContext::Action::CREDENTIAL_CREATE, gap);
         break;
     case Verb::UPDATE:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::CREDENTIAL_UPDATE, gap));
+        ret.emplace_back(SecurityContext::Action::CREDENTIAL_UPDATE, gap);
         break;
     case Verb::DELETE:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::CREDENTIAL_DELETE, gap));
+        ret.emplace_back(SecurityContext::Action::CREDENTIAL_DELETE, gap);
         break;
     }
     return ret;

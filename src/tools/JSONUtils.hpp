@@ -21,9 +21,69 @@
 
 #include "core/auth/AuthFwd.hpp"
 #include "exception/leosacexception.hpp"
+#include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <chrono>
 #include <json.hpp>
 #include <type_traits>
+
+
+/**
+ * Below we add a serializer into the `nlohmann` namespace to serialize
+ * the boost::uuids::uuid type. Through ADL our function will be called.
+ *
+ * This is documented at https://github.com/nlohmann/json#arbitrary-types-conversions
+ */
+
+namespace nlohmann
+{
+
+    template<>
+struct adl_serializer<boost::uuids::uuid>
+{
+    static void to_json(json &j, const boost::uuids::uuid &opt)
+    {
+        if (opt.is_nil())
+        {
+            j = nullptr;
+        }
+        else
+        {
+            std::stringstream ss;
+            ss << opt;
+            j = ss.str();
+        }
+    }
+
+    /**
+     * For unserialization we expect either a string representing the
+     * UUID, or a number.
+     */
+    static void from_json(const json &j, boost::uuids::uuid &opt)
+    {
+        if (j.is_null())
+        {
+            opt = {};
+        }
+        else
+        {
+            if (j.is_string()) {
+                std::string str = j.get<std::string>();
+                opt = boost::lexical_cast<boost::uuids::uuid>(str);
+            }
+            else if (j.is_number_unsigned() && j.get<uint64_t>() == 0)
+            {
+                opt = {};
+            }
+            else
+            {
+                throw LEOSACException("Failed to unserialize UUID");
+            }
+        }
+    }
+};
+}
 
 namespace Leosac
 {
@@ -58,7 +118,7 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
         if (!obj.at(key).is_null())
             ret = obj.at(key).get<T>();
     }
-    catch (const std::out_of_range &e)
+    catch (const json::out_of_range &e)
     {
     }
     return ret;
@@ -78,7 +138,7 @@ extract_with_default(const nlohmann::json &obj, const std::string &key,
             ret = static_cast<T>(obj.at(key).get<std::underlying_type_t<T>>());
         }
     }
-    catch (const std::out_of_range &e)
+    catch (const json::out_of_range  &e)
     {
     }
     return ret;

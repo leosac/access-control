@@ -19,13 +19,15 @@
 
 #pragma once
 
+#include <boost/uuid/uuid.hpp>
 #include <memory>
 
 namespace Leosac
 {
 namespace Hardware
 {
-using GPIOId = unsigned long long;
+using DeviceId = boost::uuids::uuid;
+
 class GPIO;
 using GPIOPtr = std::shared_ptr<GPIO>;
 }

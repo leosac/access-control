@@ -46,8 +46,8 @@ struct HardwareComparator
     {
         ASSERT_LOG(c1, "Hardware c1 is null");
         ASSERT_LOG(c2, "Hardware c2 is null");
-        ASSERT_LOG(c1->id(), "c1 has no id.");
-        ASSERT_LOG(c2->id(), "c2 has no id.");
+        ASSERT_LOG(!c1->id().is_nil(), "c1 has no id.");
+        ASSERT_LOG(!c2->id().is_nil(), "c2 has no id.");
         return c1->id() < c2->id();
     }
 };

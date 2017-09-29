@@ -32,7 +32,7 @@ odb_compile(OdbCMake_SOURCES
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME module_pifacedigital
-        PROFILE "boost/date-time" "boost/optional" "leosac-profile"
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" "leosac-profile"
         INCLUDE_PREFIX modules/pifacedigital
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         DEFAULT_POINTER "std::shared_ptr"

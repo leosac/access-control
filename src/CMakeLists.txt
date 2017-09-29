@@ -65,6 +65,7 @@ set(LEOSAC_LIB_SRCS
     hardware/facades/FGPIO.cpp
     hardware/facades/FLED.cpp
     hardware/facades/FWiegandReader.cpp
+    hardware/Device.cpp
     hardware/GPIO.cpp
     hardware/HardwareService.cpp
     hardware/serializers/GPIOSerializer.cpp

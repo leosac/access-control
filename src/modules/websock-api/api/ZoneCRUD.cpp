@@ -157,7 +157,7 @@ ZoneCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
     {
         zap.zone_id = req.at("zone_id").get<Auth::ZoneId>();
     }
-    catch (std::out_of_range &e)
+    catch (const json::out_of_range &e)
     {
         zap.zone_id = 0;
     }

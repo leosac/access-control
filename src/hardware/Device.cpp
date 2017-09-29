@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2017 Leosac
 
     This file is part of Leosac.
 
@@ -17,21 +17,19 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "core/GetServiceRegistry.hpp"
-#include "core/kernel.hpp"
+#include "hardware/Device.hpp"
+#include <boost/uuid/uuid_generators.hpp>
 
 namespace Leosac
 {
-ServiceRegistry &get_service_registry()
-{
-    // Normal mode. Kernel instance should have be available
-    // when leosac runs.
-    if (Kernel::instance_)
-        return Kernel::instance_->service_registry();
+    namespace Hardware
+    {
 
-    // This is a case we can hit when running unit tests.
-    // So we just return a dummy and empty registry.
-    static ServiceRegistry dummy_registry;
-    return dummy_registry;
-}
+        Device::Device() :
+                id_(boost::uuids::random_generator()()),
+                version_(0)
+        {
+
+        }
+    }
 }

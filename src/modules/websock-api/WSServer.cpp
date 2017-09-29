@@ -367,7 +367,7 @@ ClientMessage WSServer::parse_request(const json &req)
         msg.type    = req.at("type");
         msg.content = req.at("content");
     }
-    catch (const std::out_of_range &e)
+    catch (const json::out_of_range &e)
     {
         throw MalformedMessage();
     }

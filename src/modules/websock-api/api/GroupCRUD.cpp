@@ -187,7 +187,7 @@ GroupCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) 
     {
         gap.group_id = req.at("group_id").get<Auth::GroupId>();
     }
-    catch (std::out_of_range &e)
+    catch (const json::out_of_range &e)
     {
         gap.group_id = 0;
     }

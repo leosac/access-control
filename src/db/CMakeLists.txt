@@ -33,7 +33,7 @@ odb_compile(OdbCMake_SOURCES_TOOLS
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
-        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" leosac-profile
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX tools
         DEFAULT_POINTER "std::shared_ptr"
@@ -64,7 +64,7 @@ odb_compile(OdbCMake_SOURCES_AUTH
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
-        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" leosac-profile
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/auth/
@@ -98,7 +98,7 @@ odb_compile(OdbCMake_SOURCES_AUDITLOG
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
-        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" leosac-profile
         HXX_PROLOGUE "#include \"tools/db/AuditEventMaskODB.hpp\""
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/audit/
@@ -123,7 +123,7 @@ odb_compile(OdbCMake_SOURCES_CREDENTIALS
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
-        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" leosac-profile
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX core/credentials/
         DEFAULT_POINTER "std::shared_ptr"
@@ -158,6 +158,7 @@ odb_compile(OdbCMake_SOURCES_UPDATES
 
 # ODB configuration for Hardware devices
 set(OdbCMake_ODB_HEADERS_HARDWARE
+        ${CMAKE_SOURCE_DIR}/src/hardware/Device.hpp
         ${CMAKE_SOURCE_DIR}/src/hardware/GPIO.hpp
         )
 
@@ -169,7 +170,7 @@ odb_compile(OdbCMake_SOURCES_HARDWARE
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
-        PROFILE "boost/date-time" "boost/optional" leosac-profile
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" leosac-profile
         INCLUDE  ${LEOSAC_ODB_INCLUDE_DIRS}
         INCLUDE_PREFIX hardware/
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
@@ -225,6 +226,7 @@ add_custom_command(
         --multi-database dynamic
         --profile boost/date-time
         --profile boost/optional
+        --profile boost/uuid
         --profile leosac-profile
         --database pgsql
         --database sqlite

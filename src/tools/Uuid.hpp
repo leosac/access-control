@@ -19,35 +19,14 @@
 
 #pragma once
 
-#include "exception/leosacexception.hpp"
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
-namespace Leosac
+class UUID
 {
-class EntityNotFound : public LEOSACException
-{
-  public:
-    /**
-     * Construct the exception from a type that can be converted
-     * to string using the `std::to_string()` call.
-     */
-    template <typename T>
-    EntityNotFound(const T &id, const std::string &type)
-        : EntityNotFound(std::to_string(id), type)
+    std::string to_string() const
     {
+        return boost::lexical_cast<std::string>(uuid_);
     }
-
-    EntityNotFound(const std::string &id, const std::string &type);
-
-    EntityNotFound(const boost::uuids::uuid &id, const std::string &type);
-
-    const std::string &entity_id() const;
-    const std::string &entity_type() const;
-
-  private:
-    std::string build_msg(const std::string &id, const std::string &type) const;
-
-    std::string entity_id_;
-    std::string entity_type_;
+    boost::uuids::uuid uuid_;
 };
-}

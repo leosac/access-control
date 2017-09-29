@@ -39,14 +39,14 @@ CRUDHandler::required_permission(WebSockAPI::ICRUDResourceHandler::Verb verb,
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
 
-    SecurityContext::HardwareGPIOActionParam gpio_action_param;
+    SecurityContext::HardwareDeviceActionParam gpio_action_param;
     try
     {
-        gpio_action_param.gpio_id = req.at("gpio_id").get<Hardware::GPIOId>();
+        gpio_action_param.gpio_id = req.at("gpio_id").get<Hardware::DeviceId>();
     }
-    catch (std::out_of_range &e)
+    catch (json::out_of_range &e)
     {
-        gpio_action_param.gpio_id = 0;
+        gpio_action_param.gpio_id = boost::uuids::uuid{};
     }
 
     switch (verb)
@@ -87,7 +87,7 @@ boost::optional<json> CRUDHandler::create_impl(const json &req)
     return rep;
 }
 
-auto find_gpio_by_id(const Hardware::GPIOId &id, DBPtr db)
+auto find_gpio_by_id(const Hardware::DeviceId &id, DBPtr db)
 {
     db::OptionalTransaction t(db->begin());
     auto gpio = db->find<PFGPIO>(id);
@@ -104,9 +104,9 @@ boost::optional<json> CRUDHandler::read_impl(const json &req)
     using Result = odb::result<PFGPIO>;
     DBPtr db     = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto gpio_id = req.at("gpio_id").get<Hardware::GPIOId>();
+    auto gpio_id = req.at("gpio_id").get<Hardware::DeviceId>();
 
-    if (gpio_id != 0)
+    if (!gpio_id.is_nil())
     {
         auto gpio   = find_gpio_by_id(gpio_id, db);
         rep["data"] = PFGPIOSerializer::serialize(*gpio, security_context());
@@ -120,7 +120,7 @@ boost::optional<json> CRUDHandler::read_impl(const json &req)
         // fixme: may be rather slow.
         for (const auto &gpio : result)
         {
-            SecurityContext::HardwareGPIOActionParam ap{.gpio_id = gpio.id()};
+            SecurityContext::HardwareDeviceActionParam ap{.gpio_id = gpio.id()};
             if (ctx_.session->security_context().check_permission(
                     SecurityContext::Action::HARDWARE_GPIO_READ, ap))
             {
@@ -138,7 +138,7 @@ boost::optional<json> CRUDHandler::update_impl(const json &req)
     json rep;
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
-    auto gpio_id = req.at("gpio_id").get<Hardware::GPIOId>();
+    auto gpio_id = req.at("gpio_id").get<Hardware::DeviceId>();
     auto gpio    = find_gpio_by_id(gpio_id, db);
 
     PFGPIOSerializer::unserialize(*gpio, req.at("attributes"), security_context());
@@ -151,7 +151,7 @@ boost::optional<json> CRUDHandler::update_impl(const json &req)
 
 boost::optional<json> CRUDHandler::delete_impl(const json &req)
 {
-    auto did = req.at("gpio_id").get<Hardware::GPIOId>();
+    auto did = req.at("gpio_id").get<Hardware::DeviceId>();
     DBPtr db = ctx_.dbsrv->db();
     odb::transaction t(db->begin());
 

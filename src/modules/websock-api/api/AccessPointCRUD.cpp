@@ -155,27 +155,23 @@ AccessPointCRUD::required_permission(CRUDResourceHandler::Verb verb,
     {
         aap.ap_id = req.at("access_point_id").get<Auth::AccessPointId>();
     }
-    catch (std::out_of_range &e)
+    catch (json::out_of_range &e)
     {
         aap.ap_id = 0;
     }
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::ACCESS_POINT_READ, aap));
+        ret.emplace_back(SecurityContext::Action::ACCESS_POINT_READ, aap);
         break;
     case Verb::CREATE:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::ACCESS_POINT_CREATE, aap));
+        ret.emplace_back(SecurityContext::Action::ACCESS_POINT_CREATE, aap);
         break;
     case Verb::UPDATE:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::ACCESS_POINT_UPDATE, aap));
+        ret.emplace_back(SecurityContext::Action::ACCESS_POINT_UPDATE, aap);
         break;
     case Verb::DELETE:
-        ret.push_back(
-            std::make_pair(SecurityContext::Action::ACCESS_POINT_DELETE, aap));
+        ret.emplace_back(SecurityContext::Action::ACCESS_POINT_DELETE, aap);
         break;
     }
     return ret;

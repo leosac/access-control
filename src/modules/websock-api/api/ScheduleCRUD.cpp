@@ -56,23 +56,23 @@ ScheduleCRUD::required_permission(CRUDResourceHandler::Verb verb,
     {
         sap.schedule_id = req.at("schedule_id").get<Auth::GroupId>();
     }
-    catch (std::out_of_range &e)
+    catch (const json::out_of_range &e)
     {
         sap.schedule_id = 0;
     }
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::SCHEDULE_READ, sap));
+        ret.emplace_back(SecurityContext::Action::SCHEDULE_READ, sap);
         break;
     case Verb::CREATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::SCHEDULE_CREATE, sap));
+        ret.emplace_back(SecurityContext::Action::SCHEDULE_CREATE, sap);
         break;
     case Verb::UPDATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::SCHEDULE_UPDATE, sap));
+        ret.emplace_back(SecurityContext::Action::SCHEDULE_UPDATE, sap);
         break;
     case Verb::DELETE:
-        ret.push_back(std::make_pair(SecurityContext::Action::SCHEDULE_DELETE, sap));
+        ret.emplace_back(SecurityContext::Action::SCHEDULE_DELETE, sap);
         break;
     }
     return ret;

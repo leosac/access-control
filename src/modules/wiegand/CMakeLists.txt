@@ -38,7 +38,7 @@ odb_compile(OdbCMake_SOURCES
         GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
         SCHEMA_FORMAT embedded
         SCHEMA_NAME module_wiegand
-        PROFILE "boost/date-time" "boost/optional" "leosac-profile"
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" "leosac-profile"
         INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
         HEADER_PROLOGUE ${CMAKE_SOURCE_DIR}/src/tools/db/ODB_Auth_Prologue.hpp
         DEFAULT_POINTER "std::shared_ptr"

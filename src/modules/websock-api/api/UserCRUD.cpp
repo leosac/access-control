@@ -148,12 +148,12 @@ UserCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
 {
     std::vector<CRUDResourceHandler::ActionActionParam> ret;
 
-    SecurityContext::UserActionParam uap;
+    SecurityContext::UserActionParam uap{};
     try
     {
         uap.user_id = req.at("user_id").get<Auth::GroupId>();
     }
-    catch (std::out_of_range &e)
+    catch (const json::out_of_range &e)
     {
         uap.user_id = 0;
     }
@@ -161,16 +161,16 @@ UserCRUD::required_permission(CRUDResourceHandler::Verb verb, const json &req) c
     switch (verb)
     {
     case Verb::READ:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_READ, uap));
+        ret.emplace_back(SecurityContext::Action::USER_READ, uap);
         break;
     case Verb::CREATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_CREATE, uap));
+        ret.emplace_back(SecurityContext::Action::USER_CREATE, uap);
         break;
     case Verb::UPDATE:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_UPDATE, uap));
+        ret.emplace_back(SecurityContext::Action::USER_UPDATE, uap);
         break;
     case Verb::DELETE:
-        ret.push_back(std::make_pair(SecurityContext::Action::USER_DELETE, uap));
+        ret.emplace_back(SecurityContext::Action::USER_DELETE, uap);
         break;
     }
     return ret;

@@ -228,9 +228,9 @@ class SecurityContext
         operator ActionParam();
     };
 
-    struct HardwareGPIOActionParam
+    struct HardwareDeviceActionParam
     {
-        Hardware::GPIOId gpio_id;
+        Hardware::DeviceId gpio_id;
 
         operator ActionParam();
     };
@@ -254,7 +254,7 @@ class SecurityContext
         DoorActionParam door;
         AccessPointActionParam access_point;
         ZoneActionParam zone;
-        HardwareGPIOActionParam hardware_gpio;
+        HardwareDeviceActionParam hardware_gpio;
         HardwareAuthSourceParam hardware_auth_source;
     };
 
