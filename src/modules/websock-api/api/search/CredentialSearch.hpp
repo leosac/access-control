@@ -42,11 +42,11 @@ using json = nlohmann::json;
  *     + 'partial_name': A part of the name we are looking for.
  *
  * Response:
- *     A list of {id,alias} for credentials that match the partial name.
+ *     A list of {id,alias,type} for credentials that match the partial name.
  *     [
  *       {id: $CREDENTIAL_ID,
  *       alias: $CREDENTIAL_ALIAS
- *       type: $CRENDETIAL_TYPE (Pin code / rfid card)
+ *       type: $CREDENTIAL_TYPE (Pin code / rfid card)
  *       },
  *       {...}
  *     ]
