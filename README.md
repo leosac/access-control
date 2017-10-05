@@ -13,7 +13,7 @@ A Leosac setup is usually composed of an embedded Linux board running the softwa
 * Multiple-door/reader support
 * Ethernet connectivity
 * **Fully** configurable wiring layout
-* Portable on virtually every Linux devices on the marke
+* Portable on virtually every Linux devices on the market
 * Open-source
 
 
