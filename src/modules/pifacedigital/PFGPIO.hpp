@@ -46,20 +46,23 @@ class PFGPIO : public Hardware::GPIO
   public:
     PFGPIO();
 
-    int hardware_address() const
+    uint8_t hardware_address() const
     {
         return hardware_address_;
     }
 
-    void hardware_address(int addr)
+    void hardware_address(uint8_t addr)
     {
         hardware_address_ = addr;
     }
 
   private:
-    // Not used for now. Maybe later when supporting
-    // stacked piface. Really a dummy data for now.
-    int hardware_address_;
+    /**
+     * Hardware address of the piface digital device.
+     *
+     * This should be 0 when using a single piface.
+     */
+    uint8_t hardware_address_;
 
     friend odb::access;
 };

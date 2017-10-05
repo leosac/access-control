@@ -45,7 +45,7 @@ struct PFDigitalPin
     * an output pin.
     */
     PFDigitalPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
-                 Direction direction, bool value);
+                 Direction direction, bool value, uint8_t hardware_address);
 
     ~PFDigitalPin();
 
@@ -100,7 +100,7 @@ struct PFDigitalPin
     */
     void send_state();
 
-    int gpio_no_;
+    uint8_t gpio_no_;
 
     /**
     * listen to command from other component.
@@ -135,6 +135,8 @@ struct PFDigitalPin
     * Time point of next wished update.
     */
     std::chrono::system_clock::time_point next_update_time_;
+
+    uint8_t hardware_address_;
 
     /**
     * Does this object wants to be `update()`d ?

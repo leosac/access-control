@@ -23,21 +23,23 @@ Configuration Options {#mod_piface_user_config}
 See below for various configuration options.
 
 
-Options      | Options   | Description                                            | Mandatory
--------------|-----------|--------------------------------------------------------|-----------
-use_database |           | If true, use database-backed configuration.            | NO (defaults to false)
-gpios        |           | GPIOS definitions                                      | YES
---->         | name      | A name for the GPIO device                             | YES
---->         | no        | The GPIO number of the piface. Range from 0 to 7       | YES
---->         | direction | Direction of the PIN. in or out                        | YES
---->         | value     | Only for out PIN. The default value of the PIN         | YES for output pin
+Options      | Options          | Description                                            | Mandatory
+-------------|------------------|--------------------------------------------------------|-----------
+use_database |                  | If true, use database-backed configuration.            | NO (defaults to false)
+gpios        |                  | GPIOS definitions                                      | YES
+--->         | name             | A name for the GPIO device                             | YES
+--->         | no               | The GPIO number of the piface. Range from 0 to 7       | YES
+--->         | direction        | Direction of the PIN. in or out                        | YES
+--->         | value            | Only for out PIN. The default value of the PIN         | YES for output pin
+--->         | hardware_address | Address of the physical pfdigital.                     | NO (defaults to 0)
 
 Notes:
 + If `use_database` is true, the module will expose its configuration API over
   websocket (provided that a Websocket module is available). All other XML configuration
   option are ignored.
 + `value` is a boolean. It's only for output GPIO and represents the default value.
-
++ `hardware_address` is used when there are multiple pifacedigital connected to the PI.
+  When there is only 1 piface device, its hardware address is 0.
 
 Database Configuration Notes
 ----------------------------

@@ -69,6 +69,14 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
         process_config();
         return;
     }
+    for (uint8_t hw_addr = 1; hw_addr < 4; ++hw_addr)
+    {
+        if (pifacedigital_open(hw_addr) == -1)
+        {
+            ERROR("Failed to initialize pifacedigital with hardware address" << hw_addr);
+        }
+    }
+
     int ret = pifacedigital_enable_interrupts();
     ASSERT_LOG(ret == 0, "Failed to enable interrupt on piface board");
 
@@ -137,27 +145,31 @@ void PFDigitalModule::handle_interrupt()
     ASSERT_LOG(ret >= 0,
                "Lseeking on interrupt_fd gave unexpected return value: " << ret);
 
-    uint8_t states = pifacedigital_read_reg(0x11, 0);
-    for (int i = 0; i < 8; ++i)
+    for (uint8_t hwaddr = 0; hwaddr < 4; ++hwaddr)
     {
-        if (((states >> i) & 0x01) == 0)
+        uint8_t states = pifacedigital_read_reg(0x11, hwaddr);
+        for (int i = 0; i < 8; ++i)
         {
-            // signal interrupt if needed (ie the pin is registered in config)
-            std::string gpio_name;
-            if (get_input_pin_name(gpio_name, i))
+            if (((states >> i) & 0x01) == 0)
             {
-                bus_push_.send(zmqpp::message()
-                               << std::string("S_INT:" + gpio_name));
+                // signal interrupt if needed (ie the pin is registered in config)
+                std::string gpio_name;
+                if (get_input_pin_name(gpio_name, i, hwaddr))
+                {
+                    bus_push_.send(zmqpp::message()
+                                   << std::string("S_INT:" + gpio_name));
+                }
             }
         }
     }
 }
 
-bool PFDigitalModule::get_input_pin_name(std::string &dest, int idx)
+bool PFDigitalModule::get_input_pin_name(std::string &dest, int idx, uint8_t hw_addr)
 {
     for (const auto &gpio : gpios_)
     {
-        if (gpio.gpio_no_ == idx && gpio.direction_ == PFDigitalPin::Direction::In)
+        if (gpio.gpio_no_ == idx && gpio.direction_ == PFDigitalPin::Direction::In &&
+            gpio.hardware_address_ == hw_addr)
         {
             dest = gpio.name_;
             return true;
@@ -174,10 +186,11 @@ void PFDigitalModule::process_xml_config(const boost::property_tree::ptree &cfg)
     {
         boost::property_tree::ptree gpio_cfg = node.second;
 
-        std::string gpio_name      = gpio_cfg.get_child("name").data();
-        int gpio_no                = std::stoi(gpio_cfg.get_child("no").data());
-        std::string gpio_direction = gpio_cfg.get_child("direction").data();
+        std::string gpio_name      = gpio_cfg.get<std::string>("name");
+        int gpio_no                = gpio_cfg.get<uint8_t>("no");
+        std::string gpio_direction = gpio_cfg.get<std::string>("direction");
         bool gpio_value            = gpio_cfg.get<bool>("value", false);
+        uint8_t hw_addr            = gpio_cfg.get<uint8_t>("hardware_address", 0);
 
         INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no
                               << ". direction = " << gpio_direction);
@@ -185,7 +198,7 @@ void PFDigitalModule::process_xml_config(const boost::property_tree::ptree &cfg)
         PFDigitalPin pin(ctx_, gpio_name, gpio_no,
                          gpio_direction == "in" ? PFDigitalPin::Direction::In
                                                 : PFDigitalPin::Direction::Out,
-                         gpio_value);
+                         gpio_value, hw_addr);
 
         if (gpio_direction != "in" && gpio_direction != "out")
             throw GpioException("Direction (" + gpio_direction + ") is invalid");
@@ -270,11 +283,19 @@ void PFDigitalModule::load_config_from_database()
     {
         // For each PFGPIO object in the database, create a PFDigitalPin
 
+        if (gpio.number() > std::numeric_limits<uint8_t>::max())
+        {
+            WARN("Cannot create GPIO "
+                 << gpio.name()
+                 << " because its number is too big: " << gpio.number());
+            continue;
+        }
+
         INFO("Creating GPIO "
              << gpio.name() << ", with no " << gpio.number() << ". direction = "
              << (gpio.direction() == PFDigitalPin::Direction::In ? "in" : "out"));
         PFDigitalPin pin(ctx_, gpio.name(), gpio.number(), gpio.direction(),
-                         gpio.default_value());
+                         gpio.default_value(), gpio.hardware_address());
         gpios_.push_back(std::move(pin));
         utils_->config_checker().register_object(gpio.name(),
                                                  ConfigChecker::ObjectType::GPIO);

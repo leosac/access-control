@@ -22,13 +22,14 @@
 #include "tools/log.hpp"
 
 PFDigitalPin::PFDigitalPin(zmqpp::context &ctx, const std::string &name, int gpio_no,
-                           Direction direction, bool value)
+                           Direction direction, bool value, uint8_t hardware_address)
     : gpio_no_(gpio_no)
     , sock_(ctx, zmqpp::socket_type::rep)
     , bus_push_(new zmqpp::socket(ctx, zmqpp::socket_type::push))
     , name_(name)
     , direction_(direction)
     , default_value_(value)
+    , hardware_address_(hardware_address)
     , want_update_(false)
 {
     DEBUG("trying to bind to " << ("inproc://" + name));
@@ -51,10 +52,11 @@ PFDigitalPin::PFDigitalPin(PFDigitalPin &&o)
     , direction_(o.direction_)
     , default_value_(o.default_value_)
 {
-    this->gpio_no_     = o.gpio_no_;
-    this->name_        = o.name_;
-    this->bus_push_    = o.bus_push_;
-    this->want_update_ = o.want_update_;
+    this->gpio_no_          = o.gpio_no_;
+    this->name_             = o.name_;
+    this->bus_push_         = o.bus_push_;
+    this->want_update_      = o.want_update_;
+    this->hardware_address_ = o.hardware_address_;
 
     o.bus_push_ = nullptr;
 }
@@ -95,7 +97,7 @@ bool PFDigitalPin::turn_on(zmqpp::message *msg /* = nullptr */)
             std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
         want_update_ = true;
     }
-    pifacedigital_digital_write(gpio_no_, 1);
+    pifacedigital_write_bit(1, gpio_no_, OUTPUT, hardware_address_);
 
     publish_state();
     return true;
@@ -105,7 +107,7 @@ bool PFDigitalPin::turn_off()
 {
     if (direction_ != Direction::Out)
         return false;
-    pifacedigital_digital_write(gpio_no_, 0);
+    pifacedigital_write_bit(0, gpio_no_, OUTPUT, hardware_address_);
 
     publish_state();
     return true;
@@ -116,12 +118,12 @@ bool PFDigitalPin::toggle()
     if (direction_ != Direction::Out)
         return false;
 
-    uint8_t v = pifacedigital_read_bit(gpio_no_, OUTPUT, 0);
+    uint8_t v = pifacedigital_read_bit(gpio_no_, OUTPUT, hardware_address_);
 
     if (v)
-        pifacedigital_digital_write(gpio_no_, 0);
+        pifacedigital_write_bit(0, gpio_no_, OUTPUT, hardware_address_);
     else
-        pifacedigital_digital_write(gpio_no_, 1);
+        pifacedigital_write_bit(1, gpio_no_, OUTPUT, hardware_address_);
 
     publish_state();
     return true;
@@ -130,8 +132,8 @@ bool PFDigitalPin::toggle()
 bool PFDigitalPin::read_value()
 {
     // pin's direction matter here (not read from same register).
-    return pifacedigital_read_bit(gpio_no_,
-                                  direction_ == Direction::Out ? OUTPUT : INPUT, 0);
+    return pifacedigital_read_bit(
+        gpio_no_, direction_ == Direction::Out ? OUTPUT : INPUT, hardware_address_);
 }
 
 void PFDigitalPin::update()

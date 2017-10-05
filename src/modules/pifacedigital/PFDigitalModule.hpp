@@ -127,12 +127,13 @@ class PFDigitalModule : public BaseModule
     std::vector<PFDigitalPin> gpios_;
 
     /**
-    * Should be removed someday...
-    * store the name of the input pin with id = idx in dest.
-    *
-    * returns true if it was successful (pin exists), false otherwise.
-    */
-    bool get_input_pin_name(std::string &dest, int idx);
+     * Retrieve the (user-given) name of the pin and store it in dest.
+     * @param dest string to store the name into
+     * @param idx The ping number, starting at 0 for the first one.
+     * @param hw_addr The underlying hardware address of the pifacedigital.
+     * @return True if we found the pin, false otherwise.
+     */
+    bool get_input_pin_name(std::string &dest, int idx, uint8_t hw_addr);
 
     /**
     * File descriptor of the PIN that triggers interrupts. This is card and will not

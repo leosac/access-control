@@ -243,7 +243,7 @@ void WSServer::run(const std::string &interface, uint16_t port)
 void WSServer::start_shutdown()
 {
     srv_.get_io_service().post([this]() {
-         attempt_unregister_ws_service();
+        attempt_unregister_ws_service();
         srv_.stop_listening();
         for (auto con_session : connection_session_)
         {
