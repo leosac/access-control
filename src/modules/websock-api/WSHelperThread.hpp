@@ -112,6 +112,7 @@ class BaseModuleSupportThread
         // If we already have a WS Service object, register ws handler asap.
         if (ws_service)
         {
+            service_ptr_ = ws_service;
             io_.post([this, ws_service]() {
                 std::lock_guard<decltype(mutex_)> lg(mutex_);
                 register_ws_handlers(*ws_service);
@@ -137,7 +138,7 @@ class BaseModuleSupportThread
                     auto ws_service =
                         get_service_registry().get_service<WebSockAPI::Service>();
                     ASSERT_LOG(ws_service, "WSService has disappeared");
-
+                    service_ptr_ = ws_service;
                     {
                         std::lock_guard<decltype(mutex_)> lg(mutex_);
                         register_ws_handlers(*ws_service);
@@ -163,6 +164,12 @@ class BaseModuleSupportThread
     std::unique_ptr<boost::asio::io_service::work> work_;
     ParameterT parameters_;
     std::mutex mutex_;
+
+    // Keep a ref to the WS service so it doesn't
+    // disapear. This effectively keep the WebSockAPI module
+    // alive.
+    // Todo: Maybe improve the whole module/service infrastructure.
+    std::shared_ptr<WebSockAPI::Service> service_ptr_;
 };
 }
 }

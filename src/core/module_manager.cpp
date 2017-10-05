@@ -197,12 +197,9 @@ ModuleManager::load_library_file(const std::string &full_path)
 
 void ModuleManager::stopModules(bool soft)
 {
-    for (std::set<ModuleInfo>::const_reverse_iterator itr = modules_.rbegin();
-         itr != modules_.rend(); ++itr)
+    for (auto itr = modules_.rbegin(); itr != modules_.rend(); ++itr)
     {
         stopModule(const_cast<ModuleInfo *>(&(*itr)), soft);
-        DEBUG("Will now sleep before stoping next module...");
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
     if (!soft)
     {

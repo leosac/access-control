@@ -233,15 +233,17 @@ void WSServer::run(const std::string &interface, uint16_t port)
 
     get_service_registry().register_service<Service>(
         std::make_unique<Service>(*this));
+    work_ = std::make_unique<boost::asio::io_service::work>(srv_.get_io_service());
     srv_.run();
-    bool ok = get_service_registry().unregister_service<Service>();
-    if (!ok)
-        WARN("Failed to unregister the WebSockAPI::Service.");
+    DEBUG("END OF WSServer::run()");
+    ASSERT_LOG(get_service_registry().get_service<Service>() == nullptr,
+               "Service has not been unregistered");
 }
 
 void WSServer::start_shutdown()
 {
     srv_.get_io_service().post([this]() {
+         attempt_unregister_ws_service();
         srv_.stop_listening();
         for (auto con_session : connection_session_)
         {
@@ -532,4 +534,20 @@ void WSServer::register_crud_handler_external(const std::string &resource_name,
     });
 
     return p.get_future().get();
+}
+
+void WSServer::attempt_unregister_ws_service()
+{
+    bool ok = get_service_registry().unregister_service<Service>();
+    if (ok)
+    {
+        INFO("WebSocket service has been unregistered.");
+        // Nobody relies on our Service anymore. We can remove work_
+        // and let the io_service run out of work.
+        work_ = nullptr;
+    }
+    else
+    {
+        srv_.get_io_service().post([this]() { attempt_unregister_ws_service(); });
+    }
 }

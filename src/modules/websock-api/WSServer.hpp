@@ -146,6 +146,8 @@ class WSServer
 
     void on_close(websocketpp::connection_hdl hdl);
 
+    void attempt_unregister_ws_service();
+
     /**
      * A websocket message has been received.
      *
@@ -254,6 +256,12 @@ class WSServer
      * The module is guaranteed to outlive the WSServer.
      */
     WebSockAPIModule &module_;
+
+    /**
+     * Work used to keep the io_service alive while someone
+     * has a reference to (WS) Service object.
+     */
+    std::unique_ptr<boost::asio::io_service::work> work_;
 };
 }
 }
