@@ -19,10 +19,20 @@
 
 #include "LEDBuzzerModule.hpp"
 #include "core/kernel.hpp"
+#include "hardware/Buzzer_odb.h"
+#include "hardware/GPIO.hpp"
+#include "hardware/LED_odb.h"
+#include "tools/db/database.hpp"
 #include "tools/timeout.hpp"
+#include "ws/WSHelperThread.hpp"
 #include <boost/iterator/transform_iterator.hpp>
 
-using namespace Leosac::Module::LedBuzzer;
+namespace Leosac
+{
+namespace Module
+{
+namespace LedBuzzer
+{
 
 LEDBuzzerModule::LEDBuzzerModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                                  boost::property_tree::ptree const &cfg,
@@ -30,32 +40,58 @@ LEDBuzzerModule::LEDBuzzerModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     : BaseModule(ctx, pipe, cfg, utils)
 {
     process_config();
-    for (auto &led : leds_)
+    for (auto &led : leds_and_buzzers_)
     {
         reactor_.add(led->frontend(),
                      std::bind(&LedBuzzerImpl::handle_message, led.get()));
     }
 }
 
+LEDBuzzerModule::~LEDBuzzerModule()
+{
+}
+
 void LEDBuzzerModule::run()
 {
+    if (config_.get_child("module_config").get<bool>("use_database", false))
+    {
+        ws_helper_thread_ = std::make_unique<WSHelperThread>(utils_);
+        ws_helper_thread_->start_running();
+    }
     while (is_running_)
     {
         auto itr_transform = [](const std::shared_ptr<LedBuzzerImpl> &lb) {
             return lb->next_update();
         };
         reactor_.poll(Tools::compute_timeout(
-            boost::make_transform_iterator(leds_.begin(), itr_transform),
-            boost::make_transform_iterator(leds_.end(), itr_transform)));
-        for (auto &led : leds_)
+            boost::make_transform_iterator(leds_and_buzzers_.begin(), itr_transform),
+            boost::make_transform_iterator(leds_and_buzzers_.end(), itr_transform)));
+        for (auto &led : leds_and_buzzers_)
         {
             if (led->next_update() <= std::chrono::system_clock::now())
                 led->update();
         }
     }
+    auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+    if (ws_service && ws_helper_thread_)
+        ws_helper_thread_->unregister_ws_handlers(*ws_service);
 }
 
 void LEDBuzzerModule::process_config()
+{
+    boost::property_tree::ptree module_config = config_.get_child("module_config");
+
+    if (module_config.get<bool>("use_database", false))
+    {
+        load_db_config();
+    }
+    else
+    {
+        load_xml_config();
+    }
+}
+
+void LEDBuzzerModule::load_xml_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
 
@@ -65,8 +101,8 @@ void LEDBuzzerModule::process_config()
         {
             boost::property_tree::ptree led_cfg = node.second;
 
-            std::string led_name  = led_cfg.get_child("name").data();
-            std::string gpio_name = led_cfg.get_child("gpio").data();
+            std::string led_name  = led_cfg.get<std::string>("name");
+            std::string gpio_name = led_cfg.get<std::string>("gpio");
             int default_blink_duration =
                 led_cfg.get<int>("default_blink_duration", 1000);
             int default_blink_speed = led_cfg.get<int>("default_blink_speed", 200);
@@ -74,9 +110,9 @@ void LEDBuzzerModule::process_config()
             INFO("Creating LED " << led_name << ", linked to GPIO " << gpio_name);
             config_check(gpio_name, ConfigChecker::ObjectType::GPIO);
 
-            leds_.push_back(std::shared_ptr<LedBuzzerImpl>(
-                new LedBuzzerImpl(ctx_, led_name, gpio_name, default_blink_duration,
-                                  default_blink_speed)));
+            leds_and_buzzers_.push_back(std::make_shared<LedBuzzerImpl>(
+                ctx_, led_name, gpio_name, default_blink_duration,
+                default_blink_speed));
             utils_->config_checker().register_object(led_name,
                                                      ConfigChecker::ObjectType::LED);
         }
@@ -88,8 +124,8 @@ void LEDBuzzerModule::process_config()
         {
             boost::property_tree::ptree buzzer_cfg = node.second;
 
-            std::string buzzer_name = buzzer_cfg.get_child("name").data();
-            std::string gpio_name   = buzzer_cfg.get_child("gpio").data();
+            std::string buzzer_name = buzzer_cfg.get<std::string>("name");
+            std::string gpio_name   = buzzer_cfg.get<std::string>("gpio");
             int default_blink_duration =
                 buzzer_cfg.get<int>("default_blink_duration", 1000);
             int default_blink_speed =
@@ -100,11 +136,71 @@ void LEDBuzzerModule::process_config()
             config_check(gpio_name, ConfigChecker::ObjectType::GPIO);
 
             // internally we do not care if its a buzzer or a led.
-            leds_.push_back(std::shared_ptr<LedBuzzerImpl>(
-                new LedBuzzerImpl(ctx_, buzzer_name, gpio_name,
-                                  default_blink_duration, default_blink_speed)));
+            leds_and_buzzers_.push_back(std::make_shared<LedBuzzerImpl>(
+                ctx_, buzzer_name, gpio_name, default_blink_duration,
+                default_blink_speed));
             utils_->config_checker().register_object(
                 buzzer_name, ConfigChecker::ObjectType::BUZZER);
         }
     }
+}
+
+void LEDBuzzerModule::load_db_config()
+{
+    using namespace odb;
+    using namespace odb::core;
+    auto db = utils_->database();
+
+    // Load leds
+    {
+        odb::transaction t(utils_->database()->begin());
+        odb::result<Hardware::LED> result(
+            utils_->database()->query<Hardware::LED>());
+        for (const auto &led : result)
+        {
+            if (!led.enabled())
+                continue;
+            if (!led.gpio())
+            {
+                WARN("No GPIO associated with device " << led.name()
+                                                       << ". Skipping.");
+                continue;
+            }
+            leds_and_buzzers_.push_back(std::make_shared<LedBuzzerImpl>(
+                ctx_, led.name(), led.gpio()->name(), led.default_blink_duration(),
+                led.default_blink_speed()));
+            utils_->config_checker().register_object(led.name(),
+                                                     ConfigChecker::ObjectType::LED);
+        }
+        t.commit();
+    }
+
+    // Load buzzer
+    {
+        odb::transaction t(utils_->database()->begin());
+        odb::result<Hardware::Buzzer> result(
+            utils_->database()->query<Hardware::Buzzer>());
+        for (const auto &buzzer : result)
+        {
+            if (!buzzer.enabled())
+                continue;
+            if (!buzzer.gpio())
+            {
+                WARN("No GPIO associated with device " << buzzer.name()
+                                                       << ". Skipping.");
+                continue;
+            }
+            leds_and_buzzers_.push_back(std::make_shared<LedBuzzerImpl>(
+                ctx_, buzzer.name(), buzzer.gpio()->name(),
+                buzzer.default_blink_duration(), buzzer.default_blink_speed()));
+            utils_->config_checker().register_object(
+                buzzer.name(), ConfigChecker::ObjectType::BUZZER);
+        }
+        t.commit();
+    }
+
+    INFO("LEDBuzzer module using SQL database for configuration.");
+}
+}
+}
 }

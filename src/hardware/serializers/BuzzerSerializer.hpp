@@ -19,34 +19,22 @@
 
 #pragma once
 
-#include "hardware/Device.hpp"
+#include "LeosacFwd.hpp"
 #include "hardware/HardwareFwd.hpp"
-#include <cstdint>
-#include <odb/callback.hxx>
-#include <odb/core.hxx>
-#include <string>
+#include <json.hpp>
 
 namespace Leosac
 {
+using json = nlohmann::json;
+
 namespace Hardware
 {
-
-/**
- *  Abstraction of a RFID Reader device.
- *
- *  For now we have no attributes. Probably will change
- *  when WiegandReader module works correctly with database.
- *  todo: move some common attributes here
- */
-#pragma db object callback(validation_callback) table("HARDWARE_RFIDReader")
-class RFIDReader : public Device
+struct BuzzerSerializer
 {
-  public:
-    RFIDReader();
+    static json serialize(const Hardware::Buzzer &in, const SecurityContext &sc);
 
-    void validation_callback(odb::callback_event, odb::database &) const override;
-
-    friend odb::access;
+    static void unserialize(Hardware::Buzzer &out, const json &in,
+                            const SecurityContext &sc);
 };
 }
 }

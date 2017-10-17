@@ -42,10 +42,21 @@ class HardwareService
   public:
     explicit HardwareService(const Leosac::DBServicePtr &dbservice);
 
+    DevicePtr find_device_by_name(const std::string &dev_name) const;
+
     /**
      * Return the name of real type of a device.
      */
-    std::string hardware_device_type(Hardware::Device &device) const;
+    std::string hardware_device_type(const Hardware::Device &device) const;
+
+    /**
+     * Serialize as json the metadata of a device.
+     *
+     * This is useful when serializer when to describe a relationship.
+     * @param device
+     * @return json object looking like: {"id": DEVICE_UUID, "type": DEVICE_TYPE}
+     */
+    json serialize_device_metadata(const Hardware::DevicePtr &device) const;
 
   private:
     DBServicePtr dbservice_;

@@ -21,10 +21,8 @@
 
 #include "hardware/Device.hpp"
 #include "hardware/HardwareFwd.hpp"
-#include <cstdint>
 #include <odb/callback.hxx>
 #include <odb/core.hxx>
-#include <string>
 
 namespace Leosac
 {
@@ -32,49 +30,48 @@ namespace Hardware
 {
 
 /**
- *  Abstraction of a GPIO device attributes.
+ *  Abstraction of Buzzer device attributes.
  *
- *  Modules that provides GPIO support may subclass
- *  this to provide additional configuration options.
+ *  Note: This code is copy pasted with the LED class.
+ *  Both device share the same attribute set but are different from a
+ *  semantic point of view.
+ *  It might be possible to reduce code duplication by using template
+ *  to share code.
  */
-#pragma db object callback(validation_callback) table("HARDWARE_GPIO")
-class GPIO : public Device
+#pragma db object callback(validation_callback) table("HARDWARE_BUZZER")
+class Buzzer : public Device
 {
   public:
-    enum class Direction
-    {
-        In  = 0,
-        Out = 1
-    };
-
-    explicit GPIO();
-    virtual ~GPIO() = default;
-
-    uint16_t number() const;
-
-    void number(uint16_t number);
-
-    Direction direction() const;
-
-    void direction(Direction direction);
-
-    bool default_value() const;
-
-    void default_value(bool default_value);
+    explicit Buzzer();
+    virtual ~Buzzer() = default;
 
     void validation_callback(odb::callback_event e, odb::database &) const override;
 
-  private:
-    uint16_t number_;
+    const GPIOPtr &gpio() const;
 
-    Direction direction_;
+    void gpio(const GPIOPtr &gpio);
+
+    int64_t default_blink_duration() const;
+
+    void default_blink_duration(int64_t default_blink_duration);
+
+    int64_t default_blink_speed() const;
+
+    void default_blink_speed(int64_t default_blink_speed);
+
+  private:
+    int64_t default_blink_duration_;
+    int64_t default_blink_speed_;
 
     /**
-     * True to default to ON, false otherwise.
+     * The underlying GPIO.
      */
-    bool default_value_;
-
+    GPIOPtr gpio_;
     friend odb::access;
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "hardware/GPIO.hpp"
+#endif

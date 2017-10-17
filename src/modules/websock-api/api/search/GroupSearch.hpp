@@ -52,7 +52,7 @@ using json = nlohmann::json;
 class GroupSearch : public MethodHandler
 {
   public:
-    GroupSearch(RequestContext ctx);
+    explicit GroupSearch(RequestContext ctx);
 
     static MethodHandlerUPtr create(RequestContext);
 

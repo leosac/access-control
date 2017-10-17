@@ -43,6 +43,8 @@ enum class DeviceClass
     UNKNOWN      = 0,
     GPIO         = 1,
     RFID_READERS = 2,
+    LED          = 3,
+    BUZZER       = 4
 };
 
 class Device;
@@ -51,5 +53,11 @@ using DevicePtr = std::shared_ptr<Device>;
 
 class GPIO;
 using GPIOPtr = std::shared_ptr<GPIO>;
+
+class LED;
+using LEDPtr = std::shared_ptr<LED>;
+
+class Buzzer;
+using BuzzerPtr = std::shared_ptr<Buzzer>;
 }
 }

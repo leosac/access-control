@@ -19,34 +19,23 @@
 
 #pragma once
 
-#include "hardware/Device.hpp"
-#include "hardware/HardwareFwd.hpp"
-#include <cstdint>
-#include <odb/callback.hxx>
-#include <odb/core.hxx>
-#include <string>
+#include "modules/websock-api/WSHelperThread.hpp"
 
 namespace Leosac
 {
-namespace Hardware
+namespace Module
 {
-
-/**
- *  Abstraction of a RFID Reader device.
- *
- *  For now we have no attributes. Probably will change
- *  when WiegandReader module works correctly with database.
- *  todo: move some common attributes here
- */
-#pragma db object callback(validation_callback) table("HARDWARE_RFIDReader")
-class RFIDReader : public Device
+namespace LedBuzzer
+{
+class WSHelperThread : public WebSockAPI::BaseModuleSupportThread<int>
 {
   public:
-    RFIDReader();
+    explicit WSHelperThread(const CoreUtilsPtr &core_utils);
+    void unregister_ws_handlers(WebSockAPI::Service &ws_service) override;
 
-    void validation_callback(odb::callback_event, odb::database &) const override;
-
-    friend odb::access;
+  private:
+    void register_ws_handlers(WebSockAPI::Service &ws_service) override;
 };
+}
 }
 }

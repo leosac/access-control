@@ -21,10 +21,8 @@
 
 #include "hardware/Device.hpp"
 #include "hardware/HardwareFwd.hpp"
-#include <cstdint>
 #include <odb/callback.hxx>
 #include <odb/core.hxx>
-#include <string>
 
 namespace Leosac
 {
@@ -32,21 +30,45 @@ namespace Hardware
 {
 
 /**
- *  Abstraction of a RFID Reader device.
- *
- *  For now we have no attributes. Probably will change
- *  when WiegandReader module works correctly with database.
- *  todo: move some common attributes here
+ *  Abstraction of LED device attributes.
  */
-#pragma db object callback(validation_callback) table("HARDWARE_RFIDReader")
-class RFIDReader : public Device
+#pragma db object callback(validation_callback) table("HARDWARE_LED")
+class LED : public Device
 {
   public:
-    RFIDReader();
+    explicit LED();
+    virtual ~LED() = default;
 
-    void validation_callback(odb::callback_event, odb::database &) const override;
+    void validation_callback(odb::callback_event e, odb::database &) const override;
 
+    const GPIOPtr &gpio() const;
+
+    void gpio(const GPIOPtr &gpio);
+
+    int64_t default_blink_duration() const;
+
+    void default_blink_duration(int64_t default_blink_duration);
+
+    int64_t default_blink_speed() const;
+
+    void default_blink_speed(int64_t default_blink_speed);
+
+  private:
+    int64_t default_blink_duration_;
+    int64_t default_blink_speed_;
+
+    /**
+     * The underlying GPIO.
+     */
+    GPIOPtr gpio_;
+
+
+  private:
     friend odb::access;
 };
 }
 }
+
+#ifdef ODB_COMPILER
+#include "hardware/GPIO.hpp"
+#endif

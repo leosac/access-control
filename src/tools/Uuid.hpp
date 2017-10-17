@@ -44,6 +44,16 @@ class UUID
     {
     }
 
+    bool operator==(const UUID &other) const
+    {
+        return uuid_ == other.uuid_;
+    }
+
+    bool operator!=(const UUID &other) const
+    {
+        return uuid_ != other.uuid_;
+    }
+
     bool is_nil() const
     {
         return uuid_.is_nil();

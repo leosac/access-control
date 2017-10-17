@@ -33,7 +33,6 @@ class WSHelperThread : public WebSockAPI::BaseModuleSupportThread<int>
     explicit WSHelperThread(const CoreUtilsPtr &core_utils);
     void unregister_ws_handlers(WebSockAPI::Service &ws_service) override;
 
-
   private:
     void register_ws_handlers(WebSockAPI::Service &ws_service) override;
 };

@@ -233,7 +233,7 @@ void WiegandReaderModule::load_db_config()
             wiegand_config_->add_reader(reader_ptr);
     }
     t.commit();
-    INFO("SMTP module using SQL database for configuration.");
+    INFO("Wiegand module using SQL database for configuration.");
 }
 
 void WiegandReaderModule::load_xml_config(

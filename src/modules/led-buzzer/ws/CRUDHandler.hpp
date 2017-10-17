@@ -25,8 +25,32 @@ namespace Leosac
 {
 namespace Module
 {
-namespace Wiegand
+namespace LedBuzzer
 {
+
+struct CRUDHandlerHelper
+{
+    /**
+     * How to retrieve the object's id when instanciate the crud handler for buzzer
+     */
+    static constexpr const char buzzer_object_id_key[] = "buzzer_id";
+    /**
+     * How to retrieve the object's id when instanciate the crud handler for led
+     */
+    static constexpr const char led_object_id_key[] = "led_id";
+};
+
+/**
+ * CRUD handler for Buzzer and LED.
+ *
+ * Since LED and Buzzer are very close wrt their attributes
+ * we use a templated CRUD Handler.
+ *
+ * @tparam ObjectT LED or Buzzer
+ * @tparam ObjectIdKey  The key in JSON to retrieve object's id.
+ * @tparam SerializerT The serializer type to use.
+ */
+template <typename ObjectT, const char *ObjectIdKey, typename SerializerT>
 class CRUDHandler : public WebSockAPI::CRUDResourceHandler
 {
   public:

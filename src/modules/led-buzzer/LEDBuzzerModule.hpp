@@ -28,6 +28,7 @@ namespace Leosac
 {
 namespace Module
 {
+
 /**
 * Namespace where implementation of Led (or buzzer) support is done.
 *
@@ -47,6 +48,8 @@ namespace Module
 */
 namespace LedBuzzer
 {
+class WSHelperThread;
+
 /**
 * Main class for LED support.
 *
@@ -59,7 +62,7 @@ class LEDBuzzerModule : public BaseModule
     LEDBuzzerModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
 
-    virtual ~LEDBuzzerModule() = default;
+    virtual ~LEDBuzzerModule();
 
     LEDBuzzerModule(const LEDBuzzerModule &) = delete;
     LEDBuzzerModule(LEDBuzzerModule &&)      = delete;
@@ -71,7 +74,11 @@ class LEDBuzzerModule : public BaseModule
   private:
     void process_config();
 
-    std::vector<std::shared_ptr<LedBuzzerImpl>> leds_;
+    void load_xml_config();
+    void load_db_config();
+
+    std::vector<std::shared_ptr<LedBuzzerImpl>> leds_and_buzzers_;
+    std::unique_ptr<WSHelperThread> ws_helper_thread_;
 };
 }
 }

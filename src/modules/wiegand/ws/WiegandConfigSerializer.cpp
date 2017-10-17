@@ -31,21 +31,6 @@ namespace Module
 namespace Wiegand
 {
 
-static json serialize_gpio_metadata(const Hardware::GPIOPtr &gpio)
-{
-    auto hwd_service =
-        get_service_registry().get_service<Hardware::HardwareService>();
-    ASSERT_LOG(hwd_service, "No hardware service.");
-
-    if (gpio)
-    {
-        std::string type = hwd_service->hardware_device_type(*gpio);
-        json gpio_info   = {{"id", gpio->id()}, {"type", type}};
-        return gpio_info;
-    }
-    return json{};
-}
-
 json WiegandReaderConfigSerializer::serialize(const WiegandReaderConfig &in,
                                               const SecurityContext &sc)
 {
@@ -60,9 +45,15 @@ json WiegandReaderConfigSerializer::serialize(const WiegandReaderConfig &in,
     serialized["attributes"]["mode"]      = in.mode;
 
     serialized["relationships"] = json{};
+
+    auto hwd_service =
+        get_service_registry().get_service<Hardware::HardwareService>();
+    ASSERT_LOG(hwd_service, "No hardware service.");
+
     serialized["relationships"]["gpio_high"] =
-        serialize_gpio_metadata(in.gpio_high_);
-    serialized["relationships"]["gpio_low"] = serialize_gpio_metadata(in.gpio_low_);
+        hwd_service->serialize_device_metadata(in.gpio_high_);
+    serialized["relationships"]["gpio_low"] =
+        hwd_service->serialize_device_metadata(in.gpio_low_);
 
     return serialized;
 }

@@ -63,17 +63,9 @@ void GPIO::default_value(bool default_value)
     default_value_ = default_value;
 }
 
-void GPIO::validation_callback(odb::callback_event e, odb::database &) const
+void GPIO::validation_callback(odb::callback_event e, odb::database &db) const
 {
-    if (e == odb::callback_event::post_persist ||
-        e == odb::callback_event::post_update)
-    {
-        if (name().empty())
-        {
-            throw ModelException("data/attributes/name",
-                                 "GPIO name must be non empty");
-        }
-    }
+    Device::validation_callback(e, db);
 }
 }
 }

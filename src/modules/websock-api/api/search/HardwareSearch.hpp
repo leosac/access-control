@@ -54,7 +54,7 @@ using json = nlohmann::json;
 class HardwareSearch : public MethodHandler
 {
   public:
-    HardwareSearch(RequestContext ctx);
+    explicit HardwareSearch(RequestContext ctx);
 
     static MethodHandlerUPtr create(RequestContext);
 

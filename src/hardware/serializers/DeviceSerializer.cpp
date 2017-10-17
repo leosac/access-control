@@ -43,7 +43,6 @@ void DeviceSerializer::unserialize(Hardware::Device &out, const json &in,
     using namespace JSONUtil;
 
     out.name(extract_with_default(in, "name", out.name()));
-    out.device_class(extract_with_default(in, "device_class", out.device_class()));
     out.enabled(extract_with_default(in, "enabled", out.enabled()));
 }
 }

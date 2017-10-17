@@ -48,7 +48,7 @@ void AuthDBModule::process_config()
     setup_database();
 }
 
-void AuthDBModule::on_service_event(const service_event::Event &event)
+void AuthDBModule::on_service_event(const service_event::Event &)
 {
 }
 

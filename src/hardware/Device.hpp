@@ -39,7 +39,8 @@ namespace Hardware
  *
  *  @note This class hierarchy provide no behavior, simply data storage.
  */
-#pragma db object optimistic polymorphic table("HARDWARE_Device")
+#pragma db object callback(validation_callback)                                     \
+    optimistic polymorphic table("HARDWARE_Device")
 class Device
 {
   public:
@@ -47,6 +48,8 @@ class Device
     explicit Device(DeviceClass device_class);
 
     virtual ~Device() = default;
+
+    virtual void validation_callback(odb::callback_event e, odb::database &) const;
 
     UUID id() const;
 

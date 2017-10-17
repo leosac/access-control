@@ -68,10 +68,14 @@ set(LEOSAC_LIB_SRCS
     hardware/Device.cpp
     hardware/GPIO.cpp
     hardware/RFIDReader.cpp
+    hardware/Buzzer.cpp
+    hardware/LED.cpp
     hardware/HardwareService.cpp
     hardware/serializers/RFIDReaderSerializer.cpp
     hardware/serializers/GPIOSerializer.cpp
     hardware/serializers/DeviceSerializer.cpp
+    hardware/serializers/LEDSerializer.cpp
+    hardware/serializers/BuzzerSerializer.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
     tools/unixshellscript.cpp
@@ -144,7 +148,7 @@ set(LEOSAC_LIB_SRCS
     tools/Visitor.cpp
     core/SecurityContext.cpp
     core/audit/serializers/UpdateEventSerializer.cpp
-    )
+        hardware/serializers/BuzzerSerializer.cpp hardware/serializers/BuzzerSerializer.hpp)
 
 # Include mode to extract Git Revision.
 include(GetGitRevisionDescription)

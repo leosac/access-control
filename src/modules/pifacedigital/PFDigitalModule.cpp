@@ -73,7 +73,8 @@ PFDigitalModule::PFDigitalModule(zmqpp::context &ctx,
     {
         if (pifacedigital_open(hw_addr) == -1)
         {
-            ERROR("Failed to initialize pifacedigital with hardware address" << hw_addr);
+            ERROR("Failed to initialize pifacedigital with hardware address"
+                  << hw_addr);
         }
     }
 
@@ -193,7 +194,8 @@ void PFDigitalModule::process_xml_config(const boost::property_tree::ptree &cfg)
         uint8_t hw_addr            = gpio_cfg.get<uint8_t>("hardware_address", 0);
 
         INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no
-                              << ". direction = " << gpio_direction);
+                              << ". direction = " << gpio_direction
+                              << "Hardware address: " << (int)hw_addr);
 
         PFDigitalPin pin(ctx_, gpio_name, gpio_no,
                          gpio_direction == "in" ? PFDigitalPin::Direction::In
@@ -351,7 +353,7 @@ void WSHelperThread::test_output_pin(const UUID &gpio_id)
 void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
 {
     ws_service.register_handler(
-        [mode = parameters_.degraded_mode](const WebSockAPI::RequestContext rc) {
+        [mode = parameters_.degraded_mode](const WebSockAPI::RequestContext) {
             json j{{"mode", mode}};
             return j;
         },

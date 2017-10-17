@@ -50,9 +50,13 @@
         </module>
 
         <module>
-            <name>EVOXS</name>
-            <file>libevoxs.so</file>
+            <name>LED_BUZZER</name>
+            <file>libled-buzzer.so</file>
             <level>3</level>
+
+            <module_config>
+              <use_database>true</use_database>
+            </module_config>
         </module>
 
     </modules>

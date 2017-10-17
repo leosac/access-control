@@ -17,21 +17,53 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/RFIDReader.hpp"
+#include "hardware/LED.hpp"
+#include "hardware/GPIO.hpp"
 
 namespace Leosac
 {
 namespace Hardware
 {
 
-RFIDReader::RFIDReader()
-    : Device(DeviceClass::RFID_READERS)
+LED::LED()
+    : Device(DeviceClass::LED)
 {
 }
 
-void RFIDReader::validation_callback(odb::callback_event e, odb::database &db) const
+void LED::validation_callback(odb::callback_event e, odb::database &db) const
 {
     Device::validation_callback(e, db);
+    if (gpio_)
+        gpio_->validation_callback(e, db);
+}
+const GPIOPtr &LED::gpio() const
+{
+    return gpio_;
+}
+
+void LED::gpio(const GPIOPtr &gpio)
+{
+    gpio_ = gpio;
+}
+
+int64_t LED::default_blink_duration() const
+{
+    return default_blink_duration_;
+}
+
+void LED::default_blink_duration(int64_t default_blink_duration)
+{
+    default_blink_duration_ = default_blink_duration;
+}
+
+int64_t LED::default_blink_speed() const
+{
+    return default_blink_speed_;
+}
+
+void LED::default_blink_speed(int64_t default_blink_speed)
+{
+    default_blink_speed_ = default_blink_speed;
 }
 }
 }
