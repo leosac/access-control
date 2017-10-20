@@ -35,6 +35,13 @@ namespace Leosac
  * ObjectT. They can also remove serializers, and call the
  * `serialize()` method.
  *
+ * @note: The ExtensibleSerializer is thread safe. Management of user-defined
+ * serializers, aswell as invocation of serializers is performed while
+ * holding an internal recursive mutex. It is therefore allowed for a
+ * serializer implementation to make call to the ExtensibleSerializer.
+ * However, be careful to avoid deadlock if using multiple ExtensibleSerializer.
+ *
+ *
  * @tparam SerializedT The type of serialization output.
  * @tparam ObjectT The base type of the class hierarchy this serializer
  * will be able to handle.
@@ -48,7 +55,7 @@ class ExtensibleSerializer
   public:
     SerializedT serialize(const ObjectT &input, AdditionalArgs &&... args) const
     {
-        std::lock_guard<std::mutex> lg(mutex_);
+        std::lock_guard<decltype(mutex_)> lg(mutex_);
 
         auto type_index = boost::typeindex::type_id_runtime(input);
         auto itr        = serializers_.find(type_index);
@@ -78,7 +85,7 @@ class ExtensibleSerializer
         static_assert(std::is_base_of<ObjectT, T>::value,
                       "T is not a subclass of ObjectT");
 
-        std::lock_guard<std::mutex> lg(mutex_);
+        std::lock_guard<decltype(mutex_)> lg(mutex_);
         auto type_index = boost::typeindex::type_id<T>();
         ASSERT_LOG(serializers_.count(type_index) == 0,
                    "Already got a serializer for this type of object.");
@@ -104,14 +111,14 @@ class ExtensibleSerializer
     template <typename T>
     void unregister_serializer()
     {
-        std::lock_guard<std::mutex> lg(mutex_);
+        std::lock_guard<decltype(mutex_)> lg(mutex_);
 
         auto type_index = boost::typeindex::type_id<T>();
         serializers_.erase(type_index);
     }
 
   private:
-    mutable std::mutex mutex_;
+    mutable std::recursive_mutex mutex_;
     std::map<boost::typeindex::type_index, SerializationCallable> serializers_;
 };
 }
