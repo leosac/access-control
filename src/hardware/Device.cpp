@@ -18,8 +18,8 @@
 */
 
 #include "hardware/Device.hpp"
-#include "exception/ModelException.hpp"
 #include "HardwareService.hpp"
+#include "exception/ModelException.hpp"
 #include <boost/uuid/uuid_generators.hpp>
 #include <core/GetServiceRegistry.hpp>
 
@@ -85,15 +85,16 @@ void Device::enabled(bool e)
 void Device::validation_callback(odb::callback_event e, odb::database &) const
 {
     if (e == odb::callback_event::pre_persist ||
-        e == odb::callback_event::pre_update) {
+        e == odb::callback_event::pre_update)
+    {
         // Make sure name is unique.
-        auto hwd_service = get_service_registry().get_service<Hardware::HardwareService>();
+        auto hwd_service =
+            get_service_registry().get_service<Hardware::HardwareService>();
         ASSERT_LOG(hwd_service, "No hardware service.");
         auto d = hwd_service->find_device_by_name(name());
 
         if (d && d->id() != id())
-            throw ModelException("data/attributes/name",
-                                 "Device name already used");
+            throw ModelException("data/attributes/name", "Device name already used");
     }
 
     if (e == odb::callback_event::post_persist ||

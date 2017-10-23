@@ -26,7 +26,7 @@ namespace Hardware
 {
 
 Buzzer::Buzzer()
-    : Device(DeviceClass::GPIO)
+    : Device(DeviceClass::BUZZER)
 {
 }
 

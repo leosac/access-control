@@ -38,7 +38,8 @@ using json = nlohmann::json;
  *     + 'partial_name': A part of the name we are looking for.
  *
  * Response:
- *     A list of {id, name, device_class, type} for device that match the partial name.
+ *     A list of {id, name, device_class, type} for device that match the partial
+ * name.
  *     [
  *       {id: $HARDWARE_DEVICE_ID,
  *       name: $HARDWARE_DEVICE_NAME,
