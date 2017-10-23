@@ -50,9 +50,9 @@ json WiegandReaderConfigSerializer::serialize(const WiegandReaderConfig &in,
         get_service_registry().get_service<Hardware::HardwareService>();
     ASSERT_LOG(hwd_service, "No hardware service.");
 
-    serialized["relationships"]["gpio_high"] =
+    serialized["relationships"]["gpio-high"] =
         hwd_service->serialize_device_metadata(in.gpio_high_);
-    serialized["relationships"]["gpio_low"] =
+    serialized["relationships"]["gpio-low"] =
         hwd_service->serialize_device_metadata(in.gpio_low_);
 
     return serialized;

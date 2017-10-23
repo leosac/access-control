@@ -40,7 +40,7 @@ json PFGPIOSerializer::serialize(const PFGPIO &in, const SecurityContext &sc)
     // Now we override the type.
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base GPIO serialization did something unexpected.");
-    serialized["type"] = "pfdigital.gpio";
+    serialized["type"] = "piface-digital-gpio";
 
     serialized["attributes"]["hardware-address"] = in.hardware_address();
     return serialized;

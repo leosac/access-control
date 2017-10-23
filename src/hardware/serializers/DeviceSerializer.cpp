@@ -31,7 +31,7 @@ json DeviceSerializer::serialize(const Hardware::Device &in, const SecurityConte
                        {"type", "device"},
                        {"attributes",
                         {{"name", in.name()},
-                         {"device_class", in.device_class()},
+                         {"device-class", in.device_class()},
                          {"enabled", in.enabled()}}}};
 
     return serialized;

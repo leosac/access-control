@@ -51,10 +51,10 @@ json HardwareService::serialize_device_metadata(
     const Hardware::DevicePtr &device) const
 {
     if (!device)
-        return json{};
+        return json{{"data", {}}};
 
     std::string type  = hardware_device_type(*device);
-    json dev_metadata = {{"id", device->id()}, {"type", type}};
+    json dev_metadata = {{"data", {{"id", device->id()}, {"type", type}}}};
     return dev_metadata;
 }
 
