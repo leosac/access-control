@@ -43,27 +43,11 @@ const std::vector<WiegandReaderConfigPtr> &WiegandConfig::readers() const
 void WiegandReaderConfig::validation_callback(odb::callback_event e,
                                               odb::database &db) const
 {
-    // We make sure that:
-    //   1. The name is unique
-    //   2. The mode is valid
+    Device::validation_callback(e, db);
 
     if (e == odb::callback_event::post_update ||
         e == odb::callback_event::post_persist)
     {
-        using QueryT = odb::query<WiegandReaderConfig>;
-        QueryT q(QueryT::name == name());
-        auto results        = db.query(q);
-        size_t count_result = 0;
-        for (auto &&unused : results)
-        {
-            (void)unused;
-            ++count_result;
-            if (count_result > 1)
-            {
-                throw ModelException("data/attributes/name", "Name is not unique");
-            }
-        }
-
         if (std::find(valid_operation_modes.begin(), valid_operation_modes.end(),
                       mode) == valid_operation_modes.end())
         {

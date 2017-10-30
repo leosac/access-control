@@ -20,7 +20,9 @@
 #include "modules/wiegand/wiegand.hpp"
 #include "core/Scheduler.hpp"
 #include "core/kernel.hpp"
+#include "hardware/Buzzer.hpp"
 #include "hardware/HardwareService.hpp"
+#include "hardware/LED.hpp"
 #include "modules/wiegand/WiegandConfig_odb.h"
 #include "modules/wiegand/strategies/Autodetect.hpp"
 #include "modules/wiegand/ws/WSHelperThread.hpp"
@@ -109,8 +111,8 @@ void WiegandReaderModule::process_config()
 
         WiegandReaderImpl reader(
             ctx_, reader_config->name(), reader_config->gpio_high_name(),
-            reader_config->gpio_low_name(), reader_config->green_led,
-            reader_config->buzzer, create_strategy(*reader_config, &reader));
+            reader_config->gpio_low_name(), reader_config->green_led_name(),
+            reader_config->buzzer_name(), create_strategy(*reader_config, &reader));
         utils_->config_checker().register_object(reader.name(),
                                                  ConfigChecker::ObjectType::READER);
         readers_.push_back(std::move(reader));
@@ -250,16 +252,22 @@ void WiegandReaderModule::load_xml_config(
         // object is to hold the device's name
 
         auto gpio_high = std::make_shared<Hardware::GPIO>();
-        gpio_high->name(xml_reader_cfg.get_child("high").data());
+        gpio_high->name(xml_reader_cfg.get<std::string>("high"));
 
         auto gpio_low = std::make_shared<Hardware::GPIO>();
-        gpio_low->name(xml_reader_cfg.get_child("low").data());
+        gpio_low->name(xml_reader_cfg.get<std::string>("low"));
+
+        auto green_led = std::make_shared<Hardware::LED>();
+        green_led->name(xml_reader_cfg.get<std::string>("green_led", ""));
+
+        auto buzzer = std::make_shared<Hardware::Buzzer>();
+        buzzer->name(xml_reader_cfg.get<std::string>("buzzer", ""));
 
         reader_config->name(xml_reader_cfg.get_child("name").data());
         reader_config->gpio_high_ = gpio_high;
         reader_config->gpio_low_  = gpio_low;
-        reader_config->buzzer     = xml_reader_cfg.get<std::string>("buzzer", "");
-        reader_config->green_led  = xml_reader_cfg.get<std::string>("green_led", "");
+        reader_config->buzzer_    = buzzer;
+        reader_config->green_led_ = green_led;
 
         reader_config->mode =
             xml_reader_cfg.get<std::string>("mode", "SIMPLE_WIEGAND");

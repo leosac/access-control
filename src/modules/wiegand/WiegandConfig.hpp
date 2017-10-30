@@ -20,8 +20,10 @@
 #pragma once
 
 #define ODB_NO_BASE_VERSION
+#include "hardware/Buzzer.hpp"
 #include "hardware/GPIO.hpp"
 #include "hardware/HardwareFwd.hpp"
+#include "hardware/LED.hpp"
 #include "hardware/RFIDReader.hpp"
 #include "modules/wiegand/WiegandFwd.hpp"
 #include "tools/db/database.hpp"
@@ -73,13 +75,12 @@ struct WiegandReaderConfig : public Hardware::RFIDReader
 
     std::string green_led_name() const
     {
-        return green_led;
-        // return device_name(green_led);
+        return device_name(green_led_);
     }
 
     std::string buzzer_name() const
     {
-        return buzzer;
+        return device_name(buzzer_);
     }
 
     /**
@@ -89,8 +90,8 @@ struct WiegandReaderConfig : public Hardware::RFIDReader
 
     Hardware::GPIOPtr gpio_high_;
     Hardware::GPIOPtr gpio_low_;
-    std::string green_led;
-    std::string buzzer;
+    Hardware::LEDPtr green_led_;
+    Hardware::BuzzerPtr buzzer_;
     std::string mode;
 
     std::chrono::milliseconds pin_timeout;
@@ -133,5 +134,7 @@ class WiegandConfig
 }
 
 #ifdef ODB_COMPILER
+#include "hardware/Buzzer.hpp"
 #include "hardware/GPIO.hpp"
+#include "hardware/LED.hpp"
 #endif

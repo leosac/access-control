@@ -33,9 +33,8 @@ LED::LED()
 void LED::validation_callback(odb::callback_event e, odb::database &db) const
 {
     Device::validation_callback(e, db);
-    if (gpio_)
-        gpio_->validation_callback(e, db);
 }
+
 const GPIOPtr &LED::gpio() const
 {
     return gpio_;
