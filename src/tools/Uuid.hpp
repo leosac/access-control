@@ -64,6 +64,9 @@ class UUID
         return boost::lexical_cast<std::string>(uuid_);
     }
 
+    /**
+     * Returns a null UUID with a full zero value.
+     */
     static UUID null_uuid()
     {
         UUID u{};

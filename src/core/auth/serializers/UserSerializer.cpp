@@ -86,7 +86,7 @@ json UserJSONSerializer::serialize(const Auth::User &user, const SecurityContext
              {"rank", static_cast<int>(user.rank())},
              {"validity-enabled", user.validity().is_enabled()},
              {"validity-start", date::format("%FT%T%z", user.validity().start())},
-             {"validity-end", date::format("%FT%T%z", user.validity().start())},
+             {"validity-end", date::format("%FT%T%z", user.validity().end())},
          }},
         {"relationships",
          {{"memberships", {{"data", memberships}}},
