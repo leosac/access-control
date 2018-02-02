@@ -62,7 +62,7 @@ def run_in_container(build_dir, repo_root_dir, command,
         },
         repo_root_dir: {
             'bind': '/leosac',
-            'mode': 'ro'
+            'mode': 'rw'
         }
     }
 
