@@ -3,12 +3,12 @@ project(LEOSAC)
 
 # Version definitions
 add_definitions(-DLEOSAC_VERSION_MAJOR=0)
-add_definitions(-DLEOSAC_VERSION_MINOR=6)
-add_definitions(-DLEOSAC_VERSION_PATCH=3)
+add_definitions(-DLEOSAC_VERSION_MINOR=7)
+add_definitions(-DLEOSAC_VERSION_PATCH=0)
 
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
-set(CPACK_PACKAGE_VERSION_MINOR "6")
-set(CPACK_PACKAGE_VERSION_PATCH "3")
+set(CPACK_PACKAGE_VERSION_MINOR "7")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
 
 include(CPack)
 
