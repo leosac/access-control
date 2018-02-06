@@ -3,7 +3,27 @@ Maintainer: Arnaud Kapp <kapp.arno@gmail.com>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), cmake, libtclap-dev, libboost-serialization-dev, g++ (>= 4.8)
+Build-Depends: debhelper (>= 9),
+               cmake,
+               default-libmysqlclient-dev | libmysqlclient-dev,
+               libtclap-dev,
+               libboost-date-time-dev,
+               libboost-filesystem-dev,
+               libboost-regex-dev,
+               libboost-serialization-dev,
+               libboost-system-dev,
+               libcurl4-openssl-dev,
+               libgtest-dev,
+               libpq-dev,
+               libpython2.7-dev,
+               libscrypt-dev,
+               libsqlite3-dev,
+               libsodium-dev,
+               libssl-dev,
+               libpython2.7-dev,
+               libunwind-dev,
+               libzmq3-dev,
+               g++ (>= 5)
 
 Package: leosac
 Architecture: any
