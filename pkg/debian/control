@@ -6,6 +6,7 @@ Standards-Version: 3.9.2
 Build-Depends: debhelper (>= 9),
                cmake,
                default-libmysqlclient-dev | libmysqlclient-dev,
+               g++ (>= 5),
                libtclap-dev,
                libboost-date-time-dev,
                libboost-filesystem-dev,
@@ -23,7 +24,12 @@ Build-Depends: debhelper (>= 9),
                libpython2.7-dev,
                libunwind-dev,
                libzmq3-dev,
-               g++ (>= 5)
+               libodb-dev,
+               libodb-boost-dev,
+               libodb-mysql-dev,
+               libodb-pgsql-dev,
+               libodb-sqlite-dev,
+               odb
 
 Package: leosac
 Architecture: any
