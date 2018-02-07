@@ -125,7 +125,6 @@ void SysFsGpioPin::handle_message()
 
 bool SysFsGpioPin::turn_on(zmqpp::message *msg /* = nullptr */)
 {
-    DEBUG("Remaining = " << msg->remaining());
     if (msg && msg->remaining() == 1)
     {
         // ASSERT_LOG(msg->parts() == 2 && msg->remaining() == 1, "Invalid internal
@@ -136,6 +135,11 @@ bool SysFsGpioPin::turn_on(zmqpp::message *msg /* = nullptr */)
         next_update_time_ =
             std::chrono::system_clock::now() + std::chrono::milliseconds(duration);
     }
+    else if (msg)
+    {
+        WARN("Called with unexpected number of arguments: " << msg->remaining());
+    }
+
     UnixFs::writeSysFsValue(path_cfg_.value_path(gpio_no_), 1);
     return true;
 }
