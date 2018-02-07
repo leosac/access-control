@@ -59,7 +59,7 @@ sudo install -m 755 -t "/etc/init.d" "../pkg/deb/leosacd"
 ```
 The steps above assume you are still in the build subfolder created earlier.
 
-Create a kernel.xml file (see the [installation guide](https://leosac.github.io/leosac-doc/doc_output/develop/d5/d97/page_guide_rpi_piface_wiegand.html)) and copy it to /etc/leosac.d.
+Create a kernel.xml file (see the [installation guide](@ref page_guide_rpi_piface_wiegand)) and copy it to /etc/leosac.d.
 ```
 sudo install -m 755 -d "/etc/leosac.d"
 ```

@@ -1,4 +1,4 @@
-@page page_guide_install_from_package Building Leosac
+@page page_guide_install_from_package Build and install Debian package
 
 @brief Describe how to build and install a Leosac deb package.
 
