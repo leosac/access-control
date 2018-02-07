@@ -1,3 +1,11 @@
+leosac (0.7.0-1) UNRELEASED; urgency=medium
+
+  * Pre release of 0.7
+  * Lots of internal changes
+  * Initial database support
+
+ --  <kapp.arno@gmail.com>  Wed, 07 Feb 2018 20:06:00 +0100
+
 leosac (0.6.3-1) UNRELEASED; urgency=medium
 
   * RPleth can now support card number with up to 64bits in the Wiegand frame.
