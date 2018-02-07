@@ -76,12 +76,6 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
         if (syslog)
             syslog->info(remove_ascii_format(log_msg_with_thread_id));
         break;
-    case LogLevel::NOTICE:
-        if (console)
-            console->notice(log_msg_with_thread_id);
-        if (syslog)
-            syslog->notice(remove_ascii_format(log_msg_with_thread_id));
-        break;
     case LogLevel::WARN:
         if (console)
             console->warn(log_msg_with_thread_id);
@@ -100,18 +94,6 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
         if (syslog)
             syslog->critical(remove_ascii_format(log_msg_with_thread_id));
         break;
-    case LogLevel::ALERT:
-        if (console)
-            console->alert(log_msg_with_thread_id);
-        if (syslog)
-            syslog->alert(remove_ascii_format(log_msg_with_thread_id));
-        break;
-    case LogLevel::EMERG:
-        if (console)
-            console->emerg(log_msg_with_thread_id);
-        if (syslog)
-            syslog->emerg(remove_ascii_format(log_msg_with_thread_id));
-        break;
     }
 }
 
@@ -121,16 +103,12 @@ LogLevel log_level_from_string(const std::string &level)
         return LogLevel::DEBUG;
     else if (level == "INFO")
         return LogLevel::INFO;
-    else if (level == "NOTICE")
-        return LogLevel::NOTICE;
     else if (level == "WARNING")
         return LogLevel::WARN;
     else if (level == "ERROR")
         return LogLevel::ERROR;
-    else if (level == "ALERT")
-        return LogLevel::ALERT;
-    else if (level == "EMERGENCY")
-        return LogLevel::EMERG;
+    else if (level == "CRIT")
+        return LogLevel::CRIT;
     throw std::runtime_error("Invalid log level: " + level);
 }
 }

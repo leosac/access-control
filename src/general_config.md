@@ -107,12 +107,10 @@ min_syslog     | Minimal log entry level to write to syslog         | NO (defaul
 Here is a list of the various log level available:
    + `DEBUG`
    + `INFO`
-   + `NOTICE`
    + `WARNING`
    + `ERROR`
    + `CRITICAL`
-   + `ALERT`
-   + `EMERGENCY`
+
 
 Example {#logger_example}
 -------------------------

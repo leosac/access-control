@@ -27,7 +27,7 @@
 #include "tools/GitSHA1.hpp"
 #include <algorithm>
 #include <boost/regex.hpp>
-#include <spdlog/details/format.h>
+#include <spdlog/fmt/bundled/format.h>
 
 using namespace Leosac::Tools;
 

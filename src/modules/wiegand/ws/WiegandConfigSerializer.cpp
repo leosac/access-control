@@ -41,8 +41,8 @@ json WiegandReaderConfigSerializer::serialize(const WiegandReaderConfig &in,
     ASSERT_LOG(serialized.at("type").is_string(),
                "Base GPIO serialization did something unexpected.");
 
-    serialized["type"]                    = "wiegand-reader";
-    serialized["attributes"]["mode"]      = in.mode;
+    serialized["type"]               = "wiegand-reader";
+    serialized["attributes"]["mode"] = in.mode;
 
     serialized["relationships"] = json{};
 
@@ -70,7 +70,7 @@ void WiegandReaderConfigSerializer::unserialize(WiegandReaderConfig &out,
     Hardware::RFIDReaderSerializer::unserialize(out, in, sc);
 
     out.mode = extract_with_default(in, "mode", out.mode);
-    auto db                      = get_service_registry().get_service<DBService>();
+    auto db  = get_service_registry().get_service<DBService>();
 
     // High GPIO
     Hardware::DeviceId device_id = extract_with_default(in, "gpio_high_id", UUID{});

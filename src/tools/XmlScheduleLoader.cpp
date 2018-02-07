@@ -101,8 +101,8 @@ bool XmlScheduleLoader::extract_one(const boost::property_tree::ptree &node)
         sched.add_timeframe(tf);
     }
     if (schedules_.count(schedule_name))
-        NOTICE("A schedule with name " << schedule_name
-                                       << " already exists. It will be overridden.");
+        INFO("A schedule with name " << schedule_name
+                                     << " already exists. It will be overridden.");
 
     schedules_[schedule_name] = std::make_shared<Schedule>(sched);
     return true;

@@ -183,6 +183,7 @@ target_include_directories(${LEOSAC_LIB}
 
 target_compile_definitions(${LEOSAC_LIB}
         PRIVATE
+        -DSPDLOG_ENABLE_SYSLOG=1
         )
 
 target_compile_definitions(${LEOSAC_BIN}

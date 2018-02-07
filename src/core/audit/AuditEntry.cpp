@@ -60,8 +60,7 @@ void AuditEntry::finalize()
                "Not currently in a database transaction.");
     if (finalized_)
     {
-        NOTICE(
-            "Trying to finalizing already finalized entry. Doing nothing instead.");
+        INFO("Trying to finalizing already finalized entry. Doing nothing instead.");
         return;
     }
     finalized_ = true;

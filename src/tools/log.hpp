@@ -28,14 +28,11 @@
 
 enum LogLevel
 {
-    EMERG  = spdlog::level::emerg,
-    ALERT  = spdlog::level::alert,
-    CRIT   = spdlog::level::critical,
-    ERROR  = spdlog::level::err,
-    WARN   = spdlog::level::warn,
-    NOTICE = spdlog::level::notice,
-    INFO   = spdlog::level::info,
-    DEBUG  = spdlog::level::debug,
+    CRIT  = spdlog::level::critical,
+    ERROR = spdlog::level::err,
+    WARN  = spdlog::level::warn,
+    INFO  = spdlog::level::info,
+    DEBUG = spdlog::level::debug,
 };
 
 namespace LogHelper
@@ -125,34 +122,6 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
 #define INFO(...)                                                                   \
     INFO_X(, ##__VA_ARGS__, INFO_1(__VA_ARGS__), INFO_0(__VA_ARGS__),               \
            INFO_NO_PARAM(__VA_ARGS__), )
-
-
-/**
-* See "Internal macros documentation"
-*/
-#define NOTICE_0(msg)                                                               \
-    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
-                   LogLevel::NOTICE)
-
-/**
-* See "Internal macros documentation"
-*/
-#define NOTICE_1(msg, loggers)                                                      \
-    LogHelper::log(BUILD_STR(msg), __LINE__, FUNCTION_NAME_MACRO, __FILE__,         \
-                   LogLevel::NOTICE, loggers)
-
-/**
-* See "Internal macros documentation"
-*/
-#define NOTICE_X(trash, msg, loggers, targetMacro, ...) targetMacro
-
-/**
-* Notice macro.
-* Issue a log message with NOTICE level.
-*/
-#define NOTICE(...)                                                                 \
-    NOTICE_X(, ##__VA_ARGS__, NOTICE_1(__VA_ARGS__), NOTICE_0(__VA_ARGS__),         \
-             NOTICE_NO_PARAM(__VA_ARGS__), )
 
 
 /**

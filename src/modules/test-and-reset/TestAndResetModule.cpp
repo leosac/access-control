@@ -144,7 +144,7 @@ void TestAndResetModule::run_test_sequence()
     }
     if (!test_led_ && !test_buzzer_)
     {
-        NOTICE("Test sequence doing nothing...");
+        INFO("Test sequence doing nothing...");
     }
 }
 

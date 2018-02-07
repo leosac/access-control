@@ -414,7 +414,7 @@ void FileAuthSourceMapper::load_users(const boost::property_tree::ptree &users)
 
         if (users_.count(username))
         {
-            NOTICE("User " << username << " was already defined. Will overwrite.");
+            WARN("User " << username << " was already defined. Will overwrite.");
         }
         users_[username] = uptr;
     }
@@ -448,9 +448,9 @@ void FileAuthSourceMapper::add_cred_to_id_map(
     {
         if (id_to_cred_.count(credential->alias()))
         {
-            NOTICE("Credential with ID = " << credential->alias()
-                                           << " already exist and "
-                                              "will be overwritten.");
+            WARN("Credential with ID = " << credential->alias()
+                                         << " already exist and "
+                                            "will be overwritten.");
         }
         id_to_cred_[credential->alias()] = credential;
     }
@@ -470,15 +470,15 @@ FileAuthSourceMapper::buildProfile(Leosac::Cred::ICredentialPtr cred)
     auto cred_owner = cred->owner().get_eager();
     if (!cred->validity().is_valid())
     {
-        NOTICE("Credentials is invalid. It was disabled or out of its validity "
-               "period.");
+        INFO("Credentials is invalid. It was disabled or out of its validity "
+             "period.");
         return nullptr;
     }
 
     if (cred_owner && !cred_owner->is_valid())
     {
-        NOTICE("The user (" << cred_owner->username()
-                            << ") is disabled or out of its validity period.");
+        INFO("The user (" << cred_owner->username()
+                          << ") is disabled or out of its validity period.");
         return nullptr;
     }
 

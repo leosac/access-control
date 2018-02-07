@@ -232,8 +232,8 @@ void ModuleManager::stopModule(ModuleInfo *modinfo, bool soft)
     }
     else
     {
-        NOTICE("Not stopping module " << modinfo->name_
-                                      << " as it doesn't seem to run.");
+        INFO("Not stopping module " << modinfo->name_
+                                    << " as it doesn't seem to run.");
     }
 }
 

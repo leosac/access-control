@@ -135,9 +135,9 @@ bool DoormanInstance::ignore_action(const DoormanAction &action,
     if (target && (target->is_always_closed(std::chrono::system_clock::now()) ||
                    target->is_always_open(std::chrono::system_clock::now())))
     {
-        NOTICE("Door " << target->name() << " is in immutable state (always open, "
-                                            "or always closed) so we ignore this "
-                                            "action against it");
+        INFO("Door " << target->name() << " is in immutable state (always open, "
+                                          "or always closed) so we ignore this "
+                                          "action against it");
         return true;
     }
     return false;

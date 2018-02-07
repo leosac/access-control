@@ -449,7 +449,7 @@ RplethPacket RplethModule::set_dhcp_state(const RplethPacket &p)
             WARN("Failed to update network config.");
     }
     else
-        NOTICE("Network not managed by Leosac, doing nothing.");
+        INFO("Network not managed by Leosac, doing nothing.");
     return response;
 }
 
@@ -482,7 +482,7 @@ RplethPacket RplethModule::set_reader_ip(const RplethPacket &p)
             WARN("Failed to update network config.");
     }
     else
-        NOTICE("Network not managed by Leosac, doing nothing.");
+        INFO("Network not managed by Leosac, doing nothing.");
     return response;
 }
 
@@ -514,7 +514,7 @@ RplethPacket RplethModule::set_reader_netmask(const RplethPacket &p)
             WARN("Failed to update network config.");
     }
     else
-        NOTICE("Network not managed by Leosac, doing nothing.");
+        INFO("Network not managed by Leosac, doing nothing.");
     return response;
 }
 
@@ -546,7 +546,7 @@ RplethPacket RplethModule::set_reader_gw(const RplethPacket &p)
             WARN("Failed to update network config.");
     }
     else
-        NOTICE("Network not managed by Leosac, doing nothing.");
+        INFO("Network not managed by Leosac, doing nothing.");
     return response;
 }
 
