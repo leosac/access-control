@@ -6,39 +6,31 @@
 Target platform
 ---------------
 
-This guide target a Debian Stretch system running an amd64 platform.
+This guide is intended to be used on Debian Stretch with amd64 architecture or Raspbian Stretch with armv6/armv7 architecture.
 
 Dependencies
 ------------
 
-
-Leosac as a number of dependencies that needs to be installed:
+Leosac has a number of dependencies that need to be installed:
 ```
-apt-get install cmake build-essential git         \
-libssl-dev                                        \
-libcurl4-openssl-dev libtclap-dev libscrypt-dev   \
-libzmq3-dev                                       \
-python3 python3-pip
-```
-
-Database stuff
-
-First get the ODB compiler package from http://www.codesynthesis.com/products/odb/download.xhtml.
-Direct link: http://www.codesynthesis.com/download/odb/2.4/odb_2.4.0-1_amd64.deb
-
-@note The ODB package from the Debian repository is broken.
-
-```
-apt-get install libsqlite3-dev libpq-dev \
-libodb-dev libodb-boost-dev libodb-sqlite-dev libodb-pgsql-dev
+sudo apt-get install cmake build-essential git \
+default-libmysqlclient-dev libtclap-dev libcurl4-openssl-dev libgtest-dev \
+libunwind-dev libzmq3-dev libpq-dev libpython2.7-dev libscrypt-dev \
+libsqlite3-dev libsodium-dev libssl-dev libboost-date-time-dev \
+libboost-filesystem-dev libboost-regex-dev libboost-serialization-dev \
+libboost-system-dev python3 python3-pip
 ```
 
-Boost libraries (todo)
+@note The ODB package from the Debian repository is broken. A bug report has been filed. See [889664](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=889664). Until this is resolved, a set of patched odb packages have been made available in the Leosac bin-resources repository
 
+The following steps assume there are not already any odb packages installed on the target system. If there are, uninstall them first.
 ```
-apt-get install libboost1.62-all-dev
+git clone https://github.com/leosac/bin-resources
+cd bin-resources/debian/gcc6/amd64
+sudo dpkg -i *.deb
+sudo apt-get install -f
 ```
-
+If running Raspbian, replace amd64 in the folder name shown above with armhf.
 
 Build
 -----
@@ -50,6 +42,24 @@ Now go to the `leosac` directory.
 git submodule init && git submodule update
 mkdir build;
 cd build;
-cmake ..
-make -j10
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
+sudo make install
+```
+
+Follow-Up Tasks
+---------------
+
+Leosac is now installed on your system, but there are couple of tasks you should perform.
+
+Copy the init script into place so that Leosac can be started as a service:
+```
+sed -i 's/\/usr\/bin\/leosac/\/usr\/local\/bin\/leosac/g' ../pkg/deb/leosacd
+sudo install -m 755 -t "/etc/init.d" "../pkg/deb/leosacd"
+```
+The steps above assume you are still in the build subfolder created earlier.
+
+Create a kernel.xml file (see the [installation guide](https://leosac.github.io/leosac-doc/doc_output/develop/d5/d97/page_guide_rpi_piface_wiegand.html)) and copy it to /etc/leosac.d.
+```
+sudo install -m 755 -d "/etc/leosac.d"
 ```
