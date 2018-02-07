@@ -30,6 +30,7 @@ cd bin-resources/debian/gcc6/amd64
 sudo dpkg -i *.deb
 sudo apt-get install -f
 ```
+If running Raspbian, replace amd64 in the folder name shown above with armhf.
 
 Build
 -----
