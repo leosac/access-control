@@ -20,7 +20,7 @@
 #pragma once
 
 #include "exception/leosacexception.hpp"
-#include <spdlog/fmt/bundled/format.h>
+#include <spdlog/fmt/fmt.h>
 
 namespace Leosac
 {
