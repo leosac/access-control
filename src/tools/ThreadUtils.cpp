@@ -20,7 +20,7 @@
 #include "ThreadUtils.hpp"
 #include "enforce.hpp"
 #include <errno.h>
-#include <spdlog/fmt/bundled/format.h>
+#include <spdlog/fmt/fmt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/prctl.h>
