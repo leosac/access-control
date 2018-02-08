@@ -12,8 +12,7 @@ override_dh_shlibdeps:
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-            -DCMAKE_BUILD_TYPE=Release \
-            ..
+            -DCMAKE_BUILD_TYPE=Release
 
 override_dh_auto_install:
 	dh_auto_install
