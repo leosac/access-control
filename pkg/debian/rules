@@ -1,9 +1,7 @@
 #!/usr/bin/make -f
 
-_INSTALL_PATH = $$(pwd)/debian/leosac
-
 %:
-	dh $@ --parallel
+	dh $@ --parallel --with systemd
 
 override_dh_shlibdeps:
 	# Should disable error against libzmq not being installed
@@ -14,14 +12,12 @@ override_dh_auto_configure:
 	dh_auto_configure -- \
             -DCMAKE_BUILD_TYPE=Release
 
-override_dh_auto_install:
-	dh_auto_install
-	install -m 755 -d "$(_INSTALL_PATH)/etc/init.d"
-	install -m 755 -t "$(_INSTALL_PATH)/etc/init.d"                 \
-		"pkg/deb/leosacd"
-	install -m 755 -d "$(_INSTALL_PATH)/etc/leosac.d"
-	install -m 755 -d "$(_INSTALL_PATH)/etc/leosac.d/factory"
+override_dh_systemd_start:
+	dh_systemd_start --no-start
 
-	install -m 644 -t "$(_INSTALL_PATH)/etc/leosac.d/factory"       \
-		"cfg/factory/kernel.xml" \
-		"cfg/factory/README.md"   
+override_dh_systemd_enable:
+	dh_systemd_enable --no-enable  
+
+override_dh_installinit:
+	dh_installinit --no-start
+ 

@@ -2,13 +2,16 @@
 
 echo "----------------------------------------------------------------"
 echo "To enable leosac daemon run these commands as root:"
-echo "update-rc.d leosacd defaults"
-echo "service leosacd start"
+echo "systemctl enable leosacd"
+echo "systemctl start leosacd"
 echo ""
 echo "To disable, run as root:"
-echo "service leosacd stop"
-echo "update-rc.d -f leosacd remove"
+echo "systemctl stop leosacd"
+echo "systemctl disable leosacd"
 echo ""
 echo "More info here:"
-echo "https://github.com/islog/leosac/wiki"
+echo "https://www.leosac.com/"
 echo "----------------------------------------------------------------"
+
+#DEBHELPER#
+
