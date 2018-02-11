@@ -9,7 +9,7 @@ The process of cross-compilation builds, then bundles, all dependencies.
 Background
 ----------
 
-This method trades simplicity for speed. If watching your Pi take hours to build Leosac is not your idea of fun, then you should consider this method to build Leosac.
+This method trades simplicity for speed. If your idea of fun is not watching your Pi take hours to build Leosac, then you should consider this method to build Leosac.
 
 The recommended way to interact with the cross-compile container is to use `leosaccli dev cc XXX`. 
 This tool must be built first, however, and the steps below explain how to do that.
@@ -34,16 +34,8 @@ This will create a set of files in an aribtrary folder under /tmp. This folder w
 Prerequsites
 ------------
 
-Before cross-compiling Leosac, the "cross_compile" container must be built.
-
-@note Prior to following these steps, [Docker](https://docs.docker.com/get-started/) must be installed, and you must be able to run Docker as a non-root user.
-
-Perform these steps to build the cross-compile container:
-  + Clone the Leosac bin-resources repository: `git clone http://github.com/leosac/bin-resources`
-  + Move the the `cross-compile-resources` subfolder into the root of the Leosac repository
-  + Now build the container with `leosaccli dev docker build cross_compile`.
-
-@note Building the container *does not* build Leosac. Instead, it builds and install its dependencies and required toolchain.
+Prior to following the steps below, [Docker](https://docs.docker.com/get-started/) must be installed, and you must be able to run Docker as a non-root user.
+Verify Docker is working currently by running the "Hello World" container as shown in the [Get-Started](https://docs.docker.com/get-started/) guide.
 
 
 Full Example from Start to Finish
@@ -66,6 +58,8 @@ Build the leosaccli tool:
 
 Build the cross-compile container:
   + `leosaccli dev docker build cross_compile`
+
+@note Building the cross-compile container *does not* build Leosac. Instead, it builds and install its dependencies and required toolchain.
   
 Cross-compile Leosac:
   + `leosaccli dev cc cmake`
@@ -86,12 +80,14 @@ After copying the files to the target machine, log in and unpack the files:
 Follow-Up Tasks
 ---------------
 
-Leosac is now installed on your system, but there are couple of additonal tasks you should perform for the best experience.
+Leosac is now installed on your system, but there are couple of additional tasks you should perform.
 
-Copy the Leosac init script into place so it can be started as a service:
-  + `wget https://raw.githubusercontent.com/leosac/leosac/develop/pkg/deb/leosacd`
-  + `sed -i 's/\/usr\/bin\/leosac/\/usr\/local\/bin\/leosac/g' pkg/deb/leosacd`
-  + `sudo install -m 755 -t "/etc/init.d" "leosacd"`
+Get the Leosac service file:
+  + `https://raw.githubusercontent.com/leosac/leosac/develop/pkg/debian/leosac.service`
 
-Create a kernel.xml file (see the [installation guide](@ref page_guide_rpi_piface_wiegand)) and copy it to /etc/leosac.d.
-  + `sudo install -m 755 -d "/etc/leosac.d"`
+Edit the leosac service file, changing `/usr/bin/leosac` to `/usr/local/bin/leosac`, then copy it into place:
+  + `vi/gedit leosac.service`
+  + `sudo cp leosac.service /etc/systemd/system`
+
+Finally, before you can start Leosac, you need to create a kernel.xml file. See the [installation guide](@ref page_guide_rpi_piface_wiegand).
+
