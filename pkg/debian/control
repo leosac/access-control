@@ -2,8 +2,8 @@ Source: leosac
 Maintainer: Arnaud Kapp <kapp.arno@gmail.com>
 Section: misc
 Priority: optional
-Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9),
+Standards-Version: 3.9.8
+Build-Depends: debhelper (>= 9), dh-systemd,
                cmake,
                default-libmysqlclient-dev | libmysqlclient-dev,
                g++ (>= 5),
@@ -33,5 +33,5 @@ Build-Depends: debhelper (>= 9),
 
 Package: leosac
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-serialization1.49.0, libtclap-dev
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: open source access control

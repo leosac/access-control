@@ -1,0 +1,14 @@
+[Unit]
+Description=Leosac daemon
+Documentation=http://www.leosac.com/
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/leosac -k /etc/leosac.d/kernel.xml
+WorkingDirectory=/etc/leosac.d
+PIDFile=/var/run/leosac.pid
+
+[Install]
+WantedBy=default.target
+
