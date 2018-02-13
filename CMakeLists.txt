@@ -12,7 +12,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "0")
 
 include(CPack)
 
-set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
+
+set(CMAKE_INSTALL_RPATH "\$ORIGN:\$ORIGIN/../lib/leosac")
 set(LEOSAC_CROSS_COMPILE 0)
 if (CMAKE_TOOLCHAIN_FILE)
     # a bit hacky -- if a toolchain file si present, assume
@@ -26,7 +27,7 @@ if (CMAKE_TOOLCHAIN_FILE)
 
     # Set RPATH to "binary directory" (for dev mode) and "/opt/rpi_faekroot"
     # for "installed" mode
-    set(CMAKE_INSTALL_RPATH "/opt/rpi_fakeroot/lib:\$ORIGIN:${CMAKE_INSTALL_RPATH}")
+    set(CMAKE_INSTALL_RPATH "/opt/rpi_fakeroot/lib:${CMAKE_INSTALL_RPATH}")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif ()
 
