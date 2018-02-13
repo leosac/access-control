@@ -10,7 +10,8 @@ override_dh_shlibdeps:
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLEOSAC_STACKTRACE_DISABLED=1
 
 override_dh_systemd_start:
 	dh_systemd_start --no-start
