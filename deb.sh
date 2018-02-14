@@ -105,7 +105,9 @@ cd $name
 cp -R pkg/debian .
 
 # Auto-install build dependencies using the debian control file
-sudo mk-build-deps -ir ./debian/control
+sudo mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes \
+    --no-install-recommends --no-upgrade -y" \
+    ./debian/control
 
 if [ -z ${DEB_BUILD_OPTIONS} ] ; then
     export DEB_BUILD_OPTIONS="parallel=3"
