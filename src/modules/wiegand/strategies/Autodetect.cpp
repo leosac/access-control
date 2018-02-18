@@ -25,13 +25,14 @@ using namespace Leosac::Module::Wiegand;
 using namespace Leosac::Module::Wiegand::Strategy;
 
 Autodetect::Autodetect(WiegandReaderImpl *reader, std::chrono::milliseconds delay,
-                       char pin_key_end)
+                       char pin_key_end, bool nowait)
     : WiegandStrategy(reader)
     , delay_(delay)
     , reading_pin_(false)
     , reading_card_(true)
     , ready_(false)
     , pin_key_end_(pin_key_end)
+    , nowait_(nowait)
 {
     time_card_read_ = std::chrono::system_clock::now();
     last_pin_read_  = std::chrono::system_clock::now();
@@ -114,7 +115,7 @@ void Autodetect::check_timeout()
         }
     }
     // 2 sec of total inactivity and we valid card.
-    if (elapsed_ms > delay_ && elapsed_ms_pin > delay_)
+    if ((elapsed_ms > delay_ && elapsed_ms_pin > delay_) || nowait_)
     {
         if (read_card_strategy_->completed() && read_card_strategy_->get_nb_bits())
         {

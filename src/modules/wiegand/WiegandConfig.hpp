@@ -48,7 +48,8 @@ struct WiegandReaderConfig : public Hardware::RFIDReader
     WiegandReaderConfig()
         : mode("SIMPLE_WIEGAND")
         , pin_timeout(2500)
-        , pin_key_end('#'){};
+        , pin_key_end('#')
+        , nowait(0){};
 
     WiegandReaderConfig(const WiegandReaderConfig &) = default;
 
@@ -96,6 +97,7 @@ struct WiegandReaderConfig : public Hardware::RFIDReader
 
     std::chrono::milliseconds pin_timeout;
     char pin_key_end;
+    bool nowait;
 
     /**
      * List of valid operation mode for a reader.
