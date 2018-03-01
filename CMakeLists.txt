@@ -11,7 +11,7 @@ set(CPACK_PACKAGE_VERSION_MINOR "7")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 
 include(CPack)
-
+include (CheckIncludeFile)
 
 set(CMAKE_INSTALL_RPATH "\$ORIGN:\$ORIGIN/../lib/leosac")
 set(LEOSAC_CROSS_COMPILE 0)
@@ -51,6 +51,14 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 find_package(CXX11 REQUIRED)
 find_package(TCLAP REQUIRED)
 find_package(Boost 1.62 REQUIRED date_time system serialization regex filesystem)
+find_package(LibScrypt REQUIRED)
+find_package(PkgConfig REQUIRED)
+find_package(SQLite REQUIRED)
+find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
+
+include_directories(${TCLAP_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${LIBSCRYPT_INCLUDE_DIR}
+                    ${SQLITE_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${OPENSSL_INCLUDE_DIR})
 
 # ODB stuff
 find_package(ODB REQUIRED COMPONENTS pgsql sqlite boost)
