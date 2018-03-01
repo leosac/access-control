@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y emacs25-nox wget
 
 ## General dependencies
 RUN apt-get update && apt-get install -y          \
-cmake build-essential git                         \
+cmake build-essential pkg-config git              \
 libssl-dev                                        \
 libcurl4-openssl-dev libtclap-dev libscrypt-dev   \
 libzmq3-dev                                       \
