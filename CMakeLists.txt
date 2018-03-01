@@ -11,7 +11,6 @@ set(CPACK_PACKAGE_VERSION_MINOR "7")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 
 include(CPack)
-include (CheckIncludeFile)
 
 set(CMAKE_INSTALL_RPATH "\$ORIGN:\$ORIGIN/../lib/leosac")
 set(LEOSAC_CROSS_COMPILE 0)
