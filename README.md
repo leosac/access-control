@@ -19,7 +19,7 @@ A Leosac setup is usually composed of an embedded Linux board running the softwa
 
 ## Getting started  
 
-You can follow the [install guide](http://leosac.github.io/leosac/doc_output/develop/html/d5/d38/install_guide.html)
+You can follow the [install guide](https://leosac.github.io/leosac-doc/doc_output/develop/d5/d97/page_guide_rpi_piface_wiegand.html#install_guide)
 to have a basic setup ready.
 
 ## Issues
