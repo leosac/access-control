@@ -183,7 +183,7 @@ WiegandReaderModule::create_strategy(const WiegandReaderConfig &reader_cfg,
     else if (reader_cfg.mode == "AUTODETECT")
     {
         return std::unique_ptr<WiegandStrategy>(
-            new Autodetect(reader, reader_cfg.pin_timeout, reader_cfg.pin_key_end));
+            new Autodetect(reader, reader_cfg.pin_timeout, reader_cfg.pin_key_end, reader_cfg.nowait));
     }
     else
     {
@@ -274,6 +274,7 @@ void WiegandReaderModule::load_xml_config(
         reader_config->pin_timeout =
             std::chrono::milliseconds(xml_reader_cfg.get<int>("pin_timeout", 2500));
         reader_config->pin_key_end = xml_reader_cfg.get<char>("pin_key_end", '#');
+        reader_config->nowait = xml_reader_cfg.get<bool>("nowait", 0);
 
         config_check(reader_config->gpio_low_name(),
                      ConfigChecker::ObjectType::GPIO);

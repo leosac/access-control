@@ -52,7 +52,7 @@ class Autodetect : public WiegandStrategy
     * @param pin_key_end    what key on the reader signals the end of the pin code ?
     */
     Autodetect(WiegandReaderImpl *reader, std::chrono::milliseconds delay,
-               char pin_key_end);
+               char pin_key_end, bool nowait);
 
     virtual void timeout() override;
 
@@ -100,6 +100,7 @@ class Autodetect : public WiegandStrategy
     bool ready_;
 
     char pin_key_end_;
+    bool nowait_;
 };
 }
 }

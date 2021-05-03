@@ -35,6 +35,7 @@ readers      |          |             | Lists of all configured readers         
 --->         | --->     | mode        | Which mode the reader is using (see below)                 | NO (defaults to `SIMPLE_WIEGAND`)
 --->         | --->     | pin_timeout | Timeout when reading a PIN code.                           | NO (defaults to 2500ms)
 --->         | --->     | pin_key_end | Which key is used to signal the end of a PIN code          | NO (defaults to '#')
+--->         | --->     | nowait      | Don't wait for pin code after card read                    | NO (defaults to 0)
 
 **Note**: `high`, `low`, `green_led` and `buzzer` must be name of GPIO object: either defined using
 the sysfsgpio or pifacedigital module.
@@ -50,7 +51,7 @@ There are multiples `mode` available for a reader:
 7. `WIEGAND_CARD_PIN_BUFFERED` reads a card number followed by a PIN code read in buffered mode.
 8. `AUTODETECT` allows the module to read and create different type of credentials. It can read a pin code or a card number, or both.
 The pin code can be read if the reader is either in 4 bits or 8 bits mode. If you are doing card-only authentication,
-note that you will notice a delay of ~2second. This delay is here to let the user have a chance to enter his PIN code.
+note that you will notice a delay of ~2 second, unless nowait is set to true. This delay is here to let the user have a chance to enter his PIN code.
 
 @warning The `AUTODETECT` mode is not compatible with the hardware Wiegand-Buffered mode.
 
