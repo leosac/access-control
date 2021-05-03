@@ -16,7 +16,7 @@ Dependencies
 ------------
 
 For starters, install these packages:
-  + `apt-get install cmake build-essential git sudo devscripts`
+  + `apt-get install cmake build-essential pkg-config git sudo devscripts`
 
 @note The ODB package in the Debian & Raspbian repositories is broken. A bug report has been filed. See [889664](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=889664). Until this is resolved, a set of patched odb packages have been made available in the Leosac [bin-resources](https://github.com/leosac/bin-resources) repository.
 

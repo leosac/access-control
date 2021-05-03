@@ -26,7 +26,7 @@ If running Raspbian, replace amd64 in the folder name shown above with armhf.
 
 Leosac has a number of additonal dependencies which need to be installed:
 ```
-sudo apt-get install cmake build-essential git \
+sudo apt-get install cmake build-essential pkg-config git \
 default-libmysqlclient-dev libtclap-dev libcurl4-openssl-dev libgtest-dev \
 libunwind-dev libzmq3-dev libpq-dev libpython2.7-dev libscrypt-dev \
 libsqlite3-dev libsodium-dev libssl-dev libboost-date-time-dev \
