@@ -86,7 +86,7 @@ void AsioModule::AsyncReactorPoller::schedule_wait()
 void AsioModule::AsyncReactorPoller::wait_handler(
     const boost::system::error_code &ec)
 {
-    ASSERT_LOG(ec == 0, "Error while processing wait_handler: " << ec.message());
+    ASSERT_LOG(ec == boost::system::errc::success, "Error while processing wait_handler: " << ec.message());
     self_.reactor_.poll(0);
     if (self_.is_running_)
         schedule_wait();
