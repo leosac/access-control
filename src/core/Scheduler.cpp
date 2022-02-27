@@ -21,6 +21,7 @@
 #include "core/tasks/Task.hpp"
 #include <assert.h>
 #include <future>
+#include <functional>
 
 using namespace Leosac;
 using namespace Leosac::Tasks;

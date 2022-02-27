@@ -22,6 +22,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <memory>
+#include <functional>
 
 namespace Leosac
 {

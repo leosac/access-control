@@ -20,6 +20,7 @@
 #pragma once
 
 #include "tools/Uuid.hpp"
+#include <memory>
 
 namespace Leosac
 {

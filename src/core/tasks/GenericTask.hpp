@@ -21,6 +21,7 @@
 
 #include "LeosacFwd.hpp"
 #include "Task.hpp"
+#include <functional>
 
 namespace Leosac
 {
