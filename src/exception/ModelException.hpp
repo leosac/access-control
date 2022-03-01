@@ -20,7 +20,7 @@
 #pragma once
 
 #include "exception/leosacexception.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 /**
  * An exception class for general API error.

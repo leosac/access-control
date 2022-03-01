@@ -24,7 +24,7 @@
 
 #include "LeosacFwd.hpp"
 #include "hardware/GPIO.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {

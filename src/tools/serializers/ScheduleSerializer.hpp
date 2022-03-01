@@ -21,7 +21,7 @@
 
 #include "LeosacFwd.hpp"
 #include "tools/ISchedule.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace Leosac

@@ -30,7 +30,7 @@ set(OdbCMake_SOURCES_TOOLS "")
 odb_compile(OdbCMake_SOURCES_TOOLS
         FILES ${OdbCMake_ODB_HEADERS_TOOLS}
         MULTI_DATABASE dynamic
-        DB pgsql sqlite 
+        DB pgsql sqlite
         STANDARD "c++14"
         GENERATE_QUERY GENERATE_SESSION
         SCHEMA_NAME core
@@ -204,6 +204,8 @@ target_include_directories(leosac_db PRIVATE
         ${ZEROMQ_INCLUDE_DIR}
         ${ODB_INCLUDE_DIRS}
         )
+
+target_link_libraries(leosac_db ${ODB_LIBRARIES} ${Boost_LIBRARIES})
 
 if (LEOSAC_CROSS_COMPILE)
     set(__LEOSAC_SQL_GENERATION_ADDITIONAL_INCLUDES -I ${CMAKE_SYSROOT}/include)

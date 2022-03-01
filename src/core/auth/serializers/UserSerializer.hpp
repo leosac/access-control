@@ -21,7 +21,7 @@
 
 #include "LeosacFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace Leosac

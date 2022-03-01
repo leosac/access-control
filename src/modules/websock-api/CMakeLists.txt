@@ -56,7 +56,7 @@ target_link_libraries(${WEBSOCK_API_BIN}
 target_include_directories(${WEBSOCK_API_BIN}
         PUBLIC
         ${CMAKE_SOURCE_DIR}/deps/websocketpp
-        ${CMAKE_SOURCE_DIR}/deps/json/src
+        ${CMAKE_SOURCE_DIR}/deps/json/include
         ${ODB_INCLUDE_DIRS}
         ${ODB_COMPILE_OUTPUT_DIR}
 

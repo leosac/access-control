@@ -22,7 +22,7 @@
 #include "LeosacFwd.hpp"
 #include "SMTPFwd.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace Leosac

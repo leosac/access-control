@@ -20,7 +20,7 @@
 #pragma once
 
 #include <boost/optional.hpp>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <memory>
 
 namespace Leosac

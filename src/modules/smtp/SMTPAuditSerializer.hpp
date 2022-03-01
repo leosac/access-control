@@ -23,7 +23,7 @@
 #include "SMTPAudit.hpp"
 #include "core/audit/IAuditEntry.hpp"
 #include "tools/Visitor.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace Leosac

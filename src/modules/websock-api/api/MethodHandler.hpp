@@ -23,7 +23,7 @@
 #include "RequestContext.hpp"
 #include "core/SecurityContext.hpp"
 #include "core/UserSecurityContext.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {

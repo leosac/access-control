@@ -31,7 +31,7 @@
 #include "core/auth/serializers/UserGroupMembershipSerializer.hpp"
 #include "tools/JSONUtils.hpp"
 #include "tools/log.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module;

@@ -22,7 +22,7 @@
 #include "LeosacFwd.hpp"
 #include "core/credentials/IRFIDCard.hpp"
 #include "tools/Visitor.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <string>
 
 namespace Leosac

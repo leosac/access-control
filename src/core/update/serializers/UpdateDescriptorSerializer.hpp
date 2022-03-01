@@ -20,7 +20,7 @@
 #pragma once
 
 #include "core/update/UpdateFwd.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {

@@ -18,7 +18,7 @@ set(LEOSAC_ODB_INCLUDE_DIRS
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/deps/flagset
         ${CMAKE_SOURCE_DIR}/deps/date/include
-        ${CMAKE_SOURCE_DIR}/deps/json/src/
+        ${CMAKE_SOURCE_DIR}/deps/json/include/
         ${ZEROMQ_INCLUDE_DIR}
         ${CMAKE_SOURCE_DIR}/src/db
         )

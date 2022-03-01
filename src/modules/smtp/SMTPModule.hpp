@@ -30,7 +30,7 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <curl/curl.h>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {

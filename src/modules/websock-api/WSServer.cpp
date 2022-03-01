@@ -66,7 +66,7 @@
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 #include "tools/registry/ThreadLocalRegistry.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <odb/session.hxx>
 
 using namespace Leosac;

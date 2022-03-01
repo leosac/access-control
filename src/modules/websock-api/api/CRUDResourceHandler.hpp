@@ -23,7 +23,7 @@
 #include "modules/websock-api/RequestContext.hpp"
 #include "modules/websock-api/WebSockFwd.hpp"
 #include <boost/optional.hpp>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <vector>
 
 namespace Leosac

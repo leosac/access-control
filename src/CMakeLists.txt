@@ -218,7 +218,7 @@ ${CMAKE_SOURCE_DIR}/deps/libmcp23s17/src/
 ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
 ${CMAKE_SOURCE_DIR}/deps/spdlog/include
 ${CMAKE_SOURCE_DIR}/deps/flagset
-${CMAKE_SOURCE_DIR}/deps/json/src
+${CMAKE_SOURCE_DIR}/deps/json/include
 ${Boost_INCLUDE_DIRS}
 )
 

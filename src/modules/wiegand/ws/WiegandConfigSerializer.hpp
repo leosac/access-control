@@ -21,7 +21,7 @@
 
 #include "LeosacFwd.hpp"
 #include "modules/wiegand/WiegandConfig.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {

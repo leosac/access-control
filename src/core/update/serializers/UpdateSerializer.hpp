@@ -21,7 +21,7 @@
 
 #include "core/SecurityContext.hpp"
 #include "core/update/UpdateFwd.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {

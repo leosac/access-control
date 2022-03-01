@@ -21,7 +21,7 @@
 
 #include "LeosacFwd.hpp"
 #include "hardware/HardwareFwd.hpp"
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 namespace Leosac
 {
