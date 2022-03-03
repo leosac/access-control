@@ -1,6 +1,6 @@
 [Unit]
 Description=Leosac daemon
-Documentation=http://www.github.com/islog/leosac/wiki
+Documentation=http://www.github.com/leosac/leosac/wiki
 After=default.target
 
 [Service]

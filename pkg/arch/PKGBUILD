@@ -6,13 +6,13 @@ pkgver=0
 pkgrel=1
 pkgdesc="Open source access control"
 arch=('i686' 'x86_64' 'armv6h')
-url="https://github.com/islog/leosac"
+url="https://github.com/leosac/leosac"
 license=('AGPL3')
 makedepends=('git cmake boost tclap')
 conflicts=('leosac')
 provides=('leosac')
 install='leosac.install'
-source=('git+https://github.com/islog/leosac.git'
+source=('git+https://github.com/leosac/leosac.git'
     leosacd.service
     leosac.install)
 sha512sums=('SKIP'

@@ -11,39 +11,39 @@ leosac (0.6.3-1) UNRELEASED; urgency=medium
   * RPleth can now support card number with up to 64bits in the Wiegand frame.
   * The TCP-Notifier module is now much more flexible.
 
- --  <arnaud.kapp@islog.com>  Tue, 17 Nov 2015 14:50:00 +0100
+ --  <kapp.arno@gmail.com>  Tue, 17 Nov 2015 14:50:00 +0100
 
 leosac (0.6.2-1) UNRELEASED; urgency=medium
 
   * Add support for TCP notifications
   * Add support for webservice notifications.
 
- --  <arnaud.kapp@islog.com>  Wed, 16 Sep 2015 10:40:17 +0100
+ --  <kapp.arno@gmail.com>  Wed, 16 Sep 2015 10:40:17 +0100
 
 leosac (0.6.1-1) UNRELEASED; urgency=medium
 
   * Update to commit 126089bcd8b8f182c01a42731577127db81e30ff
 
- --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 18:00:25 +0100
+ --  <kapp.arno@gmail.com>  Fri, 06 Mar 2015 18:00:25 +0100
 
 leosac (0.6.0-1) UNRELEASED; urgency=medium
 
   * Master / Slave mode
 
- --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 18:00:25 +0100
+ --  <kapp.arno@gmail.com>  Fri, 06 Mar 2015 18:00:25 +0100
 
 leosac (0.5.2-1) UNRELEASED; urgency=medium
 
   * A few documentation patches
   * A new module to publish on a ZMQ pub socket.
 
- --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 18:00:25 +0100
+ --  <kapp.arno@gmail.com>  Fri, 06 Mar 2015 18:00:25 +0100
 
 leosac (0.5.1-1) UNRELEASED; urgency=medium
 
   * Update libmcp23s17 to fix a bug on recent kernel
 
- --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 18:00:25 +0100
+ --  <kapp.arno@gmail.com>  Fri, 06 Mar 2015 18:00:25 +0100
 
 leosac (0.5.0-1) UNRELEASED; urgency=medium
 
@@ -51,13 +51,13 @@ leosac (0.5.0-1) UNRELEASED; urgency=medium
   * Improved doorman module.
   * Ability to (partially) remote control Leosac.
 
- --  <xaqq@atlantis.islog.private>  Fri, 06 Mar 2015 14:09:15 +0100
+ --  <kapp.arno@gmail.com>  Fri, 06 Mar 2015 14:09:15 +0100
 
 leosac (0.4.1-1) UNRELEASED; urgency=medium
 
   * Fix package dependecies
 
- --  <xaqq@atlantis.islog.private>  Mon, 22 Dec 2014 15:11:41 +0100
+ --  <kapp.arno@gmail.com>  Mon, 22 Dec 2014 15:11:41 +0100
 
 leosac (0.4.0-1) UNRELEASED; urgency=medium
 
@@ -65,10 +65,10 @@ leosac (0.4.0-1) UNRELEASED; urgency=medium
   * Full Rpleth support.
   * Group and user permission support.
 
- --  <xaqq@atlantis.islog.private>  Wed, 26 Nov 2014 15:11:41 +0100
+ --  <kapp.arno@gmail.com>  Wed, 26 Nov 2014 15:11:41 +0100
 
 leosac (0.3.4-1) UNRELEASED; urgency=medium
 
   * Initial test release.
 
- --  <xaqq@atlantis.islog.private>  Wed, 26 Nov 2014 15:11:41 +0100
+ --  <kapp.arno@gmail.com>  Wed, 26 Nov 2014 15:11:41 +0100

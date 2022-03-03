@@ -14,7 +14,7 @@ Welcome to the main documentation page for the Rpleth module.
 This page is about Rpleth from an end-user point of view. \n
 It describes how to configure the Rpleth module for Leosac.
 
-This module is for internal use at Islog, it's unlikely you will ever need it.
+This module is for internal use, it's unlikely you will ever need it.
 
 Configuration Options {#mod_rpleth_user_config}
 ===============================================
@@ -44,7 +44,7 @@ This is a example of Rpleth possible configuration for Rpleth module into Leosac
     </module_config>
 </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
+
 Notes {#mod_rpleth_notes}
 =========================
 

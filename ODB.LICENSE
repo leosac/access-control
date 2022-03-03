@@ -25,11 +25,11 @@ a similar exception free of charge by contacting Code Synthesis Tools CC.
 
 2. Definitions
 
-"Original Software" is the Leosac software, Copyright (c) ISLOG,
+"Original Software" is the Leosac software, Copyright (c) Leosac,
 distributed under the terms of the AGPLv3 license, and available to
 any third party from:
 
-  https://github.com/islog/leosac
+  https://github.com/leosac/leosac
 
 "ODB-Extended Software" are any modifications to the Original Software
 that require additions or changes to the persistent object model of
