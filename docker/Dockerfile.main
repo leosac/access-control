@@ -1,4 +1,5 @@
-FROM debian:bullseye
+ARG ARCH=
+FROM ${ARCH}debian:bullseye
 
 ## Add APT 'contrib' repository
 RUN sed -i 's/main/main contrib/' /etc/apt/sources.list

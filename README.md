@@ -2,6 +2,9 @@ The documentation for both end user and developpers can be found [here](http://l
 
 # Leosac
 
+* Stable branch: master [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/leosac/actions/workflows/build.yml)
+* Development branch: develop [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/leosac/actions/workflows/build.yml)
+
 ## What is Leosac?
 
 Leosac is an open source physical access control system software. It is meant to be installed on embedded devices running Linux, to handle the logic processing of an access control. Basically, it opens doors.
