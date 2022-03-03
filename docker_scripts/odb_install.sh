@@ -5,6 +5,12 @@ set -x
 
 cd /tmp
 
+# ODB 2.4 do not build properly with G++9
+# and ODB 2.5 which will officially support latest G++ versions
+# is not released yet.
+# Manually building ODB may also be impacted on latest Debian by
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=980609
+
 wget http://www.codesynthesis.com/download/odb/2.4/odb_2.4.0-1_amd64.deb && dpkg -i odb_2.4.0-1_amd64.deb
 
 # Common runtime

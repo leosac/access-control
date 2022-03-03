@@ -24,6 +24,7 @@
  */
 
 #include "runtimeoptions.hpp"
+#include <stdexcept>
 
 using namespace Leosac::Tools;
 const std::string RuntimeOptions::DefaultEmptyParam("undef");
