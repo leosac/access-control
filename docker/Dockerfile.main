@@ -41,7 +41,7 @@ make install                                   && \
 ldconfig)
 
 # Create DEB
-RUN if [ -n "$VCS_REF"] ; then /usr/src/leosac/docker_scripts/makepkg.sh ; fi
+RUN if [[ -n "$VCS_REF" ]] ; then /usr/src/leosac/docker_scripts/makepkg.sh ; fi
 
 RUN mkdir -p /etc/leosac/config
 VOLUME /etc/leosac/config
