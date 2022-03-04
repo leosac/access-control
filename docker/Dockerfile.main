@@ -37,7 +37,8 @@ cmake -DCMAKE_BUILD_TYPE=Release                  \
 -DZMQPP_LIBZMQ_CMAKE=0                            \
 /usr/src/leosac                                && \
 make -j4                                       && \
-make install)
+make install                                   && \
+ldconfig)
 
 # Create DEB
 RUN if [ -n "$VCS_REF"] ; then bash /usr/src/leosac/docker_scripts/makepkg.sh ; fi
