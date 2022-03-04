@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: |
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release ..
     - uses: vapier/coverity-scan-action@v1
       with:
         email: ${{ secrets.REPORT_EMAIL }}

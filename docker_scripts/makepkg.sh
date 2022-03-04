@@ -25,7 +25,7 @@ echo "3.0 (quilt)" > debian/source/format
 
 debuild -b -us -uc
 
-LEOSAC_DEB=`find ../ -maxdepth 0 -name leosac_*.deb` && \
-echo Installing package $LEOSAC_DEB ...
-dpkg --install $LEOSAC_DEB
+LEOSAC_DEB=`find ../* -maxdepth 0 -name leosac_*.deb`
+echo Installing package ${LEOSAC_DEB} ...
+dpkg --install ${LEOSAC_DEB}
 mv ${LEOSAC_DEB} /tmp/leosac
