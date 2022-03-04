@@ -17,8 +17,8 @@ jobs:
         cd build
         cmake -DCMAKE_BUILD_TYPE=Release ..
     - uses: vapier/coverity-scan-action@v1
-      working-directory: ./build
       with:
         email: ${{ secrets.REPORT_EMAIL }}
         token: ${{ secrets.COVERITY_SCAN_TOKEN }}
         build_language: 'cxx'
+        working-directory: ./build
