@@ -24,9 +24,6 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
             -f docker/Dockerfile.main .
-      - name: Inspect image
-        run: |
-          docker buildx imagetools inspect maxhy/leosac:edge
       - run: mkdir /build
       - name: Run linux/amd64
         if: success()
