@@ -7,7 +7,7 @@ ARG VCS_REF=
 ## Add APT 'contrib' repository
 RUN sed -i 's/main/main contrib/' /etc/apt/sources.list
 
-## General dependencies
+## General dependencies for build and run
 RUN apt-get update && apt-get install -y          \
 cmake build-essential pkg-config git              \
 apt-utils libssl-dev libzmq5 libzmq3-dev          \
@@ -19,8 +19,8 @@ libsqlite3-dev libpq-dev odb libodb-dev           \
 libodb-pgsql-dev libodb-pgsql-2.4                 \
 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2
-RUN pip3 install pyzmq
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \
+pip3 install pyzmq
 
 ## we mount leosac source dir in read only
 VOLUME /usr/src/leosac
@@ -28,27 +28,16 @@ ADD . /usr/src/leosac
 
 RUN (cd /usr/src/leosac/python && pip3 install -e .)
 
+VOLUME /etc/leosac.d
 VOLUME /tmp/leosac
 
-RUN (mkdir -p /tmp/leosac/build && cd /tmp/leosac/build      && \
-cmake -DCMAKE_BUILD_TYPE=Release                  \
--DCMAKE_INSTALL_PREFIX=/usr/local                 \
--DZMQPP_BUILD_STATIC=0                            \
--DZMQPP_LIBZMQ_CMAKE=0                            \
-/usr/src/leosac                                && \
-make -j4                                       && \
-make install                                   && \
-ldconfig)
-
 # Create DEB
-RUN if [[ -n "$VCS_REF" ]] ; then /usr/src/leosac/docker_scripts/makepkg.sh ; fi
+RUN cd /usr/src/leosac && docker_scripts/makepkg.sh && \
+dpkg --install /tmp/leosac/leosac_*.deb
 
-RUN mkdir -p /etc/leosac/config
-VOLUME /etc/leosac/config
-
-ADD cfg/factory/docker.xml /etc/leosac/config/config.xml
+ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
 
 # Container config
 CMD [""]
-ENTRYPOINT ["leosac", "-k", "/etc/leosac/config/config.xml"]
+ENTRYPOINT ["leosac", "-k", "/etc/leosac.d/docker.xml"]
 EXPOSE 8888

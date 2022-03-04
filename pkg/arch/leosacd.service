@@ -1,11 +1,11 @@
 [Unit]
 Description=Leosac daemon
-Documentation=http://www.github.com/leosac/leosac/wiki
+Documentation=https://github.com/leosac/leosac
 After=default.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/leosac -f /etc/leosac.d/core.xml -g /etc/leosac.d/hw.xml
+ExecStart=/usr/bin/leosac -k /etc/leosac.d/kernel.xml
 WorkingDirectory=/etc/leosac.d
 
 [Install]

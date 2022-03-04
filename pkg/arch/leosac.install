@@ -8,7 +8,7 @@ post_install()
     echo "systemctl start leosacd"
     echo ""
     echo "More info here:"
-    echo "https://github.com/leosac/leosac/wiki"
+    echo "https://github.com/leosac/leosac"
     echo "----------------------------------------------------------------"
 }
 
@@ -20,6 +20,6 @@ post_upgrade()
     echo "systemctl restart leosacd"
     echo ""
     echo "More info here:"
-    echo "https://github.com/leosac/leosac/wiki"
+    echo "https://github.com/leosac/leosac"
     echo "----------------------------------------------------------------"
 }
