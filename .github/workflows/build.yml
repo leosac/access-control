@@ -28,7 +28,7 @@ jobs:
       - run: mkdir build
       - name: Run linux/amd64
         if: success()
-        run: docker create --platform linux/amd64 -v "${PWD}/build:/tmp/leosac" maxhy/leosac:edge
+        run: docker run --entrypoint=/bin/bash --platform linux/amd64 -v "${PWD}/build:/tmp/leosac" maxhy/leosac:edge
       - uses: actions/upload-artifact@v3
         if: success()
         with:

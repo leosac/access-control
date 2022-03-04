@@ -26,7 +26,7 @@ jobs:
           SONAR_SCANNER_DOWNLOAD_URL: https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${{ env.SONAR_SCANNER_VERSION }}-linux.zip
         run: |
           mkdir -p $HOME/.sonar
-          curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} 
+          curl -sSLo $HOME/.sonar/sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
           unzip -o $HOME/.sonar/sonar-scanner.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/sonar-scanner-${{ env.SONAR_SCANNER_VERSION }}-linux/bin" >> $GITHUB_PATH
       - name: Download and set up build-wrapper
@@ -38,8 +38,8 @@ jobs:
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
       - run: sudo apt-get install -y cmake build-essential pkg-config git apt-utils libssl-dev libzmq5 libzmq3-dev libcurl4-openssl-dev libtclap-dev libscrypt-dev python3 python3-pip gcc-9 g++-9 libboost-all-dev libgtest-dev libsqlite3-dev libpq-dev odb libodb-dev libodb-pgsql-dev libodb-pgsql-2.4 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
       - run: |
-        mkdir build
-        cd build
+          mkdir build
+          cd build
       - name: Run build-wrapper
         run: |
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} cmake -DCMAKE_BUILD_TYPE=Release ..
