@@ -1,9 +1,9 @@
-The documentation for both end user and developpers can be found [here](http://leosac.github.io/leosac-doc/doc_output/develop/).
-
-# Leosac
+ # Leosac ![Logo](rc/logo.png)
 
 * Stable branch: master [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/leosac/actions/workflows/build.yml)
 * Development branch: develop [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/leosac/actions/workflows/build.yml)
+
+The documentation for both end user and developpers can be found [here](http://leosac.github.io/leosac-doc/doc_output/develop/).
 
 ## What is Leosac?
 
