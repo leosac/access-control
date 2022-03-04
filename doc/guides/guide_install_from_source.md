@@ -6,49 +6,62 @@
 Background
 ----------
 
-This guide is intended to be used on Debian Stretch with amd64 architecture or Raspbian Stretch with armv6/armv7 architecture.
+This guide is intended to be used on Debian Bullseye with amd64 architecture or Raspbian Stretch with armv6/armv7/arm64 architecture.
 While not quite as slow as building Leosac into a deb package, this method can still takes hours to complete when building natively on a Raspberry Pi.
 
 
 Dependencies
 ------------
 
-@note The ODB package from the Debian & Raspbian repositories is broken. A bug report has been filed. See [889664](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=889664). Until this is resolved, a set of patched odb packages have been made available in the Leosac [bin-resources](https://github.com/leosac/bin-resources) repository.
+You will need a working Linux environment and the following packages:
 
-The following steps assume the odb package is not already installed on the target system. If it is, uninstall it first.
-  + `git clone https://github.com/leosac/bin-resources`
-  + `cd bin-resources/debian/gcc6/armhf`
-  + `sudo dpkg -i odb_2.4.0*.deb`
-  + `sudo apt-mark hold odb`
-  + `sudo apt-get install -f`
+ * GCC 4.8+ (any C++11-compatible compiler should do)
+ * Git (to clone the repo)
+ * CMake 2.8.8 (and above)
+ * Boost 1.41 (and above)
+ * ODB 2.4 (and above)
+ * TCLAP
+ * GoogleTest is required if you plan to build the test suite.
 
-If running Raspbian, replace amd64 in the folder name shown above with armhf.
-
-Leosac has a number of additonal dependencies which need to be installed:
+Such dependencies need to be installed:
 ```
-sudo apt-get install cmake build-essential pkg-config git \
-default-libmysqlclient-dev libtclap-dev libcurl4-openssl-dev libgtest-dev \
-libunwind-dev libzmq3-dev libpq-dev libpython2.7-dev libscrypt-dev \
-libsqlite3-dev libsodium-dev libssl-dev libboost-date-time-dev \
-libboost-filesystem-dev libboost-regex-dev libboost-serialization-dev \
-libboost-system-dev python3 python3-pip libodb-boost-dev libodb-mysql-dev \
-libodb-pgsql-dev libodb-sqlite-dev libodb-dev
+sudo apt-get install cmake build-essential pkg-config git apt-utils libssl-dev libzmq5 libzmq3-dev libcurl4-openssl-dev libtclap-dev libscrypt-dev python3 python3-pip gcc-9 g++-9 libboost-all-dev libgtest-dev libsqlite3-dev libpq-dev odb libodb-dev libodb-pgsql-dev libodb-pgsql-2.4 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 ```
 
 
 Build
 -----
 
-Clone the repo and peform a legacy make install from-source:
-  + `git clone https://github.com/leosac/leosac.git`
-  + `cd leosac`
-  + `git submodule init && git submodule update`
-  + `mkdir build`
-  + `cd build`
-  + `cmake -DCMAKE_BUILD_TYPE=Release ..`
-  + `make`
-  + `sudo make install`
+*Note:* Make sure `g++ --version` shows at least 4.8. You can use the `update-alternative` command on Debian to set the default version of `gcc/g++`.
 
+Clone the repo and peform a legacy make install from-source:
+```
+git clone -b master https://github.com/islog/leosac.git
+cd leosac
+git submodule init
+git submodule update
+```
+
+`libzmq` and `zmqpp` are bundled with the project (using git submodules).
+
+CMake takes care of the build process, here's a minimal procedure to compile Leosac:
+```
+mkdir -p build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DZMQPP_BUILD_STATIC=0 -DZEROMQ_LIB_DIR=`pwd`/libzmq/.libs/ -DZEROMQ_INCLUDE_DIR=`pwd`/../libzmq/include -DZMQPP_LIBZMQ_CMAKE=1
+make
+```
+
+If you have difficulties building libzmq, install it from debian repository instead.
+```
+apt install libzmq5 libzmq3-dev
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DZMQPP_BUILD_STATIC=0 -DZMQPP_LIBZMQ_CMAKE=0
+make
+```
+
+The `LEOSAC_PLATFORM` var is set to 'Unknown' by default, you can safely ignore it for now, or see *Advanced CMake* flags section for more info.
+
+    * `LEOSAC_GPROF`: CMake will add [GNU Gprof](https://en.wikipedia.org/wiki/Gprof) compilation/linking flags. This flag is for debugging purpose only and should be coupled with `-DCMAKE_BUILD_TYPE=Debug`
+    * `LEOSAC_BUILD_MODULES`: Unset this flag if you don't want CMake to build Leosac modules.
 
 Follow-Up Tasks
 ---------------
@@ -62,4 +75,3 @@ Edit the leosac service file, changing `/usr/bin/leosac` to `/usr/local/bin/leos
 @note The steps above assume you are still in the build subfolder created earlier.
 
 Finally, before you can start Leosac, you need to create a kernel.xml file. See the [installation guide](@ref page_guide_rpi_piface_wiegand).
-

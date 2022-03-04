@@ -6,8 +6,10 @@ set -x
 test ! -d debian
 mkdir debian
 
+DEBEMAIL="support@leosac.com"
+DEBFULLNAME="Leosac CI"
 DEBVERSION="${VERSION}"
-if [ $VERSION == "edge" ] || [ $VERSION == "latest" ] || [ $VERSION == "snapshot" ] ; then DEBVERSION=0.0.0 ; fi
+if [[ -z "${VERSION}" ]] || [[ $VERSION == "edge" ]] || [[ $VERSION == "latest" ]] || [[ $VERSION == "snapshot" ]] ; then DEBVERSION="0.0.0" ; fi
 
 dch --create -v "${DEBVERSION}-1" --package leosac "CI auto-generated package (commit ${VCS_REF})" # Initial changelog
 dch -r "Unforeseen Consequences" # Mark as release
@@ -22,5 +24,5 @@ echo "3.0 (quilt)" > debian/source/format
 
 debuild -b -us -uc
 
-LEOSAC_DEB=`find * -maxdepth 0 -name leosac_*.deb`
+LEOSAC_DEB=`find ../* -maxdepth 0 -name leosac_*.deb`
 mv ${LEOSAC_DEB} /tmp/leosac

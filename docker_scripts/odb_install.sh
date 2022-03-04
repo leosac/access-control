@@ -5,9 +5,12 @@ set -x
 
 cd /tmp
 
-# ODB 2.4 do not build properly with G++9
-# and ODB 2.5 which will officially support latest G++ versions
-# is not released yet.
+# Current packages on Debian Bullseye and Ubuntu 20.04.4 have
+# been tested successfully. Manual build of ODB shouldn't be
+# required on these systems.
+
+# ODB 2.4 do not build properly with G++9 nd ODB 2.5 which will
+# officially support latest G++ versions is not released yet.
 # Manually building ODB may also be impacted on latest Debian by
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=980609
 
@@ -25,10 +28,6 @@ cd libodb-sqlite-2.4.0 && ./configure && make -j4 && make install
 
 wget http://www.codesynthesis.com/download/odb/2.4/libodb-boost-2.4.0.tar.gz && tar xvf libodb-boost-2.4.0.tar.gz
 cd libodb-boost-2.4.0 && ./configure && make -j4 && make install
-
-# MySQL runtime
-wget http://www.codesynthesis.com/download/odb/2.4/libodb-mysql-2.4.0.tar.gz && tar xvf libodb-mysql-2.4.0.tar.gz
-cd libodb-mysql-2.4.0 && ./configure && make -j4 && make install
 
 #PGSQL runtime
 wget http://www.codesynthesis.com/download/odb/2.4/libodb-pgsql-2.4.0.tar.gz && tar xvf libodb-pgsql-2.4.0.tar.gz
