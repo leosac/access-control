@@ -76,7 +76,7 @@ jobs:
       - name: Run linux/386
         if: success()
         run: docker run --platform linux/386 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
-      - uses: actions/upload-artifacts@v3
+      - uses: actions/upload-artifact@v3
         if: success()
         with:
           name: Deb files

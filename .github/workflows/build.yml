@@ -31,7 +31,7 @@ jobs:
       - name: Run linux/amd64
         if: success()
         run: docker run --platform linux/amd64 -v /build:/tmp/leosac maxhy/leosac:edge
-      - uses: actions/upload-artifacts@v3
+      - uses: actions/upload-artifact@v3
         if: success()
         with:
           name: Deb files
