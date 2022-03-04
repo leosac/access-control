@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <kernel>
+    <instance_name>Leosac</instance_name>
     <plugin_directories>
       <plugindir>/usr/lib/leosac</plugindir>
       <plugindir>/usr/lib/leosac/auth</plugindir>
@@ -18,7 +19,7 @@
       <enable_syslog>true</enable_syslog>
       <min_syslog>DEBUG</min_syslog>
     </log>
-    
+
     <modules>
         <module>
             <name>PIFACEDIGITAL_GPIO</name>
@@ -69,7 +70,7 @@
 
         <module>
             <name>LED_BUZZER</name>
-            <file>libled.so</file>
+            <file>libled-buzzer.so</file>
             <level>3</level>
             <module_config>
                 <leds>

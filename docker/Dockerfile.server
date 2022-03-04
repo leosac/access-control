@@ -1,8 +1,0 @@
-ARG VERSION=latest
-FROM maxhy/leosac:${VERSION}
-
-RUN mkdir -p /etc/leosac/config
-VOLUME /etc/leosac/config
-VOLUME /etc/leosac/config/config.xml
-
-ENTRYPOINT ["leosac", "-k", "/etc/leosac/config/config.xml"]

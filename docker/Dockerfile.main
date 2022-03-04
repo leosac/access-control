@@ -58,3 +58,10 @@ make install)
 
 # Create DEB
 RUN if [ -n "$VCS_REF"] ; then bash ./docker_scripts/makepkg.sh ; fi
+
+RUN mkdir -p /etc/leosac/config
+VOLUME /etc/leosac/config
+
+ADD cfg/factory/docker.xml /etc/leosac/config/config.xml
+
+ENTRYPOINT ["leosac", "-k", "/etc/leosac/config/config.xml"]
