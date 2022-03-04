@@ -13,35 +13,18 @@ cmake build-essential pkg-config git              \
 apt-utils libssl-dev libzmq5 libzmq3-dev          \
 libcurl4-openssl-dev libtclap-dev libscrypt-dev   \
 python3 python3-pip gcc-9 g++-9                   \
-dh-make dpkg-dev debhelper devscripts
-
-## Boost
-RUN apt-get install -y libboost-all-dev
-
-## Some niceties for when using the container manually
-RUN apt-get install -y emacs-nox vim wget
+dh-make dpkg-dev debhelper devscripts             \
+libboost-all-dev emacs-nox vim wget               \
+libsqlite3-dev libpq-dev odb libodb-dev           \
+libodb-pgsql-dev libodb-pgsql-2.4                 \
+libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 RUN pip3 install pyzmq
 
-# Container config
-CMD [""]
-ENTRYPOINT ["/docker_scripts/entry.sh"]
-EXPOSE 8888
-
 ## we mount leosac source dir in read only
 VOLUME /usr/src/leosac
 ADD . /usr/src/leosac
-
-# Database runtime libraries. Required by ODB.
-RUN apt-get install -y                            \
-libsqlite3-dev libpq-dev
-
-RUN apt-get install -y                            \
-odb libodb-dev libodb-pgsql-dev libodb-pgsql-2.4  \
-libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
-
-# RUN apt-get install postgresql-client-9.6 -y
 
 RUN (cd /usr/src/leosac/python && pip3 install -e .)
 
@@ -57,11 +40,14 @@ make -j4                                       && \
 make install)
 
 # Create DEB
-RUN if [ -n "$VCS_REF"] ; then bash ./docker_scripts/makepkg.sh ; fi
+RUN if [ -n "$VCS_REF"] ; then bash /usr/src/leosac/docker_scripts/makepkg.sh ; fi
 
 RUN mkdir -p /etc/leosac/config
 VOLUME /etc/leosac/config
 
 ADD cfg/factory/docker.xml /etc/leosac/config/config.xml
 
+# Container config
+CMD [""]
 ENTRYPOINT ["leosac", "-k", "/etc/leosac/config/config.xml"]
+EXPOSE 8888
