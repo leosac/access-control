@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron: '0 3 * * *' # Everyday at 3am
+    - cron: '0 1 * * 6' # Every saturday at 1am
   push:
     branches: master
     tags:
@@ -16,7 +16,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          DOCKER_IMAGE=leosac/leosac
+          DOCKER_IMAGE=maxhy/leosac
           DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/arm64,linux/386
           VERSION=edge
           PUSH=false
@@ -25,7 +25,7 @@ jobs:
             VERSION=${GITHUB_REF#refs/tags/v}
           fi
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=nightly
+            VERSION=weekly
           fi
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             PUSH=true
@@ -55,7 +55,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build Docker Leosac Main
-        if: success() && github.event_name != 'pull_request'
+        if: success()
         run: |
           docker buildx build --output "type=image,push=${{ steps.prepare.outputs.buildx_push }}" \
           ${{ steps.prepare.outputs.buildx_args }} --file ./docker/Dockerfile.main .
@@ -65,14 +65,19 @@ jobs:
           docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - run: mkdir /build
       - name: Run linux/amd64
+        if: success()
         run: docker run --platform linux/amd64 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - name: Run linux/arm/v7
+        if: success()
         run: docker run --platform linux/arm/v7 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - name: Run linux/arm64
+        if: success()
         run: docker run --platform linux/arm64 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - name: Run linux/386
+        if: success()
         run: docker run --platform linux/386 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - uses: actions/upload-artifacts@v3
+        if: success()
         with:
           name: Deb files
           path: /build/*.deb

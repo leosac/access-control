@@ -1,5 +1,8 @@
 ARG ARCH=
 FROM ${ARCH}debian:bullseye
+ARG VERSION=latest
+ARG BUILD_DATE=
+ARG VCS_REF=
 
 ## Add APT 'contrib' repository
 RUN sed -i 's/main/main contrib/' /etc/apt/sources.list
@@ -9,7 +12,8 @@ RUN apt-get update && apt-get install -y          \
 cmake build-essential pkg-config git              \
 apt-utils libssl-dev libzmq5 libzmq3-dev          \
 libcurl4-openssl-dev libtclap-dev libscrypt-dev   \
-python3 python3-pip gcc-9 g++-9
+python3 python3-pip gcc-9 g++-9                   \
+dh-make dpkg-dev debhelper devscripts
 
 ## Boost
 RUN apt-get install -y libboost-all-dev
@@ -41,7 +45,9 @@ libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 
 RUN (cd /usr/src/leosac/python && pip3 install -e .)
 
-RUN (mkdir -p /tmp/build && cd /tmp/build      && \
+VOLUME /tmp/leosac
+
+RUN (mkdir -p /tmp/leosac/build && cd /tmp/leosac/build      && \
 cmake -DCMAKE_BUILD_TYPE=Release                  \
 -DCMAKE_INSTALL_PREFIX=/usr/local                 \
 -DZMQPP_BUILD_STATIC=0                            \
@@ -51,14 +57,4 @@ make -j4                                       && \
 make install)
 
 # Create DEB
-RUN COMMIT=`git rev-parse HEAD`
-
-RUN apt-get update && apt-get install -y          \
-dh-make dpkg-dev debhelper devscripts
-
-RUN bash scripts/makepkg.sh
-RUN LEOSAC_DEB=`find * -maxdepth 0 -name leosac_*.deb`
-
-VOLUME /tmp/leosac
-
-COPY ${LEOSAC_DEB} /tmp/leosac
+RUN if [ -n "$VCS_REF"] ; then bash ./docker_scripts/makepkg.sh ; fi

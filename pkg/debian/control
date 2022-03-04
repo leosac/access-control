@@ -6,7 +6,7 @@ Standards-Version: 3.9.8
 Build-Depends: debhelper (>= 9),
                cmake,
                default-libmysqlclient-dev | libmysqlclient-dev,
-               g++ (>= 5),
+               g++ (>= 9),
                libtclap-dev,
                libboost-date-time-dev,
                libboost-filesystem-dev,
