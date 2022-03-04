@@ -24,12 +24,12 @@ jobs:
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
             -f docker/Dockerfile.main .
-      - run: mkdir /build
+      - run: mkdir build
       - name: Run linux/amd64
         if: success()
-        run: docker run --platform linux/amd64 -v /build:/tmp/leosac maxhy/leosac:edge
+        run: docker run --platform linux/amd64 -v ./build:/tmp/leosac maxhy/leosac:edge
       - uses: actions/upload-artifact@v3
         if: success()
         with:
           name: Deb files
-          path: /build/*.deb
+          path: build/*.deb
