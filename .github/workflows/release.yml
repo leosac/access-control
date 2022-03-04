@@ -68,19 +68,19 @@ jobs:
       - run: mkdir build/amd64
       - name: Run linux/amd64
         if: success() && github.event_name != 'pull_request'
-        run: docker run --platform linux/amd64 -v "${PWD}/build/amd64:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        run: docker create --platform linux/amd64 -v "${PWD}/build/amd64:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - run: mkdir build/armv7
       - name: Run linux/arm/v7
         if: success() && github.event_name != 'pull_request'
-        run: docker run --platform linux/arm/v7 -v "${PWD}/build/armv7:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        run: docker create --platform linux/arm/v7 -v "${PWD}/build/armv7:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - run: mkdir build/arm64
       - name: Run linux/arm64
         if: success() && github.event_name != 'pull_request'
-        run: docker run --platform linux/arm64 -v "${PWD}/build/arm64:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        run: docker create --platform linux/arm64 -v "${PWD}/build/arm64:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - run: mkdir build/386
       - name: Run linux/386
         if: success() && github.event_name != 'pull_request'
-        run: docker run --platform linux/386 -v "${PWD}/build/386:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+        run: docker create --platform linux/386 -v "${PWD}/build/386:/tmp/leosac" ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
       - uses: actions/upload-artifact@v3
         if: success() && github.event_name != 'pull_request'
         with:
