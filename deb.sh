@@ -112,7 +112,7 @@ sudo mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes \
 if [ -z ${DEB_BUILD_OPTIONS} ] ; then
     export DEB_BUILD_OPTIONS="parallel=3"
 fi
-debuild -us -uc
+debuild -b -us -uc
 
 RESULT="$?"
 
@@ -122,4 +122,3 @@ if [ "$RESULT" == "0" ]; then
     echo "Debian package files can be found here: ${TMP_DIR}"
     echo
 fi
-

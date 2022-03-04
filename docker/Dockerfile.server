@@ -1,4 +1,5 @@
-FROM leosac_main
+ARG TAG=latest
+FROM leosac/leosac:${TAG}
 
 RUN mkdir -p /etc/leosac/config
 VOLUME /etc/leosac/config

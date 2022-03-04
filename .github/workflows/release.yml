@@ -1,6 +1,10 @@
 on:
-  release:
-    types: [published]
+  schedule:
+    - cron: '0 3 * * *' # Everyday at 3am
+  push:
+    branches: master
+    tags:
+      - v*
 
 jobs:
   build:
@@ -9,14 +13,66 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Prepare
+        id: prepare
+        run: |
+          DOCKER_IMAGE=leosac/leosac
+          DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/arm64,linux/386
+          VERSION=edge
+          PUSH=false
+
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            VERSION=nightly
+          fi
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            PUSH=true
+          fi
+
+          TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
+          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
+          fi
+
+          echo ::set-output name=docker_image::${DOCKER_IMAGE}
+          echo ::set-output name=version::${VERSION}
+          echo ::set-output name=push::${PUSH}
+          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} \
+            --build-arg VERSION=${VERSION} \
+            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+            --build-arg VCS_REF=${GITHUB_SHA::8} \
+            ${TAGS}
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1.6.0
       - name: Docker Login
+        if: success() && github.event_name != 'pull_request'
         uses: docker/login-action@v1.14.1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Docker Setup Buildx
-        uses: docker/setup-buildx-action@v1.6.0
-      - name: Build
-        run: docker buildx build --push --platform linux/amd64,linux/arm64,linux/arm/v7 -f docker/Dockerfile.main .
+      - name: Build Docker Leosac Main
+        if: success() && github.event_name != 'pull_request'
+        run: |
+          docker buildx build --output "type=image,push=${{ steps.prepare.outputs.buildx_push }}" \
+          ${{ steps.prepare.outputs.buildx_args }} --file ./docker/Dockerfile.main .
+      - name: Inspect image
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          docker buildx imagetools inspect ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+      - run: mkdir /build
+      - name: Run linux/amd64
+        run: docker run --platform linux/amd64 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+      - name: Run linux/arm/v7
+        run: docker run --platform linux/arm/v7 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+      - name: Run linux/arm64
+        run: docker run --platform linux/arm64 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+      - name: Run linux/386
+        run: docker run --platform linux/386 -v /build:/tmp/leosac ${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}
+      - uses: actions/upload-artifacts@v3
+        with:
+          name: Deb files
+          path: /build/*.deb

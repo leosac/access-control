@@ -49,3 +49,16 @@ cmake -DCMAKE_BUILD_TYPE=Release                  \
 /usr/src/leosac                                && \
 make -j4                                       && \
 make install)
+
+# Create DEB
+RUN COMMIT=`git rev-parse HEAD`
+
+RUN apt-get update && apt-get install -y          \
+dh-make dpkg-dev debhelper devscripts
+
+RUN bash scripts/makepkg.sh
+RUN LEOSAC_DEB=`find * -maxdepth 0 -name leosac_*.deb`
+
+VOLUME /tmp/leosac
+
+COPY ${LEOSAC_DEB} /tmp/leosac
