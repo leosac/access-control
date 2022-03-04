@@ -32,8 +32,7 @@ VOLUME /etc/leosac.d
 VOLUME /tmp/leosac
 
 # Create DEB
-RUN cd /usr/src/leosac && docker_scripts/makepkg.sh && \
-dpkg --install /tmp/leosac/leosac_*.deb
+RUN cd /usr/src/leosac && docker_scripts/makepkg.sh
 
 ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
 

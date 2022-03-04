@@ -1,0 +1,16 @@
+name: Coverity Scan
+
+on:
+  push:
+    branches: [master, develop]
+
+jobs:
+  coverity:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: vapier/coverity-scan-action@v1
+      with:
+        email: ${{ secrets.REPORT_EMAIL }}
+        token: ${{ secrets.COVERITY_SCAN_TOKEN }}
+        build_language: 'cxx'
