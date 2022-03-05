@@ -37,7 +37,7 @@ RUN cd /usr/src/leosac/leosac && docker_scripts/makepkg.sh && \
 LEOSAC_DEB=`find /usr/src/leosac/* -maxdepth 0 -name leosac_*.deb` && \
 echo Installing package ${LEOSAC_DEB} ... && \
 dpkg --install ${LEOSAC_DEB}
-ADD ${LEOSAC_DEB} /tmp/leosac
+ADD /usr/src/leosac/*.deb /tmp/leosac
 
 ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
 
