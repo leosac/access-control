@@ -65,7 +65,7 @@ or some reader object ("my_wiegand1"), etc.
 
 @hr
 
-@note Declaring `doors` is optional, and is only ever useful if you make use of 
+@note Declaring `doors` is optional, and is only ever useful if you make use of
 the "always open" or "always close" feature.
 
 Example 0 {#mod_doorman_example_0}
@@ -196,3 +196,8 @@ The following example file defines the following:
     </module_config>
 </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Relay Wiring {#mod_doorman_relay_wiring}
+========================================
+![Relay Wiring](doorrelay.png)
+The relay is used to control the door. Here it is materialized by a lamp for the sake of simplicity, but feel free to replace it by the mechanism you want to use to open the door, like an electric strike. If you really don't have this hardware now, you could also just left the controlled circuit open (just wire the GPIO), and you'll hear the relay click when the door is activated.

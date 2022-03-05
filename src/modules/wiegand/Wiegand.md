@@ -89,7 +89,15 @@ This is a example of configuration for the Wiegand module.
     </module_config>
 </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
+
+Wiegand Wiring {#mod_wiegand_wiring}
+====================================
+![Wiegand Wiring](wiegand.png)
+
+The values on the resistors are not strictly fixed. As long as the ratio between the upper and lower resistor value is 1/2 for the [voltage divider](http://en.wikipedia.org/wiki/Voltage_divider), the 5k resistor can be safely replaced with another in the range from 2k to 10k depending on what you have. If you only have 10k resistors, you could even put 2 in series to obtain 20k.
+
+Do not forget to plug the reader on a 12V current source. 5V is also suitable with some readers if you don't have another choice but is less recommended.
+
 Notes {#mod_wiegand_notes}
 ==========================
 

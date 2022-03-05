@@ -38,13 +38,7 @@ Software {#install_guide_req_soft}
 ----------------------------------
 
 1. A SD card with a dumped Raspbian image.
-2. GCC 4.8+ (any C++11-compatible compiler should do)
-3. Git (to clone the repo)
-4. CMake 2.8.12 (and above)
-5. Boost 1.41 (and above)
-6. TCLAP
-7. GoogleTest is required if you plan to build the test suite.
-
+2. Leosac and all its dependencies
 
 **Note:** Leosac will work with something else than Raspbian, but some steps may change.
 If you know what you are doing and are fluent with Linux you shouldn't have any problem following this guide even if you don't use Raspbian.
@@ -68,23 +62,13 @@ You have your first choice to make:
 From Source {#install_guide_installing_src}
 -------------------------------------------
 
-If you chose to build from source, follow [this guide](https://github.com/leosac/leosac/wiki/Build-and-install).
-Note that building on Raspberry Pi will take quite a while, and cross compiling is out of scope for this guide.
+If you chose to build from source, follow @subpage page_guide_install_from_source.
+Note that building on Raspberry Pi will take quite a while
 
 Debian Package {#install_guide_installing_deb}
 ----------------------------------------------
 
-Grab the latest armhf package from the [Github Release tab](https://github.com/leosac/leosac/releases).
-Install the package and install missing dependencies:
-
-~~~~~~~~~~.sh
-apt-get update;
-dpkg -i leosac_armhf.deb;
-apt-get install -f;
-~~~~~~~~~~
-
-Before going to the next step, make sure you can launch the `leosac` binary (ie, that it is
-available in your PATH).
+See @subpage page_guide_install_from_package
 
 Basic Configuration {#install_guide_basic_cfg}
 ==============================================
