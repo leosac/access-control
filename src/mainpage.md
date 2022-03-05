@@ -2,6 +2,8 @@
 
 [TOC]
 
+[![leosac.com](logo_banner.png)](http://www.leosac.com)
+
 Introduction {#main_intro}
 ==========================
 

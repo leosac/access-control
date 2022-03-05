@@ -1,7 +1,7 @@
  # Leosac ![Logo](rc/logo.png)
 
-* Stable branch: master [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/leosac/actions/workflows/build.yml)
-* Development branch: develop [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/leosac/actions/workflows/build.yml) [![Coverity Scan](https://scan.coverity.com/projects/24616/badge.svg)](https://scan.coverity.com/projects/leosac-leosac)
+* Stable branch: master [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/leosac/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_leosac&metric=alert_status&branch=master)](https://sonarcloud.io/summary/new_code?id=leosac_leosac&branch=master)
+* Development branch: develop [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/leosac/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_leosac&metric=alert_status&branch=develop)](https://sonarcloud.io/summary/new_code?id=leosac_leosac&branch=develop) [![Coverity Scan](https://scan.coverity.com/projects/24616/badge.svg)](https://scan.coverity.com/projects/leosac-leosac)
 
 The documentation for both end user and developpers can be found [here](http://leosac.github.io/leosac-doc/doc_output/develop/).
 

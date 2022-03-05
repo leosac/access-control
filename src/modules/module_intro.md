@@ -93,7 +93,7 @@ is loaded and provide the support for the GPIOs.
 Leosac's core also set up a message-bus where everyone can write and read from everyone else.
 This is useful to broadcast information and is used a lot.
 
-![Modules communications](../resources/modules_communication.png)
+![Modules communications](modules_communication.png)
 
 Writing a new module {#modules_write}
 -------------------------------------

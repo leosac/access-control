@@ -14,14 +14,14 @@ Since the main goal of Leosac is to handle access control of physical object (ma
 because it reads data from specific hardware (various wiegand reader) we can say that the hardware
 plays an important role in the project.
 
-We must be able to interface with various devices, in various setup. A strong abstraction of the 
+We must be able to interface with various devices, in various setup. A strong abstraction of the
 hardware is in place. This allows easy and flexible configuration for the end-user, and help with
 maintaining and expanding the code.
 
 A Module based architecture {#hardware_management_mba}
 =====================================================
 
-As you probably already know, Leosac is built around modules (aka shared library). 
+As you probably already know, Leosac is built around modules (aka shared library).
 Leosac module are more than just plugins. They do not extend core functionalities, they **provide** them.
 If you do not start any module, Leosac will be useless and will literally sleep forever.
 
@@ -33,8 +33,8 @@ the expected interaction between components are defined through the project.
 This is a graphic overview of hardware modules. The GPIO module can be changed without impacting the other
 modules on top if it, provided that it properly implements the specifications.
 
-![Modules Images](../resources/hardware.png)
-@image latex "../resources/hardware.png"
+![Modules Images](hardware.png)
+@image latex "hardware.png"
 
 
 An example of hardware management {#hardware_management_example}
@@ -83,7 +83,7 @@ Hardware modules specifications {#hardware_mod_spec}
 ====================================================
 
 You can find below the specifications that must be implemented when writing a module that provide
-support for some kind of hardware. 
+support for some kind of hardware.
 
 Specification for GPIOs modules {#hardware_spec_gpio}
 -----------------------------------------------------
@@ -91,7 +91,7 @@ Specification for GPIOs modules {#hardware_spec_gpio}
 A module that implements GPIOs support must:
     1. Allow user to configure `input` / `output` pin and let them associate a name per GPIO.
     2. Allow other modules to talk to each GPIO individually, by name.
-    
+
 A facade object, [FGPIO](@ref Leosac::Hardware::FGPIO) implements client-code (requests) of those specs, and
 the module must implement the server-code (responses).
 
@@ -102,7 +102,7 @@ We define 4 commands that can be send to a GPIO device:
     + [TOGGLE](@ref hardware_spec_gpio_toggle).
 
 ### STATE {#hardware_spec_gpio_state}
- 
+
 This is used to query the state of the GPIO pin.
 
 _Request_:
@@ -112,7 +112,7 @@ Frame    | Content                                       | Type
 1        | "STATE"                                       | `string`
 
 _Response_:
- 
+
 Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------
 1        | "ON" or "OFF"                                 | `string`
@@ -133,7 +133,7 @@ Frame    | Content                                       | Type
 2        | 3500                                          | `int64_t`
 
 _Response_:
- 
+
 Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                                  | `string`
@@ -152,7 +152,7 @@ Frame    | Content                                       | Type
 1        | "OFF"                                         | `string`
 
 _Response_:
- 
+
 Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                                  | `string`
@@ -171,7 +171,7 @@ Frame    | Content                                       | Type
 1        | "TOGGLE"                                      | `string`
 
 _Response_:
- 
+
 Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                                  | `string`
@@ -199,7 +199,7 @@ We define 5 commands that can be send to a LED device:
 
 ### STATE {#hardware_spec_led_state}
 
-Shall return the state of the LED device. 
+Shall return the state of the LED device.
 
 _Request_:
 
@@ -208,7 +208,7 @@ Frame    | Content                               | Type
 1        | "STATE"                               | `string`
 
 _Response_:
- 
+
 Frame    | Content                               | Type        | Comment
 ---------|---------------------------------------|-------------|------------------------------
 1        | "ON" or "OFF" or "BLINKING"           | `string`    | -
@@ -233,7 +233,7 @@ Frame    | Content                               | Type      | Comment
 3        | BLINK_SPEED                           | `int64_t` | Optional. In milliseconds.
 
 _Response_:
- 
+
 Frame    | Content                                       | Type
 ---------|-----------------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                                  | `string`
@@ -277,7 +277,7 @@ Frame    | Content                               | Type      | Comment
 2        | BEEP_DURATION                         | `int64_t` | In milliseconds.
 
 _Response_:
- 
+
 Frame    | Content                               | Type
 ---------|---------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                          | `string`
@@ -296,7 +296,7 @@ Frame    | Content                               | Type      | Comment
 1        | "BEEP_ON"                                | `string`  | -
 
 _Response_:
- 
+
 Frame    | Content                               | Type
 ---------|---------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                          | `string`
@@ -315,7 +315,7 @@ Frame    | Content                               | Type      | Comment
 1        | "BEEP_OFF"                            | `string`  | -
 
 _Response_:
- 
+
 Frame    | Content                               | Type
 ---------|---------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                          | `string`
@@ -336,7 +336,7 @@ Frame    | Content                               | Type      | Comment
 3        | yyy                                   | `yyy`     | Parameter 1 for the command. Can have more, or none.
 
 _Response_:
- 
+
 Frame    | Content                               | Type
 ---------|---------------------------------------|-------------------------------------------
 1        | "OK" or "KO"                          | `string`

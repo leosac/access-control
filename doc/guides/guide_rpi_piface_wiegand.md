@@ -3,7 +3,7 @@
 Installation guide {#install_guide}
 =====================================
 
-This tutorial describes the full install process of Leosac on Raspbian. 
+This tutorial describes the full install process of Leosac on Raspbian.
 It will walk you through a complete install on a Raspbian system.
 
 [TOC]
@@ -23,8 +23,8 @@ the whole thing.
 Requirements {#install_guide_req}
 =================================
 
-Here is a list of requirements, both hardware and software. 
-The hardware requirements hard requirements for this tutorial to work. 
+Here is a list of requirements, both hardware and software.
+The hardware requirements hard requirements for this tutorial to work.
 
 Hardware {#install_guide_req_hard}
 ----------------------------------
@@ -56,7 +56,7 @@ There is 2 thing to make sure before installing Leosac:
 1. You have an updated system. Run `apt-get update && apt-get upgrade` to make sure of this.
 2. The SPI kernel module is installed. The PifaceDigital card needs this module to work.\n
    On Raspbian you can turn it on using `raspi-config` --> `Advanced Options` --> `SPI`.\n
-   Otherwise you can try to manually load the module: `modprobe spi_bcm2708`. 
+   Otherwise you can try to manually load the module: `modprobe spi_bcm2708`.
 
 Installing Leosac {#install_guide_installing}
 =============================================
@@ -126,7 +126,7 @@ Explanations:
   2. `file` is the name of the shared library (`.so`) file.
   3. `level` is the order of module loading. The closer to 0 it is, the sooner the module will be load.
   4. `module_config` is for per-module specific configuration information.
-  
+
 **MAKE SURE YOU DONT USE THE SAME `LEVEL` TWICE**
 
 <HR>
@@ -139,7 +139,7 @@ We need a few modules to make thing works:
 + We also need the [wiegand module](@ref mod_wiegand_main) to interact with the card reader.
 + The [file auth](@ref mod_auth_file_main) module will be used to grant (or deny) access after receiving data
   rom the card reader. This module will also store our card and time slice configuration.
-+ Last but not least, we need the [doorman](@ref mod_doorman_main) module to react to an authentication attempt. 
++ Last but not least, we need the [doorman](@ref mod_doorman_main) module to react to an authentication attempt.
 
 We will do this step by step, as modules configuration will depends on our hardware.
 
@@ -150,8 +150,8 @@ You can find the documentation of the module [here](@ref mod_piface_main). It fo
 the module for any use case. We will instead explain why we need a given configuration.
 
 We are using a Wiegand card reader. Therefore we need 2 INPUTs GPIO.
-We also have 1 OUTPUT gpio for the door. 
- 
+We also have 1 OUTPUT gpio for the door.
+
 We add this to our config file:
 
 ~~~~~~~~~~~~~~~~~~~.xml
@@ -216,10 +216,10 @@ We have 1 reader to configure, and we will use both INPUT pin: `wiegand_data_low
 ~~~~~~~~~~~~~~~~~~~
 
 As you can see, we are re-using `wiegand_data_low` and `wiegand_data_high`. We assign them to our
-reader (`MY_WIEGAND_1`). 
+reader (`MY_WIEGAND_1`).
 **Note**: Most wiegand card readers also have a green led and a buzzer than you can activate. We are not using
  them in this tutorial, we are leaving them out in the configuration.
- 
+
 Configure the auth-file module {#install_guide_add_mod_auth_file}
 -----------------------------------------------------------------
 
@@ -320,7 +320,7 @@ Configuring the doorman module {#install_guide_add_mod_doorman}
 ---------------------------------------------------------------
 
 At last, we need to react to those "grant access" or "deny access" from the auth module.
-In our scenario, we want to open the door for a few seconds when an access is successful. In case 
+In our scenario, we want to open the door for a few seconds when an access is successful. In case
 an access is failed, we do nothing.
 This is easy to do using the doorman module.
 
@@ -360,15 +360,15 @@ Wiring everything {#install_guide_wiring}
 =========================================
 
 This is the board with the PiFace plug onto it.
-![Raspi and board](../resources/piface-front.png)
+![Raspi and board](piface-front.png)
 The orange port are output ports. Green ports are for inputs.
 
 We have 3 wire to connect:
     1. Brown wire is our OUTPUT wire, connected to the door.
     2. Purple wire is wiegand low.
     3. Yellow wire is wiegand high.
-    
-![Raspi wired](../resources/piface-wire.png)
+
+![Raspi wired](piface-wire.png)
 
 
 Conclusion {#install_guide_end}

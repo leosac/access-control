@@ -3,11 +3,14 @@ FROM ${ARCH}debian:bullseye
 ARG VERSION=latest
 ARG BUILD_DATE=
 ARG VCS_REF=
+ENV APP_PATH=/usr/src/leosac/leosac
+WORKDIR $APP_PATH
 
-## Add APT 'contrib' repository
-RUN sed -i 's/main/main contrib/' /etc/apt/sources.list
+VOLUME /etc/leosac.d
+VOLUME /tmp/leosac
 
-## General dependencies for build and run
+ADD . /usr/src/leosac/leosac
+
 RUN apt-get update && apt-get install -y          \
 cmake build-essential pkg-config git              \
 apt-utils libssl-dev libzmq5 libzmq3-dev          \
@@ -17,29 +20,22 @@ dh-make dpkg-dev debhelper devscripts             \
 libboost-all-dev libgtest-dev emacs-nox vim wget  \
 libsqlite3-dev libpq-dev odb libodb-dev           \
 libodb-pgsql-dev libodb-pgsql-2.4                 \
-libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
-
-VOLUME /etc/leosac.d
-VOLUME /usr/src/leosac/leosac
-VOLUME /tmp/leosac
-
-RUN mkdir -p /usr/src/leosac/leosac && \
-mkdir -p /tmp/leosac
-ADD . /usr/src/leosac/leosac
-
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \
+libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev && \
+mkdir -p /usr/src/leosac/leosac && \
+mkdir -p /tmp/leosac && \
+update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \
 pip3 install pyzmq && \
-cd /usr/src/leosac/leosac/python && \
-pip3 install -e .
-
-# Create DEB
-RUN cd /usr/src/leosac/leosac && docker_scripts/makepkg.sh && \
-LEOSAC_DEB=`find /usr/src/leosac/* -maxdepth 0 -name leosac_*.deb` && \
+cd $APP_PATH/python && \
+pip3 install -e . && \
+cd ${APP_PATH} && \
+docker_scripts/makepkg.sh && \
+LEOSAC_DEB=`find ../* -maxdepth 0 -name leosac_*.deb` && \
 echo Installing package ${LEOSAC_DEB} ... && \
-dpkg --install ${LEOSAC_DEB}
-ADD /usr/src/leosac/*.deb /tmp/leosac
+dpkg --install ${LEOSAC_DEB} && \
+mv ${LEOSAC_DEB} ${APP_PATH}
 
-ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
+COPY *.deb /tmp/leosac
+COPY cfg/factory/docker.xml /etc/leosac.d/docker.xml
 
 # Container config
 CMD [""]
