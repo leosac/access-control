@@ -20,7 +20,7 @@ libodb-pgsql-dev libodb-pgsql-2.4                 \
 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 
 VOLUME /etc/leosac.d
-VOLUME /usr/src/leosac
+VOLUME /usr/src/leosac/leosac
 VOLUME /tmp/leosac
 
 RUN mkdir -p /usr/src/leosac/leosac && \

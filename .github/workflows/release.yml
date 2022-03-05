@@ -2,7 +2,7 @@ on:
   schedule:
     - cron: '0 1 * * 6' # Every saturday at 1am
   push:
-    branches: master
+    branches: [ master ]
     tags:
       - v*
 
