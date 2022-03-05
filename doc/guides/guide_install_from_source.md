@@ -75,3 +75,10 @@ Edit the leosac service file, changing `/usr/bin/leosac` to `/usr/local/bin/leos
 @note The steps above assume you are still in the build subfolder created earlier.
 
 Finally, before you can start Leosac, you need to create a kernel.xml file. See the [installation guide](@ref page_guide_rpi_piface_wiegand).
+
+Distcc
+------
+
+[distcc](https://www.distcc.org/) is a powerful tool that allows cross-compilation in a distributed manner. It is strongly recommended to setup distcc when developing leosac if you're building directly on raspberry-like hardware because standard ARM boards are very slow in the compilation stage.
+
+A proper setup with a standard x86/x64 machine can easily speed up the process by a factor of ten.

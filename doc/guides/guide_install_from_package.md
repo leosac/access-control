@@ -11,15 +11,18 @@ The process described here is a straightforward and relatively simple approach t
 It does this at the expense of speed. The build process described here will take several hours to complete on a modern Raspberry Pi, and will take around 12 hours or more to complete on the model 1 Pi's and the Zero.
 Consider using one of the other build methods if build time is important.
 
+Download pre-built releases
+---------------------------
+
+DEB files can be downloaded directly from GitHub releases here: https://github.com/leosac/leosac/releases
 
 Dependencies
 ------------
 
 For starters, install these packages:
-  + `apt-get install cmake build-essential pkg-config git sudo devscripts`
+  + `apt-get install cmake build-essential pkg-config git sudo devscripts debhelper`
 
 There are additional dependencies required to build Leosac, but those will be installed for you by the deb.sh script.
-
 
 Build
 -----
@@ -34,7 +37,7 @@ If you intend to build the very latest code from the develop branch, then simply
 If instead you prefer to build the latest release (or some other branch), then use the -b flag to specify the branch, tag, or release to build:
   + `./deb.sh -b v0.8.0`
 
-Replace "v0.70" with the tag name of the most recent release, found on the leosac [releases page](https://github.com/leosac/leosac/releases).
+Replace "v0.8.0" with the tag name of the most recent release, found on the leosac [releases page](https://github.com/leosac/leosac/releases).
 
 Let's say you have development work in a branch in your own fork you want to test, you can call deb.sh this way:
   + `./deb.sh -u https://github.com/your-git-profile/leosac -b your-branch`
@@ -42,6 +45,13 @@ Let's say you have development work in a branch in your own fork you want to tes
 When the build completes, it will present the name of any arbitrary folder under /tmp where the newly built package files reside.
 From the command line, navigate to that folder and install the Leosac debian package file using dpkg -i or gdebi.
   + `cd /tmp/some-random-name`
-  + `sudo gdebi leosac_0.8.0-1_amd64.deb`
+  + `sudo dpkg -i leosac_0.8.0-1_amd64.deb`
 
-Leosac is now installed, but before you can start it, you need to create a kernel.xml file. See the [installation guide](@ref page_guide_rpi_piface_wiegand).
+Use
+---
+
+Leosac is now installed, but before you can start it, you need to create/edit a configuration file on /etc/leosac.d/kernel.xml. See the [installation guide](@ref page_guide_rpi_piface_wiegand).
+
+Once the configuration file ready, enable the service and start it:
+ * `systemctl enable leosac`
+ * `systemctl start leosac`
