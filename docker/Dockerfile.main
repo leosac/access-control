@@ -19,20 +19,25 @@ libsqlite3-dev libpq-dev odb libodb-dev           \
 libodb-pgsql-dev libodb-pgsql-2.4                 \
 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \
-pip3 install pyzmq
-
-## we mount leosac source dir in read only
-VOLUME /usr/src/leosac
-ADD . /usr/src/leosac
-
-RUN (cd /usr/src/leosac/python && pip3 install -e .)
-
 VOLUME /etc/leosac.d
+VOLUME /usr/src/leosac
 VOLUME /tmp/leosac
 
+RUN mkdir -p /usr/src/leosac/leosac && \
+mkdir -p /tmp/leosac
+ADD . /usr/src/leosac/leosac
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \
+pip3 install pyzmq && \
+cd /usr/src/leosac/leosac/python && \
+pip3 install -e .
+
 # Create DEB
-RUN cd /usr/src/leosac && docker_scripts/makepkg.sh
+RUN cd /usr/src/leosac/leosac && docker_scripts/makepkg.sh && \
+LEOSAC_DEB=`find /usr/src/leosac/* -maxdepth 0 -name leosac_*.deb` && \
+echo Installing package ${LEOSAC_DEB} ... && \
+dpkg --install ${LEOSAC_DEB}
+ADD ${LEOSAC_DEB} /tmp/leosac
 
 ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
 
