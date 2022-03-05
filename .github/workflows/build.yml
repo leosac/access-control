@@ -29,7 +29,7 @@ jobs:
       - run: mkdir build
       - name: Run linux/amd64
         if: success()
-        run: docker run --entrypoint=/bin/bash --platform linux/amd64 -v "${GITHUB_WORKSPACE}/build:/tmp/leosac" maxhy/leosac:edge -c "cp /usr/src/leosac/*.deb /tmp/leosac"
+        run: docker run --entrypoint=/bin/bash --platform linux/amd64 -v "${GITHUB_WORKSPACE}/build:/tmp/leosac" maxhy/leosac:edge -c "cp /usr/src/leosac/leosac_*.deb /tmp/leosac"
       - uses: actions/upload-artifact@v3
         if: success()
         with:
