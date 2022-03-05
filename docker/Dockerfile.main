@@ -31,11 +31,9 @@ cd ${APP_PATH} && \
 docker_scripts/makepkg.sh && \
 LEOSAC_DEB=`find ../* -maxdepth 0 -name leosac_*.deb` && \
 echo Installing package ${LEOSAC_DEB} ... && \
-dpkg --install ${LEOSAC_DEB} && \
-mv ${LEOSAC_DEB} ${APP_PATH}
+dpkg --install ${LEOSAC_DEB}
 
-COPY *.deb /tmp/leosac
-COPY cfg/factory/docker.xml /etc/leosac.d/docker.xml
+ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
 
 # Container config
 CMD [""]
