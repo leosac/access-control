@@ -1,0 +1,7 @@
+FROM leosac_main
+
+RUN mkdir /leosac_config
+VOLUME /leosac_config
+VOLUME /leosac_config/config.xml
+
+ENTRYPOINT ["leosac", "-k", "/leosac_config/config.xml"]

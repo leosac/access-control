@@ -1,0 +1,40 @@
+FROM maxhy:leosac-buildsystem
+
+# Container config
+CMD [""]
+ENTRYPOINT ["/docker_scripts/entry.sh"]
+EXPOSE 8888
+
+## we mount leosac source dir in read only
+VOLUME /leosac_src
+VOLUME /docker_scripts
+
+ADD docker_scripts /docker_scripts
+RUN /docker_scripts/odb_install.sh
+RUN /docker_scripts/gtest_install.sh
+
+RUN apt-get install -y postgresql-client-9.6 libboost-coroutine-dev
+
+## This is way too verbose, but we don't have a choice...
+## We want the necessary files to build, not the tests scripts and all.
+## Otherwise, just editing a test-script would cause full rebuild ...
+RUN mkdir -p /leosac_src/{cmake,cfg,docker_scripts,libmcp23s17,libpifacedigital,libzmq,scripts,spdlog,src,test,tools,zmqpp,test_helper}
+
+ADD cfg /leosac_src/cfg/
+ADD docker_scripts /leosac_src/docker_scripts/
+ADD scripts /leosac_src/scripts/
+ADD test /leosac_src/test/
+ADD deps /leosac_src/deps/
+ADD cmake /leosac_src/cmake/
+ADD src /leosac_src/src/
+ADD CMakeLists.txt /leosac_src/
+
+RUN mkdir -p /tmp/leosac_build && \
+cd /tmp/leosac_build && \
+make -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=1 \
+  -DZMQ_BUILD_TESTS=off -DLEOSAC_STACKTRACE_DISABLED=2 \
+  -DZMQPP_LIBZMQ_CMAKE=0 /leosac_src && \
+make -j4 && \
+make install
+
+ADD test_helper /leosac_src/test_helper

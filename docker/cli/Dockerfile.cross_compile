@@ -3,13 +3,12 @@
 
 # We recommend you use leosaccli to use this container.
 
-FROM debian:stretch
+FROM debian:bullseye
 
-RUN echo 'deb-src http://deb.debian.org/debian stretch main' >> /etc/apt/sources.list
+RUN echo 'deb-src http://deb.debian.org/debian bullseye main' >> /etc/apt/sources.list
 
-RUN apt-get update && apt-get install emacs24-nox wget git cmake build-essential -y
-RUN apt-get update && apt-get install g++-arm-linux-gnueabihf libtool-bin -y
-RUN apt-get update && apt-get install autoconf automake pkg-config python3 -y
+RUN apt-get update && apt-get install -y emacs-nox vim wget git cmake build-essential \
+g++-arm-linux-gnueabihf libtool-bin autoconf automake pkg-config python3
 
 ADD cross-compile-resources /cross-compile-resources
 

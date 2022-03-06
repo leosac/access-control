@@ -17,7 +17,7 @@ def docker(ctx):
     pass
 
 
-AVAILABLE_IMAGES = ['main', 'main2', 'server', 'cross_compile']
+AVAILABLE_IMAGES = ['main', 'server', 'cross_compile']
 
 
 def clean_output_build_line(raw_line):
@@ -55,14 +55,14 @@ def clean_output_build_line(raw_line):
 @click.pass_context
 def build(ctx, images, nocache):
     """
-    
-    Build the specified ('main', 'main2', 'server', or 'cross_compile'), or all
+
+    Build the specified ('main', 'server', or 'cross_compile'), or all
     leosac related images.
     """
     dc = get_docker_api_client()
 
     for image in (images or AVAILABLE_IMAGES):
-        dockerfile = 'docker/Dockerfile.{}'.format(image)
+        dockerfile = 'docker/cli/Dockerfile.{}'.format(image)
         build_output = dc.build(path=guess_root_dir(),
                                 dockerfile=dockerfile,
                                 tag='leosac_{}'.format(image),

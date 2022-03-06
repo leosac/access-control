@@ -18,6 +18,7 @@ if (CMAKE_TOOLCHAIN_FILE)
     # a bit hacky -- if a toolchain file si present, assume
     # cross compilation to raspberry pi
     set(LEOSAC_CROSS_COMPILE 1)
+    message(WARNING "CROSS COMPILE detected.")
 
     # We configure RPATH handling here, assuming that the fakeroot on
     # the raspberry will be located at /opt/rpi_fakeroot
