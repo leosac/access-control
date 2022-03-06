@@ -16,7 +16,7 @@ jobs:
           submodules: recursive
       - name: Install dependencies
         run: >
-          apt-get install -y cmake build-essential pkg-config
+          sudo apt-get install -y cmake build-essential pkg-config
           apt-utils libssl-dev libzmq5 libzmq3-dev
           libcurl4-openssl-dev libtclap-dev libscrypt-dev
           python3 python3-pip gcc-9 g++-9 git
@@ -34,7 +34,7 @@ jobs:
       - name: Build
         if: success()
         run: |
-          docker buildx build --tag maxhy/leosac:edge \
+          sudo docker buildx build --tag maxhy/leosac:edge \
             --platform linux/amd64 \
             --build-arg VERSION=edge \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
@@ -44,7 +44,7 @@ jobs:
       - run: mkdir build
       - name: Run linux/amd64
         if: success()
-        run: docker run --entrypoint=/bin/bash --platform linux/amd64 -v "${GITHUB_WORKSPACE}/build:/tmp/leosac" maxhy/leosac:edge -c "cp /usr/src/leosac/leosac_*.deb /tmp/leosac"
+        run: sudo docker run --entrypoint=/bin/bash --platform linux/amd64 -v "${GITHUB_WORKSPACE}/build:/tmp/leosac" maxhy/leosac:edge -c "cp /usr/src/leosac/leosac_*.deb /tmp/leosac"
       - uses: actions/upload-artifact@v3
         if: success()
         with:
