@@ -64,14 +64,14 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: Run ${{ matrix.platform }}
         if: success() && github.event_name != 'pull_request'
-        run: docker run --entrypoint=/bin/bash \
-          --platform ${{ matrix.platform }} \
-          -v "${GITHUB_WORKSPACE}:/tmp/leosac" \
-          ${{needs.prepare.outputs.docker_buildimage}} \
-          -c "TARGETPLATFORM=${{ matrix.platform }} && \
-          VERSION=${{ needs.prepare.outputs.version }} && \
-          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && \
-          VCS_REF=${GITHUB_SHA::8} && \
+        run: docker run --entrypoint=/bin/bash
+          --platform ${{ matrix.platform }}
+          -v "${GITHUB_WORKSPACE}:/tmp/leosac"
+          ${{needs.prepare.outputs.docker_buildimage}}
+          -c "TARGETPLATFORM=${{ matrix.platform }} &&
+          VERSION=${{ needs.prepare.outputs.version }} &&
+          BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') &&
+          VCS_REF=${GITHUB_SHA::8} &&
           export TARGETPLATFORM VERSION BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
       - uses: actions/upload-artifact@v3
         if: success()
