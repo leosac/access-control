@@ -55,7 +55,7 @@ jobs:
     needs: prepare
     strategy:
       matrix:
-        platform: [ 'amd64', 'arm64', 'armv7' ]
+        platform: [ 'amd64', 'arm64', 'arm' ]
     steps:
       - uses: actions/checkout@v2
         with:
