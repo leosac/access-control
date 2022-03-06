@@ -1,41 +1,17 @@
-ARG ARCH=
-FROM ${ARCH}debian:bullseye
-ARG VERSION=latest
-ARG BUILD_DATE=
-ARG VCS_REF=
-ENV APP_PATH=/usr/src/leosac/leosac
-WORKDIR $APP_PATH
+FROM debian:bullseye
+ARG TARGETPLATFORM
 
 VOLUME /etc/leosac.d
-VOLUME /tmp/leosac
 
-ADD . /usr/src/leosac/leosac
+ADD ${TARGETPLATFORM} /tmp/leosac/
 
-RUN apt-get update && apt-get install -y          \
-cmake build-essential pkg-config git              \
-apt-utils libssl-dev libzmq5 libzmq3-dev          \
-libcurl4-openssl-dev libtclap-dev libscrypt-dev   \
-python3 python3-pip gcc-9 g++-9                   \
-dh-make dpkg-dev debhelper devscripts             \
-libboost-all-dev libgtest-dev emacs-nox vim wget  \
-libsqlite3-dev libpq-dev odb libodb-dev           \
-libodb-pgsql-dev libodb-pgsql-2.4                 \
-libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev && \
-mkdir -p /usr/src/leosac/leosac && \
-mkdir -p /tmp/leosac && \
-update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \
-pip3 install pyzmq && \
-cd $APP_PATH/python && \
-pip3 install -e . && \
-cd ${APP_PATH} && \
-docker_scripts/makepkg.sh && \
-LEOSAC_DEB=`find ../* -maxdepth 0 -name leosac_*.deb` && \
-echo Installing package ${LEOSAC_DEB} ... && \
-dpkg --install ${LEOSAC_DEB}
+RUN apt-get update -qq && apt-get upgrade -qq && apt-get install -qq \
+libboost-regex1.74.0 libboost-serialization1.74.0 libcurl4 libodb-2.4 \
+libodb-boost-2.4 libodb-pgsql-2.4 libodb-sqlite-2.4 libscrypt0 libzmq5
 
-ADD cfg/factory/docker.xml /etc/leosac.d/docker.xml
+RUN dpkg --install /tmp/leosac/leosac_*.deb
 
 # Container config
 CMD [""]
-ENTRYPOINT ["leosac", "-k", "/etc/leosac.d/docker.xml"]
+ENTRYPOINT ["leosac", "-k", "/etc/leosac.d/kernel.xml"]
 EXPOSE 8888

@@ -1,18 +1,21 @@
 #!/bin/bash
 #
-# This script will build leosac (assuming source are at /leosac_src)
-# and will install into /usr/local
+# This script will build leosac and copy resulting deb file
 
 set -x
 set -e
 
-mkdir -p /tmp/leosac_build;
-pushd /tmp/leosac_build;
+APP_PATH=/tmp/leosac
+DEB_PATH=$APP_PATH/build/packages/debian/$TARGETPLATFORM
+mkdir -p $DEB_PATH
 
-# We disable Stacktrace cause its a big memory leak
-# right now.
-(cmake -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=1 -DZMQ_BUILD_TESTS=off \
-       -DLEOSAC_STACKTRACE_DISABLED=2 \
-       -DZMQPP_LIBZMQ_CMAKE=0 /leosac_src && make -j5 && make install)
+pushd $APP_PATH/python
+pip3 install -e .
+popd;
+
+pushd $APP_PATH
+./docker_scripts/makepkg.sh
+LEOSAC_DEB=`find ../* -maxdepth 0 -name leosac_*.deb`
+mv $LEOSAC_DEB $DEB_PATH
 
 popd;

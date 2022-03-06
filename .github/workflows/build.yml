@@ -1,21 +1,41 @@
 name: Build
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - '*'
   pull_request:
     branches: [ develop ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: debian-bullseye
+
     steps:
+      - name: Update packages
+        run: apt-get --qq update && apt-get -qq upgrade
+      - name: Install git
+        run: apt-get -qq install git
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Docker Setup Buildx
-        uses: docker/setup-buildx-action@v1.6.0
+      - name: Install dependencies
+        run: >
+          apt-get install -qq cmake build-essential pkg-config
+          apt-utils libssl-dev libzmq5 libzmq3-dev
+          libcurl4-openssl-dev libtclap-dev libscrypt-dev
+          python3 python3-pip gcc-9 g++-9
+          libboost-all-dev libgtest-dev
+          libsqlite3-dev libpq-dev odb libodb-dev
+          libodb-pgsql-dev libodb-pgsql-2.4
+          libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
+      - run: mkdir build
+      - name: Configure
+        working-directory: build
+        run: cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+      - name: Build
+        working-directory: build
+        run: make -j3
       - name: Build
         if: success()
         run: |

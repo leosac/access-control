@@ -16,8 +16,13 @@ Download pre-built releases
 
 DEB files can be downloaded directly from GitHub releases here: https://github.com/leosac/leosac/releases
 
-Dependencies
-------------
+```
+sudo apt-get install libboost-regex1.74.0 libboost-serialization1.74.0 libcurl4 libodb-2.4 libodb-boost-2.4 libodb-pgsql-2.4 libodb-sqlite-2.4 libscrypt0 libzmq5
+sudo dpkg -i leosac_0.8.0-1_amd64.deb
+```
+
+Package Build Dependencies
+--------------------------
 
 For starters, install these packages:
   + `apt-get install cmake build-essential pkg-config git sudo devscripts debhelper`
