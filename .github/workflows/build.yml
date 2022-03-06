@@ -11,14 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Update packages
-        run: apt-get --qq update && apt-get -qq upgrade
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: Install dependencies
         run: >
-          apt-get install -qq cmake build-essential pkg-config
+          apt-get install -y cmake build-essential pkg-config
           apt-utils libssl-dev libzmq5 libzmq3-dev
           libcurl4-openssl-dev libtclap-dev libscrypt-dev
           python3 python3-pip gcc-9 g++-9 git
