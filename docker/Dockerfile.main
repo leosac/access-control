@@ -3,6 +3,9 @@ ARG TARGETPLATFORM
 
 VOLUME /etc/leosac.d
 
+# Required for now to workaround GitHub Artifacts name which doesn't allow a slash
+RUN if [ "${TARGETPLATFORM}" == "linux/arm/v7" ]; then mkdir -p linux/arm/v7; mv linux/arm/*.deb linux/arm/v7; fi
+
 ADD ${TARGETPLATFORM} /tmp/leosac/
 
 RUN apt-get update -qq && apt-get upgrade -qq && apt-get install -qq \
