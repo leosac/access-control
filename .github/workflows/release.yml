@@ -24,7 +24,7 @@ jobs:
         run: |
           DOCKER_IMAGE=maxhy/leosac
           DOCKER_BUILDIMAGE=maxhy/leosac-buildsystem
-          DOCKER_PLATFORMS=linux/amd64,linux/arm/v7,linux/arm64
+          DOCKER_PLATFORMS=linux/amd64,linux/armv7,linux/arm64
           VERSION=edge
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -55,7 +55,7 @@ jobs:
     needs: prepare
     strategy:
       matrix:
-        platform: [ 'linux/amd64', 'linux/arm64', 'linux/arm/v7' ]
+        platform: [ 'amd64', 'arm64', 'armv7' ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -65,10 +65,10 @@ jobs:
       - name: Run ${{ matrix.platform }}
         if: success() && github.event_name != 'pull_request'
         run: docker run --entrypoint=/bin/bash
-          --platform ${{ matrix.platform }}
+          --platform linux/${{ matrix.platform }}
           -v "${GITHUB_WORKSPACE}:/tmp/leosac"
           ${{needs.prepare.outputs.docker_buildimage}}
-          -c "TARGETPLATFORM=${{ matrix.platform }} &&
+          -c "TARGETPLATFORM=linux/${{ matrix.platform }} &&
           VERSION=${{ needs.prepare.outputs.version }} &&
           BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') &&
           VCS_REF=${GITHUB_SHA::8} &&
@@ -77,7 +77,7 @@ jobs:
         if: success()
         with:
           name: ${{ matrix.platform }}
-          path: build/packages/debian/${{ matrix.platform }}/*.deb
+          path: build/packages/debian/linux/${{ matrix.platform }}/*.deb
 
   docker:
     runs-on: ubuntu-latest
@@ -107,7 +107,7 @@ jobs:
       - uses: actions/download-artifact@v3
         if: success()
         with:
-          path: build/packages/debian
+          path: build/packages/debian/linux
       - name: Build Docker Leosac Main
         if: success() && github.event_name != 'pull_request'
         run: |
