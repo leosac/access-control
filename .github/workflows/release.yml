@@ -1,3 +1,4 @@
+name: Release
 on:
   schedule:
     - cron: '0 1 * * 6' # Every saturday at 1am
@@ -102,7 +103,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - uses: actions/download-artifact@v3
         if: success()
-        working-directory: build/packages/debian
+        with:
+          path: build/packages/debian
       - name: Build Docker Leosac Main
         if: success() && github.event_name != 'pull_request'
         run: |
