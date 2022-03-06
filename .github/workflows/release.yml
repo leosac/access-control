@@ -24,7 +24,7 @@ jobs:
         run: |
           DOCKER_IMAGE=maxhy/leosac
           DOCKER_BUILDIMAGE=maxhy/leosac-buildsystem
-          DOCKER_PLATFORMS=linux/amd64,linux/armv7,linux/arm64
+          DOCKER_PLATFORMS=linux/amd64,linux/arm,linux/arm64
           VERSION=edge
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then

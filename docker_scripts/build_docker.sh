@@ -5,7 +5,7 @@
 
 IMAGE_BUILD="maxhy/leosac-buildsystem:latest"
 IMAGE_RUN="maxhy/leosac:snapshot"
-PLATFORMS="linux/amd64,linux/arm64,linux/armv7"
+PLATFORMS="linux/amd64,linux/arm64,linux/arm"
 
 # Build system
 read -p "Do you want to re-build the Docker Buildsystem for Leosac first?" bs
