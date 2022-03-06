@@ -31,22 +31,3 @@ jobs:
       - name: Build
         working-directory: build
         run: make -j3
-      - name: Build
-        if: success()
-        run: |
-          sudo docker buildx build --tag maxhy/leosac:edge \
-            --platform linux/amd64 \
-            --build-arg VERSION=edge \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg VCS_REF=${GITHUB_SHA::8} \
-            --output "type=docker,name=maxhy/leosac:edge" \
-            -f docker/Dockerfile.main .
-      - run: mkdir build
-      - name: Run linux/amd64
-        if: success()
-        run: sudo docker run --entrypoint=/bin/bash --platform linux/amd64 -v "${GITHUB_WORKSPACE}/build:/tmp/leosac" maxhy/leosac:edge -c "cp /usr/src/leosac/leosac_*.deb /tmp/leosac"
-      - uses: actions/upload-artifact@v3
-        if: success()
-        with:
-          name: Deb files
-          path: build/*.deb

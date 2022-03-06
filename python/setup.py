@@ -2,11 +2,11 @@
 
 from distutils.core import setup
 
-setup(name='leoascpy',
+setup(name='leosacpy',
       version='0.1',
       description='Leosac Python Libray',
-      author='xaqq',
-      author_email='kapp.arno@gmail.com',
+      author='Leosac',
+      author_email='support@leosac.com',
       packages=['leosacpy', 'leosacpy.cli', 'leosacpy.tools'],
       install_requires=[
           'Click',

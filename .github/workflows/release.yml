@@ -6,6 +6,7 @@ on:
       - v*
   pull_request:
     branches: [ master, develop ]
+  workflow_dispatch:
 
 jobs:
   prepare:
@@ -31,7 +32,10 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=weekly
           fi
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            VERSION=snapshot
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             DOCKER_PLATFORMS=linux/amd64
           fi
 

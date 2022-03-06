@@ -5,9 +5,12 @@
 *.bak
 
 #CMake related
-build
-install
-!/pkg/debian/install
+build/
+install/
+
+#Debian
+debian/
+obj-*/
 
 #IDE workspace stuff
 .idea/workspace.xml
@@ -25,6 +28,7 @@ src/*/*/*.xml
 
 # Python cache
 **/__pycache__
+python/leosacpy.egg-info/
 
 # Don't track the cross compile folder
 cross-compile-resources
