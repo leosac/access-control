@@ -33,10 +33,10 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ]; then
             VERSION=weekly
           fi
-          if [ "${{ github.event_name }}" = "schedule" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             VERSION=snapshot
           fi
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             DOCKER_PLATFORMS=linux/amd64
           fi
 
@@ -129,7 +129,7 @@ jobs:
           path: packages
       - name: Upload artifacts to Debian repository
         run: |
-          PACKAGES=packages/linux
+          PACKAGES=packages
           for arch in ${PACKAGES}/* ; do
             for deb in ${arch}/*.deb ; do
               curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/leosac;deb.distribution=bullseye;deb.component=main;deb.architecture=${arch##*/}" -T ${deb}
