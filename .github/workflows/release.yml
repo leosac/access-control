@@ -94,6 +94,9 @@ jobs:
           echo ::set-output name=buildx_args::--platform ${{ needs.prepare.outputs.platforms }} \
             --build-arg VERSION=${{ needs.prepare.outputs.version }} \
             ${TAGS}
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
       - name: Setup Docker Buildx
@@ -116,3 +119,19 @@ jobs:
         if: always() && github.event_name != 'pull_request'
         run: |
           docker buildx imagetools inspect ${{ needs.prepare.outputs.docker_image }}:${{ needs.prepare.outputs.version }}
+  jfrog:
+    runs-on: ubuntu-latest
+    needs: [ prepare, build ]
+    steps:
+      - uses: actions/download-artifact@v3
+        if: success()
+        with:
+          path: packages
+      - name: Upload artifacts to Debian repository
+        run: |
+          PACKAGES=packages/linux
+          for arch in ${PACKAGES}/* ; do
+            for deb in ${arch}/*.deb ; do
+              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/leosac;deb.distribution=bullseye;deb.component=main;deb.architecture=${arch##*/}" -T ${deb}
+            done
+          done
