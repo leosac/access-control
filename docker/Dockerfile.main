@@ -3,16 +3,16 @@ ARG TARGETPLATFORM
 
 VOLUME /etc/leosac.d
 
-# Required for now to workaround GitHub Artifacts name which doesn't allow a slash
-RUN if [ "${TARGETPLATFORM}" == "linux/arm/v7" ]; then mkdir -p linux/arm/v7; mv linux/arm/*.deb linux/arm/v7; fi
+ADD . /tmp/leosac/
 
-ADD ${TARGETPLATFORM} /tmp/leosac/
+# Required for now to workaround GitHub Artifacts name which doesn't allow a slash
+RUN if [ "${TARGETPLATFORM}" == "linux/arm/v7" ]; then mkdir -p /tmp/leosac/linux/arm/v7; mv /tmp/leosac/linux/arm/*.deb /tmp/leosac/linux/arm/v7; fi
 
 RUN apt-get update -qq && apt-get upgrade -qq && apt-get install -qq \
 libboost-regex1.74.0 libboost-serialization1.74.0 libcurl4 libodb-2.4 \
 libodb-boost-2.4 libodb-pgsql-2.4 libodb-sqlite-2.4 libscrypt0 libzmq5
 
-RUN dpkg --install /tmp/leosac/leosac_*.deb
+RUN dpkg --install /tmp/leosac/${TARGETPLATFORM}/leosac_*.deb
 
 # Container config
 CMD [""]

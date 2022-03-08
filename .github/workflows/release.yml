@@ -129,9 +129,18 @@ jobs:
           path: packages
       - name: Upload artifacts to Debian repository
         run: |
+          POOL=test
+          DEBPREFIX=
+          if [ "${{ github.event_name }}" = "push" ]; then
+            POOL=main
+          fi
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            POOL=pull-request
+            DEBPREFIX=$(date +%s)-
+          fi
           PACKAGES=packages
           for arch in ${PACKAGES}/* ; do
             for deb in ${arch}/*.deb ; do
-              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/leosac;deb.distribution=bullseye;deb.component=main;deb.architecture=${arch##*/}" -T ${deb}
+              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/${POOL}/l/leosac/${DEBPREFIX}$(basename -- $deb);deb.distribution=bullseye;deb.component=main;deb.architecture=${arch##*/}" -T ${deb}
             done
           done
