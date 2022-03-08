@@ -1,12 +1,13 @@
 FROM debian:bullseye
 ARG TARGETPLATFORM
+ARG VERSION
 
 VOLUME /etc/leosac.d
 
 ADD . /tmp/leosac/
 
 # Required for now to workaround GitHub Artifacts name which doesn't allow a slash
-RUN if [ "${TARGETPLATFORM}" == "linux/arm/v7" ]; then mkdir -p /tmp/leosac/linux/arm/v7; mv /tmp/leosac/linux/arm/*.deb /tmp/leosac/linux/arm/v7; fi
+RUN if [ "${TARGETPLATFORM}" = "linux/arm/v7" ]; then mkdir -p /tmp/leosac/linux/arm/v7; mv /tmp/leosac/linux/arm/*.deb /tmp/leosac/linux/arm/v7; fi
 
 RUN apt-get update -qq && apt-get upgrade -qq && apt-get install -qq \
 libboost-regex1.74.0 libboost-serialization1.74.0 libcurl4 libodb-2.4 \

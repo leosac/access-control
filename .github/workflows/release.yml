@@ -15,6 +15,7 @@ jobs:
     outputs:
       docker_image: ${{ steps.prepare.outputs.docker_image }}
       docker_buildimage: ${{ steps.prepare.outputs.docker_buildimage }}
+      tag: ${{ steps.prepare.outputs.tag }}
       version: ${{ steps.prepare.outputs.version }}
       platforms: ${{ steps.prepare.outputs.platforms }}
       docker_variables: ${{ steps.prepare.outputs.docker_variables }}
@@ -25,29 +26,27 @@ jobs:
           DOCKER_IMAGE=maxhy/leosac
           DOCKER_BUILDIMAGE=maxhy/leosac-buildsystem
           DOCKER_PLATFORMS=linux/amd64,linux/arm,linux/arm64
-          VERSION=edge
+          TAG=edge
+          VERSION=$(date +%s):0.0.0
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/v}
+            TAG=${GITHUB_REF#refs/tags/v}
+            VERSION=${TAG}
           fi
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            VERSION=weekly
+            TAG=weekly
           fi
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION=snapshot
+            TAG=snapshot
           fi
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             DOCKER_PLATFORMS=linux/amd64
           fi
 
-          TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
-          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
-          fi
-
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
           echo ::set-output name=docker_buildimage::${DOCKER_BUILDIMAGE}
           echo ::set-output name=platforms::${DOCKER_PLATFORMS}
+          echo ::set-output name=tag::${TAG}
           echo ::set-output name=version::${VERSION}
 
   build:
@@ -70,9 +69,10 @@ jobs:
           ${{needs.prepare.outputs.docker_buildimage}}
           -c "TARGETPLATFORM=linux/${{ matrix.platform }} &&
           VERSION=${{ needs.prepare.outputs.version }} &&
+          TAG=${{ needs.prepare.outputs.tag }} &&
           BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') &&
           VCS_REF=${GITHUB_SHA::8} &&
-          export TARGETPLATFORM VERSION BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
+          export TARGETPLATFORM VERSION TAG BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
       - uses: actions/upload-artifact@v3
         if: success()
         with:
@@ -86,8 +86,8 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          TAGS="--tag ${{ needs.prepare.outputs.docker_image }}:${{ needs.prepare.outputs.version }}"
-          if [[ ${{ needs.prepare.outputs.version }} =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+          TAGS="--tag ${{ needs.prepare.outputs.docker_image }}:${{ needs.prepare.outputs.tag }}"
+          if [[ ${{ needs.prepare.outputs.tag }} =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
             TAGS="$TAGS --tag ${{ needs.prepare.outputs.docker_image }}:latest"
           fi
 
@@ -118,7 +118,7 @@ jobs:
       - name: Inspect image
         if: always() && github.event_name != 'pull_request'
         run: |
-          docker buildx imagetools inspect ${{ needs.prepare.outputs.docker_image }}:${{ needs.prepare.outputs.version }}
+          docker buildx imagetools inspect ${{ needs.prepare.outputs.docker_image }}:${{ needs.prepare.outputs.tag }}
   jfrog:
     runs-on: ubuntu-latest
     needs: [ prepare, build ]
