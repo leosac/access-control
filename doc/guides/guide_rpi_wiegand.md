@@ -1,9 +1,9 @@
-@page page_guide_rpi_wiegand Raspberry Pi and Wiegand
+@page page_guide_rpi_wiegand Raspberry Pi 1 and Wiegand
 
-This page describes how to set up a Raspberry with a Wiegand reader, step by step.
+This page describes how to set up a Raspberry 1 with a Wiegand reader, step by step.
 It is not the recommended approach in production but can be useful in lab for tests
-purpose. We recommend to use dedicated PCB hardware connected to the Raspberry Pi
-(or any other pico-pc) or to go with @subpage page_guide_rpi_piface_wiegand.html
+purpose. We recommend to use dedicated PCB hardware connected for the Raspberry Pi
+(or any other pico-pc) or to go with @subpage page_guide_rpi_piface_wiegand
 
 Informations
 ============
@@ -67,4 +67,4 @@ Step 5: Plug the reader into the board
 ------------------------------------------------
 ![Plug Reader with Breadboard](wiegand_voltdivider5.jpg)
 
-You're done for the hardware setup. If Leosac is already [installed](@ref install_guide), you can now setup the @subpage page_module_wiegand.
+You're done for the hardware setup. If Leosac is already [installed](@ref install_guide), you can now setup the @subpage page_module_sysfs_gpio and @subpage page_module_wiegand.
