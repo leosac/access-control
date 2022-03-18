@@ -41,11 +41,13 @@ namespace Hardware
  */
 enum class DeviceClass
 {
-    UNKNOWN      = 0,
-    GPIO         = 1,
-    RFID_READERS = 2,
-    LED          = 3,
-    BUZZER       = 4
+    UNKNOWN           = 0,
+    GPIO              = 1,
+    RFID_READER       = 2,
+    LED               = 3,
+    BUZZER            = 4,
+    EXTERNAL_MESSAGE  = 5,
+    EXTERNAL_SERVER   = 6
 };
 
 class Device;
@@ -60,5 +62,11 @@ using LEDPtr = std::shared_ptr<LED>;
 
 class Buzzer;
 using BuzzerPtr = std::shared_ptr<Buzzer>;
+
+class ExternalMessage;
+using ExternalMessagePtr = std::shared_ptr<ExternalMessage>;
+
+class ExternalServer;
+using ExternalServerPtr = std::shared_ptr<ExternalServer>;
 }
 }

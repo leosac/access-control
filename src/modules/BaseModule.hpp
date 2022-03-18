@@ -167,7 +167,7 @@ class BaseModule
      * Based on whether or not strict mode is enable, it prints a warning or
      * prints an error and assert.
      */
-    void config_check(const std::string &obj_name, ConfigChecker::ObjectType type);
+    void config_check(const std::string &obj_name, Leosac::Hardware::DeviceClass type);
 
     /**
      * An helper that checks configuration the existence of some objects.

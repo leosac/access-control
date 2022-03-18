@@ -30,8 +30,7 @@ build() {
     pushd build
     cmake "$srcdir/$_gitname"                   \
         -DCMAKE_BUILD_TYPE=Release              \
-        -DCMAKE_INSTALL_PREFIX="$pkgdir/usr"    \
-        -DLEOSAC_PLATFORM=None
+        -DCMAKE_INSTALL_PREFIX="$pkgdir/usr"
     make
 }
 

@@ -56,6 +56,11 @@ class AuthTarget
     */
     bool is_always_closed(const std::chrono::system_clock::time_point &tp) const;
 
+    /*
+    * Reset the door the its expected default state at the current time.
+    */
+    void resetToExpectedState(const std::chrono::system_clock::time_point &tp);
+
     /**
     * Returns the pointer to the optional FGPIO associated with the door.
     * It may be NULL.
@@ -70,6 +75,22 @@ class AuthTarget
 
     void gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
 
+    Hardware::FGPIO *exitreq_gpio();
+
+    void exitreq_gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
+
+    std::chrono::milliseconds exitreq_duration();
+
+    void exitreq_duration(std::chrono::milliseconds duration);
+
+    Hardware::FGPIO *contact_gpio();
+
+    void contact_gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
+
+    std::chrono::milliseconds contact_duration();
+
+    void contact_duration(std::chrono::milliseconds duration);
+
   protected:
     std::string name_;
 
@@ -80,6 +101,26 @@ class AuthTarget
     * Optional GPIO associated with the door.
     */
     std::unique_ptr<Hardware::FGPIO> gpio_;
+
+    /**
+    * Optional Exit Req GPIO associated with the door.
+    */
+    std::unique_ptr<Hardware::FGPIO> exitreq_gpio_;
+
+    /**
+    * Duration for the Exit Req to keep the door open
+    */
+    std::chrono::milliseconds exitreq_duration_;
+
+    /**
+    * Optional Contact Door Sensor GPIO associated with the door.
+    */
+    std::unique_ptr<Hardware::FGPIO> contact_gpio_;
+
+    /**
+    * Duration for the Contact Door Sensor to be ignored before triggering an alarm
+    */
+    std::chrono::milliseconds contact_duration_;
 };
 }
 }

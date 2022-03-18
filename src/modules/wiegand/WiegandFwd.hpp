@@ -27,8 +27,6 @@ namespace Module
 {
 namespace Wiegand
 {
-using WiegandConfigId = unsigned long;
-
 struct WiegandReaderConfig;
 using WiegandReaderConfigPtr = std::shared_ptr<WiegandReaderConfig>;
 }

@@ -58,6 +58,26 @@ void AuthTarget::gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
     gpio_ = std::move(new_gpio);
 }
 
+void AuthTarget::exitreq_gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
+{
+    exitreq_gpio_ = std::move(new_gpio);
+}
+
+void AuthTarget::exitreq_duration(std::chrono::milliseconds duration)
+{
+    exitreq_duration_ = duration;
+}
+
+void AuthTarget::contact_gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
+{
+    contact_gpio_ = std::move(new_gpio);
+}
+
+void AuthTarget::contact_duration(std::chrono::milliseconds duration)
+{
+    contact_duration_ = duration;
+}
+
 bool AuthTarget::is_always_open(
     const std::chrono::system_clock::time_point &tp) const
 {
@@ -78,4 +98,22 @@ bool AuthTarget::is_always_closed(
             return true;
     }
     return false;
+}
+
+void AuthTarget::resetToExpectedState(const std::chrono::system_clock::time_point &tp)
+{
+  if (is_always_open(tp) && is_always_closed(tp))
+  {
+      WARN("Oops, door "
+           << name()
+           << " is both always open and always close at the same time.");
+  }
+  else if (is_always_open(tp) && !gpio()->isOn())
+  {
+      gpio()->turnOn();
+  }
+  else if (is_always_closed(tp) && !gpio()->isOff())
+  {
+      gpio()->turnOff();
+  }
 }

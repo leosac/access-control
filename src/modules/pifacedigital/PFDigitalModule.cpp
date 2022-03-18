@@ -206,7 +206,7 @@ void PFDigitalModule::process_xml_config(const boost::property_tree::ptree &cfg)
             throw GpioException("Direction (" + gpio_direction + ") is invalid");
         gpios_.push_back(std::move(pin));
         utils_->config_checker().register_object(gpio_name,
-                                                 ConfigChecker::ObjectType::GPIO);
+                                                 Leosac::Hardware::DeviceClass::GPIO);
     }
 }
 
@@ -300,7 +300,7 @@ void PFDigitalModule::load_config_from_database()
                          gpio.default_value(), gpio.hardware_address());
         gpios_.push_back(std::move(pin));
         utils_->config_checker().register_object(gpio.name(),
-                                                 ConfigChecker::ObjectType::GPIO);
+                                                 Leosac::Hardware::DeviceClass::GPIO);
     }
 
     t.commit();
@@ -331,7 +331,7 @@ void WSHelperThread::test_output_pin(const UUID &gpio_id)
         throw ModelException("", "GPIO is not an output GPIO.");
 
     if (!core_utils_->config_checker().has_object(gpio->name(),
-                                                  ConfigChecker::ObjectType::GPIO))
+                                                  Leosac::Hardware::DeviceClass::GPIO))
     {
         throw ModelException(
             "", "GPIO doesn't exist in the runtime configuration checker. "

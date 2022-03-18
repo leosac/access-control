@@ -28,24 +28,30 @@ DoormanInstance::DoormanInstance(DoormanModule &module, zmqpp::context &ctx,
                                  std::string const &name,
                                  const std::vector<std::string> &auth_contexts,
                                  const std::vector<DoormanAction> &actions)
-    : module_(module)
-    , name_(name)
+    : name_(name)
     , actions_(actions)
     , bus_sub_(ctx, zmqpp::socket_type::sub)
 {
     bus_sub_.connect("inproc://zmq-bus-pub");
     for (auto &endpoint : auth_contexts)
-        bus_sub_.subscribe("S_" + endpoint);
+    {
+      bus_sub_.subscribe("S_" + endpoint);
+    }
 
     for (auto &action : actions_)
     {
-        if (targets_.count(action.target_))
-            continue; // already have a socket to this target.
+      if (targets_.count(action.target_))
+        continue; // already have a socket to this target.
 
-        // create socket (and connect them) to target
-        zmqpp::socket target_socket(ctx, zmqpp::socket_type::req);
-        target_socket.connect("inproc://" + action.target_);
-        targets_.insert(std::make_pair(action.target_, std::move(target_socket)));
+      // create socket (and connect them) to target
+      zmqpp::socket target_socket(ctx, zmqpp::socket_type::req);
+      target_socket.connect("inproc://" + action.target_);
+      targets_.insert(std::make_pair(action.target_, std::move(target_socket)));
+    }
+
+    for (auto &door : module.doors())
+    {
+      doors_.push_back(std::make_shared<DoormanDoor>(door, ctx));
     }
 }
 
@@ -117,10 +123,10 @@ void DoormanInstance::command_send_recv(std::string const &target_name,
 Leosac::Auth::AuthTargetPtr
 DoormanInstance::find_target(const std::string &name) const
 {
-    for (const auto &d : module_.doors())
+    for (const auto &d : doors())
     {
-        if (d->gpio()->name() == name)
-            return d;
+        if (d->door()->gpio()->name() == name)
+            return d->door();
     }
     return nullptr;
 }
@@ -141,4 +147,9 @@ bool DoormanInstance::ignore_action(const DoormanAction &action,
         return true;
     }
     return false;
+}
+
+const std::vector<std::shared_ptr<DoormanDoor>> &DoormanInstance::doors() const
+{
+    return doors_;
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2017 Leosac
+    Copyright (C) 2014-2022 Leosac
 
     This file is part of Leosac.
 
@@ -17,21 +17,42 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/RFIDReader.hpp"
+#include "exception/ModelException.hpp"
+#include "modules/mqtt/MqttConfig_odb.h"
+#include <odb/pgsql/query.hxx>
 
 namespace Leosac
 {
-namespace Hardware
+namespace Module
+{
+namespace Mqtt
 {
 
-RFIDReader::RFIDReader()
-    : Device(DeviceClass::RFID_READER)
+void MqttConfig::add_server(std::shared_ptr<const MqttServerConfig> server)
 {
+    servers_.push_back(server);
 }
 
-void RFIDReader::validation_callback(odb::callback_event e, odb::database &db) const
+const std::vector<std::shared_ptr<const MqttServerConfig>> &MqttConfig::servers() const
+{
+    return servers_;
+}
+
+void MqttConfig::add_topic(std::shared_ptr<const MqttExternalMessage> topic)
+{
+    topics_.push_back(topic);
+}
+
+const std::vector<std::shared_ptr<const MqttExternalMessage>> &MqttConfig::topics() const
+{
+    return topics_;
+}
+
+void MqttServerConfig::validation_callback(odb::callback_event e,
+                                              odb::database &db) const
 {
     Device::validation_callback(e, db);
+}
 }
 }
 }

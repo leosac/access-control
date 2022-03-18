@@ -108,13 +108,13 @@ void LEDBuzzerModule::load_xml_config()
             int default_blink_speed = led_cfg.get<int>("default_blink_speed", 200);
 
             INFO("Creating LED " << led_name << ", linked to GPIO " << gpio_name);
-            config_check(gpio_name, ConfigChecker::ObjectType::GPIO);
+            config_check(gpio_name, Leosac::Hardware::DeviceClass::GPIO);
 
             leds_and_buzzers_.push_back(std::make_shared<LedBuzzerImpl>(
                 ctx_, led_name, gpio_name, default_blink_duration,
                 default_blink_speed));
             utils_->config_checker().register_object(led_name,
-                                                     ConfigChecker::ObjectType::LED);
+                                                     Leosac::Hardware::DeviceClass::LED);
         }
     }
 
@@ -133,14 +133,14 @@ void LEDBuzzerModule::load_xml_config()
 
             INFO("Creating Buzzer " << buzzer_name << ", linked to GPIO "
                                     << gpio_name);
-            config_check(gpio_name, ConfigChecker::ObjectType::GPIO);
+            config_check(gpio_name, Leosac::Hardware::DeviceClass::GPIO);
 
             // internally we do not care if its a buzzer or a led.
             leds_and_buzzers_.push_back(std::make_shared<LedBuzzerImpl>(
                 ctx_, buzzer_name, gpio_name, default_blink_duration,
                 default_blink_speed));
             utils_->config_checker().register_object(
-                buzzer_name, ConfigChecker::ObjectType::BUZZER);
+                buzzer_name, Leosac::Hardware::DeviceClass::BUZZER);
         }
     }
 }
@@ -170,7 +170,7 @@ void LEDBuzzerModule::load_db_config()
                 ctx_, led.name(), led.gpio()->name(), led.default_blink_duration(),
                 led.default_blink_speed()));
             utils_->config_checker().register_object(led.name(),
-                                                     ConfigChecker::ObjectType::LED);
+                                                     Leosac::Hardware::DeviceClass::LED);
         }
         t.commit();
     }
@@ -194,7 +194,7 @@ void LEDBuzzerModule::load_db_config()
                 ctx_, buzzer.name(), buzzer.gpio()->name(),
                 buzzer.default_blink_duration(), buzzer.default_blink_speed()));
             utils_->config_checker().register_object(
-                buzzer.name(), ConfigChecker::ObjectType::BUZZER);
+                buzzer.name(), Leosac::Hardware::DeviceClass::BUZZER);
         }
         t.commit();
     }

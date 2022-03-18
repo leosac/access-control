@@ -21,6 +21,7 @@
 
 #include <map>
 #include <mutex>
+#include "hardware/HardwareFwd.hpp"
 
 namespace Leosac
 {
@@ -45,18 +46,10 @@ namespace Leosac
 class ConfigChecker
 {
   public:
-    enum class ObjectType
-    {
-        GPIO   = 0,
-        LED    = 1,
-        READER = 2,
-        BUZZER = 3
-    };
-
     /**
      * Declare an object on the registry.
      */
-    void register_object(const std::string &name, const ObjectType &type);
+    void register_object(const std::string &name, const Leosac::Hardware::DeviceClass &type);
 
     /**
      * Check whether or not an object with name `name` is declared
@@ -68,7 +61,7 @@ class ConfigChecker
      * Check whether or not an object with name `name` is declared
      * in the registry and if check that its type is `type`.
      */
-    bool has_object(const std::string &name, const ObjectType &type) const;
+    bool has_object(const std::string &name, const Leosac::Hardware::DeviceClass &type) const;
 
     /**
      * Clear all informations.
@@ -77,7 +70,7 @@ class ConfigChecker
     void clear();
 
   private:
-    std::map<std::string, ObjectType> objects_;
+    std::map<std::string, Leosac::Hardware::DeviceClass> objects_;
     mutable std::mutex mutex_;
 };
 }

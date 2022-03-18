@@ -58,8 +58,6 @@ cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DZMQPP_BU
 make
 ```
 
-The `LEOSAC_PLATFORM` var is set to 'Unknown' by default, you can safely ignore it for now, or see *Advanced CMake* flags section for more info.
-
     * `LEOSAC_GPROF`: CMake will add [GNU Gprof](https://en.wikipedia.org/wiki/Gprof) compilation/linking flags. This flag is for debugging purpose only and should be coupled with `-DCMAKE_BUILD_TYPE=Debug`
     * `LEOSAC_BUILD_MODULES`: Unset this flag if you don't want CMake to build Leosac modules.
 

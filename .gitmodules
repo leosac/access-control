@@ -28,3 +28,9 @@
 [submodule "deps/date/date"]
 	path = deps/date/date
 	url = https://github.com/HowardHinnant/date
+[submodule "deps/paho.mqtt.c"]
+	path = deps/paho.mqtt.c
+	url = https://github.com/eclipse/paho.mqtt.c.git
+[submodule "deps/paho.mqtt.cpp"]
+	path = deps/paho.mqtt.cpp
+	url = https://github.com/eclipse/paho.mqtt.cpp.git

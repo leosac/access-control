@@ -23,7 +23,7 @@
 using namespace Leosac;
 
 void ConfigChecker::register_object(const std::string &name,
-                                    const ConfigChecker::ObjectType &type)
+                                    const Leosac::Hardware::DeviceClass &type)
 {
     std::lock_guard<std::mutex> lg(mutex_);
     ASSERT_LOG(objects_.count(name) == 0, "Already have an object with name "
@@ -38,7 +38,7 @@ bool ConfigChecker::has_object(const std::string &name) const
 }
 
 bool ConfigChecker::has_object(const std::string &name,
-                               const ConfigChecker::ObjectType &type) const
+                               const Leosac::Hardware::DeviceClass &type) const
 {
     std::lock_guard<std::mutex> lg(mutex_);
     const auto itr = objects_.find(name);

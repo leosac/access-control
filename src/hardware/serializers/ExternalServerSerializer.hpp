@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2022 Leosac
 
     This file is part of Leosac.
 
@@ -17,25 +17,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "TcpNotifier.hpp"
-#include <tools/log.hpp>
+#pragma once
 
-using namespace Leosac::Module::TCPNotifier;
+#include "LeosacFwd.hpp"
+#include "hardware/ExternalServer.hpp"
+#include <nlohmann/json.hpp>
 
-extern "C" {
-const char *get_module_name()
+namespace Leosac
 {
-    return "TCP_NOTIFIER";
-}
-}
+using json = nlohmann::json;
 
-/**
-* Entry point for the TCP Notifier module.
-*/
-extern "C" __attribute__((visibility("default"))) bool
-start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
-             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
+namespace Hardware
 {
-    return Leosac::Module::start_module_helper<TCPNotifierModule>(pipe, cfg, zmq_ctx,
-                                                                  utils);
+struct ExternalServerSerializer
+{
+    static json serialize(const Hardware::ExternalServer &in, const SecurityContext &sc);
+
+    static void unserialize(Hardware::ExternalServer &out, const json &in,
+                            const SecurityContext &sc);
+};
+}
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2022 Leosac
 
     This file is part of Leosac.
 
@@ -17,25 +17,18 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "TcpNotifier.hpp"
-#include <tools/log.hpp>
+#pragma once
 
-using namespace Leosac::Module::TCPNotifier;
+#include <memory>
 
-extern "C" {
-const char *get_module_name()
+namespace Leosac
 {
-    return "TCP_NOTIFIER";
+namespace Module
+{
+namespace Mqtt
+{
+struct MqttServerConfig;
+using MqttServerConfigPtr = std::shared_ptr<MqttServerConfig>;
 }
 }
-
-/**
-* Entry point for the TCP Notifier module.
-*/
-extern "C" __attribute__((visibility("default"))) bool
-start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,
-             zmqpp::context &zmq_ctx, Leosac::CoreUtilsPtr utils)
-{
-    return Leosac::Module::start_module_helper<TCPNotifierModule>(pipe, cfg, zmq_ctx,
-                                                                  utils);
 }

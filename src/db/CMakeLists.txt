@@ -164,6 +164,8 @@ set(OdbCMake_ODB_HEADERS_HARDWARE
         ${CMAKE_SOURCE_DIR}/src/hardware/RFIDReader.hpp
         ${CMAKE_SOURCE_DIR}/src/hardware/LED.hpp
         ${CMAKE_SOURCE_DIR}/src/hardware/Buzzer.hpp
+        ${CMAKE_SOURCE_DIR}/src/hardware/ExternalServer.hpp
+        ${CMAKE_SOURCE_DIR}/src/hardware/ExternalMessage.hpp
         )
 
 set(OdbCMake_SOURCES_HARDWARE "")

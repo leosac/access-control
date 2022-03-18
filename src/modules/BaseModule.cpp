@@ -141,7 +141,7 @@ void BaseModule::config_check(const std::string &obj_name)
 }
 
 void BaseModule::config_check(const std::string &obj_name,
-                              ConfigChecker::ObjectType type)
+                              Leosac::Hardware::DeviceClass type)
 {
     bool res = utils_->config_checker().has_object(obj_name, type);
 
@@ -152,17 +152,20 @@ void BaseModule::config_check(const std::string &obj_name,
 
     switch (type)
     {
-    case ConfigChecker::ObjectType::GPIO:
+    case Leosac::Hardware::DeviceClass::GPIO:
         ERROR(prefix << "GPIO " << obj_name << " doesn't exist.");
         break;
-    case ConfigChecker::ObjectType::LED:
+    case Leosac::Hardware::DeviceClass::LED:
         ERROR(prefix << "LED " << obj_name << " doesn't exist.");
         break;
-    case ConfigChecker::ObjectType::BUZZER:
+    case Leosac::Hardware::DeviceClass::BUZZER:
         ERROR(prefix << "BUZZER " << obj_name << " doesn't exists.");
         break;
-    case ConfigChecker::ObjectType::READER:
+    case Leosac::Hardware::DeviceClass::RFID_READER:
         ERROR(prefix << "READER " << obj_name << " doesn't exists.");
+        break;
+    case Leosac::Hardware::DeviceClass::EXTERNAL_SERVER:
+        ERROR(prefix << "EXTERNAL SERVER " << obj_name << " doesn't exists.");
         break;
     default:
         ASSERT_LOG(false, prefix << "Missing case in switch: value "

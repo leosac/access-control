@@ -103,7 +103,7 @@ void SysFsGpioModule::process_config(const boost::property_tree::ptree &cfg)
                                           *this));
 
         utils_->config_checker().register_object(gpio_name,
-                                                 ConfigChecker::ObjectType::GPIO);
+                                                 Leosac::Hardware::DeviceClass::GPIO);
     }
 }
 

@@ -21,6 +21,7 @@
 
 #include "core/auth/Auth.hpp"
 #include "core/auth/AuthFwd.hpp"
+#include "DoormanDoor.hpp"
 #include <map>
 #include <zmqpp/zmqpp.hpp>
 
@@ -88,6 +89,8 @@ class DoormanInstance
     */
     void handle_bus_msg();
 
+    const std::vector<std::shared_ptr<DoormanDoor>> &doors() const;
+
   private:
     /**
     * Should we ignore this action.
@@ -101,7 +104,7 @@ class DoormanInstance
 
     Auth::AuthTargetPtr find_target(const std::string &name) const;
 
-    DoormanModule &module_;
+    std::vector<std::shared_ptr<DoormanDoor>> doors_;
 
     /**
     * Send a command to a target and wait for response.

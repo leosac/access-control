@@ -65,17 +65,22 @@ set(LEOSAC_LIB_SRCS
     hardware/facades/FGPIO.cpp
     hardware/facades/FLED.cpp
     hardware/facades/FWiegandReader.cpp
+    hardware/facades/FExternalServer.cpp
     hardware/Device.cpp
     hardware/GPIO.cpp
     hardware/RFIDReader.cpp
     hardware/Buzzer.cpp
     hardware/LED.cpp
+    hardware/ExternalMessage.cpp
+    hardware/ExternalServer.cpp
     hardware/HardwareService.cpp
     hardware/serializers/RFIDReaderSerializer.cpp
     hardware/serializers/GPIOSerializer.cpp
     hardware/serializers/DeviceSerializer.cpp
     hardware/serializers/LEDSerializer.cpp
     hardware/serializers/BuzzerSerializer.cpp
+    hardware/serializers/ExternalMessageSerializer.cpp
+    hardware/serializers/ExternalServerSerializer.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
     tools/unixshellscript.cpp

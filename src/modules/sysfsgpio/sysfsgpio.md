@@ -18,6 +18,8 @@ This module provide support for FGPIO device by supporting the
 Linux Kernel SysFs interface. It allows the application to deals with
 GPIO pin that are in fact controlled through sysfs.
 
+@note SysFs GPIO has been deprecated on Linux systems by [Character Device GPIO and libgpiod](@ref page_module_libgpiod).
+
 Configuration Options {#mod_sysfsgpio_user_config}
 ==================================================
 
@@ -26,7 +28,7 @@ Below are the configuration options available.
 Options | Options | Options        | Description                                                                             | Mandatory
 --------|---------|----------------|-----------------------------------------------------------------------------------------|-----------
 aliases |         |                | Define GPIO aliases. This is useful to support multiple platform                        | **YES**
---->    | default |                | Default name resolution for pin. `__NO__` will be replace by the `no` field             | NO 
+--->    | default |                | Default name resolution for pin. `__NO__` will be replace by the `no` field             | NO
 --->    | PIN_ID  |                | Option name shall be the pin number, **not** textual `PIN_ID`. Value is the identifier for the pin. | NO
 export_path |     |                | Absolute path to "export" sysfs file                                                    | **YES**
 unexport_path |   |                | Absolute path to "unexport" sysfs file                                                  | **YES**
@@ -56,7 +58,7 @@ A simple example:
       by `14`).
     + `__PLACEHOLDER__` is replaced by the pin identifier: The module will resolve
       the value path of the PIN to `/sys/class/gpio/gpio14/value`
-    
+
 @see SysFsGpioConfigTest for more example.
 
 Interrupt Mode
@@ -116,7 +118,7 @@ This is a example of SysFsGpio possible configuration for SysFsGpio module into 
             </module_config>
         </module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
+
 Notes {#mod_sysfsgpio_notes}
 ============================
 

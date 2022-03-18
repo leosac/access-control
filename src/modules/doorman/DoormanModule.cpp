@@ -46,6 +46,12 @@ DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
     {
         reactor_.add(doorman->bus_sub(),
                      std::bind(&DoormanInstance::handle_bus_msg, doorman));
+
+        for (auto &&door : doorman->doors())
+        {
+          reactor_.add(door->bus_sub(),
+                       std::bind(&DoormanDoor::handle_bus_msg, door));
+        }
     }
 }
 
@@ -146,32 +152,38 @@ void DoormanModule::process_doors_config(
                 door->add_always_close_sched(map_entry.second);
             }
         }
+
+        const auto &exitreq =
+            door_cfg.second.get_child_optional("exitreq");
+        if (exitreq)
+        {
+          std::string exitreq_gpio = exitreq.get().get<std::string>("gpio");
+          door->exitreq_gpio(
+              std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, exitreq_gpio)));
+          door->exitreq_duration(std::chrono::milliseconds(exitreq.get().get<uint16_t>("duration")));
+        }
+
+        const auto &contact =
+            door_cfg.second.get_child_optional("contact");
+        if (contact)
+        {
+          std::string contact_gpio = contact.get().get<std::string>("gpio");
+          door->contact_gpio(
+              std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, contact_gpio)));
+          door->contact_duration(std::chrono::milliseconds(contact.get().get<uint16_t>("duration")));
+        }
         doors_.push_back(door);
     }
 }
 
 void DoormanModule::update()
 {
-    auto now = std::chrono::system_clock::now();
+  auto now = std::chrono::system_clock::now();
 
-    for (auto &&door : doors_)
-    {
-        if (door->is_always_open(now) && door->is_always_closed(now))
-        {
-            WARN("Oops, door "
-                 << door->name()
-                 << " is both always open and always close at the same time.");
-            continue;
-        }
-        if (door->is_always_open(now) && !door->gpio()->isOn())
-        {
-            door->gpio()->turnOn();
-        }
-        if (door->is_always_closed(now) && !door->gpio()->isOff())
-        {
-            door->gpio()->turnOff();
-        }
-    }
+  for (auto &&door : doors_)
+  {
+    door->resetToExpectedState(now);
+  }
 }
 
 std::vector<AuthTargetPtr> const &DoormanModule::doors() const

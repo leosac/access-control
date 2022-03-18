@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2022 Leosac
 
     This file is part of Leosac.
 
@@ -35,51 +35,36 @@ namespace Hardware
 * @note This class implements the client code to [theses specifications](@ref
 * hardware_spec_wiegand).
 */
-class FWiegandReader
+class FExternalServer
 {
   public:
     /**
-    * Construct a facade to a wiegand reader; this facade will connect to the reader
+    * Construct a facade to an external server; this facade will connect to the server
     * @param ctx ZMQ context
-    * @param reader_name name of targeted wiegand device
+    * @param server_name name of targeted server
     */
-    FWiegandReader(zmqpp::context &ctx, const std::string &reader_name);
+    FExternalServer(zmqpp::context &ctx, const std::string &server_name);
 
-    FWiegandReader(const FWiegandReader &) = delete;
+    FExternalServer(const FExternalServer &) = delete;
 
-    FWiegandReader &operator=(const FWiegandReader &) = delete;
+    FExternalServer &operator=(const FExternalServer &) = delete;
 
-    ~FWiegandReader() = default;
+    ~FExternalServer() = default;
 
     /**
-    * Turn the reader's green led on.
+    * Connect to the server.
     */
-    bool greenLedOn();
+    bool connect();
 
     /**
-    * Turn the reader's green led off.
+    * Disconnect from the server.
     */
-    bool greenLedOff();
+    bool disconnect();
 
     /**
-    * Make the reader's green led blink.
+    * Check if is connected to the server.
     */
-    bool greenLedBlink(int64_t duration = 1000, int64_t speed = 300);
-
-    /**
-    * Beep for a given duration
-    */
-    bool beep(int64_t duration = 1000);
-
-    /**
-    * Turn the buzzer on.
-    */
-    bool buzzerOn();
-
-    /**
-    * Turn the buzzer off.
-    */
-    bool buzzerOff();
+    bool isConnected() const;
 
     /**
     * Returns the device's name.
@@ -87,14 +72,15 @@ class FWiegandReader
     const std::string &name() const;
 
   private:
+
     /**
-    * Send a message to the `backend_` wiegand reader and wait for a response.
+    * Send a message to the `backend_` server and wait for a response.
     * The response shall be either "OK" or "KO"
     */
     bool send_to_backend(zmqpp::message &m);
 
     /**
-    * A socket to talk to the backend wiegand reader.
+    * A socket to talk to the backend server.
     */
     zmqpp::socket backend_;
 

@@ -5,7 +5,7 @@ list(APPEND LEOSAC_TEST_INCLUDE_DIRECTORIES
         ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
         ${GTEST_INCLUDE_DIRS}
         ${CMAKE_SOURCE_DIR}/deps/spdlog/include
-        ${CMAKE_SOURCE_DIR}/deps/json/src
+        ${CMAKE_SOURCE_DIR}/deps/json/include
         )
 list(APPEND LEOSAC_TEST_LIBRARIES leosac_lib ${GTEST_BOTH_LIBRARIES})
 

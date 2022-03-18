@@ -45,6 +45,12 @@ doors      |           |                 |              |             | Optional
 --->       | --->      | --->            | schedules    |             | See [here](@ref mod_auth_sched_declare) to learn how to declare schedules | YES
 --->       | --->      | off             |              |             | Some schedules for when the door is in "always closed" mode       | NO
 --->       | --->      | --->            | schedules    |             | See [here](@ref mod_auth_sched_declare) to learn how to declare schedules | YES
+--->       | --->      | exitreq         |              |             | Manage "request to exit" for the door (usually a push button)     | NO
+--->       | --->      | --->            | gpio         |             | The request to exit GPIO                                          | YES
+--->       | --->      | --->            | duration     |             | The normal state (open / close)                                   | YES
+--->       | --->      | contact         |              |             | Duration to keep the door open                                    | NO
+--->       | --->      | --->            | gpio         |             | The contact sensor GPIO. Interrupt mode needs to be set to Both.  | YES
+--->       | --->      | --->            | duration     |             | Duration before triggering an alarm                               | YES
 
 
 @note The `<cmd>` tag is quite simple. It looks like this:
@@ -66,7 +72,7 @@ or some reader object ("my_wiegand1"), etc.
 @hr
 
 @note Declaring `doors` is optional, and is only ever useful if you make use of
-the "always open" or "always close" feature.
+the "always open", "always close", "exit request" or "contact" feature.
 
 Example 0 {#mod_doorman_example_0}
 ----------------------------------

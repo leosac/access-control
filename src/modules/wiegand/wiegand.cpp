@@ -114,7 +114,7 @@ void WiegandReaderModule::process_config()
             reader_config->gpio_low_name(), reader_config->green_led_name(),
             reader_config->buzzer_name(), create_strategy(*reader_config, &reader));
         utils_->config_checker().register_object(reader.name(),
-                                                 ConfigChecker::ObjectType::READER);
+                                                 Leosac::Hardware::DeviceClass::RFID_READER);
         readers_.push_back(std::move(reader));
     }
 }
@@ -277,16 +277,16 @@ void WiegandReaderModule::load_xml_config(
         reader_config->nowait = xml_reader_cfg.get<bool>("nowait", 0);
 
         config_check(reader_config->gpio_low_name(),
-                     ConfigChecker::ObjectType::GPIO);
+                     Leosac::Hardware::DeviceClass::GPIO);
         config_check(reader_config->gpio_high_name(),
-                     ConfigChecker::ObjectType::GPIO);
+                     Leosac::Hardware::DeviceClass::GPIO);
 
         if (!reader_config->green_led_name().empty())
             config_check(reader_config->green_led_name(),
-                         ConfigChecker::ObjectType::LED);
+                         Leosac::Hardware::DeviceClass::LED);
         if (!reader_config->buzzer_name().empty())
             config_check(reader_config->buzzer_name(),
-                         ConfigChecker::ObjectType::BUZZER);
+                         Leosac::Hardware::DeviceClass::BUZZER);
 
         wiegand_config_->add_reader(reader_config);
     }

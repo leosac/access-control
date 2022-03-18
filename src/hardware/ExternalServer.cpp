@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2017 Leosac
+    Copyright (C) 2014-2022 Leosac
 
     This file is part of Leosac.
 
@@ -17,19 +17,46 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "hardware/RFIDReader.hpp"
+#include "hardware/ExternalServer.hpp"
 
 namespace Leosac
 {
 namespace Hardware
 {
 
-RFIDReader::RFIDReader()
-    : Device(DeviceClass::RFID_READER)
+ExternalServer::ExternalServer()
+    : Device(DeviceClass::EXTERNAL_SERVER)
 {
 }
 
-void RFIDReader::validation_callback(odb::callback_event e, odb::database &db) const
+ExternalServer::ExternalServer(const std::string& host, uint16_t port)
+    : Device(DeviceClass::EXTERNAL_SERVER),
+    host_(host),
+    port_(port)
+{
+}
+
+std::string ExternalServer::host() const
+{
+    return host_;
+}
+
+void ExternalServer::host(std::string host)
+{
+    host_ = host;
+}
+
+uint16_t ExternalServer::port() const
+{
+    return port_;
+}
+
+void ExternalServer::port(uint16_t port)
+{
+    port_ = port;
+}
+
+void ExternalServer::validation_callback(odb::callback_event e, odb::database &db) const
 {
     Device::validation_callback(e, db);
 }
