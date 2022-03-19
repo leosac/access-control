@@ -25,10 +25,14 @@ A Wiegand reader will usually use +5V as its "high" voltage level. However, Rasp
 
 We want to go from +5V to about +3.3V: `Vin = +5` and we would like `Vout = +3.3`.
 
-We will use 2 resistors: `R1 = 330` and `R2 = 560`. This gives `Vout = 3.146`, which is acceptable.
+![Wiegand Wiring](wiegand.png)
 
-Guide
-=====
+The values on the resistors are not strictly fixed. As long as the ratio between the upper and lower resistor value is 1/2 for the [voltage divider](http://en.wikipedia.org/wiki/Voltage_divider), the 5k resistor can be safely replaced with another in the range from 2k to 10k depending on what you have. If you only have 10k resistors, you could even put 2 in series to obtain 20k.
+
+Do not forget to plug the reader on a 12V current source. 5V is also suitable with some readers if you don't have another choice but is less recommended.
+
+DYI Guide
+=========
 
 Step 1: Prepare the GPIOs
 -------------------------
@@ -43,12 +47,14 @@ Raspberry Pi with wires connected to GPIO.
 
 Step 2: Prepare the breadboard
 ------------------------------
+We will use 2 resistors type: `R1 = 330` and `R2 = 560`. This gives `Vout = 3.146`, which is acceptable.
+
 This is what the breadboard look like, with 4 resistors for voltage divider. The led will be lighted if an access control is successful.
 ![Breadboard](wiegand_voltdivider2.jpg)
 
 Step 3: The wiegand reader
 --------------------------
-![Wiegard reader](wiegand_voltdivider3.jpg)
+![Wiegand reader](wiegand_voltdivider3.jpg)
 
  * The blue, yellow and orange wires are useless, as far as i know.
  * The red wire is for powering the reader. (Based on your reader, it can range from 5V to 12V -- maybe more)
@@ -68,3 +74,12 @@ Step 5: Plug the reader into the board
 ![Plug Reader with Breadboard](wiegand_voltdivider5.jpg)
 
 You're done for the hardware setup. If Leosac is already [installed](@ref install_guide), you can now setup the @subpage page_module_sysfs_gpio and @subpage page_module_wiegand.
+
+
+Better Prototyping
+==================
+
+You may want to use *74LVC244* / *74LVC245* or *CD4049* / *CD4050* CMOS devices instead to convert 5V signal to 3.3V in a more professional way.
+
+When working with a breadboard you may even want to use *Level-Shifter 8-Channel*  (or 4 channel, just be sure input is 5V and output 3.3V).
+![Level-Shifter 8-Channel](level-shifter-8-channels-bi-directionnal.jpg)
