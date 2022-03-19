@@ -71,7 +71,7 @@ class DoormanDoor
 
     bool contact_triggered;
 
-    std::chrono::time_point contact_lastupdate;
+    std::chrono::system_clock::time_point contact_lastupdate;
 };
 }
 }

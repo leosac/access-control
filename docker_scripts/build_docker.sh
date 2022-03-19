@@ -3,9 +3,10 @@
 # This script allows to easily recreate docker images manually
 # It shouldn't be required as it is normally triggered by the CI
 
-IMAGE_BUILD="maxhy/leosac-buildsystem:latest"
+IMAGE_BUILD_1="maxhy/leosac-buildsystem:debian-bullseye"
+IMAGE_BUILD_2="maxhy/leosac-buildsystem:debian-buster"
 IMAGE_RUN="maxhy/leosac:snapshot"
-PLATFORMS="linux/amd64,linux/arm64,linux/arm"
+PLATFORMS="linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
 
 # Build system
 read -p "Do you want to re-build the Docker Buildsystem for Leosac first?" bs
@@ -13,7 +14,8 @@ case $bs in
   [Yy]* )
       docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
       docker buildx create --name multiarch --driver docker-container --use
-      docker buildx build --push --tag $IMAGE_BUILD --platform $PLATFORMS -f docker/Dockerfile.buildsystem .
+      docker buildx build --push --tag $IMAGE_BUILD_1 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.bullseye .
+      docker buildx build --push --tag $IMAGE_BUILD_2 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.buster .
       break;;
   * ) echo "Docker Buildsystem skipped";;
 esac

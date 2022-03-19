@@ -5,7 +5,7 @@ Priority: optional
 Standards-Version: 3.9.8
 Build-Depends: debhelper (>= 9),
                cmake,
-               g++ (>= 9),
+               g++ (>= 8),
                libtclap-dev,
                libboost-date-time-dev,
                libboost-filesystem-dev,

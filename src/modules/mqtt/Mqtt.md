@@ -51,31 +51,45 @@ Example {#mod_mqtt_example}
 This is a example of possible configuration for MQTT module into Leosac:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.xml
-        <module>
-          <name>MQTT</name>
-          <file>libmqtt.so</file>
-          <level>2</level>
-          <module_config>            
-            <servers>
-              <server>
-                <name>hass</name>
-                <host>localhost</host>
-                <port>1883</port>
-                <client_id>leosac</client_id>
-                <subscribe_prefix>homeassistant/</subscribe_prefix>
-                <publish_prefix>leosac/</publish_prefix>
-                <ssl>false</ssl>
-              </server>
-            </servers>
-            <topics>
-              <topic>
-                <name>frontdoor</name>
-                <subject>enocean/Front Door Sensor</subject>
-                <direction>subscribe</direction>
-                <virtualtype>gpio</virtualtype>
-                <payload>{CO: __PLACEHOLDER__}</payload>
-              </topic>
-            </topics>
-          </module_config>
-        </module>
+<module>
+  <name>MQTT</name>
+  <file>libmqtt.so</file>
+  <level>2</level>
+  <module_config>            
+    <servers>
+      <server>
+        <name>hass</name>
+        <host>localhost</host>
+        <port>1883</port>
+        <client_id>leosac</client_id>
+        <subscribe_prefix>homeassistant/</subscribe_prefix>
+        <publish_prefix>leosac/</publish_prefix>
+        <ssl>false</ssl>
+      </server>
+    </servers>
+    <topics>
+      <topic>
+        <name>frontdoor</name>
+        <subject>frontdoor</subject>
+        <direction>publish</direction>
+        <virtualtype>gpio</virtualtype>
+        <payload>{ state: __PLACEHOLDER__ }</payload>
+      </topic>
+      <topic>
+        <name>frontdoor_sensor</name>
+        <subject>enocean/Front Door Sensor</subject>
+        <direction>subscribe</direction>
+        <virtualtype>gpio</virtualtype>
+        <payload></payload>
+      </topic>
+      <topic>
+        <name>basement_light</name>
+        <subject>zigbee2mqtt/0x123456789abcdef</subject>
+        <direction>subscribe</direction>
+        <virtualtype>gpio</virtualtype>
+        <payload>state</payload>
+      </topic>
+    </topics>
+  </module_config>
+</module>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

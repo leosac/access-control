@@ -25,7 +25,7 @@ jobs:
         run: |
           DOCKER_IMAGE=maxhy/leosac
           DOCKER_BUILDIMAGE=maxhy/leosac-buildsystem
-          DOCKER_PLATFORMS=linux/amd64,linux/arm,linux/arm64
+          DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
           TAG=edge
           VERSION=$(date +%s):0.0.0
 
@@ -54,14 +54,21 @@ jobs:
     needs: prepare
     strategy:
       matrix:
-        platform: [ 'amd64', 'arm64', 'arm' ]
+        buildsystem: [ 'debian-bullseye', 'debian-buster' ]
+        platform: [ 'amd64', 'arm64', 'arm/v7', 'arm/v6' ]
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Prepare
+        id: prepare
+        run: |
+          ARTIFACT_NAME="${{ matrix.buildsystem }}_${{ matrix.platform }}"
+          ARTIFACT_NAME="${ARTIFACT_NAME////_}"
+          echo ::set-output name=artifact_name::${ARTIFACT_NAME}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
-      - name: Run ${{ matrix.platform }}
+      - name: Run ${{ matrix.platform }} on ${{ matrix.buildsystem }}
         if: success() && github.event_name != 'pull_request'
         run: docker run --entrypoint=/bin/bash
           --platform linux/${{ matrix.platform }}
@@ -76,8 +83,8 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: success()
         with:
-          name: ${{ matrix.platform }}
-          path: build/packages/debian/linux/${{ matrix.platform }}/*.deb
+          name: ${{ steps.prepare.outputs.artifact_name }}
+          path: build/packages/${{ matrix.buildsystem }}/linux/${{ matrix.platform }}/*.deb
 
   docker:
     runs-on: ubuntu-latest
@@ -110,11 +117,27 @@ jobs:
       - uses: actions/download-artifact@v3
         if: success()
         with:
-          path: build/packages/debian/linux
+          name: debian-bullseye_linux-amd64
+          path: build/packages/debian-bullseye/linux/amd64
+      - uses: actions/download-artifact@v3
+        if: success()
+        with:
+          name: debian-bullseye_linux-arm64
+          path: build/packages/debian-bullseye/linux/arm64
+      - uses: actions/download-artifact@v3
+        if: success()
+        with:
+          name: debian-bullseye_linux-arm-v7
+          path: build/packages/debian-bullseye/linux/arm/v7
+      - uses: actions/download-artifact@v3
+        if: success()
+        with:
+          name: debian-bullseye_linux-arm-v6
+          path: build/packages/debian-bullseye/linux/arm/v6
       - name: Build Docker Leosac Main
         if: success() && github.event_name != 'pull_request'
         run: |
-          docker buildx build --push ${{ steps.prepare.outputs.buildx_args }} --file ./docker/Dockerfile.main build/packages/debian
+          docker buildx build --push ${{ steps.prepare.outputs.buildx_args }} --file ./docker/Dockerfile.main build/packages/debian-bullseye
       - name: Inspect image
         if: always() && github.event_name != 'pull_request'
         run: |

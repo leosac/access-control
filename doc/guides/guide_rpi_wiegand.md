@@ -31,7 +31,7 @@ The values on the resistors are not strictly fixed. As long as the ratio between
 
 Do not forget to plug the reader on a 12V current source. 5V is also suitable with some readers if you don't have another choice but is less recommended.
 
-DYI Guide
+DIY Guide
 =========
 
 Step 1: Prepare the GPIOs
