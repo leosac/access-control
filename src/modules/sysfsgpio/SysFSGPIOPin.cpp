@@ -60,10 +60,17 @@ SysFsGpioPin::~SysFsGpioPin()
 {
     if (direction_ == Direction::Out)
     {
-        if (initial_value_)
-            turn_on();
-        else
-            turn_off();
+        try
+        {
+            if (initial_value_)
+                turn_on();
+            else
+                turn_off();
+        }
+        catch(FsException &e)
+        {
+            ERROR("Error while resetting gpio state: " << e.what());
+        }
     }
 
     if (file_fd_ != -1 && ::close(file_fd_) != 0)

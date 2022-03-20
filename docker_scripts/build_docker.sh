@@ -16,7 +16,6 @@ case $bs in
       docker buildx create --name multiarch --driver docker-container --use
       docker buildx build --push --tag $IMAGE_BUILD_1 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.bullseye .
       docker buildx build --push --tag $IMAGE_BUILD_2 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.buster .
-      break;;
   * ) echo "Docker Buildsystem skipped";;
 esac
 

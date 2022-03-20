@@ -44,7 +44,7 @@ class RuntimeOptions
     static const std::string DefaultEmptyParam;
 
   public:
-    explicit RuntimeOptions() = default;
+    explicit RuntimeOptions();
 
     ~RuntimeOptions() = default;
 

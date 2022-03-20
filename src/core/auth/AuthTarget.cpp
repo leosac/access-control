@@ -34,7 +34,8 @@ void AuthTarget::name(std::string const &param)
 }
 
 AuthTarget::AuthTarget(const std::string target_name)
-    : name_(target_name)
+    : name_(target_name),
+    contact_duration_(15000)
 {
 }
 

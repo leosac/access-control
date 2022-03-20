@@ -162,8 +162,12 @@ jobs:
             DEBPREFIX=$(date +%s)-
           fi
           PACKAGES=packages
-          for arch in ${PACKAGES}/* ; do
-            for deb in ${arch}/*.deb ; do
-              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/${POOL}/l/leosac/${DEBPREFIX}$(basename -- $deb);deb.distribution=bullseye;deb.component=main;deb.architecture=${arch##*/}" -T ${deb}
+          for pkg in ${PACKAGES}/debian-* ; do
+            distri=${pkg%_*}
+            distri=${distri#*-}
+            arch=${pkg#*linux-}
+            arch=${arch%/*}
+            for deb in ${pkg}/*.deb ; do
+              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/${POOL}/l/leosac/${DEBPREFIX}$(basename -- $deb);deb.distribution=${distri};deb.component=main;deb.architecture=${arch}" -T ${deb}
             done
           done

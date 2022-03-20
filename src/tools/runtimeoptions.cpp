@@ -29,6 +29,10 @@
 using namespace Leosac::Tools;
 const std::string RuntimeOptions::DefaultEmptyParam("undef");
 
+RuntimeOptions::RuntimeOptions() : strict_(false)
+{
+}
+
 void RuntimeOptions::set_param(const std::string &key, const std::string &value)
 {
     _params[key] = value;

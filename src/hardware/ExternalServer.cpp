@@ -25,7 +25,8 @@ namespace Hardware
 {
 
 ExternalServer::ExternalServer()
-    : Device(DeviceClass::EXTERNAL_SERVER)
+    : Device(DeviceClass::EXTERNAL_SERVER),
+    port_(80)
 {
 }
 
