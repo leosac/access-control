@@ -73,7 +73,7 @@ jobs:
         run: docker run --entrypoint=/bin/bash
           --platform linux/${{ matrix.platform }}
           -v "${GITHUB_WORKSPACE}:/tmp/leosac"
-          ${{needs.prepare.outputs.docker_buildimage}}
+          ${{needs.prepare.outputs.docker_buildimage}}:${{matrix.buildsystem}}
           -c "TARGETPLATFORM=linux/${{ matrix.platform }} &&
           VERSION=${{ needs.prepare.outputs.version }} &&
           TAG=${{ needs.prepare.outputs.tag }} &&
