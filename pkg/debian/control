@@ -24,6 +24,7 @@ Build-Depends: debhelper (>= 9),
                libodb-boost-dev,
                libodb-pgsql-dev,
                libodb-sqlite-dev,
+               libgpiod-dev,
                odb,
                pkg-config
 

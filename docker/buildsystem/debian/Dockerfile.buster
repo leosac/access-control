@@ -13,7 +13,7 @@ python3 python3-pip gcc g++                   \
 dh-make dpkg-dev debhelper devscripts             \
 libboost-all-dev libgtest-dev emacs-nox vim wget  \
 libsqlite3-dev libpq-dev odb libodb-dev           \
-libodb-pgsql-dev libodb-pgsql-2.4                 \
+libodb-pgsql-dev libodb-pgsql-2.4 libgpiod-dev    \
 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 2 && \

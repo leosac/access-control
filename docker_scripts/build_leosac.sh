@@ -6,7 +6,7 @@ set -x
 set -e
 
 APP_PATH=/tmp/leosac
-DEB_PATH=$APP_PATH/build/packages/debian/$TARGETPLATFORM
+DEB_PATH=${APP_PATH}/build/packages/${DISTRIB}/${TARGETPLATFORM}
 mkdir -p $DEB_PATH
 
 pushd $APP_PATH/python

@@ -16,6 +16,7 @@ case $bs in
       docker buildx create --name multiarch --driver docker-container --use
       docker buildx build --push --tag $IMAGE_BUILD_1 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.bullseye .
       docker buildx build --push --tag $IMAGE_BUILD_2 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.buster .
+      ;;
   * ) echo "Docker Buildsystem skipped";;
 esac
 
@@ -25,8 +26,9 @@ case $ds in
       for platform in ${PLATFORMS//,/ } ; do
         rm ./build -rf
         rm ./obj-* -rf
-        docker run --rm --entrypoint=/bin/bash --platform $platform -v "${PWD}:/tmp/leosac" $IMAGE_BUILD -c "TARGETPLATFORM=${platform} && VERSION=snapshot && BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && VCS_REF=HEAD && export TARGETPLATFORM VERSION BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
+        docker run --rm --entrypoint=/bin/bash --platform $platform -v "${PWD}:/tmp/leosac" $IMAGE_BUILD -c "DISTRIB=debian-bullseye && TARGETPLATFORM=${platform} && VERSION=snapshot && BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') && VCS_REF=HEAD && export DISTRIB TARGETPLATFORM VERSION BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
       done
       docker buildx build --push --tag $IMAGE_RUN --platform $PLATFORMS --file docker/Dockerfile.main build/packages/debian
+      ;;
   * ) echo "Docker skipped";;
 esac

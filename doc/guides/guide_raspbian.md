@@ -58,13 +58,13 @@ You have your first choice to make:
 From Source {#install_guide_installing_src}
 -------------------------------------------
 
-If you chose to build from source, follow @subpage page_guide_install_from_source.
+If you chose to build from source, follow @ref page_guide_install_from_source.
 Note that building on Raspberry Pi will take quite a while
 
 Debian Package {#install_guide_installing_deb}
 ----------------------------------------------
 
-See @subpage page_guide_install_from_package
+See @ref page_guide_install_from_package
 
 Basic Configuration {#install_guide_basic_cfg}
 ==============================================
@@ -295,4 +295,4 @@ We are defining an action that will target `my_door_gpio` and send the `ON` comm
 Hardware specific configuration examples
 =========================================
 
-Select an installation guide labeled *part 2* from @subpage page_guides.
+Select an installation guide labeled *part 2* from @ref page_guides.

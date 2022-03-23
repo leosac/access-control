@@ -25,7 +25,7 @@ You will need a working Linux environment and the following packages:
 
 Such dependencies need to be installed:
 ```
-sudo apt-get install cmake build-essential pkg-config git apt-utils libssl-dev libzmq5 libzmq3-dev libcurl4-openssl-dev libtclap-dev libscrypt-dev python3 python3-pip gcc-9 g++-9 libboost-all-dev libgtest-dev libsqlite3-dev libpq-dev odb libodb-dev libodb-pgsql-dev libodb-pgsql-2.4 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
+sudo apt-get install cmake build-essential pkg-config git apt-utils libssl-dev libzmq5 libzmq3-dev libcurl4-openssl-dev libtclap-dev libscrypt-dev python3 python3-pip gcc-9 g++-9 libboost-all-dev libgtest-dev libsqlite3-dev libpq-dev odb libodb-dev libodb-pgsql-dev libodb-pgsql-2.4 libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev libgpiod-dev
 ```
 
 

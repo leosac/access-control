@@ -23,7 +23,7 @@ jobs:
           libboost-all-dev libgtest-dev
           libsqlite3-dev libpq-dev odb libodb-dev
           libodb-pgsql-dev libodb-pgsql-2.4
-          libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev
+          libodb-sqlite-2.4 libodb-sqlite-dev libodb-boost-dev libgpiod-dev
       - run: mkdir build
       - name: Configure
         working-directory: build

@@ -74,12 +74,13 @@ jobs:
           --platform linux/${{ matrix.platform }}
           -v "${GITHUB_WORKSPACE}:/tmp/leosac"
           ${{needs.prepare.outputs.docker_buildimage}}:${{matrix.buildsystem}}
-          -c "TARGETPLATFORM=linux/${{ matrix.platform }} &&
+          -c "DISTRIB=${{ matrix.buildsystem }} &&
+          TARGETPLATFORM=linux/${{ matrix.platform }} &&
           VERSION=${{ needs.prepare.outputs.version }} &&
           TAG=${{ needs.prepare.outputs.tag }} &&
           BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') &&
           VCS_REF=${GITHUB_SHA::8} &&
-          export TARGETPLATFORM VERSION TAG BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
+          export DISTRIB TARGETPLATFORM VERSION TAG BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
       - uses: actions/upload-artifact@v3
         if: success()
         with:
