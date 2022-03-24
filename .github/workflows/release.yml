@@ -64,7 +64,7 @@ jobs:
         id: prepare
         run: |
           ARTIFACT_NAME="${{ matrix.buildsystem }}_${{ matrix.platform }}"
-          ARTIFACT_NAME="${ARTIFACT_NAME////_}"
+          ARTIFACT_NAME="${ARTIFACT_NAME////-}"
           echo ::set-output name=artifact_name::${ARTIFACT_NAME}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
@@ -118,22 +118,22 @@ jobs:
       - uses: actions/download-artifact@v3
         if: success()
         with:
-          name: debian-bullseye_linux-amd64
+          name: debian-bullseye_amd64
           path: build/packages/debian-bullseye/linux/amd64
       - uses: actions/download-artifact@v3
         if: success()
         with:
-          name: debian-bullseye_linux-arm64
+          name: debian-bullseye_arm64
           path: build/packages/debian-bullseye/linux/arm64
       - uses: actions/download-artifact@v3
         if: success()
         with:
-          name: debian-bullseye_linux-arm-v7
+          name: debian-bullseye_arm-v7
           path: build/packages/debian-bullseye/linux/arm/v7
       - uses: actions/download-artifact@v3
         if: success()
         with:
-          name: debian-bullseye_linux-arm-v6
+          name: debian-bullseye_arm-v6
           path: build/packages/debian-bullseye/linux/arm/v6
       - name: Build Docker Leosac Main
         if: success() && github.event_name != 'pull_request'
@@ -169,6 +169,6 @@ jobs:
             arch=${pkg#*linux-}
             arch=${arch%/*}
             for deb in ${pkg}/*.deb ; do
-              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/${POOL}/l/leosac/${DEBPREFIX}$(basename -- $deb);deb.distribution=${distri};deb.component=main;deb.architecture=${arch}" -T ${deb}
+              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/${POOL}/l/leosac/${distri}/${DEBPREFIX}$(basename -- $deb);deb.distribution=${distri};deb.component=main;deb.architecture=${arch}" -T ${deb}
             done
           done

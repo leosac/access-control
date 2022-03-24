@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014-2016 Leosac
+    Copyright (C) 2014-2022 Leosac
 
     This file is part of Leosac.
 
@@ -19,7 +19,6 @@
 
 /**
 * \file version.hpp
-* \author Thibault Schueller <ryp.sqrt@gmail.com>
 * \brief version handling
 */
 
