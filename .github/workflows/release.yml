@@ -16,7 +16,6 @@ jobs:
       docker_image: ${{ steps.prepare.outputs.docker_image }}
       docker_buildimage: ${{ steps.prepare.outputs.docker_buildimage }}
       tag: ${{ steps.prepare.outputs.tag }}
-      version: ${{ steps.prepare.outputs.version }}
       platforms: ${{ steps.prepare.outputs.platforms }}
       docker_variables: ${{ steps.prepare.outputs.docker_variables }}
     steps:
@@ -27,11 +26,9 @@ jobs:
           DOCKER_BUILDIMAGE=maxhy/leosac-buildsystem
           DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
           TAG=edge
-          VERSION=$(date +%s):0.0.0
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/v}
-            VERSION=${TAG}
           fi
           if [ "${{ github.event_name }}" = "schedule" ]; then
             TAG=weekly
@@ -47,7 +44,6 @@ jobs:
           echo ::set-output name=docker_buildimage::${DOCKER_BUILDIMAGE}
           echo ::set-output name=platforms::${DOCKER_PLATFORMS}
           echo ::set-output name=tag::${TAG}
-          echo ::set-output name=version::${VERSION}
 
   build:
     runs-on: ubuntu-latest
@@ -65,7 +61,15 @@ jobs:
         run: |
           ARTIFACT_NAME="${{ matrix.buildsystem }}_${{ matrix.platform }}"
           ARTIFACT_NAME="${ARTIFACT_NAME////-}"
+          MAJOR=`grep "DLEOSAC_VERSION_MAJOR=" ${GITHUB_WORKSPACE}/CMakeLists.txt | egrep -o '([0-9]+)'`
+          MINOR=`grep "DLEOSAC_VERSION_MINOR=" ${GITHUB_WORKSPACE}/CMakeLists.txt | egrep -o '([0-9]+)'`
+          PATCH=`grep "DLEOSAC_VERSION_PATCH=" ${GITHUB_WORKSPACE}/CMakeLists.txt | egrep -o '([0-9]+)'`
+          VERSION=${MAJOR}.${MINOR}.${PATCH}
+          if [[ $GITHUB_REF != refs/tags/* ]]; then
+            VERSION=$(date +%s):${VERSION}
+          fi
           echo ::set-output name=artifact_name::${ARTIFACT_NAME}
+          echo ::set-output name=version::${VERSION}
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
       - name: Run ${{ matrix.platform }} on ${{ matrix.buildsystem }}
@@ -76,7 +80,7 @@ jobs:
           ${{needs.prepare.outputs.docker_buildimage}}:${{matrix.buildsystem}}
           -c "DISTRIB=${{ matrix.buildsystem }} &&
           TARGETPLATFORM=linux/${{ matrix.platform }} &&
-          VERSION=${{ needs.prepare.outputs.version }} &&
+          VERSION=${{ steps.prepare.outputs.version }} &&
           TAG=${{ needs.prepare.outputs.tag }} &&
           BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') &&
           VCS_REF=${GITHUB_SHA::8} &&
@@ -100,7 +104,6 @@ jobs:
           fi
 
           echo ::set-output name=buildx_args::--platform ${{ needs.prepare.outputs.platforms }} \
-            --build-arg VERSION=${{ needs.prepare.outputs.version }} \
             ${TAGS}
       - uses: actions/checkout@v2
         with:

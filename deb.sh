@@ -38,8 +38,9 @@ Usage: $0 [-h] [-u GIT REPO ] [-b GIT BRANCH ]
 
 OPTIONS:
    -h      Show this message and quit
-   -u      Full url to a Leosac git repo
+   -u      Full url to a Leosac git repo. If undefined default git repo will be used.
    -b      Git branch name to checkout
+   -v      A version to force set. If undefined, the version is extracted from the root CMakeLists.txt
 
 EOF
 }
@@ -64,6 +65,9 @@ do
              ;;
          b)
              branch="$OPTARG"
+             ;;
+         v)
+             VERSION="$OPTARG"
              ;;
          *)
              usage
@@ -90,14 +94,17 @@ echo $TMP_DIR
 
 clone $url $branch
 
-MAJOR=`grep "DLEOSAC_VERSION_MAJOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
-MINOR=`grep "DLEOSAC_VERSION_MINOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
-PATCH=`grep "DLEOSAC_VERSION_PATCH=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
+if [ -z ${VERSION+x} ] ; then
+  MAJOR=`grep "DLEOSAC_VERSION_MAJOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
+  MINOR=`grep "DLEOSAC_VERSION_MINOR=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
+  PATCH=`grep "DLEOSAC_VERSION_PATCH=" leosac/CMakeLists.txt | egrep -o '([0-9]+)'`
+  VERSION=${MAJOR}.${MINOR}.${PATCH}
+fi
 
-name="leosac_${MAJOR}.${MINOR}.${PATCH}"
+name="leosac_${VERSION}"
 mv leosac $name
 
-tar czf leosac_${MAJOR}.${MINOR}.${PATCH}.orig.tar.gz $name
+tar czf leosac_${VERSION}.orig.tar.gz $name
 
 cd $name
 
