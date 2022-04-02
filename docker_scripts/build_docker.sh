@@ -3,9 +3,9 @@
 # This script allows to easily recreate docker images manually
 # It shouldn't be required as it is normally triggered by the CI
 
-IMAGE_BUILD_1="maxhy/leosac-buildsystem:debian-bullseye"
-IMAGE_BUILD_2="maxhy/leosac-buildsystem:debian-buster"
-IMAGE_RUN="maxhy/leosac:snapshot"
+IMAGE_BUILD_1="leosac/leosac-buildsystem:debian-bullseye"
+IMAGE_BUILD_2="leosac/leosac-buildsystem:debian-buster"
+IMAGE_RUN="leosac/leosac:snapshot"
 PLATFORMS="linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
 
 # Build system

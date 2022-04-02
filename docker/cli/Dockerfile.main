@@ -1,4 +1,4 @@
-FROM maxhy:leosac-buildsystem
+FROM leosac:leosac-buildsystem
 
 # Container config
 CMD [""]

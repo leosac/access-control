@@ -1,7 +1,7 @@
 @page page_guide_docker_cc Docker: Cross Compiling Container
 
 Describes how to use the "cross_compile" helper container.
-For ready to run Leosac docker images, see https://hub.docker.com/r/maxhy/leosac
+For ready to run Leosac docker images, see https://hub.docker.com/r/leosac/leosac
 
 Leosac comes with a container tailored for cross compiling Leosac to the Raspberry Pi.
 The process of cross-compilation builds, then bundles, all dependencies.
