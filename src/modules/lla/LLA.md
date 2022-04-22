@@ -1,3 +1,5 @@
+@page page_module_lla Module: LibLogicalAccess (LLA)
+
 LibLogicalAccess (LLA) Module Documentation {#mod_lla_main}
 ==========================================================
 

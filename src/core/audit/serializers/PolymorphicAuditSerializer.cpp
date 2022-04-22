@@ -20,6 +20,7 @@
 #include "core/audit/serializers/PolymorphicAuditSerializer.hpp"
 #include "CredentialEventSerializer.hpp"
 #include "DoorEventSerializer.hpp"
+#include "AuthEventSerializer.hpp"
 #include "GroupEventSerializer.hpp"
 #include "JSONService.hpp"
 #include "ScheduleEventSerializer.hpp"
@@ -92,6 +93,11 @@ void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::ICredentialEvent 
 void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IDoorEvent &t)
 {
     result_ = DoorEventJSON::serialize(t, security_context_);
+}
+
+void PolymorphicAuditJSON::HelperSerialize::visit(const Audit::IAuthEvent &t)
+{
+    result_ = AuthEventJSON::serialize(t, security_context_);
 }
 
 void PolymorphicAuditJSON::HelperSerialize::visit(

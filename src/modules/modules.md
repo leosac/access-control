@@ -11,6 +11,7 @@ Below is a list of documented modules:
   * @subpage page_module_instrumentation
   * @subpage page_module_led_buzzer
   * @subpage page_module_libgpiod
+  * @subpage page_module_lla
   * @subpage page_module_monitor
   * @subpage page_module_mqtt
   * @subpage page_module_piface

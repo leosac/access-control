@@ -40,20 +40,21 @@ with multiple Leosac system. This field is mandatory.
 Database {#general_database}
 ============================
 
-Leosac can work with either an SQLite or PostgreSQL database. The database is mandatory to provide
-support for some features. For example, the WebSocket API needs access to the
-database to store users, permissions, etc. Similarly, the HardwareService needs the 
-DBService to operate.
+Leosac can work with either an SQLite or PostgreSQL database. Leosac works with
+configuration files only by default. The database is mandatory to provide support
+for some features. For example, the WebSocket API needs access to the database
+to store users, permissions, etc. Similarly, the HardwareService needs the
+DBService to operate and the Audit feature as well.
 
 The `database` tag holds various information about the database.
 
 Options       | Options  | Description                                            | Mandatory
 --------------|----------|--------------------------------------------------------|-----------
-type          |          | Underlying database type. Either "sqlite" or "mysql".  | YES
+type          |          | Underlying database type. Either "sqlite" or "pgsql".  | YES
 path          |          | **SQLite only**: Path to the database file.            | YES if SQLite
-username      |          | **PGSQL only**: Database username.                     | YES if MySQL
-password      |          | **PGSQL only**: Password for the database user.        | YES if MySQL
-dbname        |          | **PGSQL only**: Database name to use.                  | YES if MySQL
+username      |          | **PGSQL only**: Database username.                     | YES if PostgreSQL
+password      |          | **PGSQL only**: Password for the database user.        | YES if PostgreSQL
+dbname        |          | **PGSQL only**: Database name to use.                  | YES if PostgreSQL
 host          |          | **PGSQL only**: Database hostname / IP.                | NO
 port          |          | **PGSQL only**: Port the database listens to           | NO
 
@@ -73,7 +74,7 @@ An one for PGSQL.
 <database>
       <type>pgsql</type>
       <username>root</username>
-	  <password></password>
+	    <password></password>
       <dbname>leosac</dbname>
 </database>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +85,7 @@ Automatic Configuration Saving {#general_config_save}
 There is a useful configuration option: `autosave`. When set to true,
 the current configuration of Leosac will be saved to disk when Leosac exits.
 It defaults to false.  
-  
+
 Logger Configuration {#general_config_logger}
 =============================================
 
@@ -95,7 +96,7 @@ It is not recommended to log DEBUG message to syslog.
 Configuration Options {#logger_user_config}
 -------------------------------------------
 
-Default configuration will log everything to `stdout`. Entry with 
+Default configuration will log everything to `stdout`. Entry with
 a level >= `WARNING` will be written to syslog.
 
 Options        | Description                                        | Mandatory

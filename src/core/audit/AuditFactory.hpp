@@ -71,6 +71,9 @@ class Factory
     static IDoorEventPtr DoorEvent(const DBPtr &database, Auth::IDoorPtr target_door,
                                    IAuditEntryPtr parent);
 
+    static IAuthEventPtr AuthEvent(const DBPtr &database, Cred::ICredentialPtr credential, Auth::IAccessPointPtr access_point,
+                                  IAuditEntryPtr parent);
+
     static IAccessPointEventPtr AccessPointEvent(const DBPtr &database,
                                                  Auth::IAccessPointPtr target_ap,
                                                  IAuditEntryPtr parent);

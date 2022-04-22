@@ -111,6 +111,14 @@ std::string DoorEvent::generate_description() const
         ss << "Door " << generate_target_description() << " has been edited.";
     else if (event_mask_ & EventType::DOOR_DELETED)
         ss << "Door " << generate_target_description() << " has been deleted.";
+    else if (event_mask_ & EventType::DOOR_OPENED)
+        ss << "Door " << generate_target_description() << " has been opened.";
+    else if (event_mask_ & EventType::DOOR_OPENED_MANUALLY)
+        ss << "Door " << generate_target_description() << " has been opened manually (eg. exit button).";
+    else if (event_mask_ & EventType::DOOR_FORCED)
+        ss << "Door " << generate_target_description() << " has been forced.";
+    else if (event_mask_ & EventType::DOOR_FORCED_END)
+        ss << "Door " << generate_target_description() << " forcing ended.";
 
     return ss.str();
 }

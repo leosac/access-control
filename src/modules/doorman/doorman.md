@@ -47,8 +47,8 @@ doors      |           |                 |              |             | Optional
 --->       | --->      | --->            | schedules    |             | See [here](@ref mod_auth_sched_declare) to learn how to declare schedules | YES
 --->       | --->      | exitreq         |              |             | Manage "request to exit" for the door (usually a push button)     | NO
 --->       | --->      | --->            | gpio         |             | The request to exit GPIO                                          | YES
---->       | --->      | --->            | duration     |             | The normal state (open / close)                                   | YES
---->       | --->      | contact         |              |             | Duration to keep the door open                                    | NO
+--->       | --->      | --->            | duration     |             | Duration to keep the door open                                    | YES
+--->       | --->      | contact         |              |             | Contact Sensor triggered when the door is open                    | NO
 --->       | --->      | --->            | gpio         |             | The contact sensor GPIO. Interrupt mode needs to be set to Both.  | YES
 --->       | --->      | --->            | duration     |             | Duration before triggering an alarm                               | YES
 

@@ -70,6 +70,7 @@ struct PolymorphicAuditJSON
                              public Tools::Visitor<Audit::IGroupEvent>,
                              public Tools::Visitor<Audit::ICredentialEvent>,
                              public Tools::Visitor<Audit::IDoorEvent>,
+                             public Tools::Visitor<Audit::IAuthEvent>,
                              public Tools::Visitor<Audit::IUserGroupMembershipEvent>,
                              public Tools::Visitor<Audit::IUpdateEvent>,
                              public Tools::Visitor<Audit::IZoneEvent>
@@ -82,6 +83,7 @@ struct PolymorphicAuditJSON
         virtual void visit(const Audit::IGroupEvent &t) override;
         virtual void visit(const Audit::ICredentialEvent &t) override;
         virtual void visit(const Audit::IDoorEvent &t) override;
+        virtual void visit(const Audit::IAuthEvent &t) override;
         virtual void visit(const Audit::IUserGroupMembershipEvent &t) override;
         virtual void visit(const Audit::IUpdateEvent &t) override;
         virtual void visit(const Audit::IZoneEvent &t) override;

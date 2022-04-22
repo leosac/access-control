@@ -21,6 +21,7 @@
 #include "core/audit/AccessPointEvent.hpp"
 #include "core/audit/CredentialEvent.hpp"
 #include "core/audit/DoorEvent.hpp"
+#include "core/audit/AuthEvent.hpp"
 #include "core/audit/GroupEvent.hpp"
 #include "core/audit/ScheduleEvent.hpp"
 #include "core/audit/UpdateEvent.hpp"
@@ -134,6 +135,22 @@ IDoorEventPtr Factory::DoorEvent(const DBPtr &database, Auth::IDoorPtr target_do
     ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
 
     return Audit::DoorEvent::create(database, target_door, parent_odb);
+}
+
+IAuthEventPtr Factory::AuthEvent(const DBPtr &database, Cred::ICredentialPtr credential, Auth::IAccessPointPtr access_point,
+                                 IAuditEntryPtr parent)
+{
+    ASSERT_LOG(database, "Database cannot be null.");
+    ASSERT_LOG(credential, "Credential must be non null.");
+    ASSERT_LOG(access_point, "AccessPoint must be non null.");
+    ASSERT_LOG(access_point->id(), "AccessPoint must be already persisted.");
+    ASSERT_LOG(parent, "Parent must be non null.");
+    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+
+    AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+    ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+
+    return Audit::AuthEvent::create(database, credential, access_point, parent_odb);
 }
 
 IAccessPointEventPtr Factory::AccessPointEvent(const DBPtr &database,

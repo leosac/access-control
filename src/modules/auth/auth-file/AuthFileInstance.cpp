@@ -27,6 +27,8 @@
 #include "core/auth/User.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "exception/ExceptionsTools.hpp"
+#include "core/audit/AuditFactory.hpp"
+#include "core/audit/IAuthEvent.hpp"
 #include "tools/Colorize.hpp"
 #include "tools/log.hpp"
 #include <boost/algorithm/string/join.hpp>
@@ -108,48 +110,56 @@ zmqpp::socket &AuthFileInstance::bus_sub()
 
 AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
 {
-    try
+  AuthResult authres(false, nullptr, nullptr);
+  try
+  {
+    std::lock_guard<std::mutex> guard(mutex_);
+
+    AuthSourceBuilder build;
+    Cred::ICredentialPtr auth_source = build.create(msg);
+    DEBUG("Auth source OK... will map");
+    mapper_->mapToUser(auth_source);
+    DEBUG("Mapping done");
+    assert(auth_source);
+
+    auto cred_serialized = PolymorphicCredentialJSONStringSerializer::serialize(
+        *auth_source, SystemSecurityContext::instance());
+    INFO("Using Credential: " << cred_serialized);
+    auto profile = mapper_->buildProfile(auth_source);
+    AuthTargetPtr t;
+
+    if (!profile)
     {
-        std::lock_guard<std::mutex> guard(mutex_);
-
-        AuthSourceBuilder build;
-        Cred::ICredentialPtr auth_source = build.create(msg);
-        DEBUG("Auth source OK... will map");
-        mapper_->mapToUser(auth_source);
-        DEBUG("Mapping done");
-        assert(auth_source);
-
-        auto cred_serialized = PolymorphicCredentialJSONStringSerializer::serialize(
-            *auth_source, SystemSecurityContext::instance());
-        INFO("Using Credential: " << cred_serialized);
-        auto profile = mapper_->buildProfile(auth_source);
-
-        if (!profile)
-        {
-            INFO("No profile was created from this auth source message.");
-            // assert(auth_source->owner() == nullptr);
-            return {false, nullptr, nullptr};
-        }
-        if (target_name_.empty())
-        {
-            // check against default target
-            return {
-                profile->isAccessGranted(std::chrono::system_clock::now(), nullptr),
-                profile, auth_source->owner().get_eager()};
-        }
-        else
-        {
-            AuthTargetPtr t(new AuthTarget(target_name_));
-            return {profile->isAccessGranted(std::chrono::system_clock::now(), t),
-                    profile, auth_source->owner().get_eager()};
-        }
+      INFO("No profile was created from this auth source message.");
     }
-    catch (std::exception &e)
+    else if (target_name_.empty())
     {
-        WARN("Exception when handling authentication request.");
-        log_exception(e);
+      // check against default target
+      authres = AuthResult(profile->isAccessGranted(std::chrono::system_clock::now(), nullptr),
+          profile, auth_source->owner().get_eager());
     }
-    return {false, nullptr, nullptr};
+    else
+    {
+      t.reset(new AuthTarget(target_name_));
+      authres = AuthResult(profile->isAccessGranted(std::chrono::system_clock::now(), t),
+          profile, auth_source->owner().get_eager());
+    }
+
+    /*auto db = core_utils_->database();
+    if (db)
+    {
+      auto audit = Audit::Factory::AuthEvent(db, auth_source, t, ctx_.auth);
+      audit->access_status(status);
+      audit->finalize();
+    }*/
+  }
+  catch (std::exception &e)
+  {
+    WARN("Exception when handling authentication request.");
+    log_exception(e);
+  }
+
+  return authres;
 }
 
 std::string AuthFileInstance::auth_file_content() const

@@ -129,6 +129,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/CredentialEvent.cpp
     core/audit/ScheduleEvent.cpp
     core/audit/DoorEvent.cpp
+    core/audit/AuthEvent.cpp
     core/audit/UpdateEvent.cpp
     core/audit/AccessPointEvent.cpp
     core/audit/AuditTracker.cpp
@@ -141,6 +142,7 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/GroupEventSerializer.cpp
     core/audit/serializers/ScheduleEventSerializer.cpp
     core/audit/serializers/DoorEventSerializer.cpp
+    core/audit/serializers/AuthEventSerializer.cpp
     core/audit/serializers/UserGroupMembershipEventSerializer.cpp
     core/audit/serializers/AccessPointEventSerializer.cpp
     core/audit/serializers/ZoneEventSerializer.cpp
