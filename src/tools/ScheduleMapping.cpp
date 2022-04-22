@@ -20,6 +20,7 @@
 #include "tools/ScheduleMapping.hpp"
 #include "AssertCast.hpp"
 #include "core/auth/Door.hpp"
+#include "core/auth/Zone.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/Group_odb.h"
 #include "core/auth/User.hpp"
@@ -99,6 +100,16 @@ bool ScheduleMapping::has_door(Auth::DoorId did) const
     return false;
 }
 
+bool ScheduleMapping::has_zone(Auth::ZoneId zid) const
+{
+    for (const auto &lazy_weak_zone : zones_)
+    {
+        if (lazy_weak_zone.object_id() == zid)
+            return true;
+    }
+    return false;
+}
+
 bool ScheduleMapping::has_user_indirect(Auth::UserPtr user) const
 {
     // Has user
@@ -128,6 +139,15 @@ void ScheduleMapping::add_door(const Auth::DoorLPtr &door)
     doors_.push_back(door);
     if (door.get_eager())
         door->schedule_mapping_added(shared_from_this());
+}
+
+void ScheduleMapping::add_zone(const Auth::ZoneLPtr &zone)
+{
+    ASSERT_LOG(zone, "Cannot add a null zone to a ScheduleMapping.");
+
+    zones_.push_back(zone);
+    if (zone.get_eager())
+        zone->schedule_mapping_added(shared_from_this());
 }
 
 void ScheduleMapping::add_user(const Auth::UserLPtr &user)
@@ -177,9 +197,19 @@ const std::vector<Auth::DoorLWPtr> &ScheduleMapping::doors() const
     return doors_;
 }
 
+const std::vector<Auth::ZoneLWPtr> &ScheduleMapping::zones() const
+{
+    return zones_;
+}
+
 void ScheduleMapping::clear_doors()
 {
     doors_.clear();
+}
+
+void ScheduleMapping::clear_zones()
+{
+    zones_.clear();
 }
 
 void ScheduleMapping::clear_users()

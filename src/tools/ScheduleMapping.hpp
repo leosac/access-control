@@ -52,6 +52,7 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
     const std::vector<Auth::GroupLWPtr> &groups() const;
     const std::vector<Cred::CredentialLWPtr> &credentials() const;
     const std::vector<Auth::DoorLWPtr> &doors() const;
+    const std::vector<Auth::ZoneLWPtr> &zones() const;
 
     size_t odb_version() const;
 
@@ -77,6 +78,11 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
     bool has_door(Auth::DoorId) const;
 
     /**
+     * Check if the zone is mapped by this object.
+     */
+    bool has_zone(Auth::ZoneId) const;
+
+    /**
      * Check wether the user is mapped, either directly or not, by
      * this ScheduleMapping object.
      *
@@ -94,6 +100,16 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
     void add_door(const Auth::DoorLPtr &door);
 
     void clear_doors();
+
+    /**
+     * Add a zone to the mapping.
+     *
+     * This call properly notify the zone object (if eager) that a
+     * ScheduleMapping has added it into its mapping.
+     */
+    void add_zone(const Auth::ZoneLPtr &zone);
+
+    void clear_zones();
 
     /**
      * Add a user to the mapping.
@@ -149,6 +165,11 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
 #pragma db on_delete(cascade)
     std::vector<Auth::DoorLWPtr> doors_;
 
+#pragma db id_column("schedule_mapping_id") value_column("zone_id")
+#pragma db value_not_null unordered
+#pragma db on_delete(cascade)
+    std::vector<Auth::ZoneLWPtr> zones_;
+
 /**
  * The schedule that owns the mapping.
  */
@@ -172,6 +193,7 @@ struct ScheduleMapping : public std::enable_shared_from_this<ScheduleMapping>
 
 #ifdef ODB_COMPILER
 #include "core/auth/Door.hpp"
+#include "core/auth/Zone.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/User.hpp"
 #include "core/credentials/Credential.hpp"

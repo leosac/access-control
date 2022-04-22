@@ -20,6 +20,7 @@
 #pragma once
 
 #include "LeosacFwd.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "core/auth/IZone.hpp"
 #include <odb/callback.hxx>
 
@@ -87,6 +88,17 @@ class Zone : public virtual IZone
 
     virtual void add_child(ZoneLPtr zone) override;
 
+    virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const override;
+
+    /**
+     * A ScheduleMapping object has added this zone as part of its mapping.
+     *
+     * This method is called by the ScheduleMapping to give a chance to the
+     * zone to maintain its inverse vector.
+     * @param sched_mapping
+     */
+    void schedule_mapping_added(const Tools::ScheduleMappingPtr &sched_mapping);
+
     /**
      * Callback function called by ODB before/after database
      * operation against a Zone object.
@@ -112,6 +124,9 @@ class Zone : public virtual IZone
 
 #pragma db value_not_null inverse(children_)
     std::vector<ZoneLWPtr> parents_;
+
+#pragma db value_not_null inverse(zones_)
+    std::vector<Tools::ScheduleMappingLWPtr> schedules_mapping_;
 
 #pragma db version
     const size_t version_;

@@ -20,6 +20,7 @@
 #include "FileAuthSourceMapper.hpp"
 #include "core/auth/Auth.hpp"
 #include "core/auth/Door.hpp"
+#include "core/auth/Zone.hpp"
 #include "core/auth/Group.hpp"
 #include "core/auth/Interfaces/IAuthenticationSource.hpp"
 #include "core/auth/ProfileMerger.hpp"
@@ -325,58 +326,68 @@ void FileAuthSourceMapper::map_schedules(
         std::list<std::string> user_names;
         std::list<std::string> group_names;
         std::list<std::string> credential_names;
-        std::string target_door;
-        target_door = node.get<std::string>("door", "");
-        auto door(std::make_shared<Leosac::Auth::Door>());
-        door->alias(target_door);
-        doors_.push_back(door);
+        std::string target_door = node.get<std::string>("door", "");
+        std::string target_zone = node.get<std::string>("zone", "");
 
         // lets loop over all the info we have
         for (const auto &mapping_data : node)
         {
-            if (mapping_data.first == "door")
-                continue;
-            if (mapping_data.first == "schedule")
-                schedule_names.push_back(mapping_data.second.data());
-            if (mapping_data.first == "user")
-                user_names.push_back(mapping_data.second.data());
-            if (mapping_data.first == "group")
-                group_names.push_back(mapping_data.second.data());
-            if (mapping_data.first == "credential")
-                credential_names.push_back(mapping_data.second.data());
+          if (mapping_data.first == "door")
+            continue;
+          if (mapping_data.first == "zone")
+            continue;
+          if (mapping_data.first == "schedule")
+            schedule_names.push_back(mapping_data.second.data());
+          if (mapping_data.first == "user")
+            user_names.push_back(mapping_data.second.data());
+          if (mapping_data.first == "group")
+            group_names.push_back(mapping_data.second.data());
+          if (mapping_data.first == "credential")
+            credential_names.push_back(mapping_data.second.data());
         }
 
         // now build object based on what we extracted.
         for (const auto &schedule_name : schedule_names)
         {
-            // Each schedule can be mapped once per ScheduleMapping, but can be
-            // referenced by multiple schedule mapping. What we do here is for each
-            // schedule in the mapping entry, we create a ScheduleMapping object.
-            Tools::ScheduleMappingPtr sm(std::make_shared<Tools::ScheduleMapping>());
-            xml_schedules_.schedules().at(schedule_name)->add_mapping(sm);
+          // Each schedule can be mapped once per ScheduleMapping, but can be
+          // referenced by multiple schedule mapping. What we do here is for each
+          // schedule in the mapping entry, we create a ScheduleMapping object.
+          Tools::ScheduleMappingPtr sm(std::make_shared<Tools::ScheduleMapping>());
+          xml_schedules_.schedules().at(schedule_name)->add_mapping(sm);
 
-            if (!door->alias().empty())
-                sm->add_door(door);
+          if (!target_door.empty())
+          {
+            auto door(std::make_shared<Leosac::Auth::Door>());
+            door->alias(target_door);
+            sm->add_door(door);
+          }
 
-            for (const auto &user_name : user_names)
-            {
-                UserPtr user = users_[user_name];
-                sm->add_user(user);
-            }
-            // now for groups
-            for (const auto &group_name : group_names)
-            {
-                GroupPtr grp = groups_[group_name];
-                sm->add_group(grp);
-            }
-            for (const auto &cred_id : credential_names)
-            {
-                DEBUG("CRED  = " << cred_id);
-                Cred::ICredentialPtr cred = find_cred_by_alias(cred_id);
-                sm->add_credential(assert_cast<Cred::CredentialPtr>(cred));
-            }
+          if (!target_zone.empty())
+          {
+            auto zone(std::make_shared<Leosac::Auth::Zone>());
+            zone->alias(target_zone);
+            sm->add_zone(zone);
+          }
 
-            mappings_.push_back(sm);
+          for (const auto &user_name : user_names)
+          {
+            UserPtr user = users_[user_name];
+            sm->add_user(user);
+          }
+          // now for groups
+          for (const auto &group_name : group_names)
+          {
+            GroupPtr grp = groups_[group_name];
+            sm->add_group(grp);
+          }
+          for (const auto &cred_id : credential_names)
+          {
+            DEBUG("CRED  = " << cred_id);
+            Cred::ICredentialPtr cred = find_cred_by_alias(cred_id);
+            sm->add_credential(assert_cast<Cred::CredentialPtr>(cred));
+          }
+
+          mappings_.push_back(sm);
         }
     }
 }
@@ -518,6 +529,23 @@ add_schedule_from_mapping_to_profile(Leosac::Tools::ScheduleMappingPtr mapping,
             profile->addAccessSchedule(
                 std::make_shared<AuthTarget>(door_ptr->alias()),
                 std::static_pointer_cast<const Leosac::Tools::ISchedule>(schedule));
+        }
+    }
+    else if (mapping->zones().size())
+    {
+        // If we have zones, add the schedule against each zone's door (AuthTarget)
+        for (auto lazy_weak_zone : mapping->zones())
+        {
+          auto zone_ptr = LEOSAC_ENFORCE(lazy_weak_zone.get_eager().lock(),
+                                         "Cannot get Zone from mapping");
+          for (auto lazy_weak_door : zone_ptr->doors())
+          {
+            auto door_ptr = LEOSAC_ENFORCE(lazy_weak_door.get_eager(),
+                                           "Cannot get Door from Zone");
+            profile->addAccessSchedule(
+                std::make_shared<AuthTarget>(door_ptr->alias()),
+                std::static_pointer_cast<const Leosac::Tools::ISchedule>(schedule));
+          }
         }
     }
     else

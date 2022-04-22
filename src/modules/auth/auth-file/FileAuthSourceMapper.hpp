@@ -196,13 +196,6 @@ class FileAuthSourceMapper
      */
     std::vector<Tools::ScheduleMappingPtr> mappings_;
 
-    /**
-     * We store doors object, but really we only use the name
-     * property.
-     * On door object is created for each mapping that specify a door.
-     */
-    std::vector<Leosac::Auth::DoorPtr> doors_;
-
     Tools::XmlNodeNameEnforcer xmlnne_;
 };
 using FileAuthSourceMapperPtr = std::shared_ptr<FileAuthSourceMapper>;

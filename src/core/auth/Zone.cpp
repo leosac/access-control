@@ -97,6 +97,17 @@ void Zone::add_child(ZoneLPtr zone)
     children_.push_back(zone);
 }
 
+std::vector<Leosac::Tools::ScheduleMappingLWPtr> Zone::lazy_mapping() const
+{
+    return schedules_mapping_;
+}
+
+void Zone::schedule_mapping_added(
+    const Leosac::Tools::ScheduleMappingPtr &sched_mapping)
+{
+    schedules_mapping_.push_back(sched_mapping);
+}
+
 void Zone::validation_callback(odb::callback_event e, odb::database &) const
 {
     if (e == odb::callback_event::post_update ||

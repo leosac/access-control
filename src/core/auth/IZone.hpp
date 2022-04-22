@@ -20,6 +20,7 @@
 #pragma once
 
 #include "core/auth/AuthFwd.hpp"
+#include "tools/db/database.hpp"
 #include <memory>
 #include <string>
 
@@ -80,6 +81,12 @@ class IZone : public std::enable_shared_from_this<IZone>
      * Retrieve the doors associated with the zones.
      */
     virtual std::vector<DoorLPtr> doors() const = 0;
+
+    /**
+     * Retrieve the lazy pointers to the ScheduleMapping objects that
+     * map this zone.
+     */
+    virtual std::vector<Tools::ScheduleMappingLWPtr> lazy_mapping() const = 0;
 };
 }
 }

@@ -20,6 +20,7 @@
 #include "UserSecurityContext.hpp"
 #include "core/auth/Group_odb.h"
 #include "core/auth/IDoor.hpp"
+#include "core/auth/Zone.hpp"
 #include "core/auth/User_odb.h"
 #include "tools/ScheduleMapping.hpp"
 #include "tools/db/DBService.hpp"
@@ -286,6 +287,7 @@ bool UserSecurityContext::can_read_door(
         if (loaded_mapping->has_user_indirect(self()))
             return true;
     }
+    // TODO: check zones?
     return false;
 }
 

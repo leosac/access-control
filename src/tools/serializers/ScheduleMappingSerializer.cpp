@@ -72,10 +72,18 @@ json ScheduleMappingJSONSerializer::serialize(const Tools::ScheduleMapping &in,
         doors.push_back(json_door);
     }
 
+    json zones = json::array();
+    for (const auto &zone : in.zones())
+    {
+        json json_zone = {{"id", zone.object_id()}, {"type", "zone"}};
+        zones.push_back(json_zone);
+    }
+
     serialized["relationships"]["users"]       = {{"data", users}};
     serialized["relationships"]["groups"]      = {{"data", groups}};
     serialized["relationships"]["credentials"] = {{"data", creds}};
     serialized["relationships"]["doors"]       = {{"data", doors}};
+    serialized["relationships"]["zones"]       = {{"data", zones}};
 
     return serialized;
 }
@@ -120,6 +128,14 @@ void ScheduleMappingJSONSerializer::unserialize(Tools::ScheduleMapping &out,
     {
         Auth::DoorLPtr door(*db, door_id.get<Auth::DoorId>());
         out.add_door(door);
+    }
+
+    auto zone_ids = in.at("zones");
+    out.clear_zones();
+    for (const auto &zone_id : zone_ids)
+    {
+        Auth::ZoneLPtr zone(*db, zone_id.get<Auth::ZoneId>());
+        out.add_zone(zone);
     }
 }
 
