@@ -32,32 +32,30 @@ using namespace Leosac::Audit;
 
 AuthEvent::AuthEvent()
     : cred_id_(0)
-    , access_point_id_(0)
 {
 }
 
 std::shared_ptr<AuthEvent> AuthEvent::create(const DBPtr &database,
                                              Cred::ICredentialPtr credential,
-                                             Auth::IAccessPointPtr access_point,
+                                             const std::string& door,
                                              AuditEntryPtr parent)
 {
     ASSERT_LOG(database, "Database cannot be null.");
     ASSERT_LOG(credential, "Credential must be non null.");
-    ASSERT_LOG(access_point, "AccessPoint must be non null.");
-    ASSERT_LOG(access_point->id(), "AccessPoint must be already persisted.");
-    ASSERT_LOG(parent, "Parent must be non null.");
-    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
+    ASSERT_LOG(!door.empty(), "Door must be set.");
 
     db::OptionalTransaction t(database->begin());
 
     Audit::AuthEventPtr audit =
         std::shared_ptr<Audit::AuthEvent>(new Audit::AuthEvent());
     audit->database_ = database;
-    audit->access_point_id(access_point->id());
+    audit->door(door);
     audit->credential(credential);
     database->persist(audit);
-
-    audit->set_parent(parent);
+    if (parent)
+    {
+      audit->set_parent(parent);
+    }
     database->update(audit);
 
     t.commit();
@@ -121,22 +119,12 @@ Cred::CredentialId AuthEvent::credential_id() const
     return cred_id_;
 }
 
-Auth::AccessPointId AuthEvent::access_point_id() const
+std::string AuthEvent::door() const
 {
-    return access_point_id_;
+    return door_;
 }
 
-void AuthEvent::access_point_id(Auth::AccessPointId id)
+void AuthEvent::door(const std::string& d)
 {
-    access_point_id_ = id;
-}
-
-Auth::AccessStatus AuthEvent::access_status() const
-{
-    return access_status_;
-}
-
-void AuthEvent::access_status(Auth::AccessStatus access_status)
-{
-    access_status_ = access_status;
+    door_ = d;
 }

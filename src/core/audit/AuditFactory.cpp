@@ -137,20 +137,23 @@ IDoorEventPtr Factory::DoorEvent(const DBPtr &database, Auth::IDoorPtr target_do
     return Audit::DoorEvent::create(database, target_door, parent_odb);
 }
 
-IAuthEventPtr Factory::AuthEvent(const DBPtr &database, Cred::ICredentialPtr credential, Auth::IAccessPointPtr access_point,
+IAuthEventPtr Factory::AuthEvent(const DBPtr &database, Cred::ICredentialPtr credential, const std::string& door,
                                  IAuditEntryPtr parent)
 {
     ASSERT_LOG(database, "Database cannot be null.");
     ASSERT_LOG(credential, "Credential must be non null.");
-    ASSERT_LOG(access_point, "AccessPoint must be non null.");
-    ASSERT_LOG(access_point->id(), "AccessPoint must be already persisted.");
+    ASSERT_LOG(!door.empty(), "Door must be set.");
     ASSERT_LOG(parent, "Parent must be non null.");
     ASSERT_LOG(parent->id(), "Parent must be already persisted.");
 
-    AuditEntryPtr parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
-    ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+    AuditEntryPtr parent_odb;
+    if (parent && parent->id())
+    {
+      parent_odb = std::dynamic_pointer_cast<AuditEntry>(parent);
+      ASSERT_LOG(parent_odb, "Parent object was not an instance of AuditEntry");
+    }
 
-    return Audit::AuthEvent::create(database, credential, access_point, parent_odb);
+    return Audit::AuthEvent::create(database, credential, door, parent_odb);
 }
 
 IAccessPointEventPtr Factory::AccessPointEvent(const DBPtr &database,

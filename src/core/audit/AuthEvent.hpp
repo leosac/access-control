@@ -38,7 +38,7 @@ class AuthEvent : virtual public IAuthEvent, public AuditEntry
     friend class Factory;
 
     static std::shared_ptr<AuthEvent>
-    create(const DBPtr &database, Cred::ICredentialPtr credential, Auth::IAccessPointPtr access_point, AuditEntryPtr parent);
+    create(const DBPtr &database, Cred::ICredentialPtr credential, const std::string& door, AuditEntryPtr parent = nullptr);
 
   public:
     virtual ~AuthEvent() = default;
@@ -51,13 +51,9 @@ class AuthEvent : virtual public IAuthEvent, public AuditEntry
 
     virtual Cred::CredentialId credential_id() const override;
 
-    virtual void access_point_id(Auth::AccessPointId id) override;
+    virtual void door(const std::string& d) override;
 
-    virtual Auth::AccessPointId access_point_id() const override;
-
-    virtual void access_status(Auth::AccessStatus access_status) override;
-
-    virtual Auth::AccessStatus access_status() const override;
+    virtual std::string door() const override;
 
     virtual std::string generate_description() const override;
 
@@ -75,16 +71,7 @@ class AuthEvent : virtual public IAuthEvent, public AuditEntry
 
     Cred::CredentialId cred_id_;
 
-    /**
-     * The id of the associated AP before the event.
-     *
-     * @note We don't store a real reference to an object, just
-     * a dump integer. Foreign Keys wont be enforced (which is what we
-     * want because we want to keep history).
-     */
-    Auth::AccessPointId access_point_id_;
-
-    Auth::AccessStatus access_status_;
+    std::string door_;
 
     friend class odb::access;
 };

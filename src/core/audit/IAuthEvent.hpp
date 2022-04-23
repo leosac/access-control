@@ -45,18 +45,11 @@ class IAuthEvent : virtual public IAuditEntry
     virtual Cred::CredentialId credential_id() const = 0;
 
     /**
-     * Set the AccessPoint that is targeted by the event.
+     * Set the door that is targeted by the event.
      */
-    virtual void access_point_id(Auth::AccessPointId id) = 0;
+    virtual void door(const std::string& d) = 0;
 
-    virtual Auth::AccessPointId access_point_id() const = 0;
-
-    /**
-     * Set the event access status.
-     */
-    virtual void access_status(Auth::AccessStatus access_status) = 0;
-
-    virtual Auth::AccessStatus access_status() const = 0;
+    virtual std::string door() const = 0;
 };
 }
 }

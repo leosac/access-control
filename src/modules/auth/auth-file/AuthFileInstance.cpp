@@ -126,7 +126,6 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
         *auth_source, SystemSecurityContext::instance());
     INFO("Using Credential: " << cred_serialized);
     auto profile = mapper_->buildProfile(auth_source);
-    AuthTargetPtr t;
 
     if (!profile)
     {
@@ -140,18 +139,18 @@ AuthResult AuthFileInstance::handle_auth(zmqpp::message *msg) noexcept
     }
     else
     {
-      t.reset(new AuthTarget(target_name_));
+      AuthTargetPtr t(new AuthTarget(target_name_));
       authres = AuthResult(profile->isAccessGranted(std::chrono::system_clock::now(), t),
           profile, auth_source->owner().get_eager());
     }
 
-    /*auto db = core_utils_->database();
+    auto db = core_utils_->database();
     if (db)
     {
-      auto audit = Audit::Factory::AuthEvent(db, auth_source, t, ctx_.auth);
-      audit->access_status(status);
+      auto audit = Audit::Factory::AuthEvent(db, auth_source, target_name_);
+      audit->event_mask(authres.success ? Audit::EventType::AUTH_GRANTED : Audit::EventType::AUTH_DENIED);
       audit->finalize();
-    }*/
+    }
   }
   catch (std::exception &e)
   {

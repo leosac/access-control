@@ -40,8 +40,8 @@ json AuthEventJSON::serialize(const Audit::IAuthEvent &in, const SecurityContext
     serialized["relationships"]["credential"] = {
         {{"id", in.credential_id()}, {"raw", in.credential_raw()}}};
 
-    serialized["relationships"]["access_point"] = {
-        {{"id", in.access_point_id()}}};
+    serialized["relationships"]["door"] = {
+        {{"id", in.door()}}};
 
     return serialized;
 }
