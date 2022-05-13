@@ -141,4 +141,5 @@ class Zone : public virtual IZone
 
 #ifdef ODB_COMPILER
 #include "core/auth/Door.hpp"
+#include "tools/ScheduleMapping.hpp"
 #endif
