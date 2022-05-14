@@ -21,6 +21,7 @@
 #include "AssertCast.hpp"
 #include "core/auth/Door.hpp"
 #include "core/auth/Zone.hpp"
+#include "core/auth/Zone_odb.h"
 #include "core/auth/Group.hpp"
 #include "core/auth/Group_odb.h"
 #include "core/auth/User.hpp"

@@ -20,7 +20,7 @@
 #include "UserSecurityContext.hpp"
 #include "core/auth/Group_odb.h"
 #include "core/auth/IDoor.hpp"
-#include "core/auth/Zone.hpp"
+#include "core/auth/IZone.hpp"
 #include "core/auth/User_odb.h"
 #include "tools/ScheduleMapping.hpp"
 #include "tools/db/DBService.hpp"
