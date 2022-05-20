@@ -26,6 +26,7 @@
 #include <boost/property_tree/ptree_serialization.hpp>
 #include <signal.h>
 
+using namespace Leosac;
 using namespace Leosac::Module;
 using namespace Leosac::Tools;
 
@@ -43,6 +44,11 @@ BaseModule::BaseModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 
     reactor_.add(control_, std::bind(&BaseModule::handle_control, this));
     reactor_.add(pipe_, std::bind(&BaseModule::handle_pipe, this));
+}
+
+CoreUtilsPtr BaseModule::utils() const
+{
+  return utils_;
 }
 
 void BaseModule::run()

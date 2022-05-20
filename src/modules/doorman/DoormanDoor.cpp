@@ -27,7 +27,7 @@ using namespace Leosac::Module::Doorman;
 DoormanDoor::DoormanDoor(const Auth::AuthTargetPtr &door, zmqpp::context &ctx)
     : door_(door)
     , bus_sub_(ctx, zmqpp::socket_type::sub)
-    , contact_triggered(false)
+    , contact_triggered_(false)
 {
   bus_sub_.connect("inproc://zmq-bus-pub");
 
@@ -46,6 +46,16 @@ DoormanDoor::DoormanDoor(const Auth::AuthTargetPtr &door, zmqpp::context &ctx)
 Leosac::Auth::AuthTargetPtr DoormanDoor::door() const
 {
   return door_;
+}
+
+void DoormanDoor::alarm_door_forced(Leosac::Alarms::AlarmPtr alarm)
+{
+  alarm_door_forced_ = alarm;
+}
+
+Leosac::Alarms::AlarmPtr DoormanDoor::alarm_door_forced() const
+{
+  return alarm_door_forced_;
 }
 
 zmqpp::socket &DoormanDoor::bus_sub()
@@ -68,8 +78,17 @@ void DoormanDoor::handle_bus_msg()
   }
   else if (msg == topic_contact_)
   {
-    // TODO: We don't use this information yet, we need the ALARM module first
-    contact_triggered = !contact_triggered;
-    contact_lastupdate = std::chrono::system_clock::now();
+    contact_triggered_ = !contact_triggered_;
+    contact_lastupdate_ = std::chrono::system_clock::now();
   }
+}
+
+bool DoormanDoor::contact_triggered() const
+{
+  return contact_triggered_;
+}
+
+std::chrono::system_clock::time_point DoormanDoor::contact_lastupdate() const
+{
+  return contact_lastupdate_;
 }

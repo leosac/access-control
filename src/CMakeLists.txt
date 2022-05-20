@@ -146,6 +146,9 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/UserGroupMembershipEventSerializer.cpp
     core/audit/serializers/AccessPointEventSerializer.cpp
     core/audit/serializers/ZoneEventSerializer.cpp
+    core/alarms/Alarm.cpp
+    core/alarms/AlarmEntry.cpp
+    core/alarms/serializers/AlarmSerializer.cpp
     core/update/UpdateService.cpp
     core/update/Update.cpp
     core/update/serializers/AccessPointUpdateSerializer.cpp
@@ -155,7 +158,8 @@ set(LEOSAC_LIB_SRCS
     tools/Visitor.cpp
     core/SecurityContext.cpp
     core/audit/serializers/UpdateEventSerializer.cpp
-        hardware/serializers/BuzzerSerializer.cpp hardware/serializers/BuzzerSerializer.hpp)
+    hardware/serializers/BuzzerSerializer.cpp
+    hardware/serializers/BuzzerSerializer.hpp)
 
 # Include mode to extract Git Revision.
 include(GetGitRevisionDescription)

@@ -94,6 +94,8 @@ class FGPIO
     */
     const std::string &name() const;
 
+    std::chrono::system_clock::time_point lastupdate() const;
+
   private:
     std::string gpio_name_;
 
@@ -106,6 +108,8 @@ class FGPIO
      * A poller to not wait for infinity in case something went wrong.
      */
     zmqpp::poller poller_;
+
+    std::chrono::system_clock::time_point lastupdate_;
 };
 }
 }

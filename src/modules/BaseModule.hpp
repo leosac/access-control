@@ -126,6 +126,8 @@ class BaseModule
     */
     virtual void run();
 
+    CoreUtilsPtr utils() const;
+
   protected:
     /**
     * The base class register the `pipe_` socket to its `reactor_` so that this

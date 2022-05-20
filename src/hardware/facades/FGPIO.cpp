@@ -44,7 +44,10 @@ bool FGPIO::turnOn(std::chrono::milliseconds duration)
     backend_.receive(rep);
 
     if (rep == "OK")
+    {
+        lastupdate_ = std::chrono::system_clock::now() + duration;
         return true;
+    }
     return false;
 }
 
@@ -58,7 +61,10 @@ bool FGPIO::turnOn()
     backend_.receive(rep);
 
     if (rep == "OK")
+    {
+        lastupdate_ = std::chrono::system_clock::now();
         return true;
+    }
     return false;
 }
 
@@ -72,7 +78,10 @@ bool FGPIO::turnOff()
     backend_.receive(rep);
 
     if (rep == "OK")
+    {
+        lastupdate_ = std::chrono::system_clock::now();
         return true;
+    }
     return false;
 }
 
@@ -86,7 +95,10 @@ bool FGPIO::toggle()
     backend_.receive(rep);
 
     if (rep == "OK")
+    {
+        lastupdate_ = std::chrono::system_clock::now();
         return true;
+    }
     return false;
 }
 
@@ -113,4 +125,9 @@ bool FGPIO::isOff()
 std::string const &FGPIO::name() const
 {
     return gpio_name_;
+}
+
+std::chrono::system_clock::time_point FGPIO::lastupdate() const
+{
+    return lastupdate_;
 }

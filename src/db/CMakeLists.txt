@@ -75,6 +75,28 @@ odb_compile(OdbCMake_SOURCES_AUTH
         OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/auth
         )
 
+# ODB configuration for Alarms
+set(OdbCMake_ODB_HEADERS_ALARMS
+        ${CMAKE_SOURCE_DIR}/src/core/alarms/AlarmEntry.hpp
+        )
+
+set(OdbCMake_SOURCES_ALARMS "")
+odb_compile(OdbCMake_SOURCES_ALARMS
+        FILES ${OdbCMake_ODB_HEADERS_ALARMS}
+        MULTI_DATABASE dynamic
+        DB pgsql sqlite
+        STANDARD "c++14"
+        GENERATE_QUERY GENERATE_SESSION
+        SCHEMA_NAME core
+        PROFILE "boost/date-time" "boost/optional" "boost/uuid" leosac-profile
+        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
+        INCLUDE_PREFIX core/alarms/
+        DEFAULT_POINTER "std::shared_ptr"
+        PGSQL_SERVER_VERSION "9.1"
+        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/core/alarms
+        )
+
 # ODB configuration for Audit log
 set(OdbCMake_ODB_HEADERS_AUDITLOG
         ${CMAKE_SOURCE_DIR}/src/core/audit/AuditEntry.hpp
@@ -190,6 +212,7 @@ odb_compile(OdbCMake_SOURCES_HARDWARE
 add_library(leosac_db SHARED
         ${OdbCMake_SOURCES_TOOLS} ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_SOURCES_AUTH} ${OdbCMake_ODB_HEADERS_AUTH}
+        ${OdbCMake_SOURCES_ALARMS} ${OdbCMake_ODB_HEADERS_ALARMS}
         ${OdbCMake_SOURCES_AUDITLOG} ${OdbCMake_ODB_HEADERS_AUDITLOG}
         ${OdbCMake_SOURCES_CREDENTIALS} ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         ${OdbCMake_SOURCES_UPDATES} ${OdbCMake_ODB_HEADERS_UPDATES}
@@ -217,6 +240,7 @@ endif()
 set(LEOSAC_DATABASE_CORE_HEADERS
         ${OdbCMake_ODB_HEADERS_TOOLS}
         ${OdbCMake_ODB_HEADERS_AUTH}
+        ${OdbCMake_ODB_HEADERS_ALARMS}
         ${OdbCMake_ODB_HEADERS_AUDITLOG}
         ${OdbCMake_ODB_HEADERS_CREDENTIALS}
         ${OdbCMake_ODB_HEADERS_UPDATES}

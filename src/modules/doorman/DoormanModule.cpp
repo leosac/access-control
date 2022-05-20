@@ -21,10 +21,12 @@
 #include "DoormanInstance.hpp"
 #include "core/Scheduler.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/alarms/Alarm.hpp"
 #include "core/kernel.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac::Module::Doorman;
+using namespace Leosac::Alarms;
 using namespace Leosac::Auth;
 
 DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
@@ -103,8 +105,9 @@ void DoormanModule::process_config()
         }
 
         INFO("Creating Doorman instance " << doorman_name);
-        doormen_.push_back(std::make_shared<DoormanInstance>(
-            *this, ctx_, doorman_name, auth_ctx_names, actions));
+        auto instance = std::make_shared<DoormanInstance>(
+            *this, ctx_, doorman_name, auth_ctx_names, actions);
+        doormen_.push_back(instance);
     }
 }
 
@@ -180,9 +183,29 @@ void DoormanModule::update()
 {
   auto now = std::chrono::system_clock::now();
 
-  for (auto &&door : doors_)
+  for (auto &&doorman : doormen_)
   {
-    door->resetToExpectedState(now);
+    for (auto &&door : doorman->doors())
+    {
+      auto d = door->door();
+      if (door->alarm_door_forced()->state() == AlarmState::STATE_DEFAULT && door->contact_triggered())
+      {
+        auto gpio = d->gpio();
+        if ((door->contact_lastupdate() + d->contact_duration()) >= now)
+        {
+          door->alarm_door_forced()->raise("Door forced (opened too long).");
+        }
+        else if (gpio && (gpio->lastupdate() + d->contact_duration()) < now)
+        {
+          door->alarm_door_forced()->raise("Door forced (unexpected opening).");
+        }
+      }
+      else if (door->alarm_door_forced()->state() == AlarmState::STATE_RAISED && !door->contact_triggered())
+      {
+        door->alarm_door_forced()->disarm();
+      }
+      d->resetToExpectedState(now);
+    }
   }
 }
 

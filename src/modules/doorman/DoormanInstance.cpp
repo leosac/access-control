@@ -19,9 +19,12 @@
 
 #include "DoormanInstance.hpp"
 #include "DoormanModule.hpp"
+#include "core/CoreUtils.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/alarms/Alarm.hpp"
 #include "tools/log.hpp"
 
+using namespace Leosac::Alarms;
 using namespace Leosac::Module::Doorman;
 
 DoormanInstance::DoormanInstance(DoormanModule &module, zmqpp::context &ctx,
@@ -49,9 +52,11 @@ DoormanInstance::DoormanInstance(DoormanModule &module, zmqpp::context &ctx,
       targets_.insert(std::make_pair(action.target_, std::move(target_socket)));
     }
 
-    for (auto &door : module.doors())
+    for (auto &d : module.doors())
     {
-      doors_.push_back(std::make_shared<DoormanDoor>(door, ctx));
+      auto door = std::make_shared<DoormanDoor>(d, ctx);
+      door->alarm_door_forced(std::make_shared<Leosac::Alarms::Alarm>(ctx, module.utils()->database(), d->name() + "_alarm", AlarmType::ALARM_FORCED, AlarmSeverity::SEVERITY_NORMAL));
+      doors_.push_back(door);
     }
 }
 
