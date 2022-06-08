@@ -28,12 +28,7 @@ namespace Hardware
 {
 
 /**
-* Facade object for a Wiegand Reader device.
-*
-* You can control a reader through this class by acting on its led and buzzer.
-*
-* @note This class implements the client code to [theses specifications](@ref
-* hardware_spec_wiegand).
+* Facade object for an external server.
 */
 class FExternalServer
 {

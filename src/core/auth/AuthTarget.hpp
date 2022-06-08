@@ -20,6 +20,7 @@
 #pragma once
 
 #include "hardware/facades/FGPIO.hpp"
+#include "hardware/facades/FAlarm.hpp"
 #include "tools/ISchedule.hpp"
 #include <memory>
 #include <string>
@@ -91,6 +92,10 @@ class AuthTarget
 
     void contact_duration(std::chrono::milliseconds duration);
 
+    void alarm(std::unique_ptr<Leosac::Hardware::FAlarm> alarm);
+
+    Leosac::Hardware::FAlarm* alarm() const;
+
   protected:
     std::string name_;
 
@@ -121,6 +126,11 @@ class AuthTarget
     * Duration for the Contact Door Sensor to be ignored before triggering an alarm
     */
     std::chrono::milliseconds contact_duration_;
+
+    /**
+    * Optional Alarm associated with the door.
+    */
+    std::unique_ptr<Leosac::Hardware::FAlarm> alarm_;
 };
 }
 }

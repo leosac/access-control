@@ -17,25 +17,50 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#pragma once
-
-#include "LeosacFwd.hpp"
-#include "core/alarms/AlarmFwd.hpp"
-#include <nlohmann/json.hpp>
-#include <string>
+#include "hardware/Alarm.hpp"
+#include "hardware/Alarm_odb.h"
+#include "hardware/GPIO.hpp"
 
 namespace Leosac
 {
-using json = nlohmann::json;
+namespace Hardware
+{
 
-namespace Alarms
+Alarm::Alarm()
+    : Device(DeviceClass::ALARM)
+    , severity_(AlarmSeverity::SEVERITY_NORMAL)
 {
-namespace Serializer
+}
+
+Alarm::Alarm(const Alarm::AlarmSeverity& severity)
+    : Device(DeviceClass::ALARM),
+    severity_(severity)
 {
-struct AlarmJSON
+}
+
+Alarm::AlarmSeverity Alarm::severity() const
 {
-    static json serialize(const Alarms::IAlarmEntry &in, const SecurityContext &sc);
-};
+    return severity_;
+}
+
+void Alarm::severity(const Alarm::AlarmSeverity& severity)
+{
+    severity_ = severity;
+}
+
+const GPIOPtr &Alarm::gpio() const
+{
+    return gpio_;
+}
+
+void Alarm::gpio(const GPIOPtr &gpio)
+{
+    gpio_ = gpio;
+}
+
+void Alarm::validation_callback(odb::callback_event e, odb::database &db) const
+{
+    Device::validation_callback(e, db);
 }
 }
 }

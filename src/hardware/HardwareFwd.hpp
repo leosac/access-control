@@ -47,7 +47,8 @@ enum class DeviceClass
     LED               = 3,
     BUZZER            = 4,
     EXTERNAL_MESSAGE  = 5,
-    EXTERNAL_SERVER   = 6
+    EXTERNAL_SERVER   = 6,
+    ALARM             = 7
 };
 
 class Device;
@@ -68,5 +69,8 @@ using ExternalMessagePtr = std::shared_ptr<ExternalMessage>;
 
 class ExternalServer;
 using ExternalServerPtr = std::shared_ptr<ExternalServer>;
+
+class Alarm;
+using AlarmPtr = std::shared_ptr<Alarm>;
 }
 }

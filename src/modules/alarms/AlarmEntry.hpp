@@ -19,8 +19,10 @@
 
 #pragma once
 
-#include "core/alarms/AlarmFwd.hpp"
-#include "core/alarms/IAlarmEntry.hpp"
+#define ODB_NO_BASE_VERSION
+#include "modules/alarms/AlarmsFwd.hpp"
+#include "hardware/Alarm.hpp"
+#include "hardware/facades/FAlarm.hpp"
 #include "core/auth/AuthFwd.hpp"
 #include "tools/ElapsedTimeCounter.hpp"
 #include "tools/db/database.hpp"
@@ -29,21 +31,20 @@
 #include <odb/callback.hxx>
 #include <odb/core.hxx>
 
+#pragma db model version(1, 1, open)
+
 namespace Leosac
+{
+namespace Module
 {
 namespace Alarms
 {
 /**
- * Implementation of IAlarmEntry, backed by ODB.
- *
  * This class, as well as all its child are backed by ODB, and are therefore
  * persisted in a SQL database.
- *
- * @see IAlarmEntry
   */
-#pragma db object optimistic
-class AlarmEntry : virtual public IAlarmEntry,
-                   public std::enable_shared_from_this<AlarmEntry>
+#pragma db object optimistic table("HARDWARE_ALARM_ALARMENTRY")
+class AlarmEntry
 {
   protected:
     AlarmEntry();
@@ -52,43 +53,37 @@ class AlarmEntry : virtual public IAlarmEntry,
     AlarmEntry(const AlarmEntry &) = delete;
     virtual ~AlarmEntry()          = default;
 
-    static std::shared_ptr<AlarmEntry>  create(const DBPtr &database, const std::string& alarm_name, const AlarmType &type, const AlarmSeverity &severity, const std::string& reason);
+    static std::shared_ptr<AlarmEntry> create(const DBPtr &database, const std::string& alarm_name, const Hardware::AlarmType &type, const Hardware::Alarm::AlarmSeverity &severity, const std::string& reason);
 
-    virtual AlarmEntryId id() const override;
+    virtual AlarmEntryId id() const;
 
-    virtual bool finalized() const override;
+    virtual bool finalized() const;
 
-    virtual void alarm(const std::string& alarm_name) override;
+    virtual void alarm(const std::string& alarm_name);
 
-    virtual std::string alarm() const override;
+    virtual std::string alarm() const;
 
-    virtual void state(const AlarmState &state) override;
+    virtual void state(const Hardware::AlarmState &state);
 
-    virtual const AlarmState &state() const override;
+    virtual const Hardware::AlarmState &state() const;
 
-    virtual void severity(const AlarmSeverity &severity) override;
+    virtual void severity(const Hardware::Alarm::AlarmSeverity &severity);
 
-    virtual const AlarmSeverity &severity() const override;
+    virtual const Hardware::Alarm::AlarmSeverity &severity() const;
 
-    virtual void type(const AlarmType &type) override;
+    virtual void type(const Hardware::AlarmType &type);
 
-    virtual const AlarmType &type() const override;
+    virtual const Hardware::AlarmType &type() const;
 
-    virtual void author(Auth::UserPtr user) override;
+    virtual void reason(const std::string& r);
 
-    virtual Auth::UserId author_id() const override;
+    virtual std::string reason() const;
 
-    virtual void reason(const std::string& r) override;
+    virtual size_t version() const;
 
-    virtual std::string reason() const override;
+    virtual boost::posix_time::ptime timestamp() const;
 
-    virtual size_t version() const override;
-
-    virtual void reload() override;
-
-    virtual boost::posix_time::ptime timestamp() const override;
-
-    virtual std::string generate_description() const override;
+    virtual std::string generate_description() const;
 
     /**
      * Set the database pointer.
@@ -108,19 +103,13 @@ class AlarmEntry : virtual public IAlarmEntry,
 #pragma db not_null
     std::string alarm_;
 
-    /**
-     * The user at the source of the entry.
-     * May be null.
-     */
-    Auth::UserLPtr author_;
-
     std::string reason_;
 
-    AlarmState state_;
+    Hardware::AlarmState state_;
 
-    AlarmSeverity severity_;
+    Hardware::Alarm::AlarmSeverity severity_;
 
-    AlarmType type_;
+    Hardware::AlarmType type_;
 
     /**
      * How long did it take for the Alarm object to be finalized.
@@ -131,7 +120,7 @@ class AlarmEntry : virtual public IAlarmEntry,
  * Pointer to the database.
  * Required to implement `finalize()`.
  *
- * Manually set by AlarmFactory.
+ * Manually set.
  */
 #pragma db transient
     DBPtr database_;
@@ -152,7 +141,4 @@ class AlarmEntry : virtual public IAlarmEntry,
 
 }
 }
-
-#ifdef ODB_COMPILER
-#include "core/auth/User.hpp"
-#endif
+}

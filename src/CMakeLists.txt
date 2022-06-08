@@ -66,6 +66,7 @@ set(LEOSAC_LIB_SRCS
     hardware/facades/FLED.cpp
     hardware/facades/FWiegandReader.cpp
     hardware/facades/FExternalServer.cpp
+    hardware/facades/FAlarm.cpp
     hardware/Device.cpp
     hardware/GPIO.cpp
     hardware/RFIDReader.cpp
@@ -73,6 +74,7 @@ set(LEOSAC_LIB_SRCS
     hardware/LED.cpp
     hardware/ExternalMessage.cpp
     hardware/ExternalServer.cpp
+    hardware/Alarm.cpp
     hardware/HardwareService.cpp
     hardware/serializers/RFIDReaderSerializer.cpp
     hardware/serializers/GPIOSerializer.cpp
@@ -81,6 +83,7 @@ set(LEOSAC_LIB_SRCS
     hardware/serializers/BuzzerSerializer.cpp
     hardware/serializers/ExternalMessageSerializer.cpp
     hardware/serializers/ExternalServerSerializer.cpp
+    hardware/serializers/AlarmSerializer.cpp
     tools/runtimeoptions.cpp
     tools/signalhandler.cpp
     tools/unixshellscript.cpp
@@ -146,9 +149,6 @@ set(LEOSAC_LIB_SRCS
     core/audit/serializers/UserGroupMembershipEventSerializer.cpp
     core/audit/serializers/AccessPointEventSerializer.cpp
     core/audit/serializers/ZoneEventSerializer.cpp
-    core/alarms/Alarm.cpp
-    core/alarms/AlarmEntry.cpp
-    core/alarms/serializers/AlarmSerializer.cpp
     core/update/UpdateService.cpp
     core/update/Update.cpp
     core/update/serializers/AccessPointUpdateSerializer.cpp

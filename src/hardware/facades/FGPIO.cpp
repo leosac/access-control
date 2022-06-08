@@ -27,8 +27,11 @@ FGPIO::FGPIO(zmqpp::context &ctx, const std::string &gpio_name)
     : gpio_name_(gpio_name)
     , backend_(ctx, zmqpp::socket_type::req)
 {
-    backend_.connect("inproc://" + gpio_name);
-    poller_.add(backend_);
+    if (!gpio_name.empty())
+    {
+      backend_.connect("inproc://" + gpio_name);
+      poller_.add(backend_);
+    }
 }
 
 bool FGPIO::turnOn(std::chrono::milliseconds duration)

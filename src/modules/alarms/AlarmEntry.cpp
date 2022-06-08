@@ -18,19 +18,19 @@
 */
 
 #include "AlarmEntry.hpp"
-#include "core/alarms/AlarmEntry_odb.h"
-#include "core/auth/User.hpp"
-#include "core/auth/User_odb.h"
+#include "modules/alarms/AlarmEntry_odb.h"
 #include "tools/db/OptionalTransaction.hpp"
 #include "tools/log.hpp"
 #include <odb/query.hxx>
 
 using namespace Leosac;
-using namespace Leosac::Alarms;
+using namespace Leosac::Module::Alarms;
 
 AlarmEntry::AlarmEntry()
-    : duration_(0)
-    , state_(AlarmState::STATE_DEFAULT)
+    : state_(Hardware::AlarmState::STATE_DEFAULT)
+    , severity_(Hardware::Alarm::AlarmSeverity::SEVERITY_NORMAL)
+    , type_(Hardware::AlarmType::ALARM_UNKNOWN)
+    , duration_(0)
     , version_(0)
 {
     timestamp_ = boost::posix_time::second_clock::local_time();
@@ -38,14 +38,14 @@ AlarmEntry::AlarmEntry()
 
 std::shared_ptr<AlarmEntry> AlarmEntry::create(const DBPtr &database,
                                              const std::string& alarm_name,
-                                             const AlarmType &type,
-                                             const AlarmSeverity &severity,
+                                             const Hardware::AlarmType &type,
+                                             const Hardware::Alarm::AlarmSeverity &severity,
                                              const std::string& reason)
 {
     ASSERT_LOG(database, "Database must be non null.");
 
     db::OptionalTransaction t(database->begin());
-    auto alarm = std::shared_ptr<Alarms::AlarmEntry>(new Alarms::AlarmEntry());
+    auto alarm = std::shared_ptr<AlarmEntry>(new AlarmEntry());
     alarm->database(database);
     alarm->alarm(alarm_name);
     alarm->type(type);
@@ -64,7 +64,7 @@ AlarmEntryId AlarmEntry::id() const
 
 bool AlarmEntry::finalized() const
 {
-    return (state_ == AlarmState::STATE_DEFAULT || state_ == AlarmState::STATE_RAISED);
+    return (state_ == Hardware::AlarmState::STATE_DEFAULT || state_ == Hardware::AlarmState::STATE_RAISED);
 }
 
 std::string AlarmEntry::alarm() const
@@ -77,7 +77,7 @@ void AlarmEntry::alarm(const std::string& alarm_name)
     alarm_ = alarm_name;
 }
 
-void AlarmEntry::state(const AlarmState &state)
+void AlarmEntry::state(const Hardware::AlarmState &state)
 {
     ASSERT_LOG(odb::transaction::has_current(),
               "Not currently in a database transaction.");
@@ -90,38 +90,31 @@ void AlarmEntry::state(const AlarmState &state)
     database_->update(*this);
 }
 
-const AlarmState &AlarmEntry::state() const
+const Hardware::AlarmState &AlarmEntry::state() const
 {
     return state_;
 }
 
-void AlarmEntry::severity(const AlarmSeverity &severity)
+void AlarmEntry::severity(const Hardware::Alarm::AlarmSeverity &severity)
 {
     ASSERT_LOG(!finalized(), "Alarm entry is already finalized.");
     severity_ = severity;
 }
 
-const AlarmSeverity &AlarmEntry::severity() const
+const Hardware::Alarm::AlarmSeverity &AlarmEntry::severity() const
 {
     return severity_;
 }
 
-void AlarmEntry::type(const AlarmType &type)
+void AlarmEntry::type(const Hardware::AlarmType &type)
 {
     ASSERT_LOG(!finalized(), "Alarm entry is already finalized.");
     type_ = type;
 }
 
-const AlarmType &AlarmEntry::type() const
+const Hardware::AlarmType &AlarmEntry::type() const
 {
     return type_;
-}
-
-void AlarmEntry::author(Auth::UserPtr user)
-{
-    if (user)
-        ASSERT_LOG(user->id(), "Author is not already persisted.");
-    author_ = user;
 }
 
 size_t AlarmEntry::version() const
@@ -129,22 +122,9 @@ size_t AlarmEntry::version() const
     return version_;
 }
 
-void AlarmEntry::reload()
-{
-    ASSERT_LOG(odb::transaction::has_current(), "Not currently in transaction.");
-    database_->reload(this);
-}
-
 void AlarmEntry::database(DBPtr db)
 {
     database_ = db;
-}
-
-Auth::UserId AlarmEntry::author_id() const
-{
-    if (author_)
-        return author_.object_id();
-    return 0;
 }
 
 std::string AlarmEntry::reason() const
@@ -167,17 +147,17 @@ std::string AlarmEntry::generate_description() const
     std::stringstream ss;
 
     ss << "Alarm" << alarm_ << " of type ";
-    if (type_ == AlarmType::ALARM_FORCED)
+    if (type_ == Hardware::AlarmType::ALARM_FORCED)
         ss << "`forced`";
-    else if (type_ == AlarmType::ALARM_UNAUTHORIZED_ACCESS)
+    else if (type_ == Hardware::AlarmType::ALARM_UNAUTHORIZED_ACCESS)
         ss << "`unauthorized access`";
-    else if (type_ == AlarmType::ALARM_OFFLINE)
+    else if (type_ == Hardware::AlarmType::ALARM_OFFLINE)
         ss << "`marked as offline`";
-    else if (type_ == AlarmType::ALARM_BATTERY_LOW)
+    else if (type_ == Hardware::AlarmType::ALARM_BATTERY_LOW)
         ss << "`low battery`";
-    else if (type_ == AlarmType::ALARM_BATTERY_ACTIVATED)
+    else if (type_ == Hardware::AlarmType::ALARM_BATTERY_ACTIVATED)
         ss << "`switched to battery`";
-    else if (type_ == AlarmType::ALARM_SUSPICIOUS_BEHAVIOR)
+    else if (type_ == Hardware::AlarmType::ALARM_SUSPICIOUS_BEHAVIOR)
         ss << "`suspicious behavior`";
 
     ss << " (Reason:" << reason_ << ").";

@@ -48,14 +48,14 @@ Leosac::Auth::AuthTargetPtr DoormanDoor::door() const
   return door_;
 }
 
-void DoormanDoor::alarm_door_forced(Leosac::Alarms::AlarmPtr alarm)
+void DoormanDoor::alarm_forced(const std::string& alarm)
 {
-  alarm_door_forced_ = alarm;
+  alarm_forced_ = alarm;
 }
 
-Leosac::Alarms::AlarmPtr DoormanDoor::alarm_door_forced() const
+std::string DoormanDoor::alarm_forced() const
 {
-  return alarm_door_forced_;
+  return alarm_forced_;
 }
 
 zmqpp::socket &DoormanDoor::bus_sub()

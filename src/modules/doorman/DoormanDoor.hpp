@@ -21,7 +21,6 @@
 
 #include "core/auth/Auth.hpp"
 #include "core/auth/AuthFwd.hpp"
-#include "core/alarms/AlarmFwd.hpp"
 #include <map>
 #include <zmqpp/zmqpp.hpp>
 
@@ -60,14 +59,13 @@ class DoormanDoor
 
     Leosac::Auth::AuthTargetPtr door() const;
 
-    void alarm_door_forced(Leosac::Alarms::AlarmPtr alarm);
-
-    Leosac::Alarms::AlarmPtr alarm_door_forced() const;
-
     bool contact_triggered() const;
 
     std::chrono::system_clock::time_point contact_lastupdate() const;
 
+    std::string alarm_forced() const;
+
+    void alarm_forced(const std::string& alarm);
 
   private:
 
@@ -83,7 +81,7 @@ class DoormanDoor
 
     std::chrono::system_clock::time_point contact_lastupdate_;
 
-    Leosac::Alarms::AlarmPtr alarm_door_forced_;
+    std::string alarm_forced_;
 };
 }
 }

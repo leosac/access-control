@@ -28,48 +28,50 @@ namespace Leosac
 {
 namespace Hardware
 {
-
-/**
- *  Abstraction of Buzzer device attributes.
- *
- *  Note: This code is copy pasted with the LED class.
- *  Both device share the same attribute set but are different from a
- *  semantic point of view.
- *  It might be possible to reduce code duplication by using template
- *  to share code.
- */
-#pragma db object callback(validation_callback) table("HARDWARE_BUZZER")
-class Buzzer : public Device
+  /**
+   *  Abstraction of an Alarm device attributes.
+   */
+#pragma db object callback(validation_callback) table("HARDWARE_ALARM")
+class Alarm : public Device
 {
   public:
-    explicit Buzzer();
-    virtual ~Buzzer() = default;
 
-    void validation_callback(odb::callback_event e, odb::database &) const override;
+    enum class AlarmSeverity : uint8_t
+    {
+      SEVERITY_LOWEST           = 0,
+      SEVERITY_LOW              = 1,
+      SEVERITY_NORMAL           = 2,
+      SEVERITY_IMPORTANT        = 3,
+      SEVERITY_CRITICAL         = 4
+    };
+
+    explicit Alarm();
+
+    Alarm(const AlarmSeverity& severity);
+
+    virtual ~Alarm() = default;
+
+    virtual void validation_callback(odb::callback_event e, odb::database &) const;
+
+    virtual void severity(const AlarmSeverity &severity);
+
+    virtual AlarmSeverity severity() const;
 
     const GPIOPtr &gpio() const;
 
     void gpio(const GPIOPtr &gpio);
 
-    int64_t default_blink_duration() const;
-
-    void default_blink_duration(int64_t default_blink_duration);
-
-    int64_t default_blink_speed() const;
-
-    void default_blink_speed(int64_t default_blink_speed);
-
   private:
-    int64_t default_blink_duration_;
-    int64_t default_blink_speed_;
+    AlarmSeverity severity_;
 
     /**
      * The underlying GPIO.
      */
     GPIOPtr gpio_;
-    
-    friend odb::access;
+
+    friend class odb::access;
 };
+
 }
 }
 

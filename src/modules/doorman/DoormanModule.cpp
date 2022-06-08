@@ -21,12 +21,11 @@
 #include "DoormanInstance.hpp"
 #include "core/Scheduler.hpp"
 #include "core/auth/Auth.hpp"
-#include "core/alarms/Alarm.hpp"
 #include "core/kernel.hpp"
+#include "hardware/facades/FAlarm.hpp"
 #include "tools/log.hpp"
 
 using namespace Leosac::Module::Doorman;
-using namespace Leosac::Alarms;
 using namespace Leosac::Auth;
 
 DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
@@ -175,6 +174,12 @@ void DoormanModule::process_doors_config(
               std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, contact_gpio)));
           door->contact_duration(std::chrono::milliseconds(contact.get().get<uint16_t>("duration")));
         }
+
+        const auto &alarm = door_cfg.second.get<std::string>("alarm", "");
+        if (!alarm.empty())
+        {
+          door->alarm(std::unique_ptr<Hardware::FAlarm>(new Hardware::FAlarm(ctx_, alarm)));
+        }
         doors_.push_back(door);
     }
 }
@@ -188,21 +193,29 @@ void DoormanModule::update()
     for (auto &&door : doorman->doors())
     {
       auto d = door->door();
-      if (door->alarm_door_forced()->state() == AlarmState::STATE_DEFAULT && door->contact_triggered())
+      auto alarm = d->alarm();
+      if (alarm != nullptr)
       {
-        auto gpio = d->gpio();
-        if ((door->contact_lastupdate() + d->contact_duration()) >= now)
+        if (door->alarm_forced().empty() && door->contact_triggered())
         {
-          door->alarm_door_forced()->raise("Door forced (opened too long).");
+          auto gpio = d->gpio();
+          if ((door->contact_lastupdate() + d->contact_duration()) >= now)
+          {
+            door->alarm_forced(alarm->raise(Hardware::AlarmType::ALARM_FORCED, "Door forced (opened too long)."));
+          }
+          else if (gpio && (gpio->lastupdate() + d->contact_duration()) < now)
+          {
+            door->alarm_forced(alarm->raise(Hardware::AlarmType::ALARM_FORCED, "Door forced (unexpected opening)."));
+          }
         }
-        else if (gpio && (gpio->lastupdate() + d->contact_duration()) < now)
+        else if (!door->alarm_forced().empty() && !door->contact_triggered())
         {
-          door->alarm_door_forced()->raise("Door forced (unexpected opening).");
+          if (alarm->state(door->alarm_forced()) == Hardware::AlarmState::STATE_RAISED)
+          {
+            alarm->disarm(door->alarm_forced());
+          }
+          door->alarm_forced("");
         }
-      }
-      else if (door->alarm_door_forced()->state() == AlarmState::STATE_RAISED && !door->contact_triggered())
-      {
-        door->alarm_door_forced()->disarm();
       }
       d->resetToExpectedState(now);
     }
