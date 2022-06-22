@@ -24,7 +24,7 @@ jobs:
         run: |
           DOCKER_IMAGE=leosac/leosac
           DOCKER_BUILDIMAGE=leosac/leosac-buildsystem
-          DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
+          DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/riscv64
           TAG=edge
 
           if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -51,7 +51,7 @@ jobs:
     strategy:
       matrix:
         buildsystem: [ 'debian-bullseye', 'debian-buster' ]
-        platform: [ 'amd64', 'arm64', 'arm/v7', 'arm/v6' ]
+        platform: [ 'amd64', 'arm64', 'arm/v7', 'arm/v6', 'riscv64' ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -138,6 +138,11 @@ jobs:
         with:
           name: debian-bullseye_arm-v6
           path: build/packages/debian-bullseye/linux/arm/v6
+      - uses: actions/download-artifact@v3
+        if: success()
+        with:
+          name: debian-bullseye_riscv64
+          path: build/packages/debian-bullseye/linux/riscv64
       - name: Build Docker Leosac Main
         if: success() && github.event_name != 'pull_request'
         run: |
