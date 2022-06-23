@@ -5,8 +5,10 @@
 
 IMAGE_BUILD_1="leosac/leosac-buildsystem:debian-bullseye"
 IMAGE_BUILD_2="leosac/leosac-buildsystem:debian-buster"
+IMAGE_BUILD_3="leosac/leosac-buildsystem:debian-sid"
 IMAGE_RUN="leosac/leosac:snapshot"
 PLATFORMS="linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6"
+PLATFORMS_SID="${PLATFORMS},linux/riscv64"
 
 # Build system
 read -p "Do you want to re-build the Docker Buildsystem for Leosac first?" bs
@@ -16,6 +18,7 @@ case $bs in
       docker buildx create --name multiarch --driver docker-container --use
       docker buildx build --push --tag $IMAGE_BUILD_1 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.bullseye .
       docker buildx build --push --tag $IMAGE_BUILD_2 --platform $PLATFORMS -f docker/buildsystem/debian/Dockerfile.buster .
+	  docker buildx build --push --tag $IMAGE_BUILD_3 --platform $PLATFORMS_SID -f docker/buildsystem/debian/Dockerfile.sid .
       ;;
   * ) echo "Docker Buildsystem skipped";;
 esac
