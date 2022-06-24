@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y          \
 cmake build-essential pkg-config git              \
 apt-utils libssl-dev libzmq5 libzmq3-dev          \
 libcurl4-openssl-dev libtclap-dev libscrypt-dev   \
-python3 python3-pip gcc-9 g++-9 gcc-10 g++-10     \
+python3 python3-pip gcc-9 g++-9                   \
 dh-make dpkg-dev debhelper devscripts             \
 libboost-all-dev libgtest-dev emacs-nox vim wget  \
 libsqlite3-dev libpq-dev odb libodb-dev           \

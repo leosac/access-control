@@ -73,7 +73,7 @@ jobs:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v1
       - name: Run ${{ matrix.platform }} on ${{ matrix.buildsystem }}
-        if: success() && (matrix.buildsystem == 'debian-sid' || matrix.platform != 'riscv64')
+        if: success()
         run: docker run --entrypoint=/bin/bash
           --platform linux/${{ matrix.platform }}
           -v "${GITHUB_WORKSPACE}:/tmp/leosac"
@@ -138,11 +138,6 @@ jobs:
         with:
           name: debian-bullseye_arm-v6
           path: build/packages/debian-bullseye/linux/arm/v6
-      - uses: actions/download-artifact@v3
-        if: success()
-        with:
-          name: debian-sid_riscv64
-          path: build/packages/debian-sid/linux/riscv64
       - name: Build Docker Leosac Main
         if: success() && github.event_name != 'pull_request'
         run: |
