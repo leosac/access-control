@@ -45,7 +45,7 @@ Getting Started {#install_guide_getting_started}
 There is 2 thing to make sure before installing Leosac:
 1. You have an updated system. Run `apt-get update && apt-get upgrade` to make sure of this.
 2. The SPI kernel module is installed. The PifaceDigital card needs this module to work.\n
-   On Raspbian you can turn it on using `raspi-config` --> `Advanced Options` --> `SPI`.\n
+   On Raspbian you can turn it on using `raspi-config` --> `Interface Options` (it was previously on `Advanced Options`) --> `SPI`.\n
    Otherwise you can try to manually load the module: `modprobe spi_bcm2708`.
 
 Installing Leosac {#install_guide_installing}
