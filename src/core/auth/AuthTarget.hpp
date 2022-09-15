@@ -72,23 +72,23 @@ class AuthTarget
     * reference will
     * become invalid.
     */
-    Hardware::FGPIO *gpio();
+    Hardware::FGPIO *gpio() const;
 
     void gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
 
-    Hardware::FGPIO *exitreq_gpio();
+    Hardware::FGPIO *exitreq_gpio() const;
 
     void exitreq_gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
 
-    std::chrono::milliseconds exitreq_duration();
+    std::chrono::milliseconds exitreq_duration() const;
 
     void exitreq_duration(std::chrono::milliseconds duration);
 
-    Hardware::FGPIO *contact_gpio();
+    Hardware::FGPIO *contact_gpio() const;
 
     void contact_gpio(std::unique_ptr<Hardware::FGPIO> new_gpio);
 
-    std::chrono::milliseconds contact_duration();
+    std::chrono::milliseconds contact_duration() const;
 
     void contact_duration(std::chrono::milliseconds duration);
 

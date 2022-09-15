@@ -49,7 +49,7 @@ void AuthTarget::add_always_close_sched(Leosac::Tools::IScheduleCPtr const &sche
     always_close_.push_back(sched);
 }
 
-Leosac::Hardware::FGPIO *AuthTarget::gpio()
+Leosac::Hardware::FGPIO *AuthTarget::gpio() const
 {
     return gpio_.get();
 }
@@ -59,9 +59,19 @@ void AuthTarget::gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
     gpio_ = std::move(new_gpio);
 }
 
+Leosac::Hardware::FGPIO *AuthTarget::exitreq_gpio() const
+{
+	return exitreq_gpio_.get();
+}
+
 void AuthTarget::exitreq_gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
 {
     exitreq_gpio_ = std::move(new_gpio);
+}
+
+std::chrono::milliseconds AuthTarget::exitreq_duration() const
+{
+	return exitreq_duration_;
 }
 
 void AuthTarget::exitreq_duration(std::chrono::milliseconds duration)
@@ -69,14 +79,34 @@ void AuthTarget::exitreq_duration(std::chrono::milliseconds duration)
     exitreq_duration_ = duration;
 }
 
+Leosac::Hardware::FGPIO *AuthTarget::contact_gpio() const
+{
+	return contact_gpio_.get();
+}
+
 void AuthTarget::contact_gpio(std::unique_ptr<Leosac::Hardware::FGPIO> new_gpio)
 {
     contact_gpio_ = std::move(new_gpio);
 }
 
+std::chrono::milliseconds AuthTarget::contact_duration() const
+{
+	return contact_duration_;
+}
+
 void AuthTarget::contact_duration(std::chrono::milliseconds duration)
 {
     contact_duration_ = duration;
+}
+
+Leosac::Hardware::FAlarm *AuthTarget::alarm() const
+{
+	return alarm_.get();
+}
+
+void AuthTarget::alarm(std::unique_ptr<Leosac::Hardware::FAlarm> alarm)
+{
+    alarm_ = std::move(alarm);
 }
 
 bool AuthTarget::is_always_open(
