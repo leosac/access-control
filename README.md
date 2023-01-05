@@ -31,7 +31,7 @@ Please report issues [here](https://github.com/leosac/leosac/issues).
 
 ## License
 
-This project is released under the GNU Affero GPLv3 license.
+This project has been founded by Maxime Chamley (@maxhy), owned by Leosac SAS, and released under the GNU Affero GPLv3 license.
 A copy of the license can be found in the root folder.
 
 ![logo](https://raw.githubusercontent.com/leosac/leosac/master/rc/AGPLv3.png  "AGPL Logo")
