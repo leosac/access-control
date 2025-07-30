@@ -36,7 +36,10 @@ class AuthDBModule : public AsioModule
                      const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
         
         ~AuthDBModule();
-}
+    
+    protected:
+        void on_service_event(const service_event::Event &event) override;
+};
 }
 }
 }
