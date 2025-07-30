@@ -19,46 +19,24 @@
 
 #pragma once
 
-#include "modules/AsioModule.hpp"
-#include <boost/property_tree/ptree.hpp>
-#include <vector>
-#include <zmqpp/zmqpp.hpp>
+#include "AsioModule.hpp"
+#include <list>
 
 namespace Leosac
 {
 namespace Module
 {
-namespace Auth
+nameSpace Auth
 {
-class AuthDBInstance;
 
-/**
-* This implements a authentication module that uses Leosac database
-* to validate access.
-*/
 class AuthDBModule : public AsioModule
 {
-  public:
-    AuthDBModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                 const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
-
-    AuthDBModule(const AuthDBModule &) = delete;
-
-    ~AuthDBModule();
-
-  protected:
-    void on_service_event(const service_event::Event &event) override;
-
-  private:
-    void process_config();
-
-    void setup_database();
-
-    /**
-    * Authenticator instance.
-    */
-    // std::vector<AuthDBInstancePtr> authenticators_;
-};
+    public:
+        AuthDBModule(zmqpp::context& ctx, zmqpp::socket *pipe, 
+                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+        
+        ~AuthDBModule();
+}
 }
 }
 }
