@@ -82,7 +82,6 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
 
         std::mutex mutex_;
 };
-
 }
 }
 }

@@ -26,7 +26,7 @@ namespace Leosac
 {
 namespace Module
 {
-nameSpace Auth
+namespace Auth
 {
 
 class AuthDBModule : public AsioModule
