@@ -46,7 +46,7 @@ AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
         bus_sub_.subscribe("S_" + auth_source);
     }
 
-    INFO("AuthDB Instance (" << auth_ctx_name << ") and is subscribed to "
+    INFO("AuthDB Instance (" << auth_ctx_name << ") created and is subscribed to "
                              << boost::algorithm::join(auth_sources_names, ", "));
 }
 
