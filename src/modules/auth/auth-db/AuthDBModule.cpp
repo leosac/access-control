@@ -35,3 +35,5 @@ AuthDBModule::~AuthDBModule()
 {
     // TODO: Implement
 }
+
+void AuthDBModule::on_service_event(const service_event::Event &event) {}
