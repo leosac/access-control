@@ -17,3 +17,72 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
+#pragma once
+
+#include "LeosacFwd.hpp"
+#include "tools/db/DBService.hpp"
+#include <zmqpp/zmqpp.hpp>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <list>
+
+namespace Leosac
+{
+namespace Module
+{
+namespace Auth 
+{
+class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
+{
+    public:
+        /**
+        * Create an Authenticator instance that watches readers and writes authentication messages to the bus
+        * @param ctx the ZeroMQ context
+        * @param auth_ctx_name name of the instance in the auth_db module config
+        * @param auth_source_names names of the authentication sources for the instance in the auth_db module config
+        * @param auth_target_name name of the target attached to the instance
+        * @param core_utils core utilities
+        */
+        AuthDBInstance(zmqpp::context &ctx, const std::string &auth_ctx_name,
+                       const std::list<std::string> &auth_sources_names,
+                       const std::string &auth_target_name,
+                       CoreUtilsPtr core_utils);
+
+        ~AuthDBInstance();
+    
+    private:
+        /**
+         * Database service to query 
+        */
+        std::shared_ptr<DBService> db_service_;
+
+        /**
+         * Socket to write authentication messages to the bus
+        */
+        zmqpp::socket bus_push_;
+
+        /**
+         * Socket to read authentication messages from the bus
+        */
+        zmqpp::socket bus_sub_;
+
+        /**
+         * Name of the auth context instance
+        */
+        std::string name_;
+
+        /**
+         * Name of the target to authenticate against
+        */
+        std::string target_name_;
+
+
+        CoreUtilsPtr core_utils_;
+
+        std::mutex mutex_;
+};
+
+}
+}
+}

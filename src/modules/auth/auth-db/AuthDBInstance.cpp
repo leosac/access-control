@@ -18,3 +18,36 @@
 */
 
 #include "AuthDBInstance.hpp"
+#include "core/CoreUtils.hpp"
+#include "tools/db/DBService.hpp"
+#include "tools/log.hpp"
+#include <boost/algorithm/string/join.hpp>
+#include <zmqpp/zmqpp.hpp>
+
+using namespace Leosac::Module::Auth;
+
+AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
+                               const std::string &auth_ctx_name,
+                               const std::list<std::string> &auth_sources_names,
+                               const std::string &auth_target_name,
+                               CoreUtilsPtr core_utils)
+    : db_service_(std::make_shared<DBService>(core_utils->database()))
+    , bus_push_(ctx, zmqpp::socket_type::push)
+    , bus_sub_(ctx, zmqpp::socket_type::sub)
+    , name_(auth_ctx_name)
+    , target_name_(auth_target_name)
+    , core_utils_(core_utils)
+{
+    bus_push_.connect("inproc://zmq-bus-pull");
+    bus_sub_.connect("inproc://zmq-bus-pub");
+    bus_sub_.subscribe("KERNEL");
+    
+    for (const auto &auth_source : auth_sources_names) {
+        bus_sub_.subscribe("S_" + auth_source);
+    }
+
+    INFO("AuthDB Instance (" << auth_ctx_name << ") and is subscribed to "
+                             << boost::algorithm::join(auth_sources_names, ", "));
+}
+
+AuthDBInstance::~AuthDBInstance(){}
