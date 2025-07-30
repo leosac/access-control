@@ -12,7 +12,7 @@ set(LIBGPIOD_SRCS
 
 add_library(${LIBGPIOD_BIN} SHARED ${LIBGPIOD_SRCS})
 
-target_linked_libraries(${LIBGPIOD_BIN}
+target_link_libraries(${LIBGPIOD_BIN}
     PRIVATE
     PkgConfig::LIBGPIOD
 )
