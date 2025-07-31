@@ -58,7 +58,10 @@ void AuthDBModule::process_config() {
 
         INFO("Config processed for AuthDB instance: " << auth_ctx_name);
         INFO("  - Target: " << auth_target_name);
-        INFO("  - Sources: " << boost::algorithm::join(auth_sources_names, ", "));
+        INFO("  - Sources (" << auth_sources_names.size() << "): ");
+        for (const auto& source : auth_sources_names) {
+            INFO("    * " << source);
+        }
     }
 }
 
