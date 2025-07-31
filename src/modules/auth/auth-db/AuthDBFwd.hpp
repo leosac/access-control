@@ -27,7 +27,9 @@ namespace Module
 {
 namespace Auth
 {
-    class AuthDBInstance;
+class AuthDBInstance;
+using AuthDBInstancePtr = std::shared_ptr<AuthDBInstance>;
+using AuthDBInstanceId = unsigned long long;
 }
 }
 }

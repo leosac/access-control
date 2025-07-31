@@ -19,8 +19,11 @@
 
 #pragma once
 
+#include "AuthDBFwd.hpp"
 #include "AsioModule.hpp"
+#include "core/CoreUtils.hpp"
 #include <list>
+#include <memory>
 
 namespace Leosac
 {
@@ -39,6 +42,27 @@ class AuthDBModule : public AsioModule
     
     protected:
         void on_service_event(const service_event::Event &event) override;
+
+    private:
+        /* 
+         * Process the module configuration from the kernel
+        */
+        void process_config();
+
+        /*
+         * Add tables to the database if they don't exist
+        */
+        void setup_tables();
+
+        /*
+         * Setup authenticator instances
+        */
+        void setup_authenticators();
+
+        /*
+         * List of the created authenticator instances
+        */
+        std::list<AuthDBInstancePtr> authenticators_;
 };
 }
 }
