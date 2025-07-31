@@ -32,36 +32,40 @@ namespace Module
 namespace Auth
 {
 
+/**
+ * Module that provides authentication using database-stored credentials
+ */
 class AuthDBModule : public AsioModule
 {
     public:
         AuthDBModule(zmqpp::context& ctx, zmqpp::socket *pipe, 
                      const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
         
+        AuthDBModule(const AuthDBModule &) = delete;
         ~AuthDBModule();
     
     protected:
         void on_service_event(const service_event::Event &event) override;
 
     private:
-        /* 
+        /** 
          * Process the module configuration from the kernel
-        */
+         */
         void process_config();
 
-        /*
+        /**
          * Add tables to the database if they don't exist
-        */
+         */
         void setup_tables();
 
-        /*
+        /**
          * Setup authenticator instances
-        */
+         */
         void setup_authenticators();
 
-        /*
+        /**
          * List of the created authenticator instances
-        */
+         */
         std::list<AuthDBInstancePtr> authenticators_;
 };
 }

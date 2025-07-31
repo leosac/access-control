@@ -20,6 +20,8 @@
 #include "modules/auth/auth-db/AuthDBModule.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/kernel.hpp"
+#include "modules/auth/auth-db/AuthDBInstance.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module::Auth;
@@ -28,12 +30,42 @@ AuthDBModule::AuthDBModule(zmqpp::context& ctx, zmqpp::socket *pipe,
                            const boost::property_tree::ptree &cfg, CoreUtilsPtr utils)
     : AsioModule(ctx, pipe, cfg, utils)
 {
-    // TODO: Implement
+    process_config();
 }
 
-AuthDBModule::~AuthDBModule()
-{
-    // TODO: Implement
-}
+AuthDBModule::~AuthDBModule() {}
 
 void AuthDBModule::on_service_event(const service_event::Event &event) {}
+
+void AuthDBModule::process_config() {
+    boost::property_tree::ptree auth_db_cfg = config_.get_child("module_config");
+
+    for (const auto &instance_node : auth_db_cfg.get_child("instances")) {
+        boost::property_tree::ptree auth_instance_cfg = instance_node.second;
+        std::string auth_ctx_name = auth_instance_cfg.get_child("name").data();
+        std::string auth_target_name = auth_instance_cfg.get<std::string>("target", "");
+        std::list<std::string> auth_sources_names;
+
+        for (const auto &instance_subnode : auth_instance_cfg) {
+            if (instance_subnode.first == "auth_source") {
+                auth_sources_names.push_back(instance_subnode.second.data());
+            }
+        }
+
+        if (!auth_target_name.empty()) {
+            auth_target_name = utils_->kernel().config_manager().instance_name() + '.' + auth_target_name;
+        }
+
+        INFO("Config processed for AuthDB instance: " << auth_ctx_name);
+        INFO("  - Target: " << auth_target_name);
+        INFO("  - Sources: " << boost::algorithm::join(auth_sources_names, ", "));
+    }
+}
+
+void AuthDBModule::setup_tables() {
+    // TODO: Re-implement this back in the future
+}
+
+void AuthDBModule::setup_authenticators() {
+    // TODO: Implement
+}
