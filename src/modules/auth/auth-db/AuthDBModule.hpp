@@ -61,7 +61,9 @@ class AuthDBModule : public AsioModule
         /**
          * Setup authenticator instances
          */
-        void setup_authenticators();
+        void setup_authenticators(const std::string &auth_ctx_name, 
+                                  const std::list<std::string> &auth_sources_names, 
+                                  const std::string &auth_target_name);
 
         /**
          * List of the created authenticator instances

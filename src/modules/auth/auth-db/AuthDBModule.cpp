@@ -62,6 +62,8 @@ void AuthDBModule::process_config() {
         for (const auto& source : auth_sources_names) {
             INFO("    * " << source);
         }
+
+        setup_authenticators(auth_ctx_name, auth_sources_names, auth_target_name);
     }
 }
 
@@ -69,6 +71,11 @@ void AuthDBModule::setup_tables() {
     // TODO: Re-implement this back in the future
 }
 
-void AuthDBModule::setup_authenticators() {
-    // TODO: Implement
+void AuthDBModule::setup_authenticators(const std::string &auth_ctx_name, 
+                                        const std::list<std::string> &auth_sources_names, 
+                                        const std::string &auth_target_name) 
+{
+    authenticators_.push_back(AuthDBInstancePtr(
+        new AuthDBInstance(ctx_, auth_ctx_name, auth_sources_names,
+                           auth_target_name, utils_)));
 }
