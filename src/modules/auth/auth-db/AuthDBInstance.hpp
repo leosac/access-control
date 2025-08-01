@@ -33,6 +33,34 @@ namespace Module
 {
 namespace Auth 
 {
+
+struct AuthResult 
+{
+    AuthResult(bool s, ::Leosac::Auth::IAccessProfilePtr p,
+               ::Leosac::Auth::UserPtr u) 
+            : success(s)
+            , profile(p)
+            , user(u)
+    {}
+
+    /**
+     * Access granted or denied
+     */
+    bool success;
+
+    /**
+     * Profile used to grant or deny access. May be null if no profiles
+     * corresponding to the auth source were found.
+     */
+    ::Leosac::Auth::IAccessProfilePtr profile;
+
+    /**
+     * A user object representing the user who made the authentication
+     * attempt.
+     */
+    ::Leosac::Auth::UserPtr user;
+};
+
 class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
 {
     public:
