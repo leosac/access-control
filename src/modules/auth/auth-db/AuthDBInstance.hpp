@@ -109,9 +109,9 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         std::string format_user_name(const AuthResult &auth_result);
 
         /**
-         * Append full auth result info to auth result message
+         * Append access result to auth result and log event to console
          */
-        void update_auth_result_msg(const AuthResult &auth_result, zmqpp::message &msg);
+        void update_and_log_auth_result_msg(const AuthResult &auth_result, zmqpp::message &auth_result_msg);
 
         /**
          * Database service to query 

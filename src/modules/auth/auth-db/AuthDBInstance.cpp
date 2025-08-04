@@ -22,10 +22,12 @@
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
 #include "tools/Colorize.hpp"
+#include "core/auth/Auth.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
 
 using namespace Leosac::Module::Auth;
+using namespace Leosac::Auth;
 
 AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
                                const std::string &auth_ctx_name,
@@ -67,7 +69,7 @@ void AuthDBInstance::handle_bus_msg() {
     format_auth_result_msg(auth_result_msg);
     auto auth_result = handle_auth_msg(msg);
 
-    update_auth_result_msg(auth_result, auth_result_msg);
+    update_and_log_auth_result_msg(auth_result, auth_result_msg);
     bus_push_.send(auth_result_msg);
 }
 
@@ -94,7 +96,19 @@ std::string AuthDBInstance::format_user_name(const AuthResult &auth_result) {
     }
 }
 
-void AuthDBInstance::update_auth_result_msg(const AuthResult &auth_result, zmqpp::message &msg) {
-    // TODO: Implement this
-    INFO("TODO");
+void AuthDBInstance::update_and_log_auth_result_msg(const AuthResult &auth_result, zmqpp::message &auth_result_msg) {
+    using namespace Colorize;
+    std::string user = format_user_name(auth_result);
+
+    if (auth_result.success) {
+        auth_result_msg << Leosac::Auth::AccessStatus::GRANTED;
+        INFO(Colorize::bold(name_)
+            << " " << Colorize::green("GRANTED") << " access to target "
+            << Colorize::underline(target_name_) << " for user " << user);
+    } else {
+        auth_result_msg << Leosac::Auth::AccessStatus::DENIED;
+        INFO(Colorize::bold(name_)
+            << " " << Colorize::red("DENIED") << " access to target "
+            << Colorize::underline(target_name_) << " for user " << user);
+    }
 }
