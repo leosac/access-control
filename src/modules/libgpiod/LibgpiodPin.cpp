@@ -176,7 +176,7 @@ void LibgpiodPin::register_sockets(zmqpp::reactor *reactor)
         gpiod_fd_ = gpiod_line_event_get_fd(gpiod_line_);
         ASSERT_LOG(gpiod_fd_ >= 0, "Bad GPIO line or the line is not setup for event monitoring.");
         reactor->add(gpiod_fd_, std::bind(&LibgpiodPin::handle_interrupt, this),
-                     zmqpp::poller::poll_pri);
+                     zmqpp::poller::poll_in);
     }
 }
 
