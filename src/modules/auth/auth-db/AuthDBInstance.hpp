@@ -110,6 +110,11 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         Cred::ICredentialPtr find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const;
 
         /**
+         * Get the user from the db associated with the credentials
+         */
+         ::Leosac::Auth::UserPtr get_user(const Cred::ICredentialPtr *credentials);
+
+        /**
          * Format auth result message
          */
         void format_auth_result_msg(zmqpp::message &msg);

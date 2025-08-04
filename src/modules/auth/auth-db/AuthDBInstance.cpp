@@ -27,6 +27,7 @@
 #include "exception/ExceptionsTools.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
+#include <odb/transaction.hxx>
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
@@ -97,12 +98,12 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     try {
         std::lock_guard<std::mutex> guard(mutex_);
         
-        Cred::ICredentialPtr db_credentials = find_db_credentials(msg);
-        if (!db_credentials) {
+        Cred::ICredentialPtr credentials = find_db_credentials(msg);
+        if (!credentials) {
             return auth_result;
         }
 
-        Cred::ICredentialPtr auth_source = db_credentials;
+        ::Leosac::Auth::UserPtr user = get_user(credentials);
 
         //TODO: Finish this
 
@@ -135,6 +136,29 @@ Cred::ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
 Cred::ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
     // TODO: Implement this
     return nullptr;
+}
+
+::Leosac::Auth::UserPtr AuthDBInstance::get_user(const Cred::ICredentialPtr *credentials) {
+    using namespace odb;
+    using namespace odb::core;
+    ::Leosac::Auth::UserPtr user = nullptr;
+
+    auto db = core_utils_->database();
+    odb::transaction t(db->begin());
+
+    if (auto owner_lazy = credentials->owner()) {
+        if (auto owner = owner_lazy.load()) {
+            user = owner;
+        } else {
+            INFO("User does not exist in database");
+        }
+    } else {
+        INFO("These credentials do not have an owner");
+    }
+
+    t.commit();
+
+    return user;
 }
 
 void AuthDBInstance::format_auth_result_msg(zmqpp::message &msg) {
