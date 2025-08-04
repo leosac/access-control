@@ -97,7 +97,7 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
          * Handle a message from an auth source
          * Check if access is granted or denied by checking source against the database
          */
-        AuthResult handle_auth(zmqpp::message &msg);
+        AuthResult handle_auth(zmqpp::message *msg) noexcept;
 
         /**
          * Format auth result message

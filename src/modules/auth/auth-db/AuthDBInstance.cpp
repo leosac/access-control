@@ -68,7 +68,7 @@ void AuthDBInstance::handle_bus_msg() {
     }
 
     format_auth_result_msg(auth_result_msg);
-    auto auth_result = handle_auth_msg(msg);
+    auto auth_result = handle_auth(&msg);
 
     update_and_log_auth_result_msg(auth_result, auth_result_msg);
     bus_push_.send(auth_result_msg);
@@ -90,7 +90,7 @@ bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
     return false;
 }
 
-AuthResult AuthDBInstance::handle_auth(zmqpp::message &msg) {
+AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     AuthResult auth_result(false, nullptr, nullptr);
 
     try {
