@@ -124,6 +124,11 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
          */
         ::Leosac::Auth::IAccessProfilePtr build_profile(::Leosac::Auth::UserPtr &user, 
                                                         Cred::ICredentialPtr &credentials);
+        
+        /**
+         * Checks if the profile has access to the target
+         */
+        bool is_access_granted(::Leosac::Auth::IAccessProfilePtr &profile);
 
         /**
          * Format auth result message

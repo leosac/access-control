@@ -122,6 +122,11 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
         UserPtr user = get_user(credentials);
         IAccessProfilePtr profile = build_profile(user, credentials);
 
+        if (profile) {
+            bool access_granted = is_access_granted(profile);
+            auth_result = AuthResult(access_granted, profile, user);
+        }
+
         //TODO: Finish this
 
     } catch (std::exception &e) {
@@ -246,6 +251,17 @@ void AuthDBInstance::create_profile_from_schedule_mapping(const Tools::ScheduleM
     {
         profile->addAccessSchedule(nullptr, schedule);
         profiles.push_back(profile);
+    }
+}
+
+bool AuthDBInstance::is_access_granted(IAccessProfilePtr &profile) {
+    auto now = std::chrono::system_clock::now();
+
+    if (target_name_.empty()) {
+        return profile->isAccessGranted(now, nullptr);
+    } else {
+        AuthTargetPtr target(new AuthTarget(target_name_));
+        return profile->isAccessGranted(now, target);
     }
 }
 
