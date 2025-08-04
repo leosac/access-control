@@ -23,9 +23,11 @@
 #include "tools/log.hpp"
 #include "tools/Colorize.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/AuthFwd.hpp"
 #include "core/auth/User.hpp"
 #include "core/auth/User_odb.h"
 #include "core/auth/AuthSourceBuilder.hpp"
+#include "core/auth/SimpleAccessProfile.hpp"
 #include "core/credentials/ICredential.hpp"
 #include "core/credentials/RFIDCard.hpp"
 #include "core/credentials/PinCode.hpp"
@@ -42,6 +44,7 @@
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
 using namespace Leosac::Cred;
+using namespace ::Leosac::Auth;
 
 AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
                                const std::string &auth_ctx_name,
@@ -115,6 +118,9 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
         }
 
         log_credentials(credentials); // Temporary
+
+        UserPtr user = get_user(credentials);
+        IAccessProfilePtr profile = build_profile(user, credentials);
 
         //TODO: Finish this
 
@@ -200,6 +206,49 @@ ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &ca
     return user;
 }
 
+::Leosac::Auth::IAccessProfilePtr AuthDBInstance::build_profile(UserPtr &user, ICredentialPtr &credentials) {
+    try {
+        std::vector<IAccessProfilePtr> profiles;
+
+        using namespace odb;
+        using namespace odb::core;
+        auto db = core_utils_->database();
+        odb::transaction t(db->begin());
+
+        auto mappings = db->query<Tools::ScheduleMapping>();
+
+        for (const auto &schedule_map : mappings) {
+            if ((user && schedule_map.has_user(user->id())) || 
+                (credentials && schedule_map.has_cred(credentials->id()))) {
+                create_profile_from_schedule_mapping(schedule_map, profiles);
+            }
+        }
+
+        t.commit();
+        
+        if (profiles.empty()) {
+            return nullptr;
+        }
+
+        return profiles.at(0); // Temporary
+
+    } catch (const std::exception &e) {
+        WARN("AuthDBInstance::build_profile - Error building profile: " << e.what());
+        return nullptr;
+    }
+}
+
+void AuthDBInstance::create_profile_from_schedule_mapping(const Tools::ScheduleMapping &mapping, 
+                                                         std::vector<IAccessProfilePtr> &profiles) {
+    auto profile = std::make_shared<SimpleAccessProfile>();
+    auto schedule = mapping.schedule().load();
+    if (schedule)
+    {
+        profile->addAccessSchedule(nullptr, schedule);
+        profiles.push_back(profile);
+    }
+}
+
 void AuthDBInstance::format_auth_result_msg(zmqpp::message &msg) {
     msg << ("S_" + name_);
 }
@@ -239,7 +288,7 @@ void AuthDBInstance::log_credentials(Cred::ICredentialPtr &credentials) {
     std::string cred_serialized;
     cred_serialized = PolymorphicCredentialJSONStringSerializer::serialize(
         *credentials, SystemSecurityContext::instance());
-    INFO("Using Credential: " << cred_serialized);
+    INFO("Using Credentials: " << cred_serialized);
     
     t.commit();
 }

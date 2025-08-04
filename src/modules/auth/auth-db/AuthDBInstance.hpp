@@ -117,7 +117,13 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         /**
          * Get the user from the db associated with the credentials
          */
-         ::Leosac::Auth::UserPtr get_user(Cred::ICredentialPtr &credentials);
+        ::Leosac::Auth::UserPtr get_user(Cred::ICredentialPtr &credentials);
+
+        /**
+         * Build access profile for the user
+         */
+        ::Leosac::Auth::IAccessProfilePtr build_profile(::Leosac::Auth::UserPtr &user, 
+                                                        Cred::ICredentialPtr &credentials);
 
         /**
          * Format auth result message
@@ -138,6 +144,12 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
          * Log credentials to console
          */
         void log_credentials(Cred::ICredentialPtr &credentials);
+
+        /**
+         * Create a profile from a schedule mapping and add it to the list of profiles
+         */
+        void create_profile_from_schedule_mapping(const Tools::ScheduleMapping &mapping, 
+                                                  std::vector<::Leosac::Auth::IAccessProfilePtr> &profiles);
 
         /**
          * Database service to query 

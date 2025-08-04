@@ -175,8 +175,8 @@ function(odb_compile outvar)
     list(APPEND ODB_ARGS "-I${dir}")
   endforeach()
 
-  file(REMOVE_RECURSE "${ODB_COMPILE_OUTPUT_DIR}")
-  file(MAKE_DIRECTORY "${ODB_COMPILE_OUTPUT_DIR}")
+  # file(REMOVE_RECURSE "${ODB_COMPILE_OUTPUT_DIR}") # Temporary for debugging and fast make
+  # file(MAKE_DIRECTORY "${ODB_COMPILE_OUTPUT_DIR}") # Temporary for debugging and fast make
 
   foreach(input ${PARAM_FILES})
     get_filename_component(fname "${input}" NAME_WE)
