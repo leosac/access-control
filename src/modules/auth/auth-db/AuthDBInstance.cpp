@@ -74,7 +74,18 @@ void AuthDBInstance::handle_bus_msg() {
 }
 
 bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
-    // TODO: Implement this
+    auto msg_copy = msg.copy();
+    std::string tmp;
+    msg_copy >> tmp;
+
+    if (tmp == "KERNEL") {
+        msg_copy >> tmp;
+        if (tmp == "SIGHUP") {
+            INFO("AuthDBInstance received SIGHUP");
+            // TODO: Implement reload authdb config
+        }
+        return true;
+    }
     return false;
 }
 
