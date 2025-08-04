@@ -23,6 +23,7 @@
 #include "tools/log.hpp"
 #include "tools/Colorize.hpp"
 #include "core/auth/Auth.hpp"
+#include "exception/ExceptionsTools.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
 
@@ -89,9 +90,18 @@ bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
     return false;
 }
 
-AuthResult AuthDBInstance::handle_auth_msg(zmqpp::message &msg) {
-    // TODO: Implement this
-    return AuthResult(false, nullptr, nullptr);
+AuthResult AuthDBInstance::handle_auth(zmqpp::message &msg) {
+    AuthResult auth_result(false, nullptr, nullptr);
+
+    try {
+        std::lock_guard<std::mutex> guard(mutex_);
+
+    } catch (std::exception &e) {
+        WARN("Error while handling auth request: " << e.what());
+        log_exception(e);
+    }
+
+    return auth_result;
 }
 
 void AuthDBInstance::format_auth_result_msg(zmqpp::message &msg) {
