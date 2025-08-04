@@ -31,6 +31,12 @@ AuthDBModule::AuthDBModule(zmqpp::context& ctx, zmqpp::socket *pipe,
     : AsioModule(ctx, pipe, cfg, utils)
 {
     process_config();
+
+    for (auto authenticator : authenticators_)
+    {
+        reactor_.add(authenticator->bus_sub(),
+                     std::bind(&AuthDBInstance::handle_bus_msg, authenticator));
+    }
 }
 
 AuthDBModule::~AuthDBModule() {}

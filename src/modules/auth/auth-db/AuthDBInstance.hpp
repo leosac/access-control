@@ -87,6 +87,11 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
          */
         void handle_bus_msg();
 
+        /**
+         * Get the bus subscription socket
+         */
+        zmqpp::socket& bus_sub() { return bus_sub_; }
+
     private:
         /**
          * Handle a message from the kernel
@@ -112,7 +117,7 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         /**
          * Get the user from the db associated with the credentials
          */
-         ::Leosac::Auth::UserPtr get_user(const Cred::ICredentialPtr *credentials);
+         ::Leosac::Auth::UserPtr get_user(Cred::ICredentialPtr &credentials);
 
         /**
          * Format auth result message

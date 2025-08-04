@@ -23,7 +23,15 @@
 #include "tools/log.hpp"
 #include "tools/Colorize.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/User.hpp"
+#include "core/auth/User_odb.h"
 #include "core/auth/AuthSourceBuilder.hpp"
+#include "core/credentials/ICredential.hpp"
+#include "core/credentials/RFIDCard.hpp"
+#include "core/credentials/PinCode.hpp"
+#include "core/credentials/RFIDCardPin.hpp"
+#include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
+#include "core/SecurityContext.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
@@ -31,6 +39,7 @@
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
+using namespace Leosac::Cred;
 
 AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
                                const std::string &auth_ctx_name,
@@ -115,7 +124,7 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     return auth_result;
 }
 
-Cred::ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
+ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
     AuthSourceBuilder builder;
     Cred::ICredentialPtr auth_source = builder.create(msg);
     Cred::ICredentialPtr db_credentials = nullptr;
@@ -133,12 +142,12 @@ Cred::ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
     return db_credentials;
 }
 
-Cred::ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
+ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
     // TODO: Implement this
     return nullptr;
 }
 
-::Leosac::Auth::UserPtr AuthDBInstance::get_user(const Cred::ICredentialPtr *credentials) {
+::Leosac::Auth::UserPtr AuthDBInstance::get_user(Cred::ICredentialPtr &credentials) {
     using namespace odb;
     using namespace odb::core;
     ::Leosac::Auth::UserPtr user = nullptr;
