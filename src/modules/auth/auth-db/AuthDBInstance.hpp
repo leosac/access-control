@@ -78,8 +78,41 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
                        CoreUtilsPtr core_utils);
 
         ~AuthDBInstance();
-    
+
+        AuthDBInstance(const AuthDBInstance &) = delete;
+        AuthDBInstance &operator=(const AuthDBInstance &) = delete;
+
+        /**
+         * Handle a message from the bus
+         */
+        void handle_bus_msg();
+
     private:
+        /**
+         * Handle a message from the kernel
+         */
+        bool handle_kernel_msg(zmqpp::message &msg);
+
+        /**
+         * Handle a message from an auth source
+         */
+        AuthResult handle_auth_msg(zmqpp::message &msg);
+
+        /**
+         * Format auth result message
+         */
+        void format_auth_result_msg(zmqpp::message &msg);
+
+        /**
+         * Format user name for logging 
+         */
+        std::string format_user_name(const AuthResult &auth_result);
+
+        /**
+         * Append full auth result info to auth result message
+         */
+        void update_auth_result_msg(const AuthResult &auth_result, zmqpp::message &msg);
+
         /**
          * Database service to query 
         */

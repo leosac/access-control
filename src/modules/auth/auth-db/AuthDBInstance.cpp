@@ -21,6 +21,7 @@
 #include "core/CoreUtils.hpp"
 #include "tools/db/DBService.hpp"
 #include "tools/log.hpp"
+#include "tools/Colorize.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
 
@@ -50,4 +51,50 @@ AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
                              << boost::algorithm::join(auth_sources_names, ", "));
 }
 
-AuthDBInstance::~AuthDBInstance(){}
+AuthDBInstance::~AuthDBInstance() {
+    INFO("AuthDBInstance (" << name_ << ") destroyed");
+}
+
+void AuthDBInstance::handle_bus_msg() {
+    zmqpp::message msg;
+    zmqpp::message auth_result_msg;
+
+    bus_sub_.receive(msg);
+    if(handle_kernel_msg(msg)) {
+        return;
+    }
+
+    format_auth_result_msg(auth_result_msg);
+    auto auth_result = handle_auth_msg(msg);
+
+    update_auth_result_msg(auth_result, auth_result_msg);
+    bus_push_.send(auth_result_msg);
+}
+
+bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
+    // TODO: Implement this
+    return false;
+}
+
+AuthResult AuthDBInstance::handle_auth_msg(zmqpp::message &msg) {
+    // TODO: Implement this
+    return AuthResult(false, nullptr, nullptr);
+}
+
+void AuthDBInstance::format_auth_result_msg(zmqpp::message &msg) {
+    msg << ("S_" + name_);
+}
+
+std::string AuthDBInstance::format_user_name(const AuthResult &auth_result) {
+    using namespace Colorize;
+    if (auth_result.user) {
+        return Colorize::green(auth_result.user->username());
+    } else {
+        return Colorize::red("UNKNOWN_USER");
+    }
+}
+
+void AuthDBInstance::update_auth_result_msg(const AuthResult &auth_result, zmqpp::message &msg) {
+    // TODO: Implement this
+    INFO("TODO");
+}
