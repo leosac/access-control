@@ -107,7 +107,7 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         /**
          * Fetch credentials passed in message from database if they exist
          */
-        Cred::ICredentialPtr find_db_credentials(zmqpp::message *msg);
+        Cred::ICredentialPtr get_db_credentials(zmqpp::message *msg);
 
         /**
          * Find credentials in database by card id and number of bits
@@ -133,6 +133,11 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
          * Append access result to auth result and log event to console
          */
         void update_and_log_auth_result_msg(const AuthResult &auth_result, zmqpp::message &auth_result_msg);
+
+        /**
+         * Log credentials to console
+         */
+        void log_credentials(Cred::ICredentialPtr &credentials);
 
         /**
          * Database service to query 

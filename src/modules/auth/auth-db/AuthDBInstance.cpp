@@ -31,11 +31,13 @@
 #include "core/credentials/PinCode.hpp"
 #include "core/credentials/RFIDCardPin.hpp"
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
+#include "core/credentials/RFIDCard_odb.h"
 #include "core/SecurityContext.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
 #include <odb/transaction.hxx>
+#include <odb/query.hxx>
 
 using namespace Leosac::Module::Auth;
 using namespace Leosac::Auth;
@@ -107,12 +109,12 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     try {
         std::lock_guard<std::mutex> guard(mutex_);
         
-        Cred::ICredentialPtr credentials = find_db_credentials(msg);
+        Cred::ICredentialPtr credentials = get_db_credentials(msg);
         if (!credentials) {
             return auth_result;
         }
 
-        ::Leosac::Auth::UserPtr user = get_user(credentials);
+        log_credentials(credentials); // Temporary
 
         //TODO: Finish this
 
@@ -124,7 +126,7 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     return auth_result;
 }
 
-ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
+ICredentialPtr AuthDBInstance::get_db_credentials(zmqpp::message *msg) {
     AuthSourceBuilder builder;
     Cred::ICredentialPtr auth_source = builder.create(msg);
     Cred::ICredentialPtr db_credentials = nullptr;
@@ -143,8 +145,36 @@ ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
 }
 
 ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
-    // TODO: Implement this
-    return nullptr;
+    INFO("Searching for credentials by card id: " << card_id << " with " << nb_bits << " bits");
+
+    try {
+        using namespace odb;
+        using namespace odb::core;
+        using Query = odb::query<Cred::RFIDCard>;
+
+        auto db = core_utils_->database();
+        odb::transaction t(db->begin());
+
+        Query q(Query::card_id == card_id && Query::nb_bits == nb_bits);
+        auto result = db->query<Cred::RFIDCard>(q);
+
+        for (const auto &card : result) {
+            if (card.validity().is_valid()) {
+                t.commit();
+                return std::make_shared<Cred::RFIDCard>(card);
+            } else {
+                INFO("RFIDCard is not enabled (validity check failed).");
+            }
+        }
+
+        t.commit();
+        return nullptr;
+
+    } catch (const std::exception &e) {
+        WARN("Error finding credentials by card id: " << e.what());
+        log_exception(e);
+        return nullptr;
+    }
 }
 
 ::Leosac::Auth::UserPtr AuthDBInstance::get_user(Cred::ICredentialPtr &credentials) {
@@ -198,4 +228,18 @@ void AuthDBInstance::update_and_log_auth_result_msg(const AuthResult &auth_resul
             << " " << Colorize::red("DENIED") << " access to target "
             << Colorize::underline(target_name_) << " for user " << user);
     }
+}
+
+void AuthDBInstance::log_credentials(Cred::ICredentialPtr &credentials) {
+    using namespace odb;
+    using namespace odb::core;
+    auto db = core_utils_->database();
+    odb::transaction t(db->begin());
+    
+    std::string cred_serialized;
+    cred_serialized = PolymorphicCredentialJSONStringSerializer::serialize(
+        *credentials, SystemSecurityContext::instance());
+    INFO("Using Credential: " << cred_serialized);
+    
+    t.commit();
 }
