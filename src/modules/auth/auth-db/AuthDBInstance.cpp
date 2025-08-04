@@ -23,6 +23,7 @@
 #include "tools/log.hpp"
 #include "tools/Colorize.hpp"
 #include "core/auth/Auth.hpp"
+#include "core/auth/AuthSourceBuilder.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
@@ -95,6 +96,15 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
 
     try {
         std::lock_guard<std::mutex> guard(mutex_);
+        
+        Cred::ICredentialPtr db_credentials = find_db_credentials(msg);
+        if (!db_credentials) {
+            return auth_result;
+        }
+
+        Cred::ICredentialPtr auth_source = db_credentials;
+
+        //TODO: Finish this
 
     } catch (std::exception &e) {
         WARN("Error while handling auth request: " << e.what());
@@ -102,6 +112,29 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     }
 
     return auth_result;
+}
+
+Cred::ICredentialPtr AuthDBInstance::find_db_credentials(zmqpp::message *msg) {
+    AuthSourceBuilder builder;
+    Cred::ICredentialPtr auth_source = builder.create(msg);
+    Cred::ICredentialPtr db_credentials = nullptr;
+
+    if (auto rfid_card = std::dynamic_pointer_cast<Cred::RFIDCard>(auth_source)) {
+        db_credentials = find_credentials_by_card_id(rfid_card->card_id(), rfid_card->nb_bits());
+    } else if (auto pin_code = std::dynamic_pointer_cast<Cred::PinCode>(auth_source)) {
+        INFO("Pin code auth source not supported yet");
+    } else if (auto card_pin = std::dynamic_pointer_cast<Cred::RFIDCardPin>(auth_source)) {
+        INFO("Card pin auth source not supported yet");
+    } else {
+        WARN("Unknown credential type");
+    }
+
+    return db_credentials;
+}
+
+Cred::ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
+    // TODO: Implement this
+    return nullptr;
 }
 
 void AuthDBInstance::format_auth_result_msg(zmqpp::message &msg) {

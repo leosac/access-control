@@ -100,6 +100,16 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         AuthResult handle_auth(zmqpp::message *msg) noexcept;
 
         /**
+         * Fetch credentials passed in message from database if they exist
+         */
+        Cred::ICredentialPtr find_db_credentials(zmqpp::message *msg);
+
+        /**
+         * Find credentials in database by card id and number of bits
+         */
+        Cred::ICredentialPtr find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const;
+
+        /**
          * Format auth result message
          */
         void format_auth_result_msg(zmqpp::message &msg);
