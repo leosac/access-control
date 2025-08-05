@@ -50,10 +50,10 @@ jobs:
     needs: prepare
     strategy:
       matrix:
-        buildsystem: [ 'debian-bullseye', 'debian-buster' ]
+        buildsystem: [ 'debian-bookworm', 'debian-bullseye', 'debian-buster' ]
         platform: [ 'amd64', 'arm64', 'arm/v7', 'arm/v6' ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Prepare
@@ -71,7 +71,7 @@ jobs:
           echo ::set-output name=artifact_name::${ARTIFACT_NAME}
           echo ::set-output name=version::${VERSION}
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       - name: Run ${{ matrix.platform }} on ${{ matrix.buildsystem }}
         if: success()
         run: docker run --entrypoint=/bin/bash
@@ -85,7 +85,7 @@ jobs:
           BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') &&
           VCS_REF=${GITHUB_SHA::8} &&
           export DISTRIB TARGETPLATFORM VERSION TAG BUILD_DATE VCS_REF && /tmp/leosac/docker_scripts/build_leosac.sh"
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: success()
         with:
           name: ${{ steps.prepare.outputs.artifact_name }}
@@ -105,35 +105,35 @@ jobs:
 
           echo ::set-output name=buildx_args::--platform ${{ needs.prepare.outputs.platforms }} \
             ${TAGS}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v1.6.0
+        uses: docker/setup-buildx-action@v3
       - name: Docker Login
         if: success()
-        uses: docker/login-action@v1.14.1
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         if: success()
         with:
           name: debian-bullseye_amd64
           path: build/packages/debian-bullseye/linux/amd64
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         if: success()
         with:
           name: debian-bullseye_arm64
           path: build/packages/debian-bullseye/linux/arm64
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         if: success()
         with:
           name: debian-bullseye_arm-v7
           path: build/packages/debian-bullseye/linux/arm/v7
-      - uses: actions/download-artifact@v4.1.7
+      - uses: actions/download-artifact@v4
         if: success()
         with:
           name: debian-bullseye_arm-v6
@@ -146,32 +146,3 @@ jobs:
         if: always() && github.event_name != 'pull_request'
         run: |
           docker buildx imagetools inspect ${{ needs.prepare.outputs.docker_image }}:${{ needs.prepare.outputs.tag }}
-  jfrog:
-    runs-on: ubuntu-latest
-    needs: [ prepare, build ]
-    steps:
-      - uses: actions/download-artifact@v4.1.7
-        if: success()
-        with:
-          path: packages
-      - name: Upload artifacts to Debian repository
-        run: |
-          POOL=test
-          DEBPREFIX=
-          if [ "${{ github.event_name }}" = "push" ]; then
-            POOL=main
-          fi
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            POOL=pull-request
-            DEBPREFIX=$(date +%s)-
-          fi
-          PACKAGES=packages
-          for pkg in ${PACKAGES}/debian-* ; do
-            distri=${pkg%_*}
-            distri=${distri#*-}
-            arch=${pkg#*linux-}
-            arch=${arch%/*}
-            for deb in ${pkg}/*.deb ; do
-              curl -H "X-JFrog-Art-Api:${{ secrets.JFROG_API_KEY }}" -XPUT "https://leosac.jfrog.io/artifactory/default-debian/pool/${POOL}/l/leosac/${distri}/${DEBPREFIX}$(basename -- $deb);deb.distribution=${distri};deb.component=main;deb.architecture=${arch}" -T ${deb}
-            done
-          done
