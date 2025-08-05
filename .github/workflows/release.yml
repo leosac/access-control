@@ -40,10 +40,10 @@ jobs:
             DOCKER_PLATFORMS=linux/amd64
           fi
 
-          echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=docker_buildimage::${DOCKER_BUILDIMAGE}
-          echo ::set-output name=platforms::${DOCKER_PLATFORMS}
-          echo ::set-output name=tag::${TAG}
+          echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+          echo "docker_buildimage=${DOCKER_BUILDIMAGE}" >> $GITHUB_OUTPUT
+          echo "platforms=${DOCKER_PLATFORMS}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest
@@ -68,8 +68,8 @@ jobs:
           if [[ $GITHUB_REF != refs/tags/* ]]; then
             VERSION=$(date +%s):${VERSION}
           fi
-          echo ::set-output name=artifact_name::${ARTIFACT_NAME}
-          echo ::set-output name=version::${VERSION}
+          echo "artifact_name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
       - name: Run ${{ matrix.platform }} on ${{ matrix.buildsystem }}
@@ -103,8 +103,7 @@ jobs:
             TAGS="$TAGS --tag ${{ needs.prepare.outputs.docker_image }}:latest"
           fi
 
-          echo ::set-output name=buildx_args::--platform ${{ needs.prepare.outputs.platforms }} \
-            ${TAGS}
+          echo "buildx_args=--platform ${{ needs.prepare.outputs.platforms }} ${TAGS}" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v4
         with:
           submodules: recursive
