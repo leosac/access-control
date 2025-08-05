@@ -1,14 +1,14 @@
 /*
-    Copyright (C) 2014-2022 Leosac
+    Copyright (C) 2014-2025 Leosac
 
-    This file is part of Leosac.
+    This file is part of Leosac Access Control.
 
-    Leosac is free software: you can redistribute it and/or modify
+    Leosac Access Control is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    Leosac is distributed in the hope that it will be useful,
+    Leosac Access Control is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU Affero General Public License for more details.
@@ -53,7 +53,7 @@ int main(int argc, const char **argv)
     RuntimeOptions options;
     int relaunch = 1;
 
-    std::cout << "Running Leosac version " << Version::get_full_version()
+    std::cout << "Running Leosac Access Control version " << Version::get_full_version()
               << std::endl;
 
     Leosac::set_thread_name("main");
@@ -67,7 +67,7 @@ int main(int argc, const char **argv)
         TCLAP::ValueArg<std::string> kernelFile(
             "k", "kernel-cfg", "Kernel Configuration file", true, "", "config_file");
         TCLAP::ValueArg<std::string> working_directory(
-            "d", "working-directory", "Leosac's working directory", false, "",
+            "d", "working-directory", "LAC's working directory", false, "",
             "working_directory");
 
         cmd.add(strict);
@@ -91,7 +91,7 @@ int main(int argc, const char **argv)
     {
         try
         {
-            INFO("Creating Leosac Kernel...");
+            INFO("Creating LAC Kernel...");
             Kernel kernel(Kernel::make_config(options), options.is_strict());
             relaunch = kernel.run();
         }
