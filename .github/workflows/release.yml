@@ -50,7 +50,7 @@ jobs:
     needs: prepare
     strategy:
       matrix:
-        buildsystem: [ 'debian-bookworm', 'debian-bullseye' ]
+        buildsystem: [ 'debian-bullseye' ]
         platform: [ 'amd64', 'arm64', 'arm/v7' ]
     steps:
       - uses: actions/checkout@v4
