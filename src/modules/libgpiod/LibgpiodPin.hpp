@@ -124,9 +124,9 @@ class LibgpiodPin
     void handle_message();
 
     /**
-    * Write direction to the `direction` file.
+    * Configure the line with direction to output or set interrupt mode.
     */
-    void set_direction(Direction dir);
+    void configure_line(Direction dir, InterruptMode mode);
 
     /**
     * Write interrupt mode to the `edge` file.

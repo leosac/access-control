@@ -47,8 +47,7 @@ LibgpiodPin::LibgpiodPin(zmqpp::context &ctx, const std::string &name, const std
     gpiod_line_ = gpiod_chip_get_line(gpiod_chip_, gpio_offset_);
     assert(gpiod_line_ != nullptr);
 
-    set_direction(direction);
-    set_interrupt(interrupt_mode);
+    configure_line(direction, interrupt_mode);
 }
 
 LibgpiodPin::~LibgpiodPin()
@@ -68,16 +67,17 @@ void LibgpiodPin::release()
   }
 }
 
-void LibgpiodPin::set_direction(Direction dir)
+void LibgpiodPin::configure_line(Direction dir, InterruptMode mode)
 {
-    if (dir == Direction::In)
-    {
-      gpiod_line_request_input(gpiod_line_, module_.general_config()->consumer().c_str());
-    }
-    else
-    {
-      gpiod_line_request_output(gpiod_line_, module_.general_config()->consumer().c_str(), initial_value_);
-    }
+  if (gpiod_line_) {
+    gpiod_line_release(gpiod_line_);
+  }
+
+  if (dir == Direction::Out) {
+    gpiod_line_request_output(gpiod_line_, module_.general_config()->consumer().c_str(), initial_value_);
+  } else {
+    set_interrupt(mode);
+  }
 }
 
 void LibgpiodPin::set_interrupt(InterruptMode mode)
@@ -176,7 +176,7 @@ void LibgpiodPin::register_sockets(zmqpp::reactor *reactor)
         gpiod_fd_ = gpiod_line_event_get_fd(gpiod_line_);
         ASSERT_LOG(gpiod_fd_ >= 0, "Bad GPIO line or the line is not setup for event monitoring.");
         reactor->add(gpiod_fd_, std::bind(&LibgpiodPin::handle_interrupt, this),
-                     zmqpp::poller::poll_pri);
+                     zmqpp::poller::poll_in);
     }
 }
 

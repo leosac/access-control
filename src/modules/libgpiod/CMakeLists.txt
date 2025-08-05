@@ -1,3 +1,6 @@
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBGPIOD REQUIRED IMPORTED_TARGET libgpiod)
+
 set(LIBGPIOD_BIN libgpiod)
 
 set(LIBGPIOD_SRCS
@@ -8,6 +11,11 @@ set(LIBGPIOD_SRCS
 )
 
 add_library(${LIBGPIOD_BIN} SHARED ${LIBGPIOD_SRCS})
+
+target_link_libraries(${LIBGPIOD_BIN}
+    PRIVATE
+    PkgConfig::LIBGPIOD
+)
 
 set_target_properties(${LIBGPIOD_BIN} PROPERTIES
     COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
