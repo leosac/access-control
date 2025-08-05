@@ -10,7 +10,7 @@ DEB_PATH=${APP_PATH}/build/packages/${DISTRIB}/${TARGETPLATFORM}
 mkdir -p $DEB_PATH
 
 pushd $APP_PATH/python
-pip3 install -e .
+pip3 install -e . --break-system-packages
 popd;
 
 pushd $APP_PATH
