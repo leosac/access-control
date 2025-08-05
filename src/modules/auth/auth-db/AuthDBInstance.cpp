@@ -35,6 +35,8 @@
 #include "core/credentials/serializers/PolymorphicCredentialSerializer.hpp"
 #include "core/credentials/RFIDCard_odb.h"
 #include "core/SecurityContext.hpp"
+#include "core/audit/AuthEvent.hpp"
+#include "core/audit/AuditFactory.hpp"
 #include "exception/ExceptionsTools.hpp"
 #include <boost/algorithm/string/join.hpp>
 #include <zmqpp/zmqpp.hpp>
@@ -127,7 +129,7 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
             auth_result = AuthResult(access_granted, profile, user);
         }
 
-        //TODO: Finish this
+        log_auth_event(auth_result, credentials);
 
     } catch (std::exception &e) {
         WARN("Error while handling auth request: " << e.what());
@@ -262,6 +264,27 @@ bool AuthDBInstance::is_access_granted(IAccessProfilePtr &profile) {
     } else {
         AuthTargetPtr target(new AuthTarget(target_name_));
         return profile->isAccessGranted(now, target);
+    }
+}
+
+void AuthDBInstance::log_auth_event(const AuthResult &auth_result, Cred::ICredentialPtr &credentials) {
+    try {
+        if (!target_name_.empty()) {
+            using namespace odb;
+            using namespace odb::core;
+            auto db = core_utils_->database();
+            odb::transaction t(db->begin());
+
+            auto audit = Audit::Factory::AuthEvent(db, credentials, target_name_);
+            audit->event_mask(auth_result.success ? Audit::EventType::AUTH_GRANTED : Audit::EventType::AUTH_DENIED);
+            audit->finalize();
+
+            t.commit();
+        } else {
+            INFO("No target name provided, skipping Audit AuthEvent creation");
+        }
+    } catch (const std::exception &e) {
+        WARN("Failed to create AuthEvent: " << e.what());
     }
 }
 

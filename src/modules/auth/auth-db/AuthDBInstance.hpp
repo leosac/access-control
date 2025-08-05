@@ -131,6 +131,11 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         bool is_access_granted(::Leosac::Auth::IAccessProfilePtr &profile);
 
         /**
+         * Log auth event
+         */
+        void log_auth_event(const AuthResult &auth_result, Cred::ICredentialPtr &credentials);
+
+        /**
          * Format auth result message
          */
         void format_auth_result_msg(zmqpp::message &msg);
