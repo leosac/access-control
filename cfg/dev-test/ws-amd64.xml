@@ -35,7 +35,7 @@
 
             <module_config>
               <port>8888</port>
-              <interface>10.2.1.5</interface>
+              <interface>0.0.0.0</interface>
             </module_config>
         </module>
 

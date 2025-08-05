@@ -25,6 +25,7 @@
 #include "modules/wiegand/strategies/WiegandStrategy.hpp"
 #include "zmqpp/zmqpp.hpp"
 #include <chrono>
+#include <array>
 #include <string>
 
 namespace Leosac

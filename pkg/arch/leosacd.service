@@ -1,6 +1,6 @@
 [Unit]
 Description=Leosac daemon
-Documentation=https://github.com/leosac/leosac
+Documentation=https://github.com/leosac/access-control
 After=default.target
 
 [Service]

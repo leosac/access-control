@@ -21,6 +21,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <string>
 #include <memory>
 #include <functional>
 

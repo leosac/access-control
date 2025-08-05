@@ -7,14 +7,14 @@
 Introduction {#main_intro}
 ==========================
 
-What is Leosac? {#what_is_leosac}
+What is Leosac Access Control? {#what_is_leosac}
 ---------------------------------
 
-Leosac is an open source physical access control system software.
+Leosac Access Control is an open source physical access control system software.
 It is meant to be installed on embedded devices running Linux, to handle the logic processing of an access control.
 Basically, it opens doors.
 
-A Leosac setup is usually composed of an embedded Linux board running the software,
+A Leosac Access Control setup is usually composed of an embedded Linux board running the software,
 locked in a case, connected to a RFID card reader and to the electric strike of a door.
 
 Features {#leosac_features}
@@ -69,7 +69,7 @@ This is to prevent problem when synchronizing configuration between Leosac unit.
 Issues {#issues}
 ----------------
 
-Please report issues (and ask questions) [here](https://github.com/leosac/leosac/issues).
+Please report issues (and ask questions) [here](https://github.com/leosac/access-control/issues).
 
 License {#license}
 ------------------

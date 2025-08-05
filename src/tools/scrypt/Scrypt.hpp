@@ -30,6 +30,7 @@ extern "C" {
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 struct ScryptParam

@@ -36,7 +36,7 @@ Build
 
 Clone the repo and peform a legacy make install from-source:
 ```
-git clone -b master https://github.com/islog/leosac.git
+git clone -b master https://github.com/leosac/access-control.git
 cd leosac
 git submodule init
 git submodule update

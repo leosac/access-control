@@ -14,7 +14,7 @@ Consider using one of the other build methods if build time is important.
 Download pre-built releases
 ---------------------------
 
-DEB files can be downloaded directly from GitHub releases here: https://github.com/leosac/leosac/releases
+DEB files can be downloaded directly from GitHub releases here: https://github.com/leosac/access-control/releases
 
 ```
 sudo apt-get install libboost-regex1.74.0 libboost-serialization1.74.0 libcurl4 libodb-2.4 libodb-boost-2.4 libodb-pgsql-2.4 libodb-sqlite-2.4 libscrypt0 libzmq5 libgpio2
@@ -42,7 +42,7 @@ If you intend to build the very latest code from the develop branch, then simply
 If instead you prefer to build the latest release (or some other branch), then use the -b flag to specify the branch, tag, or release to build:
   + `./deb.sh -b v0.8.0`
 
-Replace "v0.8.0" with the tag name of the most recent release, found on the leosac [releases page](https://github.com/leosac/leosac/releases).
+Replace "v0.8.0" with the tag name of the most recent release, found on the leosac [releases page](https://github.com/leosac/access-control/releases).
 
 Let's say you have development work in a branch in your own fork you want to test, you can call deb.sh this way:
   + `./deb.sh -u https://github.com/your-git-profile/leosac -b your-branch`
