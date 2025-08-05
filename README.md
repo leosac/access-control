@@ -1,15 +1,15 @@
  # Leosac ![Logo](rc/logo.png)
 
-* Stable branch: master [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/leosac/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_leosac&metric=alert_status&branch=master)](https://sonarcloud.io/summary/new_code?id=leosac_leosac&branch=master)
-* Development branch: develop [![Build Status](https://github.com/leosac/leosac/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/leosac/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_leosac&metric=alert_status&branch=develop)](https://sonarcloud.io/summary/new_code?id=leosac_leosac&branch=develop) [![Coverity Scan](https://scan.coverity.com/projects/24616/badge.svg)](https://scan.coverity.com/projects/leosac-leosac)
+* Stable branch: master [![Build Status](https://github.com/leosac/access-control/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/access-control/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_leosac&metric=alert_status&branch=master)](https://sonarcloud.io/summary/new_code?id=leosac_leosac&branch=master)
+* Development branch: develop [![Build Status](https://github.com/leosac/access-control/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/access-control/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_leosac&metric=alert_status&branch=develop)](https://sonarcloud.io/summary/new_code?id=leosac_leosac&branch=develop) [![Coverity Scan](https://scan.coverity.com/projects/24616/badge.svg)](https://scan.coverity.com/projects/leosac-leosac)
 
 The documentation for both end user and developpers can be found [here](http://leosac.github.io/leosac-doc/doc_output/develop/).
 
-## What is Leosac?
+## What is Leosac Access Control?
 
-Leosac is an open source physical access control system software. It is meant to be installed on embedded devices running Linux, to handle the logic processing of an access control. Basically, it opens doors.
+Leosac Access Control is an open source physical access control system software. It is meant to be installed on embedded devices running Linux, to handle the logic processing of an access control. Basically, it opens doors.
 
-A Leosac setup is usually composed of an embedded Linux board running the software, locked in a case, connected to a RFID card reader and to the electric strike of a door.                                                                    
+A Leosac Access Control setup is usually composed of an embedded Linux board running the software, locked in a case, connected to a RFID card reader and to the electric strike of a door.                                                                    
 
 ## Features                                                                                                                                                                                                                                    
 
@@ -27,7 +27,7 @@ to have a basic setup ready.
 
 ## Issues
 
-Please report issues [here](https://github.com/leosac/leosac/issues).
+Please report issues [here](https://github.com/leosac/access-control/issues).
 
 ## License
 
