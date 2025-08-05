@@ -10,7 +10,11 @@ DEB_PATH=${APP_PATH}/build/packages/${DISTRIB}/${TARGETPLATFORM}
 mkdir -p $DEB_PATH
 
 pushd $APP_PATH/python
-pip3 install -e . --break-system-packages
+if [ $DISTRIB = "debian-bullseye" ]; then
+   pip3 install -e .
+else
+   pip3 install -e . --break-system-packages
+fi
 popd;
 
 pushd $APP_PATH
