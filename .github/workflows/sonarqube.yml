@@ -9,7 +9,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     env:
-      SONAR_SERVER_URL: "https://sonarcloud.io" #SONAR_SCANNER_VERSION: 7.0.2.4839
+      SONAR_SCANNER_VERSION: 7.0.2.4839
+      SONAR_SERVER_URL: "https://sonarcloud.io"
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output # Directory where build-wrapper output will be placed
     steps:
       - uses: actions/checkout@v2
