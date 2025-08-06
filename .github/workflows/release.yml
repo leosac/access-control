@@ -22,7 +22,7 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          DOCKER_IMAGE=leosac/leosac
+          DOCKER_IMAGE=leosac/leosac-access-control
           DOCKER_BUILDIMAGE=leosac/leosac-buildsystem
           DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7
           TAG=edge
