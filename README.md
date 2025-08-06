@@ -1,4 +1,4 @@
- # Leosac ![Logo](rc/logo.png)
+ # Leosac Access Control ![Logo](rc/logo.png)
 
 * Stable branch: master [![Build Status](https://github.com/leosac/access-control/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/leosac/access-control/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_access-control&metric=alert_status&branch=master)](https://sonarcloud.io/summary/new_code?id=leosac_access-control&branch=master)
 * Development branch: develop [![Build Status](https://github.com/leosac/access-control/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/leosac/access-control/actions/workflows/build.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=leosac_access-control&metric=alert_status&branch=develop)](https://sonarcloud.io/summary/new_code?id=leosac_access-control&branch=develop) [![Coverity Scan](https://scan.coverity.com/projects/32137/badge.svg)](https://scan.coverity.com/projects/leosac-access-control)
