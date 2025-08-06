@@ -9,7 +9,7 @@ EXPOSE 8888
 VOLUME /leosac_src
 VOLUME /docker_scripts
 
-ADD docker_scripts /docker_scripts
+COPY docker_scripts /docker_scripts
 RUN /docker_scripts/odb_install.sh
 RUN /docker_scripts/gtest_install.sh
 
@@ -20,14 +20,14 @@ RUN apt-get install -y postgresql-client-9.6 libboost-coroutine-dev
 ## Otherwise, just editing a test-script would cause full rebuild ...
 RUN mkdir -p /leosac_src/{cmake,cfg,docker_scripts,libmcp23s17,libpifacedigital,libzmq,scripts,spdlog,src,test,tools,zmqpp,test_helper}
 
-ADD cfg /leosac_src/cfg/
-ADD docker_scripts /leosac_src/docker_scripts/
-ADD scripts /leosac_src/scripts/
-ADD test /leosac_src/test/
-ADD deps /leosac_src/deps/
-ADD cmake /leosac_src/cmake/
-ADD src /leosac_src/src/
-ADD CMakeLists.txt /leosac_src/
+COPY cfg /leosac_src/cfg/
+COPY docker_scripts /leosac_src/docker_scripts/
+COPY scripts /leosac_src/scripts/
+COPY test /leosac_src/test/
+COPY deps /leosac_src/deps/
+COPY cmake /leosac_src/cmake/
+COPY src /leosac_src/src/
+COPY CMakeLists.txt /leosac_src/
 
 RUN mkdir -p /tmp/leosac_build && \
 cd /tmp/leosac_build && \
@@ -37,4 +37,4 @@ make -DCMAKE_BUILD_TYPE=Debug -DLEOSAC_BUILD_TESTS=1 \
 make -j4 && \
 make install
 
-ADD test_helper /leosac_src/test_helper
+COPY test_helper /leosac_src/test_helper

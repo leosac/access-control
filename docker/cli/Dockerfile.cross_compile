@@ -10,7 +10,7 @@ RUN echo 'deb-src http://deb.debian.org/debian bullseye main' >> /etc/apt/source
 RUN apt-get update && apt-get install -y emacs-nox vim wget git cmake build-essential \
 g++-arm-linux-gnueabihf libtool-bin autoconf automake pkg-config python3
 
-ADD cross-compile-resources /cross-compile-resources
+COPY cross-compile-resources /cross-compile-resources
 
 # Boost libraries.
 
@@ -119,7 +119,7 @@ RUN (cd /tmp && cp /cross-compile-resources/lla.tar . && tar xvf lla.tar && \
     -DPCSCLITE_INCLUDE_DIR=/opt/rpi_fakeroot/include/PCSC .. && \
     make -j6 && make install)
 
-ADD docker_scripts /docker_scripts
+COPY docker_scripts /docker_scripts
 
 # Volume where the root of the Leosac repository lives.
 VOLUME /leosac
