@@ -43,6 +43,17 @@ class AuthDBModule : public AsioModule
         
         AuthDBModule(const AuthDBModule &) = delete;
         ~AuthDBModule();
+
+        
+        /**
+         * Ignore less than this number of bits from bus
+         */
+        int bits_low_threshold_;
+
+        /**
+        * Ignore bits higher than this number of bits from bus
+        */
+        int bits_high_threshold_;
     
     protected:
         void on_service_event(const service_event::Event &event) override;

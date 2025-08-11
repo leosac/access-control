@@ -34,11 +34,31 @@ namespace Module
 namespace Auth 
 {
 
+struct CredResult
+{
+    CredResult(bool i, Cred::ICredentialPtr c)
+        : ignore(i)
+        , db_credentials(c)
+    {}
+
+    /**
+     * If true, the auth request should be ignored
+     * Used for kickback and other unwanted noise on the bus
+     */
+    bool ignore;
+
+    /**
+     * Credentials found in the database
+     */
+    Cred::ICredentialPtr db_credentials;
+};
+
 struct AuthResult 
 {
-    AuthResult(bool s, ::Leosac::Auth::IAccessProfilePtr p,
+    AuthResult(bool s, bool i, ::Leosac::Auth::IAccessProfilePtr p,
                ::Leosac::Auth::UserPtr u) 
             : success(s)
+            , ignore(i)
             , profile(p)
             , user(u)
     {}
@@ -47,6 +67,12 @@ struct AuthResult
      * Access granted or denied
      */
     bool success;
+
+    /**
+     * If true, the auth request should be ignored
+     * Used for kickback and other unwanted noise on the bus
+    */
+    bool ignore;
 
     /**
      * Profile used to grant or deny access. May be null if no profiles
@@ -75,7 +101,9 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         AuthDBInstance(zmqpp::context &ctx, const std::string &auth_ctx_name,
                        const std::list<std::string> &auth_sources_names,
                        const std::string &auth_target_name,
-                       CoreUtilsPtr core_utils);
+                       CoreUtilsPtr core_utils,
+                       const int bits_low_threshold,
+                       const int bits_high_threshold);
 
         ~AuthDBInstance();
 
@@ -107,12 +135,12 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         /**
          * Fetch credentials passed in message from database if they exist
          */
-        Cred::ICredentialPtr get_db_credentials(zmqpp::message *msg);
+        CredResult get_db_credentials(zmqpp::message *msg);
 
         /**
          * Find credentials in database by card id and number of bits
          */
-        Cred::ICredentialPtr find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const;
+        CredResult find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const;
 
         /**
          * Get the user from the db associated with the credentials
@@ -160,6 +188,11 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
          */
         void create_profile_from_schedule_mapping(const Tools::ScheduleMapping &mapping, 
                                                   std::vector<::Leosac::Auth::IAccessProfilePtr> &profiles);
+        
+        /**
+         * Check if the number of bits received is considered noise
+         */
+        bool is_noise(const int nb_bits) const;
 
         /**
          * Database service to query 
@@ -190,6 +223,16 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
         CoreUtilsPtr core_utils_;
 
         std::mutex mutex_;
+
+        /**
+         * Ignore <= this number of bits from bus
+         */
+        int bits_low_threshold_;
+
+        /**
+         * Ignore >= this number of bits from bus
+         */
+        int bits_high_threshold_;
 };
 }
 }

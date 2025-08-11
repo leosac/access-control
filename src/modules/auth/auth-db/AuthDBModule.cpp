@@ -45,6 +45,12 @@ void AuthDBModule::on_service_event(const service_event::Event &event) {}
 
 void AuthDBModule::process_config() {
     boost::property_tree::ptree auth_db_cfg = config_.get_child("module_config");
+    
+    bits_low_threshold_ = auth_db_cfg.get<int>("bits_low_threshold", -1);
+    bits_high_threshold_ = auth_db_cfg.get<int>("bits_high_threshold", 127);
+
+    INFO("Configured bits_low_threshold: " << bits_low_threshold_);
+    INFO("Configured bits_high_threshold: " << bits_high_threshold_);
 
     for (const auto &instance_node : auth_db_cfg.get_child("instances")) {
         boost::property_tree::ptree auth_instance_cfg = instance_node.second;
@@ -83,5 +89,6 @@ void AuthDBModule::setup_authenticators(const std::string &auth_ctx_name,
 {
     authenticators_.push_back(AuthDBInstancePtr(
         new AuthDBInstance(ctx_, auth_ctx_name, auth_sources_names,
-                           auth_target_name, utils_)));
+                           auth_target_name, utils_, bits_low_threshold_,
+                           bits_high_threshold_)));
 }

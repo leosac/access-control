@@ -52,13 +52,17 @@ AuthDBInstance::AuthDBInstance(zmqpp::context &ctx,
                                const std::string &auth_ctx_name,
                                const std::list<std::string> &auth_sources_names,
                                const std::string &auth_target_name,
-                               CoreUtilsPtr core_utils)
+                               CoreUtilsPtr core_utils,
+                               const int bits_low_threshold,
+                               const int bits_high_threshold)
     : db_service_(std::make_shared<DBService>(core_utils->database()))
     , bus_push_(ctx, zmqpp::socket_type::push)
     , bus_sub_(ctx, zmqpp::socket_type::sub)
     , name_(auth_ctx_name)
     , target_name_(auth_target_name)
     , core_utils_(core_utils)
+    , bits_low_threshold_(bits_low_threshold)
+    , bits_high_threshold_(bits_high_threshold)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
     bus_sub_.connect("inproc://zmq-bus-pub");
@@ -87,9 +91,11 @@ void AuthDBInstance::handle_bus_msg() {
 
     format_auth_result_msg(auth_result_msg);
     auto auth_result = handle_auth(&msg);
-
-    update_and_log_auth_result_msg(auth_result, auth_result_msg);
-    bus_push_.send(auth_result_msg);
+ 
+    if (!auth_result.ignore) {
+        update_and_log_auth_result_msg(auth_result, auth_result_msg);
+        bus_push_.send(auth_result_msg);
+    }
 }
 
 bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
@@ -101,7 +107,7 @@ bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
         msg_copy >> tmp;
         if (tmp == "SIGHUP") {
             INFO("AuthDBInstance received SIGHUP");
-            // TODO: Implement reload authdb config
+            // TODO: Implement reload authdb config?
         }
         return true;
     }
@@ -109,12 +115,18 @@ bool AuthDBInstance::handle_kernel_msg(zmqpp::message &msg) {
 }
 
 AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
-    AuthResult auth_result(false, nullptr, nullptr);
+    AuthResult auth_result(false, false, nullptr, nullptr);
 
     try {
         std::lock_guard<std::mutex> guard(mutex_);
         
-        Cred::ICredentialPtr credentials = get_db_credentials(msg);
+        CredResult cred_result = get_db_credentials(msg);
+        if (cred_result.ignore) {
+            auth_result.ignore = true;
+            return auth_result;
+        }
+
+        Cred::ICredentialPtr credentials = cred_result.db_credentials;
         if (!credentials) {
             return auth_result;
         }
@@ -126,7 +138,7 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
 
         if (profile) {
             bool access_granted = is_access_granted(profile);
-            auth_result = AuthResult(access_granted, profile, user);
+            auth_result = AuthResult(access_granted, false, profile, user);
         }
 
         log_auth_event(auth_result, credentials);
@@ -139,13 +151,13 @@ AuthResult AuthDBInstance::handle_auth(zmqpp::message *msg) noexcept {
     return auth_result;
 }
 
-ICredentialPtr AuthDBInstance::get_db_credentials(zmqpp::message *msg) {
+CredResult AuthDBInstance::get_db_credentials(zmqpp::message *msg) {
     AuthSourceBuilder builder;
     Cred::ICredentialPtr auth_source = builder.create(msg);
-    Cred::ICredentialPtr db_credentials = nullptr;
+    CredResult cred_result(false, nullptr);
 
     if (auto rfid_card = std::dynamic_pointer_cast<Cred::RFIDCard>(auth_source)) {
-        db_credentials = find_credentials_by_card_id(rfid_card->card_id(), rfid_card->nb_bits());
+        cred_result = find_credentials_by_card_id(rfid_card->card_id(), rfid_card->nb_bits());
     } else if (auto pin_code = std::dynamic_pointer_cast<Cred::PinCode>(auth_source)) {
         INFO("Pin code auth source not supported yet");
     } else if (auto card_pin = std::dynamic_pointer_cast<Cred::RFIDCardPin>(auth_source)) {
@@ -154,11 +166,16 @@ ICredentialPtr AuthDBInstance::get_db_credentials(zmqpp::message *msg) {
         WARN("Unknown credential type");
     }
 
-    return db_credentials;
+    return cred_result;
 }
 
-ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
+CredResult AuthDBInstance::find_credentials_by_card_id(const std::string &card_id, const int nb_bits) const {
     INFO("Searching for credentials by card id: " << card_id << " with " << nb_bits << " bits");
+
+    if (is_noise(nb_bits)) {
+        INFO("Number of bits, " << nb_bits << ", is configured as noise, ignoring.");
+        return CredResult(true, nullptr);
+    }
 
     try {
         using namespace odb;
@@ -174,19 +191,19 @@ ICredentialPtr AuthDBInstance::find_credentials_by_card_id(const std::string &ca
         for (const auto &card : result) {
             if (card.validity().is_valid()) {
                 t.commit();
-                return std::make_shared<Cred::RFIDCard>(card);
+                return CredResult(false, std::make_shared<Cred::RFIDCard>(card));
             } else {
                 INFO("RFIDCard is not enabled (validity check failed).");
             }
         }
 
         t.commit();
-        return nullptr;
+        return CredResult(false, nullptr);
 
     } catch (const std::exception &e) {
         WARN("Error finding credentials by card id: " << e.what());
         log_exception(e);
-        return nullptr;
+        return CredResult(false, nullptr);
     }
 }
 
@@ -330,4 +347,16 @@ void AuthDBInstance::log_credentials(Cred::ICredentialPtr &credentials) {
     INFO("Using Credentials: " << cred_serialized);
     
     t.commit();
+}
+
+bool AuthDBInstance::is_noise(const int nb_bits) const {
+    if (bits_low_threshold_ != -1 && nb_bits < bits_low_threshold_) {
+        return true;
+    }
+
+    if (bits_high_threshold_ != -1 && nb_bits > bits_high_threshold_) {
+        return true;
+    }
+
+    return false;
 }
