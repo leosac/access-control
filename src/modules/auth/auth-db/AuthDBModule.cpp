@@ -79,10 +79,6 @@ void AuthDBModule::process_config() {
     }
 }
 
-void AuthDBModule::setup_tables() {
-    // TODO: Re-implement this back in the future
-}
-
 void AuthDBModule::setup_authenticators(const std::string &auth_ctx_name, 
                                         const std::list<std::string> &auth_sources_names, 
                                         const std::string &auth_target_name) 

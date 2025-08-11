@@ -65,11 +65,6 @@ class AuthDBModule : public AsioModule
         void process_config();
 
         /**
-         * Add tables to the database if they don't exist
-         */
-        void setup_tables();
-
-        /**
          * Setup authenticator instances
          */
         void setup_authenticators(const std::string &auth_ctx_name, 
