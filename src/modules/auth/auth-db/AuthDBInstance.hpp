@@ -190,6 +190,13 @@ class AuthDBInstance : public std::enable_shared_from_this<AuthDBInstance>
                                                   std::vector<::Leosac::Auth::IAccessProfilePtr> &profiles);
         
         /**
+         * Add targets to the profile from a schedule mapping
+         */
+        void add_doors_to_profile(const Tools::ScheduleMapping &mapping,
+                                  Leosac::Auth::SimpleAccessProfilePtr &profile,
+                                  const ::Leosac::Tools::IScheduleCPtr& schedule);
+        
+        /**
          * Check if the number of bits received is considered noise
          */
         bool is_noise(const int nb_bits) const;

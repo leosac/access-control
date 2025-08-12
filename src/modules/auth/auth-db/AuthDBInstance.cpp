@@ -266,10 +266,37 @@ void AuthDBInstance::create_profile_from_schedule_mapping(const Tools::ScheduleM
                                                          std::vector<IAccessProfilePtr> &profiles) {
     auto profile = std::make_shared<SimpleAccessProfile>();
     auto schedule = mapping.schedule().load();
-    if (schedule)
-    {
+
+    if (!schedule) {
+        return;
+    }
+
+    add_doors_to_profile(mapping, profile, schedule);
+
+    profiles.push_back(profile);
+}
+
+void AuthDBInstance::add_doors_to_profile(const Tools::ScheduleMapping &mapping,
+                                          SimpleAccessProfilePtr &profile,
+                                          const Leosac::Tools::IScheduleCPtr& schedule) {
+    for (const auto &door : mapping.doors()) {
+        if (auto lazy_door = door.load()) {
+            std::string alias = lazy_door->alias();
+            if (alias.empty()) {
+                continue;
+            }
+
+            profile->addAccessSchedule(AuthTargetPtr(new AuthTarget(alias)), schedule);
+
+            static const std::string ns_prefix = "my_leosac.";
+            if (alias.rfind(ns_prefix, 0) != 0) {
+                profile->addAccessSchedule(AuthTargetPtr(new AuthTarget(ns_prefix + alias)), schedule);
+            }
+        }
+    }
+
+    if (mapping.doors().empty()) {
         profile->addAccessSchedule(nullptr, schedule);
-        profiles.push_back(profile);
     }
 }
 
