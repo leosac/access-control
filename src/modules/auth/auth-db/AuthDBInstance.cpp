@@ -242,7 +242,7 @@ CredResult AuthDBInstance::find_credentials_by_card_id(const std::string &card_i
         auto mappings = db->query<Tools::ScheduleMapping>();
 
         for (const auto &schedule_map : mappings) {
-            if ((user && schedule_map.has_user(user->id())) || 
+            if ((user && schedule_map.has_user_indirect(user)) || 
                 (credentials && schedule_map.has_cred(credentials->id()))) {
                 create_profile_from_schedule_mapping(schedule_map, profiles);
             }
