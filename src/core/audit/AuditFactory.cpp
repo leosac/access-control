@@ -143,8 +143,6 @@ IAuthEventPtr Factory::AuthEvent(const DBPtr &database, Cred::ICredentialPtr cre
     ASSERT_LOG(database, "Database cannot be null.");
     ASSERT_LOG(credential, "Credential must be non null.");
     ASSERT_LOG(!door.empty(), "Door must be set.");
-    ASSERT_LOG(parent, "Parent must be non null.");
-    ASSERT_LOG(parent->id(), "Parent must be already persisted.");
 
     AuditEntryPtr parent_odb;
     if (parent && parent->id())
