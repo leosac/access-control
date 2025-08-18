@@ -50,7 +50,7 @@ EOF
 #
 
 # Set default values
-url="https://github.com/leosac/leosac.git"
+url="https://github.com/leosac/access-control.git"
 branch="develop"
 
 while getopts "hu:b:" OPTION

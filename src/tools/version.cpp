@@ -25,6 +25,7 @@
 #include "version.hpp"
 #include "tools/GitSHA1.hpp"
 #include <algorithm>
+#include <sstream>
 #include <boost/regex.hpp>
 #include <spdlog/fmt/fmt.h>
 

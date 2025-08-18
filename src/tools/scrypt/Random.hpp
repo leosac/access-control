@@ -20,8 +20,9 @@
 #pragma once
 
 #include <cstdint>
-#include <mutex>
 #include <vector>
+#include <string>
+#include <mutex>
 
 using ByteVector = std::vector<uint8_t>;
 

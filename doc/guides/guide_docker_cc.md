@@ -43,7 +43,7 @@ Full Example from Start to Finish
 ---------------------------------
 
 Clone the Leosac repository:
-  + `git clone https://github.com/leosac/leosac`
+  + `git clone https://github.com/leosac/access-control`
   + `cd leosac`
   + `git submodule init && git submodule update`
 

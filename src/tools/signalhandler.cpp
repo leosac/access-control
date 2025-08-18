@@ -23,6 +23,7 @@
  */
 
 #include "signalhandler.hpp"
+#include <array>
 #include <assert.h>
 
 extern "C" {
@@ -34,8 +35,7 @@ extern "C" {
 
 using namespace Leosac::Tools;
 
-static std::array<std::function<void(Signal)>, Leosac::Tools::num_signals>
-    sigCallback;
+static std::array<std::function<void(Signal)>, Leosac::Tools::num_signals> sigCallback;
 
 static void fesser_e(int signal)
 {

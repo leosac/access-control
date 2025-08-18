@@ -10,7 +10,7 @@ LibLogicalAccess (LLA) Module Documentation {#mod_lla_main}
 Introduction {#mod_lla_intro}
 =============================
 
-The LLA module integrates ISLOG's LibLogicalAccess into Leosac. This is a
+The LLA module integrates LibLogicalAccess into Leosac. This is a
 as a module that provide an authentication source, therefore it shall
 conforms to [those specifications](@ref auth_specc) regarding message passing.
 

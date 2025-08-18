@@ -1,6 +1,6 @@
 # Contributor License Agreement.
 
-*The document below clarifies the terms under which You, the person listed below, may make "Contributions" (software, bug fixes, configuration changes, documentation, or any other materials) to the project at [https://github.com/leosac/leosac](https://github.com/leosac/leosac). This license protects You, [Leosac](http://www.leosac.com) and licensees; it does not change your rights to use your own Contributions for any other purpose. Please complete the following information about You and the Contributions. If you have questions about these terms, please [contact us](mailto:support@leosac.com).*
+*The document below clarifies the terms under which You, the person listed below, may make "Contributions" (software, bug fixes, configuration changes, documentation, or any other materials) to the project at [https://github.com/leosac/access-control](https://github.com/leosac/access-control). This license protects You, [Leosac](http://www.leosac.com) and licensees; it does not change your rights to use your own Contributions for any other purpose. Please complete the following information about You and the Contributions. If you have questions about these terms, please [contact us](mailto:support@leosac.com).*
 
 ## You and Leosac agree:
 
