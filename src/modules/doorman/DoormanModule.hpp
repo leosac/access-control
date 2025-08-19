@@ -76,10 +76,22 @@ class DoormanModule : public BaseModule
 
     void process_doors_config(const boost::property_tree::ptree &t);
 
+    void process_db_schedules();
+
     /**
      * Sets the db_service_ member variable if use_db_schedules_ is true.
      */
     void set_db_service();
+
+    /**
+     * Clears always on and off schedules from all doors.
+     */
+    void clear_door_schedules();
+
+    /**
+     * Checks if a schedule mapping contains only doors
+     */
+    bool is_door_schedule(const Tools::ScheduleMappingPtr &mapping);
 
     void update();
 

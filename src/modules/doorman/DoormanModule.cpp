@@ -26,6 +26,10 @@
 #include "tools/log.hpp"
 #include "tools/service/ServiceRegistry.hpp"
 #include "tools/db/DBService.hpp"
+#include "tools/Schedule.hpp"
+#include "tools/ScheduleMapping.hpp"
+#include "core/auth/Door.hpp"
+#include "core/auth/Door_odb.h"
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;
@@ -71,6 +75,8 @@ void DoormanModule::process_config()
     auto doors_cfg = module_config.get_child_optional("doors");
     if (doors_cfg)
         process_doors_config(*doors_cfg);
+    if (use_db_schedules_)
+        process_db_schedules();
 
     for (const auto &node : module_config.get_child("instances"))
     {
@@ -202,6 +208,45 @@ void DoormanModule::process_doors_config(
         }
         doors_.push_back(door);
     }
+}
+
+void DoormanModule::process_db_schedules() {
+    try {
+        auto db = db_service_->db();
+        odb::transaction t(db->begin());
+        odb::result<Tools::Schedule> schedules = db->query<Tools::Schedule>();
+        std::map<std::string, std::vector<Tools::SingleTimeFrame>> door_open_timeframes;
+
+        clear_door_schedules();
+
+        for (const auto &schedule : schedules) {
+            for (const auto &mapping : schedule.mapping()) {
+                if (is_door_schedule(mapping)) {
+                    for (const auto &lazy_door : mapping->doors()) {
+                        // Continue here
+                    }
+                }
+            }
+        }
+    } catch (const std::exception &e) {
+        ERROR("Failed to process database schedules: " << e.what());
+        use_db_schedules_ = false;
+    }
+}
+
+void DoormanModule::clear_door_schedules() {
+    for (auto &door : doors_)
+        door->clear_schedules();
+}
+
+bool DoormanModule::is_door_schedule(const Tools::ScheduleMappingPtr &mapping) {
+    bool has_doors = !mapping->doors().empty();
+    bool has_users = !mapping->users().empty();
+    bool has_groups = !mapping->groups().empty();
+    bool has_credentials = !mapping->credentials().empty();
+    bool has_zones = !mapping->zones().empty();
+    
+    return (has_doors || has_zones) && !has_users && !has_groups && !has_credentials;
 }
 
 void DoormanModule::update()
