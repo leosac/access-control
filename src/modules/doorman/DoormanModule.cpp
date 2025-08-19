@@ -219,18 +219,33 @@ void DoormanModule::process_db_schedules() {
 
         clear_door_schedules();
 
-        for (const auto &schedule : schedules) {
-            for (const auto &mapping : schedule.mapping()) {
-                if (is_door_schedule(mapping)) {
-                    for (const auto &lazy_door : mapping->doors()) {
-                        // Continue here
+        add_open_door_schedules(schedules);
+
+        t.commit();
+    } catch (const std::exception &e) {
+        ERROR("Failed to process database schedules: " << e.what());
+        use_db_schedules_ = false;
+    }
+}
+
+void DoormanModule::add_open_door_schedules(odb::result<Tools::Schedule> &schedules) {
+    for (const auto &schedule : schedules) {
+        for (const auto &mapping : schedule.mapping()) {
+            if (is_door_schedule(mapping)) {
+                for (const auto &lazy_door : mapping->doors()) {
+                    auto door_ptr = lazy_door.load();
+                    if (door_ptr) {
+                        std::string door_name = door_ptr->alias();
+                        for (auto &door : doors_) {
+                            if (door->name() == door_name) {
+                                auto schedule_copy = std::make_shared<Tools::Schedule>(schedule);
+                                door->add_always_open_sched(schedule_copy);
+                            }
+                        }
                     }
                 }
             }
         }
-    } catch (const std::exception &e) {
-        ERROR("Failed to process database schedules: " << e.what());
-        use_db_schedules_ = false;
     }
 }
 

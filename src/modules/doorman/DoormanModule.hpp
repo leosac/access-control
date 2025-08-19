@@ -24,6 +24,7 @@
 #include "modules/BaseModule.hpp"
 #include "tools/XmlScheduleLoader.hpp"
 #include "tools/db/db_fwd.hpp"
+#include "tools/Schedule.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <memory>
 #include <vector>
@@ -77,6 +78,11 @@ class DoormanModule : public BaseModule
     void process_doors_config(const boost::property_tree::ptree &t);
 
     void process_db_schedules();
+
+    /**
+     * Adds open schedules to the doors from the database.
+     */
+    void add_open_door_schedules(odb::result<Tools::Schedule> &schedules);
 
     /**
      * Sets the db_service_ member variable if use_db_schedules_ is true.
