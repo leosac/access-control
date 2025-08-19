@@ -23,6 +23,7 @@
 #include "hardware/facades/FGPIO.hpp"
 #include "modules/BaseModule.hpp"
 #include "tools/XmlScheduleLoader.hpp"
+#include "tools/db/db_fwd.hpp"
 #include <boost/property_tree/ptree.hpp>
 #include <memory>
 #include <vector>
@@ -66,8 +67,6 @@ class DoormanModule : public BaseModule
     const std::vector<Auth::AuthTargetPtr> &doors() const;
 
   private:
-    void update();
-
     /**
     * Processing the configuration tree, spawning AuthFileInstance object as
     * described in the
@@ -78,6 +77,13 @@ class DoormanModule : public BaseModule
     void process_doors_config(const boost::property_tree::ptree &t);
 
     /**
+     * Sets the db_service_ member variable if use_db_schedules_ is true.
+     */
+    void set_db_service();
+
+    void update();
+
+    /**
     * Authenticator instances.
     */
     std::vector<std::shared_ptr<DoormanInstance>> doormen_;
@@ -86,6 +92,10 @@ class DoormanModule : public BaseModule
     * Doors, to manage the always-on or always off stuff.
     */
     std::vector<Auth::AuthTargetPtr> doors_;
+
+    bool use_db_schedules_;
+
+    DBServicePtr db_service_;
 };
 }
 }

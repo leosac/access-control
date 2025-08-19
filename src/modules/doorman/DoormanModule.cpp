@@ -24,6 +24,8 @@
 #include "core/kernel.hpp"
 #include "hardware/facades/FAlarm.hpp"
 #include "tools/log.hpp"
+#include "tools/service/ServiceRegistry.hpp"
+#include "tools/db/DBService.hpp"
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;
@@ -32,6 +34,9 @@ DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                              const boost::property_tree::ptree &cfg,
                              CoreUtilsPtr utils)
     : BaseModule(ctx, pipe, cfg, utils)
+    , use_db_schedules_(false)
+    , db_service_(nullptr)
+    
 {
     try
     {
@@ -59,6 +64,9 @@ DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 void DoormanModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
+
+    use_db_schedules_ = module_config.get<bool>("use_db_schedules", false);
+    set_db_service();
 
     auto doors_cfg = module_config.get_child_optional("doors");
     if (doors_cfg)
@@ -110,6 +118,18 @@ void DoormanModule::process_config()
     }
 }
 
+void DoormanModule::set_db_service() {
+    if (use_db_schedules_) {
+        db_service_ = utils_->service_registry().get_service<DBService>();
+        if (!db_service_) {
+            WARN("Database schedules requested but DBService not available. Falling back to config schedules.");
+            use_db_schedules_ = false;
+        } else {
+            INFO("Using database schedules for doorman module");
+        }
+    }
+}
+
 void DoormanModule::run()
 {
     while (is_running_)
@@ -136,7 +156,7 @@ void DoormanModule::process_doors_config(
         door->gpio(
             std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, gpio)));
 
-        if (open_schedule)
+        if (!use_db_schedules_ && open_schedule)
         {
             Tools::XmlScheduleLoader xml_sched;
             xml_sched.load(*open_schedule);
