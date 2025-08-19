@@ -49,6 +49,11 @@ void AuthTarget::add_always_close_sched(Leosac::Tools::IScheduleCPtr const &sche
     always_close_.push_back(sched);
 }
 
+void AuthTarget::clear_schedules() {
+    always_open_.clear();
+    always_close_.clear();
+}
+
 Leosac::Hardware::FGPIO *AuthTarget::gpio() const
 {
     return gpio_.get();
