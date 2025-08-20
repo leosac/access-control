@@ -123,6 +123,13 @@ class DoormanModule : public BaseModule
     void sort_tf_vec_by_time(std::vector<Tools::SingleTimeFrame> &timeframes);
 
     /**
+     * Adds and subtracts 1 minute from the start and end times of a timeframe.
+     * Prevents open and close start/end times from being the same.
+     * Ex: Open: 14:00-18:30 -> Closed: 14:01-18:29
+     */
+    void adjust_tf_times(int &start_hour, int &start_min, int &end_hour, int &end_min);
+
+    /**
      * Sets the db_service_ member variable if use_db_schedules_ is true.
      */
     void set_db_service();

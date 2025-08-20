@@ -325,6 +325,7 @@ void DoormanModule::sort_tf_vec_by_time(std::vector<Tools::SingleTimeFrame> &tim
 void DoormanModule::add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs, std::shared_ptr<Leosac::Tools::Schedule> closed_schedule, int day) {
     auto add_tf = [&](int start_hour, int start_min, int end_hour, int end_min) {
         if (start_hour < end_hour || (start_hour == end_hour && start_min < end_min)) {
+            adjust_tf_times(start_hour, start_min, end_hour, end_min);
             add_timeframe_to_schedule(closed_schedule, day, start_hour, start_min, end_hour, end_min);
         }
     };
@@ -337,10 +338,30 @@ void DoormanModule::add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs
         const auto &current_tf = open_tfs[i];
         const auto &next_tf = open_tfs[i + 1];
         add_tf(current_tf.end_hour, current_tf.end_min, next_tf.start_hour, next_tf.start_min);
+        // 14:00, 18:30
     }
 
     auto &last_tf = open_tfs.back();
     add_tf(last_tf.end_hour, last_tf.end_min, 23, 59);
+}
+
+void DoormanModule::adjust_tf_times(int &start_hour, int &start_min, int &end_hour, int &end_min) {
+    if ((start_hour == 0 && start_min == 0) || (end_hour == 0 && end_min == 0)) {}
+    else {
+        if(start_min == 59) {
+            start_hour++;
+            start_min = 0;
+        } else {
+            start_min++;
+        }
+    }
+
+    if (end_min == 0) {
+        end_min = 59;
+        end_hour--;
+    } else if (end_hour != 23) {
+        end_min--;
+    }
 }
 
 void DoormanModule::log_open_and_closed_timeframes(const std::vector<Tools::SingleTimeFrame> &open_tfs, 
