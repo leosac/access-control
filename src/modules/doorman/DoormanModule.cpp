@@ -220,7 +220,7 @@ void DoormanModule::process_db_schedules() {
         clear_door_schedules();
 
         add_open_door_schedules(schedules, door_open_timeframes);
-        add_close_door_schedules(schedules, door_open_timeframes);
+        add_close_door_schedules(door_open_timeframes);
 
         t.commit();
     } catch (const std::exception &e) {
@@ -257,38 +257,49 @@ void DoormanModule::add_open_door_schedules(odb::result<Tools::Schedule> &schedu
     }
 }
 
-void DoormanModule::add_close_door_schedules(odb::result<Tools::Schedule> &schedules, 
-                                            std::map<std::string, std::vector<Tools::SingleTimeFrame>> &door_open_timeframes) 
+void DoormanModule::add_close_door_schedules(std::map<std::string, std::vector<Tools::SingleTimeFrame>> &door_open_timeframes) 
 {
     for (const auto &door : doors_) {
         std::string door_name = door->name();
         auto timeframes = door_open_timeframes[door_name];
-        auto inverse_schedules = create_inverse_schedules(timeframes);
-        for (const auto &schedule : inverse_schedules) {
-            INFO("Adding inverse schedule to door " << door_name);
-            door->add_always_close_sched(schedule);
+        if (auto inverse_schedule = create_inverse_schedule(timeframes)) {
+            door->add_always_close_sched(inverse_schedule);
         }
     }
 }
 
-std::vector<std::shared_ptr<Leosac::Tools::ISchedule>> DoormanModule::create_inverse_schedules(const std::vector<Tools::SingleTimeFrame> &timeframes) {
-    std::vector<std::shared_ptr<Leosac::Tools::ISchedule>> inverse_schedules;
+std::shared_ptr<Leosac::Tools::ISchedule> DoormanModule::create_inverse_schedule(const std::vector<Tools::SingleTimeFrame> &timeframes) {
+    if (timeframes.empty()) return create_24_7_schedule();
 
-    if (timeframes.empty()) {
-        inverse_schedules.push_back(create_24_7_schedule());
-        return inverse_schedules;
+    auto inverse_schedule = std::make_shared<Tools::Schedule>("inverse_schedule");
+
+    std::map<int, std::vector<Tools::SingleTimeFrame>> timeframes_grouped_by_day;
+    for (const auto &tf : timeframes) {
+        timeframes_grouped_by_day[tf.day].push_back(tf);
     }
 
-    return {};
+    for (int day = 0; day < 7; ++day) {
+        auto tf_map = timeframes_grouped_by_day.find(day);
+        if (tf_map == timeframes_grouped_by_day.end() || tf_map->second.empty()) {
+            add_timeframe_to_schedule(inverse_schedule, day, 0, 0, 23, 59);
+            continue;
+        }
+    }
+
+    return inverse_schedule;
 }
 
 std::shared_ptr<Leosac::Tools::Schedule> DoormanModule::create_24_7_schedule() {
     auto schedule = std::make_shared<Tools::Schedule>("closed_24_7");
     for (int day = 0; day < 7; ++day) {
-        Tools::SingleTimeFrame tf(day, 0, 0, 23, 59);
-        schedule->add_timeframe(tf);
+        add_timeframe_to_schedule(schedule, day, 0, 0, 23, 59);
     }
     return schedule;
+}
+
+void DoormanModule::add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min) {
+    Tools::SingleTimeFrame tf(day, start_hour, start_min, end_hour, end_min);
+    schedule->add_timeframe(tf);
 }
 
 void DoormanModule::clear_door_schedules() {

@@ -87,18 +87,23 @@ class DoormanModule : public BaseModule
     /**
      * Adds close schedules to the doors from the database.
      */
-    void add_close_door_schedules(odb::result<Tools::Schedule> &schedules, std::map<std::string, std::vector<Tools::SingleTimeFrame>> &door_open_timeframes);
+    void add_close_door_schedules(std::map<std::string, std::vector<Tools::SingleTimeFrame>> &door_open_timeframes);
 
     /**
      * Creates an inverse schedule based off of the open timeframes to close the door
      * when the open schedule is not active.
      */
-    std::vector<std::shared_ptr<Leosac::Tools::ISchedule>> create_inverse_schedules(const std::vector<Tools::SingleTimeFrame> &timeframes);
+    std::shared_ptr<Leosac::Tools::ISchedule> create_inverse_schedule(const std::vector<Tools::SingleTimeFrame> &timeframes);
     
     /**
      * Creates a schedule with 7 timeframes (all days 00:00-23:59).
      */
     std::shared_ptr<Leosac::Tools::Schedule> create_24_7_schedule();
+
+    /**
+     * Adds a timeframe to a schedule.
+     */
+    void add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min);
 
     /**
      * Sets the db_service_ member variable if use_db_schedules_ is true.
