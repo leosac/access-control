@@ -101,6 +101,12 @@ class DoormanModule : public BaseModule
     std::shared_ptr<Leosac::Tools::Schedule> create_24_7_schedule();
 
     /**
+     * Adds the beginning of the day timeframe to a schedule.
+     * Ex: If the open schedule is 08:00-17:00, the closed schedule will be 00:00-08:00.
+     */
+    void add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs, std::shared_ptr<Leosac::Tools::Schedule> closed_schedule, int day);
+
+    /**
      * Adds a timeframe to a schedule.
      */
     void add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min);
