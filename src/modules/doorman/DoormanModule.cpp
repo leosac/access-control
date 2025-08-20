@@ -262,38 +262,38 @@ void DoormanModule::add_close_door_schedules(std::map<std::string, std::vector<T
     for (const auto &door : doors_) {
         std::string door_name = door->name();
         auto timeframes = door_open_timeframes[door_name];
-        if (auto inverse_schedule = create_inverse_schedule(timeframes)) {
+        if (auto inverse_schedule = create_closed_schedule(timeframes)) {
             door->add_always_close_sched(inverse_schedule);
         }
     }
 }
 
-std::shared_ptr<Leosac::Tools::ISchedule> DoormanModule::create_inverse_schedule(const std::vector<Tools::SingleTimeFrame> &timeframes) {
-    if (timeframes.empty()) return create_24_7_schedule();
+std::shared_ptr<Leosac::Tools::ISchedule> DoormanModule::create_closed_schedule(const std::vector<Tools::SingleTimeFrame> &open_timeframes) {
+    if (open_timeframes.empty()) return create_24_7_schedule();
 
-    auto inverse_schedule = std::make_shared<Tools::Schedule>("inverse_schedule");
+    auto inverse_schedule = std::make_shared<Tools::Schedule>("closed_schedule");
 
-    std::map<int, std::vector<Tools::SingleTimeFrame>> timeframes_grouped_by_day;
-    for (const auto &tf : timeframes) {
-        timeframes_grouped_by_day[tf.day].push_back(tf);
+    std::map<int, std::vector<Tools::SingleTimeFrame>> open_timeframes_grouped_by_day;
+    for (const auto &tf : open_timeframes) {
+        open_timeframes_grouped_by_day[tf.day].push_back(tf);
     }
 
     for (int day = 0; day < 7; ++day) {
-        auto tf_map = timeframes_grouped_by_day.find(day);
-        if (tf_map == timeframes_grouped_by_day.end() || tf_map->second.empty()) {
+        auto open_tf_map = open_timeframes_grouped_by_day.find(day);
+        if (open_tf_map == open_timeframes_grouped_by_day.end() || open_tf_map->second.empty()) {
             add_timeframe_to_schedule(inverse_schedule, day, 0, 0, 23, 59);
             continue;
         }
 
-        auto &open_tfs_for_day = tf_map->second;
-        sort_tf_vec_by_time(tfs_for_day);
+        auto &open_tfs_for_day = open_tf_map->second;
+        sort_tf_vec_by_time(open_tfs_for_day);
     }
 
     return inverse_schedule;
 }
 
 std::shared_ptr<Leosac::Tools::Schedule> DoormanModule::create_24_7_schedule() {
-    auto schedule = std::make_shared<Tools::Schedule>("closed_24_7");
+    auto schedule = std::make_shared<Tools::Schedule>("closed_schedule");
     for (int day = 0; day < 7; ++day) {
         add_timeframe_to_schedule(schedule, day, 0, 0, 23, 59);
     }

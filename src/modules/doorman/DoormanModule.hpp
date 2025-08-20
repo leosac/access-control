@@ -93,7 +93,7 @@ class DoormanModule : public BaseModule
      * Creates an inverse schedule based off of the open timeframes to close the door
      * when the open schedule is not active.
      */
-    std::shared_ptr<Leosac::Tools::ISchedule> create_inverse_schedule(const std::vector<Tools::SingleTimeFrame> &timeframes);
+    std::shared_ptr<Leosac::Tools::ISchedule> create_closed_schedule(const std::vector<Tools::SingleTimeFrame> &open_timeframes);
     
     /**
      * Creates a schedule with 7 timeframes (all days 00:00-23:59).
