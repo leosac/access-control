@@ -107,6 +107,13 @@ class DoormanModule : public BaseModule
     void add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs, std::shared_ptr<Leosac::Tools::Schedule> closed_schedule, int day);
 
     /**
+     * Logs the open and closed timeframes for a door.
+     */
+    void log_open_and_closed_timeframes(const std::vector<Tools::SingleTimeFrame> &open_tfs, 
+                                      const std::shared_ptr<Leosac::Tools::ISchedule> &closed_schedule, 
+                                      const std::string &door_name);
+
+    /**
      * Adds a timeframe to a schedule.
      */
     void add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min);

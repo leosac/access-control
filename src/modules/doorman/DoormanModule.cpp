@@ -263,7 +263,10 @@ void DoormanModule::add_close_door_schedules(std::map<std::string, std::vector<T
         std::string door_name = door->name();
         auto timeframes = door_open_timeframes[door_name];
         if (auto closed_schedule = create_closed_schedule(timeframes)) {
+            log_open_and_closed_timeframes(timeframes, closed_schedule, door_name);
             door->add_always_close_sched(closed_schedule);
+        } else {
+            INFO("Door " << door_name << " is always open");
         }
     }
 }
@@ -337,6 +340,60 @@ void DoormanModule::add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs
             add_timeframe_to_schedule(closed_schedule, day, next_tf.end_hour, next_tf.end_min, 23, 59);
         }
     }
+}
+
+void DoormanModule::log_open_and_closed_timeframes(const std::vector<Tools::SingleTimeFrame> &open_tfs, 
+                                                const std::shared_ptr<Leosac::Tools::ISchedule> &closed_schedule, 
+                                                const std::string &door_name) 
+{
+    INFO("=== SCHEDULE SUMMARY FOR DOOR: " << door_name << " ===");
+
+    INFO("OPEN timeframes (" << open_tfs.size() << " total):");
+        for (size_t i = 0; i < open_tfs.size(); ++i) {
+        const auto& tf = open_tfs[i];
+        std::string day_name;
+        switch(tf.day) {
+            case 0: day_name = "Sunday"; break;
+            case 1: day_name = "Monday"; break;
+            case 2: day_name = "Tuesday"; break;
+            case 3: day_name = "Wednesday"; break;
+            case 4: day_name = "Thursday"; break;
+            case 5: day_name = "Friday"; break;
+            case 6: day_name = "Saturday"; break;
+            default: day_name = "Unknown"; break;
+        }
+
+        INFO("  Open " << (i + 1) << ": " << day_name << " "
+            << std::setfill('0') << std::setw(2) << tf.start_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.start_min << " to "
+            << std::setfill('0') << std::setw(2) << tf.end_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.end_min);
+    }
+
+    INFO("CLOSED timeframes (" << closed_schedule->timeframes().size() << " total):");
+    auto created_timeframes = closed_schedule->timeframes();
+    for (size_t i = 0; i < created_timeframes.size(); ++i) {
+        const auto& tf = created_timeframes[i];
+        std::string day_name;
+        switch(tf.day) {
+            case 0: day_name = "Sunday"; break;
+            case 1: day_name = "Monday"; break;
+            case 2: day_name = "Tuesday"; break;
+            case 3: day_name = "Wednesday"; break;
+            case 4: day_name = "Thursday"; break;
+            case 5: day_name = "Friday"; break;
+            case 6: day_name = "Saturday"; break;
+            default: day_name = "Unknown"; break;
+        }
+
+        INFO("  Closed " << (i + 1) << ": " << day_name << " "
+            << std::setfill('0') << std::setw(2) << tf.start_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.start_min << " to "
+            << std::setfill('0') << std::setw(2) << tf.end_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.end_min);
+    }
+
+    INFO("=== END SCHEDULE SUMMARY ===");
 }
 
 void DoormanModule::clear_door_schedules() {
