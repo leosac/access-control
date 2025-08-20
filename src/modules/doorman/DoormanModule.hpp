@@ -106,6 +106,12 @@ class DoormanModule : public BaseModule
     void add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min);
 
     /**
+     * Sorts a vector of timeframes by start time hh:mm.
+     * Does not sort by day.
+     */
+    void sort_tf_vec_by_time(std::vector<Tools::SingleTimeFrame> &timeframes);
+
+    /**
      * Sets the db_service_ member variable if use_db_schedules_ is true.
      */
     void set_db_service();

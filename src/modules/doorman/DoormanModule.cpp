@@ -284,6 +284,9 @@ std::shared_ptr<Leosac::Tools::ISchedule> DoormanModule::create_inverse_schedule
             add_timeframe_to_schedule(inverse_schedule, day, 0, 0, 23, 59);
             continue;
         }
+
+        auto &open_tfs_for_day = tf_map->second;
+        sort_tf_vec_by_time(tfs_for_day);
     }
 
     return inverse_schedule;
@@ -300,6 +303,16 @@ std::shared_ptr<Leosac::Tools::Schedule> DoormanModule::create_24_7_schedule() {
 void DoormanModule::add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min) {
     Tools::SingleTimeFrame tf(day, start_hour, start_min, end_hour, end_min);
     schedule->add_timeframe(tf);
+}
+
+void DoormanModule::sort_tf_vec_by_time(std::vector<Tools::SingleTimeFrame> &timeframes) {
+    std::sort(timeframes.begin(), timeframes.end(),
+            [](const Tools::SingleTimeFrame &a, const Tools::SingleTimeFrame &b) {
+                if (a.start_hour != b.start_hour) {
+                    return a.start_hour < b.start_hour;
+                }
+                return a.start_min < b.start_min;
+            });
 }
 
 void DoormanModule::clear_door_schedules() {
