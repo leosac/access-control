@@ -26,8 +26,6 @@
 #include "tools/db/db_fwd.hpp"
 #include "tools/Schedule.hpp"
 #include <boost/property_tree/ptree.hpp>
-#include <memory>
-#include <vector>
 #include <zmqpp/zmqpp.hpp>
 
 namespace Leosac
@@ -135,6 +133,12 @@ class DoormanModule : public BaseModule
     void clear_door_schedules();
 
     /**
+     * Re-checks the database for updated/deleted schedules
+     * Removes all schedules and re-adds them.
+     */
+    void refresh_db_schedules(std::chrono::system_clock::time_point now);
+
+    /**
      * Checks if a schedule mapping contains only doors
      */
     bool is_door_schedule(const Tools::ScheduleMappingPtr &mapping);
@@ -154,6 +158,10 @@ class DoormanModule : public BaseModule
     bool use_db_schedules_;
 
     DBServicePtr db_service_;
+
+    std::chrono::system_clock::time_point last_schedule_refresh_;
+
+    static constexpr std::chrono::seconds SCHEDULE_REFRESH_INTERVAL{60};
 };
 }
 }

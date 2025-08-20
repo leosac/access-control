@@ -30,9 +30,12 @@
 #include "tools/ScheduleMapping.hpp"
 #include "core/auth/Door.hpp"
 #include "core/auth/Door_odb.h"
+#include <chrono>
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;
+
+const std::chrono::seconds DoormanModule::SCHEDULE_REFRESH_INTERVAL;
 
 DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                              const boost::property_tree::ptree &cfg,
@@ -411,9 +414,19 @@ bool DoormanModule::is_door_schedule(const Tools::ScheduleMappingPtr &mapping) {
     return (has_doors || has_zones) && !has_users && !has_groups && !has_credentials;
 }
 
+void DoormanModule::refresh_db_schedules(std::chrono::system_clock::time_point now) {
+    if (!use_db_schedules_ || !db_service_) return;
+
+    if ((now - last_schedule_refresh_) >= SCHEDULE_REFRESH_INTERVAL) {
+        process_db_schedules();
+        last_schedule_refresh_ = now;
+    }
+}
+
 void DoormanModule::update()
 {
   auto now = std::chrono::system_clock::now();
+  refresh_db_schedules(now);
 
   for (auto &&doorman : doormen_)
   {
