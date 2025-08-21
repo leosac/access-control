@@ -377,11 +377,11 @@ void AuthDBInstance::log_credentials(Cred::ICredentialPtr &credentials) {
 }
 
 bool AuthDBInstance::is_noise(const int nb_bits) const {
-    if (bits_low_threshold_ != -1 && nb_bits < bits_low_threshold_) {
+    if (bits_low_threshold_ != -1 && nb_bits <= bits_low_threshold_) {
         return true;
     }
 
-    if (bits_high_threshold_ != -1 && nb_bits > bits_high_threshold_) {
+    if (bits_high_threshold_ != -1 && nb_bits >= bits_high_threshold_) {
         return true;
     }
 
