@@ -71,6 +71,11 @@ class WebSockAPIModule : public BaseModule
     std::string interface_;
 
     /**
+     * WebSocket logging configuration
+     */
+    bool enable_websocket_logging_;
+
+    /**
      * Our websocket server object.
      */
     std::unique_ptr<WSServer> wssrv_;

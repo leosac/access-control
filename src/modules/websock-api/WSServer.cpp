@@ -75,10 +75,11 @@ using namespace Leosac::Module::WebSockAPI;
 
 using json = nlohmann::json;
 
-WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
+WSServer::WSServer(WebSockAPIModule &module, DBPtr database, bool enable_logging)
     : auth_(*this)
     , dbsrv_(std::make_shared<DBService>(database))
     , module_(module)
+    , enable_logging_(enable_logging)
 {
     ASSERT_LOG(database, "No database object passed into WSServer.");
     using websocketpp::lib::placeholders::_1;
@@ -89,9 +90,11 @@ WSServer::WSServer(WebSockAPIModule &module, DBPtr database)
     srv_.set_close_handler(std::bind(&WSServer::on_close, this, _1));
     srv_.set_message_handler(std::bind(&WSServer::on_message, this, _1, _2));
     srv_.set_reuse_addr(true);
-    // clear all logs.
-    // srv_.clear_access_channels(websocketpp::log::alevel::all);
-
+    
+    if (!enable_logging_) {
+        srv_.clear_access_channels(websocketpp::log::alevel::all);
+        srv_.clear_error_channels(websocketpp::log::elevel::all);
+    }
 
     // Register internal handlers, ie handler that are managed by the Websocket
     // module itself.
