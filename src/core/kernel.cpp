@@ -371,6 +371,7 @@ void Kernel::configure_logger()
     bool use_database            = false;
     std::string syslog_min_level = "WARNING";
     std::shared_ptr<spdlog::logger> console;
+    std::string console_level = "DEBUG";
 
     // Drop existing logger, if any. (This is for the case of a "in process" restart)
     spdlog::drop("syslog");
@@ -382,6 +383,7 @@ void Kernel::configure_logger()
         use_syslog       = log_cfg_node->get<bool>("enable_syslog", true);
         use_database     = log_cfg_node->get<bool>("enable_database", false);
         syslog_min_level = log_cfg_node->get<std::string>("min_syslog", "WARNING");
+        console_level = log_cfg_node->get<std::string>("console_level", "DEBUG");
     }
     if (use_syslog)
     {
@@ -399,7 +401,9 @@ void Kernel::configure_logger()
     else
         console = spdlog::create(
             "console", {std::make_shared<spdlog::sinks::stdout_sink_mt>()});
-    console->set_level(spdlog::level::debug);
+    
+    console->set_level(static_cast<spdlog::level::level_enum>(
+                    LogHelper::log_level_from_string(console_level)));
 }
 
 const ModuleManager &Kernel::module_manager() const
