@@ -334,11 +334,10 @@ void DoormanModule::add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs
     add_tf(0, 0, first_tf.start_hour, first_tf.start_min);
 
     int max_tf_index = open_tfs.size() - 1;
-    for (int i = 1; i < max_tf_index; ++i) {
+    for (int i = 0; i < max_tf_index; ++i) {
         const auto &current_tf = open_tfs[i];
         const auto &next_tf = open_tfs[i + 1];
         add_tf(current_tf.end_hour, current_tf.end_min, next_tf.start_hour, next_tf.start_min);
-        // 14:00, 18:30
     }
 
     auto &last_tf = open_tfs.back();
