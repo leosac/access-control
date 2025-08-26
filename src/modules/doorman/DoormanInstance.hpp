@@ -98,7 +98,7 @@ class DoormanInstance
     * There are multiple reason why we might wanna ignore an action:
     *    1. The expected status (`granted` / `denied`) does not match the received
     * status.
-    *    2. The door is in always_open (or alway_closed) mode.
+    *    2. The door is in always_open mode.
     */
     bool ignore_action(const DoormanAction &action, Auth::AccessStatus status) const;
 

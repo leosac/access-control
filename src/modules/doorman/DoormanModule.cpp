@@ -475,7 +475,10 @@ void DoormanModule::update()
           door->alarm_forced("");
         }
       }
-      d->resetToExpectedState(now);
+
+      if (!door->is_door_override_active()) {
+          d->resetToExpectedState(now);
+      }
     }
   }
 }

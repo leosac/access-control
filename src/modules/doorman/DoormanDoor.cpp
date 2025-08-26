@@ -92,3 +92,14 @@ std::chrono::system_clock::time_point DoormanDoor::contact_lastupdate() const
 {
   return contact_lastupdate_;
 }
+
+bool DoormanDoor::is_door_override_active() const
+{
+  auto now = std::chrono::system_clock::now();
+  return = now < door_override_until_;
+}
+
+void DoormanDoor::set_door_override_until(std::chrono::system_clock::time_point until)
+{
+  door_override_until_ = until;
+}
