@@ -14,14 +14,23 @@ set_target_properties(${AUTH-DB_BIN} PROPERTIES
         COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
         )
 
-find_library(LEOSAC_DB_LIB leosac_db PATHS /home/pi/leosac/build NO_DEFAULT_PATH)
-find_library(LEOSAC_LIB_LIB leosac_lib PATHS /home/pi/leosac/build NO_DEFAULT_PATH)
+find_library(LEOSAC_DB_LIB leosac_db PATHS ${CMAKE_BINARY_DIR} NO_DEFAULT_PATH)
+find_library(LEOSAC_LIB_LIB leosac_lib PATHS ${CMAKE_BINARY_DIR} NO_DEFAULT_PATH)
 
-target_link_libraries(${AUTH-DB_BIN}
-        ${Boost_LIBRARIES}
-        ${LEOSAC_DB_LIB}
-        ${LEOSAC_LIB_LIB}
-        )
+if(LEOSAC_DB_LIB AND LEOSAC_LIB_LIB)
+    target_link_libraries(${AUTH-DB_BIN}
+            ${Boost_LIBRARIES}
+            ${LEOSAC_DB_LIB}
+            ${LEOSAC_LIB_LIB}
+            )
+else()
+    target_link_libraries(${AUTH-DB_BIN}
+            ${Boost_LIBRARIES}
+            leosac_db
+            leosac_lib
+            )
+    add_dependencies(${AUTH-DB_BIN} leosac_db leosac_lib)
+endif()
 
 target_include_directories(${AUTH-DB_BIN}
         PUBLIC
