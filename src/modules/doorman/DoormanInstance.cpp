@@ -53,8 +53,17 @@ DoormanInstance::DoormanInstance(DoormanModule &module, zmqpp::context &ctx,
 
     for (auto &d : module.doors())
     {
-      auto door = std::make_shared<DoormanDoor>(d, ctx);
-      doors_.push_back(door);
+        bool door_in_instance = false;
+        for (const auto &action : actions_) {
+            if (action.target_ == d->gpio()->name()) {
+                door_in_instance = true;
+                break;
+            }
+        }
+        if (door_in_instance) {
+            auto door = std::make_shared<DoormanDoor>(d, ctx);
+            doors_.push_back(door);
+        }
     }
 }
 
