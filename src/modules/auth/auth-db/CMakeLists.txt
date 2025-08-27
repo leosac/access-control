@@ -29,7 +29,6 @@ else()
             leosac_db
             leosac_lib
             )
-    add_dependencies(${AUTH-DB_BIN} leosac_db leosac_lib)
 endif()
 
 target_include_directories(${AUTH-DB_BIN}
