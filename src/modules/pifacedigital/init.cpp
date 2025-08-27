@@ -1,9 +1,9 @@
 /*
-    Copyright (C) 2014-2022 Leosac
+    Copyright (C) 2014-2025 Leosac
 
-    This file is part of Leosac.
+    This file is part of Leosac Access Control.
 
-    Leosac is free software: you can redistribute it and/or modify
+    Leosac Access Control is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.

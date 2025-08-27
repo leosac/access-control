@@ -3,11 +3,12 @@ ARG TARGETPLATFORM
 
 VOLUME /etc/leosac.d
 
-ADD . /tmp/leosac/
+COPY . /tmp/leosac/
 
 RUN apt-get update -qq && apt-get upgrade -qq && apt-get install -qq \
 libboost-regex1.74.0 libboost-serialization1.74.0 libcurl4 libodb-2.4 \
-libodb-boost-2.4 libodb-pgsql-2.4 libodb-sqlite-2.4 libscrypt0 libzmq5
+libodb-boost-2.4 libodb-pgsql-2.4 libodb-sqlite-2.4 libscrypt0 libzmq5 \
+libgpiod2
 
 RUN dpkg --install /tmp/leosac/${TARGETPLATFORM}/leosac_*.deb
 

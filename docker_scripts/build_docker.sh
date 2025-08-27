@@ -6,7 +6,7 @@
 IMAGE_BUILD_1="leosac/leosac-buildsystem:debian-bookworm"
 IMAGE_BUILD_2="leosac/leosac-buildsystem:debian-bullseye"
 IMAGE_BUILD_3="leosac/leosac-buildsystem:debian-sid"
-IMAGE_RUN="leosac/leosac:snapshot"
+IMAGE_RUN="leosac/leosac-access-control:snapshot"
 PLATFORMS="linux/amd64,linux/arm64,linux/arm/v7"
 PLATFORMS_SID="${PLATFORMS},linux/riscv64"
 
