@@ -63,24 +63,35 @@ void ICRUDResourceHandler::enforce_permission(
 
 boost::optional<json> ICRUDResourceHandler::process(const ClientMessage &msg)
 {
-    auto perms = required_permission(verb_from_request_type(msg.type), msg.content);
-    switch (verb_from_request_type(msg.type))
+    try
     {
-    case Verb::READ:
-        enforce_permission(perms);
-        return read_impl(msg.content);
-    case Verb::CREATE:
-        enforce_permission(perms);
-        return create_impl(msg.content);
-    case Verb::UPDATE:
-        enforce_permission(perms);
-        return update_impl(msg.content);
-    case Verb::DELETE:
-        enforce_permission(perms);
-        return delete_impl(msg.content);
+        auto perms = required_permission(verb_from_request_type(msg.type), msg.content);
+        switch (verb_from_request_type(msg.type))
+        {
+        case Verb::READ:
+            enforce_permission(perms);
+            return read_impl(msg.content);
+        case Verb::CREATE:
+            enforce_permission(perms);
+            return create_impl(msg.content);
+        case Verb::UPDATE:
+            enforce_permission(perms);
+            return update_impl(msg.content);
+        case Verb::DELETE:
+            enforce_permission(perms);
+            return delete_impl(msg.content);
+        }
+
+        ASSERT_LOG(0, "Should not be here.");
+        throw LEOSACException("Should not be here");
     }
-    ASSERT_LOG(0, "Should not be here.");
-    throw LEOSACException("Should not be here");
+    catch(const LEOSACException& e)
+    {
+        json rep;
+        rep["status"]  = -1;
+        rep["message"] = e.what();
+        return rep;
+    }
 }
 
 CRUDResourceHandler::CRUDResourceHandler(RequestContext ctx)
