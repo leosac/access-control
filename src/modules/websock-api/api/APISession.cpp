@@ -61,19 +61,27 @@ APISession::json APISession::create_auth_token(const APISession::json &req)
     std::string username = req.at("username");
     std::string password = req.at("password");
 
-    auto token = server_.auth().authenticate_credentials(username, password);
-
-    if (token)
+    try
     {
-        rep["status"]  = 0;
-        rep["user_id"] = token->owner()->id();
-        rep["token"]   = token->token();
-        mark_authenticated(token);
+        auto token = server_.auth().authenticate_credentials(username, password);
+
+        if (token)
+        {
+            rep["status"]  = 0;
+            rep["user_id"] = token->owner()->id();
+            rep["token"]   = token->token();
+            mark_authenticated(token);
+        }
+        else
+        {
+            rep["status"]  = -1;
+            rep["message"] = "Invalid credentials";
+        }
     }
-    else
+    catch(const LEOSACException& e)
     {
         rep["status"]  = -1;
-        rep["message"] = "Invalid credentials";
+        rep["message"] = e.what();
     }
 
     return rep;
@@ -84,18 +92,26 @@ APISession::json APISession::authenticate_with_token(const APISession::json &req
     json rep;
     ASSERT_LOG(auth_status_ == AuthStatus::NONE, "Invalid auth status.");
 
-    auto token = server_.auth().authenticate_token(req.at("token"));
-    if (token)
+    try
     {
-        rep["status"]   = 0;
-        rep["user_id"]  = token->owner()->id();
-        rep["username"] = token->owner()->username();
-        mark_authenticated(token);
+        auto token = server_.auth().authenticate_token(req.at("token"));
+        if (token)
+        {
+            rep["status"]   = 0;
+            rep["user_id"]  = token->owner()->id();
+            rep["username"] = token->owner()->username();
+            mark_authenticated(token);
+        }
+        else
+        {
+            rep["status"]  = -1;
+            rep["message"] = "Invalid credentials";
+        }
     }
-    else
+    catch(const LEOSACException& e)
     {
         rep["status"]  = -1;
-        rep["message"] = "Invalid credentials";
+        rep["message"] = e.what();
     }
 
     return rep;

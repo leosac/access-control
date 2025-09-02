@@ -60,29 +60,37 @@ json AuditGet::process_impl(const json &req)
         int page      = extract_with_default(req, "p", 1);
         int page_size = extract_with_default(req, "ps", 20);
 
-        LEOSAC_ENFORCE_ARGUMENT(page > 0, page, "Page must be >0");
-        LEOSAC_ENFORCE_ARGUMENT(page_size > 0, page_size, "Page size must be >0");
-
-        odb::transaction t(db->begin());
-        Audit::AuditEntryCount view(
-            db->query_value<Audit::AuditEntryCount>(build_in_clause(req)));
-        rep["meta"]["count"] = view.count;
-        if (view.count)
+        try
         {
-            rep["meta"]["total_page"] =
-                (view.count / page_size) + (view.count % page_size ? 1 : 0);
+            LEOSAC_ENFORCE_ARGUMENT(page > 0, page, "Page must be >0");
+            LEOSAC_ENFORCE_ARGUMENT(page_size > 0, page_size, "Page size must be >0");
+
+            odb::transaction t(db->begin());
+            Audit::AuditEntryCount view(
+                db->query_value<Audit::AuditEntryCount>(build_in_clause(req)));
+            rep["meta"]["count"] = view.count;
+            if (view.count)
+            {
+                rep["meta"]["total_page"] =
+                    (view.count / page_size) + (view.count % page_size ? 1 : 0);
+            }
+            else
+                rep["meta"]["total_page"] = 0;
+
+            auto query  = Query(build_request_string(req, page, page_size));
+            auto ret    = db->query<Audit::AuditEntry>(query);
+            rep["data"] = json::array();
+            for (const auto &audit : ret)
+            {
+                json audit_json = Audit::Serializer::PolymorphicAuditJSON::serialize(
+                    audit, security_context());
+                rep["data"].push_back(audit_json);
+            }
         }
-        else
-            rep["meta"]["total_page"] = 0;
-
-        auto query  = Query(build_request_string(req, page, page_size));
-        auto ret    = db->query<Audit::AuditEntry>(query);
-        rep["data"] = json::array();
-        for (const auto &audit : ret)
+        catch(const LEOSACException& e)
         {
-            json audit_json = Audit::Serializer::PolymorphicAuditJSON::serialize(
-                audit, security_context());
-            rep["data"].push_back(audit_json);
+            rep["status"]  = -1;
+            rep["message"] = e.what();
         }
     }
     else
