@@ -28,6 +28,7 @@
 #include "core/auth/User_odb.h"
 #include "core/auth/AuthSourceBuilder.hpp"
 #include "core/auth/SimpleAccessProfile.hpp"
+#include "core/auth/ProfileMerger.hpp"
 #include "core/credentials/ICredential.hpp"
 #include "core/credentials/RFIDCard.hpp"
 #include "core/credentials/PinCode.hpp"
@@ -252,9 +253,16 @@ CredResult AuthDBInstance::find_credentials_by_card_id(const std::string &card_i
         
         if (profiles.empty()) {
             return nullptr;
+        } else if (profiles.size() == 1) {
+            return profiles.at(0);
+        } else {
+            ProfileMerger merger;
+            auto merged_profile = profiles.at(0);
+            for (size_t i = 1; i < profiles.size(); ++i) {
+                merged_profile = merger.merge(merged_profile, profiles.at(i));
+            }
+            return merged_profile;
         }
-
-        return profiles.at(0); // Temporary
 
     } catch (const std::exception &e) {
         WARN("AuthDBInstance::build_profile - Error building profile: " << e.what());
