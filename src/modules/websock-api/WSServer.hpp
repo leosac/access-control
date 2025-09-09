@@ -65,7 +65,7 @@ class WSServer
      * @param database A (non-null) pointer to the
      * database.
      */
-    WSServer(WebSockAPIModule &module, DBPtr database);
+    WSServer(WebSockAPIModule &module, DBPtr database, bool enable_logging = true);
     ~WSServer();
 
     using Server           = websocketpp::server<websocketpp::config::asio>;
@@ -256,6 +256,11 @@ class WSServer
      * The module is guaranteed to outlive the WSServer.
      */
     WebSockAPIModule &module_;
+
+    /**
+     * WebSocket logging configuration
+     */
+    bool enable_logging_;
 
     /**
      * Work used to keep the io_service alive while someone

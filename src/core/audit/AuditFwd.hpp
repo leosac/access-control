@@ -124,80 +124,65 @@ using ZoneEventPtr = std::shared_ptr<ZoneEvent>;
 
 enum class EventType
 {
-  /**
-   * Admin & System Event Types
-   */
-  AL_SYSTEM                         = 0x1000,
-  /**
-   * User Event Types
-   */
-  AL_USER                           = 0x2000,
+  // 0..63 reserved to keep masks within 64-bit numeric serialization
 
-  WSAPI_CALL                        = 0x00 & AL_SYSTEM,
+  // 0..15 System/Admin
+  WSAPI_CALL                        = 0,
+  USER_CREATED                      = 1,
+  USER_DELETED                      = 2,
+  USER_EDITED                       = 3,
+  USER_PASSWORD_CHANGED             = 4,
+  USER_PASSWORD_CHANGE_FAILURE      = 5,
 
-  USER_CREATED                      = 0x10 & AL_SYSTEM,
-  USER_DELETED                      = 0x11 & AL_SYSTEM,
-  USER_EDITED                       = 0x12 & AL_SYSTEM,
-  USER_PASSWORD_CHANGED             = 0x13 & AL_SYSTEM,
-  /**
-   * An attempt to change the password failed.
-   */
-  USER_PASSWORD_CHANGE_FAILURE      = 0x14 & AL_SYSTEM,
+  // 16..23 Groups
+  GROUP_CREATED                     = 16,
+  GROUP_UPDATED                     = 17,
+  GROUP_DELETED                     = 18,
+  GROUP_MEMBERSHIP_JOINED           = 19,
+  GROUP_MEMBERSHIP_LEFT             = 20,
 
-  GROUP_CREATED                     = 0x20 & AL_SYSTEM,
-  GROUP_UPDATED                     = 0x21 & AL_SYSTEM,
-  GROUP_DELETED                     = 0x22 & AL_SYSTEM,
-  /**
-   * Someone joined the group.
-   */
-  GROUP_MEMBERSHIP_JOINED           = 0x23 & AL_SYSTEM,
-  /**
-   * Someone left the group.
-   */
-  GROUP_MEMBERSHIP_LEFT             = 0x24 & AL_SYSTEM,
+  // 24..27 Credentials
+  CREDENTIAL_CREATED                = 24,
+  CREDENTIAL_UPDATED                = 25,
+  CREDENTIAL_DELETED                = 26,
 
-  CREDENTIAL_DELETED                = 0x30 & AL_SYSTEM,
-  CREDENTIAL_CREATED                = 0x31 & AL_SYSTEM,
-  CREDENTIAL_UPDATED                = 0x32 & AL_SYSTEM,
+  // 28..30 Schedules
+  SCHEDULE_CREATED                  = 28,
+  SCHEDULE_UPDATED                  = 29,
+  SCHEDULE_DELETED                  = 30,
 
-  SCHEDULE_CREATED                  = 0x40 & AL_SYSTEM,
-  SCHEDULE_DELETED                  = 0x41 & AL_SYSTEM,
-  SCHEDULE_UPDATED                  = 0x42 & AL_SYSTEM,
+  // 31..35 Doors
+  DOOR_CREATED                      = 31,
+  DOOR_UPDATED                      = 32,
+  DOOR_DELETED                      = 33,
+  MAPPING_MAY_HAVE_CHANGED          = 34,
 
-  DOOR_CREATED                      = 0x50 & AL_SYSTEM,
-  DOOR_UPDATED                      = 0x51 & AL_SYSTEM,
-  DOOR_DELETED                      = 0x52 & AL_SYSTEM,
-  /**
-   * This event is linked to door. It is generated
-   * by the Schedule CRUD manager. It's used to let a door
-   * know that it may have been removed from a mapping.
-   *
-   * Fixme: Currently this event is triggered for every door in a mapping
-   * everytime a schedule is updated.
-   */
-  MAPPING_MAY_HAVE_CHANGED          = 0x53 & AL_SYSTEM,
+  // 36..38 Access points
+  ACCESS_POINT_CREATED              = 36,
+  ACCESS_POINT_UPDATED              = 37,
+  ACCESS_POINT_DELETED              = 38,
 
-  ACCESS_POINT_CREATED              = 0x60 & AL_SYSTEM,
-  ACCESS_POINT_UPDATED              = 0x61 & AL_SYSTEM,
-  ACCESS_POINT_DELETED              = 0x62 & AL_SYSTEM,
+  // 39..41 Zones
+  ZONE_CREATED                      = 39,
+  ZONE_UPDATED                      = 40,
+  ZONE_DELETED                      = 41,
 
-  ZONE_CREATED                      = 0x70 & AL_SYSTEM,
-  ZONE_UPDATED                      = 0x71 & AL_SYSTEM,
-  ZONE_DELETED                      = 0x72 & AL_SYSTEM,
+  // 42..44 Updates
+  UPDATE_CREATED                    = 42,
+  UPDATE_ACKED                      = 43,
+  UPDATE_CANCELLED                  = 44,
 
-  UPDATE_CREATED                    = 0x80 & AL_SYSTEM,
-  UPDATE_ACKED                      = 0x81 & AL_SYSTEM,
-  UPDATE_CANCELLED                  = 0x81 & AL_SYSTEM,
+  // 45..48 Door usage
+  DOOR_OPENED                       = 45,
+  DOOR_OPENED_MANUALLY              = 46,
+  DOOR_FORCED                       = 47,
+  DOOR_FORCED_END                   = 48,
 
-  DOOR_OPENED                       = 0x10 & AL_USER,
-  DOOR_OPENED_MANUALLY              = 0x11 & AL_USER,
-  DOOR_FORCED                       = 0x12 & AL_USER,
-  DOOR_FORCED_END                   = 0x13 & AL_USER,
+  // 49..50 Auth outcomes
+  AUTH_GRANTED                      = 49,
+  AUTH_DENIED                       = 50,
 
-  AUTH_GRANTED                      = 0x20 & AL_USER,
-  AUTH_DENIED                       = 0x21 & AL_USER,
-
-  LAST__                            = 0xffff
+  LAST__                            = 64
 };
 
 using EventMask = FlagSet<EventType>;

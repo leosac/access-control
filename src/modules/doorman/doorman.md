@@ -26,6 +26,7 @@ Configuration Options {#mod_doorman_user_config}
 
 Options    | Options   | Options         | Options      | Options     | Description                                                       | Mandatory
 -----------|-----------|-----------------|--------------|-------------|-------------------------------------------------------------------|-----------
+use_db_schedules |        |                 |              |             | When set to true, use database schedules instead of config schedules | NO (default: false)
 instances  |           |                 |              |             | Multiples (unrelated) doorman instance are allowed                | YES
 --->       | instance  |                 |              |             | Configuration information for 1 instance                          | YES
 --->       | --->      | name            |              |             | Name of this doorman instance                                     | YES

@@ -67,6 +67,9 @@ class DoormanDoor
 
     void alarm_forced(const std::string& alarm);
 
+    bool is_door_override_active() const;
+    void set_door_override_until(std::chrono::system_clock::time_point until);
+
   private:
 
     Leosac::Auth::AuthTargetPtr door_;
@@ -82,6 +85,8 @@ class DoormanDoor
     std::chrono::system_clock::time_point contact_lastupdate_;
 
     std::string alarm_forced_;
+
+    std::chrono::system_clock::time_point door_override_until_;
 };
 }
 }

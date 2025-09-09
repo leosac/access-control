@@ -17,4 +17,149 @@ grant or deny access.
 Granting or denying access means sending a message to the application. This module doesn't open a door
 or perform action on its own.
 
-@note Obviously this module requires that Leosac run with a database enabled.
+@note This module requires that Leosac run with a database enabled.
+
+@note This module is suitable for systems with a large number of users/cards/groups as all data is stored in the database.
+
+Configuration Options {#mod_auth_db_user_config}
+===================================================
+
+Options    | Options   | Options         | Options      | Description                                                       | Mandatory
+-----------|-----------|-----------------|--------------|-------------------------------------------------------------------|-----------
+module_config |           |                 |              | Module configuration section                                          | YES
+--->       | bits_low_threshold |                 |              | Minimum number of bits to accept (ignores shorter as noise) | NO (default: -1)
+--->       | bits_high_threshold |                 |              | Maximum number of bits to accept (ignores longer as noise) | NO (default: 127)
+--->       | instances  |                 |              | List of each link between reader and door(s) for authentication                                 | YES
+--->       | --->       | instance        |              | Name of one particular auth context instance. Links with doorman module. Each instance under `instances` requires `<instance></instance>` | YES
+--->       | --->       | --->           | name         | Name of one particular auth context instance. Links with doorman module           | YES
+--->       | --->       | --->           | auth_source  | Which device (auth source) we listen to. Can appear multiple times. | YES
+--->       | --->       | --->           | target       | Name of the target (door) that we are authenticating against | NO
+
+Notes:
+  + If the `target` is not present, the module assumes the default target, and will ignore target-specific permissions.
+  + The `bits_low_threshold` and `bits_high_threshold` help filter out noise from the bus. Values ≤ low_threshold or ≥ high_threshold are ignored. This is to help with systems that have inductive load (most door strikes are). D0 and D1 wires are very sensitive to any type of noise. Note that from a hardware perspective, you should have a diode across your door strike if it's an inductive load, since the kickback could potentially damage the GPIO pins.
+  + You can enter multiple `auth_source` devices. The module instance will listen to all of them.
+  + The `target` field is prefixed by the instance name and a dot when checking for permission in the database. This should match the GPIO out name in the `LIBGPIOD` module.
+
+Noise Filtering {#mod_auth_db_noise_filtering}
+==============================================
+
+The AuthDB module includes intelligent noise filtering to prevent false authentication attempts from electrical interference or corrupted data on the bus.
+
+### Bit Threshold Configuration
+
+- **`bits_low_threshold`**: Any credential with fewer bits than this value will be ignored as noise
+- **`bits_high_threshold`**: Any credential with more bits than this value will be ignored as corruption
+
+### Default Values
+
+- **Low threshold**: -1 (disabled by default)
+- **High threshold**: 127 (maximum reasonable bit length)
+
+### Example Configuration
+
+```xml
+<module_config>
+    <bits_low_threshold>8</bits_low_threshold>
+    <bits_high_threshold>64</bits_high_threshold>
+    <!-- instances configuration here -->
+</module_config>
+```
+
+This configuration would:
+- Ignore any credentials with ≤8 bits (likely noise)
+- Ignore any credentials with ≥64 bits (likely noise)
+- Only process credentials with 9-63 bits
+
+If for example, you only wanted to monitor attempts with 27 bit wiegand data, you could set the following:
+
+```xml
+<module_config>
+    <bits_low_threshold>26</bits_low_threshold>
+    <bits_high_threshold>28</bits_high_threshold>
+    <!-- instances configuration here -->
+</module_config>
+```
+
+This configuration would:
+- Ignore any attempts that aren't 27 bits
+- Even if there are valid attempts made with cards that aren't 27 bits, it would ignore it.
+
+Users {#mod_auth_db_user}
+======================
+
+Users are stored in the Leosac database and are a core component of the authentication system.
+Users map to groups, credentials, schedules, etc.
+
+Users can hold additional properties like their name, email address, or the status of their account (`enabled`, or `disabled`).
+
+Credentials {#mod_auth_db_cred}
+================================
+
+Credentials are stored in the database and map to users. The module supports multiple credential types:
+
+### Supported Credential Types
+
+1. **RFIDCard**: Standard RFID card credentials
+2. **PinCode**: PIN code authentication (not yet implemented)
+3. **RFIDCardPin**: Combination of RFID card and PIN code (not yet implemented)
+
+Audit Logging {#mod_auth_db_audit}
+===================================
+
+The module provides comprehensive audit logging for all authentication attempts:
+
+### Logged Events
+
+- **AUTH_GRANTED**: Successful authentication attempts
+- **AUTH_DENIED**: Failed authentication attempts
+- **Credential usage**: Details about which credentials were used
+- **Target information**: Which door/area was accessed
+- **User information**: Who attempted the access
+
+### Audit Data
+
+Each audit event includes:
+- Timestamp of the attempt
+- Credential used
+- Target accessed
+- User attempting access
+- Result (granted/denied)
+- Access profile used
+
+Example Configuration {#mod_auth_db_example}
+================================
+
+This is the module configuration in the main config file:
+
+```xml
+<module>
+    <name>AUTH-MANAGER-DB</name>
+    <file>libauth-db.so</file>
+    <level>41</level>
+    <module_config>
+        <bits_low_threshold>8</bits_low_threshold>
+        <bits_high_threshold>64</bits_high_threshold>
+        <instances>
+            <instance>
+                <name>AUTH_CONTEXT_1</name>
+                <auth_source>MY_WIEGAND_1</auth_source>
+                <auth_source>MY_WIEGAND_2</auth_source>
+                <target>MAIN_ENTRANCE</target>
+            </instance>
+            <instance>
+                <name>AUTH_CONTEXT_2</name>
+                <auth_source>BACK_DOOR_READER</auth_source>
+                <target>BACK_ENTRANCE</target>
+            </instance>
+        </instances>
+    </module_config>
+</module>
+```
+
+This configuration:
+- Sets noise filtering thresholds (8-64 bits)
+- Creates two authentication contexts
+- Each context listens to different readers
+- Each context targets different doors
+

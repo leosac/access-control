@@ -53,8 +53,17 @@ DoormanInstance::DoormanInstance(DoormanModule &module, zmqpp::context &ctx,
 
     for (auto &d : module.doors())
     {
-      auto door = std::make_shared<DoormanDoor>(d, ctx);
-      doors_.push_back(door);
+        bool door_in_instance = false;
+        for (const auto &action : actions_) {
+            if (action.target_ == d->gpio()->name()) {
+                door_in_instance = true;
+                break;
+            }
+        }
+        if (door_in_instance) {
+            auto door = std::make_shared<DoormanDoor>(d, ctx);
+            doors_.push_back(door);
+        }
     }
 }
 
@@ -81,6 +90,8 @@ void DoormanInstance::handle_bus_msg()
         DEBUG("ACTION (target = " << action.target_ << ")");
 
         zmqpp::message msg;
+        int door_duration = 0;
+        
         for (auto &frame : action.cmd_)
         {
             // we try to convert argument to int. if it works we send as int64_t,
@@ -90,6 +101,9 @@ void DoormanInstance::handle_bus_msg()
             try
             {
                 v = std::stoi(frame);
+                if (msg.parts() == 1 && v > 0) {
+                    door_duration = v;
+                }
             }
             catch (...)
             {
@@ -101,6 +115,17 @@ void DoormanInstance::handle_bus_msg()
                 msg << static_cast<int64_t>(v);
             DEBUG("would do : " << frame << " to target: " << action.target_);
         }
+        
+        if (door_duration > 0) {
+            for (auto& door : doors()) {
+                if (door->door()->gpio()->name() == action.target_) {
+                    auto override_end = std::chrono::system_clock::now() + std::chrono::milliseconds(door_duration);
+                    door->set_door_override_until(override_end);
+                    break;
+                }
+            }
+        }
+
         command_send_recv(action.target_, std::move(msg));
     }
 }
@@ -141,8 +166,7 @@ bool DoormanInstance::ignore_action(const DoormanAction &action,
         return true;
 
     auto target = find_target(action.target_);
-    if (target && (target->is_always_closed(std::chrono::system_clock::now()) ||
-                   target->is_always_open(std::chrono::system_clock::now())))
+    if (target && target->is_always_open(std::chrono::system_clock::now()))
     {
         INFO("Door " << target->name() << " is in immutable state (always open, "
                                           "or always closed) so we ignore this "

@@ -24,14 +24,26 @@
 #include "core/kernel.hpp"
 #include "hardware/facades/FAlarm.hpp"
 #include "tools/log.hpp"
+#include "tools/service/ServiceRegistry.hpp"
+#include "tools/db/DBService.hpp"
+#include "tools/Schedule.hpp"
+#include "tools/ScheduleMapping.hpp"
+#include "core/auth/Door.hpp"
+#include "core/auth/Door_odb.h"
+#include <chrono>
 
 using namespace Leosac::Module::Doorman;
 using namespace Leosac::Auth;
+
+const std::chrono::seconds DoormanModule::SCHEDULE_REFRESH_INTERVAL;
 
 DoormanModule::DoormanModule(zmqpp::context &ctx, zmqpp::socket *pipe,
                              const boost::property_tree::ptree &cfg,
                              CoreUtilsPtr utils)
     : BaseModule(ctx, pipe, cfg, utils)
+    , use_db_schedules_(false)
+    , db_service_(nullptr)
+    
 {
     try
     {
@@ -60,9 +72,14 @@ void DoormanModule::process_config()
 {
     boost::property_tree::ptree module_config = config_.get_child("module_config");
 
+    use_db_schedules_ = module_config.get<bool>("use_db_schedules", false);
+    set_db_service();
+
     auto doors_cfg = module_config.get_child_optional("doors");
     if (doors_cfg)
         process_doors_config(*doors_cfg);
+    if (use_db_schedules_)
+        process_db_schedules();
 
     for (const auto &node : module_config.get_child("instances"))
     {
@@ -110,6 +127,18 @@ void DoormanModule::process_config()
     }
 }
 
+void DoormanModule::set_db_service() {
+    if (use_db_schedules_) {
+        db_service_ = utils_->service_registry().get_service<DBService>();
+        if (!db_service_) {
+            WARN("Database schedules requested but DBService not available. Falling back to config schedules.");
+            use_db_schedules_ = false;
+        } else {
+            INFO("Using database schedules for doorman module");
+        }
+    }
+}
+
 void DoormanModule::run()
 {
     while (is_running_)
@@ -136,7 +165,7 @@ void DoormanModule::process_doors_config(
         door->gpio(
             std::unique_ptr<Hardware::FGPIO>(new Hardware::FGPIO(ctx_, gpio)));
 
-        if (open_schedule)
+        if (!use_db_schedules_ && open_schedule)
         {
             Tools::XmlScheduleLoader xml_sched;
             xml_sched.load(*open_schedule);
@@ -184,9 +213,238 @@ void DoormanModule::process_doors_config(
     }
 }
 
+void DoormanModule::process_db_schedules() {
+    try {
+        auto db = db_service_->db();
+        odb::transaction t(db->begin());
+        odb::result<Tools::Schedule> schedules = db->query<Tools::Schedule>();
+        std::map<std::string, std::vector<Tools::SingleTimeFrame>> door_open_timeframes;
+
+        clear_door_schedules();
+
+        add_open_door_schedules(schedules, door_open_timeframes);
+        add_close_door_schedules(door_open_timeframes);
+
+        t.commit();
+    } catch (const std::exception &e) {
+        ERROR("Failed to process database schedules: " << e.what());
+        use_db_schedules_ = false;
+    }
+}
+
+void DoormanModule::add_open_door_schedules(odb::result<Tools::Schedule> &schedules, 
+                                            std::map<std::string, std::vector<Tools::SingleTimeFrame>> &door_open_timeframes) 
+{
+    for (const auto &schedule : schedules) {
+        for (const auto &mapping : schedule.mapping()) {
+            if (is_door_schedule(mapping)) {
+                for (const auto &lazy_door : mapping->doors()) {
+                    auto door_ptr = lazy_door.load();
+                    if (door_ptr) {
+                        std::string door_name = door_ptr->alias();
+                        for (auto &door : doors_) {
+                            if (door->name() == door_name) {
+                                auto schedule_copy = std::make_shared<Tools::Schedule>(schedule);
+                                door->add_always_open_sched(schedule_copy);
+                                
+                                for (const auto &tf : schedule_copy->timeframes()) {
+                                    door_open_timeframes[door_name].push_back(tf);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // TODO: Add schedules to doors in zones
+        }
+    }
+}
+
+void DoormanModule::add_close_door_schedules(std::map<std::string, std::vector<Tools::SingleTimeFrame>> &door_open_timeframes) 
+{
+    for (const auto &door : doors_) {
+        std::string door_name = door->name();
+        auto timeframes = door_open_timeframes[door_name];
+        if (auto closed_schedule = create_closed_schedule(timeframes)) {
+            log_open_and_closed_timeframes(timeframes, closed_schedule, door_name);
+            door->add_always_close_sched(closed_schedule);
+        } else {
+            INFO("Door " << door_name << " is always open");
+        }
+    }
+}
+
+std::shared_ptr<Leosac::Tools::ISchedule> DoormanModule::create_closed_schedule(const std::vector<Tools::SingleTimeFrame> &open_timeframes) {
+    if (open_timeframes.empty()) return create_24_7_schedule();
+
+    auto closed_schedule = std::make_shared<Tools::Schedule>("closed_schedule");
+
+    std::map<int, std::vector<Tools::SingleTimeFrame>> open_timeframes_grouped_by_day;
+    for (const auto &tf : open_timeframes) {
+        open_timeframes_grouped_by_day[tf.day].push_back(tf);
+    }
+
+    for (int day = 0; day < 7; ++day) {
+        auto open_tf_map = open_timeframes_grouped_by_day.find(day);
+        if (open_tf_map == open_timeframes_grouped_by_day.end() || open_tf_map->second.empty()) {
+            add_timeframe_to_schedule(closed_schedule, day, 0, 0, 23, 59);
+            continue;
+        }
+
+        auto &open_tfs = open_tf_map->second;
+        sort_tf_vec_by_time(open_tfs);
+        add_closed_tfs(open_tfs, closed_schedule, day);
+    }
+
+    return closed_schedule;
+}
+
+std::shared_ptr<Leosac::Tools::Schedule> DoormanModule::create_24_7_schedule() {
+    auto schedule = std::make_shared<Tools::Schedule>("closed_schedule");
+    for (int day = 0; day < 7; ++day) {
+        add_timeframe_to_schedule(schedule, day, 0, 0, 23, 59);
+    }
+    return schedule;
+}
+
+void DoormanModule::add_timeframe_to_schedule(std::shared_ptr<Leosac::Tools::Schedule> schedule, int day, int start_hour, int start_min, int end_hour, int end_min) {
+    Tools::SingleTimeFrame tf(day, start_hour, start_min, end_hour, end_min);
+    schedule->add_timeframe(tf);
+}
+
+void DoormanModule::sort_tf_vec_by_time(std::vector<Tools::SingleTimeFrame> &timeframes) {
+    std::sort(timeframes.begin(), timeframes.end(),
+            [](const Tools::SingleTimeFrame &a, const Tools::SingleTimeFrame &b) {
+                if (a.start_hour != b.start_hour) {
+                    return a.start_hour < b.start_hour;
+                }
+                return a.start_min < b.start_min;
+            });
+}
+
+void DoormanModule::add_closed_tfs(std::vector<Tools::SingleTimeFrame> &open_tfs, std::shared_ptr<Leosac::Tools::Schedule> closed_schedule, int day) {
+    auto add_tf = [&](int start_hour, int start_min, int end_hour, int end_min) {
+        if (start_hour < end_hour || (start_hour == end_hour && start_min < end_min)) {
+            adjust_tf_times(start_hour, start_min, end_hour, end_min);
+            add_timeframe_to_schedule(closed_schedule, day, start_hour, start_min, end_hour, end_min);
+        }
+    };
+
+    auto &first_tf = open_tfs[0];
+    add_tf(0, 0, first_tf.start_hour, first_tf.start_min);
+
+    int max_tf_index = open_tfs.size() - 1;
+    for (int i = 0; i < max_tf_index; ++i) {
+        const auto &current_tf = open_tfs[i];
+        const auto &next_tf = open_tfs[i + 1];
+        add_tf(current_tf.end_hour, current_tf.end_min, next_tf.start_hour, next_tf.start_min);
+    }
+
+    auto &last_tf = open_tfs.back();
+    add_tf(last_tf.end_hour, last_tf.end_min, 23, 59);
+}
+
+void DoormanModule::adjust_tf_times(int &start_hour, int &start_min, int &end_hour, int &end_min) {
+    if ((start_hour == 0 && start_min == 0) || (end_hour == 0 && end_min == 0)) {}
+    else {
+        if(start_min == 59) {
+            start_hour++;
+            start_min = 0;
+        } else {
+            start_min++;
+        }
+    }
+
+    if (end_min == 0) {
+        end_min = 59;
+        end_hour--;
+    } else if (end_hour != 23) {
+        end_min--;
+    }
+}
+
+void DoormanModule::log_open_and_closed_timeframes(const std::vector<Tools::SingleTimeFrame> &open_tfs, 
+                                                const std::shared_ptr<Leosac::Tools::ISchedule> &closed_schedule, 
+                                                const std::string &door_name) 
+{
+    INFO("=== SCHEDULE SUMMARY FOR DOOR: " << door_name << " ===");
+
+    INFO("OPEN timeframes (" << open_tfs.size() << " total):");
+        for (size_t i = 0; i < open_tfs.size(); ++i) {
+        const auto& tf = open_tfs[i];
+        std::string day_name;
+        switch(tf.day) {
+            case 0: day_name = "Sunday"; break;
+            case 1: day_name = "Monday"; break;
+            case 2: day_name = "Tuesday"; break;
+            case 3: day_name = "Wednesday"; break;
+            case 4: day_name = "Thursday"; break;
+            case 5: day_name = "Friday"; break;
+            case 6: day_name = "Saturday"; break;
+            default: day_name = "Unknown"; break;
+        }
+
+        INFO("  Open " << (i + 1) << ": " << day_name << " "
+            << std::setfill('0') << std::setw(2) << tf.start_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.start_min << " to "
+            << std::setfill('0') << std::setw(2) << tf.end_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.end_min);
+    }
+
+    INFO("CLOSED timeframes (" << closed_schedule->timeframes().size() << " total):");
+    auto created_timeframes = closed_schedule->timeframes();
+    for (size_t i = 0; i < created_timeframes.size(); ++i) {
+        const auto& tf = created_timeframes[i];
+        std::string day_name;
+        switch(tf.day) {
+            case 0: day_name = "Sunday"; break;
+            case 1: day_name = "Monday"; break;
+            case 2: day_name = "Tuesday"; break;
+            case 3: day_name = "Wednesday"; break;
+            case 4: day_name = "Thursday"; break;
+            case 5: day_name = "Friday"; break;
+            case 6: day_name = "Saturday"; break;
+            default: day_name = "Unknown"; break;
+        }
+
+        INFO("  Closed " << (i + 1) << ": " << day_name << " "
+            << std::setfill('0') << std::setw(2) << tf.start_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.start_min << " to "
+            << std::setfill('0') << std::setw(2) << tf.end_hour << ":" 
+            << std::setfill('0') << std::setw(2) << tf.end_min);
+    }
+
+    INFO("=== END SCHEDULE SUMMARY ===");
+}
+
+void DoormanModule::clear_door_schedules() {
+    for (auto &door : doors_)
+        door->clear_schedules();
+}
+
+bool DoormanModule::is_door_schedule(const Tools::ScheduleMappingPtr &mapping) {
+    bool has_doors = !mapping->doors().empty();
+    bool has_users = !mapping->users().empty();
+    bool has_groups = !mapping->groups().empty();
+    bool has_credentials = !mapping->credentials().empty();
+    bool has_zones = !mapping->zones().empty();
+    
+    return (has_doors || has_zones) && !has_users && !has_groups && !has_credentials;
+}
+
+void DoormanModule::refresh_db_schedules(std::chrono::system_clock::time_point now) {
+    if (!use_db_schedules_ || !db_service_) return;
+
+    if ((now - last_schedule_refresh_) >= SCHEDULE_REFRESH_INTERVAL) {
+        process_db_schedules();
+        last_schedule_refresh_ = now;
+    }
+}
+
 void DoormanModule::update()
 {
   auto now = std::chrono::system_clock::now();
+  refresh_db_schedules(now);
 
   for (auto &&doorman : doormen_)
   {
@@ -217,7 +475,10 @@ void DoormanModule::update()
           door->alarm_forced("");
         }
       }
-      d->resetToExpectedState(now);
+
+      if (!door->is_door_override_active()) {
+          d->resetToExpectedState(now);
+      }
     }
   }
 }

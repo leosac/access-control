@@ -36,6 +36,7 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 {
     port_      = cfg.get<uint16_t>("module_config.port", 8976);
     interface_ = cfg.get<std::string>("module_config.interface", "127.0.0.1");
+    enable_websocket_logging_ = cfg.get<bool>("module_config.enable_logging", true);
 
     auto endpoint_colorized = Colorize::green(
         Colorize::underline(fmt::format("{}:{}", interface_, port_)));
@@ -45,7 +46,7 @@ WebSockAPIModule::WebSockAPIModule(zmqpp::context &ctx, zmqpp::socket *pipe,
 
 void WebSockAPIModule::run()
 {
-    wssrv_ = std::make_unique<WSServer>(*this, core_utils()->database());
+    wssrv_ = std::make_unique<WSServer>(*this, core_utils()->database(), enable_websocket_logging_);
     std::thread thread(std::bind(&WSServer::run, wssrv_.get(), interface_, port_));
 
     while (is_running_)

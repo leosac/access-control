@@ -20,57 +20,71 @@
 #include "modules/auth/auth-db/AuthDBModule.hpp"
 #include "core/CoreUtils.hpp"
 #include "core/kernel.hpp"
-#include <tools/db/database.hpp>
+#include "modules/auth/auth-db/AuthDBInstance.hpp"
+#include <boost/property_tree/ptree.hpp>
 
 using namespace Leosac;
 using namespace Leosac::Module::Auth;
 
-AuthDBModule::AuthDBModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                           const boost::property_tree::ptree &cfg,
-                           CoreUtilsPtr utils)
+AuthDBModule::AuthDBModule(zmqpp::context& ctx, zmqpp::socket *pipe, 
+                           const boost::property_tree::ptree &cfg, CoreUtilsPtr utils)
     : AsioModule(ctx, pipe, cfg, utils)
 {
     process_config();
 
-    /*   for (auto authenticator : authenticators_)
-       {
-           reactor_.add(authenticator->bus_sub(),
-                        std::bind(&AuthDBInstance::handle_bus_msg, authenticator));
-       }*/
-}
-
-AuthDBModule::~AuthDBModule()
-{
-}
-
-void AuthDBModule::process_config()
-{
-    setup_database();
-}
-
-void AuthDBModule::on_service_event(const service_event::Event &)
-{
-}
-
-void AuthDBModule::setup_database()
-{
-    using namespace odb;
-    using namespace odb::core;
-    auto db          = utils_->database();
-    schema_version v = db->schema_version("module_auth-db");
-    schema_version cv(schema_catalog::current_version(*db, "module_auth-db"));
-    if (v == 0)
+    for (auto authenticator : authenticators_)
     {
-        transaction t(db->begin());
-        schema_catalog::create_schema(*db, "module_auth-db");
-        t.commit();
+        reactor_.add(authenticator->bus_sub(),
+                     std::bind(&AuthDBInstance::handle_bus_msg, authenticator));
     }
-    else if (v < cv)
-    {
-        INFO("AuthDB Module performing database migration. Going from version "
-             << v << " to version " << cv);
-        transaction t(db->begin());
-        schema_catalog::migrate(*db, cv, "module_auth-db");
-        t.commit();
+}
+
+AuthDBModule::~AuthDBModule() {}
+
+void AuthDBModule::on_service_event(const service_event::Event &event) {}
+
+void AuthDBModule::process_config() {
+    boost::property_tree::ptree auth_db_cfg = config_.get_child("module_config");
+    
+    bits_low_threshold_ = auth_db_cfg.get<int>("bits_low_threshold", -1);
+    bits_high_threshold_ = auth_db_cfg.get<int>("bits_high_threshold", 127);
+
+    INFO("Configured bits_low_threshold: " << bits_low_threshold_);
+    INFO("Configured bits_high_threshold: " << bits_high_threshold_);
+
+    for (const auto &instance_node : auth_db_cfg.get_child("instances")) {
+        boost::property_tree::ptree auth_instance_cfg = instance_node.second;
+        std::string auth_ctx_name = auth_instance_cfg.get_child("name").data();
+        std::string auth_target_name = auth_instance_cfg.get<std::string>("target", "");
+        std::list<std::string> auth_sources_names;
+
+        for (const auto &instance_subnode : auth_instance_cfg) {
+            if (instance_subnode.first == "auth_source") {
+                auth_sources_names.push_back(instance_subnode.second.data());
+            }
+        }
+
+        if (!auth_target_name.empty()) {
+            auth_target_name = utils_->kernel().config_manager().instance_name() + '.' + auth_target_name;
+        }
+
+        INFO("Config processed for AuthDB instance: " << auth_ctx_name);
+        INFO("  - Target: " << auth_target_name);
+        INFO("  - Sources (" << auth_sources_names.size() << "): ");
+        for (const auto& source : auth_sources_names) {
+            INFO("    * " << source);
+        }
+
+        setup_authenticators(auth_ctx_name, auth_sources_names, auth_target_name);
     }
+}
+
+void AuthDBModule::setup_authenticators(const std::string &auth_ctx_name, 
+                                        const std::list<std::string> &auth_sources_names, 
+                                        const std::string &auth_target_name) 
+{
+    authenticators_.push_back(AuthDBInstancePtr(
+        new AuthDBInstance(ctx_, auth_ctx_name, auth_sources_names,
+                           auth_target_name, utils_, bits_low_threshold_,
+                           bits_high_threshold_)));
 }

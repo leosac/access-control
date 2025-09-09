@@ -111,6 +111,11 @@ void LibgpiodPin::handle_message()
         ok = turn_off();
     else if (frame1 == "TOGGLE")
         ok = toggle();
+    else if (frame1 == "STATE") {
+      bool state = read_value();
+      sock_.send(state ? "ON" : "OFF");
+      return;
+    }
     sock_.send(ok ? "OK" : "KO");
 
     // publish new state.

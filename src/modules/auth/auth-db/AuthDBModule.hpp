@@ -19,10 +19,11 @@
 
 #pragma once
 
-#include "modules/AsioModule.hpp"
-#include <boost/property_tree/ptree.hpp>
-#include <vector>
-#include <zmqpp/zmqpp.hpp>
+#include "AuthDBFwd.hpp"
+#include "AsioModule.hpp"
+#include "core/CoreUtils.hpp"
+#include <list>
+#include <memory>
 
 namespace Leosac
 {
@@ -30,34 +31,50 @@ namespace Module
 {
 namespace Auth
 {
-class AuthDBInstance;
 
 /**
-* This implements a authentication module that uses Leosac database
-* to validate access.
-*/
+ * Module that provides authentication using database-stored credentials
+ */
 class AuthDBModule : public AsioModule
 {
-  public:
-    AuthDBModule(zmqpp::context &ctx, zmqpp::socket *pipe,
-                 const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+    public:
+        AuthDBModule(zmqpp::context& ctx, zmqpp::socket *pipe, 
+                     const boost::property_tree::ptree &cfg, CoreUtilsPtr utils);
+        
+        AuthDBModule(const AuthDBModule &) = delete;
+        ~AuthDBModule();
 
-    AuthDBModule(const AuthDBModule &) = delete;
+        
+        /**
+         * Ignore less than this number of bits from bus
+         */
+        int bits_low_threshold_;
 
-    ~AuthDBModule();
+        /**
+        * Ignore bits higher than this number of bits from bus
+        */
+        int bits_high_threshold_;
+    
+    protected:
+        void on_service_event(const service_event::Event &event) override;
 
-  protected:
-    void on_service_event(const service_event::Event &event) override;
+    private:
+        /** 
+         * Process the module configuration from the kernel
+         */
+        void process_config();
 
-  private:
-    void process_config();
+        /**
+         * Setup authenticator instances
+         */
+        void setup_authenticators(const std::string &auth_ctx_name, 
+                                  const std::list<std::string> &auth_sources_names, 
+                                  const std::string &auth_target_name);
 
-    void setup_database();
-
-    /**
-    * Authenticator instance.
-    */
-    // std::vector<AuthDBInstancePtr> authenticators_;
+        /**
+         * List of the created authenticator instances
+         */
+        std::list<AuthDBInstancePtr> authenticators_;
 };
 }
 }

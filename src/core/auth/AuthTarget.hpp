@@ -57,6 +57,11 @@ class AuthTarget
     */
     bool is_always_closed(const std::chrono::system_clock::time_point &tp) const;
 
+    /**
+    * Clear schedules (helper for refreshing schedules)
+    */
+    void clear_schedules();
+
     /*
     * Reset the door the its expected default state at the current time.
     */

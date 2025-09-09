@@ -3,55 +3,48 @@ set(AUTH-DB_BIN auth-db)
 set(AUTH-DB_SRCS
         init.cpp
         AuthDBModule.cpp
-        )
-
-# Database support
-set(OdbCMake_ODB_HEADERS
-        ${CMAKE_CURRENT_SOURCE_DIR}/AuthDBInstance.hpp
-        )
-
-set(LEOSAC_ODB_INCLUDE_DIRS
-        ${CMAKE_SOURCE_DIR}/deps/zmqpp/src/
-        ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/deps/flagset
-        ${CMAKE_SOURCE_DIR}/deps/date/include
-        ${ZEROMQ_INCLUDE_DIR}
-        ${CMAKE_SOURCE_DIR}/src/db
-        )
-
-set(OdbCMake_SOURCES "" AuthDBInstance.cpp AuthDBInstance.hpp)
-odb_compile(OdbCMake_SOURCES
-        FILES ${OdbCMake_ODB_HEADERS}
-        MULTI_DATABASE dynamic
-        DB pgsql sqlite
-        STANDARD "c++14"
-        GENERATE_QUERY GENERATE_SESSION GENERATE_SCHEMA
-        SCHEMA_FORMAT embedded
-        SCHEMA_NAME module_auth-db
-        PROFILE "boost/date-time" "boost/optional" "leosac-profile"
-        INCLUDE_PREFIX modules/auth/auth-db
-        INCLUDE ${LEOSAC_ODB_INCLUDE_DIRS}
-        DEFAULT_POINTER "std::shared_ptr"
-        PGSQL_SERVER_VERSION "9.1"
-        ODB_EPILOGUE "#include \"core/audit/AuditEntry.hpp\""
-        OUTPUT_DIR ${CMAKE_BINARY_DIR}/odb_gen/modules/auth/auth-db
+        AuthDBInstance.cpp
         )
 
 add_library(${AUTH-DB_BIN} SHARED
         ${AUTH-DB_SRCS}
-        ${OdbCMake_SOURCES}
         )
 
 set_target_properties(${AUTH-DB_BIN} PROPERTIES
         COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}"
         )
 
-target_include_directories(${AUTH-DB_BIN} PUBLIC
+find_library(LEOSAC_DB_LIB leosac_db PATHS ${CMAKE_BINARY_DIR} NO_DEFAULT_PATH)
+find_library(LEOSAC_LIB_LIB leosac_lib PATHS ${CMAKE_BINARY_DIR} NO_DEFAULT_PATH)
+
+if(LEOSAC_DB_LIB AND LEOSAC_LIB_LIB)
+    target_link_libraries(${AUTH-DB_BIN}
+            ${Boost_LIBRARIES}
+            ${LEOSAC_DB_LIB}
+            ${LEOSAC_LIB_LIB}
+            )
+else()
+    target_link_libraries(${AUTH-DB_BIN}
+            ${Boost_LIBRARIES}
+            leosac_db
+            leosac_lib
+            )
+endif()
+
+target_include_directories(${AUTH-DB_BIN}
+        PUBLIC
         ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/src/modules
+        ${CMAKE_SOURCE_DIR}/deps/zmqpp/src
+        ${CMAKE_SOURCE_DIR}/deps/flagset
+        ${CMAKE_SOURCE_DIR}/deps/date/include
+        ${CMAKE_BINARY_DIR}/odb_gen
+        ${CMAKE_BINARY_DIR}
+        ${ZEROMQ_INCLUDE_DIR}
         ${ODB_INCLUDE_DIRS}
         ${ODB_COMPILE_OUTPUT_DIR}
         )
 
-target_link_libraries(${AUTH-DB_BIN} websock-api)
-
-install(TARGETS ${AUTH-DB_BIN} DESTINATION ${LEOSAC_MODULE_INSTALL_DIR})
+install(TARGETS ${AUTH-DB_BIN}
+        LIBRARY DESTINATION lib/leosac/modules
+        )

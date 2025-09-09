@@ -19,12 +19,16 @@
 
 #pragma once
 
+#include <memory>
+
 namespace Leosac
 {
 namespace Module
 {
 namespace Auth
 {
+class AuthDBInstance;
+using AuthDBInstancePtr = std::shared_ptr<AuthDBInstance>;
 using AuthDBInstanceId = unsigned long long;
 }
 }
