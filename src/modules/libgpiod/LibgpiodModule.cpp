@@ -41,8 +41,17 @@ LibgpiodModule::LibgpiodModule(zmqpp::context &ctx,
     , general_cfg_(nullptr)
 {
     bus_push_.connect("inproc://zmq-bus-pull");
+    bool use_db = false;
+    try {
+        use_db = config.get_child("module_config").get<bool>("use_database", false);
+    } catch (...) {}
+    if (use_db) {
+        ws_helper_thread_ = std::make_unique<WSHelperThread>(utils_, LibgpiodWSParams{});
+        auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+        if (ws_service)
+            ws_helper_thread_->register_ws_handlers(*ws_service);
+    }
     process_config(config);
-
     for (auto gpio : gpios_)
     {
         gpio->register_sockets(&reactor_);
@@ -69,41 +78,44 @@ void LibgpiodModule::process_config(const boost::property_tree::ptree &cfg)
 
     process_general_config();
 
-    for (auto &node : module_config.get_child("gpios"))
+    if (module_config.get_child_optional("gpios"))
     {
-        boost::property_tree::ptree gpio_cfg = node.second;
-        LibgpiodPin::Direction direction;
-        LibgpiodPin::InterruptMode interrupt_mode;
-        std::string gpio_name;
-        std::string gpio_device;
-        std::string gpio_direction;
-        std::string gpio_interrupt;
-        int gpio_offset;
-        bool gpio_initial_value;
+        for (auto &node : module_config.get_child("gpios"))
+        {
+            boost::property_tree::ptree gpio_cfg = node.second;
+            LibgpiodPin::Direction direction;
+            LibgpiodPin::InterruptMode interrupt_mode;
+            std::string gpio_name;
+            std::string gpio_device;
+            std::string gpio_direction;
+            std::string gpio_interrupt;
+            int gpio_offset;
+            bool gpio_initial_value;
 
-        gpio_name          = gpio_cfg.get_child("name").data();
-        gpio_device        = gpio_cfg.get<std::string>("device", "leosac");
-        gpio_offset        = std::stoi(gpio_cfg.get_child("offset").data());
-        gpio_direction     = gpio_cfg.get_child("direction").data();
-        gpio_interrupt     = gpio_cfg.get<std::string>("interrupt_mode", "none");
-        gpio_initial_value = gpio_cfg.get<bool>("value", false);
+            gpio_name          = gpio_cfg.get_child("name").data();
+            gpio_device        = gpio_cfg.get<std::string>("device", "leosac");
+            gpio_offset        = std::stoi(gpio_cfg.get_child("offset").data());
+            gpio_direction     = gpio_cfg.get_child("direction").data();
+            gpio_interrupt     = gpio_cfg.get<std::string>("interrupt_mode", "none");
+            gpio_initial_value = gpio_cfg.get<bool>("value", false);
 
-        using namespace Colorize;
-        INFO("Creating GPIO " << green(underline(gpio_name)) << ", device "
-                              << green(underline(gpio_device)) << " with offset "
-                              << green(underline(gpio_offset)) << ". direction = "
-                              << green(underline(gpio_direction)));
+            using namespace Colorize;
+            INFO("Creating GPIO " << green(underline(gpio_name)) << ", device "
+                                << green(underline(gpio_device)) << " with offset "
+                                << green(underline(gpio_offset)) << ". direction = "
+                                << green(underline(gpio_direction)));
 
-        interrupt_mode = gpio_interrupt_from_string(gpio_interrupt);
+            interrupt_mode = gpio_interrupt_from_string(gpio_interrupt);
 
-        direction = (gpio_direction == "in" ? LibgpiodPin::Direction::In
-                                            : LibgpiodPin::Direction::Out);
-        gpios_.push_back(std::make_shared<LibgpiodPin>(ctx_, gpio_name, gpio_device, gpio_offset, direction,
-                                          interrupt_mode, gpio_initial_value,
-                                          *this));
+            direction = (gpio_direction == "in" ? LibgpiodPin::Direction::In
+                                                : LibgpiodPin::Direction::Out);
+            gpios_.push_back(std::make_shared<LibgpiodPin>(ctx_, gpio_name, gpio_device, gpio_offset, direction,
+                                            interrupt_mode, gpio_initial_value,
+                                            *this));
 
-        utils_->config_checker().register_object(gpio_name,
-                                                 Leosac::Hardware::DeviceClass::GPIO);
+            utils_->config_checker().register_object(gpio_name,
+                                                    Leosac::Hardware::DeviceClass::GPIO);
+        }
     }
 }
 
@@ -111,6 +123,11 @@ LibgpiodModule::~LibgpiodModule()
 {
     for (auto gpio : gpios_)
         gpio->release();
+    if (ws_helper_thread_) {
+        auto ws_service = get_service_registry().get_service<WebSockAPI::Service>();
+        if (ws_service)
+            ws_helper_thread_->unregister_ws_handlers(*ws_service);
+    }
 }
 
 void LibgpiodModule::publish_on_bus(zmqpp::message &msg)

@@ -18,22 +18,67 @@ This module provide support for FGPIO device by supporting the
 Linux Kernel Libgpiod interface. It allows the application to deals with
 GPIO pin that are in fact controlled through libgpiod.
 
+gpios    |         |                | List of GPIOs pins we configure                                                         | **YES**
+
 Configuration Options {#mod_libgpiod_user_config}
 ==================================================
 
 Below are the configuration options available.
 
-Options | Options | Options        | Description                                                                             | Mandatory
----------|---------|----------------|-----------------------------------------------------------------------------------------|-----------
-consumer |         |                | The GPIOs consumer name (default: leosac)                                               | NO
-gpios    |         |                | List of GPIOs pins we configure                                                         | **YES**
---->     | gpio    |                | Configuration informations for one GPIO pin.                                            | **YES**
---->     | --->    | name           | Name of the GPIO pin                                                                    | **YES**
---->     | --->    | device         | GPIO chip device.                                                                       | **YES**
---->     | --->    | offset         | Offset of the GPIO pin.                                                                 | **YES**
---->     | --->    | direction      | Direction of the pin. This in either `in` or `out`                                      | **YES**
---->     | --->    | interrupt_mode | What interrupt do we care about? See below for details                                  | NO
---->     | --->    | value          | Default value of the PIN. Either `1` or `0`                                             | NO
+Options      | Options          | Description                                            | Mandatory
+-------------|------------------|--------------------------------------------------------|-----------
+use_database |                  | If true, use database-backed configuration.            | NO (defaults to false)
+consumer     |                  | The GPIOs consumer name (default: leosac)              | NO
+gpios        |                  | List of GPIOs pins we configure                        | **YES** (if not using database)
+--->         | gpio             | Configuration informations for one GPIO pin.           | **YES**
+--->         | ---> name        | Name of the GPIO pin                                   | **YES**
+--->         | ---> device      | GPIO chip device.                                      | **YES**
+--->         | ---> offset      | Offset of the GPIO pin.                                | **YES**
+--->         | ---> direction   | Direction of the pin. This in either `in` or `out`     | **YES**
+--->         | ---> interrupt_mode | What interrupt do we care about? See below for details | NO
+--->         | ---> value       | Default value of the PIN. Either `1` or `0`            | NO
+
+Notes:
++ If `use_database` is true, the module will expose its configuration API over
+    WebSocket (provided that a WebSocket module is available). All other XML configuration
+    options are ignored.
++ Uniqueness is enforced on the combination of GPIO name and device.
++ When configuration is updated (create/update/delete GPIO objects), a restart is required to apply changes.
+
+Database Configuration Notes
+----------------------------
+It is not possible to mix both database configuration and XML configuration.
+If the XML configuration sets `use_database` to `true`, then all other XML
+configuration values are ignored.
+
+WebSocket API {#mod_libgpiod_ws_api}
+====================================
+
+When `use_database` is enabled, the following WebSocket endpoints are available:
+
+- `libgpiod.gpio.create` — Create a new GPIO
+- `libgpiod.gpio.read` — Read a GPIO or list all
+- `libgpiod.gpio.update` — Update a GPIO
+- `libgpiod.gpio.delete` — Delete a GPIO
+
+All fields (name, device, offset, direction, value, interrupt_mode) are supported.
+Uniqueness of (name, device) is enforced.
+Admin permissions are required for all operations.
+
+Example WebSocket request (create):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.json
+{
+    "action": "libgpiod.gpio.create",
+    "content": {
+        "name": "my_gpio",
+        "device": "gpiochip0",
+        "offset": 5,
+        "direction": 1, // 0 = in, 1 = out
+        "value": 1,
+        "interrupt_mode": "none"
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Interrupt Mode
 --------------

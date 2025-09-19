@@ -35,8 +35,8 @@ const char *get_module_name()
 
 
 /**
-* Entry point of the SysFsGpio module.
-* It provides a way to control GPIO through the sysfs kernel interface.
+* Entry point of the Libgpiod module.
+* It provides a way to control GPIO through the libgpiod library.
 */
 extern "C" __attribute__((visibility("default"))) bool
 start_module(zmqpp::socket *pipe, boost::property_tree::ptree cfg,

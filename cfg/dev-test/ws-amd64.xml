@@ -50,9 +50,20 @@
         </module>
 
         <module>
+            <name>LIBGPIOD</name>
+            <file>liblibgpiod.so</file>
+            <level>3</level>
+
+            <module_config>
+              <use_database>true</use_database>
+              <consumer>leosac</consumer>
+            </module_config>
+        </module>
+
+        <module>
             <name>LED_BUZZER</name>
             <file>libled-buzzer.so</file>
-            <level>3</level>
+            <level>4</level>
 
             <module_config>
               <use_database>true</use_database>

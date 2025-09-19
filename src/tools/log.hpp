@@ -196,7 +196,7 @@ void log(const std::string &log_msg, int /*line*/, const char * /*funcName*/,
             ERROR("Assertion failed in " << __FILE__ << " --> "                     \
                                          << FUNCTION_NAME_MACRO << ":" << __LINE__  \
                                          << ". Aborting.");                         \
-            raise(SIGABRT);                                                         \
+            ::raise(SIGABRT);                                                        \
         }                                                                           \
     } while (false)
 #endif

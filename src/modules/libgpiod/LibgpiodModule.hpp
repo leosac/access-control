@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "WSHelperThread.hpp"
 #include "LibgpiodPin.hpp"
 #include "LibgpiodConfig.hpp"
 #include <boost/property_tree/ptree.hpp>
@@ -71,7 +72,6 @@ class LibgpiodModule : public BaseModule
 
     virtual void run() override;
 
-
   private:
     /**
     * Process the configuration, preparing configured GPIO pin.
@@ -97,6 +97,8 @@ class LibgpiodModule : public BaseModule
     * General configuration for module
     */
     std::shared_ptr<LibgpiodConfig> general_cfg_;
+
+    std::unique_ptr<WSHelperThread> ws_helper_thread_;
 };
 }
 }

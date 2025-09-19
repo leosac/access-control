@@ -25,6 +25,7 @@ doc/output
 # For now we don't care about ODB xml file.
 # Later we'll need them tho.
 src/*/*/*.xml
+src/*/*/*/*.xml
 
 # Python cache
 **/__pycache__

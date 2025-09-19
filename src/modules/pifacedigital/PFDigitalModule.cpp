@@ -183,30 +183,33 @@ void PFDigitalModule::process_xml_config(const boost::property_tree::ptree &cfg)
 {
     boost::property_tree::ptree module_config = cfg.get_child("module_config");
 
-    for (auto &node : module_config.get_child("gpios"))
+    if (module_config.get_child_optional("gpios"))
     {
-        boost::property_tree::ptree gpio_cfg = node.second;
+        for (auto &node : module_config.get_child("gpios"))
+        {
+            boost::property_tree::ptree gpio_cfg = node.second;
 
-        std::string gpio_name      = gpio_cfg.get<std::string>("name");
-        int gpio_no                = gpio_cfg.get<uint8_t>("no");
-        std::string gpio_direction = gpio_cfg.get<std::string>("direction");
-        bool gpio_value            = gpio_cfg.get<bool>("value", false);
-        uint8_t hw_addr            = gpio_cfg.get<uint8_t>("hardware_address", 0);
+            std::string gpio_name      = gpio_cfg.get<std::string>("name");
+            int gpio_no                = gpio_cfg.get<uint8_t>("no");
+            std::string gpio_direction = gpio_cfg.get<std::string>("direction");
+            bool gpio_value            = gpio_cfg.get<bool>("value", false);
+            uint8_t hw_addr            = gpio_cfg.get<uint8_t>("hardware_address", 0);
 
-        INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no
-                              << ". direction = " << gpio_direction
-                              << "Hardware address: " << (int)hw_addr);
+            INFO("Creating GPIO " << gpio_name << ", with no " << gpio_no
+                                << ". direction = " << gpio_direction
+                                << "Hardware address: " << (int)hw_addr);
 
-        PFDigitalPin pin(ctx_, gpio_name, gpio_no,
-                         gpio_direction == "in" ? PFDigitalPin::Direction::In
-                                                : PFDigitalPin::Direction::Out,
-                         gpio_value, hw_addr);
+            PFDigitalPin pin(ctx_, gpio_name, gpio_no,
+                            gpio_direction == "in" ? PFDigitalPin::Direction::In
+                                                    : PFDigitalPin::Direction::Out,
+                            gpio_value, hw_addr);
 
-        if (gpio_direction != "in" && gpio_direction != "out")
-            throw GpioException("Direction (" + gpio_direction + ") is invalid");
-        gpios_.push_back(std::move(pin));
-        utils_->config_checker().register_object(gpio_name,
-                                                 Leosac::Hardware::DeviceClass::GPIO);
+            if (gpio_direction != "in" && gpio_direction != "out")
+                throw GpioException("Direction (" + gpio_direction + ") is invalid");
+            gpios_.push_back(std::move(pin));
+            utils_->config_checker().register_object(gpio_name,
+                                                    Leosac::Hardware::DeviceClass::GPIO);
+        }
     }
 }
 
