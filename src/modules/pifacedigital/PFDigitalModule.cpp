@@ -356,13 +356,6 @@ void WSHelperThread::test_output_pin(const UUID &gpio_id)
 void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
 {
     ws_service.register_handler(
-        [mode = parameters_.degraded_mode](const WebSockAPI::RequestContext) {
-            json j{{"mode", mode}};
-            return j;
-        },
-        "pfdigital.is_degraded_mode");
-
-    ws_service.register_handler(
         [this](const WebSockAPI::RequestContext rc) {
             rc.security_ctx.enforce_permission(SecurityContext::Action::IS_ADMIN,
                                                {});
@@ -378,7 +371,6 @@ void WSHelperThread::register_ws_handlers(WebSockAPI::Service &ws_service)
 
 void WSHelperThread::unregister_ws_handlers(WebSockAPI::Service &ws_service)
 {
-    ws_service.unregister_handler("pfdigital.is_degraded_mode");
     ws_service.unregister_handler("pfdigital.test_output_pin");
 
     // Remove 4 handlers, one for each CRUD operation
