@@ -22,8 +22,8 @@ function die()
 
 function clone()
 {
-    git clone $1
-    pushd access-control
+    git clone $1 leosac
+    pushd leosac
     git checkout $2;
     git submodule init;
     git submodule update;
