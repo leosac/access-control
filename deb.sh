@@ -23,7 +23,7 @@ function die()
 function clone()
 {
     git clone $1
-    pushd leosac
+    pushd access-control
     git checkout $2;
     git submodule init;
     git submodule update;
